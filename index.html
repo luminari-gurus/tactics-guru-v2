@@ -8,7 +8,18 @@
     <title>Tactics Guru v2</title>
   </head>
   <body>
-    <main id="game" aria-label="Tactics Guru game canvas"></main>
+    <main id="game" aria-label="Tactics Guru game canvas" data-ready="false"></main>
+    <aside id="fit-panel" aria-label="Proof scene diagnostics">
+      <div class="fit-controls">
+        <span id="fit-status" role="status" aria-live="polite">Loading</span>
+        <button id="fit-restart" type="button" disabled>Restart proof scene</button>
+      </div>
+      <details>
+        <summary>Measurements</summary>
+        <button id="fit-snapshot" type="button">Refresh measurements</button>
+        <pre id="fit-report">Refresh to capture current measurements.</pre>
+      </details>
+    </aside>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
