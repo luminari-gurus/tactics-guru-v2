@@ -69,7 +69,7 @@ try {
       sourceDirty: Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim()),
       browserVersion: browser.version(),
       host: { platform: platform(), release: release(), arch: arch(), cpu: cpus()[0]?.model, node: process.version },
-      conditions: { url, mode: 'headless Chromium; mobile profiles are emulation', network: 'unthrottled loopback HTTP, no TLS or content compression', cache: 'cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes', frames: 'first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload' },
+      conditions: { url, mode: 'headless Chromium; mobile profiles are emulation', network: 'unthrottled loopback HTTP, no TLS; Vite preview serves precompressed assets when negotiated', cache: 'cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes', frames: 'first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload' },
       buildFiles: await buildFiles('dist'),
       samples,
     };

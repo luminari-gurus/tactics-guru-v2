@@ -1,6 +1,6 @@
 # Tactics Guru v2
 
-Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a responsive startup placeholder; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
+Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a restartable proof-of-fit shell with loading/error status and timing diagnostics; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
 
 ## Requirements
 
@@ -66,4 +66,4 @@ npm run measure:fit
 
 The collector starts its own localhost production preview on port 4174, runs three fresh-context cold loads and same-context warm reloads for desktop and both mobile-emulated orientations, then writes `test-results/fit-baseline.json`. An optional output path follows `npm run measure:fit -- /absolute/path/result.json`. Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` as above if using installed Chrome. Do not run other browser workloads during measurement. The JSON includes source/build commit and dirty state, browser version, network/cache method, exact build-file sizes/SHA-256 hashes, and all samples. A normal build requires the Git checkout to capture its source identity.
 
-Local preview is uncompressed loopback HTTP; actual beta compression, network latency, physical devices and gameplay workload require later evidence in #20 and #11. See [the initial baseline](docs/qa/issue-14-baseline.md). No numerical fit budgets are asserted by this scaffold.
+Local preview uses loopback HTTP and negotiates precompressed assets; actual beta compression, network latency, physical devices and gameplay workload require later evidence in #20 and #11. See [the initial baseline](docs/qa/issue-14-baseline.md). No numerical fit budgets are asserted by this scaffold.
