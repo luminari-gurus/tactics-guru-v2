@@ -4,7 +4,7 @@
 
 - Measured implementation commit: `4b7efb47c5d6aa44d53f517f772b782823d19e08`; clean checkout at build and capture. Raw results and build-file SHA-256 hashes: [issue-14-baseline.json](issue-14-baseline.json).
 - Host: macOS 26.6.2, Intel(R) Core(TM) i5-10600 CPU @ 3.30GHz, x64; Node v26.4.0.
-- Browser: installed Chrome 154.0.8037.98, headless through Playwright. Desktop viewport 1280×720, DPR 1; Pixel 7 emulation 393×727 portrait and 915×412 landscape, DPR 2.75. These profiles are not physical Android or iPhone evidence.
+- Browser: installed Chrome 154.0.8037.98, headless through Playwright. Desktop viewport 1280×720, DPR 1; Pixel 7 emulation 412×839 portrait and 915×412 landscape, DPR 2.625. These profiles are not physical Android or iPhone evidence.
 - Network: `http://127.0.0.1:4174`, production build served by Vite preview; unthrottled loopback HTTP, no TLS. HTTP content compression is negotiated by preview. Build files total 1,382,861 bytes before transfer compression; the Phaser chunk remains about 1.38 MB raw / 358 kB gzip.
 - Three independent contexts per profile. Each context navigates once (cold browser cache), then reloads once (warm browser cache). No routing/interception or network throttling. Host/OS disk caches are not flushed. Warm responses in this run report 300 bytes per resource and zero encoded body bytes on cached assets, consistent with cache revalidation rather than another body transfer.
 - Capture after at least 120 visible scene-update intervals. Statistics use nearest-rank p50/p95 of active intervals after controls are usable. Sampling is bounded to the first 600 intervals per scene run and excludes hidden-tab gaps. This shell is idle; there is no board, animation or combat workload yet.
@@ -33,7 +33,7 @@ All 18 captures had zero console/page errors. Scene/assets-ready is recorded at 
 - An initial run with six parallel headless workers had four boot/readiness timeouts; all checks passed sequentially. The suite now serializes Phaser renderers to avoid host GPU contention; this is not evidence of mobile runtime performance.
 - `git diff --check` — passed.
 - Production baseline collector — 18 cold/warm samples; source/build identity assertions and zero-error assertions passed.
-- Restart screenshots visually checked; the diagnostic controls remain visible and the empty scene fits the resized viewport.
+- Restart screenshot visually checked; the diagnostic controls remain visible and the empty scene fits the resized viewport.
 
 ## Reproduce
 
