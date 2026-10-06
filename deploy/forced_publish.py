@@ -1,4 +1,6 @@
 """Fixed authorized_keys command: bounded JSON line + ZIP bytes + EOF."""
+from contextlib import contextmanager
+import fcntl
 import hashlib
 import io
 import json
@@ -36,6 +38,72 @@ if __name__ == '__main__':
 # -I ignores PYTHONPATH/user site; only our admin-controlled sibling is imported.
 sys.path.insert(0, str(Path(__file__).absolute().parent))
 from release import MAX_MEMBER, MAX_UPLOAD, Rejected, publish, validate_metadata
+
+
+class AdmissionClosed(RuntimeError):
+    """Temporary maintenance denial; the SSH command returns EX_TEMPFAIL."""
+
+
+class PublicationGate:
+    """Root-controlled fixed inode lock outside deploy-writable release storage.
+
+    Explicit owner/boundary injection is for pure tests only. main fixes both
+    paths and UID0; no environment, argv or configuration bypass exists.
+    """
+    def __init__(self, gate='/etc/tg-deploy/admission.gate',
+                 lock='/etc/tg-deploy/publication.lock', *, owner=0, boundary=Path('/')):
+        self.gate=Path(gate); self.lock=Path(lock)
+        self.owner=owner; self.boundary=Path(boundary)
+
+    def open(self, path):
+        path=Path(path)
+        try: parts=path.relative_to(self.boundary).parts
+        except ValueError: raise AdmissionClosed('path boundary') from None
+        if not parts or any(p in ('','..','.') for p in parts):
+            raise AdmissionClosed('path components')
+        fd=os.open(self.boundary,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        try:
+            for i,part in enumerate(parts):
+                s=os.fstat(fd)
+                if s.st_uid!=self.owner or s.st_mode & 0o022:
+                    raise AdmissionClosed('unsafe admission ancestor')
+                following=os.open(part,os.O_RDONLY|os.O_NOFOLLOW |
+                                  (os.O_DIRECTORY if i<len(parts)-1 else os.O_NONBLOCK),dir_fd=fd)
+                os.close(fd); fd=following
+            s=os.fstat(fd)
+            if (not stat.S_ISREG(s.st_mode) or s.st_uid!=self.owner
+                    or s.st_nlink!=1 or stat.S_IMODE(s.st_mode)!=0o644):
+                raise AdmissionClosed('unsafe admission inode')
+            result=fd; fd=None; return result
+        finally:
+            if fd is not None: os.close(fd)
+
+    def enabled(self):
+        fd=self.open(self.gate)
+        try:
+            if os.read(fd,32)!=b'enabled\n': raise AdmissionClosed('maintenance')
+        finally: os.close(fd)
+
+    @contextmanager
+    def publication(self, deadline):
+        self.enabled()
+        fd=self.open(self.lock)
+        try:
+            while True:
+                if time.monotonic()>=deadline: raise AdmissionClosed('admission deadline')
+                try: fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB); break
+                except BlockingIOError: time.sleep(min(.01,max(0,deadline-time.monotonic())))
+            def verify():
+                other=self.open(self.lock)
+                try:
+                    a,b=os.fstat(fd),os.fstat(other)
+                    if (a.st_dev,a.st_ino)!=(b.st_dev,b.st_ino):
+                        raise AdmissionClosed('canonical lock replaced')
+                finally: os.close(other)
+            verify(); self.enabled()
+            yield
+            verify()
+        finally: os.close(fd)
 
 
 def unique_object(pairs):
@@ -88,25 +156,9 @@ def read_frame(stream, timeout=15):
 
 
 def origin_probe(hashes):
-    import urllib.request
-    class NoRedirect(urllib.request.HTTPRedirectHandler):
-        def redirect_request(self, *args):
-            return None
-    def expire(*args):
-        raise OSError('probe deadline')
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
-    previous = signal.signal(signal.SIGALRM, expire)
-    signal.setitimer(signal.ITIMER_REAL, 30)
-    try:
-        for name, digest in [('', hashes['index.html']), *hashes.items()]:
-            req = urllib.request.Request(ORIGIN + '/' + name, headers={'Cache-Control': 'no-cache'})
-            with opener.open(req, timeout=3) as response:
-                if response.status != 200 or hashlib.sha256(response.read(MAX_MEMBER + 1)).hexdigest() != digest:
-                    raise OSError('origin mismatch')
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-        signal.signal(signal.SIGALRM, previous)
-
+    check_code(Path(__file__).with_name('artifact_health.py'))
+    from artifact_health import probe
+    probe(hashes, time.monotonic()+30)
 
 def receive(command, stream, root, probe):
     if command != COMMAND:
@@ -123,9 +175,15 @@ def main():
         info = ROOT.lstat()
         if info.st_uid != os.getuid() or info.st_mode & 0o022 or not stat.S_ISDIR(info.st_mode):
             raise Rejected('storage ownership')
-        result = receive(os.environ.get('SSH_ORIGINAL_COMMAND', ''), sys.stdin.buffer, ROOT, origin_probe)
+        # Gate and canonical root-controlled publication lock precede every
+        # release mutation, including creation of releases/ and its .lock.
+        with PublicationGate().publication(time.monotonic()+20):
+            result = receive(os.environ.get('SSH_ORIGINAL_COMMAND', ''), sys.stdin.buffer, ROOT, origin_probe)
         print(json.dumps(result, sort_keys=True))
         return 0
+    except AdmissionClosed:
+        print('{"status":"maintenance"}')
+        return 75
     except Exception:
         print('{"status":"rejected"}')
         return 1

@@ -11,7 +11,12 @@ RUN apk add --no-cache openssh && adduser -D -u 10001 -s /bin/sh tgdeploy && pas
     && printf 'restrict,command="/usr/local/bin/python3 -I /usr/local/lib/tg-deploy/forced_publish.py" ' > /home/tgdeploy/.ssh/authorized_keys \
     && cat /tmp/test-key.pub >> /home/tgdeploy/.ssh/authorized_keys \
     && chmod 644 /home/tgdeploy/.ssh/authorized_keys
-COPY deploy/forced_publish.py deploy/release.py /usr/local/lib/tg-deploy/
+COPY deploy/forced_publish.py deploy/release.py deploy/artifact_health.py /usr/local/lib/tg-deploy/
+# Root-controlled admission files are not writable by the publication UID.
+RUN mkdir -m 755 /etc/tg-deploy \
+    && printf 'enabled\n' > /etc/tg-deploy/admission.gate \
+    && touch /etc/tg-deploy/publication.lock \
+    && chmod 644 /etc/tg-deploy/admission.gate /etc/tg-deploy/publication.lock
 COPY deploy/test-sshd.conf /etc/ssh/test_sshd_config
 COPY deploy/ /test/
 ENV TG_SSH_INTEGRATION=1

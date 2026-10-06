@@ -1,5 +1,6 @@
 """Real SSH integration inside the disposable test image (never host sshd)."""
 import io
+import hashlib
 import json
 import os
 import socket
@@ -7,6 +8,7 @@ import subprocess
 import tempfile
 import time
 import unittest
+import zipfile
 from pathlib import Path
 import release
 import ssh_upload
@@ -38,6 +40,52 @@ class OpenSSHTests(unittest.TestCase):
 
     def send(self, command, payload=b''):
         return subprocess.run(self.base+[command],input=payload,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=25)
+
+    def assert_rejected_with_stdin_open(self, command, code):
+        process=subprocess.Popen(self.base+[command],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        try:
+            # Do not send EOF: rejection must precede frame consumption.
+            process.wait(timeout=3)
+            self.assertIsNotNone(process.stderr)
+            self.assertEqual(process.returncode,code,process.stderr.read().decode())
+        finally:
+            if process.poll() is None:process.kill()
+            process.communicate(timeout=3)
+
+    def test_fifo_admission_files_root_owned_rejected_with_stdin_open(self):
+        store=Path('/var/lib/tg-deploy')
+        before=sorted(str(p.relative_to(store)) for p in store.rglob('*'))
+        for name in ('admission.gate','publication.lock'):
+            with self.subTest(name=name):
+                path=Path('/etc/tg-deploy')/name; original=path.read_bytes()
+                path.unlink();os.mkfifo(path,0o644);path.chmod(0o644)
+                try:
+                    self.assertEqual(path.stat().st_uid,0)
+                    self.assert_rejected_with_stdin_open('tg-publish-v1',75)
+                finally:
+                    path.unlink();path.write_bytes(original);path.chmod(0o644)
+        self.assertEqual(sorted(str(p.relative_to(store)) for p in store.rglob('*')),before)
+
+    def test_unknown_command_rejected_with_stdin_open(self):
+        self.assert_rejected_with_stdin_open('not-a-publisher-command',1)
+
+    def test_z_maximum_archive_real_http_publication(self):
+        raw=io.BytesIO()
+        names=('index.html','app.js','style.css','assets/data.json')
+        with zipfile.ZipFile(raw,'w',compression=zipfile.ZIP_DEFLATED) as archive:
+            for name in names:archive.writestr(name,b'x'*release.MAX_MEMBER)
+        body=raw.getvalue()
+        meta=dict(repository=release.REPOSITORY,ref='refs/heads/main',sha='c'*40,
+                  event='push',timestamp=int(time.time()),run_number=2,run_attempt=1,deployment_id='9'*20)
+        result=self.send('tg-publish-v1',ssh_upload.frame(body,meta))
+        self.assertEqual(result.returncode,0,result.stderr.decode())
+        self.assertEqual(json.loads(result.stdout),{'status':'published','sha':meta['sha']})
+        current=Path('/var/lib/tg-deploy/current')
+        manifest=json.loads((current/'manifest.json').read_bytes())
+        self.assertEqual(sum((current/name).stat().st_size for name in names),release.MAX_EXPANDED)
+        for name,digest in manifest['hashes'].items():
+            self.assertEqual(hashlib.sha256((current/name).read_bytes()).hexdigest(),digest)
+        self.assertEqual(json.loads((current/'_deployment.json').read_bytes())['deployment_id'],meta['deployment_id'])
 
     def test_publish_real_key_auth_hash_probe_retry_and_stale(self):
         meta = dict(repository=release.REPOSITORY,ref='refs/heads/main',sha='a'*40,
