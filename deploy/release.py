@@ -1,8 +1,8 @@
 """Bounded, authenticated static releases. No archive code is ever executed."""
-import base64
+
 import fcntl
 import hashlib
-import hmac
+
 import io
 import json
 import os
@@ -21,29 +21,16 @@ MAX_MEMBER = 16 * 1024 * 1024
 MAX_MEMBERS = 512
 MAX_AGE = 900
 EXTENSIONS = {'.html', '.js', '.css', '.json', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.woff', '.woff2', '.mp3', '.ogg', '.wav'}
-DOMAIN = b'tactics-guru-static-release-v1\n'
+
 
 
 class Rejected(Exception):
     pass
 
 
-def signed_headers(key, metadata, body):
-    encoded = base64.b64encode(json.dumps(metadata, sort_keys=True, separators=(',', ':')).encode()).decode()
-    signature = hmac.new(key, DOMAIN + encoded.encode() + b'\n' + body, hashlib.sha256).hexdigest()
-    return {'metadata': encoded, 'signature': signature}
-
-
-def validate_headers(headers):
-    """Reject bounded syntax/context before reading an unauthenticated body."""
-    encoded = headers.get('metadata', '')
-    signature = headers.get('signature', '')
-    if not 0 < len(encoded) <= 2048:
-        raise Rejected('bounds')
-    if not re.fullmatch('[0-9a-f]{64}', signature):
-        raise Rejected('signature')
+def validate_metadata(metadata):
+    """Transport authenticates the caller; this fixes publication context."""
     try:
-        metadata = json.loads(base64.b64decode(encoded, validate=True))
         required = {'repository', 'ref', 'sha', 'event', 'timestamp', 'run_number', 'run_attempt', 'deployment_id'}
         if not isinstance(metadata, dict) or set(metadata) != required:
             raise ValueError()
@@ -64,16 +51,6 @@ def validate_headers(headers):
         raise Rejected('metadata') from None
     return metadata
 
-
-def authenticate(key, headers, body):
-    metadata = validate_headers(headers)
-    if len(key) < 32 or len(body) > MAX_UPLOAD:
-        raise Rejected('bounds')
-    encoded = headers['metadata']
-    expected = hmac.new(key, DOMAIN + encoded.encode('ascii') + b'\n' + body, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(headers['signature'], expected):
-        raise Rejected('signature')
-    return metadata
 
 
 def validate_archive(body):
@@ -179,8 +156,10 @@ def audit(root, status, metadata):
     atomic_json(path, entries[-100:])
 
 
-def publish(root, key, headers, body, probe):
-    metadata = authenticate(key, headers, body)
+def publish(root, metadata, body, probe):
+    metadata = validate_metadata(metadata)
+    if not 0 < len(body) <= MAX_UPLOAD:
+        raise Rejected('bounds')
     files = validate_archive(body)
     root = Path(root)
     if root.is_symlink() or not root.is_dir() or root.stat().st_mode & 0o022:

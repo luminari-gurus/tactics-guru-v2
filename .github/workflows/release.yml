@@ -21,19 +21,21 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
-      - name: Receiver security tests
+      - name: Restricted publisher security tests
         run: python3 -m unittest discover -s deploy -v
+      - name: Real isolated OpenSSH security tests
+        run: |
+          docker build -f deploy/Dockerfile.ssh-test -t tg-ssh-test .
+          docker run --rm --network none --security-opt no-new-privileges tg-ssh-test
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm test
-      - name: Verify current main and send signed static archive
+      - name: Verify current main and publish via restricted SSH
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         env:
           GH_TOKEN: ${{ github.token }}
-          TG_DEPLOY_HMAC_KEY: ${{ secrets.TG_DEPLOY_HMAC_KEY }}
-          TG_DEPLOY_CF_ACCESS_CLIENT_ID: ${{ secrets.TG_DEPLOY_CF_ACCESS_CLIENT_ID }}
-          TG_DEPLOY_CF_ACCESS_CLIENT_SECRET: ${{ secrets.TG_DEPLOY_CF_ACCESS_CLIENT_SECRET }}
+          TG_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.TG_DEPLOY_SSH_PRIVATE_KEY }}
         run: |
           set -eu
           latest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
@@ -41,4 +43,4 @@ jobs:
             printf '%s\n' 'Superseded main build: not deployed'
             exit 0
           fi
-          python3 deploy/upload.py
+          python3 deploy/ssh_upload.py

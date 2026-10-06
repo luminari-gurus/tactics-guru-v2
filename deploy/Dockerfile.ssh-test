@@ -1,0 +1,19 @@
+# Disposable integration fixture only. No production mounts, socket or ports.
+FROM python:3.13-alpine@sha256:2d9aefe2fef018a7eb2c13064c89c71929800fd2e5dccdbf52ea5da5bb8d929a
+RUN apk add --no-cache openssh && adduser -D -u 10001 -s /bin/sh tgdeploy && passwd -d tgdeploy \
+    && mkdir -p /usr/local/lib/tg-deploy /var/lib/tg-deploy /home/tgdeploy/.ssh /run/sshd \
+    && chown 10001:10001 /var/lib/tg-deploy \
+    && chown root:root /home/tgdeploy /home/tgdeploy/.ssh \
+    && chmod 755 /home/tgdeploy /home/tgdeploy/.ssh \
+    && ssh-keygen -q -t ed25519 -N '' -f /tmp/test-key \
+    && ssh-keygen -A \
+    && printf '127.0.0.1 ' > /tmp/test-known-hosts && cat /etc/ssh/ssh_host_ed25519_key.pub >> /tmp/test-known-hosts \
+    && printf 'restrict,command="/usr/local/bin/python3 -I /usr/local/lib/tg-deploy/forced_publish.py" ' > /home/tgdeploy/.ssh/authorized_keys \
+    && cat /tmp/test-key.pub >> /home/tgdeploy/.ssh/authorized_keys \
+    && chmod 644 /home/tgdeploy/.ssh/authorized_keys
+COPY deploy/forced_publish.py deploy/release.py /usr/local/lib/tg-deploy/
+COPY deploy/test-sshd.conf /etc/ssh/test_sshd_config
+COPY deploy/ /test/
+ENV TG_SSH_INTEGRATION=1
+WORKDIR /test
+CMD ["python3", "-m", "unittest", "test_openssh", "-v"]

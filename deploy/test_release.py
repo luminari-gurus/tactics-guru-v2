@@ -19,7 +19,7 @@ class ReleaseTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.key = b'x' * 32
+
         self.meta = dict(repository='luminari-gurus/tactics-guru-v2', ref='refs/heads/main',
                          sha='a' * 40, event='push', timestamp=int(time.time()),
                          run_number=1, run_attempt=1, deployment_id='123')
@@ -34,8 +34,7 @@ class ReleaseTests(unittest.TestCase):
     def deliver(self, body=None, meta=None, probe=None):
         body = self.archive() if body is None else body
         meta = self.meta if meta is None else meta
-        headers = release.signed_headers(self.key, meta, body)
-        return release.publish(self.root, self.key, headers, body, probe or (lambda files: None))
+        return release.publish(self.root, meta, body, probe or (lambda files: None))
 
     def test_publish_hashes_and_idempotency(self):
         self.assertEqual(self.deliver()['status'], 'published')
@@ -44,16 +43,10 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(self.deliver()['status'], 'idempotent')
         self.assertEqual((self.root / 'current').resolve(), target)
 
-    def test_bad_signature_and_bound_metadata(self):
-        body = self.archive()
-        headers = release.signed_headers(self.key, self.meta, body)
-        for field in ('signature', 'metadata'):
-            bad = dict(headers)
-            bad[field] += 'x'
-            with self.subTest(field=field), self.assertRaises(release.Rejected):
-                release.publish(self.root, self.key, bad, body, lambda files: None)
-        with self.assertRaises(release.Rejected):
-            release.publish(self.root, self.key, headers, body + b'x', lambda files: None)
+    def test_metadata_shape_bound(self):
+        for meta in [[], {**self.meta, 'extra': 1}, {'sha': 'a'*40}]:
+            with self.subTest(meta=meta), self.assertRaises(release.Rejected):
+                self.deliver(meta=meta)
 
     def test_wrong_context_stale_and_invalid_types(self):
         for field, value in [('repository', 'evil/repo'), ('ref', 'refs/heads/dev'),
