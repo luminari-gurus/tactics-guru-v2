@@ -29,7 +29,7 @@ Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4
 
 ## Rendering and lifecycle
 
-The 4×4 diagnostic board retains generated side faces and uses a derived transparent grass surface. The renderer selects its alpha bounding frame and scales it to the shared 80×40 top-surface dimensions with a centered anchor. Per-tile diamond geometry masks prevent irregular alpha edges from spilling onto adjacent columns. Tree uses a base anchor and Fighter a foot anchor.
+The 4×4 diagnostic board retains generated side faces and uses a derived transparent grass surface. The renderer excludes noisy alpha bounds and uses a 1510×755 interior crop (exactly 2:1) with a centered anchor. Both image axes use the same scale, yielding 82×41 logical pixels. A one-pixel horizontal bleed is clipped to the shared 80×40 tile diamond. Per-tile diamond geometry masks prevent irregular alpha edges from spilling onto adjacent columns. Tree uses a base anchor and Fighter a foot anchor.
 
 Complete tile columns, surface art and occupants share stable grid-depth slots with the existing sum/y/x ordering. Elevation changes projected position, not depth priority. The fixed fixture buttons show one Fighter and one tree at a time. Ground fixtures use a tree at (2,0), elevation 0; raised fixtures use (1,1), elevation 1. The raised front Fighter stands on the existing elevation-2 tile at (2,2). Ground fixtures have ±28 logical-pixel foot offsets inside their tiles to make canopy overlap visible. They are diagnostic positions, not tactical moves.
 
@@ -42,7 +42,7 @@ Phaser owns the container and its 34 children (16 side/top graphics, 16 grass im
 - RED-first: the two new desktop browser checks failed against the old scene: missing portrait and no controlled asset-load failure. The typed diagnostic contract was added before executing these behavior failures.
 - `npm run test:unit`: all 12 existing geometry/measurement tests passed.
 - `npm run build`: strict TypeScript check and production build passed; existing Phaser bundle-size warning remains.
-- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`: all 21 checks passed across configured desktop and mobile-emulated portrait/landscape projects. New checks exercise actual fixture buttons, assert asset count/near-far depth/elevation, verify a decoded portrait, repeat restart three times, and abort the Fighter request to verify controlled errors. Existing checks cover complete board bounds, resize, readiness and lifecycle.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`: all 24 checks passed across configured desktop and mobile-emulated portrait/landscape projects. New checks exercise actual fixture buttons, assert asset count/near-far depth/elevation, verify a decoded portrait, repeat restart three times, and abort the Fighter request to verify controlled errors. Existing checks cover complete board bounds, resize, readiness and lifecycle.
 - `git diff --check`: passed.
 
 Representative screenshots are linked below. Visual review checks grass alignment, readable Fighter/portrait, visible near/far canopy overlap and complete-board framing. Physical iPhone/Android acceptance remains in #20; these Chromium screenshots are supporting evidence.
@@ -59,8 +59,14 @@ Representative screenshots are linked below. Visual review checks grass alignmen
 `public/proof/grass-surface.png` is a built-in ImageGen edit of the original `art/tiles/grass_detailed_N.png`. The original remains byte-identical in `public/proof/grass.png` and in the read-only legacy checkout. The edit removes dirt walls, orange underside and opaque black bands. It has genuine RGBA transparency; inspection found no opaque pure-black pixels. Because ImageGen changes small texture details, this is an edited derivative rather than a pixel-exact crop of the canonical image.
 
 - PNG dimensions: 1774×887; alpha bounds: (71,20) to (1758,869).
-- Renderer frame: x=71, y=20, width=1687, height=849; display: 80×40; origin: center.
+- Renderer frame: x=130, y=62, width=1510, height=755 (2:1); uniform scale: 82/1510; display before clipping: 82×41; masked visible diamond: 80×40; origin: center.
 - SHA-256: `f4840886a8b68a4ecac4eb5a7ebb694d51a4184d91936510290ffdf67ccd2509`.
 - Bytes: 1,093,498. The larger edited asset is recorded for subsequent loading measurements.
 - Method and final prompt: [grass-surface-prompt.md](issue-16/grass-surface-prompt.md).
 - Visual comparison confirms that the old black bands and detached grass lips are removed. All four fixtures are recaptured below using the new surface.
+
+## Aspect-ratio and coverage correction
+
+The previous alpha bounding frame measured 1687×849 (1.987:1) and included transparent padding and edge specks. Its actual grass diamond did not fill that rectangle, leaving exposed top-face color. The corrected runtime crop is 1510×755 (exactly 2:1) at (130,62), chosen inside the solid grass. Uniform scaling and clipped bleed fill the whole visible diamond without skewing the texture. The PNG bytes remain unchanged.
+
+`tests/grass-surface.spec.ts` first failed against the old mapping on both aspect ratio and uncovered alpha samples. It now asserts exact 2:1 framing and inspects the real decoded PNG alpha at sampled pixel centers throughout the target diamond, including edges and vertices. All sampled points have alpha ≥250. Updated desktop/portrait/landscape screenshots show covered top faces; gray vertical faces are the authored elevation sides.

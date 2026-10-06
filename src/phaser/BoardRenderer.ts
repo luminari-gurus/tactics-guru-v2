@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
 import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, TILE_WIDTH } from '../geometry/iso';
 
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
@@ -14,6 +14,7 @@ export class BoardRenderer {
   constructor(scene: Phaser.Scene) {
     this.root = scene.add.container();
     const frame = PROOF_ART.grass.frame;
+    const surfaceScale = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / frame.width;
     if (!scene.textures.get('grass').has('surface')) scene.textures.get('grass').add('surface', 0, frame.x, frame.y, frame.width, frame.height);
     const drawFace = (graphics: Phaser.GameObjects.Graphics, points: readonly Point[], color: number): void => {
       const vertices = points.map(point => new Phaser.Math.Vector2(point.x, point.y));
@@ -28,8 +29,9 @@ export class BoardRenderer {
       drawFace(graphics, faces.top, 0x638b82);
       const point = projectTile(tile);
       const grass = scene.add.image(point.x, point.y, 'grass', 'surface')
-        .setOrigin(0.5).setDisplaySize(TILE_WIDTH, TILE_HEIGHT).setDepth(proofDepth(tile, 1));
-      // The edit has a slightly irregular alpha edge; geometry guarantees a tile-sized diamond.
+        .setOrigin(0.5).setScale(surfaceScale)
+        .setDepth(proofDepth(tile, 1));
+      // Uniform scaling plus a small bleed fills the diamond; the mask clips excess coverage.
       const mask = scene.add.graphics().setVisible(false);
       mask.fillStyle(0xffffff).fillPoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
       grass.setMask(mask.createGeometryMask());
