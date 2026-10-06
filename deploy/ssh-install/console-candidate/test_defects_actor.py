@@ -75,7 +75,15 @@ class Defects(NativeSSH):
  def activation_case(self,point,uncertain=False):
   gate=Path('/etc/tg-deploy/admission.gate');key=Path('/etc/tg-deploy/authorized_keys')
   gate.write_bytes(b'maintenance\n');key.write_bytes(self.key)
-  fence=Fence(lambda:None,session.stamp(self.daemon.pid),self.original/'.lock',approved_key=self.key)
+  def maintenance():
+   if point=='lease-expiry' and (fired or gate.read_bytes()==b'enabled\n'):
+    if not fired:fired.append(point)
+    raise p.Invalid('maintenance lease expired')
+  fence=Fence(maintenance,session.stamp(self.daemon.pid),self.original/'.lock',approved_key=self.key)
+  # Real installed-file identity checks also require the maintenance lease.
+  def key_check():
+   maintenance();s=key.stat();return s.st_dev,s.st_ino
+  fence.key_check=key_check
   class Stage:
    def apply(s,d):pass
   engine=Lifecycle(self.base/'lifecycle','a'*64,{n:Stage() for n in PHASES},fence)
@@ -111,13 +119,14 @@ class Defects(NativeSSH):
    if uncertain:raise OSError('closure unavailable')
    return original_disable(d)
   with patch.object(p,'sync',sync),patch.object(p,'read',read),patch.object(os,'fsync',fsync),patch.object(engine,'save',save),patch.object(session.Held,'verify',verify),patch.object(fence,'disable',disable):
-   with self.assertRaises(OSError):engine.activate(time.monotonic()+10,lambda:None,lambda d:None,'ACTIVATE '+'a'*64)
+   with self.assertRaises((OSError,p.Invalid)):engine.activate(time.monotonic()+10,lambda:None,lambda d:None,'ACTIVATE '+'a'*64)
   self.assertEqual(locks,[True])
   self.assertEqual(fired,[point])
   if uncertain:self.assertEqual(engine.state()['status'],'activation-uncertain')
   else:
    self.assertEqual(gate.read_bytes(),b'maintenance\n');self.assertEqual(key.read_bytes(),b'')
-   self.assertEqual(engine.state()['status'],'activation-failed-closed')
+   self.assertEqual(engine.state()['status'],'activation-uncertain' if point=='lease-expiry' else 'activation-failed-closed')
+ def test_lease_expiry_after_enable_closes_gate_and_revokes_owned_key(self):self.activation_case('lease-expiry')
  def test_gate_file_fsync(self):self.activation_case('file-fsync')
  def test_gate_parent_fsync(self):self.activation_case('parent-fsync')
  def test_gate_readback(self):self.activation_case('readback')

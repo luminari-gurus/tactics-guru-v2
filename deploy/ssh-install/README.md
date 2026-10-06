@@ -240,6 +240,10 @@ proof. Catchable activation failures attempt gate closure and owned-key revocati
 before releasing the publication/legacy fence, with one bounded compensation
 attempt and no automatic activation retry. Confirmed compensation is journaled
 `activation-failed-closed`; unconfirmed closure/revocation is `activation-uncertain`.
+An expired or unreadable maintenance lease does not skip these cleanup attempts.
+Compensation retains the key device/inode captured before enabling admission and
+preserves a foreign replacement. Lease failure still records `activation-uncertain`,
+even if the gate/key readback shows closure; reestablish exclusion before recovery.
 A hard crash, lost response or unavailable journal storage is **not atomic** with
 the admission change: the gate may be enabled and the journal may still say
 `activating` (or retain a stale `activated` value). A failed CLI command is never

@@ -9,13 +9,13 @@
     "deploy/nginx.conf": "73d86b9f5a698aa25a73a4b54f2be8929662f07f687abf0d5d5b367b77978f24",
     "deploy/release.py": "16144bc87705ab70f44444da1f9736da8d557b2547f45a7444264e0f6a971e99",
     "deploy/ssh-install/.gitignore": "793e838870a35fc0befc479615359cbba20a24c1ba3c4c7b0c35e88e0e565b87",
-    "deploy/ssh-install/PACKAGING.md": "aa1437db63c2a46dcdb25e2e91e15af98a64a9030e754080581ddef0ff99b271",
-    "deploy/ssh-install/README.md": "35cd191024e7385730fdbbaf47b2bab6306cf9f22cbef804218ab2c08bb23802",
+    "deploy/ssh-install/PACKAGING.md": "6379dd12dc48166a185470b6d23eadb1e2cf76ce3ee527d0bd0dbf7f83923bd6",
+    "deploy/ssh-install/README.md": "ad464d696751ae7c49803d3db87aec3b333dc1ab1d869228034567d172e2ab32",
     "deploy/ssh-install/console-candidate/bootstrap_stage.py": "08a00ff5bde4824e0a77a0274884e21fbe07fd70ed690fce744f41af1fcd48e8",
     "deploy/ssh-install/console-candidate/candidate_plan.py": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996",
     "deploy/ssh-install/console-candidate/console_cli.py": "2d7832e7a8b3ff6f907ec3577014b83dcf5635f3de26ebd692263245a9716bfe",
     "deploy/ssh-install/console-candidate/console_lifecycle.py": "db6006df94774487d98d0d554c86eb41a0072b16c589bf4407dac81479b1948c",
-    "deploy/ssh-install/console-candidate/host_console_backend.py": "a6fdf07a7a8583bde0db1187d6f80d39b9edffd78273636be5743346db911130",
+    "deploy/ssh-install/console-candidate/host_console_backend.py": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
     "deploy/ssh-install/console-candidate/host_inventory.py": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3",
     "deploy/ssh-install/console-candidate/host_policy.py": "af42bf44e87296228dc09503079c25960bd73235b030aa316f45b96ecd3e461f",
     "deploy/ssh-install/console-candidate/run_defects_candidate.py": "e3765e813063930afb40b509bf0c23a490bca042f13832222111264ca26ed1fc",
@@ -23,9 +23,9 @@
     "deploy/ssh-install/console-candidate/run_integrated_matrix.py": "196edcbabf3e3290b567b794cdb0ef908b066223b9cc8b0ffd04b0a5d9215f6f",
     "deploy/ssh-install/console-candidate/run_native_candidate.py": "ac1a4bdbcc5a4db7bf9d921d9d53622267a6bd0b458b761dc222f3062d112a72",
     "deploy/ssh-install/console-candidate/ssh_acceptance.py": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7",
-    "deploy/ssh-install/console-candidate/test_activation.py": "f5673e2c7e45207cc5311033ffe1ddafc8fb83de31c250618f0cac35e97d3567",
+    "deploy/ssh-install/console-candidate/test_activation.py": "b1b8042d7a36322427e7723e930ba386c0bc3ba3206adf1e7f97178e237483c2",
     "deploy/ssh-install/console-candidate/test_candidate.py": "3ce7c9d2fb70d133105fd081b8ff30f577b2fb435709471a3d0eeccc2e6c4ae9",
-    "deploy/ssh-install/console-candidate/test_defects_actor.py": "1a3b4741ead2b465e9beaa6d008501238de3481ccaa8f14461cf276f9dcf35fe",
+    "deploy/ssh-install/console-candidate/test_defects_actor.py": "28212f2a9e8aff4b3884698e2a9c5a4acff0f7802eb0cc76dd6a71c888695542",
     "deploy/ssh-install/console-candidate/test_integrated_actor.py": "44d0bcbd162dc145d7ea77d7e03c6f8965b108b2971c7858e9722989feca8c48",
     "deploy/ssh-install/console-candidate/test_inventory.py": "8088453a745309587e3a6710dfa5e3c64b87acd62ae8c80ed597b88ad4104e8b",
     "deploy/ssh-install/console-candidate/test_lifecycle.py": "6bcc4b20edd3cfe8545baa74570ac70c8a1828a4e491370c4c23b266c766493d",
@@ -53,7 +53,7 @@
   "installation_ready": false,
   "new_regression_files": {
     "deploy/ssh-install/console-candidate/run_defects_candidate.py": "e3765e813063930afb40b509bf0c23a490bca042f13832222111264ca26ed1fc",
-    "deploy/ssh-install/console-candidate/test_defects_actor.py": "1a3b4741ead2b465e9beaa6d008501238de3481ccaa8f14461cf276f9dcf35fe"
+    "deploy/ssh-install/console-candidate/test_defects_actor.py": "28212f2a9e8aff4b3884698e2a9c5a4acff0f7802eb0cc76dd6a71c888695542"
   },
   "predecessor_mapping": [
     {
@@ -87,7 +87,7 @@
     {
       "changed_from_predecessor": true,
       "packaged": "deploy/ssh-install/console-candidate/host_console_backend.py",
-      "packaged_sha256": "a6fdf07a7a8583bde0db1187d6f80d39b9edffd78273636be5743346db911130",
+      "packaged_sha256": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
       "predecessor": "console-candidate/host_console_backend.py",
       "predecessor_sha256": "9650c8aa811fea141a03c2364457ba840826ca69178f73384cbde37c9ac0f22e"
     },
@@ -134,9 +134,9 @@
       "predecessor_sha256": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7"
     },
     {
-      "changed_from_predecessor": false,
+      "changed_from_predecessor": true,
       "packaged": "deploy/ssh-install/console-candidate/test_activation.py",
-      "packaged_sha256": "f5673e2c7e45207cc5311033ffe1ddafc8fb83de31c250618f0cac35e97d3567",
+      "packaged_sha256": "b1b8042d7a36322427e7723e930ba386c0bc3ba3206adf1e7f97178e237483c2",
       "predecessor": "console-candidate/test_activation.py",
       "predecessor_sha256": "f5673e2c7e45207cc5311033ffe1ddafc8fb83de31c250618f0cac35e97d3567"
     },
@@ -239,7 +239,7 @@
       "predecessor_sha256": "7fca1d400a35a2b559dcd64f53fab401a65e7f362831b057aecb63adf285e8e7"
     }
   ],
-  "production_canonical_sha256": "b102ba862b4b59c47b531a1599afb897e1d3603bdda4a9dfc1d43a5b28c76a64",
+  "production_canonical_sha256": "4017df2d5c8a952fde63e9092de7a7708795ec67d61403930a3ba6c1382ba438",
   "production_sources": {
     "deploy/artifact_health.py": "3e36755adc2f6ec33decf8ec476312098daac782574cb726e2b75c39837cdc7a",
     "deploy/forced_publish.py": "47354fe0bd060bba22e6a181896ff2ed7c12b79a02a1cb9624656512b0483196",
@@ -248,7 +248,7 @@
     "deploy/ssh-install/console-candidate/candidate_plan.py": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996",
     "deploy/ssh-install/console-candidate/console_cli.py": "2d7832e7a8b3ff6f907ec3577014b83dcf5635f3de26ebd692263245a9716bfe",
     "deploy/ssh-install/console-candidate/console_lifecycle.py": "db6006df94774487d98d0d554c86eb41a0072b16c589bf4407dac81479b1948c",
-    "deploy/ssh-install/console-candidate/host_console_backend.py": "a6fdf07a7a8583bde0db1187d6f80d39b9edffd78273636be5743346db911130",
+    "deploy/ssh-install/console-candidate/host_console_backend.py": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
     "deploy/ssh-install/console-candidate/host_inventory.py": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3",
     "deploy/ssh-install/console-candidate/host_policy.py": "af42bf44e87296228dc09503079c25960bd73235b030aa316f45b96ecd3e461f",
     "deploy/ssh-install/console-candidate/ssh_acceptance.py": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7",

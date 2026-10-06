@@ -18,6 +18,12 @@ All 26 copied installer/dependency/test Python files were checked against that p
 
 New files: portability tests, isolated publisher driver (fresh fixture keys, existing pinned equipped image), generated-output ignore rules, operator runbook, this provenance note, `SOURCE-MANIFEST.json` and `SHA256SUMS`. R1/R2 additionally introduce `console-candidate/test_defects_actor.py` and its explicit confined driver `console-candidate/run_defects_candidate.py`; these have no copied predecessor. The manifest enumerates all 26 predecessor mappings with current hashes and explicit changed/unchanged classification, the two new regression files, and the named 18-file production canonical map. Existing `deploy/README.md` now links the public runbook and removes obsolete unfinished requirements. No CI workflow change is introduced by packaging; package-specific commands are explicitly listed in the runbook and exercised locally, not claimed as newly wired CI checks.
 
+The subsequent lease-expiry compensation fix changes `host_console_backend.py`,
+adds lifecycle regressions in `test_activation.py`, and extends the confined
+`test_defects_actor.py` suite. Closure attempts survive maintenance validation
+failure and retain the activation-bound key inode; forward approval requirements
+are unchanged. The manifests below bind these updated bytes.
+
 ## Exact-review contract
 
 Authenticate `SHA256SUMS` by its separately supplied manifest SHA256, then verify it from the repository root. It includes all public deploy files plus the existing release workflow and excludes itself/generated evidence. The external handoff also binds the baseline Git HEAD, every public path/mode/hash, complete tracked and untracked diff and validation receipts. Any edit invalidates that handoff.

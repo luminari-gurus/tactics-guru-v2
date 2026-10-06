@@ -96,7 +96,10 @@ class Fence:
   if raw!=b'maintenance\n' or meta['mode']!=0o644:raise p.Invalid('publication gate must remain CLOSED')
   self.maintenance()
  def disable(self,d):
-  self.maintenance();errors=[]
+  errors=[]
+  # Lease failure is diagnostic, never a reason to skip emergency closure.
+  try:self.maintenance()
+  except Exception as exc:errors.append(exc)
   try:
    fd=session.secure_open(str(self.gate),os.O_RDWR)
    try:
@@ -110,7 +113,10 @@ class Fence:
   try:
    if time.monotonic()>=d:raise p.Invalid('closure deadline')
    check=getattr(self,'key_check',None)
-   if check is not None:self.activation_key_identity=check()
+   # enable() already bound the activation key. Reuse that identity during
+   # compensation: the journal adapter itself requires a still-valid lease.
+   # Never rebind to a replacement inode after admission has been enabled.
+   if check is not None and getattr(self,'activation_key_identity',None) is None:self.activation_key_identity=check()
    fd=session.secure_open(str(self.key),os.O_RDWR)
    try:
     s=os.fstat(fd);identity=getattr(self,'activation_key_identity',None)
