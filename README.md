@@ -1,6 +1,6 @@
 # Tactics Guru v2
 
-Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a restartable proof-of-fit shell with loading/error status and timing diagnostics; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
+Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a restartable proof-of-fit diagnostic with a fixed elevated isometric board, loading/error status and timing diagnostics; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
 
 ## Requirements
 
@@ -42,10 +42,12 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 ## Layout
 
 - `src/main.ts`: diagnostic shell, status and controls
-- `src/phaser/{start,FitScene}.ts`: Phaser game and restartable proof scene
+- `src/phaser/{start,FitScene,BoardRenderer}.ts`: Phaser game, proof scene and shape-based tile renderer
+- `src/geometry/iso.ts`: pure projection, joined tile faces, stable depth order and viewport fitting
+- `src/diagnostics/boardFixture.ts`: immutable authored 4×4 fixture with elevations 0, 1 and 2
 - `src/diagnostics/`: navigation-relative timings, transfer sizes and bounded active frame sampling
 - `src/style.css`: full-viewport canvas container
-- `tests/{boot,engine-fit}.spec.ts`: production-browser boot/resize and proof-scene checks
+- `tests/{boot,engine-fit,board}.spec.ts`: production-browser boot/resize, proof-scene and board checks
 - `tests/unit/`: Node-only unit tests, including measurement reset and visibility behavior
 - `playwright.config.ts`: desktop and mobile-emulated test projects
 
@@ -67,3 +69,9 @@ npm run measure:fit
 The collector starts its own localhost production preview on port 4174, runs three fresh-context cold loads and same-context warm reloads for desktop and both mobile-emulated orientations, then writes `test-results/fit-baseline.json`. An optional output path follows `npm run measure:fit -- /absolute/path/result.json`. Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` as above if using installed Chrome. Do not run other browser workloads during measurement. The JSON includes source/build commit and dirty state, browser version, network/cache method, exact build-file sizes/SHA-256 hashes, and all samples. A normal build requires the Git checkout to capture its source identity.
 
 Local preview uses loopback HTTP and negotiates HTTP content compression; actual beta compression, network latency, physical devices and gameplay workload require later evidence in #20 and #11. See [the initial baseline](docs/qa/issue-14-baseline.md). No numerical fit budgets are asserted by this scaffold.
+
+## Diagnostic board
+
+The board uses generated filled polygons, with named 80×40 tile dimensions, 24-pixel elevation steps and a common 12-pixel base. Complete columns draw back to front by grid depth (`x + y`), then by `y` and `x` for deterministic ties; elevation shifts the top surface instead of changing this order. The immutable elevation table is a diagnostic fixture, not gameplay content or a procedural map.
+
+Resize fits every top and side face below the current diagnostics panel with a 16-pixel margin. The Measurements snapshot includes tile count, elevation levels, scale and rendered board bounds. No selection, camera gestures, units or movement are implemented here. See [issue #15 visual QA](docs/qa/issue-15-board.md).
