@@ -3,11 +3,11 @@
 ## Source and selected files
 
 Read-only source: local `tactics-guru` repository, revision `9303d9916d99e7bf4ecda36b55fbb038983af834`.
-The source checkout was clean; each copied PNG was checked against the Git blob at that revision. Only these four runtime images were copied, unchanged. No Godot resources or gameplay catalogs were imported.
+The source checkout was clean; each copied PNG was checked against the Git blob at that revision. These four canonical images were copied unchanged. The runtime now substitutes the user-requested transparent grass derivative described below for the original grass slab. No Godot resources or gameplay catalogs were imported.
 
 | Legacy source | Proof file under `public/proof/` | Source pixels | Display size before board fit | Anchor in source pixels |
 | --- | --- | --- | --- | --- |
-| `art/tiles/grass_detailed_N.png` | `grass.png` | 256 × 352 | 88 × 121 | (128, 226); render crop (0,170,256,106), top only |
+| `art/tiles/grass_detailed_N.png` | `grass.png` | 256 × 352 | Archived original; not loaded | Original preserved |
 | `art/tiles/tree_single_detailed_N.png` | `tree.png` | 256 × 352 | 80 × 110 | (128, 170), base center |
 | `art/units/fighter.png` | `fighter.png` | 64 × 80 | 40 × 50 | (32, 76), feet |
 | `art/portraits/fighter_portrait.png` | `fighter-portrait.png` | 1254 × 1254 | 48 × 48 CSS | DOM image, full frame |
@@ -19,7 +19,7 @@ The source checkout was clean; each copied PNG was checked against the Git blob 
 | `fighter.png` | 8,843 | `b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981` |
 | `fighter-portrait.png` | 3,285,110 | `712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190` |
 
-Total selected PNG bytes: **3,388,616**. The unchanged portrait accounts for 3,285,110 bytes. This increment records that cost; #20 measures deployed cold/warm performance and sets budgets.
+Original canonical PNG bytes: **3,388,616**. Current loaded PNG bytes, including the grass derivative: **4,436,206**. The unchanged portrait accounts for 3,285,110 bytes. This increment records that cost; #20 measures deployed cold/warm performance and sets budgets.
 
 ## License and provenance status
 
@@ -29,13 +29,13 @@ Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4
 
 ## Rendering and lifecycle
 
-The 4×4 diagnostic board retains generated side faces and uses the canonical grass top art. Render-only cropping hides the legacy base slab, avoiding duplicate elevation geometry; source PNG bytes stay unchanged. Grass uses a top-face anchor, tree a base anchor, and Fighter a foot anchor.
+The 4×4 diagnostic board retains generated side faces and uses a derived transparent grass surface. The renderer selects its alpha bounding frame and scales it to the shared 80×40 top-surface dimensions with a centered anchor. Per-tile diamond geometry masks prevent irregular alpha edges from spilling onto adjacent columns. Tree uses a base anchor and Fighter a foot anchor.
 
 Complete tile columns, surface art and occupants share stable grid-depth slots with the existing sum/y/x ordering. Elevation changes projected position, not depth priority. The fixed fixture buttons show one Fighter and one tree at a time. Ground fixtures use a tree at (2,0), elevation 0; raised fixtures use (1,1), elevation 1. The raised front Fighter stands on the existing elevation-2 tile at (2,2). Ground fixtures have ±28 logical-pixel foot offsets inside their tiles to make canopy overlap visible. They are diagnostic positions, not tactical moves.
 
-Layout fits the union of all fixtures and full image rectangles below the panel, including transparent padding. The portrait displays separately in the panel. The four unique selected assets load through Phaser; the DOM portrait uses the same cached URL because Phaser revokes its temporary loader blob URL. Controls wait for both a rendered frame and the decoded DOM portrait. A failed asset produces a visible error with reload instructions and disabled scene controls.
+Layout fits the union of all fixtures and full image rectangles below the panel, including transparent padding. The portrait displays separately in the panel. The four selected runtime images load through Phaser; the DOM portrait uses the same cached URL because Phaser revokes its temporary loader blob URL. Controls wait for both a rendered frame and the decoded DOM portrait. A failed asset produces a visible error with reload instructions and disabled scene controls.
 
-Phaser owns the container and its 34 children (16 side/top graphics, 16 grass images, one tree and one hero); scene shutdown destroys them. Explicit shutdown removes fixture, portrait, resize, post-render and visibility listeners and disconnects the panel observer. Four cached textures are game-owned and reused across scene restarts. Restart returns to ground-behind and clears scene diagnostics.
+Phaser owns the container and its 34 children (16 side/top graphics, 16 grass images, one tree and one hero), plus 16 scene-owned mask graphics: 51 objects in total; scene shutdown destroys them. Explicit shutdown removes fixture, portrait, resize, post-render and visibility listeners and disconnects the panel observer. Four cached textures are game-owned and reused across scene restarts. Restart returns to ground-behind and clears scene diagnostics.
 
 ## Verification
 
@@ -53,3 +53,14 @@ Representative screenshots are linked below. Visual review checks grass alignmen
 | ground-front | [image](issue-16/desktop-ground-front.png) | [image](issue-16/mobile-portrait-ground-front.png) | [image](issue-16/mobile-landscape-ground-front.png) |
 | raised-behind | [image](issue-16/desktop-raised-behind.png) | [image](issue-16/mobile-portrait-raised-behind.png) | [image](issue-16/mobile-landscape-raised-behind.png) |
 | raised-front | [image](issue-16/desktop-raised-front.png) | [image](issue-16/mobile-portrait-raised-front.png) | [image](issue-16/mobile-landscape-raised-front.png) |
+
+## Transparent grass derivative (user-requested follow-up)
+
+`public/proof/grass-surface.png` is a built-in ImageGen edit of the original `art/tiles/grass_detailed_N.png`. The original remains byte-identical in `public/proof/grass.png` and in the read-only legacy checkout. The edit removes dirt walls, orange underside and opaque black bands. It has genuine RGBA transparency; inspection found no opaque pure-black pixels. Because ImageGen changes small texture details, this is an edited derivative rather than a pixel-exact crop of the canonical image.
+
+- PNG dimensions: 1774×887; alpha bounds: (71,20) to (1758,869).
+- Renderer frame: x=71, y=20, width=1687, height=849; display: 80×40; origin: center.
+- SHA-256: `f4840886a8b68a4ecac4eb5a7ebb694d51a4184d91936510290ffdf67ccd2509`.
+- Bytes: 1,093,498. The larger edited asset is recorded for subsequent loading measurements.
+- Method and final prompt: [grass-surface-prompt.md](issue-16/grass-surface-prompt.md).
+- Visual comparison confirms that the old black bands and detached grass lips are removed. All four fixtures are recaptured below using the new surface.

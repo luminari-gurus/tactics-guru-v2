@@ -1,13 +1,13 @@
 import { BOARD_SIZE } from './boardFixture';
 // Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
 export const PROOF_ASSETS = [
-  { key: 'grass', url: '/proof/grass.png' },
+  { key: 'grass', url: '/proof/grass-surface.png' },
   { key: 'tree', url: '/proof/tree.png' },
   { key: 'fighter', url: '/proof/fighter.png' },
   { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
 ] as const;
 export const PROOF_ART = {
-  grass: { width: 88, height: 121, originY: 226 / 352, crop: { x: 0, y: 170, width: 256, height: 106 } },
+  grass: { frame: { x: 71, y: 20, width: 1687, height: 849 } },
   tree: { width: 80, height: 110, originY: 170 / 352 },
   fighter: { width: 40, height: 50, originY: 76 / 80 },
 } as const;

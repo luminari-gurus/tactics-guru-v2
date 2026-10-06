@@ -2,16 +2,19 @@ import Phaser from 'phaser';
 import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
 import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
 
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly hero: Phaser.GameObjects.Image;
   private readonly prop: Phaser.GameObjects.Image;
   private readonly bounds: Bounds;
+  private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
 
   constructor(scene: Phaser.Scene) {
     this.root = scene.add.container();
+    const frame = PROOF_ART.grass.frame;
+    if (!scene.textures.get('grass').has('surface')) scene.textures.get('grass').add('surface', 0, frame.x, frame.y, frame.width, frame.height);
     const drawFace = (graphics: Phaser.GameObjects.Graphics, points: readonly Point[], color: number): void => {
       const vertices = points.map(point => new Phaser.Math.Vector2(point.x, point.y));
       graphics.fillStyle(color, 1).fillPoints(vertices, true);
@@ -24,9 +27,13 @@ export class BoardRenderer {
       drawFace(graphics, faces.right, 0x4e6d72);
       drawFace(graphics, faces.top, 0x638b82);
       const point = projectTile(tile);
-      const grass = scene.add.image(point.x, point.y, 'grass')
-        .setOrigin(0.5, PROOF_ART.grass.originY).setDisplaySize(PROOF_ART.grass.width, PROOF_ART.grass.height)
-        .setCrop(PROOF_ART.grass.crop.x, PROOF_ART.grass.crop.y, PROOF_ART.grass.crop.width, PROOF_ART.grass.crop.height).setDepth(proofDepth(tile, 1));
+      const grass = scene.add.image(point.x, point.y, 'grass', 'surface')
+        .setOrigin(0.5).setDisplaySize(TILE_WIDTH, TILE_HEIGHT).setDepth(proofDepth(tile, 1));
+      // The edit has a slightly irregular alpha edge; geometry guarantees a tile-sized diamond.
+      const mask = scene.add.graphics().setVisible(false);
+      mask.fillStyle(0xffffff).fillPoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
+      grass.setMask(mask.createGeometryMask());
+      this.surfaceMasks.push(mask);
       this.root.add([graphics, grass]);
     }
     this.prop = scene.add.image(0, 0, 'tree').setOrigin(0.5, PROOF_ART.tree.originY).setDisplaySize(PROOF_ART.tree.width, PROOF_ART.tree.height);
@@ -55,12 +62,13 @@ export class BoardRenderer {
     this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, 2));
     this.root.sort('depth');
     setProofDiagnostics({ fixture, relation: value.relation, propElevation: value.prop.elevation,
-      heroDepth: this.hero.depth, propDepth: this.prop.depth, assetCount: PROOF_ASSETS.length, objectCount: this.root.length + 1 });
+      heroDepth: this.hero.depth, propDepth: this.prop.depth, assetCount: PROOF_ASSETS.length, objectCount: this.root.length + 1 + this.surfaceMasks.length });
   }
 
   fit(width: number, height: number, panelBottom: number): BoardDiagnostics {
     const layout = fitBoard(this.bounds, { width, height }, panelBottom);
     this.root.setPosition(layout.x, layout.y).setScale(layout.scale);
+    for (const mask of this.surfaceMasks) mask.setPosition(layout.x, layout.y).setScale(layout.scale);
     return {
       tileCount: BOARD_FIXTURE.length,
       elevations: [...new Set(BOARD_FIXTURE.map(tile => tile.elevation))].sort(),
