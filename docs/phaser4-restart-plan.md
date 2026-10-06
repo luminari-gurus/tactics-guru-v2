@@ -298,7 +298,7 @@ Three porting hazards affect determinism:
 
 **What that requires of the build**
 
-1. Every game asset goes through Vite's asset graph, so it lands in `dist/assets/` flat and content-hashed. Vite copies `public/` verbatim, without hashing and with its folders; the companion draft's `public/assets/portraits/…` layout would be rejected for nesting, and flattened it would be cached for a year under an unchanging name.
+1. Every game asset goes through Vite's asset graph, so it lands in `dist/assets/` flat and content-hashed. Vite copies `public/` verbatim, without hashing and with its folders; the companion draft's earlier `public/assets/portraits/…` layout would have been rejected for nesting, and flattened it would have been cached for a year under an unchanging name. The draft no longer proposes it.
 2. Content JSON is imported statically, so it is bundled and hashed with the JavaScript; it is validated in CI and again at boot.
 3. Anything fetched at run time lives under `/assets/`. Elsewhere a missing file comes back as the HTML shell with status 200, which the loader reports as a decode error rather than a missing file.
 4. Source maps cannot be deployed. Keep them as CI artifacts if stack traces need decoding, and show the build identity in the app (§6).
@@ -410,7 +410,13 @@ The new repository tracks scoped implementation briefs as GitHub issues and carr
    - #4: compiler-enforced domain boundary; PRNG and ordering requirements; runner scoping when Vitest is added.
    - #6: selection of cells that are not visible.
    - #7 and #8: the pinned rules in §3.4, including the Dex-save path, and decisions D5–D7.
-7. The companion draft `docs/tech_design.phaser4.draft.md` was not edited in this pass. It still carries the superseded "do not initialize" wording and the nested, unhashed `public/assets/` layout (including an unhashed `manifest.json` that would be served from `/assets/` and cached for a year), and it has no saving-throw rule. Reconcile it with §3.4, §5.1 and §6 before it is used.
+7. The companion draft `docs/tech_design.phaser4.draft.md` was revised in a separate pass later on 2026-10-06 and reconciled with §3.4, §5.1 and §6: the superseded "do not initialize" wording, the nested `public/assets/` layout and the missing saving-throw rule are gone. That pass raised design questions T1–T11 (draft §12) that the register in §2 does not list yet; add them when confirmed. One of them, T11, questions a choice made here: §5.1 says SFX are transcoded to MP3, and the draft asks whether short mono WAV serves the very short cues better. It also established facts this plan does not carry:
+   - The legacy view draws 20 tile images on Forest Ruins, not 8: the §5.1 table's tile row covers the base images only, and the 12 slope and corner variants add 178,920 bytes (draft §7.1).
+   - Every tree on the map is at height 0, so the legacy canopy redraw never runs there; units are simply drawn over terrain (draft §5.2). With units and tiles in one depth order, ten walkable cells are at least 80% hidden: the five behind the ruin and five behind trees.
+   - Phaser's frame loop does not restart after an uncaught exception in a step callback, and an enemy holds the first turn in about half of all seeds (draft §2.1, §2.2).
+   - The preview server that the browser tests use answers a missing file with the page and status 200, and Phaser reports that as a decode failure without a load error (draft §7.3).
+   - Vite's default build target starts at Safari and iOS 16.4, which bears on D1 (draft §9.2).
+   - Vitest 5.0.3 requires Node `^22.12.0 || ^24.0.0 || >=26.0.0`, narrower than the scaffold's range (draft §10.1).
 
 ## 9. Risks and guardrails
 
@@ -440,7 +446,7 @@ Highest risk is **parity creep**: “already implemented in Godot” is not just
 
 The general mitigations stand: pinned APIs, early physical-device fit testing, explicit scope gates, catalog validation, a pure deterministic core and no production cutover until accepted. If the proof-of-fit fails, the engine-independent domain is the hedge: issues #3–#5 and #7–#9 stay valid under any renderer, and the alternative is chosen explicitly with Brian.
 
-Do not claim smaller bundle, better FPS, faster loading, compliant analytics or working live infrastructure from this planning task. No runtime prototype or new tests were written. The 2026-10-06 review ran only the scaffold's existing type-check, build and smoke tests, read both repositories and the tracker, and made one unauthenticated request to the beta host. It edited no file other than this one; the build and test runs regenerated the ignored `dist/` and `test-results/` directories, and the uncommitted `.gitignore` change that ignores `ORIGINAL/` predates the review. Afterwards, on request, the plan and the companion draft were committed to a `docs` branch; nothing was merged into `main`. This revision is ready for review. It is not a signal to begin anything beyond what the tracker already covers.
+Do not claim smaller bundle, better FPS, faster loading, compliant analytics or working live infrastructure from this planning task. No runtime prototype or new tests were written. The 2026-10-06 review ran only the scaffold's existing type-check, build and smoke tests, read both repositories and the tracker, and made one unauthenticated request to the beta host. It edited no file other than this one; the build and test runs regenerated the ignored `dist/` and `test-results/` directories, and the uncommitted `.gitignore` change that ignores `ORIGINAL/` predates the review. Afterwards, on request, the plan and the companion draft were committed to a `docs` branch; nothing was merged into `main`. The companion draft was then revised in a separate pass, which also made the edits here that keep the two documents consistent (§5.1 item 1, §8 item 7, this paragraph and the revision notes). That pass ran its own throwaway checks outside the repository; the draft's revision notes list them. This revision is ready for review. It is not a signal to begin anything beyond what the tracker already covers.
 
 ## Revision notes (2026-10-06)
 
@@ -455,6 +461,7 @@ Corrections to earlier statements:
 - Commands: the existing scripts are now distinguished from the proposed ones.
 - References to `phaser4-discovery/evidence.md` and `/opt/data/writeups/tactics-guru/` now say that those are not stored with this copy.
 - Location: the plan and the companion draft are tracked on the `docs` branch as of 2026-10-06; statements that the file was untracked were updated to match.
+- Companion draft: revised later the same day. The statements here that described its old state were updated (§5.1 item 1, §8 item 7, §9); nothing else in this plan changed in that pass.
 
 Additions: current-state table; open-decisions register (§2); slice content map, pinned rules and load-time causes (§3.3–§3.5); scaffold-versus-contract table and the restructured fit gate with hidden-cell, tile-size, context-loss, audio and measurement items (§4); asset pipeline, release limits and provenance (§5.1); enforcement, PRNG, ordering, diagnostics and storage limits (§6); CI wiring, runner scoping and legacy scenario map (§7.2–§7.3); tracker deltas (§8); risk table (§9).
 
