@@ -24,3 +24,6 @@ npm-debug.log*
 Thumbs.db
 *.swp
 *.swo
+
+# Local reference material
+ORIGINAL/
