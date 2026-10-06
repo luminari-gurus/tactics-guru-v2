@@ -32,6 +32,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TG_DEPLOY_HMAC_KEY: ${{ secrets.TG_DEPLOY_HMAC_KEY }}
+          TG_DEPLOY_CF_ACCESS_CLIENT_ID: ${{ secrets.TG_DEPLOY_CF_ACCESS_CLIENT_ID }}
+          TG_DEPLOY_CF_ACCESS_CLIENT_SECRET: ${{ secrets.TG_DEPLOY_CF_ACCESS_CLIENT_SECRET }}
         run: |
           set -eu
           latest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)

@@ -3,12 +3,11 @@ import io
 import json
 import os
 import time
-import urllib.error
-import urllib.request
+import subprocess
+import tempfile
 import zipfile
 from pathlib import Path
 
-from receiver import NoRedirect
 from release import MAX_UPLOAD, REPOSITORY, authenticate, signed_headers, validate_archive
 
 ENDPOINT = 'https://tg-beta.absoluteparallax.com/_deploy'
@@ -48,26 +47,52 @@ def metadata():
     return value
 
 
-def deliver(body, value, key):
+def deliver(body, value, key, access_id, access_secret):
+    for credential in (access_id, access_secret):
+        if not credential or len(credential) > 512 or any(not 33 <= ord(c) <= 126 for c in credential):
+            raise ValueError('invalid deployment Access credential')
     signed = signed_headers(key, value, body)
     headers = {'Content-Type': 'application/zip', 'Content-Length': str(len(body)),
-               'X-TG-Metadata': signed['metadata'], 'X-TG-Signature': signed['signature']}
-    opener = urllib.request.build_opener(NoRedirect())
-    for attempt in range(MAX_ATTEMPTS):
-        request = urllib.request.Request(ENDPOINT, data=body, headers=headers, method='POST')
-        try:
-            with opener.open(request, timeout=UPLOAD_TIMEOUT) as response:
-                result = json.loads(response.read(4096))
-                if response.status != 200 or result.get('status') not in {'published', 'idempotent'} or result.get('sha') != value['sha']:
-                    raise ValueError('unexpected deployment response')
-                return result
-        except urllib.error.HTTPError as error:
-            if error.code not in {429, 502, 503, 504} or attempt == MAX_ATTEMPTS - 1:
-                raise RuntimeError(f'deploy HTTP {error.code}; no response body logged') from None
-        except (urllib.error.URLError, TimeoutError):
-            if attempt == MAX_ATTEMPTS - 1:
+               'X-TG-Metadata': signed['metadata'], 'X-TG-Signature': signed['signature'],
+               'CF-Access-Client-Id': access_id, 'CF-Access-Client-Secret': access_secret}
+    # curl's normal client, not an impersonated browser. Credentials live in a
+    # private header file, never argv, stderr, response logging or redirects.
+    with tempfile.TemporaryDirectory(prefix='tg-upload-') as directory:
+        header_path = Path(directory) / 'headers'
+        response_path = Path(directory) / 'response'
+        for path in (header_path, response_path):
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            os.close(fd)
+        header_path.write_text(''.join(f'{k}: {v}\n' for k, v in headers.items()))
+        args = ['curl', '--disable', '--silent', '--proto', '=https',
+                '--proto-redir', '=https', '--max-redirs', '0',
+                '--connect-timeout', '15', '--max-time', str(UPLOAD_TIMEOUT),
+                '--max-filesize', '4096', '--request', 'POST',
+                '--header', '@' + str(header_path), '--data-binary', '@-',
+                '--output', str(response_path), '--write-out', '%{http_code}', ENDPOINT]
+        # Do not inherit deployment credentials into the child process.
+        env = {k: v for k, v in os.environ.items() if k not in {
+            'TG_DEPLOY_HMAC_KEY', 'TG_DEPLOY_CF_ACCESS_CLIENT_ID', 'TG_DEPLOY_CF_ACCESS_CLIENT_SECRET'}}
+        for attempt in range(MAX_ATTEMPTS):
+            try:
+                response = subprocess.run(args, input=body, stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE, env=env, timeout=UPLOAD_TIMEOUT + 5)
+            except (OSError, subprocess.TimeoutExpired):
                 raise RuntimeError('deploy transport unavailable') from None
-        time.sleep(5 * (attempt + 1))
+            status = response.stdout.decode('ascii', errors='replace')
+            if response.returncode == 0 and status == '200':
+                try:
+                    result = json.loads(response_path.read_bytes()[:4096])
+                except (ValueError, OSError):
+                    raise RuntimeError('unexpected deployment response') from None
+                if not isinstance(result, dict) or result.get('status') not in {'published', 'idempotent'} or result.get('sha') != value['sha']:
+                    raise RuntimeError('unexpected deployment response')
+                # Return only allowlisted fields, never untrusted response text.
+                return {'status': result['status'], 'sha': result['sha']}
+            transient = response.returncode in {5, 6, 7, 28, 52, 55, 56} or (response.returncode == 0 and status in {'429', '502', '503', '504'})
+            if not transient or attempt == MAX_ATTEMPTS - 1:
+                raise RuntimeError('deployment not acknowledged; transport or HTTP rejected')
+            time.sleep(5 * (attempt + 1))
     raise RuntimeError('deployment not acknowledged')
 
 
@@ -75,7 +100,9 @@ def main():
     key = os.environ.pop('TG_DEPLOY_HMAC_KEY').encode()
     if len(key) < 32:
         raise ValueError('deployment key too short')
-    result = deliver(package('dist'), metadata(), key)
+    access_id = os.environ.pop('TG_DEPLOY_CF_ACCESS_CLIENT_ID')
+    access_secret = os.environ.pop('TG_DEPLOY_CF_ACCESS_CLIENT_SECRET')
+    result = deliver(package('dist'), metadata(), key, access_id, access_secret)
     print(json.dumps(result, sort_keys=True))
 
 

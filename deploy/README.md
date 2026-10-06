@@ -71,18 +71,30 @@ npm test
 6. Add an exact highest-priority Traefik router for
    `Host(tg-beta.absoluteparallax.com) && Path(/_deploy) && Method(POST)` to the
    loopback receiver service, retaining the existing edge-IP/loopback allowlist.
-   Keep all game routes protected and unchanged. Non-POST `/_deploy` must not
-   fall through to game HTML; the Nginx exact location returns 405.
-7. Create a separate Cloudflare self-hosted Access app scoped only to
-   `tg-beta.absoluteparallax.com/_deploy`, with Bypass/Everyone for that endpoint
-   **only**. Read back app scope and policy; do not mutate the existing game app.
-   HMAC is mandatory even though the endpoint bypasses interactive Access.
-8. Generate the key outside Git. Set the GitHub secret using file/stdin
-   (`gh secret set TG_DEPLOY_HMAC_KEY < /restricted/key`), never a command literal.
-   Read back the secret **name** only. Validate anonymous game root/JS/metadata
-   still redirect to Access, GET endpoint never serves game, bad signatures reject,
-   public-IP/SNI origin remains 403, and a signed current-release HTTPS upload
-   verifies root and all hashes. Prove persistent storage after receiver restart.
+   Keep all game routes protected and unchanged. Non-POST `/_deploy` returns 405.
+   Deployment descendants return 404 for **every** method, including encoded paths
+   and raw dot-segment paths; recursive percent encodings return 400. No descendant
+   may fall through to SPA HTML. Verify this on the actual Nginx before edge changes.
+7. Create a separate Cloudflare self-hosted Access app scoped to
+   `tg-beta.absoluteparallax.com/_deploy`. Access also matches descendants, so the
+   origin deny above is mandatory. Its **only** policy is Service Auth (`non_identity`)
+   including one dedicated expiring service token; no Bypass, Everyone, email or
+   interactive Allow policy. Keep the existing game Access app/DNS unchanged and
+   verify this token cannot access game root/assets/metadata. HMAC remains mandatory.
+8. Preserve the independent HMAC key. Set the repository secrets
+   `TG_DEPLOY_CF_ACCESS_CLIENT_ID` and `TG_DEPLOY_CF_ACCESS_CLIENT_SECRET` using
+   stdin, never command literals. Use a dedicated short-lived token (operator trial:
+   720 hours), document expiry, and renew/rotate before expiry; do not broaden account
+   policy. Read back names only. `upload.py` uses actual curl (required on the runner),
+   its standard User-Agent, TLS verification, HTTPS-only transport, no redirects,
+   bounded connect/total timeouts/retries and a 4096-byte response cap. Credentials
+   are held in temporary mode-0600 headers within a mode-0700 directory, not argv;
+   curl stderr and error response bodies are never logged. No global BIC/WAF changes.
+   Validate missing/invalid token blocks at Cloudflare, valid token still rejects
+   bad/missing HMAC, descendants deny, game still Access, direct origin 403, and
+   actual workflow uploader succeeds and retries idempotently. Use the actual
+   workflow run order; never invent high counters that block the first main release.
+   Prove persistent storage and denial rules after receiver/origin restart.
 9. Obtain explicit merge authorization. Merge only after independent review and
    CI pass, then observe the first main workflow's deployment acknowledgement and
    compare origin `_deployment.json` SHA to the exact merge commit. Before that,
