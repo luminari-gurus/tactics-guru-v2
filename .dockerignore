@@ -1,0 +1,5 @@
+# Integration builds need only reviewed deployment sources, never local secrets.
+*
+!deploy/
+!deploy/**
+deploy/__pycache__/

@@ -1,0 +1,266 @@
+{
+  "base_commit": "636e0ea462ee24a36cf572d1f93ac5fffcb69525",
+  "files": {
+    ".github/workflows/release.yml": "fb96e2eea87660288ddfe452cca0b07c6e9eef3fed4c884ddb039ec54397504b",
+    "deploy/Dockerfile.ssh-test": "70698928cad992cc9b9efcd8b8333fa8245512f458181524db8e2b7a51f97af3",
+    "deploy/README.md": "ff32a2e8408085cfd704db1d79b68dd09dbc8d9bdf049858c0c089c9ec88d42c",
+    "deploy/artifact_health.py": "3e36755adc2f6ec33decf8ec476312098daac782574cb726e2b75c39837cdc7a",
+    "deploy/forced_publish.py": "47354fe0bd060bba22e6a181896ff2ed7c12b79a02a1cb9624656512b0483196",
+    "deploy/nginx.conf": "73d86b9f5a698aa25a73a4b54f2be8929662f07f687abf0d5d5b367b77978f24",
+    "deploy/release.py": "16144bc87705ab70f44444da1f9736da8d557b2547f45a7444264e0f6a971e99",
+    "deploy/ssh-install/.gitignore": "793e838870a35fc0befc479615359cbba20a24c1ba3c4c7b0c35e88e0e565b87",
+    "deploy/ssh-install/PACKAGING.md": "6379dd12dc48166a185470b6d23eadb1e2cf76ce3ee527d0bd0dbf7f83923bd6",
+    "deploy/ssh-install/README.md": "ad464d696751ae7c49803d3db87aec3b333dc1ab1d869228034567d172e2ab32",
+    "deploy/ssh-install/console-candidate/bootstrap_stage.py": "08a00ff5bde4824e0a77a0274884e21fbe07fd70ed690fce744f41af1fcd48e8",
+    "deploy/ssh-install/console-candidate/candidate_plan.py": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996",
+    "deploy/ssh-install/console-candidate/console_cli.py": "2d7832e7a8b3ff6f907ec3577014b83dcf5635f3de26ebd692263245a9716bfe",
+    "deploy/ssh-install/console-candidate/console_lifecycle.py": "db6006df94774487d98d0d554c86eb41a0072b16c589bf4407dac81479b1948c",
+    "deploy/ssh-install/console-candidate/host_console_backend.py": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
+    "deploy/ssh-install/console-candidate/host_inventory.py": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3",
+    "deploy/ssh-install/console-candidate/host_policy.py": "af42bf44e87296228dc09503079c25960bd73235b030aa316f45b96ecd3e461f",
+    "deploy/ssh-install/console-candidate/run_defects_candidate.py": "e3765e813063930afb40b509bf0c23a490bca042f13832222111264ca26ed1fc",
+    "deploy/ssh-install/console-candidate/run_integrated_candidate.py": "6d9996e356137a8a4e921702be76027059e14bc355017662c82545f01027d75c",
+    "deploy/ssh-install/console-candidate/run_integrated_matrix.py": "196edcbabf3e3290b567b794cdb0ef908b066223b9cc8b0ffd04b0a5d9215f6f",
+    "deploy/ssh-install/console-candidate/run_native_candidate.py": "ac1a4bdbcc5a4db7bf9d921d9d53622267a6bd0b458b761dc222f3062d112a72",
+    "deploy/ssh-install/console-candidate/ssh_acceptance.py": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7",
+    "deploy/ssh-install/console-candidate/test_activation.py": "b1b8042d7a36322427e7723e930ba386c0bc3ba3206adf1e7f97178e237483c2",
+    "deploy/ssh-install/console-candidate/test_candidate.py": "3ce7c9d2fb70d133105fd081b8ff30f577b2fb435709471a3d0eeccc2e6c4ae9",
+    "deploy/ssh-install/console-candidate/test_defects_actor.py": "28212f2a9e8aff4b3884698e2a9c5a4acff0f7802eb0cc76dd6a71c888695542",
+    "deploy/ssh-install/console-candidate/test_integrated_actor.py": "44d0bcbd162dc145d7ea77d7e03c6f8965b108b2971c7858e9722989feca8c48",
+    "deploy/ssh-install/console-candidate/test_inventory.py": "8088453a745309587e3a6710dfa5e3c64b87acd62ae8c80ed597b88ad4104e8b",
+    "deploy/ssh-install/console-candidate/test_lifecycle.py": "6bcc4b20edd3cfe8545baa74570ac70c8a1828a4e491370c4c23b266c766493d",
+    "deploy/ssh-install/console-candidate/test_native_actor.py": "4cb40d06a550d5b697a28f83e4b025fbcda5312d2b9dcafb1c458397f85064e2",
+    "deploy/ssh-install/console-candidate/test_review_regressions.py": "d9de3a2a5fd212b0f1f2676c94b624c3f1f845ed1eb996685dd7e4099eb19ca8",
+    "deploy/ssh-install/docker_mount_tx.py": "48d33fb94c7c3e993f4bff758c1070a454784f02af2961160f493bb5a2b1d632",
+    "deploy/ssh-install/durable_files.py": "9090ba1d2ec8d54ad064b8be71be14dda75109936d4b658155118f2aa7c1c77c",
+    "deploy/ssh-install/fixture_support.py": "f963b041f946dc7025d860f727713c577cbe3538f31ce85f79a1377ba7481ca9",
+    "deploy/ssh-install/host_account_engine.py": "92cbe45cf026d47bfc548ab9729d9f1dc457ee83a443791acb05fc757158afeb",
+    "deploy/ssh-install/host_adapters.py": "659a1afc669bca27a05e8ff977fa8711ba56381a493644e83af1a89a27fcc763",
+    "deploy/ssh-install/host_backend.py": "fdfaca054d4af2ab525e600d783ba7897a78ee90154e0e03cb7587b21943b2b5",
+    "deploy/ssh-install/offline_transaction.py": "af738bfe6be9866666d19badb0c8d4a59958949b84901e822514f0e51683c1d3",
+    "deploy/ssh-install/run_publisher_fixture.py": "8ef314fa74067333588db3db65cb6e38be3f214495ecbcbe9b4a607d3cb8f8e9",
+    "deploy/ssh-install/session_barrier.py": "f57b0cd39cd53be257715e6a6289d6d4ce59a170ac1c1bd3d53f5ebd38a39124",
+    "deploy/ssh-install/test_docker_mount_tx.py": "7fca1d400a35a2b559dcd64f53fab401a65e7f362831b057aecb63adf285e8e7",
+    "deploy/ssh-install/test_packaging.py": "0b7ce0b0a26c598303d988e92553324f154325bd3986107c67b5152ddca5ed3f",
+    "deploy/ssh_upload.py": "f5caeaf9cf76566733b2f3bed34a0945369ed7579c6e6ee5eea9b47a875e863e",
+    "deploy/test-sshd.conf": "e633f80fa10f4e78354a3db0698c1ad978600968b26316e23c56ef2e13d513fb",
+    "deploy/test_artifact_health.py": "87f06595e3017cd0262af7a5ad56786186197c7767b95f917a5feb952e843f0b",
+    "deploy/test_openssh.py": "e8083fad93b917207ed179203c244c83a008b96350aaaed88ffe97a50e382359",
+    "deploy/test_publication_gate.py": "2e8c9a757c5dbc44eba15a4ae1ac198c51f8d63f901e9488c6ea2bb3efd9945c",
+    "deploy/test_release.py": "f88e8efbfeb43becfeb708ae88d401099c20f79817e37a4665a036ddf952d041",
+    "deploy/test_ssh.py": "f9580c665e4e16bb1a3d9959696c2df272348fd0f0993022bf3101d2564269d1"
+  },
+  "installation_ready": false,
+  "new_regression_files": {
+    "deploy/ssh-install/console-candidate/run_defects_candidate.py": "e3765e813063930afb40b509bf0c23a490bca042f13832222111264ca26ed1fc",
+    "deploy/ssh-install/console-candidate/test_defects_actor.py": "28212f2a9e8aff4b3884698e2a9c5a4acff0f7802eb0cc76dd6a71c888695542"
+  },
+  "predecessor_mapping": [
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/bootstrap_stage.py",
+      "packaged_sha256": "08a00ff5bde4824e0a77a0274884e21fbe07fd70ed690fce744f41af1fcd48e8",
+      "predecessor": "console-candidate/bootstrap_stage.py",
+      "predecessor_sha256": "08a00ff5bde4824e0a77a0274884e21fbe07fd70ed690fce744f41af1fcd48e8"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/candidate_plan.py",
+      "packaged_sha256": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996",
+      "predecessor": "console-candidate/candidate_plan.py",
+      "predecessor_sha256": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/console_cli.py",
+      "packaged_sha256": "2d7832e7a8b3ff6f907ec3577014b83dcf5635f3de26ebd692263245a9716bfe",
+      "predecessor": "console-candidate/console_cli.py",
+      "predecessor_sha256": "a61769d9203cf779fd2770b13d6d92ac620cd9d92c7f5661993d5ceab962beb7"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/console_lifecycle.py",
+      "packaged_sha256": "db6006df94774487d98d0d554c86eb41a0072b16c589bf4407dac81479b1948c",
+      "predecessor": "console-candidate/console_lifecycle.py",
+      "predecessor_sha256": "c0a6a56e83a5bafe06d5817b05d83cebb25580365587185da415a53d0ec998e5"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/host_console_backend.py",
+      "packaged_sha256": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
+      "predecessor": "console-candidate/host_console_backend.py",
+      "predecessor_sha256": "9650c8aa811fea141a03c2364457ba840826ca69178f73384cbde37c9ac0f22e"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/host_inventory.py",
+      "packaged_sha256": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3",
+      "predecessor": "console-candidate/host_inventory.py",
+      "predecessor_sha256": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/host_policy.py",
+      "packaged_sha256": "af42bf44e87296228dc09503079c25960bd73235b030aa316f45b96ecd3e461f",
+      "predecessor": "console-candidate/host_policy.py",
+      "predecessor_sha256": "acb9128e674166b8d4039a543ee643dd99d0d42fdf6ffaab0e91e028bad368b8"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/run_integrated_candidate.py",
+      "packaged_sha256": "6d9996e356137a8a4e921702be76027059e14bc355017662c82545f01027d75c",
+      "predecessor": "console-candidate/run_integrated_candidate.py",
+      "predecessor_sha256": "7e048bca5f1353f9f06937310a62f722b8d527372af7cbc69bafbb9042eaa177"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/run_integrated_matrix.py",
+      "packaged_sha256": "196edcbabf3e3290b567b794cdb0ef908b066223b9cc8b0ffd04b0a5d9215f6f",
+      "predecessor": "console-candidate/run_integrated_matrix.py",
+      "predecessor_sha256": "196edcbabf3e3290b567b794cdb0ef908b066223b9cc8b0ffd04b0a5d9215f6f"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/run_native_candidate.py",
+      "packaged_sha256": "ac1a4bdbcc5a4db7bf9d921d9d53622267a6bd0b458b761dc222f3062d112a72",
+      "predecessor": "console-candidate/run_native_candidate.py",
+      "predecessor_sha256": "f0d6d658370be6baaee0f6d79a4612f6514070429c9501b1c797e7d45959a36b"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/ssh_acceptance.py",
+      "packaged_sha256": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7",
+      "predecessor": "console-candidate/ssh_acceptance.py",
+      "predecessor_sha256": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/test_activation.py",
+      "packaged_sha256": "b1b8042d7a36322427e7723e930ba386c0bc3ba3206adf1e7f97178e237483c2",
+      "predecessor": "console-candidate/test_activation.py",
+      "predecessor_sha256": "f5673e2c7e45207cc5311033ffe1ddafc8fb83de31c250618f0cac35e97d3567"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/test_candidate.py",
+      "packaged_sha256": "3ce7c9d2fb70d133105fd081b8ff30f577b2fb435709471a3d0eeccc2e6c4ae9",
+      "predecessor": "console-candidate/test_candidate.py",
+      "predecessor_sha256": "3ce7c9d2fb70d133105fd081b8ff30f577b2fb435709471a3d0eeccc2e6c4ae9"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/test_integrated_actor.py",
+      "packaged_sha256": "44d0bcbd162dc145d7ea77d7e03c6f8965b108b2971c7858e9722989feca8c48",
+      "predecessor": "console-candidate/test_integrated_actor.py",
+      "predecessor_sha256": "cb35335220b8cf2d9b417151557eb15036ef4f89881efab8a0e50562ab862cd4"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/test_inventory.py",
+      "packaged_sha256": "8088453a745309587e3a6710dfa5e3c64b87acd62ae8c80ed597b88ad4104e8b",
+      "predecessor": "console-candidate/test_inventory.py",
+      "predecessor_sha256": "8088453a745309587e3a6710dfa5e3c64b87acd62ae8c80ed597b88ad4104e8b"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/test_lifecycle.py",
+      "packaged_sha256": "6bcc4b20edd3cfe8545baa74570ac70c8a1828a4e491370c4c23b266c766493d",
+      "predecessor": "console-candidate/test_lifecycle.py",
+      "predecessor_sha256": "6bcc4b20edd3cfe8545baa74570ac70c8a1828a4e491370c4c23b266c766493d"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/console-candidate/test_native_actor.py",
+      "packaged_sha256": "4cb40d06a550d5b697a28f83e4b025fbcda5312d2b9dcafb1c458397f85064e2",
+      "predecessor": "console-candidate/test_native_actor.py",
+      "predecessor_sha256": "189a569cd0ecd0f1e3c7fb836b28087c9cd263fb4cf43c248795e1627c4d55df"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/console-candidate/test_review_regressions.py",
+      "packaged_sha256": "d9de3a2a5fd212b0f1f2676c94b624c3f1f845ed1eb996685dd7e4099eb19ca8",
+      "predecessor": "console-candidate/test_review_regressions.py",
+      "predecessor_sha256": "d9de3a2a5fd212b0f1f2676c94b624c3f1f845ed1eb996685dd7e4099eb19ca8"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/docker_mount_tx.py",
+      "packaged_sha256": "48d33fb94c7c3e993f4bff758c1070a454784f02af2961160f493bb5a2b1d632",
+      "predecessor": "docker_mount_tx.py",
+      "predecessor_sha256": "48d33fb94c7c3e993f4bff758c1070a454784f02af2961160f493bb5a2b1d632"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/durable_files.py",
+      "packaged_sha256": "9090ba1d2ec8d54ad064b8be71be14dda75109936d4b658155118f2aa7c1c77c",
+      "predecessor": "durable_files.py",
+      "predecessor_sha256": "9090ba1d2ec8d54ad064b8be71be14dda75109936d4b658155118f2aa7c1c77c"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/host_account_engine.py",
+      "packaged_sha256": "92cbe45cf026d47bfc548ab9729d9f1dc457ee83a443791acb05fc757158afeb",
+      "predecessor": "host_account_engine.py",
+      "predecessor_sha256": "92cbe45cf026d47bfc548ab9729d9f1dc457ee83a443791acb05fc757158afeb"
+    },
+    {
+      "changed_from_predecessor": true,
+      "packaged": "deploy/ssh-install/host_adapters.py",
+      "packaged_sha256": "659a1afc669bca27a05e8ff977fa8711ba56381a493644e83af1a89a27fcc763",
+      "predecessor": "host_adapters.py",
+      "predecessor_sha256": "1f9d802f6357b5b976c3f989bab93dde65ab6af600de493a996d6a27ab5316fa"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/host_backend.py",
+      "packaged_sha256": "fdfaca054d4af2ab525e600d783ba7897a78ee90154e0e03cb7587b21943b2b5",
+      "predecessor": "host_backend.py",
+      "predecessor_sha256": "fdfaca054d4af2ab525e600d783ba7897a78ee90154e0e03cb7587b21943b2b5"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/offline_transaction.py",
+      "packaged_sha256": "af738bfe6be9866666d19badb0c8d4a59958949b84901e822514f0e51683c1d3",
+      "predecessor": "offline_transaction.py",
+      "predecessor_sha256": "af738bfe6be9866666d19badb0c8d4a59958949b84901e822514f0e51683c1d3"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/session_barrier.py",
+      "packaged_sha256": "f57b0cd39cd53be257715e6a6289d6d4ce59a170ac1c1bd3d53f5ebd38a39124",
+      "predecessor": "session_barrier.py",
+      "predecessor_sha256": "f57b0cd39cd53be257715e6a6289d6d4ce59a170ac1c1bd3d53f5ebd38a39124"
+    },
+    {
+      "changed_from_predecessor": false,
+      "packaged": "deploy/ssh-install/test_docker_mount_tx.py",
+      "packaged_sha256": "7fca1d400a35a2b559dcd64f53fab401a65e7f362831b057aecb63adf285e8e7",
+      "predecessor": "test_docker_mount_tx.py",
+      "predecessor_sha256": "7fca1d400a35a2b559dcd64f53fab401a65e7f362831b057aecb63adf285e8e7"
+    }
+  ],
+  "production_canonical_sha256": "4017df2d5c8a952fde63e9092de7a7708795ec67d61403930a3ba6c1382ba438",
+  "production_sources": {
+    "deploy/artifact_health.py": "3e36755adc2f6ec33decf8ec476312098daac782574cb726e2b75c39837cdc7a",
+    "deploy/forced_publish.py": "47354fe0bd060bba22e6a181896ff2ed7c12b79a02a1cb9624656512b0483196",
+    "deploy/release.py": "16144bc87705ab70f44444da1f9736da8d557b2547f45a7444264e0f6a971e99",
+    "deploy/ssh-install/console-candidate/bootstrap_stage.py": "08a00ff5bde4824e0a77a0274884e21fbe07fd70ed690fce744f41af1fcd48e8",
+    "deploy/ssh-install/console-candidate/candidate_plan.py": "c470aa6075689580a8ee078343070d94e2036af57488aba8c70c6b8efc55e996",
+    "deploy/ssh-install/console-candidate/console_cli.py": "2d7832e7a8b3ff6f907ec3577014b83dcf5635f3de26ebd692263245a9716bfe",
+    "deploy/ssh-install/console-candidate/console_lifecycle.py": "db6006df94774487d98d0d554c86eb41a0072b16c589bf4407dac81479b1948c",
+    "deploy/ssh-install/console-candidate/host_console_backend.py": "2a5368344e8e9c3a2b337e4214ad5424f48435b50ae15c564556bb7c5679a917",
+    "deploy/ssh-install/console-candidate/host_inventory.py": "5a7a6c3573df6a3c8eb9d704a78672c32307c478c3c2bb32f8cc2855ed0ca0c3",
+    "deploy/ssh-install/console-candidate/host_policy.py": "af42bf44e87296228dc09503079c25960bd73235b030aa316f45b96ecd3e461f",
+    "deploy/ssh-install/console-candidate/ssh_acceptance.py": "6061c7959ab861f7a7c0bbf2ff620e8e36e4d2b124bbc1518d86fc27f0a0d6b7",
+    "deploy/ssh-install/docker_mount_tx.py": "48d33fb94c7c3e993f4bff758c1070a454784f02af2961160f493bb5a2b1d632",
+    "deploy/ssh-install/durable_files.py": "9090ba1d2ec8d54ad064b8be71be14dda75109936d4b658155118f2aa7c1c77c",
+    "deploy/ssh-install/host_account_engine.py": "92cbe45cf026d47bfc548ab9729d9f1dc457ee83a443791acb05fc757158afeb",
+    "deploy/ssh-install/host_adapters.py": "659a1afc669bca27a05e8ff977fa8711ba56381a493644e83af1a89a27fcc763",
+    "deploy/ssh-install/host_backend.py": "fdfaca054d4af2ab525e600d783ba7897a78ee90154e0e03cb7587b21943b2b5",
+    "deploy/ssh-install/offline_transaction.py": "af738bfe6be9866666d19badb0c8d4a59958949b84901e822514f0e51683c1d3",
+    "deploy/ssh-install/session_barrier.py": "f57b0cd39cd53be257715e6a6289d6d4ce59a170ac1c1bd3d53f5ebd38a39124"
+  },
+  "schema": 1,
+  "scope": "public exact-package candidate; independent package review pending; no production execution",
+  "self_hash_policy": "SOURCE-MANIFEST.json and SHA256SUMS excluded from files; SHA256SUMS binds SOURCE-MANIFEST.json and excludes itself; external handoff authenticates SHA256SUMS"
+}

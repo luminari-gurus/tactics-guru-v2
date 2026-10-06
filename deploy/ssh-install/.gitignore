@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*-evidence.jsonl
+console-candidate/review-deletion-boundaries.json
+console-candidate/*.log
+console-candidate/matrix-*.json
+console-candidate/*-evidence.jsonl
