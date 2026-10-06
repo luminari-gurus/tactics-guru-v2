@@ -10,3 +10,4 @@ button:disabled { opacity: 0.5; cursor: default; }
 button:focus-visible, summary:focus-visible { outline: 3px solid #ffd77d; outline-offset: 2px; }
 #fit-status { flex: 1; }
 #fit-report { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 35dvh; overflow-y: auto; font-size: 12px; }
+#board-caption { margin: 8px 0 0; color: #b3cb97; font-size: 13px; }

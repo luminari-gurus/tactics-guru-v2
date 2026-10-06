@@ -1,5 +1,14 @@
 import { FitMeasurements } from './measurements';
 
+export interface BoardDiagnostics {
+  tileCount: number;
+  elevations: number[];
+  scale: number;
+  bounds: { left: number; top: number; right: number; bottom: number };
+}
+let board: BoardDiagnostics | null = null;
+export function setBoardDiagnostics(value: BoardDiagnostics | null): void { board = value; }
+
 export const measurements = new FitMeasurements();
 export const FIT_MARKS = ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable'] as const;
 
@@ -15,6 +24,7 @@ export function diagnosticsSnapshot() {
   }));
   return {
     ...measurements.snapshot(),
+    board: board ? { ...board, elevations: [...board.elevations], bounds: { ...board.bounds } } : null,
     capturedAt: new Date().toISOString(),
     build: __BUILD_INFO__,
     userAgent: navigator.userAgent,
