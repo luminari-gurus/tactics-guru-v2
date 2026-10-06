@@ -7,7 +7,8 @@ export const PROOF_ASSETS = [
   { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
 ] as const;
 export const PROOF_ART = {
-  grass: { frame: { x: 71, y: 20, width: 1687, height: 849 } },
+  // A 2:1 interior frame excludes alpha specks; one-pixel horizontal bleed covers the mask edges.
+  grass: { frame: { x: 130, y: 62, width: 1510, height: 755 }, horizontalBleed: 1 },
   tree: { width: 80, height: 110, originY: 170 / 352 },
   fighter: { width: 40, height: 50, originY: 76 / 80 },
 } as const;
