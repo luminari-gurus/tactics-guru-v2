@@ -1,6 +1,6 @@
 # Tactics Guru v2
 
-Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a responsive startup placeholder; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
+Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a responsive startup placeholder; gameplay, legacy assets, and saves are not implemented. Signed static beta deployment tooling lives in [`deploy/README.md`](deploy/README.md); production activation requires the documented operator gates. The original Godot project is untouched. Design plans are maintained outside this repository.
 
 ## Requirements
 
