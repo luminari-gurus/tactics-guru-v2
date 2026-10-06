@@ -11,3 +11,8 @@ button:focus-visible, summary:focus-visible { outline: 3px solid #ffd77d; outlin
 #fit-status { flex: 1; }
 #fit-report { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 35dvh; overflow-y: auto; font-size: 12px; }
 #board-caption { margin: 8px 0 0; color: #b3cb97; font-size: 13px; }
+
+#proof-portrait { border-radius: 4px; margin: 0; }
+button[aria-pressed="true"] { border-color: #ffd77d; background: #46546c; }
+
+[data-fixture] { font-size: 13px; padding: 8px; }

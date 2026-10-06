@@ -8,14 +8,16 @@ const snapshotButton = document.querySelector<HTMLButtonElement>('#fit-snapshot'
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
 
-function setStatus(state: 'loading' | 'ready'): void {
+function setStatus(state: 'loading' | 'ready' | 'error'): void {
   statusLabel.textContent = state === 'ready' ? 'Ready' : 'Loading';
   container.dataset.ready = String(state === 'ready');
   container.dataset.run = String(measurements.snapshot().run);
   restartButton.disabled = state !== 'ready';
+  document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
 
 function showError(message: string): void {
+  setStatus('error');
   statusLabel.textContent = `Error: ${message}. Reload the page to retry.`;
   container.dataset.ready = 'false';
   restartButton.disabled = true;
@@ -34,7 +36,7 @@ window.addEventListener('unhandledrejection', () => showError('The proof scene e
 
 try {
   const { startProof } = await import('./phaser/start');
-  restart = startProof(setStatus);
+  restart = startProof(setStatus, showError);
 } catch {
   showError('Could not load or start Phaser');
 }
