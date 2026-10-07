@@ -14,6 +14,7 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
       expect(proof?.relation).toBe(relation === 'Behind' ? 'behind' : 'front');
       expect(proof?.propElevation).toBe(elevation === 'Ground' ? 0 : 1);
       expect(proof?.assetCount).toBe(4);
+      expect(proof?.propAlpha).toBe(relation === 'Behind' ? 0.4 : 1);
       expect(proof?.heroDepth! < proof?.propDepth!).toBe(relation === 'Behind');
       await page.screenshot({ path: test.info().outputPath(`${elevation}-${relation}.png`) });
     }
@@ -24,6 +25,7 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
     await expect(page.locator('#game')).toHaveAttribute('data-run', String(run));
     expect(await page.evaluate(() => window.fitDiagnostics().proof?.fixture)).toBe('ground-behind');
     expect(await page.evaluate(() => window.fitDiagnostics().proof?.objectCount)).toBe(71);
+    expect(await page.evaluate(() => window.fitDiagnostics().proof?.propAlpha)).toBe(0.4);
   }
   expect(errors).toEqual([]);
 });
