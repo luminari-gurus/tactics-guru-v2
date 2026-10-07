@@ -19,7 +19,7 @@ The source checkout was clean; each copied PNG was checked against the Git blob 
 | `fighter.png` | 8,843 | `b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981` |
 | `fighter-portrait.png` | 3,285,110 | `712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190` |
 
-Original canonical PNG bytes: **3,388,616**. Current loaded PNG bytes, including the fresh grass material: **6,323,069**. The unchanged portrait accounts for 3,285,110 bytes; fresh grass accounts for 2,980,361. #20 measures deployed cold/warm performance and sets budgets.
+Original canonical PNG bytes: **3,388,616**. Current loaded PNG bytes, including the fresh grass material: **7,391,806**. The unchanged portrait accounts for 3,285,110 bytes; fresh grass accounts for 2,980,361 and the new tree for 1,117,492. #20 measures deployed cold/warm performance and sets budgets.
 
 ## License and provenance status
 
@@ -29,7 +29,7 @@ Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4
 
 ## Rendering and lifecycle
 
-The 4×4 diagnostic board retains generated side faces and uses a fresh, opaque square grass material after the user's explicit authorization to generate new assets. The texture has no baked perspective or tile silhouette. The renderer rotates a square by exactly π/4 inside a container with vertical scale TILE_HEIGHT/TILE_WIDTH (1/2). Its unexpanded projected corners are the same 80×40 diamond vertices used by side faces and tile projection. A one-pixel horizontal bleed is clipped by masks made from those vertices. Original canonical grass and the first transparent derivative remain archived and are not loaded. Tree uses its legacy base anchor and Fighter its foot anchor.
+The 4×4 diagnostic board retains generated side faces and uses a fresh, opaque square grass material after the user's explicit authorization to generate new assets. The texture has no baked perspective or tile silhouette. The renderer rotates a square by exactly π/4 inside a container with vertical scale TILE_HEIGHT/TILE_WIDTH (1/2). Its unexpanded projected corners are the same 80×40 diamond vertices used by side faces and tile projection. A one-pixel horizontal bleed is clipped by masks made from those vertices. Original canonical grass and the first transparent derivative remain archived and are not loaded. The new tree uses its root anchor, and Fighter uses its canonical foot anchor.
 
 Complete tile columns, surface art and occupants share stable grid-depth slots with the existing sum/y/x ordering. Elevation changes projected position, not depth priority. The fixed fixture buttons show one Fighter and one tree at a time. Ground fixtures use a tree at (2,0), elevation 0; raised fixtures use (1,1), elevation 1. The raised front Fighter stands on the existing elevation-2 tile at (2,2). Ground fixtures have ±28 logical-pixel foot offsets inside their tiles to make canopy overlap visible. They are diagnostic positions, not tactical moves.
 
@@ -84,8 +84,20 @@ The user subsequently authorized fresh generated assets to resolve the perceived
 - Diagnostics expose maximum transformed-corner error. The browser check allows <0.001 CSS pixel for Phaser float32 matrix rounding; focused measurements observed about 0.000018 pixel, far below visible drift. All 64 corners are compared after resize.
 - RED-first corner check failed against the prior renderer's missing projection evidence. Existing geometry tests already verify adjacent equal-height tiles share identical vertices.
 
-The fresh texture and current fixture screenshots are a starting point for further visual iteration. The legacy tree/Fighter/portrait remain canonical; newly generated grass is explicitly user-authorized and does not claim to satisfy unchanged canonical-grass artwork requirements.
+The fresh texture and current fixture screenshots are a starting point for further visual iteration. The original tree asset remains archived; Fighter/portrait remain canonical; newly generated grass is explicitly user-authorized and does not claim to satisfy unchanged canonical-grass artwork requirements.
 
 ## Elevated tile edge separation
 
 Elevated tiles have a one-logical-pixel dark green outline along their exact top-face polygon. Borders draw above the grass and below occupants within each tile's depth slot, separating raised surfaces from lower grass behind/below them without changing projection or assets. Ground-level tops remain borderless. The four outline objects are scene-owned and reset with the rest of the proof.
+
+## Generated tree and grass replacement (current)
+
+The previously loaded tree was `art/tiles/tree_single_detailed_N.png` copied unchanged to `public/proof/tree.png`. At the user's request it is now replaced with `public/proof/tree-grass-v1.png`. Built-in ImageGen used the fresh `grass-material-v1.png` as a palette/material reference and the legacy tree only as a pine silhouette reference. The generated tree has a matching soft grass patch around its roots and a transparent background, without a hard tile/slab boundary. The existing projected grass remains underneath, so no grid geometry changes are needed.
+
+- Dimensions: 1233×1276, RGBA; alpha bounds: (49,21) to (1205,1230).
+- Bytes: 1,117,492; SHA-256: `850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5`.
+- Display: 80×(80×1276/1233), about 80×82.79 logical pixels, preserving source aspect ratio.
+- Root anchor: horizontal center, source y=1070; originY=1070/1276.
+- Exact prompt and method: [tree-grass-v1-prompt.md](issue-16/tree-grass-v1-prompt.md).
+- Original tree PNG is preserved but unloaded. This replacement is generated project art, explicitly user-authorized, and is not claimed to be unchanged canonical art.
+- Current screenshots verify front/behind occlusion at ground and raised elevations, framing, borders, and restart using the replacement.
