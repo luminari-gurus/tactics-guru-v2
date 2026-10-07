@@ -35,7 +35,7 @@ Complete tile columns, surface art and occupants share stable grid-depth slots w
 
 Layout fits the union of all fixtures and full image rectangles below the panel, including transparent padding. The portrait displays separately in the panel. The four selected runtime images load through Phaser; the DOM portrait uses the same cached URL because Phaser revokes its temporary loader blob URL. Controls wait for both a rendered frame and the decoded DOM portrait. A failed asset produces a visible error with reload instructions and disabled scene controls.
 
-Phaser owns the container and its 34 children (16 side/top graphics, 16 surface containers, one tree and one hero), plus 16 nested grass images and 16 scene-owned mask graphics: 67 objects in total; scene shutdown destroys them. Explicit shutdown removes fixture, portrait, resize, post-render and visibility listeners and disconnects the panel observer. Four cached textures are game-owned and reused across scene restarts. Restart returns to ground-behind and clears scene diagnostics.
+Phaser owns the container and its 38 children (16 side/top graphics, 16 surface containers, four elevated-top outlines, one tree and one hero), plus 16 nested grass images and 16 scene-owned mask graphics: 71 objects in total; scene shutdown destroys them. Explicit shutdown removes fixture, portrait, resize, post-render and visibility listeners and disconnects the panel observer. Four cached textures are game-owned and reused across scene restarts. Restart returns to ground-behind and clears scene diagnostics.
 
 ## Verification
 
@@ -85,3 +85,7 @@ The user subsequently authorized fresh generated assets to resolve the perceived
 - RED-first corner check failed against the prior renderer's missing projection evidence. Existing geometry tests already verify adjacent equal-height tiles share identical vertices.
 
 The fresh texture and current fixture screenshots are a starting point for further visual iteration. The legacy tree/Fighter/portrait remain canonical; newly generated grass is explicitly user-authorized and does not claim to satisfy unchanged canonical-grass artwork requirements.
+
+## Elevated tile edge separation
+
+Elevated tiles have a one-logical-pixel dark green outline along their exact top-face polygon. Borders draw above the grass and below occupants within each tile's depth slot, separating raised surfaces from lower grass behind/below them without changing projection or assets. Ground-level tops remain borderless. The four outline objects are scene-owned and reset with the rest of the proof.
