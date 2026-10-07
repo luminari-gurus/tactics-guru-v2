@@ -1,5 +1,6 @@
+import { terrainTextureKey } from '../terrain/materials';
 import Phaser from 'phaser';
-import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
+import { BOARD_FIXTURE, BOARD_TERRAINS } from '../diagnostics/boardFixture';
 import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, setBoardDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
@@ -46,7 +47,7 @@ export class BoardRenderer {
       const point = projectTile(tile);
       const surface = scene.add.container(point.x, point.y)
         .setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(proofDepth(tile, 1));
-      const grass = scene.add.image(0, 0, 'grass').setOrigin(0.5)
+      const grass = scene.add.image(0, 0, terrainTextureKey(tile.terrain ?? BOARD_TERRAINS[`${tile.x},${tile.y}`])).setOrigin(0.5)
         .setDisplaySize(surfaceSide, surfaceSide).setRotation(Math.PI / 4);
       surface.add(grass);
       this.surfaces.push({ tile, image: grass });

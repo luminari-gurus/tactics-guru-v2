@@ -1,4 +1,5 @@
-export interface Tile { readonly x: number; readonly y: number; readonly elevation: number; }
+import type { TerrainId } from '../terrain/materials';
+export interface Tile { readonly x: number; readonly y: number; readonly elevation: number; readonly terrain?: TerrainId; }
 export interface Point { readonly x: number; readonly y: number; }
 export interface Bounds { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number; }
 
