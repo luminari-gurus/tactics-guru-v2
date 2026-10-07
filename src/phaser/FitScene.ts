@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scriptedMove';
 import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } from '../diagnostics/browser';
-import { PROOF_ASSETS, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
+import { PROOF_ASSETS, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
 
@@ -25,11 +25,14 @@ export class FitScene extends Phaser.Scene {
     const failed = (file: Phaser.Loader.File): void => { this.error(`Could not load proof asset ${file.key}`); };
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed));
-    for (const asset of PROOF_ASSETS) if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url);
+    for (const asset of PROOF_ASSETS) {
+      if (asset.kind === 'image') { if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url); }
+      else if (!this.cache.audio.exists(asset.key)) this.load.audio(asset.key, asset.url);
+    }
   }
 
   create(): void {
-    if (PROOF_ASSETS.some(asset => !this.textures.exists(asset.key))) return;
+    if (PROOF_IMAGES.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
     const removeBoardInput = bindBoardInput(this.game.canvas, board, () => ({width: this.scale.width, height: this.scale.height}));
     const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
@@ -105,7 +108,7 @@ export class FitScene extends Phaser.Scene {
     };
     portrait.addEventListener('error', portraitFailed);
     portrait.addEventListener('load', markUsable);
-    portrait.src = PROOF_ASSETS.find(asset => asset.key === 'fighter-portrait')!.url;
+    portrait.src = PROOF_IMAGES.find(asset => asset.key === 'fighter-portrait')!.url;
     portrait.hidden = false;
     const panel = document.querySelector<HTMLElement>('#fit-panel')!;
     const layoutBoard = (): void => {
