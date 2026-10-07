@@ -13,43 +13,43 @@ Evidence for the proof-of-fit gate (#20, parent #2). Sections 2 and 3 are the ph
 
 ## 2. Physical-device checklist
 
-The diagnostic named in #20 (occlusion, selection after pan/zoom, tap versus drag, one animated move, audio unlock, resize, suspend/resume, repeated restart) plus the §6 lifecycle checklist of [issue-19-lifecycle.md](issue-19-lifecycle.md), run on the build above on 2026-10-07. Physical runs were reported as whole-list passes with no per-item notes and no on-screen errors; the per-item rows below restate that report. Sources: Android https://github.com/luminari-gurus/tactics-guru-v2/issues/20#issuecomment-6045359857, desktop https://github.com/luminari-gurus/tactics-guru-v2/issues/20#issuecomment-6045679543. The iPhone Safari and iPhone Chrome rows come from dubstylee's run and were not posted when this note was written.
+The diagnostic named in #20 (occlusion, selection after pan/zoom, tap versus drag, one animated move, audio unlock, resize, suspend/resume, repeated restart) plus the §6 lifecycle checklist of [issue-19-lifecycle.md](issue-19-lifecycle.md), run on the build above on 2026-10-07. Physical runs were reported as whole-list passes with no per-item notes and no on-screen errors; the per-item rows below restate that report. Sources: Android https://github.com/luminari-gurus/tactics-guru-v2/issues/20#issuecomment-6045359857, desktop https://github.com/luminari-gurus/tactics-guru-v2/issues/20#issuecomment-6045679543. The iPhone Chrome and iPhone Safari rows were recorded by dubstylee directly in the #20 acceptance checklist and its "Hardware verification evidence" section on 2026-10-07: Brian verified on physical devices that all testable functions are operational, including sound on iPhone Chrome. Per-scenario coverage, device model, iOS and browser versions and measurements were not supplied, so the lifecycle rows and the iPhone-only rows below are marked not recorded.
 
 | Check | Android: Brave, Chrome, Edge, Samsung Internet | Desktop browser | iPhone Safari | iPhone Chrome |
 | --- | --- | --- | --- | --- |
-| Load to Ready, board visible | pass | pass | pending | pending |
-| Tap selects, drag pans, pinch zooms | pass | pass (wheel for zoom) | pending | pending |
-| Selection correct after pan and zoom | pass | pass | pending | pending |
-| Occlusion fixtures and tree opacity | pass | pass | pending | pending |
-| Animated move completes once | pass | pass | pending | pending |
-| First-gesture audio unlock | pass | pass | pending | pending |
-| Pan-first audio unlock | pass | pass | pending | pending |
-| Retry after Blocked | n/a, never Blocked | n/a, never Blocked | pending | pending |
-| Resize: rotate / narrow and wide window | pass (portrait and landscape) | pass (narrow and wide) | pending | pending |
-| Backgrounded during move: frozen, completes once | pass | pass | pending | pending |
-| Pointer held across app switch | pass | pass | pending | pending |
-| Return after a long background | pass | pass | pending | pending |
-| Repeated restart (5+) | pass | pass | pending | pending |
-| Browser toolbar collapse | pass | n/a | pending | pending |
-| Page gestures: no zoom, selection, callout, pull-to-refresh, context menu | pass | pass | pending | pending |
-| Slow network stall | not run (optional) | not run (optional) | pending | pending |
-| Safe areas | not recorded | n/a | pending | pending |
-| Silent switch, interrupted context, Ogg probe, Low Power Mode | n/a (iPhone rows) | n/a | pending | pending |
+| Load to Ready, board visible | pass | pass | pass as reported | pass as reported |
+| Tap selects, drag pans, pinch zooms | pass | pass (wheel for zoom) | pass as reported | pass as reported |
+| Selection correct after pan and zoom | pass | pass | pass as reported | pass as reported |
+| Occlusion fixtures and tree opacity | pass | pass | pass as reported | pass as reported |
+| Animated move completes once | pass | pass | pass as reported | pass as reported |
+| First-gesture audio unlock | pass | pass | pass as reported | pass as reported (sound confirmed) |
+| Pan-first audio unlock | pass | pass | not recorded | not recorded |
+| Retry after Blocked | n/a, never Blocked | n/a, never Blocked | not recorded | not recorded |
+| Resize: rotate / narrow and wide window | pass (portrait and landscape) | pass (narrow and wide) | pass as reported | pass as reported |
+| Backgrounded during move: frozen, completes once | pass | pass | not recorded | not recorded |
+| Pointer held across app switch | pass | pass | not recorded | not recorded |
+| Return after a long background | pass | pass | not recorded | not recorded |
+| Repeated restart (5+) | pass | pass | pass as reported | pass as reported |
+| Browser toolbar collapse | pass | n/a | not recorded | not recorded |
+| Page gestures: no zoom, selection, callout, pull-to-refresh, context menu | pass | pass | not recorded | not recorded |
+| Slow network stall | not run (optional) | not run (optional) | not recorded | not recorded |
+| Safe areas | not recorded | n/a | not recorded | not recorded |
+| Silent switch, interrupted context, Ogg probe, Low Power Mode | n/a (iPhone rows) | n/a | not recorded | not recorded |
 
 Orientation coverage: every Android check in portrait; load, tap/drag/pinch, animated move and repeated restart also in landscape. Desktop at a narrow and a wide window.
 
 ## 3. Device record
 
-| Field | Android | Desktop |
-| --- | --- | --- |
-| Device / OS version | Android phone; model and OS version not recorded | not recorded |
-| Browser versions | Brave, Chrome, Edge, Samsung Internet; versions not recorded | not recorded |
-| Network / cache conditions | not recorded | not recorded |
-| Console errors | not captured (needs USB remote debugging); no on-screen error in any browser | not captured; no on-screen error |
-| Measurements JSON per browser | not captured | not captured |
-| Low Power Mode | not recorded | n/a |
+| Field | Android | Desktop | iPhone Chrome and iPhone Safari |
+| --- | --- | --- | --- |
+| Device / OS version | Android phone; model and OS version not recorded | not recorded | not supplied |
+| Browser versions | Brave, Chrome, Edge, Samsung Internet; versions not recorded | not recorded | not supplied |
+| Network / cache conditions | not recorded | not recorded | not supplied |
+| Console errors | not captured (needs USB remote debugging); no on-screen error in any browser | not captured; no on-screen error | not captured; "all testable functions operational" as reported |
+| Measurements JSON per browser | not captured | not captured | not supplied |
+| Low Power Mode | not recorded | n/a | not recorded |
 
-These blanks are accepted by the assignee for this pass and are listed again under limitations (§7). On-device bytes and timing therefore come from the collector in §4, which is emulation on this host, not device evidence.
+The Android and desktop blanks are accepted by the assignee for this pass; the iPhone blanks are stated in the issue body itself. All are listed again under limitations (§7). On-device bytes and timing therefore come from the collector in §4, which is emulation on this host, not device evidence.
 
 ## 4. Deployed measurements
 
@@ -116,12 +116,12 @@ L4 is the one measured failure. Fixing it is asset work (re-export the proof PNG
 
 ## 7. Fit decision and limitations
 
-**Proposed decision: Phaser 4.2.1 is fit for the first-battle tranche, with the loading gate held open on L4.** On every physical browser tested so far (four Android browsers, one desktop browser) the complete diagnostic passes with no functional failure, no on-screen error and no audio, lifecycle or gesture defect, and the collector found zero console errors in 36 deployed and loopback samples. The engine's cost is small and stable: 363 kB compressed, frames at the display interval, usable controls within 1.1–1.7 s over the real CDN. The only measured failure is the weight of the proof art, which is independent of the engine. The decision becomes final when the iPhone Safari and iPhone Chrome rows are posted and the maintainer agrees the budgets.
+**Proposed decision: Phaser 4.2.1 is fit for the first-battle tranche, with the loading gate held open on L4.** On every physical browser tested (four Android browsers, one desktop browser, and iPhone Chrome and iPhone Safari as reported on the issue) the diagnostic passes with no functional failure, no on-screen error and no audio, lifecycle or gesture defect, and the collector found zero console errors in 36 deployed and loopback samples. The engine's cost is small and stable: 363 kB compressed, frames at the display interval, usable controls within 1.1–1.7 s over the real CDN. The only measured failure is the weight of the proof art, which is independent of the engine. The decision becomes final when the maintainer agrees the budgets in §6.
 
 Outstanding limitations, recorded honestly:
 
-1. iPhone Safari and iPhone Chrome rows are pending from dubstylee's run; the iPhone-only checks (silent switch, interrupted context, Ogg probe, Low Power Mode) with them.
-2. No device model, OS version, browser versions or network conditions were recorded for the Android and desktop passes; no per-browser Measurements JSON, no on-device console log, no on-device bytes or timing. All numbers in §4 are emulation on one WSL2 host with software rendering.
+1. iPhone Chrome and iPhone Safari are recorded as functional acceptance only ("all testable functions are operational"); the lifecycle scenarios and the iPhone-only checks (silent switch, interrupted context, Ogg probe, Low Power Mode) were not itemised, and no device model, iOS or browser versions were supplied.
+2. No device model, OS version, browser versions or network conditions were recorded for the Android, desktop or iPhone passes; no per-browser Measurements JSON, no on-device console log, no on-device bytes or timing. All numbers in §4 are emulation on one WSL2 host with software rendering.
 3. L4 fails; F2 and I1 are unmeasured.
 4. The old deployed game was not compared (no accessible URL).
 5. The cold deployed numbers include whatever state the Cloudflare edge cache was in; the three cold samples per profile agree within 50% on timing and exactly on bytes.
