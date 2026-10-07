@@ -77,6 +77,8 @@ export function reduceAudio(state: AudioState, event: AudioEvent): AudioState {
     case 'playFailed':
       return ATTEMPTING.has(state.state) ? { ...state, state: 'blocked', lastError: event.reason } : state;
     case 'timeout':
-      return ATTEMPTING.has(state.state) ? { ...state, state: 'blocked', lastError: 'Playback did not complete in time' } : state;
+      if (state.state === 'unlocking') return { ...state, state: 'blocked', lastError: 'Audio context did not resume in time' };
+      if (state.state === 'playing') return { ...state, state: 'blocked', lastError: 'Playback did not complete in time' };
+      return state;
   }
 }

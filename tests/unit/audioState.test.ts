@@ -55,6 +55,17 @@ describe('audio diagnostic reducer', () => {
     expect(canRetry(timedOut)).toBe(true);
   });
 
+  it('names the phase that timed out: the context while unlocking, playback while playing', () => {
+    const unlocking = run([{ type: 'loaded', contextState: 'suspended' }, { type: 'gesture' }]);
+    const unlockTimedOut = reduceAudio(unlocking, { type: 'timeout' });
+    expect(unlockTimedOut).toMatchObject({ state: 'blocked', attempts: 1, playedCount: 0 });
+    expect(unlockTimedOut.lastError).toMatch(/resume/);
+    expect(canRetry(unlockTimedOut)).toBe(true);
+    const playTimedOut = run([{ type: 'contextState', contextState: 'running' }, { type: 'playStarted' }, { type: 'timeout' }], unlocking);
+    expect(playTimedOut.lastError).toMatch(/complete/);
+    expect(playTimedOut.lastError).not.toMatch(/resume/);
+  });
+
   it('is unavailable without retry when the file fails or the format is unsupported', () => {
     const failed = run([{ type: 'loadFailed', reason: 'Could not load unlock-tone' }]);
     expect(failed).toMatchObject({ state: 'unavailable', lastError: 'Could not load unlock-tone' });
