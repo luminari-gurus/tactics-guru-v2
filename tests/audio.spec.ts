@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { AUDIO_LOAD_TIMEOUT_MS } from '../src/diagnostics/proofAssets';
 
 // Headless Chromium creates Phaser's AudioContext suspended and a Playwright click is trusted input,
 // so the locked -> played path below does exercise Chromium's gesture gate. iOS Safari's rules
@@ -147,6 +148,35 @@ test('a resume() that never settles is reported as blocked with retry, then play
   await button.click();
   await expect(status).toHaveText('Played', { timeout: 5000 });
   expect(await audio(page)).toMatchObject({ state: 'played', contextState: 'running', attempts: 2, playedCount: 1, lastError: null });
+  expect(errors).toEqual([]);
+});
+
+test('a stalled tone request never holds the board; the control reports unavailable after the load timeout', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Never fulfilled, never aborted: the request neither completes nor errors on its own.
+  await page.route('**/proof/unlock-tone.mp3', () => {});
+  await page.goto('/');
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#audio-status')).toHaveText('Loading');
+  await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
+  expect(await page.evaluate(() => window.fitDiagnostics().audio)).toBeNull();
+  expect(await page.evaluate(() => window.fitDiagnostics().proof?.assetCount)).toBe(4);
+  await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeEnabled();
+  await page.getByLabel('Move destination').selectOption('raised-front');
+  await expect(page.getByRole('button', { name: 'Start diagnostic move', exact: true })).toBeEnabled();
+  // Restart is allowed while the audio pass is in flight; the new run starts its own pass.
+  await page.getByRole('button', { name: 'Restart proof scene' }).click();
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
+  await expect(page.locator('#audio-status')).toHaveText('Loading');
+  // Each attempt times out after AUDIO_LOAD_TIMEOUT_MS and Phaser's loader retries twice by default (`loader.maxRetries`).
+  await expect(page.locator('#audio-status')).toHaveText('Unavailable: Could not load unlock-tone', { timeout: AUDIO_LOAD_TIMEOUT_MS * 3 + 5000 });
+  await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
+  expect(await audio(page)).toMatchObject({ state: 'unavailable', attempts: 0, playedCount: 0, cached: { mp3: false, ogg: true } });
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
   expect(errors).toEqual([]);
 });
 

@@ -18,6 +18,8 @@ export const PROOF_AUDIO = [
   { kind: 'audio', key: UNLOCK_TONE_PROBE_KEY, url: '/proof/unlock-tone.ogg', format: 'ogg' },
 ] as const;
 export const PROOF_ASSETS = [...PROOF_IMAGES, ...PROOF_AUDIO] as const;
+/** Per-file XHR timeout for the audio pass: a stalled request becomes a load error instead of holding the control at Loading. */
+export const AUDIO_LOAD_TIMEOUT_MS = 5000;
 export type ProofAsset = (typeof PROOF_ASSETS)[number];
 export const PROOF_ART = {
   // Fresh square material: the renderer supplies all isometric geometry.
