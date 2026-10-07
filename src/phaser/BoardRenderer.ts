@@ -7,13 +7,14 @@ import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, 
 const ELEVATED_EDGE_COLOR = 0x263c29;
 const ELEVATED_EDGE_WIDTH = 1;
 const OCCUPANT_LAYER = 2.5;
-const OCCLUDING_TREE_ALPHA = 0.4;
+const DEFAULT_OCCLUDING_TREE_ALPHA = 0.4;
 
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly hero: Phaser.GameObjects.Image;
   private readonly prop: Phaser.GameObjects.Image;
   private readonly bounds: Bounds;
+  private occludingTreeAlpha = DEFAULT_OCCLUDING_TREE_ALPHA;
   private fixture: ProofFixture = 'ground-behind';
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
@@ -70,6 +71,12 @@ export class BoardRenderer {
     this.showFixture('ground-behind');
   }
 
+  setOccludingOpacity(alpha: number): void {
+    if (!Number.isFinite(alpha)) return;
+    this.occludingTreeAlpha = Math.max(0, Math.min(1, alpha));
+    this.showFixture(this.fixture);
+  }
+
   showFixture(fixture: ProofFixture): void {
     this.fixture = fixture;
     const value = PROOF_FIXTURES[fixture];
@@ -79,7 +86,7 @@ export class BoardRenderer {
     this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, OCCUPANT_LAYER));
     const occludesHero = this.hero.depth < this.prop.depth
       && Phaser.Geom.Rectangle.Overlaps(this.hero.getBounds(), this.prop.getBounds());
-    this.prop.setAlpha(occludesHero ? OCCLUDING_TREE_ALPHA : 1);
+    this.prop.setAlpha(occludesHero ? this.occludingTreeAlpha : 1);
     this.root.sort('depth');
     this.publishDiagnostics();
   }
