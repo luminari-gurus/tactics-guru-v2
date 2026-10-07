@@ -100,7 +100,7 @@ Reading: the three large PNGs are 95.1% of the cold transfer and the three slowe
 
 ## 6. Proposed budgets
 
-Proposed from the measurements above for the maintainer to agree or amend; none is asserted by code. "Deployed" means the collector against the approved URL from a wired or Wi-Fi host.
+Proposed from the measurements above and agreed as proposed by the assignee when closing #20 on 2026-10-07 (https://github.com/luminari-gurus/tactics-guru-v2/issues/20#issuecomment-6046571556); none is asserted by code. "Deployed" means the collector against the approved URL from a wired or Wi-Fi host.
 
 | Budget | Proposed limit | Evidence | Current build |
 | --- | --- | --- | --- |
@@ -116,9 +116,9 @@ L4 is the one measured failure. Fixing it is asset work (re-export the proof PNG
 
 ## 7. Fit decision and limitations
 
-**Proposed decision: Phaser 4.2.1 is fit for the first-battle tranche, with the loading gate held open on L4.** On every physical browser tested (four Android browsers, one desktop browser, and iPhone Chrome and iPhone Safari as reported on the issue) the diagnostic passes with no functional failure, no on-screen error and no audio, lifecycle or gesture defect, and the collector found zero console errors in 36 deployed and loopback samples. The engine's cost is small and stable: 363 kB compressed, frames at the display interval, usable controls within 1.1–1.7 s over the real CDN. The only measured failure is the weight of the proof art, which is independent of the engine. The decision becomes final when the maintainer agrees the budgets in §6.
+**Decision: Phaser 4.2.1 is fit for the first-battle tranche, with the loading gate held open on L4 under #35.** On every physical browser tested (four Android browsers, one desktop browser, and iPhone Chrome and iPhone Safari as reported on the issue) the diagnostic passes with no functional failure, no on-screen error and no audio, lifecycle or gesture defect, and the collector found zero console errors in 36 deployed and loopback samples. The engine's cost is small and stable: 363 kB compressed, frames at the display interval, usable controls within 1.1–1.7 s over the real CDN. The only measured failure is the weight of the proof art, which is independent of the engine. Recorded as final in the closing comment on #20; the asset re-export is tracked by #35.
 
-Outstanding limitations, recorded honestly:
+Outstanding limitations, accepted as recorded when #20 was closed:
 
 1. iPhone Chrome and iPhone Safari are recorded as functional acceptance only ("all testable functions are operational"); the lifecycle scenarios and the iPhone-only checks (silent switch, interrupted context, Ogg probe, Low Power Mode) were not itemised, and no device model, iOS or browser versions were supplied.
 2. No device model, OS version, browser versions or network conditions were recorded for the Android, desktop or iPhone passes; no per-browser Measurements JSON, no on-device console log, no on-device bytes or timing. All numbers in §4 are emulation on one WSL2 host with software rendering.
