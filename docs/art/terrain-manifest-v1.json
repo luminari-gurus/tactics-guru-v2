@@ -18,21 +18,6 @@
       "runtimeSha256": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74"
     },
     {
-      "terrain": "brush",
-      "source": "public/textures/terrain/brush-top-down-v1.png",
-      "sourceSize": [
-        1254,
-        1254
-      ],
-      "sourceSha256": "c5ad236ead95d14c8f6779d566dce71c51d207da7b43a87de15513e079e15ff8",
-      "runtime": "public/textures/terrain/runtime/brush-top-down-v1.png",
-      "runtimeSize": [
-        256,
-        256
-      ],
-      "runtimeSha256": "d4abac0d661e3f2e7755a827700a446b53edeac2198d380750325bac02e2d644"
-    },
-    {
       "terrain": "cliff",
       "source": "public/textures/terrain/cliff-top-down-v1.png",
       "sourceSize": [
@@ -151,51 +136,6 @@
         256
       ],
       "runtimeSha256": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442"
-    },
-    {
-      "terrain": "tree_cluster",
-      "source": "public/textures/terrain/tree_cluster-top-down-v1.png",
-      "sourceSize": [
-        1254,
-        1254
-      ],
-      "sourceSha256": "e3bfa2dde4862e9a89f153d702f836d0718cbc6bf79bfc549c806b0d4ad9510d",
-      "runtime": "public/textures/terrain/runtime/tree_cluster-top-down-v1.png",
-      "runtimeSize": [
-        256,
-        256
-      ],
-      "runtimeSha256": "60ce71533a3a38bfd6a8c154278dbb6697d6c5c685024acaa2edf971f7e22322"
-    },
-    {
-      "terrain": "tree_dense",
-      "source": "public/textures/terrain/tree_dense-top-down-v1.png",
-      "sourceSize": [
-        1254,
-        1254
-      ],
-      "sourceSha256": "3485330de9d6d62f51ce169e996e83c91858acb098115313c68a5969494b2fa3",
-      "runtime": "public/textures/terrain/runtime/tree_dense-top-down-v1.png",
-      "runtimeSize": [
-        256,
-        256
-      ],
-      "runtimeSha256": "812b8d73281a0a29a02019c4c4ef5b6cad3ee199ed402e4ed4173938dfedf368"
-    },
-    {
-      "terrain": "tree_single",
-      "source": "public/textures/terrain/tree_single-top-down-v1.png",
-      "sourceSize": [
-        1254,
-        1254
-      ],
-      "sourceSha256": "54a5a01d493a29f7b786242b012c67e03702e13fc9cd692efe2d5f732b3a997e",
-      "runtime": "public/textures/terrain/runtime/tree_single-top-down-v1.png",
-      "runtimeSize": [
-        256,
-        256
-      ],
-      "runtimeSha256": "306a8717fb382379ab409a125a1039867137d00637935fcc27e3a8bdea4011c6"
     },
     {
       "terrain": "water",
