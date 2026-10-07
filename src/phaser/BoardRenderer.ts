@@ -4,6 +4,10 @@ import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture 
 import { setProofDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
 
+const ELEVATED_EDGE_COLOR = 0x263c29;
+const ELEVATED_EDGE_WIDTH = 1;
+const OCCUPANT_LAYER = 2.5;
+
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly hero: Phaser.GameObjects.Image;
@@ -40,6 +44,12 @@ export class BoardRenderer {
       grass.setMask(mask.createGeometryMask());
       this.surfaceMasks.push(mask);
       this.root.add([graphics, surface]);
+      if (tile.elevation > 0) {
+        const border = scene.add.graphics().setDepth(proofDepth(tile, 2));
+        border.lineStyle(ELEVATED_EDGE_WIDTH, ELEVATED_EDGE_COLOR, 0.95)
+          .strokePoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
+        this.root.add(border);
+      }
     }
     this.prop = scene.add.image(0, 0, 'tree').setOrigin(0.5, PROOF_ART.tree.originY).setDisplaySize(PROOF_ART.tree.width, PROOF_ART.tree.height);
     this.hero = scene.add.image(0, 0, 'fighter').setOrigin(0.5, PROOF_ART.fighter.originY).setDisplaySize(PROOF_ART.fighter.width, PROOF_ART.fighter.height);
@@ -64,8 +74,8 @@ export class BoardRenderer {
     const value = PROOF_FIXTURES[fixture];
     const hero = projectTile(value.hero);
     const prop = projectTile(value.prop);
-    this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, 2));
-    this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, 2));
+    this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, OCCUPANT_LAYER));
+    this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, OCCUPANT_LAYER));
     this.root.sort('depth');
     this.publishDiagnostics();
   }

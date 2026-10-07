@@ -23,7 +23,7 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
     await expect(page.getByRole('status')).toHaveText('Ready');
     await expect(page.locator('#game')).toHaveAttribute('data-run', String(run));
     expect(await page.evaluate(() => window.fitDiagnostics().proof?.fixture)).toBe('ground-behind');
-    expect(await page.evaluate(() => window.fitDiagnostics().proof?.objectCount)).toBe(67);
+    expect(await page.evaluate(() => window.fitDiagnostics().proof?.objectCount)).toBe(71);
   }
   expect(errors).toEqual([]);
 });
