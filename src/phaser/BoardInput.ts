@@ -52,21 +52,30 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardRenderer, 
     event.preventDefault();
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
+  const reset = (): void => {
+    for (const id of pointers.keys()) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+    pointers.clear();
+    gesture = false;
+  };
+  // A finger down at an app switch may never deliver pointerup; drop it so resume cannot pan without a press.
+  const owner = canvas.ownerDocument;
+  const visibility = (): void => { if (owner.visibilityState === 'hidden') reset(); };
   canvas.addEventListener('pointerdown', down);
   canvas.addEventListener('pointermove', move);
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
   canvas.addEventListener('lostpointercapture', end);
   canvas.addEventListener('wheel', wheel, { passive: false });
+  owner.addEventListener('visibilitychange', visibility);
   return () => {
+    owner.removeEventListener('visibilitychange', visibility);
     canvas.removeEventListener('pointerdown', down);
     canvas.removeEventListener('pointermove', move);
     canvas.removeEventListener('pointerup', end);
     canvas.removeEventListener('pointercancel', end);
     canvas.removeEventListener('lostpointercapture', end);
     canvas.removeEventListener('wheel', wheel);
-    for (const id of pointers.keys()) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
-    pointers.clear();
+    reset();
     canvas.style.touchAction = previousTouchAction;
   };
 }
