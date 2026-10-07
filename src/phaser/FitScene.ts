@@ -4,10 +4,13 @@ import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } fro
 import { PROOF_ASSETS, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
+import { PROOF_AUDIO_KEYS, ProofAudio } from './ProofAudio';
 
 export const FIT_SCENE_KEY = 'fit';
 
 export class FitScene extends Phaser.Scene {
+  private readonly audioLoadErrors = new Set<string>();
+
   constructor(private readonly status: (state: 'loading' | 'ready' | 'error') => void, private readonly error: (message: string) => void) {
     super(FIT_SCENE_KEY);
   }
@@ -15,6 +18,7 @@ export class FitScene extends Phaser.Scene {
   init(): void {
     setBoardDiagnostics(null);
     setProofDiagnostics(null);
+    this.audioLoadErrors.clear();
     this.status('loading');
     for (const name of FIT_MARKS) performance.clearMarks(name);
     performance.mark('fit:scene-start');
@@ -22,7 +26,11 @@ export class FitScene extends Phaser.Scene {
   }
 
   preload(): void {
-    const failed = (file: Phaser.Loader.File): void => { this.error(`Could not load proof asset ${file.key}`); };
+    // Audio failures are recorded and shown by the audio control; image failures stay fatal.
+    const failed = (file: Phaser.Loader.File): void => {
+      if (PROOF_AUDIO_KEYS.has(file.key)) this.audioLoadErrors.add(file.key);
+      else this.error(`Could not load proof asset ${file.key}`);
+    };
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed));
     for (const asset of PROOF_ASSETS) {
@@ -34,6 +42,7 @@ export class FitScene extends Phaser.Scene {
   create(): void {
     if (PROOF_IMAGES.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
+    const audio = new ProofAudio(this, this.audioLoadErrors);
     const removeBoardInput = bindBoardInput(this.game.canvas, board, () => ({width: this.scale.width, height: this.scale.height}));
     const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
     const opacityValue = document.querySelector<HTMLElement>('#tree-opacity-value')!;
@@ -129,6 +138,7 @@ export class FitScene extends Phaser.Scene {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
       tween?.stop();
+      audio.destroy();
       moveButton.removeEventListener('click', startMove);
       destination.removeEventListener('change', previewMove);
       removeBoardInput();
