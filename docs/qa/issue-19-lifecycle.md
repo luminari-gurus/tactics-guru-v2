@@ -26,6 +26,8 @@ ffmpeg -i unlock-tone.wav -c:a libvorbis -q:a 3 -fflags +bitexact -flags:a +bite
 
 Signal: 880 Hz sine, 150 ms, 10 ms linear fade in and out, mono, 44.1 kHz. MP3 is the only compressed audio format the restart plan allows for shipped assets (§5.1); the OGG exists so an iPhone can answer the codec question in restart plan D1 by reporting `audio.device.ogg` and `audio.cached.ogg`. The same facts sit in a comment next to the catalog in `src/diagnostics/proofAssets.ts`.
 
+Four ElevenLabs-generated alternatives, with their prompts, provider bytes, ffmpeg processing and hashes, are recorded in [issue-19-unlock-tone-candidates.md](issue-19-unlock-tone-candidates.md). None is adopted; the sine tone above is still the played asset.
+
 ## 2. Decisions taken
 
 The plan proposed D-A to D-H. Taken as proposed unless noted.
