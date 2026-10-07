@@ -1,6 +1,6 @@
 # Issue #19 plan: proof-scene audio unlock and browser lifecycle
 
-Status: Draft, 2026-10-07. Owner: moshehbenavraham (assigned on the tracker).
+Status: Implemented on `issue-19-audio-lifecycle`, PR open for review, 2026-10-07. Owner: moshehbenavraham (assigned on the tracker). See §9 for the handover state.
 
 Issue: [#19 P1: Verify proof-scene audio unlock and browser lifecycle](https://github.com/luminari-gurus/tactics-guru-v2/issues/19).
 Parent: #2 (proof-of-fit), within epic #1. Depends on #18 (merged). Blocks #20.
@@ -59,7 +59,7 @@ From `src/phaser/FitScene.ts`, `BoardInput.ts`, `start.ts`, `style.css`:
 | Area | Present on `main` | Gap for #19 |
 | -- | -- | -- |
 | Audio | None. No `load.audio`, no `this.sound` use, no audio config. | Everything in AC1. |
-| Visibility | Scene listens to `visibilitychange` only to reset the frame sampler. Phaser's own `VisibilityHandler` pauses the game loop on hidden and resumes it on visible; `TimeStep.resume()` calls `resetDelta()`, so there is no catch-up jump. | No diagnostics for hidden/visible/blur/focus; no defined behaviour for a move in flight; no test. |
+| Visibility | Scene listens to `visibilitychange` only to reset the frame sampler. Phaser's own `VisibilityHandler` emits `HIDDEN`/`VISIBLE` and `Game.onHidden` calls `TimeStep.pause()`, but **(corrected 2026-10-07)** that only records a pause timestamp: the loop keeps stepping while the browser still delivers animation frames. On a hidden tab the browser stops frames, so the tween freezes; `TimeStep.resume()` calls `resetDelta()`, so there is no catch-up jump on return. | No diagnostics for hidden/visible/blur/focus; no defined behaviour for a move in flight; no test. |
 | Pointer state | `BoardInput` tracks pointers in a `Map`, clears on `pointerup`/`pointercancel`/`lostpointercapture`. | A pointer that is down when the page is hidden can survive to resume as a stuck drag. Nothing clears it on `visibilitychange`. |
 | Move | Tween-driven (`this.tweens.add`), `moving` flag, controls locked while moving, restart stops the tween. | Behaviour while hidden is implicit (loop paused, so the tween freezes). Needs to be stated, tested and surfaced. |
 | Layout | Panel is `position: fixed`, top/left/right use `env(safe-area-inset-*)`; `button, summary` have `min-height: 44px`; select and slider are 44px tall; `body { height: 100dvh }`. | Panel has no `max-height`/scroll. In 915×412 landscape the panel's six control rows plus caption and Measurements likely exceed the viewport and hide the lower controls; only `#fit-restart` is asserted in-viewport today. No `overscroll-behavior`, no `touch-action: manipulation` on controls, no `user-select`/callout suppression. |
@@ -188,13 +188,18 @@ path), emit `unsupported`. The rest of the scene proceeds to `ready`.
 
 ### D-E. Move in flight while hidden: freeze, then continue
 
-Phaser pauses the game loop on `HIDDEN`; the tween does not advance. On
-`VISIBLE`, `TimeStep.resume()` resets the delta, so the tween continues from
-the same progress with no jump. **Defined behaviour:** the move freezes
-while hidden and completes exactly once after resume; `#move-status` stays
-`Moving` throughout; controls stay locked until completion. Alternatives
-rejected: cancel-and-reset (hides the thing #20 needs to observe) and
-wall-clock catch-up (forbidden by tech design §5.6).
+**Corrected 2026-10-07.** Phaser 4.2.1 does not pause its loop on `HIDDEN`
+(`TimeStep.pause()` only records a timestamp); the tween freezes on a real
+hidden tab only because the browser stops animation frames, and Playwright
+disables that throttling. So the scene freezes explicitly: on
+`Core.Events.HIDDEN` it records `tween.progress` as `moveFrozenAt` and calls
+`tween.pause()`; on `VISIBLE` it calls `tween.resume()`. `TimeStep.resume()`
+still resets the delta, so there is no jump. Window blur alone does not
+freeze. **Defined behaviour:** the move freezes while hidden and completes
+exactly once after resume; `#move-status` stays `Moving` throughout;
+controls stay locked until completion. Alternatives rejected:
+cancel-and-reset (hides the thing #20 needs to observe) and wall-clock
+catch-up (forbidden by tech design §5.6).
 
 The scene adds counters to diagnostics so a test and a human can see what
 happened: `lifecycle: { hidden, visible, blur, focus, moveFrozenAt, moveCompleted }`.
@@ -415,6 +420,57 @@ it; then move this plan's durable content into the README/QA note and
 delete or archive this file.
 
 ## 9. Updates
+
+### 2026-10-07: implementation complete, PR open
+
+All six increments are on `issue-19-audio-lifecycle`, one commit each, in
+the planned order: `24a5507` chore (tone + catalog), `c76d3a5` feat
+(reducer + adapter), `c87ca47` feat (lifecycle), `6a10a13` style (layout),
+`9c3fbf2` test (three new specs), then the docs commit that carries this
+entry, `docs/qa/issue-19-lifecycle.md`, the README section and two
+screenshots under `docs/qa/issue-19/`. The QA note holds the provenance
+record, the decision log, the validation results, the measurements and the
+physical checklist for #20; this file is only the plan and its corrections.
+
+Deviations from the plan, all recorded in the QA note §2:
+
+- D-E is implemented as an explicit `tween.pause()`/`resume()` on
+  `HIDDEN`/`VISIBLE` (see the corrected section above). The plan's "no
+  behaviour change to the tween itself" no longer holds.
+- D-B gained a `loading` initial state and an `unlocking` state so the
+  button is disabled while `context.resume()` is pending.
+- D-D also covers decode failures: Phaser 4.2.1 emits no loader event for
+  them, so a missing `cache.audio` key after preload reads `Could not
+  decode` (or unsupported when `device.audio.mp3` is false).
+- D-G caps the panel at `min(70dvh, 100dvh − insets)` in every
+  orientation and `45dvh` in short landscape; the disclosure is named
+  **Board controls**; `#fit-report` stays selectable.
+- `assetCount` keeps counting the four images (`PROOF_IMAGES`); audio is
+  reported through `audio.cached` instead. `objectCount` stays 72.
+- Headless Chromium creates Phaser's `AudioContext` suspended in some runs
+  and running in others, and a Playwright click is trusted input, so the
+  `locked → played` path does exercise Chromium's gesture gate. The plan's
+  §4 note that headless "starts running without a gesture" was wrong; the
+  spec comment and QA note say what is and is not exercised.
+- `canvas.ownerDocument` carries the visibility listener (D-F), so
+  `bindBoardInput`'s signature is unchanged.
+- The scratch check with console warnings enabled showed two pre-existing
+  Phaser/GL warnings (`Mask.setMask` in WebGL, `GPU stall due to
+  ReadPixels`). Not errors, not in scope; noted for the maintainer.
+
+Validation as run (details and numbers in the QA note §4–5): unit 29
+passed (RED first for the reducer and the hidden-pointer test); build
+passed; focused specs 8 + 16 + 6 passed; full suite 81 passed; `git diff
+--check` clean; `measure:fit` run on this WSL2 host for both `origin/main`
+and the branch under identical conditions.
+
+Handover: nothing is left to implement for #19's four criteria in
+emulation. Remaining work is review of the PR, then #20's physical
+checklist (QA note §6). If review asks for changes, branch state is clean
+at the docs commit; re-run `npm run build && npm test` after any change to
+`src/`, `index.html` or `tests/`. Do not add `Closes #19`. When the
+maintainer closes #19, fold QA note §3 into the README if it is still
+accurate and delete this file.
 
 ### 2026-10-07: media-generation references audited
 
