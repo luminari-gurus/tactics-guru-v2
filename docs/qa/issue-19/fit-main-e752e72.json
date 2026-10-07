@@ -1,0 +1,2715 @@
+{
+  "measuredAt": "2026-10-07T13:18:03.098Z",
+  "sourceCommit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+  "sourceDirty": false,
+  "browserVersion": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "release": "6.6.114.1-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.15.0"
+  },
+  "conditions": {
+    "url": "http://127.0.0.1:4174",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+    "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload"
+  },
+  "buildFiles": [
+    {
+      "path": "dist/assets/browser-CFVYzc8k.js",
+      "bytes": 1708,
+      "sha256": "f6ba4e8a603052e3ea1d1cdde8d7861e23c142719d6e5dc8c7732bddc3058dfd"
+    },
+    {
+      "path": "dist/assets/index-DQAUVAhO.js",
+      "bytes": 3616,
+      "sha256": "8114b9a1b7646f0f278d4c1ec2ab0bfdd43dbb97b04412f835392496d695fa67"
+    },
+    {
+      "path": "dist/assets/index-KENboht4.css",
+      "bytes": 1603,
+      "sha256": "4ae007e0d26842f961bb78f2a160f38c66f74ace169eedcd8287a2d6d43ffe26"
+    },
+    {
+      "path": "dist/assets/start-MZhqF2zU.js",
+      "bytes": 1387453,
+      "sha256": "fa5b3374b11102f25efcbb6ab84602f84988b4ba2e44089c6b85e8840edb22c0"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 2426,
+      "sha256": "0ca3619fc548d36904ae5c6a4aa3c9de0164079a43002969226ad3cb764d4a37"
+    },
+    {
+      "path": "dist/proof/fighter-portrait.png",
+      "bytes": 3285110,
+      "sha256": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190"
+    },
+    {
+      "path": "dist/proof/fighter.png",
+      "bytes": 8843,
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "dist/proof/grass-material-v1.png",
+      "bytes": 2980361,
+      "sha256": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2"
+    },
+    {
+      "path": "dist/proof/tree-grass-v1.png",
+      "bytes": 1117492,
+      "sha256": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5"
+    }
+  ],
+  "samples": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 274,
+        "sceneReadyMs": 552.6999999284744,
+        "controlsUsableMs": 736.2999999523163,
+        "frames": {
+          "count": 121,
+          "medianMs": 30.700000047683716,
+          "p95Ms": 48.60000002384186,
+          "maxMs": 108.69999992847443
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:01.927Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 50.59999990463257
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 12.099999904632568
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 11.400000095367432
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 11
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 54.40000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 56.60000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 77.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 20.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 99.20000004768372
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 162.10000002384186
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 250.80000007152557,
+        "sceneReadyMs": 491.7000000476837,
+        "controlsUsableMs": 682.2000000476837,
+        "frames": {
+          "count": 120,
+          "medianMs": 23.600000023841858,
+          "p95Ms": 33.39999997615814,
+          "maxMs": 48.89999997615814
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:05.533Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 96.10000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 5.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 4.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 5.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 3.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 59.39999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 17.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 13.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 60.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 159.69999992847443
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 232.30000007152557,
+        "sceneReadyMs": 461.60000002384186,
+        "controlsUsableMs": 627.5,
+        "frames": {
+          "count": 121,
+          "medianMs": 25.799999952316284,
+          "p95Ms": 43.89999997615814,
+          "maxMs": 77
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:09.641Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 37.60000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 13.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 12.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 13.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 63.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 68.89999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 6
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 63.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 71.70000004768372
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 140.69999992847443
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 226.10000002384186,
+        "sceneReadyMs": 484.2999999523163,
+        "controlsUsableMs": 741.1000000238419,
+        "frames": {
+          "count": 120,
+          "medianMs": 24.200000047683716,
+          "p95Ms": 46.89999997615814,
+          "maxMs": 71.29999995231628
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:13.702Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 66.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 8.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 6.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 11.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 4.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 40.89999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 16.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 11.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 43.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 217.30000007152557
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 290.8000000715256,
+        "sceneReadyMs": 761.3000000715256,
+        "controlsUsableMs": 1217.4000000953674,
+        "frames": {
+          "count": 121,
+          "medianMs": 32,
+          "p95Ms": 80.60000002384186,
+          "maxMs": 140.20000004768372
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:19.655Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 50.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 15.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 17.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 16.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 100.39999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 109.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 33.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 10.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 96.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 394
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 262.5,
+        "sceneReadyMs": 501.59999990463257,
+        "controlsUsableMs": 699.5999999046326,
+        "frames": {
+          "count": 120,
+          "medianMs": 19.59999990463257,
+          "p95Ms": 34.299999952316284,
+          "maxMs": 55.60000002384186
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 430.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 349.93187347931877,
+            "bottom": 658.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:22.906Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 83.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 3
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 9.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 29.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 8
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 30.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 175
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 146.5,
+        "sceneReadyMs": 301.89999997615814,
+        "controlsUsableMs": 395.8000000715256,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.700000047683716,
+          "p95Ms": 62.40000009536743,
+          "maxMs": 98.19999992847443
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:26.458Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 29.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 5.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 5.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 5.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 34.89999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 39.39999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 22.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 7
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 35.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 79.60000002384186
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 357,
+        "sceneReadyMs": 903.7999999523163,
+        "controlsUsableMs": 1509.6999999284744,
+        "frames": {
+          "count": 120,
+          "medianMs": 46,
+          "p95Ms": 85.89999997615814,
+          "maxMs": 126.60000002384186
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:35.932Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 139.19999992847443
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 3
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 136.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 122.40000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 46.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 146.10000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 433.6999999284744
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 362.59999990463257,
+        "sceneReadyMs": 821,
+        "controlsUsableMs": 1104.0999999046326,
+        "frames": {
+          "count": 120,
+          "medianMs": 19.100000023841858,
+          "p95Ms": 47.89999997615814,
+          "maxMs": 75.79999995231628
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:39.950Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 69.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 21.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 20.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 17.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 88
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 156.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 110.69999992847443
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 20.59999990463257
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 163.29999995231628
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 194.59999990463257
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 439.40000009536743,
+        "sceneReadyMs": 776.9000000953674,
+        "controlsUsableMs": 958,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 25.899999976158142,
+          "maxMs": 242.80000007152557
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:43.285Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 98.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 21.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 13.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 21
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 15.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 43
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 34.89999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 25.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 48.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 159.10000002384186
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 193.79999995231628,
+        "sceneReadyMs": 629.3999999761581,
+        "controlsUsableMs": 720.1999999284744,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 20.199999928474426,
+          "maxMs": 35.700000047683716
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:46.153Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 38.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 12.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 12.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 11.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 54.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 57.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 20.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 6.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 46.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 73.19999992847443
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 151,
+        "sceneReadyMs": 302,
+        "controlsUsableMs": 396.60000002384186,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 17.800000071525574,
+          "maxMs": 31.600000023841858
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 570.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 507.2869812052611,
+            "bottom": 749.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:48.576Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 50.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 4.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 3.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.5999999046325684
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 6
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 8.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.1999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 13.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 73.39999997615814
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 149,
+        "sceneReadyMs": 299.5,
+        "controlsUsableMs": 381.7999999523163,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 33.300000071525574
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:51.026Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 23.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 7.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 7.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 7
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 33.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 41.60000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 30.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 5.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 38.40000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 70.89999997615814
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 121.80000007152557,
+        "sceneReadyMs": 253.10000002384186,
+        "controlsUsableMs": 354,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.800000071525574,
+          "maxMs": 33
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:53.411Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 23.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 3.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 21.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 6.400000095367432
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 18.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 87.19999992847443
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 143.89999997615814,
+        "sceneReadyMs": 303.5,
+        "controlsUsableMs": 393.2000000476837,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.90000009536743,
+          "maxMs": 33.299999952316284
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:55.894Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 25.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 5.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 5.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 32.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 57.60000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 31.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 5.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 52.60000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 76.39999997615814
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 120.30000007152557,
+        "sceneReadyMs": 258.2000000476837,
+        "controlsUsableMs": 359.5,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 39.5
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:17:58.280Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 23.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 20.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 8.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 17.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 80.89999997615814
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 147.90000009536743,
+        "sceneReadyMs": 324,
+        "controlsUsableMs": 413,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.90000009536743,
+          "maxMs": 32.699999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:18:00.746Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1266,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 26.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 1895,
+            "encodedBodyBytes": 1595,
+            "decodedBodyBytes": 3616,
+            "durationMs": 6
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 1140,
+            "encodedBodyBytes": 840,
+            "decodedBodyBytes": 1708,
+            "durationMs": 6.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 1053,
+            "encodedBodyBytes": 753,
+            "decodedBodyBytes": 1603,
+            "durationMs": 6.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 360750,
+            "encodedBodyBytes": 360450,
+            "decodedBodyBytes": 1387453,
+            "durationMs": 32.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 58.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 21
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 44.39999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 75.70000004768372
+          }
+        ],
+        "totalTransferBytes": 7759410
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 121.10000002384186,
+        "sceneReadyMs": 257,
+        "controlsUsableMs": 342.3000000715256,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 20.5
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.4478538264742111,
+          "transform": {
+            "scale": 0.4478538264742111,
+            "x": 457.5,
+            "y": 327.9262183759199
+          },
+          "selected": null,
+          "bounds": {
+            "left": 385.395533937652,
+            "right": 529.604466062348,
+            "top": 304,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.00001494372925858091,
+          "objectCount": 72
+        },
+        "capturedAt": "2026-10-07T13:18:03.093Z",
+        "build": {
+          "commit": "e752e7292bc9fe20a7277aaa027b3b1f65657917",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 966,
+            "decodedBodyBytes": 2426,
+            "durationMs": 31.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-DQAUVAhO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-KENboht4.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CFVYzc8k.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-MZhqF2zU.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.1999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 10.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 7.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 10.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 69.60000002384186
+          }
+        ],
+        "totalTransferBytes": 3000
+      },
+      "errors": []
+    }
+  ]
+}
