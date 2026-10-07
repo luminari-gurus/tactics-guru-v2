@@ -1,6 +1,6 @@
 # Generated tree with matching grass
 
-Tool: built-in `image_gen`, transparent_background=true. Image 1: `public/proof/grass-material-v1.png`, grass/style reference. Image 2: `public/proof/tree.png`, pine silhouette reference only. This is a new generated replacement requested by the user, not a pixel-preserving edit of the canonical tree.
+Tool: built-in `image_gen`, transparent_background=true. Image 1: `public/proof/grass-material-v1.png`, grass/style reference. Image 2: legacy `art/tiles/tree_single_detailed_N.png` (then copied as `public/proof/tree.png`, now excluded from this PR), pine silhouette reference only. This is a new generated replacement requested by the user, not a pixel-preserving edit of the canonical tree.
 
 Final prompt:
 
