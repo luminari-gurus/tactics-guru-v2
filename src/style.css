@@ -20,3 +20,6 @@ button[aria-pressed="true"] { border-color: #ffd77d; background: #46546c; }
 .fit-opacity { gap: 8px; font-size: 13px; }
 #tree-opacity { flex: 1; min-width: 80px; height: 44px; margin: 0; accent-color: #ffd77d; cursor: pointer; }
 #tree-opacity-value { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+#move-destination { min-height: 44px; max-width: 100%; color: inherit; background: #2b3e60; border: 1px solid #677c9e; border-radius: 5px; }
+#move-status { font-size: 13px; }

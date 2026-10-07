@@ -14,6 +14,7 @@ function setStatus(state: 'loading' | 'ready' | 'error'): void {
   container.dataset.ready = String(state === 'ready');
   container.dataset.run = String(measurements.snapshot().run);
   restartButton.disabled = state !== 'ready';
+  document.querySelectorAll<HTMLButtonElement | HTMLSelectElement>('#move-start, #move-destination').forEach(control => { control.disabled = state !== 'ready' || (control.id === 'move-start' && !document.querySelector<HTMLSelectElement>('#move-destination')!.value); });
   opacitySlider.disabled = state !== 'ready';
   document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
