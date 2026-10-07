@@ -7,6 +7,8 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
     type: Phaser.AUTO,
     parent: 'game',
     backgroundColor: '#172033',
+    // Right click and long press are cancel gestures, never a browser menu (tech design §5.6).
+    disableContextMenu: true,
     scale: { mode: Phaser.Scale.RESIZE, width: window.innerWidth, height: window.innerHeight },
     scene,
   });
