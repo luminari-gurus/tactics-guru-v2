@@ -1,6 +1,6 @@
 # Issue #19 plan: proof-scene audio unlock and browser lifecycle
 
-Status: Implemented on `issue-19-audio-lifecycle`, PR open for review, 2026-10-07. Owner: moshehbenavraham (assigned on the tracker). See §9 for the handover state.
+Status: Implemented on `issue-19-audio-lifecycle`; [PR #31](https://github.com/luminari-gurus/tactics-guru-v2/pull/31) open for review, 2026-10-07. Owner: moshehbenavraham (assigned on the tracker). See §9 for the handover state.
 
 Issue: [#19 P1: Verify proof-scene audio unlock and browser lifecycle](https://github.com/luminari-gurus/tactics-guru-v2/issues/19).
 Parent: #2 (proof-of-fit), within epic #1. Depends on #18 (merged). Blocks #20.
@@ -421,7 +421,7 @@ delete or archive this file.
 
 ## 9. Updates
 
-### 2026-10-07: implementation complete, PR open
+### 2026-10-07: implementation complete, PR #31 open
 
 All six increments are on `issue-19-audio-lifecycle`, one commit each, in
 the planned order: `24a5507` chore (tone + catalog), `c76d3a5` feat
@@ -465,8 +465,8 @@ passed; focused specs 8 + 16 + 6 passed; full suite 81 passed; `git diff
 and the branch under identical conditions.
 
 Handover: nothing is left to implement for #19's four criteria in
-emulation. Remaining work is review of the PR, then #20's physical
-checklist (QA note §6). If review asks for changes, branch state is clean
+emulation. Remaining work is review of PR #31 (a one-line comment on #19
+links it), then #20's physical checklist (QA note §6). If review asks for changes, branch state is clean
 at the docs commit; re-run `npm run build && npm test` after any change to
 `src/`, `index.html` or `tests/`. Do not add `Closes #19`. When the
 maintainer closes #19, fold QA note §3 into the README if it is still
