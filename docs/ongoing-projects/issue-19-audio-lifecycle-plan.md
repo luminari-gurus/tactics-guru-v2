@@ -1,6 +1,6 @@
 # Issue #19 plan: proof-scene audio unlock and browser lifecycle
 
-Status: Implemented on `issue-19-audio-lifecycle`; [PR #31](https://github.com/luminari-gurus/tactics-guru-v2/pull/31) open for review, 2026-10-07. Owner: moshehbenavraham (assigned on the tracker). See §9 for the handover state.
+Status: Implemented on `issue-19-audio-lifecycle`; [PR #31](https://github.com/luminari-gurus/tactics-guru-v2/pull/31) reviewed 2026-10-07 and the three review findings corrected the same day. Owner: moshehbenavraham (assigned on the tracker). See §9 for the handover state and the review corrections.
 
 Issue: [#19 P1: Verify proof-scene audio unlock and browser lifecycle](https://github.com/luminari-gurus/tactics-guru-v2/issues/19).
 Parent: #2 (proof-of-fit), within epic #1. Depends on #18 (merged). Blocks #20.
@@ -484,3 +484,35 @@ Effect on this plan: none of its decisions change. D-A stands: the unlock
 tone is an ffmpeg-generated file. Text-to-speech is out of scope for the
 first slice; the twelve-cue table in tech design §7.4 and the one optional
 music track are the future consumers of these references.
+
+### 2026-10-07: PR #31 review corrections
+
+The adversarial review of PR #31 found three defects, each reproduced with
+Playwright against the branch; all three are corrected on the branch and
+recorded in the QA note §2 (R-1 to R-3) and §4.
+
+- **Medium, D-C.** A `resume()` that never settles left the control at
+  `Unlocking` with the button disabled: no watchdog covered the unlock
+  phase. Corrected with a wall-clock `UNLOCK_TIMEOUT_MS` (2,000 ms) armed
+  before the await; expiry abandons the attempt and reports
+  `Blocked: Audio context did not resume in time`. Step 2 of D-C's click
+  sequence now reads "await it under the watchdog".
+- **Medium, D-D.** The tone and the OGG probe shared the images' loader
+  pass with no XHR timeout, so a stalled request held the board at
+  `Loading`. Corrected: `preload` queues only the images; `create()` runs
+  a second pass for the audio files with `AUDIO_LOAD_TIMEOUT_MS` (5,000 ms)
+  per file and builds the adapter when it settles. The board, Restart and
+  `fit:scene-ready` never wait on audio.
+- **Low, D-C/D-H.** The `audio` diagnostics were frozen at the last reducer
+  dispatch and nothing observed the context's `statechange`, so Phaser's
+  own body-gesture unlock left the control at `Locked`. Corrected: the
+  adapter subscribes to `statechange`, the reducer moves `locked ↔ ready`
+  with the context (`played`/`blocked` keep their result), and
+  `setAudioDiagnostics` takes a provider read at snapshot time.
+
+Each fix was written RED first (two reducer cases, three browser specs),
+then `npm run build` and `npm test` were re-run on this host. Phaser
+4.2.1's `WebAudioSoundManager.update()` resumes a suspended context on
+every step while the game has focus, so the new spec models a suspension
+through window blur. Handover is unchanged: review of the corrections,
+then #20's physical checklist, which gained a "Slow network" row.
