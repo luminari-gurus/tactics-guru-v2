@@ -413,3 +413,26 @@ repository's `type: subject` style (`chore:`, `feat:`, `style:`, `test:`,
 #19 linking it. Leave the issue assigned to us until the maintainer closes
 it; then move this plan's durable content into the README/QA note and
 delete or archive this file.
+
+## 9. Updates
+
+### 2026-10-07: media-generation references audited
+
+The five documents under `docs/media-gen/` came from another project and
+were rebound to this repository on this branch:
+a new `docs/media-gen/README.md` carries the shared rules (keys only in
+`.env`, pre-build only, `tmp/` scratch, MP3-only compressed audio, the D3
+provenance gate with `docs/qa/issue-16-assets.md` as the record format);
+dead links to the other project's ADRs, manifests and "autonomous
+acceptance suite" are gone; `tmp/` is now ignored; the README's claim that
+no `.env.example` exists was corrected. Provider facts re-checked: ElevenLabs
+`sound-generation` is unchanged (model `eleven_text_to_sound_v2`, 0.5–30 s);
+MusicAPI.ai's live `mv` enum is `sonic-v6`/`-wild`/`-mini` (older ids map to
+v6 since 2026-09-09), create costs 20 credits, and a new approximate
+`duration` field exists, so `.env.example`'s `sonic-v6` default is valid.
+
+Effect on this plan: none of its decisions change. D-A stands: the unlock
+tone is an ffmpeg-generated file, and no media service is used by #19.
+Text-to-speech is out of scope for the first slice; the twelve-cue table in
+tech design §7.4 and the one optional music track are the only future
+consumers of these references, and both sit behind D3.

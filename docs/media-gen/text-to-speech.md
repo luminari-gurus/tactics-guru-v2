@@ -1,16 +1,12 @@
 # ElevenLabs text-to-speech API
 
-<!-- cspell:words ElevenLabs alaw httpx ipa ivc kbps mulaw pathlib pvc ulaw unparseable -->
+> **Credential boundary:** the ElevenLabs API key is `ELEVENLABS_API_KEY` in
+> the ignored repository-root `.env`. `.env.example` carries the name with an
+> empty value. Never commit `.env`, and never copy the value into this
+> document, source, browser code, a `VITE_` variable, tests or logs.
 
-> **Important:** The ElevenLabs API key is configured in the repository-root
-> `.env` file as `ELEVENLABS_API_KEY`. Use the name and placeholder in
-> `.env.example`, never commit `.env`, and do not copy its secret value into
-> this document.
-
-Status: Accepted
-
-Audience: Developers integrating generated speech into project tooling or
-services
+Status: Reference. Not a dependency, credential, budget or runtime
+integration of Tactics Guru v2.
 
 Scope: ElevenLabs `POST /v1/text-to-speech/{voice_id}` authentication, request
 fields, binary response, examples, and failure handling, plus the minimum needed
@@ -18,7 +14,15 @@ of voice listing, instant voice cloning, and `POST /v1/text-to-dialogue`;
 excludes streaming and WebSocket endpoints, timestamps, speech-to-text, billing,
 and voice-library administration
 
-Authority: Evidence
+Project fit: no speech is planned. The first slice ships a small set of battle
+sound effects, a mute control and at most one optional music track
+([tech design §1, §7.4](../tech_design.phaser4.draft.md)); there is no
+narration, no battle bark and no voiced dialogue, and issue #19 uses none of
+this. The document is kept because the key already exists for sound effects
+([sound-fx-api.md](sound-fx-api.md)) and a later decision may want voice
+lines. Any such decision needs a tracker issue, a rights review for every
+voice and the provenance gate in [README.md](README.md) before a file is
+committed.
 
 Last verified: 2026-10-07
 
@@ -32,21 +36,16 @@ Evidence: [Create speech endpoint reference](https://elevenlabs.io/docs/api-refe
 and [prompting controls](https://elevenlabs.io/docs/best-practices/prompting/controls),
 checked 2026-10-07
 
-## Supplemental disposition
-
-This document is retained as external integration evidence. It does not enable
-a dependency, credential, model, voice, provider, data flow, budget, or
-production integration. Any future proposal must be expressed as a versioned
-contract and pass the product, data, privacy, security, rights, and release
-checks that apply to generated media.
-
 ## Project boundary
 
-This document is external integration reference evidence. It does not mean that
-ElevenLabs is a production dependency or that the shipped game sends data to
-ElevenLabs. Speech is generated ahead of time by a trusted local tool or server
-process; the browser bundle never contains the key, the SDK, or a request to
-`api.elevenlabs.io`.
+ElevenLabs is not a production dependency and the shipped game sends nothing
+to it. If speech is ever generated, it is generated ahead of time by a
+hand-run local script; the browser bundle never contains the key, the SDK, or
+a request to `api.elevenlabs.io`. Outputs go to the ignored
+`tmp/audio-generation/elevenlabs/` scratch directory, and a file reaches
+`src/assets/` only through the provenance record and owner sign-off
+described in [README.md](README.md). Shipped speech would have to be MP3
+([restart plan §5.1](../phaser4-restart-plan.md)).
 
 Never call ElevenLabs directly from browser code with a long-lived API key. The
 official authentication guide is explicit: the key is a secret and must not be
@@ -271,7 +270,9 @@ requires a Creator plan or above and voice verification; it is out of scope
 here.
 
 This Python example creates a clone and then synthesizes one line with it,
-streaming the result to disk under a byte limit:
+streaming the result to disk under a byte limit. It is a standalone script
+using the `httpx` package; the repository has no Python toolchain, and the
+Node.js example further down is the one that matches the repository:
 
 ```python
 import json
@@ -460,7 +461,8 @@ try {
 }
 ```
 
-This code belongs in a trusted Node.js process, not in the browser bundle.
+This code belongs in a hand-run Node.js script (the repository requires Node
+22.12 or newer, which has `fetch` built in), not in the browser bundle.
 
 ## Responses and errors
 
