@@ -5,6 +5,7 @@ const container = document.querySelector<HTMLElement>('#game')!;
 const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;
 const restartButton = document.querySelector<HTMLButtonElement>('#fit-restart')!;
 const snapshotButton = document.querySelector<HTMLButtonElement>('#fit-snapshot')!;
+const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
 
@@ -13,6 +14,7 @@ function setStatus(state: 'loading' | 'ready' | 'error'): void {
   container.dataset.ready = String(state === 'ready');
   container.dataset.run = String(measurements.snapshot().run);
   restartButton.disabled = state !== 'ready';
+  opacitySlider.disabled = state !== 'ready';
   document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
 

@@ -29,6 +29,16 @@ export class FitScene extends Phaser.Scene {
   create(): void {
     if (PROOF_ASSETS.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
+    const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
+    const opacityValue = document.querySelector<HTMLElement>('#tree-opacity-value')!;
+    const updateOpacity = (): void => {
+      const percent = opacitySlider.valueAsNumber;
+      board.setOccludingOpacity(percent / 100);
+      opacityValue.textContent = `${percent}%`;
+      opacitySlider.setAttribute('aria-valuetext', `${percent}%`);
+    };
+    opacitySlider.addEventListener('input', updateOpacity);
+    updateOpacity();
     const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-fixture]')];
     const showFixture = (event: Event): void => {
       const fixture = (event.currentTarget as HTMLButtonElement).dataset.fixture!;
@@ -77,6 +87,7 @@ export class FitScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
+      opacitySlider.removeEventListener('input', updateOpacity);
       for (const button of buttons) button.removeEventListener('click', showFixture);
       portrait.removeEventListener('error', portraitFailed);
       portrait.removeEventListener('load', markUsable);

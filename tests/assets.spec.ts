@@ -35,5 +35,6 @@ test('failed canonical asset load gives a controlled visible error', async ({ pa
   await page.goto('/');
   await expect(page.getByRole('status')).toContainText('Error: Could not load proof asset fighter');
   await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeDisabled();
+  await expect(page.getByRole('slider', { name: 'Tree opacity (unit behind)' })).toBeDisabled();
   expect(await page.evaluate(() => window.fitDiagnostics().proof)).toBeNull();
 });
