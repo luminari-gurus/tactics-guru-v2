@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scriptedMove';
 import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } from '../diagnostics/browser';
 import { PROOF_ASSETS, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
@@ -42,7 +43,42 @@ export class FitScene extends Phaser.Scene {
     opacitySlider.addEventListener('input', updateOpacity);
     updateOpacity();
     const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-fixture]')];
+    const moveButton = document.querySelector<HTMLButtonElement>('#move-start')!;
+    const destination = document.querySelector<HTMLSelectElement>('#move-destination')!;
+    const moveStatus = document.querySelector<HTMLElement>('#move-status')!;
+    let moving = false;
+    let tween: Phaser.Tweens.Tween | undefined;
+    moveStatus.textContent = 'Idle';
+    const previewMove = (): void => {
+      if (destination.value !== 'raised-front') return;
+      board.selectTile(MOVE_PATH[MOVE_PATH.length - 1]);
+      moveButton.disabled = moving;
+    };
+    destination.addEventListener('change', previewMove);
+    const startMove = (): void => {
+      if (moving || moveButton.disabled || destination.value !== 'raised-front') return;
+      moving = true;
+      moveStatus.textContent = 'Moving';
+      moveButton.disabled = destination.disabled = true;
+      for (const button of buttons) { button.disabled = true; button.setAttribute('aria-pressed', 'false'); }
+      board.showFixture('raised-behind');
+      previewMove();
+      board.moveHero(MOVE_PATH[0]);
+      const clock = { elapsed: 0 };
+      tween = this.tweens.add({ targets: clock, elapsed: MOVE_DURATION_MS, duration: MOVE_DURATION_MS,
+        ease: 'Linear', onUpdate: () => board.moveHero(sampleMove(clock.elapsed)),
+        onComplete: () => {
+          board.moveHero(MOVE_PATH[MOVE_PATH.length - 1]);
+          moving = false;
+          moveStatus.textContent = 'Completed';
+          moveButton.disabled = destination.disabled = false;
+          for (const button of buttons) button.disabled = false;
+        } });
+    };
+    moveButton.addEventListener('click', startMove);
     const showFixture = (event: Event): void => {
+      if (moving) return;
+      moveStatus.textContent = 'Idle';
       const fixture = (event.currentTarget as HTMLButtonElement).dataset.fixture!;
       if (!(fixture in PROOF_FIXTURES)) return;
       board.showFixture(fixture as ProofFixture);
@@ -89,6 +125,9 @@ export class FitScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
+      tween?.stop();
+      moveButton.removeEventListener('click', startMove);
+      destination.removeEventListener('change', previewMove);
       removeBoardInput();
       opacitySlider.removeEventListener('input', updateOpacity);
       for (const button of buttons) button.removeEventListener('click', showFixture);

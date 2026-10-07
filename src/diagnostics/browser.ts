@@ -8,7 +8,7 @@ export interface BoardDiagnostics {
   scale: number;
   bounds: { left: number; top: number; right: number; bottom: number };
 }
-export interface ProofDiagnostics { fixture: string; relation: 'behind' | 'front'; propElevation: number; heroDepth: number; propDepth: number; propAlpha: number; assetCount: number; objectCount: number; surfaceCornerError: number | null; }
+export interface ProofDiagnostics { fixture: string; relation: 'behind' | 'front'; propElevation: number; heroTile: { x: number; y: number; elevation: number }; heroPosition: { x: number; y: number }; heroDepth: number; propDepth: number; propAlpha: number; assetCount: number; objectCount: number; surfaceCornerError: number | null; }
 let proof: ProofDiagnostics | null = null;
 export function setProofDiagnostics(value: ProofDiagnostics | null): void { proof = value; }
 let board: BoardDiagnostics | null = null;
