@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { FitScene } from './FitScene';
 
-export function startProof(status: (state: 'loading' | 'ready') => void): () => void {
-  const scene = new FitScene(status);
+export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void): () => void {
+  const scene = new FitScene(status, error);
   new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',

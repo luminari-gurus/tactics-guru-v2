@@ -7,7 +7,16 @@ canvas { display: block; }
 button, summary { min-height: 44px; box-sizing: border-box; padding: 10px 12px; cursor: pointer; }
 button { color: inherit; background: #2b3e60; border: 1px solid #677c9e; border-radius: 5px; font: inherit; }
 button:disabled { opacity: 0.5; cursor: default; }
-button:focus-visible, summary:focus-visible { outline: 3px solid #ffd77d; outline-offset: 2px; }
+button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid #ffd77d; outline-offset: 2px; }
 #fit-status { flex: 1; }
 #fit-report { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 35dvh; overflow-y: auto; font-size: 12px; }
 #board-caption { margin: 8px 0 0; color: #b3cb97; font-size: 13px; }
+
+#proof-portrait { border-radius: 4px; margin: 0; }
+button[aria-pressed="true"] { border-color: #ffd77d; background: #46546c; }
+
+[data-fixture] { font-size: 13px; padding: 8px; }
+
+.fit-opacity { gap: 8px; font-size: 13px; }
+#tree-opacity { flex: 1; min-width: 80px; height: 44px; margin: 0; accent-color: #ffd77d; cursor: pointer; }
+#tree-opacity-value { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
