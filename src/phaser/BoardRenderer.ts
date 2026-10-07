@@ -2,20 +2,20 @@ import Phaser from 'phaser';
 import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
 import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, TILE_WIDTH } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
 
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly hero: Phaser.GameObjects.Image;
   private readonly prop: Phaser.GameObjects.Image;
   private readonly bounds: Bounds;
+  private fixture: ProofFixture = 'ground-behind';
+  private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
 
   constructor(scene: Phaser.Scene) {
     this.root = scene.add.container();
-    const frame = PROOF_ART.grass.frame;
-    const surfaceScale = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / frame.width;
-    if (!scene.textures.get('grass').has('surface')) scene.textures.get('grass').add('surface', 0, frame.x, frame.y, frame.width, frame.height);
+    const surfaceSide = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / Math.SQRT2;
     const drawFace = (graphics: Phaser.GameObjects.Graphics, points: readonly Point[], color: number): void => {
       const vertices = points.map(point => new Phaser.Math.Vector2(point.x, point.y));
       graphics.fillStyle(color, 1).fillPoints(vertices, true);
@@ -28,15 +28,18 @@ export class BoardRenderer {
       drawFace(graphics, faces.right, 0x4e6d72);
       drawFace(graphics, faces.top, 0x638b82);
       const point = projectTile(tile);
-      const grass = scene.add.image(point.x, point.y, 'grass', 'surface')
-        .setOrigin(0.5).setScale(surfaceScale)
-        .setDepth(proofDepth(tile, 1));
-      // Uniform scaling plus a small bleed fills the diamond; the mask clips excess coverage.
+      const surface = scene.add.container(point.x, point.y)
+        .setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(proofDepth(tile, 1));
+      const grass = scene.add.image(0, 0, 'grass').setOrigin(0.5)
+        .setDisplaySize(surfaceSide, surfaceSide).setRotation(Math.PI / 4);
+      surface.add(grass);
+      this.surfaces.push({ tile, image: grass });
+      // Rotate a square by exactly 45 degrees, then squash vertically to the grid's 2:1 diamond.
       const mask = scene.add.graphics().setVisible(false);
       mask.fillStyle(0xffffff).fillPoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
       grass.setMask(mask.createGeometryMask());
       this.surfaceMasks.push(mask);
-      this.root.add([graphics, grass]);
+      this.root.add([graphics, surface]);
     }
     this.prop = scene.add.image(0, 0, 'tree').setOrigin(0.5, PROOF_ART.tree.originY).setDisplaySize(PROOF_ART.tree.width, PROOF_ART.tree.height);
     this.hero = scene.add.image(0, 0, 'fighter').setOrigin(0.5, PROOF_ART.fighter.originY).setDisplaySize(PROOF_ART.fighter.width, PROOF_ART.fighter.height);
@@ -57,20 +60,45 @@ export class BoardRenderer {
   }
 
   showFixture(fixture: ProofFixture): void {
+    this.fixture = fixture;
     const value = PROOF_FIXTURES[fixture];
     const hero = projectTile(value.hero);
     const prop = projectTile(value.prop);
     this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, 2));
     this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, 2));
     this.root.sort('depth');
-    setProofDiagnostics({ fixture, relation: value.relation, propElevation: value.prop.elevation,
-      heroDepth: this.hero.depth, propDepth: this.prop.depth, assetCount: PROOF_ASSETS.length, objectCount: this.root.length + 1 + this.surfaceMasks.length });
+    this.publishDiagnostics();
+  }
+
+  private publishDiagnostics(): void {
+    const value = PROOF_FIXTURES[this.fixture];
+    const rootMatrix = this.root.getWorldTransformMatrix();
+    const bleedScale = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / TILE_WIDTH;
+    const errors = this.surfaces.flatMap(({ tile, image }) => {
+      const halfWidth = image.width / 2 / bleedScale;
+      const halfHeight = image.height / 2 / bleedScale;
+      const corners = [
+        { x: -halfWidth, y: -halfHeight }, { x: halfWidth, y: -halfHeight },
+        { x: halfWidth, y: halfHeight }, { x: -halfWidth, y: halfHeight },
+      ];
+      const matrix = image.getWorldTransformMatrix();
+      return tileFaces(tile).top.map((point, index) => {
+        const expected = rootMatrix.transformPoint(point.x, point.y);
+        const actual = matrix.transformPoint(corners[index].x, corners[index].y);
+        return Math.hypot(expected.x - actual.x, expected.y - actual.y);
+      });
+    });
+    setProofDiagnostics({ fixture: this.fixture, relation: value.relation, propElevation: value.prop.elevation,
+      heroDepth: this.hero.depth, propDepth: this.prop.depth, assetCount: PROOF_ASSETS.length,
+      surfaceCornerError: Math.max(...errors),
+      objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
   }
 
   fit(width: number, height: number, panelBottom: number): BoardDiagnostics {
     const layout = fitBoard(this.bounds, { width, height }, panelBottom);
     this.root.setPosition(layout.x, layout.y).setScale(layout.scale);
     for (const mask of this.surfaceMasks) mask.setPosition(layout.x, layout.y).setScale(layout.scale);
+    this.publishDiagnostics();
     return {
       tileCount: BOARD_FIXTURE.length,
       elevations: [...new Set(BOARD_FIXTURE.map(tile => tile.elevation))].sort(),
