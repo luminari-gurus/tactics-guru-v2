@@ -4,15 +4,18 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { arch, cpus, platform, release } from 'node:os';
 import { chromium, devices } from '@playwright/test';
+import { buildIdentity, collectorConditions, parseMeasureArgs } from './measure-fit-options.ts';
 
-const output = process.argv[2] ?? 'test-results/fit-baseline.json';
-const url = 'http://127.0.0.1:4174';
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'pipe' });
+// `measure:fit [output] [--url <origin>]`: without --url the collector serves `dist` itself on the preview port;
+// with --url (or FIT_URL) it measures that deployed origin and reads the served build from the page.
+const options = parseMeasureArgs(process.argv.slice(2), process.env);
+const { output, url } = options;
+const server = options.remote ? null : spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'pipe' });
 let serverError = '';
 let previewListening = false;
-server.stdout.on('data', chunk => { if (String(chunk).includes(url)) previewListening = true; });
-server.stderr.on('data', chunk => { serverError += String(chunk); });
-server.on('error', error => { serverError += error.message; });
+server?.stdout.on('data', chunk => { if (String(chunk).includes(url)) previewListening = true; });
+server?.stderr.on('data', chunk => { serverError += String(chunk); });
+server?.on('error', error => { serverError += error.message; });
 
 async function buildFiles(directory: string): Promise<{ path: string; bytes: number; sha256: string }[]> {
   const files = [];
@@ -28,13 +31,18 @@ async function buildFiles(directory: string): Promise<{ path: string; bytes: num
 }
 
 try {
-  let ready = false;
-  for (let attempt = 0; attempt < 100; attempt++) {
-    if (server.exitCode !== null) throw new Error(`Preview exited: ${serverError}`);
-    try { if (previewListening && (await fetch(url)).ok) { ready = true; break; } } catch { /* server starting */ }
-    await new Promise(resolve => setTimeout(resolve, 100));
+  if (server) {
+    let ready = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      if (server.exitCode !== null) throw new Error(`Preview exited: ${serverError}`);
+      try { if (previewListening && (await fetch(url)).ok) { ready = true; break; } } catch { /* server starting */ }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (!ready) throw new Error('Preview failed to start');
+  } else {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`${url} answered ${response.status}`);
   }
-  if (!ready) throw new Error('Preview failed to start');
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE });
   try {
     const samples = [];
@@ -63,19 +71,23 @@ try {
         } finally { await context.close(); }
       }
     }
+    const measuredBuild = buildIdentity(samples);
     const result = {
       measuredAt: new Date().toISOString(),
       sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
       sourceDirty: Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim()),
+      // The build the pages were actually served from (baked `__BUILD_INFO__`); for a deployed origin this is the deployed commit.
+      measuredBuild,
       browserVersion: browser.version(),
       host: { platform: platform(), release: release(), arch: arch(), cpu: cpus()[0]?.model, node: process.version },
-      conditions: { url, mode: 'headless Chromium; mobile profiles are emulation', network: 'unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview', cache: 'cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes', frames: 'first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload' },
-      buildFiles: await buildFiles('dist'),
+      conditions: collectorConditions(options),
+      buildFiles: options.remote ? null : await buildFiles('dist'),
       samples,
     };
     await mkdir(join(output, '..'), { recursive: true });
     await writeFile(output, JSON.stringify(result, null, 2) + '\n');
-    console.log(`Recorded ${samples.length} cold/warm samples in ${output}`);
+    console.log(`Recorded ${samples.length} cold/warm samples from build ${measuredBuild.commit}${measuredBuild.dirty ? ' (dirty)' : ''} in ${output}`);
+    if (!options.remote && measuredBuild.commit !== result.sourceCommit) throw new Error(`dist was built from ${measuredBuild.commit} but the source is at ${result.sourceCommit}; rebuild before measuring`);
     if (samples.some(sample => sample.errors.length)) throw new Error('Console/page errors detected; inspect output');
   } finally { await browser.close(); }
-} finally { server.kill(); }
+} finally { server?.kill(); }

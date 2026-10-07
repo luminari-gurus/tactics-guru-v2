@@ -1,0 +1,3449 @@
+{
+  "measuredAt": "2026-10-07T19:58:31.982Z",
+  "sourceCommit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+  "sourceDirty": true,
+  "measuredBuild": {
+    "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+    "dirty": false
+  },
+  "browserVersion": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "release": "6.6.114.1-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.15.0"
+  },
+  "conditions": {
+    "url": "http://127.0.0.1:4174",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+    "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload"
+  },
+  "buildFiles": [
+    {
+      "path": "dist/assets/browser-CNNQJbdr.js",
+      "bytes": 1827,
+      "sha256": "15074e30e7c9e6873a696e22e1ef0abae3e298a75e495e8da7d218a115cad94b"
+    },
+    {
+      "path": "dist/assets/index-NpXPp59Z.js",
+      "bytes": 3685,
+      "sha256": "0bd7be1d55e0f20678b0774379a1d3c65516021c79a715e95b333364330be804"
+    },
+    {
+      "path": "dist/assets/index-vYhN6ezP.css",
+      "bytes": 2194,
+      "sha256": "cee8dd04006c0581c4cabcc1a66f4b60c6049516981d12d8f680ff09bded6139"
+    },
+    {
+      "path": "dist/assets/start-B3wdnvD2.js",
+      "bytes": 1394209,
+      "sha256": "f47adf7896c89c30d50cb56d47c9ec17f470c4f97342eeab2bc938ac1d6edc7f"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 2764,
+      "sha256": "369b3f4047e9767f94f9fd4c332b18e2b2f580ce88d431ec1172fff7de5513d4"
+    },
+    {
+      "path": "dist/proof/fighter-portrait.png",
+      "bytes": 3285110,
+      "sha256": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190"
+    },
+    {
+      "path": "dist/proof/fighter.png",
+      "bytes": 8843,
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "dist/proof/grass-material-v1.png",
+      "bytes": 2980361,
+      "sha256": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2"
+    },
+    {
+      "path": "dist/proof/tree-grass-v1.png",
+      "bytes": 1117492,
+      "sha256": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5"
+    },
+    {
+      "path": "dist/proof/unlock-tone.mp3",
+      "bytes": 1462,
+      "sha256": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec"
+    },
+    {
+      "path": "dist/proof/unlock-tone.ogg",
+      "bytes": 3768,
+      "sha256": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d"
+    }
+  ],
+  "samples": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 142.10000002384186,
+        "sceneReadyMs": 263,
+        "controlsUsableMs": 366.5,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 17,
+          "maxMs": 26
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:57:46.972Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 24.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 6.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 6.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 6.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 28
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 34.39999997615814
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 29.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 6.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 36.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 3.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 3.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 88.20000004768372
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 106.79999995231628,
+        "sceneReadyMs": 221.5,
+        "controlsUsableMs": 313.7999999523163,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.800000071525574,
+          "maxMs": 27
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:57:49.304Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 25.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 1.7999999523162842
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 4.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 18.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 7.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 21.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.9000000953674316
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 76.79999995231628
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 122.5,
+        "sceneReadyMs": 259.2000000476837,
+        "controlsUsableMs": 361.8000000715256,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.90000009536743,
+          "maxMs": 33.300000071525574
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:57:54.327Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 16.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 4.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 4.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 27.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 29.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 18.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 5.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 31.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 85.69999992847443
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 102.79999995231628,
+        "sceneReadyMs": 217.39999997615814,
+        "controlsUsableMs": 311.2999999523163,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 29.299999952316284
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:57:56.661Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 16.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 2.8000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 1.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 2.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 16.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 5.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 18.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 1.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 1.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 78.20000004768372
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 137.10000002384186,
+        "sceneReadyMs": 281.5,
+        "controlsUsableMs": 379.1999999284744,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 33.5
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:57:59.092Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 20.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.900000095367432
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 7.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 7.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 30.90000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 34.10000002384186
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 21.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 35.90000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 83.19999992847443
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 123.39999997615814,
+        "sceneReadyMs": 265.2000000476837,
+        "controlsUsableMs": 365.3000000715256,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 27.59999990463257
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000010685223514883546,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:01.479Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 30.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 2.1999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 2.6999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 17.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.0999999046325684
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 6.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 19.40000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.1999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 86
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 110.79999995231628,
+        "sceneReadyMs": 222.39999997615814,
+        "controlsUsableMs": 292.7999999523163,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17.5
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:03.825Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 20.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.599999904632568
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 4.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 25.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 25.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 15.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 27.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 4.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 4.099999904632568
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 58
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 89.5,
+        "sceneReadyMs": 188.59999990463257,
+        "controlsUsableMs": 267.1999999284744,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.600000023841858,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 26.199999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:06.107Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 17.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.9000000953674316
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.7000000476837158
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.7000000476837158
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 8
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 6
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 8
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 1.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 62.800000071525574
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 112.39999997615814,
+        "sceneReadyMs": 226.30000007152557,
+        "controlsUsableMs": 293.39999997615814,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.90000009536743,
+          "maxMs": 30.199999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:08.460Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 19.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 4.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 24.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 31.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 12
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.9000000953674316
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 22.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 54.10000002384186
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 87.10000002384186,
+        "sceneReadyMs": 185.80000007152557,
+        "controlsUsableMs": 256.2000000476837,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.800000071525574,
+          "maxMs": 17.199999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:10.726Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 16.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.7000000476837158
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 14.099999904632568
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 5.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 11.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 1.8000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 57.199999928474426
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 104,
+        "sceneReadyMs": 217.60000002384186,
+        "controlsUsableMs": 279.7000000476837,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17.09999990463257
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:13.058Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 16.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 4.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 25.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 21.59999990463257
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 23.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 30.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 51.199999928474426
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 90,
+        "sceneReadyMs": 192.60000002384186,
+        "controlsUsableMs": 259.2000000476837,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.800000071525574,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.0000310554737552593,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:15.327Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 20
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.6999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 7.599999904632568
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.8000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 8
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 53.700000047683716
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 105,
+        "sceneReadyMs": 216.60000002384186,
+        "controlsUsableMs": 282.89999997615814,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 33.199999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:17.672Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 16.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 4.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 24.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 15
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 25.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.8000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 29
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 53.89999997615814
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 91.29999995231628,
+        "sceneReadyMs": 198.5,
+        "controlsUsableMs": 263.2000000476837,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17.100000023841858
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:19.939Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 18.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 12.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 5.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 14.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 1.7000000476837158
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.3000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 52.89999997615814
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 102.89999997615814,
+        "sceneReadyMs": 204.59999990463257,
+        "controlsUsableMs": 281.39999997615814,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:22.272Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 17.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 4.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 5.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 5.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 25.699999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 25.800000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 17.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 27.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.0999999046325684
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 63.700000047683716
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 95.79999995231628,
+        "sceneReadyMs": 211.10000002384186,
+        "controlsUsableMs": 277.2999999523163,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17.200000047683716
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:24.555Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 18.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 1.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 7.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 4.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 2.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 7
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.6999999284744263
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 54.59999990463257
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 111.60000002384186,
+        "sceneReadyMs": 226.70000004768372,
+        "controlsUsableMs": 301.10000002384186,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 17,
+          "maxMs": 17.199999928474426
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:29.693Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 1329,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 17.90000009536743
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 1910,
+            "encodedBodyBytes": 1610,
+            "decodedBodyBytes": 3685,
+            "durationMs": 5.5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 1186,
+            "encodedBodyBytes": 886,
+            "decodedBodyBytes": 1827,
+            "durationMs": 5.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 1248,
+            "encodedBodyBytes": 948,
+            "decodedBodyBytes": 2194,
+            "durationMs": 5
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 362730,
+            "encodedBodyBytes": 362430,
+            "decodedBodyBytes": 1394209,
+            "durationMs": 26
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 2980661,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 23.09999990463257
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 4.300000071525574
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 1117792,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 17
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 3285410,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 29.799999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2.9000000953674316
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.8000000715255737
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 62.199999928474426
+          }
+        ],
+        "totalTransferBytes": 7767539
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 95.30000007152557,
+        "sceneReadyMs": 210.70000004768372,
+        "controlsUsableMs": 275.7000000476837,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.699999928474426,
+          "p95Ms": 16.899999976158142,
+          "maxMs": 17.399999976158142
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 4,
+          "surfaceCornerError": 0.000032660185476596994,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "locked",
+          "contextState": "suspended",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": true,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-07T19:58:31.977Z",
+        "build": {
+          "commit": "fed393618f46c436fcca30898e6525acfab5bb2a",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4174/",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1029,
+            "decodedBodyBytes": 2764,
+            "durationMs": 19
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-NpXPp59Z.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/browser-CNNQJbdr.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2.600000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4174/assets/start-B3wdnvD2.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/grass-material-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 2980361,
+            "decodedBodyBytes": 2980361,
+            "durationMs": 7.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 3.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/tree-grass-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1117492,
+            "decodedBodyBytes": 1117492,
+            "durationMs": 6
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 9.199999928474426
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 2
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 2.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4174/proof/fighter-portrait.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3285110,
+            "decodedBodyBytes": 3285110,
+            "durationMs": 51.200000047683716
+          }
+        ],
+        "totalTransferBytes": 3600
+      },
+      "errors": []
+    }
+  ]
+}
