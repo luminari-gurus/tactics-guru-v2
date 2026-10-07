@@ -6,6 +6,7 @@ const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;
 const restartButton = document.querySelector<HTMLButtonElement>('#fit-restart')!;
 const snapshotButton = document.querySelector<HTMLButtonElement>('#fit-snapshot')!;
 const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
+const audioButton = document.querySelector<HTMLButtonElement>('#audio-play')!;
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
 
@@ -16,6 +17,8 @@ function setStatus(state: 'loading' | 'ready' | 'error'): void {
   restartButton.disabled = state !== 'ready';
   document.querySelectorAll<HTMLButtonElement | HTMLSelectElement>('#move-start, #move-destination').forEach(control => { control.disabled = state !== 'ready' || (control.id === 'move-start' && !document.querySelector<HTMLSelectElement>('#move-destination')!.value); });
   opacitySlider.disabled = state !== 'ready';
+  // The scene-owned audio adapter enables this button itself once the tone is loaded.
+  if (state !== 'ready') audioButton.disabled = true;
   document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
 
