@@ -1,13 +1,16 @@
 import Phaser from 'phaser';
 import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scriptedMove';
-import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } from '../diagnostics/browser';
-import { PROOF_ASSETS, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
+import { FIT_MARKS, measurements, setBoardDiagnostics, setLifecycleDiagnostics, setProofDiagnostics, type LifecycleDiagnostics } from '../diagnostics/browser';
+import { AUDIO_LOAD_TIMEOUT_MS, PROOF_AUDIO, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
+import { PROOF_AUDIO_KEYS, ProofAudio } from './ProofAudio';
 
 export const FIT_SCENE_KEY = 'fit';
 
 export class FitScene extends Phaser.Scene {
+  private readonly audioLoadErrors = new Set<string>();
+
   constructor(private readonly status: (state: 'loading' | 'ready' | 'error') => void, private readonly error: (message: string) => void) {
     super(FIT_SCENE_KEY);
   }
@@ -15,6 +18,8 @@ export class FitScene extends Phaser.Scene {
   init(): void {
     setBoardDiagnostics(null);
     setProofDiagnostics(null);
+    setLifecycleDiagnostics(null);
+    this.audioLoadErrors.clear();
     this.status('loading');
     for (const name of FIT_MARKS) performance.clearMarks(name);
     performance.mark('fit:scene-start');
@@ -22,15 +27,32 @@ export class FitScene extends Phaser.Scene {
   }
 
   preload(): void {
-    const failed = (file: Phaser.Loader.File): void => { this.error(`Could not load proof asset ${file.key}`); };
+    // Only the images gate create(); their failures stay fatal. The audio files load in their own pass
+    // from create() (see there), and their failures are recorded here and shown by the audio control.
+    const failed = (file: Phaser.Loader.File): void => {
+      if (PROOF_AUDIO_KEYS.has(file.key)) this.audioLoadErrors.add(file.key);
+      else this.error(`Could not load proof asset ${file.key}`);
+    };
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed));
-    for (const asset of PROOF_ASSETS) if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url);
+    for (const asset of PROOF_IMAGES) if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url);
   }
 
   create(): void {
-    if (PROOF_ASSETS.some(asset => !this.textures.exists(asset.key))) return;
+    if (PROOF_IMAGES.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
+    // The board never waits on audio: the tone and the OGG probe load in a second loader pass, each with an
+    // XHR timeout so a request that neither completes nor errors becomes a load error, and the audio control
+    // stays at Loading until that pass settles.
+    let audio: ProofAudio | undefined;
+    const audioLoaded = (): void => { audio = new ProofAudio(this, this.audioLoadErrors); };
+    const pendingAudio = PROOF_AUDIO.filter(asset => !this.cache.audio.exists(asset.key));
+    if (pendingAudio.length === 0) audioLoaded();
+    else {
+      for (const asset of pendingAudio) this.load.audio(asset.key, asset.url, undefined, { responseType: 'arraybuffer', timeout: AUDIO_LOAD_TIMEOUT_MS });
+      this.load.once(Phaser.Loader.Events.COMPLETE, audioLoaded);
+      this.load.start();
+    }
     const removeBoardInput = bindBoardInput(this.game.canvas, board, () => ({width: this.scale.width, height: this.scale.height}));
     const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
     const opacityValue = document.querySelector<HTMLElement>('#tree-opacity-value')!;
@@ -48,6 +70,9 @@ export class FitScene extends Phaser.Scene {
     const moveStatus = document.querySelector<HTMLElement>('#move-status')!;
     let moving = false;
     let tween: Phaser.Tweens.Tween | undefined;
+    const lifecycle: LifecycleDiagnostics = { hidden: 0, visible: 0, blur: 0, focus: 0, moveFrozenAt: null, moveCompleted: 0 };
+    const publishLifecycle = (): void => { setLifecycleDiagnostics({ ...lifecycle }); };
+    publishLifecycle();
     moveStatus.textContent = 'Idle';
     const previewMove = (): void => {
       if (destination.value !== 'raised-front') return;
@@ -70,12 +95,33 @@ export class FitScene extends Phaser.Scene {
         onComplete: () => {
           board.moveHero(MOVE_PATH[MOVE_PATH.length - 1]);
           moving = false;
+          lifecycle.moveCompleted++;
+          publishLifecycle();
           moveStatus.textContent = 'Completed';
           moveButton.disabled = destination.disabled = false;
           for (const button of buttons) button.disabled = false;
         } });
     };
     moveButton.addEventListener('click', startMove);
+    // A move in flight freezes while the page is hidden and continues from the same progress once visible.
+    // Phaser's loop keeps stepping whenever the browser still runs animation frames, so the pause is explicit.
+    // Blur alone (window still visible) does not freeze. Nothing here starts audio.
+    const onHidden = (): void => {
+      lifecycle.hidden++;
+      if (moving && tween && !tween.isPaused()) { lifecycle.moveFrozenAt = tween.progress; tween.pause(); }
+      publishLifecycle();
+    };
+    const onVisible = (): void => {
+      lifecycle.visible++;
+      if (moving && tween?.isPaused()) tween.resume();
+      publishLifecycle();
+    };
+    const onBlur = (): void => { lifecycle.blur++; publishLifecycle(); };
+    const onFocus = (): void => { lifecycle.focus++; publishLifecycle(); };
+    this.game.events.on(Phaser.Core.Events.HIDDEN, onHidden);
+    this.game.events.on(Phaser.Core.Events.VISIBLE, onVisible);
+    this.game.events.on(Phaser.Core.Events.BLUR, onBlur);
+    this.game.events.on(Phaser.Core.Events.FOCUS, onFocus);
     const showFixture = (event: Event): void => {
       if (moving) return;
       moveStatus.textContent = 'Idle';
@@ -105,7 +151,7 @@ export class FitScene extends Phaser.Scene {
     };
     portrait.addEventListener('error', portraitFailed);
     portrait.addEventListener('load', markUsable);
-    portrait.src = PROOF_ASSETS.find(asset => asset.key === 'fighter-portrait')!.url;
+    portrait.src = PROOF_IMAGES.find(asset => asset.key === 'fighter-portrait')!.url;
     portrait.hidden = false;
     const panel = document.querySelector<HTMLElement>('#fit-panel')!;
     const layoutBoard = (): void => {
@@ -126,6 +172,13 @@ export class FitScene extends Phaser.Scene {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
       tween?.stop();
+      this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
+      this.game.events.off(Phaser.Core.Events.VISIBLE, onVisible);
+      this.game.events.off(Phaser.Core.Events.BLUR, onBlur);
+      this.game.events.off(Phaser.Core.Events.FOCUS, onFocus);
+      setLifecycleDiagnostics(null);
+      this.load.off(Phaser.Loader.Events.COMPLETE, audioLoaded);
+      audio?.destroy();
       moveButton.removeEventListener('click', startMove);
       destination.removeEventListener('change', previewMove);
       removeBoardInput();
