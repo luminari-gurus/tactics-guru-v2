@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } from '../diagnostics/browser';
 import { PROOF_ASSETS, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
+import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
 
 export const FIT_SCENE_KEY = 'fit';
@@ -29,6 +30,7 @@ export class FitScene extends Phaser.Scene {
   create(): void {
     if (PROOF_ASSETS.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
+    const removeBoardInput = bindBoardInput(this.game.canvas, board, () => ({width: this.scale.width, height: this.scale.height}));
     const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
     const opacityValue = document.querySelector<HTMLElement>('#tree-opacity-value')!;
     const updateOpacity = (): void => {
@@ -87,6 +89,7 @@ export class FitScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
+      removeBoardInput();
       opacitySlider.removeEventListener('input', updateOpacity);
       for (const button of buttons) button.removeEventListener('click', showFixture);
       portrait.removeEventListener('error', portraitFailed);

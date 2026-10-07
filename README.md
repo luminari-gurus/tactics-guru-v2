@@ -75,3 +75,11 @@ Local preview uses loopback HTTP and negotiates HTTP content compression; actual
 The board uses generated filled polygons, with named 80×40 tile dimensions, 24-pixel elevation steps and a common 12-pixel base. Complete columns draw back to front by grid depth (`x + y`), then by `y` and `x` for deterministic ties; elevation shifts the top surface instead of changing this order. The immutable elevation table is a diagnostic fixture, not gameplay content or a procedural map.
 
 Resize fits every top and side face below the current diagnostics panel with a 16-pixel margin. The Measurements snapshot includes tile count, elevation levels, scale and rendered board bounds. No selection, camera gestures, units or movement are implemented here. See [issue #15 visual QA](docs/qa/issue-15-board.md).
+
+## Proof board input
+
+Tap/click a solid tile to select its visible top or side face. Picking uses the same back-to-front column order as rendering; trees and characters pass input through to the visible board beneath them (canopy pixels outside the board select nothing). A yellow outline marks the selected top surface. Selection is diagnostic state only.
+
+Drag with the primary mouse button or one finger to pan; wheel or pinch to zoom between the fitted size and four times that size. Pan is clamped so the board remains reachable at the center of the area below the panel. A six scene-pixel movement begins a drag; drag, cancellation, and pinch release never select. Resize refits the view while retaining zoom and selection. Coordinates use the canvas CSS rectangle rather than device pixels. Scene shutdown removes all six canvas input listeners and releases pointer captures.
+
+Issue 17 validation includes pure elevated-face picking, inverse transforms and view bounds, listener cleanup, and Chromium interactions across desktop/mobile DPR and portrait/landscape. Physical iPhone Safari/Chrome and Android touch hardware remain unverified.

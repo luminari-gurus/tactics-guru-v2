@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
 import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
-import { setProofDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
+import { setProofDiagnostics, setBoardDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
+
+import { constrainView, pickTile, screenToBoard, MAX_ZOOM, type View } from '../geometry/picking';
 
 const ELEVATED_EDGE_COLOR = 0x263c29;
 const ELEVATED_EDGE_WIDTH = 1;
@@ -15,12 +17,19 @@ export class BoardRenderer {
   private readonly prop: Phaser.GameObjects.Image;
   private readonly bounds: Bounds;
   private occludingTreeAlpha = DEFAULT_OCCLUDING_TREE_ALPHA;
+  private view: View = { x: 0, y: 0, scale: 1 };
+  private viewport = { width: 1, height: 1 };
+  private panelBottom = 0;
+  private fitScale = 1;
+  private selected: Tile | null = null;
+  private readonly selection: Phaser.GameObjects.Graphics;
   private fixture: ProofFixture = 'ground-behind';
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
 
   constructor(scene: Phaser.Scene) {
     this.root = scene.add.container();
+    this.selection = scene.add.graphics();
     const surfaceSide = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / Math.SQRT2;
     const drawFace = (graphics: Phaser.GameObjects.Graphics, points: readonly Point[], color: number): void => {
       const vertices = points.map(point => new Phaser.Math.Vector2(point.x, point.y));
@@ -69,6 +78,7 @@ export class BoardRenderer {
       bottom: Math.max(bounds.bottom, ...rectangles.map(rect => rect.bottom)),
     };
     this.showFixture('ground-behind');
+    this.root.add(this.selection);
   }
 
   setOccludingOpacity(alpha: number): void {
@@ -117,15 +127,48 @@ export class BoardRenderer {
 
   fit(width: number, height: number, panelBottom: number): BoardDiagnostics {
     const layout = fitBoard(this.bounds, { width, height }, panelBottom);
-    this.root.setPosition(layout.x, layout.y).setScale(layout.scale);
-    for (const mask of this.surfaceMasks) mask.setPosition(layout.x, layout.y).setScale(layout.scale);
-    this.publishDiagnostics();
-    return {
-      tileCount: BOARD_FIXTURE.length,
+    this.viewport = { width, height };
+    this.panelBottom = panelBottom;
+    const zoom = this.view.scale / this.fitScale;
+    this.fitScale = layout.scale;
+    this.applyView({ ...layout, scale: layout.scale * zoom });
+    return this.diagnostics();
+  }
+
+  private diagnostics(): BoardDiagnostics {
+    const { x, y, scale } = this.view;
+    return { tileCount: BOARD_FIXTURE.length,
       elevations: [...new Set(BOARD_FIXTURE.map(tile => tile.elevation))].sort(),
-      scale: layout.scale,
-      bounds: { left: layout.x + this.bounds.left * layout.scale, right: layout.x + this.bounds.right * layout.scale,
-        top: layout.y + this.bounds.top * layout.scale, bottom: layout.y + this.bounds.bottom * layout.scale },
-    };
+      scale, transform: { ...this.view }, selected: this.selected ? { ...this.selected } : null,
+      bounds: { left: x + this.bounds.left * scale, right: x + this.bounds.right * scale,
+        top: y + this.bounds.top * scale, bottom: y + this.bounds.bottom * scale } };
+  }
+
+  private applyView(view: View): void {
+    this.view = constrainView(view, this.bounds, this.viewport, this.panelBottom, this.fitScale);
+    const { x, y, scale } = this.view;
+    this.root.setPosition(x, y).setScale(scale);
+    for (const mask of this.surfaceMasks) mask.setPosition(x, y).setScale(scale);
+    this.publishDiagnostics();
+    setBoardDiagnostics(this.diagnostics());
+  }
+
+  pan(dx: number, dy: number): void { this.applyView({ ...this.view, x: this.view.x + dx, y: this.view.y + dy }); }
+
+  zoom(factor: number, anchor: Point): void {
+    const local = screenToBoard(anchor, this.view);
+    const scale = Math.max(this.fitScale, Math.min(this.fitScale * MAX_ZOOM, this.view.scale * factor));
+    this.applyView({ x: anchor.x - local.x * scale, y: anchor.y - local.y * scale, scale });
+  }
+
+  select(point: Point): void {
+    this.selected = pickTile(BOARD_FIXTURE, screenToBoard(point, this.view));
+    this.selection.clear();
+    if (this.selected) {
+      this.selection.setDepth(proofDepth(this.selected, 2.2));
+      this.selection.lineStyle(3, 0xffe070, 1).strokePoints(tileFaces(this.selected).top.map(p => new Phaser.Math.Vector2(p.x, p.y)), true);
+      this.root.sort('depth');
+    }
+    setBoardDiagnostics(this.diagnostics());
   }
 }

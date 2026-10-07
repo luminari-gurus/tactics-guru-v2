@@ -1,6 +1,8 @@
 import { FitMeasurements } from './measurements';
 
 export interface BoardDiagnostics {
+  transform: { x: number; y: number; scale: number };
+  selected: { x: number; y: number; elevation: number } | null;
   tileCount: number;
   elevations: number[];
   scale: number;
