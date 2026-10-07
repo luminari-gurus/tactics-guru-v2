@@ -17,12 +17,10 @@ and voice-library administration
 Project fit: no speech is planned. The first slice ships a small set of battle
 sound effects, a mute control and at most one optional music track
 ([tech design §1, §7.4](../tech_design.phaser4.draft.md)); there is no
-narration, no battle bark and no voiced dialogue, and issue #19 uses none of
-this. The document is kept because the key already exists for sound effects
+narration, no battle bark and no voiced dialogue. The document is kept
+because the key already exists for sound effects
 ([sound-fx-api.md](sound-fx-api.md)) and a later decision may want voice
-lines. Any such decision needs a tracker issue, a rights review for every
-voice and the provenance gate in [README.md](README.md) before a file is
-committed.
+lines. Any such decision needs a tracker issue.
 
 Last verified: 2026-10-07
 
@@ -43,8 +41,7 @@ to it. If speech is ever generated, it is generated ahead of time by a
 hand-run local script; the browser bundle never contains the key, the SDK, or
 a request to `api.elevenlabs.io`. Outputs go to the ignored
 `tmp/audio-generation/elevenlabs/` scratch directory, and a file reaches
-`src/assets/` only through the provenance record and owner sign-off
-described in [README.md](README.md). Shipped speech would have to be MP3
+`src/assets/` with the source record described in [README.md](README.md). Shipped speech would have to be MP3
 ([restart plan §5.1](../phaser4-restart-plan.md)).
 
 Never call ElevenLabs directly from browser code with a long-lived API key. The
@@ -143,7 +140,7 @@ reference rather than from SDK-specific defaults.
 | Field | Type | Required | Default | Rules and purpose |
 | -- | -- | -- | -- | -- |
 | `text` | string | Yes | - | Text to synthesize. The per-request character limit depends on `model_id`. |
-| `model_id` | string | No | `eleven_multilingual_v2` | Model identifier; see [Models](#models). Set it explicitly so provenance does not depend on a moving default. |
+| `model_id` | string | No | `eleven_multilingual_v2` | Model identifier; see [Models](#models). Set it explicitly so the record does not depend on a moving default. |
 | `language_code` | string or null | No | `null` | ISO 639-1 code that forces the output language. Not supported by `eleven_multilingual_v2`. |
 | `voice_settings` | object or null | No | `null` | Per-request overrides of the voice's stored settings; see [Voice settings object](#voice-settings-object). |
 | `pronunciation_dictionary_locators` | array or null | No | `null` | Up to three `{ "pronunciation_dictionary_id", "version_id" }` objects. `version_id` omitted uses the latest version. |
@@ -222,7 +219,7 @@ The official guidance recommends `eleven_v4` or `eleven_multilingual_v2` when
 quality matters and `eleven_v4_turbo` or a Flash model when latency matters.
 The v3 prompting guide also notes that professional voice clones are not fully
 optimized for `eleven_v3` and recommends v4 for production clone quality.
-Record the exact `model_id` in every provenance entry.
+Record the exact `model_id` in every source record.
 
 ## Voice selection
 
@@ -245,7 +242,7 @@ The response contains a `voices` array with `voice_id`, `name`, `category`
 `has_more` and `next_page_token` for pagination. Paginate on `has_more`; the
 list is a live snapshot and `total_count` can change between pages. Voice
 Library voices are not available through the API on the free tier. Record the
-selected `voice_id` and `name` in provenance rather than relying on the name
+selected `voice_id` and `name` in the record rather than relying on the name
 alone, because names are not unique.
 
 ### Instant voice clone
@@ -263,9 +260,7 @@ For a project-owned voice, create an instant voice clone once and reuse its
 | Success | `200` with `{ "voice_id": "...", "requires_verification": false }` |
 
 The overview describes instant cloning as working from short samples of under
-two minutes. Use clean recordings with minimal background noise, and use only
-voices and recordings for which the project has the necessary rights and
-consent. Professional voice cloning is a separate higher-fidelity workflow that
+two minutes. Use clean recordings with minimal background noise. Professional voice cloning is a separate higher-fidelity workflow that
 requires a Creator plan or above and voice verification; it is out of scope
 here.
 
@@ -328,7 +323,7 @@ except Exception:
 ```
 
 Clone creation is a one-time administrative step; keep it out of the per-line
-generation path and record the resulting `voice_id`, sample provenance, and
+generation path and record the resulting `voice_id`, sample source, and
 consent evidence together.
 
 ## Multi-speaker dialogue
@@ -538,7 +533,7 @@ plan limit into the integration.
   allowlist where the environment supports it.
 - Set `model_id` explicitly on every request and record it with the output.
 - Select the voice by `voice_id`; record the ID, name, category, and, for
-  clones, the sample provenance and consent evidence.
+  clones, the sample source.
 - Match the output filename and decoder to `output_format`, and confirm the
   plan allows the chosen format.
 - Treat a successful body as binary and an error body as JSON.
@@ -547,8 +542,6 @@ plan limit into the integration.
 - Put timeouts and size limits around generation and downstream storage.
 - Retry only rate-limit, concurrency, and transient server failures.
 - Avoid logging API keys, full synthesis text, or reference-audio bytes.
-- Confirm consent, provenance, and allowed use for every cloned voice, and
-  verify a paid entitlement before any commercial use of generated audio.
 - Recheck the endpoint reference, model lineup, pricing, and rate limits before
   a production rollout.
 

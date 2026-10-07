@@ -4,9 +4,9 @@ Implemented from `origin/main` at `e752e72` on `issue-19-audio-lifecycle`. Imple
 
 This note is the evidence for the PR. Section 6 is the physical-device checklist that #20 executes; nothing in Chromium emulation closes those items.
 
-## 1. Unlock tone provenance
+## 1. Unlock tone source
 
-The tone is generated from a synthetic signal with ffmpeg. It contains no third-party or legacy material; the legacy `ORIGINAL/audio/sfx/` files have no provenance entry in the legacy licence record and were not used (restart plan D3). The commands were run on 2026-10-07 with `ffmpeg version 8.1.1` (Ubuntu build, gcc 13). Metadata and encoder tags are disabled so the outputs are byte-reproducible; a second run of both encodes produced identical hashes.
+The tone is generated from a synthetic signal with ffmpeg. The commands were run on 2026-10-07 with `ffmpeg version 8.1.1` (Ubuntu build, gcc 13). Metadata and encoder tags are disabled so the outputs are byte-reproducible; a second run of both encodes produced identical hashes.
 
 ```sh
 ffmpeg -f lavfi -i "sine=frequency=880:sample_rate=44100:duration=0.15" \
@@ -30,7 +30,7 @@ Signal: 880 Hz sine, 150 ms, 10 ms linear fade in and out, mono, 44.1 kHz. MP3 i
 
 The plan proposed D-A to D-H. Taken as proposed unless noted.
 
-- **D-A tone, not legacy SFX.** As proposed. The OGG probe cost nothing extra.
+- **D-A generated tone.** As proposed. The OGG probe cost nothing extra.
 - **D-B pure reducer.** As proposed, with two additions: an initial `loading` state (before the loader reports) and an `unlocking` state between the gesture and `playStarted`, so the button is disabled while `context.resume()` is pending. `canRetry` is true for `locked`, `ready`, `played` and `blocked` only.
 - **D-C thin scene-owned adapter.** As proposed. The adapter detects `NoAudioSoundManager` (unsupported), resumes the WebAudio context synchronously inside the click and awaits it, plays one `BaseSound` instance, waits for `Phaser.Sound.Events.COMPLETE`, and arms a scene-clock timeout of duration plus 1,000 ms. Any throw or rejection becomes `blocked` with the message. `play()` has exactly one caller: the button.
 - **D-D non-fatal audio load.** As proposed, plus the decode case: Phaser 4.2.1 does not emit `FILE_LOAD_ERROR` for a decode failure (`fileProcessComplete` only moves the file to the failed set), so after `preload` the adapter treats a missing `cache.audio` key as `Could not decode` when `device.audio.mp3` is true and as unsupported when it is false. An XHR failure arrives through the loader event and reads `Could not load unlock-tone`.
