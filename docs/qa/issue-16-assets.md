@@ -29,7 +29,7 @@ Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4
 
 ## Rendering and lifecycle
 
-The 4×4 diagnostic board retains generated side faces and uses a fresh, opaque square grass material after the user's explicit authorization to generate new assets. The texture has no baked perspective or tile silhouette. The renderer rotates a square by exactly π/4 inside a container with vertical scale TILE_HEIGHT/TILE_WIDTH (1/2). Its unexpanded projected corners are the same 80×40 diamond vertices used by side faces and tile projection. A one-pixel horizontal bleed is clipped by masks made from those vertices. Original canonical grass remains in the legacy source checkout; the first transparent derivative remains archived and unloaded in this PR. The new tree uses its root anchor, and Fighter uses its canonical foot anchor.
+The 4×4 diagnostic board retains generated side faces and uses a fresh, opaque square grass material after the user's explicit authorization to generate new assets. The texture has no baked perspective or tile silhouette. The renderer rotates a square by exactly π/4 inside a container with vertical scale TILE_HEIGHT/TILE_WIDTH (1/2). Its unexpanded projected corners are the same 80×40 diamond vertices used by side faces and tile projection. A one-pixel horizontal bleed is clipped by masks made from those vertices. Original canonical grass remains in the legacy source checkout; the earlier transparent derivative is also excluded from this PR. The new tree uses its root anchor, and Fighter uses its canonical foot anchor.
 
 Complete tile columns, surface art and occupants share stable grid-depth slots with the existing sum/y/x ordering. Elevation changes projected position, not depth priority. The fixed fixture buttons show one Fighter and one tree at a time. Ground fixtures use a tree at (2,0), elevation 0; raised fixtures use (1,1), elevation 1. The raised front Fighter stands on the existing elevation-2 tile at (2,2). Ground fixtures have ±28 logical-pixel foot offsets inside their tiles to make canopy overlap visible. They are diagnostic positions, not tactical moves.
 
@@ -54,14 +54,14 @@ Representative screenshots are linked below. Visual review checks grass alignmen
 | raised-behind | [image](issue-16/desktop-raised-behind.png) | [image](issue-16/mobile-portrait-raised-behind.png) | [image](issue-16/mobile-landscape-raised-behind.png) |
 | raised-front | [image](issue-16/desktop-raised-front.png) | [image](issue-16/mobile-portrait-raised-front.png) | [image](issue-16/mobile-landscape-raised-front.png) |
 
-## Previous transparent grass derivative (archived experiment)
+## Previous transparent grass derivative (removed experiment)
 
-`public/proof/grass-surface.png` is an archived, unloaded built-in ImageGen edit of the original `art/tiles/grass_detailed_N.png`. The original remains in the read-only legacy checkout; its earlier proof copy was removed from this PR. The edit removes dirt walls, orange underside and opaque black bands. It has genuine RGBA transparency; inspection found no opaque pure-black pixels. Because ImageGen changes small texture details, this is an edited derivative rather than a pixel-exact crop of the canonical image.
+`public/proof/grass-surface.png` was an experimental built-in ImageGen edit, now removed from this PR, of the original `art/tiles/grass_detailed_N.png`. The original remains in the read-only legacy checkout; its earlier proof copy was removed from this PR. The edit removes dirt walls, orange underside and opaque black bands. It has genuine RGBA transparency; inspection found no opaque pure-black pixels. Because ImageGen changes small texture details, this is an edited derivative rather than a pixel-exact crop of the canonical image.
 
 - PNG dimensions: 1774×887; alpha bounds: (71,20) to (1758,869).
 - Renderer frame: x=130, y=62, width=1510, height=755 (2:1); uniform scale: 82/1510; display before clipping: 82×41; masked visible diamond: 80×40; origin: center.
 - SHA-256: `f4840886a8b68a4ecac4eb5a7ebb694d51a4184d91936510290ffdf67ccd2509`.
-- Bytes: 1,093,498. The larger edited asset is recorded for subsequent loading measurements.
+- Bytes: 1,093,498. These metadata record the removed experiment; it is not shipped.
 - Method and final prompt: [grass-surface-prompt.md](issue-16/grass-surface-prompt.md).
 - Visual comparison confirms that the old black bands and detached grass lips are removed. The screenshots in the table above now show the fresh material described below.
 
