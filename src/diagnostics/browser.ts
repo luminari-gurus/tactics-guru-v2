@@ -6,6 +6,9 @@ export interface BoardDiagnostics {
   scale: number;
   bounds: { left: number; top: number; right: number; bottom: number };
 }
+export interface ProofDiagnostics { fixture: string; relation: 'behind' | 'front'; propElevation: number; heroDepth: number; propDepth: number; propAlpha: number; assetCount: number; objectCount: number; surfaceCornerError: number | null; }
+let proof: ProofDiagnostics | null = null;
+export function setProofDiagnostics(value: ProofDiagnostics | null): void { proof = value; }
 let board: BoardDiagnostics | null = null;
 export function setBoardDiagnostics(value: BoardDiagnostics | null): void { board = value; }
 
@@ -25,6 +28,7 @@ export function diagnosticsSnapshot() {
   return {
     ...measurements.snapshot(),
     board: board ? { ...board, elevations: [...board.elevations], bounds: { ...board.bounds } } : null,
+    proof: proof ? { ...proof } : null,
     capturedAt: new Date().toISOString(),
     build: __BUILD_INFO__,
     userAgent: navigator.userAgent,

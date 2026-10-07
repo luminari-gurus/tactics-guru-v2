@@ -1,0 +1,25 @@
+import { BOARD_SIZE } from './boardFixture';
+// Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
+export const PROOF_ASSETS = [
+  { key: 'grass', url: '/proof/grass-material-v1.png' },
+  { key: 'tree', url: '/proof/tree-grass-v1.png' },
+  { key: 'fighter', url: '/proof/fighter.png' },
+  { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
+] as const;
+export const PROOF_ART = {
+  // Fresh square material: the renderer supplies all isometric geometry.
+  grass: { horizontalBleed: 1 },
+  tree: { width: 80, height: 80 * 1276 / 1233, originY: 1070 / 1276 },
+  fighter: { width: 40, height: 50, originY: 76 / 80 },
+} as const;
+export const PROOF_FIXTURES = {
+  'ground-behind': { hero: { x: 1, y: 0, elevation: 0 }, heroOffsetX: 28, prop: { x: 2, y: 0, elevation: 0 }, relation: 'behind' },
+  'ground-front': { hero: { x: 3, y: 0, elevation: 0 }, heroOffsetX: -28, prop: { x: 2, y: 0, elevation: 0 }, relation: 'front' },
+  'raised-behind': { hero: { x: 0, y: 0, elevation: 0 }, heroOffsetX: 0, prop: { x: 1, y: 1, elevation: 1 }, relation: 'behind' },
+  'raised-front': { hero: { x: 2, y: 2, elevation: 2 }, heroOffsetX: 0, prop: { x: 1, y: 1, elevation: 1 }, relation: 'front' },
+} as const;
+export type ProofFixture = keyof typeof PROOF_FIXTURES;
+// Tile columns get one slot, then art, then occupants. Elevation never changes depth.
+export function proofDepth(tile: { x: number; y: number }, layer: number): number {
+  return ((tile.x + tile.y) * BOARD_SIZE + tile.y) * 3 + layer;
+}
