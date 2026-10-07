@@ -1,0 +1,216 @@
+{
+  "generation": "built-in image_gen",
+  "runtimeExport": "Pillow Lanczos downsample, optimized PNG",
+  "assets": [
+    {
+      "terrain": "ash",
+      "source": "public/textures/terrain/ash-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b",
+      "runtime": "public/textures/terrain/runtime/ash-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74"
+    },
+    {
+      "terrain": "brush",
+      "source": "public/textures/terrain/brush-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "c5ad236ead95d14c8f6779d566dce71c51d207da7b43a87de15513e079e15ff8",
+      "runtime": "public/textures/terrain/runtime/brush-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "d4abac0d661e3f2e7755a827700a446b53edeac2198d380750325bac02e2d644"
+    },
+    {
+      "terrain": "cliff",
+      "source": "public/textures/terrain/cliff-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06",
+      "runtime": "public/textures/terrain/runtime/cliff-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295"
+    },
+    {
+      "terrain": "forest",
+      "source": "public/textures/terrain/forest-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
+      "runtime": "public/textures/terrain/runtime/forest-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7"
+    },
+    {
+      "terrain": "grass",
+      "source": "public/textures/terrain/grass-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
+      "runtime": "public/textures/terrain/runtime/grass-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93"
+    },
+    {
+      "terrain": "grass_path",
+      "source": "public/textures/terrain/grass_path-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
+      "runtime": "public/textures/terrain/runtime/grass_path-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61"
+    },
+    {
+      "terrain": "lava",
+      "source": "public/textures/terrain/lava-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea",
+      "runtime": "public/textures/terrain/runtime/lava-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86"
+    },
+    {
+      "terrain": "mud",
+      "source": "public/textures/terrain/mud-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8",
+      "runtime": "public/textures/terrain/runtime/mud-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f"
+    },
+    {
+      "terrain": "sand",
+      "source": "public/textures/terrain/sand-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db",
+      "runtime": "public/textures/terrain/runtime/sand-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d"
+    },
+    {
+      "terrain": "stone",
+      "source": "public/textures/terrain/stone-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
+      "runtime": "public/textures/terrain/runtime/stone-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442"
+    },
+    {
+      "terrain": "tree_cluster",
+      "source": "public/textures/terrain/tree_cluster-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "e3bfa2dde4862e9a89f153d702f836d0718cbc6bf79bfc549c806b0d4ad9510d",
+      "runtime": "public/textures/terrain/runtime/tree_cluster-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "60ce71533a3a38bfd6a8c154278dbb6697d6c5c685024acaa2edf971f7e22322"
+    },
+    {
+      "terrain": "tree_dense",
+      "source": "public/textures/terrain/tree_dense-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "3485330de9d6d62f51ce169e996e83c91858acb098115313c68a5969494b2fa3",
+      "runtime": "public/textures/terrain/runtime/tree_dense-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "812b8d73281a0a29a02019c4c4ef5b6cad3ee199ed402e4ed4173938dfedf368"
+    },
+    {
+      "terrain": "tree_single",
+      "source": "public/textures/terrain/tree_single-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "54a5a01d493a29f7b786242b012c67e03702e13fc9cd692efe2d5f732b3a997e",
+      "runtime": "public/textures/terrain/runtime/tree_single-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "306a8717fb382379ab409a125a1039867137d00637935fcc27e3a8bdea4011c6"
+    },
+    {
+      "terrain": "water",
+      "source": "public/textures/terrain/water-top-down-v1.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceSha256": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
+      "runtime": "public/textures/terrain/runtime/water-top-down-v1.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1"
+    }
+  ]
+}

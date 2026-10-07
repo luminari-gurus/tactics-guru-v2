@@ -13,7 +13,7 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
       const proof = await page.evaluate(() => window.fitDiagnostics().proof);
       expect(proof?.relation).toBe(relation === 'Behind' ? 'behind' : 'front');
       expect(proof?.propElevation).toBe(elevation === 'Ground' ? 0 : 1);
-      expect(proof?.assetCount).toBe(4);
+      expect(proof?.assetCount).toBe(17);
       expect(proof?.propAlpha).toBe(relation === 'Behind' ? 0.4 : 1);
       expect(proof?.heroDepth! < proof?.propDepth!).toBe(relation === 'Behind');
       await page.screenshot({ path: test.info().outputPath(`${elevation}-${relation}.png`) });

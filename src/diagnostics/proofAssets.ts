@@ -1,7 +1,8 @@
+import { TERRAIN_MATERIALS } from '../terrain/materials';
 import { BOARD_SIZE } from './boardFixture';
 // Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
 export const PROOF_ASSETS = [
-  { key: 'grass', url: '/proof/grass-material-v1.png' },
+  ...TERRAIN_MATERIALS,
   { key: 'tree', url: '/proof/tree-grass-v1.png' },
   { key: 'fighter', url: '/proof/fighter.png' },
   { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
