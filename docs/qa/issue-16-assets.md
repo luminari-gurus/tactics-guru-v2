@@ -21,11 +21,11 @@ The source checkout was clean; each copied PNG was checked against the Git blob 
 
 Original canonical PNG bytes: **3,388,616**. Current loaded PNG bytes, including the fresh grass material: **7,391,806**. The unchanged portrait accounts for 3,285,110 bytes; fresh grass accounts for 2,980,361 and the new tree for 1,117,492. #20 measures deployed cold/warm performance and sets budgets.
 
-## License and provenance status
+## Source history
 
-Legacy `docs/asset_licenses.md` records grass and single-tree art as project-generated detailed terrain: built-in image generation from a user-provided tactical RPG editor reference, followed by local extraction/normalization. It describes Kenney Sketch Town proportions/palette as a style reference and Kenney source assets as CC0. These selected project-generated images do **not** acquire a CC0 declaration merely from that style reference.
+Legacy docs record grass and single-tree art as project-generated detailed terrain: built-in image generation from a user-provided tactical RPG editor reference, followed by local extraction/normalization, with Kenney Sketch Town proportions/palette as a style reference.
 
-Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4397993b`; portrait first appears in `542a03d83bfec52d8f4fd4372f22620dabae13b6`. Both commits were authored by the project owner and introduce the assets for this game's runtime. The available source does not record their creator/generation method or a separate asset license. No root license or explicit redistribution grant was found for these selected files. These are existing canonical project assets reused for the authorized diagnostic; third-party licensing or outside-project redistribution rights are not asserted. The source provenance gap is preserved here rather than filled with an invented license.
+Fighter sprite first appears in source commit `d71a71d0376f4625d1e06d602f011e5b4397993b`; portrait first appears in `542a03d83bfec52d8f4fd4372f22620dabae13b6`. Both commits were authored by the project owner and introduce the assets for this game's runtime. The available source does not record their generation method.
 
 ## Rendering and lifecycle
 
@@ -79,7 +79,7 @@ The user subsequently authorized fresh generated assets to resolve the perceived
 - Bytes: 2,980,361.
 - SHA-256: `570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2`.
 - Method and exact final prompt: [grass-material-v1-prompt.md](issue-16/grass-material-v1-prompt.md).
-- Ownership/provenance: generated for this project at the user's request, with no reference image or externally sourced texture. The generation prompt is preserved; no third-party CC0 declaration is asserted.
+- Source: generated for this project at the user's request, with no reference image or externally sourced texture. The generation prompt is preserved.
 - Projection: square side (TILE_WIDTH + 2×bleed)/√2, image rotation π/4, parent Y scale TILE_HEIGHT/TILE_WIDTH. Remove the bleed when comparing projected corners with the shared tile-face vertices. No empirical rotation adjustment is applied.
 - Diagnostics expose maximum transformed-corner error. The browser check allows <0.001 CSS pixel for Phaser float32 matrix rounding; focused measurements observed about 0.000018 pixel, far below visible drift. All 64 corners are compared after resize.
 - RED-first corner check failed against the prior renderer's missing projection evidence. Existing geometry tests already verify adjacent equal-height tiles share identical vertices.

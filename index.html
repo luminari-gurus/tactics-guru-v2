@@ -15,23 +15,30 @@
         <button id="fit-restart" type="button" disabled>Restart proof scene</button>
         <img id="proof-portrait" alt="Fighter portrait" width="48" height="48" hidden />
       </div>
-      <div class="fit-controls" aria-label="Occlusion fixtures">
-        <button data-fixture="ground-behind" disabled>Ground: Behind</button>
-        <button data-fixture="ground-front" disabled>Ground: In front</button>
-        <button data-fixture="raised-behind" disabled>Raised: Behind</button>
-        <button data-fixture="raised-front" disabled>Raised: In front</button>
-      </div>
-      <div class="fit-controls fit-opacity">
-        <label for="tree-opacity">Tree opacity (unit behind)</label>
-        <input id="tree-opacity" type="range" min="0" max="100" step="1" value="40" disabled />
-        <span id="tree-opacity-value">40%</span>
-      </div>
-      <div class="fit-controls">
-        <label for="move-destination">Move destination</label>
-        <select id="move-destination" disabled><option value="" disabled selected>Choose a tile</option><option value="raised-front">Raised tile (2, 2)</option></select>
-        <button id="move-start" disabled>Start diagnostic move</button>
-        <span id="move-status" aria-live="polite">Idle</span>
-      </div>
+      <details id="fit-board-controls" open>
+        <summary>Board controls</summary>
+        <div class="fit-controls" aria-label="Occlusion fixtures">
+          <button data-fixture="ground-behind" disabled>Ground: Behind</button>
+          <button data-fixture="ground-front" disabled>Ground: In front</button>
+          <button data-fixture="raised-behind" disabled>Raised: Behind</button>
+          <button data-fixture="raised-front" disabled>Raised: In front</button>
+        </div>
+        <div class="fit-controls fit-opacity">
+          <label for="tree-opacity">Tree opacity (unit behind)</label>
+          <input id="tree-opacity" type="range" min="0" max="100" step="1" value="40" disabled />
+          <span id="tree-opacity-value">40%</span>
+        </div>
+        <div class="fit-controls">
+          <label for="move-destination">Move destination</label>
+          <select id="move-destination" disabled><option value="" disabled selected>Choose a tile</option><option value="raised-front">Raised tile (2, 2)</option></select>
+          <button id="move-start" disabled>Start diagnostic move</button>
+          <span id="move-status" aria-live="polite">Idle</span>
+        </div>
+        <div class="fit-controls">
+          <button id="audio-play" type="button" disabled>Play test sound</button>
+          <span id="audio-status" aria-live="polite">Loading</span>
+        </div>
+      </details>
       <p id="board-caption">Elevated board · Tap to select · Drag to pan · Wheel/pinch to zoom</p>
       <details>
         <summary>Measurements</summary>
