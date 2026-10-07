@@ -1,11 +1,24 @@
 import { BOARD_SIZE } from './boardFixture';
 // Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
-export const PROOF_ASSETS = [
-  { key: 'grass', url: '/proof/grass-material-v1.png' },
-  { key: 'tree', url: '/proof/tree-grass-v1.png' },
-  { key: 'fighter', url: '/proof/fighter.png' },
-  { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
+export const PROOF_IMAGES = [
+  { kind: 'image', key: 'grass', url: '/proof/grass-material-v1.png' },
+  { kind: 'image', key: 'tree', url: '/proof/tree-grass-v1.png' },
+  { kind: 'image', key: 'fighter', url: '/proof/fighter.png' },
+  { kind: 'image', key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
 ] as const;
+// Generated unlock tone, never legacy SFX (issue #19, docs/qa/issue-19-lifecycle.md):
+// ffmpeg 8.1.1, 880 Hz sine, 150 ms, 10 ms fades, mono 44.1 kHz, bitexact, no metadata.
+//   mp3: libmp3lame 64 kb/s, 1,462 bytes, sha256 0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec
+//   ogg: libvorbis q3,         3,768 bytes, sha256 e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d
+// Only the MP3 is played. The OGG is a decode-only probe for the iOS codec question (restart plan D1).
+export const UNLOCK_TONE_KEY = 'unlock-tone';
+export const UNLOCK_TONE_PROBE_KEY = 'unlock-tone-ogg';
+export const PROOF_AUDIO = [
+  { kind: 'audio', key: UNLOCK_TONE_KEY, url: '/proof/unlock-tone.mp3', format: 'mp3' },
+  { kind: 'audio', key: UNLOCK_TONE_PROBE_KEY, url: '/proof/unlock-tone.ogg', format: 'ogg' },
+] as const;
+export const PROOF_ASSETS = [...PROOF_IMAGES, ...PROOF_AUDIO] as const;
+export type ProofAsset = (typeof PROOF_ASSETS)[number];
 export const PROOF_ART = {
   // Fresh square material: the renderer supplies all isometric geometry.
   grass: { horizontalBleed: 1 },

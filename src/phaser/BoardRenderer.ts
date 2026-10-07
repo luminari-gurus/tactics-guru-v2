@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BOARD_FIXTURE } from '../diagnostics/boardFixture';
-import { PROOF_ASSETS, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
+import { PROOF_IMAGES, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, setBoardDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
 
@@ -133,7 +133,7 @@ export class BoardRenderer {
       });
     });
     setProofDiagnostics({ fixture: this.fixture, relation: this.hero.depth < this.prop.depth ? 'behind' : 'front', heroTile: { ...this.heroTile }, propElevation: value.prop.elevation,
-      heroPosition: { x: this.hero.x, y: this.hero.y }, heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_ASSETS.length,
+      heroPosition: { x: this.hero.x, y: this.hero.y }, heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_IMAGES.length,
       surfaceCornerError: Math.max(...errors),
       objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
   }
