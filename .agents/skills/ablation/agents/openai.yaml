@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ablation"
+  short_description: "Simplify work without shrinking the outcome"
+  default_prompt: "Use $ablation to simplify this plan, then implement and prove the complete outcome."
