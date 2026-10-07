@@ -118,4 +118,36 @@ test('restart during playback resets the audio control for the new run without e
   expect(errors).toEqual([]);
 });
 
+test('a resume() that never settles is reported as blocked with retry, then plays once it can', async ({ page }) => {
+  const errors = watchErrors(page);
+  // Chrome keeps resume() pending while the context is not allowed to start; WebKit keeps it pending
+  // for the length of an interruption. Neither rejects, so only a watchdog can hand the button back.
+  await page.addInitScript(() => {
+    const resume = AudioContext.prototype.resume;
+    AudioContext.prototype.resume = function (this: AudioContext) {
+      if (window.__allowAudio) return resume.call(this);
+      return new Promise<void>(() => {});
+    };
+  });
+  await page.goto('/');
+  const button = page.getByRole('button', { name: 'Play test sound' });
+  const status = page.locator('#audio-status');
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await expect(button).toBeEnabled();
+  await button.click();
+  await expect(status).toHaveText('Unlocking');
+  await expect(button).toBeDisabled();
+  await expect(status).toHaveText(/^Blocked: /, { timeout: 5000 });
+  const blocked = await audio(page);
+  expect(blocked).toMatchObject({ state: 'blocked', attempts: 1, playedCount: 0 });
+  expect(blocked.lastError).toMatch(/resume/);
+  await expect(button).toBeEnabled();
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await page.evaluate(() => { window.__allowAudio = true; });
+  await button.click();
+  await expect(status).toHaveText('Played', { timeout: 5000 });
+  expect(await audio(page)).toMatchObject({ state: 'played', contextState: 'running', attempts: 2, playedCount: 1, lastError: null });
+  expect(errors).toEqual([]);
+});
+
 declare global { interface Window { __allowAudio?: boolean } }
