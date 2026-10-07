@@ -51,7 +51,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 - `tests/unit/`: Node-only unit tests, including measurement reset and visibility behavior
 - `playwright.config.ts`: desktop and mobile-emulated test projects
 
-`.gitignore` excludes dependencies, build/test output, logs, local environment files, TypeScript caches and editor/OS files. Lockfiles and source/assets remain tracked; `.env.example` is allowed if needed later. No environment configuration or secrets are required.
+`.gitignore` excludes dependencies, build/test output, logs, local environment files, the `tmp/` scratch directory, TypeScript caches and editor/OS files. Lockfiles and source/assets remain tracked. `.env.example` lists optional media-generation API keys for hand-run asset tooling (see `docs/media-gen/`); nothing in the game, build or tests reads them, and no environment configuration or secrets are required.
 
 ## Proof-scene measurements
 

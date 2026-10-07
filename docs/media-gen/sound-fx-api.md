@@ -1,118 +1,97 @@
 # ElevenLabs sound-effects API
 
-<!-- cspell:words allowlisting ElevenLabs nonaudio noncommercial sublicensing -->
+> **Credential boundary:** `.env.example` declares `ELEVENLABS_API_KEY` with
+> an empty value. Put a real key only in the ignored repository-root `.env`,
+> and only for a hand-run, budget-bounded generation pass. Never put it in this
+> document, `.env.example`, source, browser code, a `VITE_` variable, tests,
+> logs, screenshots, prompts or retained evidence.
 
-> **Credential boundary:** `.env.example` declares
-> `ELEVENLABS_API_KEY`. Put a real value only in the ignored repository-root
-> `.env` file when performing a versioned, budget-bounded generation run. Never put
-> the value in this document, `.env.example`, source, browser code, a `VITE_`
-> variable, tests, logs, screenshots, prompts, or retained evidence.
+Status: Reference. Not a dependency, credential, budget or runtime
+integration of Tactics Guru v2.
 
-Status: Proposed
+Scope: ElevenLabs `POST /v1/sound-generation` as a pre-build source for
+sound-effect candidates: authentication, request and response contract,
+prompting, scratch handling, provenance, failure handling and rights. Excludes
+runtime vendor use, music, speech, and acceptance of any file into the game.
 
-Audience: Audio automation maintainers, game developers, security validators,
-originality validators, and specification maintainers
+Project fit: the first slice needs the twelve battle cues in the tech design's
+cue table ([§7.4](../tech_design.phaser4.draft.md)) plus a mute control. It
+needs no ambience, footstep library, interface soundscape or voice. The legacy
+WAV cues have no recorded origin for four of the twelve and no licence for any
+([restart plan §5.1](../phaser4-restart-plan.md)), so generation is one way to
+fill that table; a CC0 library and a provenance review of the legacy files are
+the others. Issue #19 does not use this endpoint: its unlock tone is generated
+with ffmpeg ([plan D-A](../ongoing-projects/issue-19-audio-lifecycle-plan.md)).
 
-Scope: ElevenLabs `POST /v1/sound-generation` as a pre-production source for
-Project Adventure sound-effect candidates, including authentication, request and
-response fields, prompting, local scratch handling, provenance, failure, and
-rights checks; excludes runtime vendor integration, music, speech, final asset
-acceptance, and changes to the proposed hybrid audio direction
+Last verified: endpoint contract re-checked against the API reference on
+2026-10-07. Rights, pricing and overview pages were last read 2026-07-15.
 
-Authority: Evidence
-
-Last verified: 2026-07-15
-
-Evidence: [ElevenLabs sound-effects API
-reference](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert),
+Sources: [create sound effect](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert),
 [sound-effects overview](https://elevenlabs.io/docs/overview/capabilities/sound-effects),
-[API authentication](https://elevenlabs.io/docs/api-reference/authentication),
-[API errors](https://elevenlabs.io/docs/eleven-api/resources/errors),
+[authentication](https://elevenlabs.io/docs/api-reference/authentication),
+[errors](https://elevenlabs.io/docs/eleven-api/resources/errors),
 [commercial-use guidance](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform),
-and [Sound Effects Terms](https://elevenlabs.io/sound-effects-terms), checked
-2026-07-15
+[Sound Effects Terms](https://elevenlabs.io/sound-effects-terms).
 
-## Supplemental disposition
-
-This document is external-integration evidence for a proposed production source.
-It does not make ElevenLabs a product dependency, accept downloaded audio
-files, or make a successful provider response shippable. A live batch runs only
-from a versioned batch configuration with bounded cost; shipping requires the
-autonomous acceptance suite below.
-
-The accepted Phase 02-05 replica baseline still requires local procedural audio
-and no downloaded audio. The proposed hybrid direction is documented in the
-[audio production findings](../../ongoing-projects/audio-production-findings.md).
-File-based audio requires a versioned manifest contract plus synchronized
-specification changes that pass repository validation before implementation.
+Rules shared by every generator in this folder are in [README.md](README.md).
 
 ## Project boundary
 
-ElevenLabs may be used only before build, from a local or otherwise trusted
-production tool. The shipped browser game must contain:
+ElevenLabs is used only before build, from a hand-run local script. The
+shipped game contains:
 
-- no ElevenLabs SDK, API key, account identifier, generation endpoint, remote
-  audio URL, telemetry, or vendor fallback;
+- no ElevenLabs SDK, API key, account identifier, endpoint, remote audio URL,
+  telemetry or vendor fallback;
 - no request to ElevenLabs or any other non-product origin;
-- only locally packaged, provenance-accepted runtime audio if the file-based
-  direction is later accepted; and
-- fully playable muted behavior with redundant nonaudio feedback.
+- only locally committed files that passed the provenance gate below; and
+- a mute control, with every outcome readable without sound. A sound failure
+  never stalls a turn (tech design §5.7, §7.4).
 
-This endpoint is for sound-effect candidates only. Project Adventure currently
-plans no recorded speech, narration, battle barks, or game-owned text-to-speech.
-Instrumental music belongs to the separately proposed music workflow, not the
-sound-effects endpoint.
-
-The production inventory is the [conservative audio
-checklist](../../ongoing-projects/audio-production-findings.md#conservative-production-checklist).
-Do not infer new footsteps, ambience, actor voices, decorative Foley, songs, or
-cue identities from generic ElevenLabs examples.
+This endpoint is for sound-effect candidates only. Music belongs to
+[musicapi-ai.md](musicapi-ai.md). Speech is not planned for the first slice
+([text-to-speech.md](text-to-speech.md)).
 
 ## Current repository state
 
-As verified on 2026-07-15:
+As of 2026-10-07:
 
-- `.env.example` declares only the safe placeholder name
-  `ELEVENLABS_API_KEY`;
-- no ElevenLabs package is present in `package.json`;
-- no repository generation script or accepted audio-output location exists;
-- `tmp/` is ignored and is the safe location for disposable local candidates;
-  and
-- missing ElevenLabs credentials do not block normal product, documentation,
-  replica, archive, build, or test commands.
+- `.env.example` declares `ELEVENLABS_API_KEY=`. Nothing in `src/`, the build
+  or the tests reads it; `npm ci`, `npm run build` and `npm test` run without
+  it.
+- No ElevenLabs package is in `package.json`, and no generation script exists
+  in the repository.
+- `tmp/` is ignored and is the scratch location for candidates.
+- `public/proof/` holds the diagnostic's assets. Shipped game assets will go
+  through a manifest module under `src/assets/` and be emitted content-hashed
+  into `dist/assets/` (restart plan §5.1, tech design §7.2).
+- ffmpeg 8.1.1 is installed on the development host for trimming and export.
+  Converters are run by hand and are not build dependencies.
 
-The examples below are provider-integration references, not Current repository
-commands or evidence that a live request has been executed.
+The examples below are provider references. No live request has been made
+from this repository.
 
 ## Credential setup
 
-The committed placeholder is:
-
-```bash
-ELEVENLABS_API_KEY=YOUR_ELEVENLABS_API_KEY_HERE
-```
-
-Copy the variable name into the repository-root `.env` and replace only the
-ignored local value. A shell example assumes the calling process already has
-`ELEVENLABS_API_KEY` in its environment; it does not require or authorize a
-particular secret-loading tool.
+Copy `.env.example` to `.env` and fill in the value there. A shell example
+assumes the calling process already has `ELEVENLABS_API_KEY` in its
+environment; `node --env-file=.env script.mjs` loads it without printing it.
 
 Use a dedicated key with:
 
-- only the Sound Effects permission required by the generation workflow;
-- a bounded credit quota from the versioned batch configuration;
-- IP allowlisting when the account and execution environment support it; and
-- rotation or revocation after suspected disclosure.
+- only the Sound Effects permission;
+- a credit quota sized to the batch;
+- IP allowlisting when the account and the machine support it; and
+- rotation or revocation after any suspected disclosure.
 
 Never print the environment, enable shell tracing around a request, paste the
-key into a command, or send it to browser code. A key found in source or retained
-output must be revoked or rotated; deleting the visible line is not sufficient
-containment.
+key into a command argument, or send it to browser code. Vite exposes only
+`VITE_`-prefixed variables to the bundle, so never give a key that prefix. A
+key found in source or retained output must be rotated; deleting the line is
+not containment.
 
 ## Endpoint contract
 
-The request contract below follows the official API reference as verified on
-2026-07-15.
+Re-checked 2026-10-07.
 
 | Item | Value |
 | -- | -- |
@@ -120,61 +99,40 @@ The request contract below follows the official API reference as verified on
 | URL | `https://api.elevenlabs.io/v1/sound-generation` |
 | Authentication | `xi-api-key: ${ELEVENLABS_API_KEY}` |
 | Request | `application/json` |
-| Success | Binary generated audio with response metadata in HTTP headers |
+| Success | `200`, binary audio in the requested `output_format` |
+| Validation failure | `422` with a `detail` array naming the field |
 
-Although the endpoint schema renders `xi-api-key` as optional, the official
-authentication guide requires an API key for API requests. Project tooling must
-treat it as required.
+The endpoint schema renders `xi-api-key` as optional; the authentication
+guide requires it. Treat it as required.
 
 ### Query parameter
 
-| Name | Required | Project treatment |
+| Name | Required | Treatment |
 | -- | -- | -- |
-| `output_format` | No | Record the exact selected enum. Values use `codec_sample_rate_bitrate`; availability and higher-quality formats can depend on the account plan. |
+| `output_format` | No | `codec_sample_rate_bitrate`, for example `mp3_44100_128`. The reference lists MP3, PCM, Opus, μ-law and A-law families; some rates depend on the plan. Record the exact value used. |
 
-Do not copy a stale list of all output enums into project tooling. Re-read the
-live API reference before the pilot and final batches. The current overview says
-MP3 is available for all effects and 48 kHz WAV for non-looping effects. The
-versioned runtime codec policy selects the first supported format that passes
-browser decode, size, and quality thresholds.
+### JSON body
 
-### JSON request body
-
-| Field | Required | Current default | Rules and Project Adventure treatment |
+| Field | Required | Default | Rules and treatment |
 | -- | -- | -- | -- |
-| `text` | Yes | None | Original cue brief only. Do not include archive text, artist names, copied signatures, private data, or unreleased copy. |
-| `loop` | No | `false` | Smooth looping is available only with `eleven_text_to_sound_v2`. Keep false for the current one-shot catalog. |
-| `duration_seconds` | No | `null` | API reference range is 0.5 through 30 seconds; null lets the model infer duration. |
-| `prompt_influence` | No | `0.3` | Range 0 through 1. Higher values follow the prompt more literally and reduce variation. |
-| `model_id` | No | `eleven_text_to_sound_v2` | Set explicitly in a recorded production request so the provenance record does not depend on a moving default. |
-
-The overview currently states a 0.1-second lower duration bound while the API
-reference states 0.5 seconds. Treat the endpoint reference as the integration
-contract and validate explicit durations from 0.5 through 30 seconds until the
-two official sources agree.
+| `text` | Yes | None | The cue brief. No artist names, franchise names, legacy filenames or copied text. |
+| `loop` | No | `false` | Seamless loop, v2 model only. Keep `false` for the one-shot cue table. |
+| `duration_seconds` | No | `null` (model decides) | 0.5 through 30. Four of the slice's cues are 0.09 to 0.12 s long in the legacy build; request 0.5 s and trim in ffmpeg. |
+| `prompt_influence` | No | `0.3` | 0 through 1. Higher follows the text more literally with less variation. |
+| `model_id` | No | `eleven_text_to_sound_v2` | The only value the reference lists. Set it explicitly so the record does not depend on a default. |
 
 ### Success response
 
-The success body is audio bytes, not JSON. The API reference documents the
-`character-cost` response header. The general API documentation also identifies
-`request-id` and `x-trace-id` as useful request metadata.
-
-For every successful candidate, retain safe provenance fields before editing:
-
-- exact output format and byte length;
-- `character-cost`, `request-id`, and `x-trace-id` when returned;
-- SHA-256 of the original response bytes; and
-- generation time, model, prompt, parameters, and candidate disposition.
-
-Do not retain the API key, raw account response, unrelated workspace metadata,
-or full provider error payload as evidence.
+The body is audio bytes, not JSON. Record `content-type`, the byte length,
+and the `request-id`, `x-trace-id` and `character-cost` headers when present.
+Hash the bytes with SHA-256 before any edit. Do not retain the key, the raw
+account response or a full provider error payload as evidence.
 
 ## Minimal candidate request
 
-Run a live request only when the generation batch, account entitlement, prompt,
-and usage budget pass their configured preflight checks. This example writes
-one disposable candidate under ignored `tmp/`; it does not create an accepted
-source or runtime asset.
+Run a live request only with a named cue, a prompt reviewed against the rules
+below and a known credit budget. This writes one disposable candidate under
+ignored `tmp/`; it does not create a game asset.
 
 ```bash
 mkdir -p tmp/audio-generation/elevenlabs
@@ -188,25 +146,24 @@ printf 'xi-api-key: %s\n' "$ELEVENLABS_API_KEY" | curl --silent --show-error --f
   --header @- \
   --header "Content-Type: application/json" \
   --data '{
-    "text": "Short polished glass and brass interface confirmation, warm precise transient, close and dry mix, no voice, no words, no music, no melody, under one second",
-    "duration_seconds": 0.8,
+    "text": "Short blunt sword impact on leather and wood, firm attack, brief tail, close and dry, no metal ring, no voice, no words, no music",
+    "duration_seconds": 0.6,
     "prompt_influence": 0.4,
     "loop": false,
     "model_id": "eleven_text_to_sound_v2"
   }' \
-  --output tmp/audio-generation/elevenlabs/ui-confirm-candidate-001.mp3
+  --output tmp/audio-generation/elevenlabs/attack-hit-001.mp3
 ```
 
-Use a unique candidate filename for every request. Never overwrite a prior
-candidate or imply that repeating the same prompt will reproduce identical
-bytes. The header is supplied on standard input so the expanded key is not a
-`curl` process argument.
+Use a unique filename for every request. Never overwrite a candidate, and do
+not assume the same prompt reproduces the same bytes. The header is supplied
+on standard input so the expanded key is not a `curl` process argument.
 
 ## Node.js request pattern
 
-Project Adventure uses supported Node.js 24. This illustrative pattern uses the
-built-in `fetch` API and returns bounded bytes plus safe response metadata. It
-intentionally does not write into a production asset directory.
+The repository requires Node 22.12 or newer, which has `fetch` built in; no
+provider SDK is needed. This pattern returns bounded bytes plus safe response
+metadata and writes nothing into `public/` or `src/`.
 
 ```javascript
 const endpoint = new URL("https://api.elevenlabs.io/v1/sound-generation");
@@ -227,8 +184,8 @@ const response = await fetch(endpoint, {
     "xi-api-key": apiKey,
   },
   body: JSON.stringify({
-    text: "Short layered impact, firm attack, restrained tail, no voice, no words, no music, no melody",
-    duration_seconds: 0.9,
+    text: "Quick air whoosh of a blade passing with no contact, light and short, dry, no voice, no words, no music",
+    duration_seconds: 0.5,
     prompt_influence: 0.4,
     loop: false,
     model_id: "eleven_text_to_sound_v2",
@@ -290,198 +247,152 @@ const candidate = {
 };
 ```
 
-A future repository-owned script must additionally validate content type, write
-to a unique `.part` path, clean partial output on failure or cancellation, hash
-the exact bytes, record bounded provenance, and promote nothing automatically.
+A script kept in the repository must also validate the content type, write
+to a unique `.part` path, delete partial output on failure, hash the bytes,
+and record provenance. It must never copy a file into `public/` or
+`src/assets/` by itself.
 
-## Project prompt contract
+## Cue briefs for this project
 
-Start from one checklist role and write a cue brief with these fields:
+Start from one row of the tech design's cue table and write a brief with
+these fields:
 
 | Field | Prompt content |
 | -- | -- |
-| Role | Exact checklist event and whether it is essential, meaning-bearing, or decorative. |
-| Source and material | What physically or synthetically produces the sound. |
-| Action | Impact, movement, pulse, scrape, release, rise, decay, or another concrete acoustic event. |
-| Timing | One-shot or loop, target duration, attack speed, sustain, and tail. |
-| Perspective and space | Close, distant, dry, reflected, narrow, broad, or otherwise mix-relevant placement. |
-| Intensity and frequency | Subtle through terminal, plus the frequency range that should remain clear around music and cues. |
-| Exclusions | No voice, words, singing, music, melody, clipping, excessive tail, or other role-specific failures. |
+| Role | The cue key (`move`, `attack_hit`, `miss`, …) and whether it carries meaning or is decoration |
+| Source and material | What physically or synthetically makes the sound |
+| Action | Impact, movement, release, rise, decay or another concrete event |
+| Timing | One-shot, target length, attack speed, tail |
+| Perspective | Close, distant, dry, reflected |
+| Intensity and frequency | How hard, and which range should stay clear of the music and of other cues |
+| Exclusions | No voice, words, singing, music, melody, clipping, long tail |
 
-A useful prompt describes an audio asset, not game lore. Keep the same validated
-material and mix vocabulary across a cue family, then change only the event,
-intensity, or variation being tested.
+Describe an audio asset, not game lore. Keep one material and mix vocabulary
+across a cue family and change only the event or intensity between
+candidates.
 
-Examples for candidate briefs:
+Examples for the slice's cues:
 
-- Menu navigation: `Very short neutral interface tick, precise soft transient, dry and quiet, repeat-safe, no voice, no words, no music, no melody`.
-- Major threat: `Short rising mechanical-and-air warning, immediate readable attack, restrained tail, clear over combat, no voice, no words, no music`.
-- Player damage: `Compact layered impact with a brittle energy crack, urgent but not cinematic, close perspective, short tail, no vocalization, no music`.
-- Tonic use: `Brief restorative liquid-and-resonance shimmer, health and energy recovery, warm release, no voice, no melody, under one second`.
+- `move`: `Single soft footstep scuff on dry leaves and packed earth, one step, close and dry, under half a second, no voice, no music`.
+- `attack` (release): `Short leather-and-steel sword draw and swing, quick rising air, no contact, dry, no voice, no music`.
+- `attack_hit`: `Short blunt sword impact on leather and wood, firm attack, brief tail, close and dry, no metal ring, no voice, no words, no music`.
+- `miss`: `Quick air whoosh of a blade passing with no contact, light and short, dry, no voice, no words, no music`.
+- `ember_burst_impact`: `Compact fire burst with a low thump and crackling embers, about one second, restrained tail, no voice, no words, no music`.
+- `victory`: `Short bright flourish of two brass notes and a drum hit, about two seconds, clean ending, no voice, no words`.
 
-Do not prompt with an artist, franchise, branded sonic logo, recognizable song,
-third-party character, archive proper noun, copied narrative phrase, or a request
-to imitate protected audio. A generic musical capability in the provider does
-not authorize its use for the Project Adventure sound-effect catalog.
+The last example asks a sound-effects model for something musical. Judge the
+result by ear; a stinger may be better served by the music route.
+
+Do not prompt with an artist, franchise, branded sonic logo, recognizable
+song, third-party character or a request to imitate protected audio. Do not
+describe or name the legacy WAV files: they have no recorded licence, and the
+endpoint takes no audio input in any case.
 
 ### Parameter starting points
 
-- Use `loop: false` for the current one-shot inventory.
-- Set explicit duration for timing-critical combat and interface cues.
-- Use `prompt_influence` around 0.3 to 0.45 for the first candidate pass, then
-  change one variable at a time during comparison.
-- Raise prompt influence only when the output misses a required material,
-  action, duration, or exclusion.
-- Generate multiple candidates instead of treating the first response as an
-  accepted asset.
+- `loop: false` for every cue in the table.
+- Set `duration_seconds` explicitly for timing-critical combat cues; let the
+  model decide for `victory` and `defeat`.
+- `prompt_influence` 0.3 to 0.45 for the first pass; raise it only when the
+  output misses a required material, action, duration or exclusion.
+- Generate several candidates per cue and choose by ear. The first response
+  is not the asset.
 
-These are Proposed production heuristics, not provider guarantees. Record the
-actual parameter values and acoustic-validator result for each candidate.
+Record the actual values with each candidate.
 
-## Candidate-to-runtime workflow
+## From candidate to committed cue
 
-The required project path is:
+1. Generate into `tmp/audio-generation/elevenlabs/` with unique filenames.
+2. For each candidate record the prompt, parameters, `output_format`, model,
+   date, byte length, SHA-256 and the safe response headers.
+3. Listen and compare. Reject speech, singing, music where none was asked
+   for, clipping, weak attacks, long tails and candidates that mask each
+   other in the mix.
+4. Edit with ffmpeg: trim to the cue's length, add 5 to 10 ms fades, peak
+   normalise, downmix to mono. Record the exact commands and the ffmpeg
+   version; the restart plan requires conversion commands to be recorded
+   next to the manifest.
+5. Export one file per cue. Compressed audio must be MP3 (restart plan §5.1
+   item 6). Whether the very short cues ship as mono WAV instead is open
+   question T11 in the tech design (§12). Phaser picks a file by extension
+   and the browser's `canPlayType`, so ship one format per key.
+6. Write the provenance record before the commit: a QA note in the shape of
+   [`docs/qa/issue-16-assets.md`](../qa/issue-16-assets.md) with the tool,
+   model, exact prompt, parameters, bytes and SHA-256 of both the provider
+   bytes and the export, plus the ffmpeg commands. When the asset manifest
+   exists, add one row per file: key, source, origin, licence, duration,
+   channels.
+7. Get the owner's sign-off (restart plan D3) before the first commit. The
+   repository is public and has no LICENSE file; the licence terms for assets
+   are undecided.
+8. Load cues after the Begin tap, never on the critical path; a missing cue
+   plays nothing (tech design §7.3).
 
-```text
-validated cue brief
-  -> provider request
-  -> immutable original response and safe provenance
-  -> autonomous selection and originality checks
-  -> deterministic editing, trimming, fades, mix, and accepted master
-  -> deterministic runtime export
-  -> manifest validation and hash
-  -> local package
-  -> Web Audio decode and playback
-```
-
-Apply the following rules:
-
-1. Generate only into a unique ignored scratch location such as
-   `tmp/audio-generation/elevenlabs/`.
-2. Treat every response as untrusted candidate bytes. Validate size, format,
-   duration, channel facts, decode behavior, and hash before scoring.
-3. Preserve the exact provider response separately from the edited master.
-4. Score several candidates with versioned acoustic, semantic-role, and
-   in-game-mix evaluators; select the highest passing candidate deterministically.
-5. Reject unwanted speech, singing, music, similarity, artifacts, clipping,
-   weak attacks, excessive tails, unusable loops, and poor separation.
-6. Record trimming, fades, layering, processing, normalization, mixing, and
-   mastering as deterministic modifications.
-7. Export with a versioned deterministic recipe and stable project-owned asset
-   identity. Provider filenames and request URLs never become runtime IDs.
-8. Promote the complete accepted source record, runtime output, manifest entry,
-   and hash atomically. Failure preserves the prior complete set.
-
-The canonical provenance and promotion rules are owned by the [audio source
-contract](../../engineering/data-contracts.md#audio-source-and-provenance) and
-[generated-asset ADR](../../engineering/adr/0014-generated-asset-manifest-and-provenance.md).
-
-## Provenance fields
-
-Every generated candidate that remains under consideration should record:
-
-| Field | Required evidence |
-| -- | -- |
-| Candidate ID | Unique local identity that is not a runtime cue ID. |
-| Intended cue role | Checklist role and intended game use. |
-| Provider and product | ElevenLabs Sound Effects. |
-| Model and feature status | Exact model ID and confirmation that the feature was not a prohibited beta for the intended use. |
-| Generation time | ISO timestamp binding the request to then-current plan and terms. |
-| Account entitlement class | Paid or research-only class without account secrets or unnecessary personal data. |
-| Prompt and options | Exact prompt, loop, duration, prompt influence, and output format. |
-| Provider request metadata | Safe request, trace, cost, or history identity when available. |
-| Original response | Byte length, media facts, and SHA-256. |
-| Deterministic modifications | Selection, trimming, arrangement, layering, fades, processing, mixing, and mastering recipes. |
-| Accepted master and export | Master hash, deterministic export recipe, runtime hash, size, codec, rate, channels, and loop points. |
-| Validation | Rights, originality, similarity, unwanted speech or music, mix, decode, and archive-boundary results. |
-| Disposition | Research-only, rejected, selected, accepted, superseded, or shipped after all autonomous checks pass. |
-
-Provider request metadata supports investigation but does not replace the
-original-response hash, prompt record, entitlement evidence, acoustic
-validation, or project acceptance record.
-
-## Failure, cancellation, duplicate, and retry behavior
+## Failure and retry
 
 | Condition | Treatment |
 | -- | -- |
-| Invalid request or unsupported option | Correct the cue brief or request; do not retry unchanged. |
-| Missing, invalid, or under-scoped key | Stop the provider path without output; use the configured licensed fallback and preserve credential restrictions. |
-| Insufficient credits or unavailable plan | Stop the provider path; apply the configured free/licensed fallback without increasing the budget. |
-| IP allowlist or permission rejection | Stop the provider path; keep the restriction intact and apply the configured licensed fallback. |
-| Rate limit | Apply bounded exponential backoff and retain the same candidate operation identity. |
-| Concurrency limit | Wait for current requests to finish; do not increase parallelism. |
-| Timeout, `5xx`, or service unavailable | Retry a bounded number of times only while the same validated request remains current. |
-| Cancellation, stale batch, or superseded brief | Abort or ignore the response, remove partial scratch output, and never promote it. |
-| Duplicate request or repeated callback | Keep a distinct candidate identity; never overwrite, double-charge a production record, or claim deterministic reproduction. |
-| Empty, oversized, corrupt, or undecodable audio | Quarantine or delete the scratch candidate, retain a safe failure record, and preserve every previously accepted source and output. |
+| `400` or `422` | Correct the request; do not retry unchanged. |
+| `401` missing or invalid key | Stop. Check `.env` and the key's scope. |
+| `402` insufficient credits | Stop. Do not raise the budget inside the script. |
+| `403` permission or IP allowlist | Stop. Keep the restriction and fix the key or the machine. |
+| `429` rate or concurrency limit | Bounded exponential backoff with jitter; do not add parallelism. |
+| Timeout, `500`, `503` | Retry a bounded number of times with backoff. |
+| Cancellation | Delete partial scratch output; never promote it. |
+| Empty, oversized, corrupt or undecodable audio | Delete the candidate and keep a one-line failure record. |
 
-The general API error guide documents `400` validation, `401` authentication,
-`402` payment, `403` authorization, `429` rate or concurrency, `500` internal,
-and `503` unavailable families. The sound-effect endpoint separately documents
-`422` validation errors. Parse provider details only inside the local tool and
-retain allowlisted fields such as status, provider code, request ID, candidate
-ID, attempt count, and disposition. Do not retain the full prompt or provider
-message in routine logs.
-
-Provider failure never creates a runtime generation fallback and never changes
-gameplay, records, deterministic state, or release status.
+Keep status, provider error code, request ID, candidate name and attempt
+count in the log. Do not log the full prompt or the provider message
+routinely. A provider failure never changes the game, the build or a
+committed asset.
 
 ## Rights and production eligibility
 
-These controls summarize current provider evidence; they are not legal advice or
-a guarantee of copyright protection or non-infringement.
+These controls summarise provider pages as read on 2026-07-15. They are not
+legal advice and do not guarantee copyright protection or non-infringement.
 
-As verified on 2026-07-15:
+- ElevenLabs states that free-plan output has no commercial licence.
+- It states that paid-plan output may be used commercially when it was not
+  made with a Beta service and the user holds the necessary rights and
+  follows the applicable terms and law.
+- The Sound Effects Terms allow the account to opt out of future third-party
+  sublicensing of its outputs; the opt-out does not unwind uses already
+  granted.
 
-- ElevenLabs states that free-plan output has no commercial license.
-- It states that paid-plan output may be used commercially when it was not made
-  with a Beta Service and the user holds the necessary rights and follows the
-  applicable terms and law.
-- The Sound Effects Terms allow the account to disable future third-party
-  sublicensing of its sound-effect outputs, but the opt-out does not unwind uses
-  already granted or commenced.
+Before a batch whose output may ship:
 
-Before a final production batch:
+- confirm a paid entitlement and that Sound Effects is not a beta feature for
+  the account, and keep the evidence with the batch record;
+- enable the third-party sublicensing opt-out;
+- use only original prompts; and
+- treat the result as subject to restart plan D3: origin and licence recorded
+  per file, owner sign-off, and a licence decision for the public repository.
 
-- verify a paid entitlement and a non-beta Sound Effects feature through
-  account/API evidence;
-- enable the Sound Effects third-party sublicensing opt-out;
-- retain plan, terms, feature-status, date, prompt, and output evidence;
-- use only original prompts and authorized inputs;
-- run acoustic originality and similarity validation; and
-- apply the repository jurisdiction and distribution rights policy, quarantining
-  any candidate whose license evidence is insufficient.
-
-Research candidates generated under an ineligible plan remain research-only and
-must not be promoted later merely because the account subsequently changes plan.
+Candidates generated under a free plan stay research-only and are not
+promoted later because the plan changed.
 
 ## Batch checklist
 
-- [ ] The hybrid file-source mode matches the versioned manifest scope, or the
-  batch is explicitly research-only.
-- [ ] The cue roles come from the current conservative audio checklist.
-- [ ] The exact prompts contain no archive terms, copied signatures, artist
-  imitation, private data, speech, singing, music, or melody.
-- [ ] The key is restricted, locally loaded from `.env`, and absent from command
-  output and retained artifacts.
-- [ ] The plan, non-beta feature status, terms, opt-out, pricing, and usage budget
-  have been rechecked.
-- [ ] Candidate IDs, output paths, byte limits, timeouts, cancellation, bounded
-  retry, partial cleanup, and duplicate behavior are defined.
-- [ ] Every successful response receives exact request metadata and an original
-  byte hash before editing.
-- [ ] Autonomous selection, deterministic edits, mix, originality, and
-  similarity validator results plus rejection reasons are recorded.
-- [ ] Accepted masters and runtime exports have deterministic recipes, stable
-  project IDs, hashes, provenance, and complete manifest coverage.
-- [ ] The packaged game makes no ElevenLabs or other vendor request and remains
-  fully playable with audio muted or unavailable.
+- [ ] Each cue maps to a row of the tech design's cue table or to a decision
+  that adds one.
+- [ ] Prompts contain no artist, franchise, legacy filename, speech, singing,
+  music or melody unless the cue is a stinger.
+- [ ] The key is scoped and quota-bound, loaded from `.env`, and absent from
+  command output and retained files.
+- [ ] Plan, beta status, terms, opt-out and budget have been rechecked.
+- [ ] Unique candidate names, byte limit, timeout and partial-file cleanup
+  are in place.
+- [ ] Every kept candidate has prompt, parameters, headers, bytes and
+  SHA-256 recorded before editing.
+- [ ] Exports have recorded ffmpeg commands, one format per key, and a QA
+  note or manifest row.
+- [ ] The built game makes no vendor request and plays with audio muted or
+  unavailable.
 
 ## Reverification
 
-Recheck the official sources automatically before the pilot, before every final
-batch, and whenever the endpoint, model, fields, output formats, plan, pricing,
-terms, feature status, distribution model, or project audio contract changes:
+Recheck before a batch whose output may ship, and whenever the endpoint,
+model, output formats, plan, pricing or terms change:
 
 - [Create sound effect API reference](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert)
 - [Sound-effects overview and prompting guide](https://elevenlabs.io/docs/overview/capabilities/sound-effects)
@@ -492,14 +403,5 @@ terms, feature status, distribution model, or project audio contract changes:
 - [Commercial-use guidance](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform)
 - [Sound Effects Terms](https://elevenlabs.io/sound-effects-terms)
 
-For local document quality, run:
-
-```bash
-npx prettier --check docs/media-gen/elevenlabs/sound-fx-api.md
-npx markdownlint-cli2 docs/media-gen/elevenlabs/sound-fx-api.md
-npx cspell lint --no-progress docs/media-gen/elevenlabs/sound-fx-api.md
-```
-
-These checks validate formatting and local prose only. They do not contact
-ElevenLabs, test a credential, spend credits, accept a generated asset, or
-change the proposed production direction.
+This repository has no markdown linter; run `git diff --check` before
+committing documentation changes.

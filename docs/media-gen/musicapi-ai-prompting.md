@@ -1,11 +1,7 @@
 # MusicAPI.ai Sonic prompting and request-variable guide
 
-<!-- cspell:words audiopipe autochorus autoformat autofill autotitle backcompat CDN HMAC infill lyrics metatag metatags MusicAPI neosoul nonterminal Nuro overpainting prechorus Riffusion singback Suno synthwave webhook webhooks -->
-
-Status: Proposed
-
-Audience: MusicAPI.ai integrators, prompt authors, audio producers, and quality
-automation maintainers
+Status: Reference. Provider guide; not a dependency or integration of
+Tactics Guru v2.
 
 Scope: Provider-focused guidance for every currently documented request-body
 variable on `POST /api/v1/sonic/create`, plus the prompt-bearing adjacent Sonic
@@ -13,9 +9,17 @@ endpoints; excludes application-specific creative direction, runtime integration
 account setup, and the separate Producer, Nuro, Studio, and deprecated Riffusion
 models
 
-Authority: Evidence
+Project fit: this repository's only planned use is instrumental description
+mode for at most one optional music track ([musicapi-ai.md](musicapi-ai.md)).
+The lyrics, auto-lyrics, vocal, persona, cover and upload sections below are
+provider reference, kept so that the field inventory is complete; none of
+them is authorised for project use. Rules shared by every generator in this
+folder are in [README.md](README.md).
 
-Last verified: 2026-07-15
+Last verified: field inventory, limits, model enum and credit costs
+re-checked against the create endpoint and credit guide on 2026-10-07. The
+live-validation evidence is from 2026-07-15, against `sonic-v5-5`, in
+another project; it has not been repeated on `sonic-v6`.
 
 Evidence: [Sonic instructions](https://docs.musicapi.ai/sonic-instructions),
 [unified Sonic create endpoint](https://docs.musicapi.ai/concat-music),
@@ -41,7 +45,9 @@ Interpret claims in this document using these labels:
 - **Documented** means the current official MusicAPI.ai pages or OpenAPI export
   state the behavior.
 - **Live-validated** means a 2026-07-15 request confirmed validation or response
-  behavior against `sonic-v5-5`.
+  behavior against `sonic-v5-5`, in another project. Suno retired that model
+  on 2026-09-09 and maps it to v6, so treat live-validated claims as
+  provider history until repeated on `sonic-v6`.
 - **Observed** means a live response exhibited the behavior, but the test did
   not prove why the model produced it.
 - **Heuristic** means a useful prompting practice, not an API guarantee.
@@ -91,9 +97,10 @@ Authorization: Bearer <raw API key>
 Content-Type: application/json
 ```
 
-The documented cost is 15 credits for create, extend, cover, persona, remaster,
-add-instrumental, or add-vocals work and 2 credits for `concat_music`. A normal
-create task returns two song variants. Recheck the
+On 2026-10-07 the create endpoint documents 20 credits per `create_music`,
+`cover_music` or `persona_music` call, 15 for `extend_music`, `remaster`,
+`add_vocals` and `add_instrumental`, and 2 for `concat_music`. A normal create
+task returns two song variants. Recheck the
 [credit guide](https://docs.musicapi.ai/credits-usage-guide) before spending.
 
 The submit call returns a `task_id`; poll
@@ -108,8 +115,9 @@ clip states, and included numeric `code` only in the later response shape.
 
 ## Complete `/sonic/create` variable inventory
 
-The current OpenAPI export lists 23 request-body properties. The tables below
-cover every one.
+The current endpoint reference lists 24 request-body properties: the 23 from
+the 2026-07-15 export plus `duration`, added since. The tables below cover
+every one.
 
 ### Operation and mode fields
 
@@ -117,7 +125,7 @@ cover every one.
 | -- | -- | -- | -- |
 | `task_type` | string | Defaults to `create_music`; live-validated | Selects create, edit, source, or utility behavior. Prefer sending it explicitly. |
 | `custom_mode` | boolean | Conditional; required for prompt-bearing generation | `true` selects custom lyrics, unless `auto_lyrics` changes `prompt` into a description. |
-| `mv` | string | Required except for `concat_music` | Sonic model version. Validate against the current endpoint enum, not an old guide or UI label. |
+| `mv` | string | Required except for `concat_music` | Sonic model version. The 2026-10-07 enum is `sonic-v6`, `sonic-v6-wild`, `sonic-v6-mini`; retired ids are accepted and run v6. Validate against the current endpoint enum, not an old guide or UI label. |
 | `use_suno_cdn` | boolean | Documented as optional, but the schema also marks it required | Chooses a requested delivery host only. Live behavior did not honor the documented distinction. |
 
 ### Creative-content fields
@@ -134,6 +142,7 @@ cover every one.
 | `vocal_gender` | string | `f` or `m` | Vocal-gender request for supported models. No neutral or additional enum is documented. |
 | `style_weight` | number | 0 through 1 | Higher values request stronger adherence to `tags`. Provider default is not documented. |
 | `weirdness_constraint` | number | 0 through 1 | Higher values request more unusual or experimental output. Provider default is not documented. |
+| `duration` | integer | 10 through 360 seconds | Target length. Documented 2026-10-07: "the generated track lands close to the requested length rather than exactly on it." Not present in the 2026-07-15 export; not live-validated. |
 
 ### Source and edit fields
 
@@ -155,7 +164,7 @@ cover every one.
 | `webhook_secret` | string | Optional | HMAC secret used to verify callbacks. It is a credential and must never be logged or committed. |
 
 There are no Sonic-create fields named `audience`, `subject`, `mood`, `genre`,
-`bpm`, `key`, `duration`, `seed`, `lyrics_strength`, or `audio_influence`.
+`bpm`, `key`, `seed`, `lyrics_strength`, or `audio_influence`.
 Encode creative concepts in the supported description, lyrics, or tag strings.
 Use `audio_weight` for the documented source-influence cases. Do not send UI
 labels as invented JSON fields.
@@ -194,18 +203,22 @@ have permission to transform.
 | `sonic-v4-5` | 5,000 | 1,000 | Documented |
 | `sonic-v4-5-plus` | 5,000 | 1,000 | Documented |
 | `sonic-v5` | 5,000 | 1,000 | Documented |
-| `sonic-v5-5` | 5,000 | 1,000 | Documented in instructions; request acceptance live-tested |
-| `sonic-v4-5-all` | N/A | N/A | Do not use: listed on one page but live-rejected as invalid |
+| `sonic-v5-5` | 5,000 | 1,000 | Documented in instructions; request acceptance live-tested in 2026-07; retired 2026-09-09, runs v6 |
+| `sonic-v6` | 5,000 | 1,000 | Current enum (2026-10-07); the repository default. Limits are the endpoint-wide figures; the instructions page gives none per v6 model |
+| `sonic-v6-wild` | 5,000 | 1,000 | Current enum; not live-tested |
+| `sonic-v6-mini` | 5,000 | 1,000 | Current enum; not live-tested |
+| `sonic-v4-5-all` | N/A | N/A | Do not use: listed on one page but live-rejected as invalid in 2026-07 |
 
 The v5.5 tag limit is omitted from one current documentation table, but a live
 1,001-character v5.5 tag string was rejected with a 1,000-character limit
 message. The title limit is 80 across modes, and the description-mode limit is
 400 across the currently documented models.
 
-Sonic has no exact-duration request field. The FAQ describes model-dependent
-duration tendencies and recommends shorter lyrics, fewer sections, ending tags,
-or extension, but those are indirect controls. Do not promise an exact runtime
-from the prompt.
+Sonic has no exact-duration control. The `duration` field (10 through 360
+seconds, added by 2026-10-07) is documented as approximate: the track lands
+close to it, not on it. The FAQ's older advice, shorter lyrics, fewer sections,
+ending tags or extension, remains an indirect lever. Do not promise an exact
+runtime from either.
 
 ## Description mode
 
@@ -215,7 +228,7 @@ Use description mode when the model should write the lyrics and composition:
 {
   "task_type": "create_music",
   "custom_mode": false,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "gpt_description_prompt": "Warm nocturnal neo-soul about choosing patience over urgency; brushed drums, electric piano, restrained lead vocal, intimate verses, open chorus, concise bridge, and a resolved ending.",
   "make_instrumental": false,
   "use_suno_cdn": false
@@ -253,7 +266,7 @@ performed:
 {
   "task_type": "create_music",
   "custom_mode": true,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "title": "Paper Constellations",
   "tags": "indie soul, intimate, warm electric piano, brushed drums, restrained vocal",
   "negative_tags": "metal, choir, spoken word, aggressive drums",
@@ -280,8 +293,8 @@ The core Sonic instructions explicitly document:
 
 The FAQ also recommends `[End]`, `[Fade Out]`, `[Short Instrumental Outro]`,
 `[Instrumental]`, and `[Guitar Solo]` as indirect arrangement or length cues.
-Live auto-lyrics responses used `[Verse 1]` and `[Verse 2]`, confirming numbered
-section labels in provider-authored output.
+Live auto-lyrics responses (2026-07) used `[Verse 1]` and `[Verse 2]`,
+confirming numbered section labels in provider-authored output.
 
 Bracketed directions remain soft conditioning. Parameterized tags such as
 `[Bridge: stripped back, electric piano only]` are an upstream prompting
@@ -315,7 +328,7 @@ Let the provider generate lyrics, title, and tags:
   "task_type": "create_music",
   "custom_mode": true,
   "auto_lyrics": true,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "prompt": "An upbeat acoustic soul song about finding a forgotten letter, with a concise verse-chorus-bridge arc.",
   "negative_tags": "metal, choir, spoken word, aggressive drums",
   "style_weight": 0.75,
@@ -346,7 +359,7 @@ The clearest instrumental request uses description mode:
 {
   "task_type": "create_music",
   "custom_mode": false,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "make_instrumental": true,
   "gpt_description_prompt": "Spacious ambient jazz with felt piano, brushed cymbals, upright bass, gradual harmonic motion, and a clean resolved ending; no vocal role.",
   "tags": "ambient jazz, felt piano, brushed cymbals, upright bass, spacious",
@@ -358,9 +371,9 @@ The clearest instrumental request uses description mode:
 `make_instrumental: true` is stronger and clearer than relying on an
 `[Instrumental]` lyric tag for the whole track. It is still a model request, not
 a proof. A live instrumental response returned a bracket-only instrumental
-marker in `lyrics` rather than an empty string. Always scan for singing, speech,
-chants, vocal chops, or lyric-like artifacts with the autonomous waveform and
-transcription classifiers.
+marker in `lyrics` rather than an empty string. Always listen to the whole track for
+singing, speech, chants, vocal chops, or lyric-like artifacts; this project
+has no automated classifier.
 
 ## Titles
 
@@ -429,7 +442,7 @@ local bound and keep the list shorter than the positive direction.
 Negative tags are not a deterministic content filter. Live responses echoed
 the submitted negative string, but the experiments did not acoustically score
 the resulting audio, so they do not prove that every exclusion was obeyed.
-The autonomous acoustic validation suite remains mandatory.
+The full listen remains mandatory.
 
 ## Style weight and weirdness
 
@@ -452,7 +465,7 @@ To compare them responsibly:
    fields unchanged;
 2. change only one weight;
 3. generate multiple paid batches because there is no Sonic seed;
-4. blind-score both variants with the versioned acoustic evaluator for the
+4. have a listener who did not write the brief score both variants for the
    intended musical traits; and
 5. record failures as well as preferred outcomes.
 
@@ -482,7 +495,7 @@ identity, consent, retention, and reuse as high-risk rights constraints.
   "continue_clip_id": "source-clip-id",
   "continue_at": 120,
   "custom_mode": true,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "prompt": "[Bridge]\nNew original lyrics\n\n[Outro]\nA final resolving line",
   "tags": "match the source style"
 }
@@ -499,7 +512,7 @@ extension clip when a full source-plus-extension file is required.
   "task_type": "cover_music",
   "continue_clip_id": "source-clip-id",
   "custom_mode": false,
-  "mv": "sonic-v5-5",
+  "mv": "sonic-v6",
   "gpt_description_prompt": "Reinterpret as sparse acoustic jazz with brushed drums, upright bass, and intimate vocals.",
   "audio_weight": 0.6
 }
@@ -539,9 +552,9 @@ constant time, and deduplicate using the event or idempotency header plus
 `task_id`. Return 2xx only after durable acceptance. Never expose the webhook
 secret in client code, logs, examples, or stored payloads.
 
-The current OpenAPI description says `use_suno_cdn: true` selects Suno CDN URLs
-and false or omission selects MusicAPI.ai delivery URLs with identical bytes.
-Live behavior contradicted that claim:
+The current endpoint description (re-read 2026-10-07) says `use_suno_cdn:
+true` selects Suno CDN URLs and false or omission selects MusicAPI.ai delivery
+URLs. Live behavior in 2026-07 contradicted that claim:
 
 - an earlier omitted-field request returned `cdn1.suno.ai` audio;
 - a paid `false` custom request returned `cdn1.suno.ai` audio and
@@ -622,13 +635,12 @@ The experiment did not download or acoustically score these six research
 outputs.
 Therefore it supports request, validation, metadata, cost, and lifecycle claims
 only. It does not prove tag strength, negative-tag compliance, vocal gender,
-musical quality, originality, or similarity.
+musical quality, originality, or similarity. The credit figures above are the
+2026-07 prices; create now costs 20.
 
-This bounded prompt-field experiment is separate from the later instrumental
-Skyglass completion batch. The completion batch's source, stem, failure, refund,
-and packaging evidence is recorded in the [project MusicAPI.ai
-guide](musicapi-ai.md#live-batch-reliability-and-refund-accounting) and [music
-provenance](../../../skyglass-assets/music/musicapi-ai-provenance.json).
+The instrumental run from the same date, with its submit, polling, download,
+failure and refund observations, is summarised in
+[musicapi-ai.md](musicapi-ai.md#observed-provider-behaviour-2026-07-15-sonic-v5-5-another-project).
 
 ## Prompting practices supported by current evidence
 
@@ -643,8 +655,8 @@ provenance](../../../skyglass-assets/music/musicapi-ai-provenance.json).
 - Keep wanted and unwanted traits in `tags` and `negative_tags` respectively.
 - Record all submitted values and returned metadata because the provider may
   normalize or generate title, tags, and lyrics.
-- Generate multiple variants and score them through the autonomous suite; no
-  prompt guarantees compliance.
+- Generate multiple variants and judge them by a full listen and the
+  provenance record; no prompt guarantees compliance.
 
 ### Unsupported or overstated practices to avoid
 
@@ -674,12 +686,12 @@ provenance](../../../skyglass-assets/music/musicapi-ai-provenance.json).
 6. Generate enough repeated batches to distinguish the change from stochastic
    variation.
 7. Keep rejected outputs and reasons in the evaluation record.
-8. Promote only files that pass the autonomous acceptance suite; a successful
-   API task is not production acceptance.
+8. Promote only files that pass the listening review and provenance gate in
+   [musicapi-ai.md](musicapi-ai.md); a successful API task is not acceptance.
 
 For title or metadata tests, compare exact returned strings. For subjective
-controls such as style weight and weirdness, use blinded acoustic-model scoring
-and more than one batch per setting.
+controls such as style weight and weirdness, use blind listening by someone
+other than the brief's author and more than one batch per setting.
 
 ## Adjacent prompt-bearing Sonic endpoints
 
@@ -717,7 +729,7 @@ before integrating it; do not copy variables from a neighboring endpoint.
 - [ ] An accepted `task_id` is persisted before polling or webhook handling.
 - [ ] Webhook secrets and API credentials remain outside request logs and
   committed files.
-- [ ] Both returned variants will be scored by the autonomous acceptance suite;
+- [ ] Both returned variants will get a full listen and a provenance record;
   no metadata field is treated as acoustic or rights evidence.
 
 ## Source interpretation notes
