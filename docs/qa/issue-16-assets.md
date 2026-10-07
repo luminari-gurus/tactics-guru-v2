@@ -101,3 +101,7 @@ The previously loaded tree was `art/tiles/tree_single_detailed_N.png` copied unc
 - Exact prompt and method: [tree-grass-v1-prompt.md](issue-16/tree-grass-v1-prompt.md).
 - Original tree PNG is preserved but unloaded. This replacement is generated project art, explicitly user-authorized, and is not claimed to be unchanged canonical art.
 - Current screenshots verify front/behind occlusion at ground and raised elevations, framing, borders, and restart using the replacement.
+
+## Unit readability through canopy
+
+The tree renders at 40% opacity when its bounds overlap the hero and it is in front in the existing depth order. It returns to full opacity for front fixtures or when bounds do not overlap. Only the prop fades; hero rendering and depth remain unchanged. Restart recomputes the default ground-behind state. Diagnostics expose the actual prop alpha; browser checks verify both behind/front states at both elevation levels and restart reset. The new opacity assertions failed before the renderer change.

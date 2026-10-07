@@ -7,6 +7,7 @@ import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, 
 const ELEVATED_EDGE_COLOR = 0x263c29;
 const ELEVATED_EDGE_WIDTH = 1;
 const OCCUPANT_LAYER = 2.5;
+const OCCLUDING_TREE_ALPHA = 0.4;
 
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
@@ -76,6 +77,9 @@ export class BoardRenderer {
     const prop = projectTile(value.prop);
     this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, OCCUPANT_LAYER));
     this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, OCCUPANT_LAYER));
+    const occludesHero = this.hero.depth < this.prop.depth
+      && Phaser.Geom.Rectangle.Overlaps(this.hero.getBounds(), this.prop.getBounds());
+    this.prop.setAlpha(occludesHero ? OCCLUDING_TREE_ALPHA : 1);
     this.root.sort('depth');
     this.publishDiagnostics();
   }
@@ -99,7 +103,7 @@ export class BoardRenderer {
       });
     });
     setProofDiagnostics({ fixture: this.fixture, relation: value.relation, propElevation: value.prop.elevation,
-      heroDepth: this.hero.depth, propDepth: this.prop.depth, assetCount: PROOF_ASSETS.length,
+      heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_ASSETS.length,
       surfaceCornerError: Math.max(...errors),
       objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
   }
