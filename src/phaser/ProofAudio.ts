@@ -12,11 +12,10 @@ export const PLAY_TIMEOUT_MS = 1000;
  */
 export const UNLOCK_TIMEOUT_MS = 2000;
 
-
 /**
  * Scene-owned adapter between the pure audio reducer, Phaser's sound manager and the panel controls.
  * `play()` is only ever called from the button's click handler: nothing here reacts to visibility,
- * focus or unlock events by starting sound.
+ * focus, unlock or context state events by starting sound.
  */
 export class ProofAudio {
   private state: AudioState = initialAudioState;
@@ -29,6 +28,10 @@ export class ProofAudio {
 
   constructor(private readonly scene: Phaser.Scene, loadErrors: ReadonlySet<string>) {
     this.button.addEventListener('click', this.onClick);
+    // The context changes state outside play(): Phaser's body-gesture unlock, its blur/focus handling,
+    // and an iOS interruption. The reducer follows those; the diagnostics read the live values.
+    this.context()?.addEventListener('statechange', this.onContextStateChange);
+    setAudioDiagnostics(() => this.snapshot());
     const manager = scene.sound;
     const cached = scene.cache.audio.exists(UNLOCK_TONE_KEY);
     if (manager instanceof Phaser.Sound.NoAudioSoundManager) this.dispatch({ type: 'unsupported', reason: 'No audio output on this device' });
@@ -57,20 +60,25 @@ export class ProofAudio {
   private render(): void {
     this.button.disabled = !canRetry(this.state);
     this.status.textContent = audioStatusText(this.state);
-    setAudioDiagnostics(this.snapshot());
   }
 
+  /** Taken when `fitDiagnostics()` runs: `contextState`, `locked` and `cached` are read then, not frozen at the last dispatch. */
   snapshot(): AudioDiagnostics {
     const manager = this.scene.sound;
     const device = this.scene.game.device.audio;
     return {
       ...this.state,
+      contextState: this.contextState(),
       manager: manager instanceof Phaser.Sound.WebAudioSoundManager ? 'webaudio' : manager instanceof Phaser.Sound.HTML5AudioSoundManager ? 'html5' : 'none',
       locked: manager.locked,
       device: { mp3: device.mp3, ogg: device.ogg, webAudio: device.webAudio },
       cached: { mp3: this.scene.cache.audio.exists(UNLOCK_TONE_KEY), ogg: this.scene.cache.audio.exists(UNLOCK_TONE_PROBE_KEY) },
     };
   }
+
+  private readonly onContextStateChange = (): void => {
+    this.dispatch({ type: 'contextState', contextState: this.contextState() });
+  };
 
   private readonly onClick = (): void => {
     if (this.button.disabled || !canRetry(this.state)) return;
@@ -87,8 +95,8 @@ export class ProofAudio {
         const resumed = context.resume();
         this.armUnlockWatchdog(attempt);
         try { await resumed; } finally { if (attempt === this.attempt) this.clearUnlockWatchdog(); }
-        // The watchdog or a restart may already have resolved this attempt.
-        if (attempt !== this.attempt) return;
+        // The watchdog, a restart or a context state change may already have resolved this attempt.
+        if (attempt !== this.attempt || this.state.state !== 'unlocking') return;
         this.dispatch({ type: 'contextState', contextState: context.state as AudioContextStateName });
         if (context.state !== 'running') return;
       }
@@ -107,7 +115,7 @@ export class ProofAudio {
         this.dispatch({ type: 'timeout' });
       });
     } catch (error) {
-      if (attempt !== this.attempt) return;
+      if (attempt !== this.attempt || this.state.state !== 'unlocking') return;
       this.dispatch({ type: 'playFailed', reason: error instanceof Error ? error.message : String(error) });
     }
   }
@@ -138,6 +146,7 @@ export class ProofAudio {
   destroy(): void {
     this.attempt++;
     this.clearUnlockWatchdog();
+    this.context()?.removeEventListener('statechange', this.onContextStateChange);
     this.button.removeEventListener('click', this.onClick);
     this.timer?.remove();
     this.timer = undefined;

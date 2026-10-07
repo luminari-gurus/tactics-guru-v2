@@ -55,6 +55,18 @@ describe('audio diagnostic reducer', () => {
     expect(canRetry(timedOut)).toBe(true);
   });
 
+  it('follows the context before a gesture: ready becomes locked when the context stops running, and back', () => {
+    const ready = run([{ type: 'loaded', contextState: 'running' }]);
+    expect(reduceAudio(ready, { type: 'contextState', contextState: 'suspended' })).toMatchObject({ state: 'locked', contextState: 'suspended' });
+    expect(reduceAudio(ready, { type: 'contextState', contextState: 'interrupted' })).toMatchObject({ state: 'locked', contextState: 'interrupted' });
+    expect(run([{ type: 'contextState', contextState: 'interrupted' }, { type: 'contextState', contextState: 'running' }], ready)).toEqual(ready);
+    // The result of the last attempt stays visible; only the recorded context state follows.
+    const played = run([{ type: 'gesture' }, { type: 'contextState', contextState: 'running' }, { type: 'playStarted' }, { type: 'playCompleted' }], ready);
+    expect(reduceAudio(played, { type: 'contextState', contextState: 'suspended' })).toMatchObject({ state: 'played', contextState: 'suspended', playedCount: 1 });
+    const blocked = reduceAudio(reduceAudio(ready, { type: 'gesture' }), { type: 'playFailed', reason: 'x' });
+    expect(reduceAudio(blocked, { type: 'contextState', contextState: 'suspended' })).toMatchObject({ state: 'blocked', contextState: 'suspended', lastError: 'x' });
+  });
+
   it('names the phase that timed out: the context while unlocking, playback while playing', () => {
     const unlocking = run([{ type: 'loaded', contextState: 'suspended' }, { type: 'gesture' }]);
     const unlockTimedOut = reduceAudio(unlocking, { type: 'timeout' });
