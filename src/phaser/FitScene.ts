@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scriptedMove';
 import { FIT_MARKS, measurements, setBoardDiagnostics, setLifecycleDiagnostics, setProofDiagnostics, type LifecycleDiagnostics } from '../diagnostics/browser';
-import { PROOF_ASSETS, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
+import { AUDIO_LOAD_TIMEOUT_MS, PROOF_AUDIO, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
 import { PROOF_AUDIO_KEYS, ProofAudio } from './ProofAudio';
@@ -27,23 +27,32 @@ export class FitScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Audio failures are recorded and shown by the audio control; image failures stay fatal.
+    // Only the images gate create(); their failures stay fatal. The audio files load in their own pass
+    // from create() (see there), and their failures are recorded here and shown by the audio control.
     const failed = (file: Phaser.Loader.File): void => {
       if (PROOF_AUDIO_KEYS.has(file.key)) this.audioLoadErrors.add(file.key);
       else this.error(`Could not load proof asset ${file.key}`);
     };
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed));
-    for (const asset of PROOF_ASSETS) {
-      if (asset.kind === 'image') { if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url); }
-      else if (!this.cache.audio.exists(asset.key)) this.load.audio(asset.key, asset.url);
-    }
+    for (const asset of PROOF_IMAGES) if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url);
   }
 
   create(): void {
     if (PROOF_IMAGES.some(asset => !this.textures.exists(asset.key))) return;
     const board = new BoardRenderer(this);
-    const audio = new ProofAudio(this, this.audioLoadErrors);
+    // The board never waits on audio: the tone and the OGG probe load in a second loader pass, each with an
+    // XHR timeout so a request that neither completes nor errors becomes a load error, and the audio control
+    // stays at Loading until that pass settles.
+    let audio: ProofAudio | undefined;
+    const audioLoaded = (): void => { audio = new ProofAudio(this, this.audioLoadErrors); };
+    const pendingAudio = PROOF_AUDIO.filter(asset => !this.cache.audio.exists(asset.key));
+    if (pendingAudio.length === 0) audioLoaded();
+    else {
+      for (const asset of pendingAudio) this.load.audio(asset.key, asset.url, undefined, { responseType: 'arraybuffer', timeout: AUDIO_LOAD_TIMEOUT_MS });
+      this.load.once(Phaser.Loader.Events.COMPLETE, audioLoaded);
+      this.load.start();
+    }
     const removeBoardInput = bindBoardInput(this.game.canvas, board, () => ({width: this.scale.width, height: this.scale.height}));
     const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!;
     const opacityValue = document.querySelector<HTMLElement>('#tree-opacity-value')!;
@@ -168,7 +177,8 @@ export class FitScene extends Phaser.Scene {
       this.game.events.off(Phaser.Core.Events.BLUR, onBlur);
       this.game.events.off(Phaser.Core.Events.FOCUS, onFocus);
       setLifecycleDiagnostics(null);
-      audio.destroy();
+      this.load.off(Phaser.Loader.Events.COMPLETE, audioLoaded);
+      audio?.destroy();
       moveButton.removeEventListener('click', startMove);
       destination.removeEventListener('change', previewMove);
       removeBoardInput();
