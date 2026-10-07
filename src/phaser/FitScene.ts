@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scriptedMove';
-import { FIT_MARKS, measurements, setBoardDiagnostics, setProofDiagnostics } from '../diagnostics/browser';
+import { FIT_MARKS, measurements, setBoardDiagnostics, setLifecycleDiagnostics, setProofDiagnostics, type LifecycleDiagnostics } from '../diagnostics/browser';
 import { PROOF_ASSETS, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
 import { BoardRenderer } from './BoardRenderer';
@@ -18,6 +18,7 @@ export class FitScene extends Phaser.Scene {
   init(): void {
     setBoardDiagnostics(null);
     setProofDiagnostics(null);
+    setLifecycleDiagnostics(null);
     this.audioLoadErrors.clear();
     this.status('loading');
     for (const name of FIT_MARKS) performance.clearMarks(name);
@@ -60,6 +61,9 @@ export class FitScene extends Phaser.Scene {
     const moveStatus = document.querySelector<HTMLElement>('#move-status')!;
     let moving = false;
     let tween: Phaser.Tweens.Tween | undefined;
+    const lifecycle: LifecycleDiagnostics = { hidden: 0, visible: 0, blur: 0, focus: 0, moveFrozenAt: null, moveCompleted: 0 };
+    const publishLifecycle = (): void => { setLifecycleDiagnostics({ ...lifecycle }); };
+    publishLifecycle();
     moveStatus.textContent = 'Idle';
     const previewMove = (): void => {
       if (destination.value !== 'raised-front') return;
@@ -82,12 +86,33 @@ export class FitScene extends Phaser.Scene {
         onComplete: () => {
           board.moveHero(MOVE_PATH[MOVE_PATH.length - 1]);
           moving = false;
+          lifecycle.moveCompleted++;
+          publishLifecycle();
           moveStatus.textContent = 'Completed';
           moveButton.disabled = destination.disabled = false;
           for (const button of buttons) button.disabled = false;
         } });
     };
     moveButton.addEventListener('click', startMove);
+    // A move in flight freezes while the page is hidden and continues from the same progress once visible.
+    // Phaser's loop keeps stepping whenever the browser still runs animation frames, so the pause is explicit.
+    // Blur alone (window still visible) does not freeze. Nothing here starts audio.
+    const onHidden = (): void => {
+      lifecycle.hidden++;
+      if (moving && tween && !tween.isPaused()) { lifecycle.moveFrozenAt = tween.progress; tween.pause(); }
+      publishLifecycle();
+    };
+    const onVisible = (): void => {
+      lifecycle.visible++;
+      if (moving && tween?.isPaused()) tween.resume();
+      publishLifecycle();
+    };
+    const onBlur = (): void => { lifecycle.blur++; publishLifecycle(); };
+    const onFocus = (): void => { lifecycle.focus++; publishLifecycle(); };
+    this.game.events.on(Phaser.Core.Events.HIDDEN, onHidden);
+    this.game.events.on(Phaser.Core.Events.VISIBLE, onVisible);
+    this.game.events.on(Phaser.Core.Events.BLUR, onBlur);
+    this.game.events.on(Phaser.Core.Events.FOCUS, onFocus);
     const showFixture = (event: Event): void => {
       if (moving) return;
       moveStatus.textContent = 'Idle';
@@ -138,6 +163,11 @@ export class FitScene extends Phaser.Scene {
       this.scale.off(Phaser.Scale.Events.RESIZE, layoutBoard);
       panelObserver.disconnect();
       tween?.stop();
+      this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
+      this.game.events.off(Phaser.Core.Events.VISIBLE, onVisible);
+      this.game.events.off(Phaser.Core.Events.BLUR, onBlur);
+      this.game.events.off(Phaser.Core.Events.FOCUS, onFocus);
+      setLifecycleDiagnostics(null);
       audio.destroy();
       moveButton.removeEventListener('click', startMove);
       destination.removeEventListener('change', previewMove);

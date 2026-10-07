@@ -22,6 +22,10 @@ export interface AudioDiagnostics extends AudioState {
 }
 let audio: AudioDiagnostics | null = null;
 export function setAudioDiagnostics(value: AudioDiagnostics | null): void { audio = value; }
+/** Per scene run. `moveFrozenAt` is the tween progress (0–1) when the page was last hidden during a move. */
+export interface LifecycleDiagnostics { hidden: number; visible: number; blur: number; focus: number; moveFrozenAt: number | null; moveCompleted: number; }
+let lifecycle: LifecycleDiagnostics | null = null;
+export function setLifecycleDiagnostics(value: LifecycleDiagnostics | null): void { lifecycle = value; }
 
 export const measurements = new FitMeasurements();
 export const FIT_MARKS = ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable'] as const;
@@ -41,6 +45,7 @@ export function diagnosticsSnapshot() {
     board: board ? { ...board, elevations: [...board.elevations], bounds: { ...board.bounds } } : null,
     proof: proof ? { ...proof } : null,
     audio: audio ? { ...audio, device: { ...audio.device }, cached: { ...audio.cached } } : null,
+    lifecycle: lifecycle ? { ...lifecycle } : null,
     capturedAt: new Date().toISOString(),
     build: __BUILD_INFO__,
     userAgent: navigator.userAgent,
