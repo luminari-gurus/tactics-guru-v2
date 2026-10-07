@@ -1,12 +1,12 @@
 import { BOARD_SIZE } from './boardFixture';
-// Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
+// Selected diagnostic assets only; sources and anchors: docs/qa/issue-16-assets.md.
 export const PROOF_IMAGES = [
   { kind: 'image', key: 'grass', url: '/proof/grass-material-v1.png' },
   { kind: 'image', key: 'tree', url: '/proof/tree-grass-v1.png' },
   { kind: 'image', key: 'fighter', url: '/proof/fighter.png' },
   { kind: 'image', key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
 ] as const;
-// Generated unlock tone, never legacy SFX (issue #19, docs/qa/issue-19-lifecycle.md):
+// Generated unlock tone (issue #19, docs/qa/issue-19-lifecycle.md):
 // ffmpeg 8.1.1, 880 Hz sine, 150 ms, 10 ms fades, mono 44.1 kHz, bitexact, no metadata.
 //   mp3: libmp3lame 64 kb/s, 1,462 bytes, sha256 0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec
 //   ogg: libvorbis q3,         3,768 bytes, sha256 e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d

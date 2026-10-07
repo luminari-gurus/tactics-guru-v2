@@ -11,26 +11,21 @@ integration of Tactics Guru v2.
 
 Scope: ElevenLabs `POST /v1/sound-generation` as a pre-build source for
 sound-effect candidates: authentication, request and response contract,
-prompting, scratch handling, provenance, failure handling and rights. Excludes
+prompting, scratch handling, source records and failure handling. Excludes
 runtime vendor use, music, speech, and acceptance of any file into the game.
 
 Project fit: the first slice needs the twelve battle cues in the tech design's
 cue table ([§7.4](../tech_design.phaser4.draft.md)) plus a mute control. It
-needs no ambience, footstep library, interface soundscape or voice. The legacy
-WAV cues have no recorded origin for four of the twelve and no licence for any
-([restart plan §5.1](../phaser4-restart-plan.md)), so generation is one way to
-fill that table; a CC0 library and a provenance review of the legacy files are
-the others. Issue #19 does not use this endpoint: its unlock tone is generated
-with ffmpeg ([plan D-A](../ongoing-projects/issue-19-audio-lifecycle-plan.md)).
+needs no ambience, footstep library, interface soundscape or voice. Generation
+is the route for that table.
 
 Last verified: endpoint contract re-checked against the API reference on
-2026-10-07. Rights, pricing and overview pages were last read 2026-07-15.
+2026-10-07. Pricing and overview pages were last read 2026-07-15.
 
 Sources: [create sound effect](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert),
 [sound-effects overview](https://elevenlabs.io/docs/overview/capabilities/sound-effects),
 [authentication](https://elevenlabs.io/docs/api-reference/authentication),
 [errors](https://elevenlabs.io/docs/eleven-api/resources/errors),
-[commercial-use guidance](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform),
 [Sound Effects Terms](https://elevenlabs.io/sound-effects-terms).
 
 Rules shared by every generator in this folder are in [README.md](README.md).
@@ -43,7 +38,7 @@ shipped game contains:
 - no ElevenLabs SDK, API key, account identifier, endpoint, remote audio URL,
   telemetry or vendor fallback;
 - no request to ElevenLabs or any other non-product origin;
-- only locally committed files that passed the provenance gate below; and
+- only locally committed files with a source record; and
 - a mute control, with every outcome readable without sound. A sound failure
   never stalls a turn (tech design §5.7, §7.4).
 
@@ -249,7 +244,7 @@ const candidate = {
 
 A script kept in the repository must also validate the content type, write
 to a unique `.part` path, delete partial output on failure, hash the bytes,
-and record provenance. It must never copy a file into `public/` or
+and record the source. It must never copy a file into `public/` or
 `src/assets/` by itself.
 
 ## Cue briefs for this project
@@ -283,10 +278,7 @@ Examples for the slice's cues:
 The last example asks a sound-effects model for something musical. Judge the
 result by ear; a stinger may be better served by the music route.
 
-Do not prompt with an artist, franchise, branded sonic logo, recognizable
-song, third-party character or a request to imitate protected audio. Do not
-describe or name the legacy WAV files: they have no recorded licence, and the
-endpoint takes no audio input in any case.
+The endpoint takes no audio input.
 
 ### Parameter starting points
 
@@ -316,16 +308,12 @@ Record the actual values with each candidate.
    item 6). Whether the very short cues ship as mono WAV instead is open
    question T11 in the tech design (§12). Phaser picks a file by extension
    and the browser's `canPlayType`, so ship one format per key.
-6. Write the provenance record before the commit: a QA note in the shape of
+6. Write the source record before the commit: a QA note in the shape of
    [`docs/qa/issue-16-assets.md`](../qa/issue-16-assets.md) with the tool,
    model, exact prompt, parameters, bytes and SHA-256 of both the provider
    bytes and the export, plus the ffmpeg commands. When the asset manifest
-   exists, add one row per file: key, source, origin, licence, duration,
-   channels.
-7. Get the owner's sign-off (restart plan D3) before the first commit. The
-   repository is public and has no LICENSE file; the licence terms for assets
-   are undecided.
-8. Load cues after the Begin tap, never on the critical path; a missing cue
+   exists, add one row per file: key, source, origin, duration, channels.
+7. Load cues after the Begin tap, never on the critical path; a missing cue
    plays nothing (tech design §7.3).
 
 ## Failure and retry
@@ -345,31 +333,6 @@ Keep status, provider error code, request ID, candidate name and attempt
 count in the log. Do not log the full prompt or the provider message
 routinely. A provider failure never changes the game, the build or a
 committed asset.
-
-## Rights and production eligibility
-
-These controls summarise provider pages as read on 2026-07-15. They are not
-legal advice and do not guarantee copyright protection or non-infringement.
-
-- ElevenLabs states that free-plan output has no commercial licence.
-- It states that paid-plan output may be used commercially when it was not
-  made with a Beta service and the user holds the necessary rights and
-  follows the applicable terms and law.
-- The Sound Effects Terms allow the account to opt out of future third-party
-  sublicensing of its outputs; the opt-out does not unwind uses already
-  granted.
-
-Before a batch whose output may ship:
-
-- confirm a paid entitlement and that Sound Effects is not a beta feature for
-  the account, and keep the evidence with the batch record;
-- enable the third-party sublicensing opt-out;
-- use only original prompts; and
-- treat the result as subject to restart plan D3: origin and licence recorded
-  per file, owner sign-off, and a licence decision for the public repository.
-
-Candidates generated under a free plan stay research-only and are not
-promoted later because the plan changed.
 
 ## Batch checklist
 
@@ -391,8 +354,8 @@ promoted later because the plan changed.
 
 ## Reverification
 
-Recheck before a batch whose output may ship, and whenever the endpoint,
-model, output formats, plan, pricing or terms change:
+Recheck before a batch, and whenever the endpoint, model, output formats,
+plan or pricing change:
 
 - [Create sound effect API reference](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert)
 - [Sound-effects overview and prompting guide](https://elevenlabs.io/docs/overview/capabilities/sound-effects)
@@ -400,8 +363,6 @@ model, output formats, plan, pricing or terms change:
 - [API keys and restrictions](https://elevenlabs.io/docs/overview/administration/workspaces/api-keys)
 - [API errors](https://elevenlabs.io/docs/eleven-api/resources/errors)
 - [API pricing](https://elevenlabs.io/pricing/api)
-- [Commercial-use guidance](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform)
-- [Sound Effects Terms](https://elevenlabs.io/sound-effects-terms)
 
 This repository has no markdown linter; run `git diff --check` before
 committing documentation changes.

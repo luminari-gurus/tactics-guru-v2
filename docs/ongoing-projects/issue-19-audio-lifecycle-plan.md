@@ -48,9 +48,6 @@ Checked against GitHub and `origin/main` on 2026-10-07.
   `tests/engine-fit.spec.ts` asserts a 40-hex commit. Build from a checkout.
 - `ffmpeg` is installed at `/usr/local/bin/ffmpeg`. Node is v24.15 (engines
   require ≥22.12).
-- The legacy SFX under `ORIGINAL/audio/sfx/` have **no provenance entry** in
-  the legacy `docs/asset_licenses.md`. Restart plan D3 says no legacy asset is
-  committed without recorded origin and licence. That rules them out for #19.
 
 ### What the current scene already does (and does not do)
 
@@ -93,7 +90,7 @@ From `src/phaser/FitScene.ts`, `BoardInput.ts`, `start.ts`, `style.css`:
 
 ### In scope (maps to the four acceptance criteria)
 
-1. **AC1 Audio unlock.** One small generated tone, committed with provenance,
+1. **AC1 Audio unlock.** One small generated tone, its generation recorded,
    loaded by the scene, played only from an explicit "Play test sound" button.
    Visible states for locked/blocked/unsupported/unavailable/playing/played,
    retry on the same button, no uncaught errors in any path.
@@ -124,11 +121,9 @@ From `src/phaser/FitScene.ts`, `BoardInput.ts`, `start.ts`, `style.css`:
 
 Decisions below are proposed; the PR records the ones taken.
 
-### D-A. The sound is a generated tone, not legacy SFX
+### D-A. The sound is a generated tone
 
-- Restart plan §4.2: "A generated test tone answers the codec question
-  without publishing legacy audio." D3 blocks legacy SFX until provenance is
-  signed off, and the legacy licence doc has no SFX entries.
+- Restart plan §4.2: a generated test tone answers the codec question.
 - Generate with ffmpeg, record the exact command, ffmpeg version, byte size
   and SHA-256 in the QA note and in a comment next to the asset table in
   `src/diagnostics/proofAssets.ts`. Proposed: 880 Hz sine, 150 ms, 10 ms
@@ -139,8 +134,6 @@ Decisions below are proposed; the PR records the ones taken.
   record whether it decodes"). It is never played. Its presence in
   `cache.audio` and `device.audio.ogg` are reported, nothing more. Drop this
   if it costs more than an hour; it is secondary.
-- ElevenLabs SFX (`docs/media-gen/sound-fx-api.md`) is not used here: it adds
-  rights and budget questions that a diagnostic tone does not need.
 
 ### D-B. Audio state lives in a pure reducer
 
@@ -246,7 +239,7 @@ Six increments, each a commit, RED-first where there is behaviour to test.
 Order matters: 1–3 are independent of layout; 4 is independent of audio;
 5 wires the browser tests; 6 is docs.
 
-### Increment 1: tone asset and provenance (`chore`)
+### Increment 1: tone asset and its record (`chore`)
 
 - Generate `public/proof/unlock-tone.mp3` and `.ogg` with ffmpeg. Record
   command, version, bytes, SHA-256.
@@ -342,7 +335,7 @@ existing ones:
 ### Increment 6: docs and PR (`docs`)
 
 - `docs/qa/issue-19-lifecycle.md`: implemented-from commit, tone
-  provenance, decisions D-A…D-H in two lines each, validation commands and
+  generation record, decisions D-A…D-H in two lines each, validation commands and
   results, and the **physical-device checklist** for #20 (section 6 below).
 - README: a "Proof-scene audio and lifecycle" section after "Diagnostic
   hero move", in the same voice; update the Layout list and the test count.
@@ -428,7 +421,7 @@ the planned order: `24a5507` chore (tone + catalog), `c76d3a5` feat
 (reducer + adapter), `c87ca47` feat (lifecycle), `6a10a13` style (layout),
 `9c3fbf2` test (three new specs), then the docs commit that carries this
 entry, `docs/qa/issue-19-lifecycle.md`, the README section and two
-screenshots under `docs/qa/issue-19/`. The QA note holds the provenance
+screenshots under `docs/qa/issue-19/`. The QA note holds the generation
 record, the decision log, the validation results, the measurements and the
 physical checklist for #20; this file is only the plan and its corrections.
 
@@ -477,8 +470,8 @@ accurate and delete this file.
 The five documents under `docs/media-gen/` came from another project and
 were rebound to this repository on this branch:
 a new `docs/media-gen/README.md` carries the shared rules (keys only in
-`.env`, pre-build only, `tmp/` scratch, MP3-only compressed audio, the D3
-provenance gate with `docs/qa/issue-16-assets.md` as the record format);
+`.env`, pre-build only, `tmp/` scratch, MP3-only compressed audio, and
+the per-file source record with `docs/qa/issue-16-assets.md` as the format);
 dead links to the other project's ADRs, manifests and "autonomous
 acceptance suite" are gone; `tmp/` is now ignored; the README's claim that
 no `.env.example` exists was corrected. Provider facts re-checked: ElevenLabs
@@ -488,7 +481,6 @@ v6 since 2026-09-09), create costs 20 credits, and a new approximate
 `duration` field exists, so `.env.example`'s `sonic-v6` default is valid.
 
 Effect on this plan: none of its decisions change. D-A stands: the unlock
-tone is an ffmpeg-generated file, and no media service is used by #19.
-Text-to-speech is out of scope for the first slice; the twelve-cue table in
-tech design §7.4 and the one optional music track are the only future
-consumers of these references, and both sit behind D3.
+tone is an ffmpeg-generated file. Text-to-speech is out of scope for the
+first slice; the twelve-cue table in tech design §7.4 and the one optional
+music track are the future consumers of these references.

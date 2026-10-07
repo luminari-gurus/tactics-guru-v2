@@ -191,8 +191,7 @@ two uploaded-audio variants.
 For new uploaded-audio integrations, prefer the separately documented
 `/api/v1/sonic/upload-extend` or `/api/v1/sonic/upload-cover` endpoint. They
 accept a source `url`, perform the upload step, and avoid guessing which unified
-endpoint enum is deployed. Never upload audio that the caller does not own or
-have permission to transform.
+endpoint enum is deployed.
 
 ## Model versions and effective limits
 
@@ -391,7 +390,7 @@ does not document it as "cosmetic only." Live behavior varied by mode:
 Use a concise, content-appropriate title. Keep internal IDs, filenames, version
 numbers, and acceptance state outside the creative title. After polling, store the
 returned title separately from the submitted title so a provider rewrite does
-not destroy provenance.
+not destroy the record.
 
 ## Tags
 
@@ -482,8 +481,7 @@ so acceptance does not prove audible compliance.
 `persona_id` is a separate source control for `persona_music`. Create it through
 the persona endpoint from authorized source audio. Persona creation has its own
 fields: `name`, `clip_id`, optional `describe`, optional `styles`, and optional
-VOX/time-range controls. These are not `/sonic/create` fields. Treat voice
-identity, consent, retention, and reuse as high-risk rights constraints.
+VOX/time-range controls. These are not `/sonic/create` fields.
 
 ## Extension, cover, remaster, and add operations
 
@@ -519,8 +517,7 @@ extension clip when a full source-plus-extension file is required.
 ```
 
 Higher `audio_weight` is documented as staying closer to the original on a
-cover. The API cannot grant rights to transform source material; authorization
-must exist before the request.
+cover.
 
 ### Remaster
 
@@ -575,7 +572,7 @@ Each terminal clip currently exposes these fields:
 | -- | -- |
 | `clip_id` | Stable provider reference for follow-up operations; do not derive meaning from it. |
 | `state` | Accept `succeeded` or `failed` as terminal; wait while other variants remain nonterminal. |
-| `title` | Compare with the submitted title and retain both when provenance matters. |
+| `title` | Compare with the submitted title and retain both for the record. |
 | `tags` | May echo caller tags or contain provider-generated prose in auto-lyrics mode. |
 | `lyrics` | Exact custom lyrics, generated lyrics, or bracket-only instrumental metadata. |
 | `negative_tags` | Live responses echoed the submitted value; absence or echo does not prove acoustic compliance. |
@@ -655,8 +652,8 @@ failure and refund observations, is summarised in
 - Keep wanted and unwanted traits in `tags` and `negative_tags` respectively.
 - Record all submitted values and returned metadata because the provider may
   normalize or generate title, tags, and lyrics.
-- Generate multiple variants and judge them by a full listen and the
-  provenance record; no prompt guarantees compliance.
+- Generate multiple variants and judge them by a full listen; no prompt
+  guarantees compliance.
 
 ### Unsupported or overstated practices to avoid
 
@@ -686,7 +683,7 @@ failure and refund observations, is summarised in
 6. Generate enough repeated batches to distinguish the change from stochastic
    variation.
 7. Keep rejected outputs and reasons in the evaluation record.
-8. Promote only files that pass the listening review and provenance gate in
+8. Promote only files that pass the listening review in
    [musicapi-ai.md](musicapi-ai.md); a successful API task is not acceptance.
 
 For title or metadata tests, compare exact returned strings. For subjective
@@ -729,8 +726,8 @@ before integrating it; do not copy variables from a neighboring endpoint.
 - [ ] An accepted `task_id` is persisted before polling or webhook handling.
 - [ ] Webhook secrets and API credentials remain outside request logs and
   committed files.
-- [ ] Both returned variants will get a full listen and a provenance record;
-  no metadata field is treated as acoustic or rights evidence.
+- [ ] Both returned variants will get a full listen and a source record;
+  no metadata field is treated as acoustic evidence.
 
 ## Source interpretation notes
 

@@ -13,17 +13,16 @@ integration of Tactics Guru v2.
 Scope: MusicAPI.ai Sonic generation (`POST /api/v1/sonic/create`,
 `GET /api/v1/sonic/task/{task_id}`) as a pre-build source for instrumental
 music candidates: authentication, the asynchronous task contract, prompting,
-scratch handling, validation, provenance, failure, cost and rights. Excludes
+scratch handling, validation, source records, failure and cost. Excludes
 runtime vendor use, lyrics, vocals, personas, covers of third-party audio and
 acceptance of any file into the game. Field-level prompting detail is in
 [musicapi-ai-prompting.md](musicapi-ai-prompting.md).
 
 Project fit: the tech design allows at most one optional music track, loaded
 last and failing soft to silence ([§7.3, §7.4](../tech_design.phaser4.draft.md)).
-The legacy combat track exists only as Ogg Vorbis with no recorded licence,
-and compressed audio must ship as MP3 ([restart plan §5.1](../phaser4-restart-plan.md)),
-so a generated instrumental is one candidate route for that single track. No
-tracker issue asks for music yet; issue #19 does not use this service.
+Compressed audio must ship as MP3 ([restart plan §5.1](../phaser4-restart-plan.md)),
+so a generated instrumental is the candidate route for that single track. No
+tracker issue asks for music yet.
 
 Last verified: create endpoint, model enum, credit costs and task endpoint
 re-checked on 2026-10-07. The observed-behaviour section records a
@@ -50,7 +49,7 @@ shipped game contains:
   webhook, analytics or online fallback;
 - no request to MusicAPI.ai, an upstream model provider or a generated-media
   CDN;
-- only a locally committed MP3 that passed the provenance gate below; and
+- only a locally committed MP3 with a source record; and
 - a mute control, with music optional at run time (tech design §7.4).
 
 This workflow is instrumental-only and creates new material only. It does
@@ -58,13 +57,7 @@ not permit:
 
 - lyrics, intelligible words, narration, chanting, choir or vocal personas;
 - `add_vocals`, `persona_music`, lyric generation, cover, remaster or
-  voice-related endpoints;
-- uploading the legacy Ogg track, any other legacy audio or any third-party
-  recording as a source for `extend`, `cover`, `remaster` or `add_*` tasks.
-  The legacy audio has no recorded licence, so there is no right to transform
-  it; or
-- naming artists, bands, franchises, copyrighted songs or provider catalogue
-  tracks in a prompt.
+  voice-related endpoints.
 
 ## Current repository state
 
@@ -279,7 +272,7 @@ The success schema lists `code`, `message` and `task_id`; a 2026-07-15 run
 received only `message` and `task_id`. Validate the task ID and do not
 require `code`.
 
-Write the accepted task ID to scratch provenance immediately. Once a task ID
+Write the accepted task ID to the scratch record immediately. Once a task ID
 exists, do not submit the same brief again because polling or a download
 timed out.
 
@@ -362,7 +355,7 @@ Suggested layout:
 
 ```text
 tmp/audio-generation/musicapi-ai/
-  provenance.json
+  record.json
   {task-id}/
     forest-ruins-combat-{clip-id}-provider.mp3
 ```
@@ -396,16 +389,14 @@ here.
    needed, fade the ends. Record every command and the ffmpeg version.
 3. Export one MP3 (restart plan §5.1 item 6: the only compressed format every
    target browser decodes). Do not also ship Ogg or WAV for the same key.
-4. Write the provenance record before the commit: a QA note in the shape of
+4. Write the source record before the commit: a QA note in the shape of
    [`docs/qa/issue-16-assets.md`](../qa/issue-16-assets.md) with the
    provider, model requested and returned, task and clip IDs, exact prompt
    and parameters, date, bytes and SHA-256 of the provider file and of the
    export, measured loudness, the ffmpeg commands and the listening-review
    result. When the asset manifest exists, add one row: key, source, origin,
-   licence, duration, channels, loop points.
-5. Get the owner's sign-off (restart plan D3). The repository is public and
-   has no LICENSE file; the licence terms for assets are undecided.
-6. Load the track last, after SFX, and fail soft to no music (tech design
+   duration, channels, loop points.
+5. Load the track last, after SFX, and fail soft to no music (tech design
    §7.3). Nothing about the track may be on the critical path, and the
    deployed size budget (D2) is measured with it included.
 
@@ -413,7 +404,7 @@ Stem separation and multi-layer adaptive packages are out of scope for a
 single optional track. If a candidate cannot loop acceptably, generate
 another or ship no music.
 
-## Provenance record
+## Source record
 
 The record must not contain credentials, full response payloads,
 secret-bearing URLs or account data.
@@ -423,37 +414,14 @@ secret-bearing URLs or account data.
 | Asset key | Game-facing identity, independent of provider titles, clip IDs and URLs |
 | Provider and endpoint | MusicAPI.ai Sonic `create_music` |
 | Requested and returned `mv` | Detect aliasing or model drift |
-| Timestamp | Bind the output to the plan, pricing and terms in force at generation |
+| Timestamp | Bind the output to the plan and pricing in force at generation |
 | Exact prompt and parameters | The authorised brief and settings |
 | Task ID and clip ID | Bounded traceability without storing raw responses |
-| Plan class and cost | The entitlement in force and the credits spent, without account data |
-| Terms evidence | Official URL, date read and a retained copy's location |
+| Plan class and cost | The plan in force and the credits spent, without account data |
 | Original file facts | SHA-256, bytes, codec, sample rate, channels, duration, measured loudness |
 | Listening review | Who listened, date, result and any rejection reason |
 | Edits | ffmpeg commands and version for every derived file |
 | Export facts | SHA-256, bytes and codec of the committed MP3 |
-| Sign-off | D3 approval reference |
-
-## Rights and provider risk
-
-MusicAPI.ai's terms (read 2026-07-15) state that the user retains ownership
-and commercial-use rights for generated songs, and assign the user
-responsibility for originality, non-infringement and third-party claims.
-Treat that as provider policy, not as a guarantee that a given output is
-copyrightable, exclusive, non-infringing or safe to ship.
-
-Before a run and again before the commit:
-
-- record the account plan class and confirm its terms permit commercial game
-  use;
-- keep a dated copy of the terms page;
-- use only original prompts; never upload or reference legacy or third-party
-  audio;
-- complete the listening review; and
-- apply restart plan D3.
-
-Provider claims, generated metadata or payment for credits do not replace
-the repository's provenance and sign-off.
 
 ## Checklist
 
@@ -485,4 +453,3 @@ Before the commit:
   loudness and size.
 - [ ] Loop seam, mute, pause, visibility suspension and restart checked in
   the browser.
-- [ ] Owner sign-off under D3.
