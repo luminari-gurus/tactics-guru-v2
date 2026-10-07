@@ -166,7 +166,7 @@ src/
   ui/
     hud.ts dialogs.ts styles.css
   assets/                    # imported through Vite, never placed under public/
-    manifest.ts              # typed rows: key, file, origin, licence, size, anchor
+    manifest.ts              # typed rows: key, file, origin, size, anchor
     tiles/ units/ portraits/ audio/
   storage/                   # deferred (§8)
 content/
@@ -590,12 +590,12 @@ The tile row is new. The map's eight terrain IDs account for 8 images and 366,90
 
 Reuse only what the slice uses. Do not transfer Godot `.import`/`.uid` metadata or unused asset batches.[24]
 
-**Provenance is a gate, not a note.** The target repository is public and the legacy one is private. `docs/asset_licenses.md` has no entry for the hero or goblin art, any SFX or any music, and four of the twelve SFX have no origin record at all. It does record that six of the map's eight base tile images, and the four grass variants, were generated from a user-supplied screenshot used as a style reference: 10 of the 20 tile images. That lineage needs the same review.[24][66][67] Record origin and licence for every shipped file and get the owner's sign-off (D3) before the first asset commit; issue #2 would otherwise make that commit. Until then, #2 can merge code that draws placeholder shapes and plays a synthesized tone, and run the real assets from a local preview only. Do not generate new art or music for the game; a test tone or placeholder shapes in the diagnostic are not shipped content.
+**Source records.** The legacy asset docs have no origin entry for the hero or goblin art, any SFX or any music, and four of the twelve SFX have no origin record at all. They do record that six of the map's eight base tile images, and the four grass variants, were generated from a user-supplied screenshot used as a style reference: 10 of the 20 tile images.[24][66][67] Record the origin of every shipped file when it is added. Until the real assets are in, #2 can merge code that draws placeholder shapes and plays a synthesized tone.
 
 ### 7.2 Pipeline (proposal for #3)
 
 - Every asset is imported through Vite, so it is emitted flat and content-hashed under `dist/assets/` (§9.2). The manifest module imports each file: a missing file breaks the build, and a content reference to an unknown key fails validation.
-- One manifest row per shipped file: key, source path at the pinned SHA, origin and licence, dimensions, anchor.
+- One manifest row per shipped file: key, source path at the pinned SHA, origin, dimensions, anchor.
 - Portraits: resize to the largest size the HUD shows multiplied by the DPR cap, and encode as WebP.
 - Tiles and unit sprites are small enough to ship individually; pack an atlas only if request count shows up in the measurements. PNG is directly usable; Phaser 4 handles ordinary image texture orientation automatically.[39]
 - Size tile images for the screen, not from the source. Phaser 4.2.1 creates a WebGL 1 context and builds mipmaps only for power-of-two textures, and only when `mipmapFilter` is set.[80][92] The 256×352 tile images therefore get none. At a phone's fit zoom and a resolution scale of 1 a tile is drawn about 40 pixels wide from a 256-pixel source, and minification that strong shimmers. Export them near the largest size they are shown at (drawn size × maximum zoom × resolution cap), or use power-of-two images with a mipmap filter. Judge the result in #2.
@@ -781,8 +781,8 @@ The tracker's order stands: proof-of-fit first; then content, pure state/RNG, gr
 
 | Issue | Sections here |
 |---|---|
-| #2 Proof-of-fit | §2.3, §5.2–§5.7 (D8, T1, T2, T4, T7), §7.3, §9.2; D3 before any asset is merged |
-| #3 Content and asset catalog | §3, §4.1, §4.3, §4.4, §7.1–§7.2, §9.2 (D3, D4, T11); §10.1 if it adds the first unit test |
+| #2 Proof-of-fit | §2.3, §5.2–§5.7 (D8, T1, T2, T4, T7), §7.3, §9.2 |
+| #3 Content and asset catalog | §3, §4.1, §4.3, §4.4, §7.1–§7.2, §9.2 (D4, T11); §10.1 if it adds the first unit test |
 | #4 State, commands, RNG | §2.4, §4.2, §6.4 (T3), §10.1 |
 | #5 Grid and movement | §6.2 movement rows |
 | #6 Board and picking | §5.1–§5.5 (D8, T4) |
@@ -817,7 +817,6 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | Rule lifecycle lost in translation | rules inside a scene controller | §2.1, §6.1 |
 | Asset failures go unnoticed | decode failures emit no load error; preview server masks 404s | cache checks, `appType: 'mpa'` (§7.3, §9.2) |
 | Build rejected or mis-cached by the release mechanism | nesting, extensions, reserved names, year-long caching | §9.1, §9.2 |
-| Private assets published without a licence | public repository | D3 before the first asset commit (§7.1) |
 | iPhone audio silent | codec support, unlock, silent switch | a universally decoded format, unlock on Begin, device test (§7.2, §7.4) |
 | Battle lost on tab discard | no saves in the first tranche | accept and state it (§8) |
 | Renderer and API drift | Phaser 4's renderer is new | pinned version, standard APIs, context-loss handling (§5.6) |
@@ -834,7 +833,6 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 |---|---|---|
 | D1 | Minimum browser versions and the physical device list | #2, #11 |
 | D2 | Numeric loading and frame budgets | #2, then #11 |
-| D3 | Asset provenance sign-off and a licence for the public repository | #2, #3 |
 | D4 | Encounter: the legacy trio or the current seeded roster | #3 |
 | D5 | Guarded on a missed strike; Ember Burst and allies | #8 |
 | D6 | Fighter's Basic Attack versus Guarded Strike | #8 |
@@ -873,7 +871,7 @@ Section numbers are those of the legacy `docs/tech_design.md`.[1]
 | 7–8 content/runtime | Replace Resources/Vector2i/StringName with immutable typed definitions and serializable runtime state; validate actual data. |
 | 9–13 lifecycle/turns/movement/targeting/combat | Preserve the baseline rules as pinned in §6; explicitly exclude newer deep effects and tempo. |
 | 14–15 initial content/AI | Keep three roles and the two goblin profiles, not the expanded rosters and abilities. |
-| 16–18 UI/rendering/audio | Rebuild browser/mobile UI and event presentation; reuse selected artwork/SFX with provenance. |
+| 16–18 UI/rendering/audio | Rebuild browser/mobile UI and event presentation; reuse selected artwork/SFX with recorded sources. |
 | 19–21 authoring/database/signals | One validated JSON map/catalog; typed commands/events instead of Godot signal/resource tooling; editor later. |
 | 22–25 debugging/tests/performance/saves | Seed and command log; Vitest/Playwright and devices; measured performance; saves deferred, with a safe namespaced design when they return. |
 | 26–27 milestones/backlog | Replaced by the tracker's issues. |
@@ -937,7 +935,7 @@ Numbers [1]–[77] are shared with the plan; only those cited here are listed. L
 [21] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/web/posthog-bootstrap.js
 [22] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/Dockerfile
 [23] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/nginx.conf
-[24] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/docs/asset_licenses.md
+[24] https://github.com/luminari-gurus/tactics-guru/tree/e9433f6b608ae6b2d95418615cce9cf17dadcf74/docs
 [25] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/tests/test_combat_resolver.gd
 [26] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/tests/test_run_equipment_effects.gd
 [27] https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/tests/test_active_battle_storage.gd

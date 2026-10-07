@@ -31,7 +31,7 @@ npm run build
 npm test
 ```
 
-Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, and check desktop/mobile-emulated viewport resizing in both orientations. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (90 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 
@@ -43,15 +43,18 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 
 - `src/main.ts`: diagnostic shell, status and controls
 - `src/phaser/{start,FitScene,BoardRenderer}.ts`: Phaser game, proof scene and shape-based tile renderer
+- `src/phaser/{BoardInput,ProofAudio}.ts`: scene-owned pointer/wheel input and the unlock-tone adapter
+- `src/diagnostics/audioState.ts`: pure audio state reducer (no Phaser or DOM), unit-tested
 - `src/geometry/iso.ts`: pure projection, joined tile faces, stable depth order and viewport fitting
 - `src/diagnostics/boardFixture.ts`: immutable authored 4×4 fixture with elevations 0, 1 and 2
 - `src/diagnostics/`: navigation-relative timings, transfer sizes and bounded active frame sampling
-- `src/style.css`: full-viewport canvas container
-- `tests/{boot,engine-fit,board}.spec.ts`: production-browser boot/resize, proof-scene and board checks
-- `tests/unit/`: Node-only unit tests, including measurement reset and visibility behavior
+- `src/style.css`: full-viewport canvas container, capped scrolling panel, page-gesture rules
+- `public/proof/`: the four canonical images and the generated unlock tone (MP3 played, OGG decode probe)
+- `tests/*.spec.ts`: production-browser checks for boot/resize, proof scene, board, assets, input, move, audio, lifecycle and layout
+- `tests/unit/`: Node-only unit tests, including measurement reset, visibility behavior, input cleanup and the audio reducer
 - `playwright.config.ts`: desktop and mobile-emulated test projects
 
-`.gitignore` excludes dependencies, build/test output, logs, local environment files, TypeScript caches and editor/OS files. Lockfiles and source/assets remain tracked; `.env.example` is allowed if needed later. No environment configuration or secrets are required.
+`.gitignore` excludes dependencies, build/test output, logs, local environment files, the `tmp/` scratch directory, TypeScript caches and editor/OS files. Lockfiles and source/assets remain tracked. `.env.example` lists optional media-generation API keys for hand-run asset tooling (see `docs/media-gen/`); nothing in the game, build or tests reads them, and no environment configuration or secrets are required.
 
 ## Proof-scene measurements
 
@@ -89,3 +92,11 @@ Issue 17 validation includes pure elevated-face picking, inverse transforms and 
 Choose **Raised tile (2, 2)** in **Move destination** to preview its yellow outline, then press **Start diagnostic move**. The two-second authored path starts at (0, 0), passes through (1, 0), (1, 1) and (2, 1), and ends at elevation 2 on (2, 2). The tree uses the raised fixture at (1, 1). Hero feet use the shared tile projection throughout; depth ordering and tree opacity update each frame as the hero crosses the canopy.
 
 The controls report Idle, Moving and Completed. Move/destination/fixture controls lock during animation, then restore; pan, zoom, tile selection and tree opacity remain available. Restart cancels the scene-owned tween and returns to the ground-behind fixture. This is a rendering/input diagnostic, without pathfinding or battle rules. `tests/move.spec.ts` exercises the controls, repeated starts and restarts, fractional elevation, projection and canopy depth/opacity in desktop and mobile emulation. Physical devices remain unverified.
+
+## Proof-scene audio and lifecycle
+
+**Play test sound** plays a generated 880 Hz, 150 ms tone (`public/proof/unlock-tone.mp3`; generation record in [issue #19 QA](docs/qa/issue-19-lifecycle.md)). The button is the only code path that starts playback: it resumes the WebAudio context inside the click, plays the tone once and waits for Phaser's completion event. The status beside it reports Loading, Locked, Ready, Unlocking, Playing, Played, Blocked or Unavailable, and follows the audio context between presses: Phaser's own gesture unlock reads Ready, and a context suspended while the window is blurred reads Locked. Blocked means the gesture happened but the context did not reach `running` or did not resume within 2 s, playback was refused or threw, or completion never arrived; the button stays enabled so the tester can retry. Unavailable means the file did not load or decode, or the device has no audio; the board stays usable. The tone and a same-source OGG decode-only probe load in their own loader pass after the board is created, each with a 5 s request timeout, so the board and Restart never wait on audio and the control reads Loading until that pass settles. The `audio` block in Measurements records the manager, lock state, context state, attempts, completed plays, the last error, the device's codec answers and which files are cached, reading the context and cache state when the snapshot is taken.
+
+While the page is hidden, a move in flight freezes at its current progress and resumes when the page is visible again, completing exactly once; `#move-status` stays Moving throughout and the locked controls stay locked. Window blur alone does not freeze the move. Pointers that are down when the page is hidden are dropped, so returning to the page cannot pan without a new press. Hidden, visible, blur and focus events are counted per scene run in the `lifecycle` block, with the tween progress at the last freeze and the number of completions. Nothing starts audio on visibility, focus or unlock events.
+
+The diagnostics panel is capped at 70% of the viewport height (45% in landscape under 500 px tall) and scrolls instead of hiding controls; **Board controls** collapses the fixture, opacity, move and audio rows. Every panel control is at least 44 CSS px tall. The page suppresses overscroll, selection and long-press callouts over the board and panel (the measurements JSON stays selectable), and the canvas has no context menu. `tests/audio.spec.ts`, `tests/lifecycle.spec.ts` and `tests/layout.spec.ts` cover these in Chromium emulation; safe-area insets, the iOS autoplay rules, OS-level suspension, browser-chrome changes and real touch gestures are physical checks listed for #20 in the QA note.
