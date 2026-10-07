@@ -2,14 +2,14 @@ import { BOARD_SIZE } from './boardFixture';
 // Selected diagnostic assets only; provenance and anchors: docs/qa/issue-16-assets.md.
 export const PROOF_ASSETS = [
   { key: 'grass', url: '/proof/grass-material-v1.png' },
-  { key: 'tree', url: '/proof/tree.png' },
+  { key: 'tree', url: '/proof/tree-grass-v1.png' },
   { key: 'fighter', url: '/proof/fighter.png' },
   { key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
 ] as const;
 export const PROOF_ART = {
   // Fresh square material: the renderer supplies all isometric geometry.
   grass: { horizontalBleed: 1 },
-  tree: { width: 80, height: 110, originY: 170 / 352 },
+  tree: { width: 80, height: 80 * 1276 / 1233, originY: 1070 / 1276 },
   fighter: { width: 40, height: 50, originY: 76 / 80 },
 } as const;
 export const PROOF_FIXTURES = {
