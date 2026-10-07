@@ -180,4 +180,41 @@ test('a stalled tone request never holds the board; the control reports unavaila
   expect(errors).toEqual([]);
 });
 
+test('the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt', async ({ page }) => {
+  const errors = watchErrors(page);
+  // Force the context to start suspended, as under an enforced autoplay policy.
+  await page.addInitScript(() => {
+    const Real = AudioContext;
+    window.AudioContext = class extends Real {
+      constructor(...args: ConstructorParameters<typeof AudioContext>) {
+        super(...args);
+        void this.suspend();
+      }
+    };
+  });
+  await page.goto('/');
+  const button = page.getByRole('button', { name: 'Play test sound' });
+  const status = page.locator('#audio-status');
+  await expect(page.getByRole('status')).toHaveText('Ready');
+  await expect(status).toHaveText('Locked');
+  await expect.poll(() => audio(page)).toMatchObject({ state: 'locked', contextState: 'suspended', locked: true, attempts: 0, playedCount: 0 });
+  // Phaser's own body unlock resumes the context on any mousedown; the control must notice without a press.
+  await page.getByRole('button', { name: 'Raised: Behind', exact: true }).click();
+  await expect(status).toHaveText('Ready');
+  await expect.poll(() => audio(page)).toMatchObject({ state: 'ready', contextState: 'running', locked: false, attempts: 0, playedCount: 0 });
+  // A context that stops running before the next press is shown as Locked. Phaser suspends the context on
+  // window blur (`pauseOnBlur`) and resumes a suspended or interrupted one on every step while the game has
+  // focus, so blur is the way a suspension persists in emulation; a bare suspend() is undone within a frame.
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await expect(status).toHaveText('Locked');
+  await expect.poll(() => audio(page)).toMatchObject({ state: 'locked', contextState: 'suspended', attempts: 0 });
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect(status).toHaveText('Ready');
+  await expect.poll(() => audio(page)).toMatchObject({ state: 'ready', contextState: 'running', attempts: 0 });
+  await button.click();
+  await expect(status).toHaveText('Played', { timeout: 5000 });
+  expect(await audio(page)).toMatchObject({ state: 'played', contextState: 'running', attempts: 1, playedCount: 1, lastError: null });
+  expect(errors).toEqual([]);
+});
+
 declare global { interface Window { __allowAudio?: boolean } }

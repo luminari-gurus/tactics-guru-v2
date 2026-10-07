@@ -68,6 +68,8 @@ export function reduceAudio(state: AudioState, event: AudioEvent): AudioState {
       const next = { ...state, contextState: event.contextState };
       if (state.state === 'unlocking' && event.contextState !== 'running') return { ...next, state: 'blocked', lastError: `Audio context is ${event.contextState}` };
       if (state.state === 'locked' && event.contextState === 'running') return { ...next, state: 'ready' };
+      // `played` and `blocked` keep the last attempt's result; only the recorded context state follows.
+      if (state.state === 'ready' && event.contextState !== 'running') return { ...next, state: 'locked' };
       return next;
     }
     case 'playStarted':
