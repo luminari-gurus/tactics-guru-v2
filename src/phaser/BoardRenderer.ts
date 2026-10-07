@@ -23,6 +23,7 @@ export class BoardRenderer {
   private fitScale = 1;
   private selected: Tile | null = null;
   private readonly selection: Phaser.GameObjects.Graphics;
+  private heroTile: Tile = PROOF_FIXTURES['ground-behind'].hero;
   private fixture: ProofFixture = 'ground-behind';
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
@@ -84,16 +85,28 @@ export class BoardRenderer {
   setOccludingOpacity(alpha: number): void {
     if (!Number.isFinite(alpha)) return;
     this.occludingTreeAlpha = Math.max(0, Math.min(1, alpha));
-    this.showFixture(this.fixture);
+    this.updateOcclusion();
   }
 
   showFixture(fixture: ProofFixture): void {
     this.fixture = fixture;
     const value = PROOF_FIXTURES[fixture];
+    this.heroTile = value.hero;
     const hero = projectTile(value.hero);
     const prop = projectTile(value.prop);
     this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, OCCUPANT_LAYER));
     this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, OCCUPANT_LAYER));
+    this.updateOcclusion();
+  }
+
+  moveHero(tile: Tile): void {
+    this.heroTile = tile;
+    const point = projectTile(tile);
+    this.hero.setPosition(point.x, point.y).setDepth(proofDepth(tile, OCCUPANT_LAYER));
+    this.updateOcclusion();
+  }
+
+  private updateOcclusion(): void {
     const occludesHero = this.hero.depth < this.prop.depth
       && Phaser.Geom.Rectangle.Overlaps(this.hero.getBounds(), this.prop.getBounds());
     this.prop.setAlpha(occludesHero ? this.occludingTreeAlpha : 1);
@@ -119,8 +132,8 @@ export class BoardRenderer {
         return Math.hypot(expected.x - actual.x, expected.y - actual.y);
       });
     });
-    setProofDiagnostics({ fixture: this.fixture, relation: value.relation, propElevation: value.prop.elevation,
-      heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_ASSETS.length,
+    setProofDiagnostics({ fixture: this.fixture, relation: this.hero.depth < this.prop.depth ? 'behind' : 'front', heroTile: { ...this.heroTile }, propElevation: value.prop.elevation,
+      heroPosition: { x: this.hero.x, y: this.hero.y }, heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_ASSETS.length,
       surfaceCornerError: Math.max(...errors),
       objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
   }
@@ -162,7 +175,11 @@ export class BoardRenderer {
   }
 
   select(point: Point): void {
-    this.selected = pickTile(BOARD_FIXTURE, screenToBoard(point, this.view));
+    this.selectTile(pickTile(BOARD_FIXTURE, screenToBoard(point, this.view)));
+  }
+
+  selectTile(tile: Tile | null): void {
+    this.selected = tile;
     this.selection.clear();
     if (this.selected) {
       this.selection.setDepth(proofDepth(this.selected, 2.2));

@@ -74,7 +74,7 @@ Local preview uses loopback HTTP and negotiates HTTP content compression; actual
 
 The board uses generated filled polygons, with named 80×40 tile dimensions, 24-pixel elevation steps and a common 12-pixel base. Complete columns draw back to front by grid depth (`x + y`), then by `y` and `x` for deterministic ties; elevation shifts the top surface instead of changing this order. The immutable elevation table is a diagnostic fixture, not gameplay content or a procedural map.
 
-Resize fits every top and side face below the current diagnostics panel with a 16-pixel margin. The Measurements snapshot includes tile count, elevation levels, scale and rendered board bounds. No selection, camera gestures, units or movement are implemented here. See [issue #15 visual QA](docs/qa/issue-15-board.md).
+Resize fits every top and side face below the current diagnostics panel with a 16-pixel margin. The Measurements snapshot includes tile count, elevation levels, scale and rendered board bounds. The proof board includes diagnostic selection, camera gestures, authored art fixtures and one scripted hero move. See [issue #15 visual QA](docs/qa/issue-15-board.md).
 
 ## Proof board input
 
@@ -83,3 +83,9 @@ Tap/click a solid tile to select its visible top or side face. Picking uses the 
 Drag with the primary mouse button or one finger to pan; wheel or pinch to zoom between the fitted size and four times that size. Pan is clamped so the board remains reachable at the center of the area below the panel. A six scene-pixel movement begins a drag; drag, cancellation, and pinch release never select. Resize refits the view while retaining zoom and selection. Coordinates use the canvas CSS rectangle rather than device pixels. Scene shutdown removes all six canvas input listeners and releases pointer captures.
 
 Issue 17 validation includes pure elevated-face picking, inverse transforms and view bounds, listener cleanup, and Chromium interactions across desktop/mobile DPR and portrait/landscape. Physical iPhone Safari/Chrome and Android touch hardware remain unverified.
+
+## Diagnostic hero move
+
+Choose **Raised tile (2, 2)** in **Move destination** to preview its yellow outline, then press **Start diagnostic move**. The two-second authored path starts at (0, 0), passes through (1, 0), (1, 1) and (2, 1), and ends at elevation 2 on (2, 2). The tree uses the raised fixture at (1, 1). Hero feet use the shared tile projection throughout; depth ordering and tree opacity update each frame as the hero crosses the canopy.
+
+The controls report Idle, Moving and Completed. Move/destination/fixture controls lock during animation, then restore; pan, zoom, tile selection and tree opacity remain available. Restart cancels the scene-owned tween and returns to the ground-behind fixture. This is a rendering/input diagnostic, without pathfinding or battle rules. `tests/move.spec.ts` exercises the controls, repeated starts and restarts, fractional elevation, projection and canopy depth/opacity in desktop and mobile emulation. Physical devices remain unverified.
