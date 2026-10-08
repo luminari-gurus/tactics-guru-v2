@@ -72,11 +72,13 @@ Every file the scene requests on a cold load, bytes on disk (`PROOF_ASSETS` at `
 | `fighter.png` (unchanged, out of scope) | 8,843 |
 | `fighter-portrait-96.webp` | 4,568 |
 | `unlock-tone.mp3` + `unlock-tone.ogg` | 5,230 |
-| **Manifest total** | **1,407,574** |
+| Manifest total on disk | 1,407,574 |
+| Per-request overhead charged by the unit gate: 300 × (15 requests + 1 portrait re-request) | 4,800 |
+| **On the wire (unit gate and §8 measurement)** | **1,412,374** |
 | L4 limit (#20 §6) | 1,500,000 |
-| Headroom | 92,426 |
+| Headroom | 87,626 |
 
-Measured on the wire the same set is 1,412,374 bytes (§8): each request carries about 300 bytes of headers and the DOM image's second request for the portrait is a 300-byte cache hit. Before this change the same measurement was 5,756,208 bytes on the live deploy (`9feb1df`, plan §1), so the asset load drops by 4,343,834 bytes, 75.5%. The terrain set is now 94.8% of the asset load; any content issue that adds a material has to re-examine it against L4 (plan §7.4).
+Measured on the wire the same set is 1,412,374 bytes (§8): each request carries about 300 bytes of headers and the DOM image's second request for the portrait is a 300-byte cache hit. The unit gate charges that overhead on top of the on-disk sum (`WIRE_OVERHEAD_BYTES` in the test, review finding 3), so a green test means the wire figure is inside L4, not the 4,800-byte smaller on-disk one. Before this change the same measurement was 5,756,208 bytes on the live deploy (`9feb1df`, plan §1), so the asset load drops by 4,343,834 bytes, 75.5%. The terrain set is now 94.8% of the asset load; any content issue that adds a material has to re-examine it against L4 (plan §7.4).
 
 ## 6. Verification
 
@@ -87,7 +89,7 @@ Host as in the #20 note: Linux 6.6.114.1 (WSL2), Node v24.15.0, Playwright 1.63.
 - **GREEN** (`1330f58`): `npx vitest run tests/unit/proofAssetExports.test.ts`: 4 passed. `npm run test:unit`: 9 files, 45 passed (41 before, 4 new). `npm run typecheck`: clean. `npm run build`: clean apart from the known Phaser chunk-size warning; `dist/proof/` holds the four originals, the three exports and the two tones. `npm test`: 93 passed across desktop, mobile-portrait and mobile-landscape in 2.8 min; the grass-corner, occlusion-fixture, opacity, terrain-material, input, move, audio, lifecycle and layout specs are unchanged. `npm ci`: lockfile unchanged (no new dependency). `git diff --check`: clean.
 - `identify` and `sha256sum` of the three outputs: as in §4.
 
-What the new unit test holds (`tests/unit/proofAssetExports.test.ts`): every `PROOF_ASSETS` extension is on the release allowlist; the tree file's pixel size equals `ceil(PROOF_ART.tree × PROOF_EXPORT.maxBoardZoom × canvasDensityCap)`; the portrait's equals `portraitCssPx × domDensityCap`; the on-disk sum of every cold-load file is at most `PROOF_COLD_ASSET_BUDGET_BYTES`. It reads the PNG IHDR or WebP `VP8 `/`VP8L`/`VP8X` header directly, so it needs no image library. The dist-wide size report (`check-dist`, every file, largest file, ZIP caps) stays with #3.
+What the new unit test holds (`tests/unit/proofAssetExports.test.ts`): every `PROOF_ASSETS` extension is on the release allowlist; the tree file's pixel size equals `ceil(PROOF_ART.tree × PROOF_EXPORT.maxBoardZoom × canvasDensityCap)`; the portrait's equals `portraitCssPx × domDensityCap`; the on-disk sum of every cold-load file plus the §5 per-request overhead (4,800 bytes) is at most `PROOF_COLD_ASSET_BUDGET_BYTES`, so the gate holds the wire figure. It reads the PNG IHDR or WebP `VP8 `/`VP8L`/`VP8X` header directly, so it needs no image library. The dist-wide size report (`check-dist`, every file, largest file, ZIP caps) stays with #3.
 
 ## 7. Screenshots
 
