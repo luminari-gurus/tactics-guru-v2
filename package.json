@@ -13,7 +13,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "playwright test",
     "test:unit": "vitest run",
-    "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts"
+    "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
+    "validate:content": "vitest run tests/unit/content.test.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"

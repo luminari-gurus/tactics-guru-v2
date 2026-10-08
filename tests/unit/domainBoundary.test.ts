@@ -13,7 +13,7 @@ function canonical(v: unknown): string {
 }
 for (const text of ['plain', 'é元宝', '🌲⚔️', 'x'.repeat(2000), '\ud800']) it(`content SHA256 agrees with independent Node oracle for ${JSON.stringify(text.slice(0,10))}`, () => {
   const catalog: ContentCatalog = { ...catalogFixture, assets: { ...catalogFixture.assets,
-    'asset:fixture-grass': { ...catalogFixture.assets['asset:fixture-grass'], provenance: { ...catalogFixture.assets['asset:fixture-grass'].provenance, prompt: text } } } };
+    'asset:fixture_grass': { ...catalogFixture.assets['asset:fixture_grass'], provenance: { ...catalogFixture.assets['asset:fixture_grass'].provenance, prompt: text } } } };
   const expected = 'sha256:' + createHash('sha256').update(canonical(catalog), 'utf8').digest('hex');
   expect(contentVersion(catalog)).toBe(expected);
 });
