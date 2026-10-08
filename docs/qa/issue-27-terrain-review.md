@@ -3,7 +3,22 @@
 Status: implementation begun; **not approved, not integrated, issue remains open**.
 Prepared from current origin/main `3f98bef` after #26 and #2 closed. The merged contract explicitly permits review of existing newly generated terrain sources. This revision reuses those sources rather than generating unrelated materials.
 
-## Review package
+## Current revision: v2 (2026-10-08)
+
+Brian requested revision of stone, water and grass_path after the v1 edge review. Built-in image_gen produced new referenced edits for water/path and a replacement stone layout after the first stone edit still showed broken joins. Only the selected final raw outputs are committed; v1 remains preserved. Grass and forest are unchanged.
+
+Current exact exports and hashes are in [manifest-v2.json](issue-27/manifest-v2.json); exact prompts are in [prompts-v2.json](issue-27/prompts-v2.json). The model was not disclosed by the tool and is recorded as unknown. Raw 1254×1254 PNGs are under `issue-27/generated/`; Pillow 10.2.0 Lanczos exports opaque RGB 1024×1024 sources and 256×256 runtimes. The current five runtime files total 703,602 bytes. Reference IDs and the v1 reference source hashes are recorded for each revised material.
+
+- [Current contact sheet](issue-27/contact-v2.png)
+- [Current 3×3 repeats](issue-27/repeat-v2.png)
+- [Current mixed adjacency](issue-27/adjacent-v2.png)
+- [Before/after comparison](issue-27/comparison-v2.png): v1 left, v2 right, each repeated 3×2 at runtime resolution.
+
+Path alignment between rows is more consistent, and water has less pronounced horizontal banding. Stone has a new, smaller slab arrangement. Repeated motifs and some edge discontinuities remain visible, especially in stone; this revision does not establish seamlessness or final approval. No procedural edge blending or artistic edits outside image_gen occurred. All outputs remain review candidates, outside the runtime asset graph.
+
+V2 validation: inline `python3`/Pillow inspection passed the exact five terrain IDs, source/runtime sizes, RGB PNG format, hashes, runtime bytes and null approval. The earlier 81 unit tests, 99 Chrome browser checks, type-check and build results remain applicable to the unchanged application. No physical-device check or battle integration is claimed.
+
+## Initial review package (v1)
 
 Exactly grass, grass_path, stone, forest and water are represented. Candidate files are outside public/src and have no runtime consumers. `issue-27/manifest-v1.json` records exact filenames, proposed stable asset IDs, hashes, dimensions, prompts, generation notes and unknown model/rights information. Source exports are opaque 1024×1024 PNG; runtime exports are opaque 256×256 PNG (686,732 bytes total). North remains image-up; all resizing uses Pillow 10.2.0 Lanczos, first 1254→1024 then 1024→256. No edge repair, rotation or artistic edits occurred.
 
