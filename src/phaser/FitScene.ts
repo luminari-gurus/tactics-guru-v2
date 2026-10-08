@@ -39,7 +39,10 @@ export class FitScene extends Phaser.Scene {
   }
 
   create(): void {
-    if (PROOF_IMAGES.some(asset => !this.textures.exists(asset.key))) return;
+    // A file that downloads but does not decode (an undecodable image, or the HTML shell the deploy returns for a
+    // missing path) never emits FILE_LOAD_ERROR: Phaser's File.onProcessError only logs. Report the missing texture here.
+    const missing = PROOF_IMAGES.find(asset => !this.textures.exists(asset.key));
+    if (missing) { this.error(`Could not load proof asset ${missing.key}`); return; }
     const board = new BoardRenderer(this);
     // The board never waits on audio: the tone and the OGG probe load in a second loader pass, each with an
     // XHR timeout so a request that neither completes nor errors becomes a load error, and the audio control
