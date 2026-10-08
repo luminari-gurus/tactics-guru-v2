@@ -1,0 +1,102 @@
+{
+  "grass": {
+    "source": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 64,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "runtime": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 16,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "grass_path": {
+    "source": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 64,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "runtime": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 16,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "stone": {
+    "source": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 64,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "runtime": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 16,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "forest": {
+    "source": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 64,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "runtime": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 16,
+      "size": [
+        256,
+        256
+      ]
+    }
+  },
+  "water": {
+    "source": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 64,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "runtime": {
+      "centralPixelsUnchanged": true,
+      "oppositeEdgePixelsEqual": true,
+      "bandPixels": 16,
+      "size": [
+        256,
+        256
+      ]
+    }
+  }
+}
