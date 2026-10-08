@@ -90,7 +90,7 @@ test('a missing tone file leaves the board usable and the audio control unavaila
   await page.getByLabel('Move destination').selectOption('raised-front');
   await expect(page.getByRole('button', { name: 'Start diagnostic move', exact: true })).toBeEnabled();
   expect(await audio(page)).toMatchObject({ state: 'unavailable', attempts: 0, playedCount: 0, cached: { mp3: false, ogg: true } });
-  expect(await page.evaluate(() => window.fitDiagnostics().proof?.assetCount)).toBe(4);
+  expect(await page.evaluate(() => window.fitDiagnostics().proof?.assetCount)).toBe(13);
   await page.getByRole('button', { name: 'Restart proof scene' }).click();
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
@@ -162,7 +162,7 @@ test('a stalled tone request never holds the board; the control reports unavaila
   await expect(page.locator('#audio-status')).toHaveText('Loading');
   await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
   expect(await page.evaluate(() => window.fitDiagnostics().audio)).toBeNull();
-  expect(await page.evaluate(() => window.fitDiagnostics().proof?.assetCount)).toBe(4);
+  expect(await page.evaluate(() => window.fitDiagnostics().proof?.assetCount)).toBe(13);
   await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeEnabled();
   await page.getByLabel('Move destination').selectOption('raised-front');
   await expect(page.getByRole('button', { name: 'Start diagnostic move', exact: true })).toBeEnabled();
