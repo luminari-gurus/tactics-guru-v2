@@ -108,6 +108,15 @@ for y in range(5):
         adjacent.paste(tiles[(x + y) % 5], (x * 256, y * 256))
 for name, preview in [('contact', contact), ('repeat', repeats), ('comparison', comparison), ('adjacent', adjacent)]:
     preview.save(ROOT / f'{name}-v1-edge.png', optimize=True)
+# Preserve approval only while regenerated exports match the approved exact hashes.
+existing_path = ROOT / 'manifest-v1-edge.json'
+if existing_path.exists():
+    receipt = json.loads(existing_path.read_text()).get('approval')
+    exports = [{key: asset[key] for key in ('terrainId', 'source', 'sourceSha256', 'runtime', 'runtimeSha256')} for asset in manifest['assets']]
+    if receipt and receipt.get('exports') == exports:
+        manifest['approval'] = receipt
+        for asset in manifest['assets']:
+            asset['status'] = 'approved'
 (ROOT / 'manifest-v1-edge.json').write_text(json.dumps(manifest, indent=2) + '\n')
 (ROOT / 'edge-proof-v1.json').write_text(json.dumps(proof, indent=2) + '\n')
 print('PASS: five IDs; ten RGB PNG sizes/hashes; unchanged interiors; exactly equal opposing border pixels.')
