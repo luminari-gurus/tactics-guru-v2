@@ -148,9 +148,22 @@ Cold transfer by resource (desktop, first sample; identical bytes in every cold 
 
 `buildFiles` in the JSON inventories `dist/`: 34 files, 43,384,574 bytes, of which the never-requested sources (PR #32's ten 1024 × 1024 terrain PNGs, 32,928,588 bytes, and the three proof originals, 7,382,963 bytes) are 40,311,551 bytes; see §10.
 
-### 8.2 Cloudflare Pages preview
+### 8.2 Cloudflare Pages preview, `7d50248`
 
-Pending: filled in after the branch is pushed and the preview alias serves it (`npm run measure:fit -- docs/qa/issue-35/fit-preview-<sha>.json --url https://issue-35-proof-asset-export.tactics-guru-v2.pages.dev`; `measuredBuild` must equal the pushed commit).
+`npm run measure:fit -- docs/qa/issue-35/fit-preview-7d50248.json --url https://issue-35-proof-asset-export.tactics-guru-v2.pages.dev`, 2026-10-08 10:10 UTC, host network over HTTPS through the Cloudflare CDN, no throttling, CDN edge cache state not controlled: [fit-preview-7d50248.json](issue-35/fit-preview-7d50248.json). `measuredBuild` `7d50248`, `dirty: false`, read from the served bundle and equal to the pushed head of PR #37. 18 samples, zero console or page errors.
+
+| Profile | Cache | Transferred bytes (median of three) | Controls usable ms (min..max) | Frame p50 / p95 ms |
+| --- | --- | ---: | ---: | ---: |
+| desktop | cold | 1,781,791 | 911 (836..1,479) | 16.7 / 16.9 |
+| desktop | warm | 7,271 | 549 (338..568) | 16.7 / 16.9 |
+| mobile-portrait | cold | 1,781,522 | 1,189 (1,147..1,199) | 16.7 / 16.9 |
+| mobile-portrait | warm | 7,271 | 671 (666..714) | 16.7 / 16.9 |
+| mobile-landscape | cold | 1,781,791 | 1,076 (987..1,135) | 16.7 / 16.9 |
+| mobile-landscape | warm | 7,271 | 664 (361..678) | 16.7 / 16.9 |
+
+**Assets on a cold load are 1,412,374 bytes in all nine cold samples, exactly the loopback figure: L4 passes on the deploy with 87,626 bytes to spare.** The 324-byte spread in the cold totals is in the Phaser chunk's transfer size (363,607 to 363,931 bytes), that is CDN response headers, not content. Per resource (desktop, first sample): the ten terrain textures 1,337,733 (107–190 ms each), `tree-grass-v1-480.webp` 54,500 (183 ms), `fighter.png` 9,143, `fighter-portrait-96.webp` 4,868 + 300 (318 and 23 ms), two tones 5,830, Phaser chunk 363,931 (537 ms, the slowest request now), HTML 1,271 and the three small code files 4,270: code 369,472 (L3 passes).
+
+Against the live deploy of `8794ae4` measured for the plan on the same host the same morning (cold assets 5,756,208; cold usable medians 1,758 / 1,793 / 1,695 ms; warm 463 / 754 / 700 ms): cold usable medians fall to 911 / 1,189 / 1,076 ms (L1 ≤ 2,500 passes, worst sample 1,479), and the warm medians are 549 / 671 / 664 ms with a worst sample of 714, inside L2's 750 where the morning run had mobile-portrait at 754. The warm change is reported, not attributed: warm reloads transfer only revalidations, so the decode of two much smaller images is the only candidate this change offers.
 
 ### 8.3 Main deploy after merge
 
@@ -174,4 +187,5 @@ Checklist for the testers on the preview URL, then on main after merge. Record a
 - `dist/` is about 43 MB because `public/` is copied verbatim: PR #32's ten terrain sources (about 33 MB) and the three proof originals kept here (7.4 MB) are never requested by the scene, so they do not count toward L4, but the §5.1 release ZIP cap of 20 MiB would reject the folder. That is #3's `check-dist` step; moving the originals out of `public/` is a one-line change if the maintainer prefers it now.
 - The canvas density cap of 1 describes today's renderer. If the DPR-capped canvas of tech design §5.5 is adopted, the tree must be re-exported (cap 2 gives 960 × 993, which cannot meet L4 with the current terrain set) or L4 revisited.
 - Chromium emulation is not device acceptance: the WebP decode question for the portrait and the 3× readability are settled only by the §9 rows. PNG fallbacks and their commands are in §3.
-- Warm medians in §8.1 are loopback; the deployed warm figure against L2 is reported in §8.2 once measured, without claiming a cause either way.
+- Warm medians against L2 are reported in §8.2 for the preview deploy without attributing the change; the loopback figures in §8.1 are not comparable to the deployed ones.
+- §8.2 measures the Pages preview of this branch; the main-deploy run the acceptance criterion names (§8.3) can only happen after the merge.
