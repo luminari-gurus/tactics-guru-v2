@@ -21,8 +21,7 @@ test('square grass material projects all corners exactly onto the shared tile ge
     }
     return { width: canvas.width, height: canvas.height, transparentSamples };
   });
-  // 348 = ceil((80 + 2 × bleed) / √2 × 6 max board zoom × canvas density 1): the #35 export of the square material.
-  expect(asset.width).toBe(348);
+  // The export's pixel size is held to the #35 rule by tests/unit/proofAssetExports.test.ts; here it must be square and opaque.
   expect(asset.width).toBe(asset.height);
   expect(asset.transparentSamples).toBe(0);
   // Phaser stores transform matrices as float32; 0.001 CSS pixel allows rounding, not visible drift.
