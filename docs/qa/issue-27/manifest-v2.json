@@ -1,11 +1,53 @@
 {
   "issue": 27,
-  "approval": null,
+  "approval": {
+    "approvedBy": "Brian",
+    "date": "2026-10-08",
+    "statement": "looks good",
+    "scope": "Visual approval of the v2 candidate set shown in this chat; exact source/runtime files and hashes below. No claim of mathematically seamless edges or renderer integration.",
+    "exports": [
+      {
+        "terrainId": "grass",
+        "source": "docs/qa/issue-27/candidates/grass-source-v1.png",
+        "sourceSha256": "f3c6d1a48719d43ea19beb1a25970c50fd7843338eba668d608080a2e9346775",
+        "runtime": "docs/qa/issue-27/candidates/grass-runtime-v1.png",
+        "runtimeSha256": "39a737caf2797f6ff97bbd81b8d7e62f9f6016bc213181dbaf4ceceabb4647da"
+      },
+      {
+        "terrainId": "grass_path",
+        "source": "docs/qa/issue-27/candidates/grass_path-source-v2.png",
+        "sourceSha256": "bb7002ff6fb240ea3b36110684b2235aac9ee05db7b120c9a92c9052728017b2",
+        "runtime": "docs/qa/issue-27/candidates/grass_path-runtime-v2.png",
+        "runtimeSha256": "58f18b189b1275a98b63c498a0462907b0c9939e0a27b07f24600f6d095fb506"
+      },
+      {
+        "terrainId": "stone",
+        "source": "docs/qa/issue-27/candidates/stone-source-v2.png",
+        "sourceSha256": "8dddc7fff97a92939373106c754f707faa39c4904281a3d784552f32d72a3403",
+        "runtime": "docs/qa/issue-27/candidates/stone-runtime-v2.png",
+        "runtimeSha256": "2a99670b23799d143c03cb2ed967e88b2ed20f38a8ed44a9107b5ac1e12a28b6"
+      },
+      {
+        "terrainId": "forest",
+        "source": "docs/qa/issue-27/candidates/forest-source-v1.png",
+        "sourceSha256": "22bd977ccb93477a8fb97f8b09bec7411a5fb99e5db273a842f4d89d3ad1f223",
+        "runtime": "docs/qa/issue-27/candidates/forest-runtime-v1.png",
+        "runtimeSha256": "0542ca461c1601052bbbbb78b7d72c8c897e4649a6032c294da3852b56a9f46e"
+      },
+      {
+        "terrainId": "water",
+        "source": "docs/qa/issue-27/candidates/water-source-v2.png",
+        "sourceSha256": "a0e8d5f16792d99fc222b889e654b07f11299f75459a844a229ba77b4c04f578",
+        "runtime": "docs/qa/issue-27/candidates/water-runtime-v2.png",
+        "runtimeSha256": "ca764d15785b6ecb0cd8ade20c6bb0d6ebfc72dfb94a3a9ed5c6ea2383eee899"
+      }
+    ]
+  },
   "assets": [
     {
       "terrainId": "grass",
       "assetId": "asset:terrain_grass",
-      "status": "pending-review",
+      "status": "visually-approved",
       "originalSource": "public/textures/terrain/grass-top-down-v1.png",
       "originalSourceSha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
       "source": "docs/qa/issue-27/candidates/grass-source-v1.png",
@@ -32,7 +74,7 @@
     {
       "terrainId": "grass_path",
       "assetId": "asset:terrain_grass_path",
-      "status": "pending-review",
+      "status": "visually-approved",
       "originalSource": "docs/qa/issue-27/generated/grass_path-generated-v2.png",
       "originalSourceSha256": "15435dc9ca23a3cb3b1785e4826493bd29bc44687e6a6645b37464c0bab816d0",
       "source": "docs/qa/issue-27/candidates/grass_path-source-v2.png",
@@ -67,7 +109,7 @@
     {
       "terrainId": "stone",
       "assetId": "asset:terrain_stone",
-      "status": "pending-review",
+      "status": "visually-approved",
       "originalSource": "docs/qa/issue-27/generated/stone-generated-v2.png",
       "originalSourceSha256": "d651339200c86dec92474d24d8b0c2b2bc315791479f9309ea9479726ea66fed",
       "source": "docs/qa/issue-27/candidates/stone-source-v2.png",
@@ -102,7 +144,7 @@
     {
       "terrainId": "forest",
       "assetId": "asset:terrain_forest",
-      "status": "pending-review",
+      "status": "visually-approved",
       "originalSource": "public/textures/terrain/forest-top-down-v1.png",
       "originalSourceSha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
       "source": "docs/qa/issue-27/candidates/forest-source-v1.png",
@@ -129,7 +171,7 @@
     {
       "terrainId": "water",
       "assetId": "asset:terrain_water",
-      "status": "pending-review",
+      "status": "visually-approved",
       "originalSource": "docs/qa/issue-27/generated/water-generated-v2.png",
       "originalSourceSha256": "06bd15d19454a4e105b92a7addab3a72f03f7ec5b4344aff55fc427d382a4d5e",
       "source": "docs/qa/issue-27/candidates/water-source-v2.png",
