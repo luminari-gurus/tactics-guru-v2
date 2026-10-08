@@ -31,7 +31,7 @@ npm run build
 npm test
 ```
 
-Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (90 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (99 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 
@@ -49,7 +49,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 - `src/diagnostics/boardFixture.ts`: immutable authored 4×4 fixture with elevations 0, 1 and 2
 - `src/diagnostics/`: navigation-relative timings, transfer sizes and bounded active frame sampling
 - `src/style.css`: full-viewport canvas container, capped scrolling panel, page-gesture rules
-- `public/proof/`: the four canonical images and the generated unlock tone (MP3 played, OGG decode probe)
+- `public/proof/`: the four proof images as originals, the display-size exports the scene loads (`tree-grass-v1-480.webp`, `fighter-portrait-96.webp`) plus the `grass-material-v1-348.png` test fixture (rule and record in [issue #35 QA](docs/qa/issue-35-proof-asset-export.md)), and the generated unlock tone (MP3 played, OGG decode probe)
 - `tests/*.spec.ts`: production-browser checks for boot/resize, proof scene, board, assets, input, move, audio, lifecycle and layout
 - `tests/unit/`: Node-only unit tests, including measurement reset, visibility behavior, input cleanup and the audio reducer
 - `playwright.config.ts`: desktop and mobile-emulated test projects
