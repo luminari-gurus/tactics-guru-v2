@@ -1,6 +1,6 @@
 # First-battle content contract (#26)
 
-`src/content/types.ts` defines plain, immutable, renderer-independent records; `constants.ts` owns inclusive numeric bounds and the texture specification. No Phaser, DOM, combat rules, asset generation, authored map or runtime validator is introduced. The existing diagnostic terrain catalog remains independent: its fourteen IDs are not the battle contract.
+`src/content/types.ts` defines plain, immutable, renderer-independent records; `constants.ts` owns inclusive numeric bounds and the texture specification. The runtime validator in `src/content/validate.ts` checks unknown input without Phaser, DOM, combat rules, asset generation or an authored map. The existing diagnostic terrain catalog remains independent: its fourteen IDs are not the battle contract.
 
 ## Identity, references and numeric rules
 
@@ -10,7 +10,7 @@ All numeric fields are finite safe integers within `CONTENT_BOUNDS`. Width/heigh
 
 Stats use maxHp (1–100), move (1–8), jump (0–4), accuracy/dexterity/will (-10–20), armorClass (1–30) and power (0–20). These are schema safety limits chosen for a small fixed battle, not balance rules. Runtime HP, abilities, damage, initiative and AI do not belong in these definitions. Image dimensions are integers 1–4096; terrain surface dimensions and format must equal `TERRAIN_TEXTURE_SPEC`. Sprite/prop anchors are source-pixel positions within the source rectangle, measured from the top-left; portraits use the full frame. Re-export notes must record scaling and anchor changes.
 
-TypeScript checks structure, discriminants and complete hero/enemy/terrain keys through `satisfies ContentCatalog`; it does not validate numbers, unique cells, key/ID equality or reference existence. Subsequent content work must validate those invariants before treating loaded data as a catalog. This PR deliberately supplies no `validateContent` function or claim that typed JSON is safe.
+TypeScript checks structure, discriminants and complete hero/enemy/terrain keys through `satisfies ContentCatalog`; it does not validate numbers, unique cells, key/ID equality or reference existence. `validateContent(input: unknown)` checks those invariants and returns either `{ ok: true, catalog: ContentCatalog }` or `{ ok: false, errors: ContentError[] }`. Errors include a typed code, field path and corrective message. It rejects unknown fields, non-data/accessor records, sparse arrays, malformed asset kinds/provenance, wrong asset-reference kinds and side/unit mismatches without changing inputs or inserting defaults. The returned catalog aliases the input; callers must preserve its readonly contract.
 
 ## Selected stat sources
 
@@ -44,6 +44,6 @@ Preserve the canonical Fighter/Ranger/Mage sprites and portraits. Fighter and it
 
 ## Focused proof and subsequent work
 
-Reuse the configured Node Vitest harness: `npm run test:unit -- tests/unit/contentContract.test.ts`. `tests/unit/fixtures/contentContract.ts` contains a complete synthetic catalog with a one-cell map, bounded placeholder stats for all five unit IDs and generated surface metadata, plus compile-time rejection fixtures for enemy references in hero spawns and canonical terrain surfaces. Paths/hashes are intentionally fake; no asset files are implied. Reuse/extend these fixtures for later catalog validation, not the renderer diagnostic board.
+Reuse the configured Node Vitest harness: `npm run test:unit -- tests/unit/contentContract.test.ts`. `tests/unit/fixtures/contentContract.ts` contains a complete synthetic catalog with a one-cell map, bounded placeholder stats for all five unit IDs and generated surface metadata, plus compile-time rejection fixtures for enemy references in hero spawns and canonical terrain surfaces. Paths/hashes are intentionally fake; no asset files are implied. Run `npm run validate:content` for the representative valid/invalid synthetic fixtures in `tests/unit/content.test.ts`; this is schema/reference validation, separate from the renderer diagnostic board. It does not read packaged files, verify image pixels or hashes against files, assess rights, or approve generated art. Content E owns packaged-file checks.
 
 Completion checks: `npm run test:unit`, `npm run typecheck`, `npm run build`, `npm test`, and `git diff --check`. Browser regression checks cover the existing diagnostic only. No physical-device or final battle acceptance is claimed by this schema change. The merged #20 [fit decision](qa/issue-20-fit-gate.md) permits first-battle work with its documented limitations and #35 loading follow-up; parent #2 remains open in the tracker.
