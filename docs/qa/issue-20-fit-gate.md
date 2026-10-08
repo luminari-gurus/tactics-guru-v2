@@ -107,7 +107,7 @@ Proposed from the measurements above and agreed as proposed by the assignee when
 | L1 Cold load to usable controls, deployed | ≤ 2,500 ms | medians 1,130–1,712 ms, worst sample 2,092 ms | passes |
 | L2 Warm reload to usable controls, deployed | ≤ 750 ms | medians 333–570 ms, worst sample 682 ms | passes |
 | L3 Code transfer (HTML, CSS, JS), cold | ≤ 400 kB compressed | 369,125 bytes | passes |
-| L4 Asset transfer per scene, cold | ≤ 1.5 MB | 7,398,836 bytes; the three PNGs are 95% of the cold load and would take about 6 s alone on a 10 Mbit/s connection, which would break L1 on a mobile radio | **fails** |
+| L4 Asset transfer per scene, cold | ≤ 1.5 MB | 7,398,836 bytes at `231fea0`; the three PNGs were 95% of the cold load and would take about 6 s alone on a 10 Mbit/s connection, which would break L1 on a mobile radio. After the #35 re-export ([issue-35-proof-asset-export.md](issue-35-proof-asset-export.md) §8): 1,412,374 bytes on loopback at `1330f58`; deployed figure pending | **fails** at `231fea0`; passes at `1330f58` (loopback; deployed pending) |
 | F1 Frame intervals at idle | p50 ≤ 16.7 ms, p95 ≤ 20 ms | 16.7 / 16.9–17.0 ms in every profile | passes |
 | F2 Frame intervals during pan, zoom and the move | p95 ≤ 33.4 ms (two display intervals) | no numeric sample yet: the collector has no interaction workload and the on-device Measurements JSON was not captured | not measured |
 | I1 Interaction response | tap-to-select and drag-to-pan visible on the next frame | tester observation only; no instrumentation exists | observed, not measured |

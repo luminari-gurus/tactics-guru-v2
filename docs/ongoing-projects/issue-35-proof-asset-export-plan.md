@@ -1,6 +1,6 @@
 # Issue #35 plan: re-export the proof assets at display size
 
-Status: planned 2026-10-08 on `issue-35-proof-asset-export` (branched from `origin/main` `9feb1df`, created with `gh issue develop` so it is linked on the issue's Development panel). No implementation commit yet. Owner: moshehbenavraham (assigned on the tracker). See §9 for updates.
+Status: implemented 2026-10-08 on `issue-35-proof-asset-export` (branched from `origin/main` `9feb1df`, created with `gh issue develop` so it is linked on the issue's Development panel). Increments 1–4 committed (`00a8dea`, `5cc6cf5`, `1330f58`, then the docs commit carrying this update); increment 5 (push, PR, preview measurement, device checklist) is the current step. Owner: moshehbenavraham (assigned on the tracker). See §9 for the state of play and what is left.
 
 Issue: [#35 P1: Re-export the proof assets at display size per restart plan §5.1](https://github.com/luminari-gurus/tactics-guru-v2/issues/35).
 Parent: #2 (proof-of-fit), within epic #1. Follow-up from #20 (closed 2026-10-07; budgets agreed). Dependencies: none for the export work itself.
@@ -244,4 +244,16 @@ Increment 1 committed: `MAX_BOARD_SCALE` exported; `PROOF_EXPORT` (`maxBoardZoom
 - `npx vitest run tests/unit/proofAssetExports.test.ts`: 3 failed, 1 passed. Tree `{1233, 1276}` ≠ `{480, 497}`; portrait `{1254, 1254}` ≠ `{96, 96}`; cold manifest 5,751,408 bytes > 1,500,000. The allowlist assertion passes already.
 - `npx playwright test tests/assets.spec.ts tests/grass-surface.spec.ts --project=desktop`: 2 failed, 1 passed. Portrait `{1254, 1254}` ≠ `{96, 96}`; grass `image.decode()` threw `EncodingError: The source image cannot be decoded` because `/proof/grass-material-v1-348.png` does not exist yet.
 
-Next: increment 2 (run the D-C conversions, record hashes), then increment 3 (wire the URLs, go GREEN).
+### 2026-10-08: increments 2–4 done
+
+- Increment 2 (`5cc6cf5`): the D-C commands run from the originals; outputs match the trial byte for byte (4,568 / 54,200 / 260,162). Source hashes match the #16 note. Fringe check on the committed WebP: partial-alpha mean RGB (89.2, 106.8, 37.7) source, (86.7, 104.3, 36.8) output; alpha plane lossless (75,329 partial pixels before and after).
+- Increment 3 (`1330f58`): `PROOF_IMAGES` wired, comment block with bytes and hashes. GREEN: focused vitest 4/4, `npm run test:unit` 45 (41 + 4), typecheck clean, build clean, `npm test` 93 passed in 2.8 min, `npm ci` lockfile unchanged, `git diff --check` clean. On-disk manifest 1,407,574 bytes.
+- Increment 4: after captures at `1330f58`; montages, portrait 3× pair and a 1:1 canopy crop (lossless vs WebP, the 6× zoom case) under `docs/qa/issue-35/`; local collector `fit-local-1330f58.json`: assets cold 1,412,374 bytes (exactly the D-C estimate), total cold 1,781,067, zero errors, 18 samples. QA note `docs/qa/issue-35-proof-asset-export.md` written; README `public/proof/` line and the #20 note's L4 row updated with the loopback figure and "deployed pending".
+
+Open after this commit (increment 5):
+
+1. Push; open the PR ("Re-export the proof assets at display size (#35)", `Refs #35`, no `Closes`).
+2. When the Cloudflare Pages check is green: `npm run measure:fit -- docs/qa/issue-35/fit-preview-<sha>.json --url https://issue-35-proof-asset-export.tactics-guru-v2.pages.dev`; confirm `measuredBuild` equals the pushed commit; fill §8.2 of the QA note and the #20 L4 row's deployed figure; commit as `docs`.
+3. Post the §6 checklist on the PR for the user (Android, four browsers; desktop) and dubstylee (iPhone Safari and Chrome); record answers in the note's §9 table as "pass as reported".
+4. If any browser fails to decode WebP: PNG fallbacks per D-C (`tmp/fighter-portrait-96.png`; `pngquant --quality=80-100 --speed 1 tmp/tree-grass-v1-480.png`), rewire, re-run increments 3 and 4 for the changed files, re-measure.
+5. After merge: main-deploy run into `fit-main-<sha>.json`, number on #35, maintainer closes the #20 loading gate and decides #2; delete this plan file.
