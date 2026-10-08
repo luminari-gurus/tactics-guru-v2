@@ -26,7 +26,7 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     !isIntegerIn(input.seed, RULE_BOUNDS.uint32) || !isRngState(input.rng) ||
     input.rng.words[3] !== (input.rng.cursor % UINT32_RANGE + RNG_WARMUP_DRAWS + 1) % UINT32_RANGE ||
     !prefixedId(input.mapId, 'map') || !Object.hasOwn(catalog.maps, input.mapId) ||
-    !isDenseArray(input.units, CONTENT_BOUNDS.spawnId.max) || input.units.length < 1 || input.units.length > CONTENT_BOUNDS.spawnId.max ||
+    !isDenseArray(input.units, CONTENT_BOUNDS.spawnId.max) || input.units.length < 1 ||
     !isDenseArray(input.initiative, CONTENT_BOUNDS.spawnId.max) || input.initiative.length !== input.units.length ||
     !isIntegerIn(input.activeIndex, { min: 0, max: input.units.length - 1 }) ||
     !isIntegerIn(input.round, RULE_BOUNDS.round) || !isIntegerIn(input.commandCount, RULE_BOUNDS.commandCount) ||
@@ -86,10 +86,10 @@ export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { read
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||
-    !versions(input.versions, contentVersion(catalog)) || !isDenseArray(input.commands, RULE_BOUNDS.maxReplayCommands) ||
-    input.commands.length > RULE_BOUNDS.maxReplayCommands || !input.commands.every(isCommand)) return bad;
+    !isDenseArray(input.commands, RULE_BOUNDS.maxReplayCommands) ||
+    !input.commands.every(isCommand)) return bad;
   const checked = readBattleState(input.initial, catalog);
-  if (!checked.ok || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min ||
+  if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min ||
     (checked.state.rng.cursor === 0 && JSON.stringify(checked.state.rng.words) !== JSON.stringify(seedRng(checked.state.seed).words))) return bad;
   return { ok: true, replay: { format: STATE_FORMAT_VERSION, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) } };
 }
