@@ -31,7 +31,7 @@ npm run build
 npm test
 ```
 
-Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (90 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (99 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 
