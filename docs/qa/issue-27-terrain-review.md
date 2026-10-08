@@ -1,7 +1,11 @@
 # Issue 27: first terrain candidate review
 
-Status: **scripted v1 edge repair prepared for exact-export review; not integrated, issue remains open**.
+Status: **repaired v1 exports approved for shipping by Brian on 2026-10-08**. Asset production and review are complete; Phaser mapping is Content E.
 Prepared from current origin/main `3f98bef` after #26 and #2 closed. The merged contract explicitly permits review of existing newly generated terrain sources. This revision reuses those sources rather than generating unrelated materials.
+
+## Final approval
+
+Brian reviewed the repaired repeat preview and said “looks good, lets ship it” on 2026-10-08. The approval receipt in `manifest-v1-edge.json` pins all five source/runtime filenames and SHA-256 hashes. The documented strip softening is accepted for this set. All issue 27 acceptance criteria are met by the generated five-material package, consistent exports, provenance, repeat/contact review and exact-file approval. Renderer mapping is outside this issue. The repair script preserves approval only if regeneration reproduces the exact approved hashes.
 
 ## Current edge repair
 
@@ -14,7 +18,7 @@ All five materials use consistent treatment. Source and runtime files are repair
 - [Mixed adjacency](issue-27/adjacent-v1-edge.png)
 - [V1 / repaired comparison](issue-27/comparison-v1-edge.png): original left, repaired right.
 
-Opposite border pixels now match exactly in both axes for every source/runtime export, eliminating abrupt color jumps at wrapping boundaries. Visual repeats retain the original natural variation and path layout. Blending softens detail and can produce ghosted slab/ripple shapes inside boundary strips, especially stone; exact border equality does not prove continuous feature shapes or eliminate recognizable repeating motifs. The original images remain intact for comparison. The new filenames/hashes require Brian’s review and approval; approval is null. No final seamless-repeat acceptance or integration is claimed before that review.
+Opposite border pixels now match exactly in both axes for every source/runtime export, eliminating abrupt color jumps at wrapping boundaries. Visual repeats retain the original natural variation and path layout. Blending softens detail and can produce ghosted slab/ripple shapes inside boundary strips, especially stone; exact border equality does not prove continuous feature shapes or eliminate recognizable repeating motifs. The original images remain intact for comparison. The repaired filenames/hashes have final visual approval in the receipt above. No Phaser mapping or battle-renderer acceptance is claimed.
 
 Verification: `python3 docs/qa/issue-27/repair_edges.py` passed all five IDs, ten dimensions/RGB PNG checks, v1 input hashes, exact central-pixel preservation and equality of opposing borders after saving/reopening. [edge-proof-v1.json](issue-27/edge-proof-v1.json) records the checks. `git diff --check` passed. Application code/configuration/runtime assets are unchanged, so the prior 81 unit tests, 99 browser tests, strict type-check and build results below remain applicable. No physical-device or battle-renderer acceptance is claimed.
 
@@ -40,9 +44,9 @@ Materials are distinct and readable: green grass, tan path, gray stone, dark for
 
 Grass and forest show recognizable repeated motifs; inspect those at projected cell scale before accepting. Grass_path has abrupt horizontal joins between vertically neighboring path segments, and repeating it across columns produces parallel paths. Stone slabs break at tile edges with visible horizontal/vertical joins. Water shows visible repeated bands and edge discontinuities. These findings mean **seamless-repeat acceptance is not established**. The mixed preview also shows hard material boundaries; renderer-owned transition treatment is outside this issue.
 
-## Remaining work and approval gate
+## Original review follow-up (resolved by final repair and approval)
 
-Revise/regenerate the failing edges in the media workflow, then export and review a new exact revision with the same five terrain IDs. Recheck repetitions and readability. Obtain Brian's approval of exact filenames and hashes, record that approval with terrain IDs, and only then integrate approved exports. No acceptance box is claimed complete by this initial review; no physical-device or battle-renderer acceptance is claimed. Do not promote these candidates to the production catalog.
+The initial review required edge repair and exact-export approval. Both are now complete through the scripted repair and receipt above. No physical-device or battle-renderer acceptance is claimed; approved exports are ready for subsequent catalog/renderer work.
 
 ## Verification
 

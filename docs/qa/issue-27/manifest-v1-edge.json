@@ -1,11 +1,53 @@
 {
   "issue": 27,
-  "approval": null,
+  "approval": {
+    "approvedBy": "Brian",
+    "date": "2026-10-08",
+    "statement": "looks good, lets ship it",
+    "scope": "Final visual approval of the exact repaired v1 source/runtime exports, including repeating-edge review and documented softening in boundary strips.",
+    "exports": [
+      {
+        "terrainId": "grass",
+        "source": "docs/qa/issue-27/candidates/grass-source-v1-edge.png",
+        "sourceSha256": "ecddc2478d7757bd00b83ec5d532509999c2f8be60a6bdb55974b3892d7903b8",
+        "runtime": "docs/qa/issue-27/candidates/grass-runtime-v1-edge.png",
+        "runtimeSha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8"
+      },
+      {
+        "terrainId": "grass_path",
+        "source": "docs/qa/issue-27/candidates/grass_path-source-v1-edge.png",
+        "sourceSha256": "d9b4398c3b734bfe709d364e792693b41fb9d88521769b36553e6d77af9fdfa8",
+        "runtime": "docs/qa/issue-27/candidates/grass_path-runtime-v1-edge.png",
+        "runtimeSha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9"
+      },
+      {
+        "terrainId": "stone",
+        "source": "docs/qa/issue-27/candidates/stone-source-v1-edge.png",
+        "sourceSha256": "a4964fc33b9487c25b56955d0c0442fb7e78d46713ac490ca0ff73134607b254",
+        "runtime": "docs/qa/issue-27/candidates/stone-runtime-v1-edge.png",
+        "runtimeSha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a"
+      },
+      {
+        "terrainId": "forest",
+        "source": "docs/qa/issue-27/candidates/forest-source-v1-edge.png",
+        "sourceSha256": "41af49a534e10853b200ed88b87a3cffe29a2c722ba49cf1a682b17ee5ba1855",
+        "runtime": "docs/qa/issue-27/candidates/forest-runtime-v1-edge.png",
+        "runtimeSha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26"
+      },
+      {
+        "terrainId": "water",
+        "source": "docs/qa/issue-27/candidates/water-source-v1-edge.png",
+        "sourceSha256": "37765429bc45966d827ed25d3e8a016b99737612e8ec08acfb36044c1d06d3a5",
+        "runtime": "docs/qa/issue-27/candidates/water-runtime-v1-edge.png",
+        "runtimeSha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622"
+      }
+    ]
+  },
   "assets": [
     {
       "terrainId": "grass",
       "assetId": "asset:terrain_grass",
-      "status": "pending-review",
+      "status": "approved",
       "originalSource": "public/textures/terrain/grass-top-down-v1.png",
       "originalSourceSha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
       "source": "docs/qa/issue-27/candidates/grass-source-v1-edge.png",
@@ -36,7 +78,7 @@
     {
       "terrainId": "grass_path",
       "assetId": "asset:terrain_grass_path",
-      "status": "pending-review",
+      "status": "approved",
       "originalSource": "public/textures/terrain/grass_path-top-down-v1.png",
       "originalSourceSha256": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
       "source": "docs/qa/issue-27/candidates/grass_path-source-v1-edge.png",
@@ -67,7 +109,7 @@
     {
       "terrainId": "stone",
       "assetId": "asset:terrain_stone",
-      "status": "pending-review",
+      "status": "approved",
       "originalSource": "public/textures/terrain/stone-top-down-v1.png",
       "originalSourceSha256": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
       "source": "docs/qa/issue-27/candidates/stone-source-v1-edge.png",
@@ -98,7 +140,7 @@
     {
       "terrainId": "forest",
       "assetId": "asset:terrain_forest",
-      "status": "pending-review",
+      "status": "approved",
       "originalSource": "public/textures/terrain/forest-top-down-v1.png",
       "originalSourceSha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
       "source": "docs/qa/issue-27/candidates/forest-source-v1-edge.png",
@@ -129,7 +171,7 @@
     {
       "terrainId": "water",
       "assetId": "asset:terrain_water",
-      "status": "pending-review",
+      "status": "approved",
       "originalSource": "public/textures/terrain/water-top-down-v1.png",
       "originalSourceSha256": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
       "source": "docs/qa/issue-27/candidates/water-source-v1-edge.png",
