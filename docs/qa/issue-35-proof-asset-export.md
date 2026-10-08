@@ -171,21 +171,23 @@ Pending: `npm run measure:fit -- docs/qa/issue-35/fit-main-<sha>.json --url http
 
 ## 9. Device record
 
-Checklist for the testers on the preview URL, then on main after merge. Record as "pass as reported"; device models and versions are not requested. A WebP decode failure would show on screen as "Could not load proof asset tree" or "… fighter-portrait" with the controls disabled.
+Checklist for the testers on the preview URL, then on main after merge. Recorded as "pass as reported"; device models and versions are not requested. A WebP decode failure would show on screen as "Could not load proof asset tree" or "… fighter-portrait" with the controls disabled.
+
+Android: the user ran the five rows on a physical Android phone in Brave, Chrome, Edge and Samsung Internet against the preview URL serving `927eef6` on 2026-10-08 and reported a whole-list pass with no on-screen error: https://github.com/luminari-gurus/tactics-guru-v2/pull/37#issuecomment-6057730129. Both WebP files therefore decode in the DOM image and in the Phaser texture on the four Android browsers of the #20 device set. Desktop and the iPhone rows are still pending.
 
 | Check | Android: Brave, Chrome, Edge, Samsung Internet | Desktop | iPhone Safari | iPhone Chrome |
 | --- | --- | --- | --- | --- |
-| Status reaches Ready, no on-screen error | pending | pending | pending | pending |
-| Portrait visible beside Restart and readable at its 48 px size (eyes, outline, colours) | pending | pending | pending | pending |
-| Tree visible on every fixture; soft canopy edge, no dark halo, at fit zoom and at maximum pinch zoom | pending | pending | pending | pending |
-| Tree opacity slider still fades the tree behind the Fighter | pending | pending | pending | pending |
-| Cold reload feels faster than before (no number asked for) | pending | pending | pending | pending |
+| Status reaches Ready, no on-screen error | pass as reported | pending | pending | pending |
+| Portrait visible beside Restart and readable at its 48 px size (eyes, outline, colours) | pass as reported | pending | pending | pending |
+| Tree visible on every fixture; soft canopy edge, no dark halo, at fit zoom and at maximum pinch zoom | pass as reported | pending | pending | pending |
+| Tree opacity slider still fades the tree behind the Fighter | pass as reported | pending | pending | pending |
+| Cold reload feels faster than before (no number asked for) | pass as reported | pending | pending | pending |
 
 ## 10. Scope and limitations
 
 - Out of scope, as the issue says: no new art, no atlas packing, no `check-dist` CI size report (#3), no change to board geometry, fixtures, controls or diagnostics beyond the two manifest URLs and the export-rule constants, no change to the game asset catalog or to `fighter.png` (64 × 80 drawn at 40 × 50 × 6: under-sized by the same rule, but 9 KB and not one of the three files).
 - `dist/` is about 43 MB because `public/` is copied verbatim: PR #32's ten terrain sources (about 33 MB) and the three proof originals kept here (7.4 MB) are never requested by the scene, so they do not count toward L4, but the §5.1 release ZIP cap of 20 MiB would reject the folder. That is #3's `check-dist` step; moving the originals out of `public/` is a one-line change if the maintainer prefers it now.
 - The canvas density cap of 1 describes today's renderer. If the DPR-capped canvas of tech design §5.5 is adopted, the tree must be re-exported (cap 2 gives 960 × 993, which cannot meet L4 with the current terrain set) or L4 revisited.
-- Chromium emulation is not device acceptance: the WebP decode question for the portrait and the 3× readability are settled only by the §9 rows. PNG fallbacks and their commands are in §3.
+- Chromium emulation is not device acceptance: the WebP decode question for the portrait and the 3× readability are settled only by the §9 rows. Android is settled (four browsers, pass as reported); desktop and the iPhone rows are open. PNG fallbacks and their commands are in §3.
 - Warm medians against L2 are reported in §8.2 for the preview deploy without attributing the change; the loopback figures in §8.1 are not comparable to the deployed ones.
 - §8.2 measures the Pages preview of this branch; the main-deploy run the acceptance criterion names (§8.3) can only happen after the merge.
