@@ -20,6 +20,9 @@ function imageSize(file: Buffer): { width: number; height: number } {
   throw new Error(`Unknown WebP chunk ${chunk}`);
 }
 
+/** L4 is a transfer budget (#20 note §6): about 300 bytes of response headers per request, plus the DOM portrait's
+ *  re-request of its URL (a 300-byte cache hit), as measured in the #35 note §8. */
+const WIRE_OVERHEAD_BYTES = 300 * (PROOF_ASSETS.length + 1);
 const image = (key: string) => PROOF_IMAGES.find(asset => asset.key === key)!;
 const exportSize = (logicalPx: number, densityCap: number) => Math.ceil(logicalPx * PROOF_EXPORT.maxBoardZoom * densityCap);
 
@@ -40,9 +43,9 @@ describe('proof asset exports (#35, restart plan §5.1)', () => {
     expect(imageSize(publicFile(image('fighter-portrait').url))).toEqual({ width: side, height: side });
   });
 
-  it('keeps every file the scene requests on a cold load within the #20 L4 budget', () => {
+  it('keeps every file the scene requests on a cold load within the #20 L4 budget on the wire', () => {
     const files = PROOF_ASSETS.map(asset => ({ url: asset.url, bytes: publicFile(asset.url).length }));
-    const total = files.reduce((sum, file) => sum + file.bytes, 0);
-    expect(total, JSON.stringify(files)).toBeLessThanOrEqual(PROOF_COLD_ASSET_BUDGET_BYTES);
+    const total = files.reduce((sum, file) => sum + file.bytes, 0) + WIRE_OVERHEAD_BYTES;
+    expect(total, JSON.stringify({ WIRE_OVERHEAD_BYTES, files })).toBeLessThanOrEqual(PROOF_COLD_ASSET_BUDGET_BYTES);
   });
 });
