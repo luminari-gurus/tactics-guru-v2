@@ -256,10 +256,21 @@ Increment 1 committed: `MAX_BOARD_SCALE` exported; `PROOF_EXPORT` (`maxBoardZoom
 - Preview collector run `docs/qa/issue-35/fit-preview-6a45b38.json`: `measuredBuild` `6a45b38`, 18 samples, zero errors, assets cold **1,412,374 bytes in all nine cold samples** (L4 passes by 87,626), cold usable medians 911 / 1,189 / 1,076 ms, warm 549 / 671 / 664 ms. QA note §8.2 and the #20 L4 row filled; committed as a `docs` commit after this entry and pushed.
 - The §6 checklist posted on PR #37 for the testers.
 
+### 2026-10-08: review of PR #37 handled
+
+Two adversarial passes at `752cba4` (reviews 5455226513 and 5455277223) gave four findings; one fix commit each, RED first, numbers in the QA note §6:
+
+1. `cf7cb74` fix: `create()` reports the first missing `PROOF_IMAGES` texture through the error callback. Phaser's `File.onProcessError` only logs a failed decode, so a WebP that does not decode, or the `index.html` the deploy returns for a missing `/proof/` path, left the status at Loading with no message. Two specs in `tests/assets.spec.ts` cover undecodable bytes and the HTML shell. No boolean guard: `showError` is idempotent.
+2. `41a1ea9` docs: §9/§10 of the note and D-C/§6 here now state the symptom per build and the real mechanism.
+3. `2b017d9` test: the L4 unit gate charges 300 bytes per request plus the portrait re-request (4,800), so it holds the wire figure 1,412,374.
+4. `2664246` test: the grass export is held to `ceil((TILE_WIDTH + 2 × bleed) / √2 × maxBoardZoom × canvasDensityCap)` from the constants; the browser spec drops its literal.
+
+Final tree: build clean, 46 unit tests, 99 browser checks, diff check clean. Threads replied to and resolved, PR body updated, testers told that a decode failure now shows the error message on the preview.
+
 What is left, and who does it:
 
 1. **Testers (human):** the §6 rows on the preview URL, then on main after merge. **Android and desktop done 2026-10-08**: the user reported all five rows passing in Brave, Chrome, Edge and Samsung Internet on the preview at `927eef6` (PR #37 comment 6057730129) and in a desktop browser at `f671042` (comment 6057747895), recorded in the QA note §9. Still open: iPhone Safari and iPhone Chrome (dubstylee). Record them as "pass as reported" in §9 when they arrive (one `docs` commit).
 2. **If any browser fails to decode WebP:** PNG fallbacks per D-C (`tmp/fighter-portrait-96.png` as is; `pngquant --quality=80-100 --speed 1 tmp/tree-grass-v1-480.png`), rewire `PROOF_IMAGES`, re-run increments 3 and 4 for the changed files, re-measure the preview. Both fallbacks fit L4 (1,445,524 estimated).
-3. **Review handling** on PR #37 per §8: inline replies, one fix commit per finding, resolve threads, leave ready for a merge commit, keep the branch.
+3. **Review handling** on PR #37 per §8: done 2026-10-08 (see the entry below); a further round follows the same rules.
 4. **After merge (session work):** `npm run measure:fit -- docs/qa/issue-35/fit-main-<sha>.json --url https://tactics-guru-v2.pages.dev` once Pages serves the merge commit (check `measuredBuild`); post the number on #35; a one-line `docs` commit on a fresh branch updates the #20 L4 row and the QA note §8.3 if the maintainer wants it in the notes rather than on the issue.
 5. **Close-out:** the maintainer closes #35 when every box is ticked, closes the #20 loading gate and decides #2; then delete this plan file (the README line is already folded).
