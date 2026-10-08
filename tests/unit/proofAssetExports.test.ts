@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { extname } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { PROOF_ART, PROOF_ASSETS, PROOF_COLD_ASSET_BUDGET_BYTES, PROOF_EXPORT, PROOF_IMAGES } from '../../src/diagnostics/proofAssets';
+import { TILE_WIDTH } from '../../src/geometry/iso';
 
 // Image and audio extensions on the release allowlist (restart plan §5.1, tech design §7.2).
 const RELEASE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.mp3', '.ogg', '.wav'];
@@ -41,6 +42,13 @@ describe('proof asset exports (#35, restart plan §5.1)', () => {
   it('exports the DOM portrait at its CSS size × DOM density cap', () => {
     const side = PROOF_EXPORT.portraitCssPx * PROOF_EXPORT.domDensityCap;
     expect(imageSize(publicFile(image('fighter-portrait').url))).toEqual({ width: side, height: side });
+  });
+
+  it('exports the grass test fixture at its drawn square side × maximum board zoom × canvas density cap', () => {
+    // BoardRenderer draws the square material rotated 45° and squashed to the tile diamond: side = (TILE_WIDTH + 2 × bleed) / √2.
+    // The file is not in PROOF_ASSETS (tiles use the runtime terrain textures); tests/grass-surface.spec.ts fetches it.
+    const side = exportSize((TILE_WIDTH + 2 * PROOF_ART.grass.horizontalBleed) / Math.SQRT2, PROOF_EXPORT.canvasDensityCap);
+    expect(imageSize(publicFile('/proof/grass-material-v1-348.png'))).toEqual({ width: side, height: side });
   });
 
   it('keeps every file the scene requests on a cold load within the #20 L4 budget on the wire', () => {
