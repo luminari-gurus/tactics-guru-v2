@@ -250,10 +250,16 @@ Increment 1 committed: `MAX_BOARD_SCALE` exported; `PROOF_EXPORT` (`maxBoardZoom
 - Increment 3 (`1330f58`): `PROOF_IMAGES` wired, comment block with bytes and hashes. GREEN: focused vitest 4/4, `npm run test:unit` 45 (41 + 4), typecheck clean, build clean, `npm test` 93 passed in 2.8 min, `npm ci` lockfile unchanged, `git diff --check` clean. On-disk manifest 1,407,574 bytes.
 - Increment 4: after captures at `1330f58`; montages, portrait 3× pair and a 1:1 canopy crop (lossless vs WebP, the 6× zoom case) under `docs/qa/issue-35/`; local collector `fit-local-1330f58.json`: assets cold 1,412,374 bytes (exactly the D-C estimate), total cold 1,781,067, zero errors, 18 samples. QA note `docs/qa/issue-35-proof-asset-export.md` written; README `public/proof/` line and the #20 note's L4 row updated with the loopback figure and "deployed pending".
 
-Open after this commit (increment 5):
+### 2026-10-08: increment 5, PR #37 open, preview measured
 
-1. Push; open the PR ("Re-export the proof assets at display size (#35)", `Refs #35`, no `Closes`).
-2. When the Cloudflare Pages check is green: `npm run measure:fit -- docs/qa/issue-35/fit-preview-<sha>.json --url https://issue-35-proof-asset-export.tactics-guru-v2.pages.dev`; confirm `measuredBuild` equals the pushed commit; fill §8.2 of the QA note and the #20 L4 row's deployed figure; commit as `docs`.
-3. Post the §6 checklist on the PR for the user (Android, four browsers; desktop) and dubstylee (iPhone Safari and Chrome); record answers in the note's §9 table as "pass as reported".
-4. If any browser fails to decode WebP: PNG fallbacks per D-C (`tmp/fighter-portrait-96.png`; `pngquant --quality=80-100 --speed 1 tmp/tree-grass-v1-480.png`), rewire, re-run increments 3 and 4 for the changed files, re-measure.
-5. After merge: main-deploy run into `fit-main-<sha>.json`, number on #35, maintainer closes the #20 loading gate and decides #2; delete this plan file.
+- Pushed `6a45b38`; PR #37 https://github.com/luminari-gurus/tactics-guru-v2/pull/37 ("Re-export the proof assets at display size (#35)", `Refs #35`, body carries the rule numbers, budget, commands, out-of-scope list and the §6 checklist). Cloudflare Pages check green within minutes; the alias served `6a45b38`.
+- Preview collector run `docs/qa/issue-35/fit-preview-6a45b38.json`: `measuredBuild` `6a45b38`, 18 samples, zero errors, assets cold **1,412,374 bytes in all nine cold samples** (L4 passes by 87,626), cold usable medians 911 / 1,189 / 1,076 ms, warm 549 / 671 / 664 ms. QA note §8.2 and the #20 L4 row filled; committed as a `docs` commit after this entry and pushed.
+- The §6 checklist posted on PR #37 for the testers.
+
+What is left, and who does it:
+
+1. **Testers (human):** the §6 rows on the preview URL, then on main after merge. The user: Android (four browsers) and desktop; dubstylee: iPhone Safari and iPhone Chrome. Record answers in the QA note §9 as "pass as reported" (one `docs` commit).
+2. **If any browser fails to decode WebP:** PNG fallbacks per D-C (`tmp/fighter-portrait-96.png` as is; `pngquant --quality=80-100 --speed 1 tmp/tree-grass-v1-480.png`), rewire `PROOF_IMAGES`, re-run increments 3 and 4 for the changed files, re-measure the preview. Both fallbacks fit L4 (1,445,524 estimated).
+3. **Review handling** on PR #37 per §8: inline replies, one fix commit per finding, resolve threads, leave ready for a merge commit, keep the branch.
+4. **After merge (session work):** `npm run measure:fit -- docs/qa/issue-35/fit-main-<sha>.json --url https://tactics-guru-v2.pages.dev` once Pages serves the merge commit (check `measuredBuild`); post the number on #35; a one-line `docs` commit on a fresh branch updates the #20 L4 row and the QA note §8.3 if the maintainer wants it in the notes rather than on the issue.
+5. **Close-out:** the maintainer closes #35 when every box is ticked, closes the #20 loading gate and decides #2; then delete this plan file (the README line is already folded).
