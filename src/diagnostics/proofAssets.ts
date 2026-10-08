@@ -1,3 +1,5 @@
+import { MAX_BOARD_SCALE } from '../geometry/iso';
+import { MAX_ZOOM } from '../geometry/picking';
 import { TERRAIN_MATERIALS } from '../terrain/materials';
 import { BOARD_SIZE } from './boardFixture';
 // Ground textures and separate props; provenance: docs/art/terrain-textures.md and docs/qa/issue-16-assets.md.
@@ -28,6 +30,20 @@ export const PROOF_ART = {
   tree: { width: 80, height: 80 * 1276 / 1233, originY: 1070 / 1276 },
   fighter: { width: 40, height: 50, originY: 76 / 80 },
 } as const;
+// Export rule for the proof images (issue #35, restart plan §5.1): largest drawn size × maximum board zoom × pixel-density cap.
+// `tests/unit/proofAssetExports.test.ts` holds the shipped files to it; docs/qa/issue-35-proof-asset-export.md records the exports.
+export const PROOF_EXPORT = {
+  /** `fitBoard` caps the fit scale (`MAX_BOARD_SCALE`) and pinch zoom is relative to the fit (`MAX_ZOOM`). */
+  maxBoardZoom: MAX_BOARD_SCALE * MAX_ZOOM,
+  /** Phaser runs in RESIZE mode with the backing store at CSS size, so canvas textures are sampled at density 1 (tech design §5.5). */
+  canvasDensityCap: 1,
+  /** The browser draws the DOM portrait at device density; capped at 2 per the #20 note (96 × 96 for 2× DPR). */
+  domDensityCap: 2,
+  /** `index.html` shows `#proof-portrait` at 48 × 48 CSS px; it is outside the board, so zoom does not apply. */
+  portraitCssPx: 48,
+} as const;
+/** #20 budget L4: asset transfer per scene on a cold load, in bytes (docs/qa/issue-20-fit-gate.md §6). */
+export const PROOF_COLD_ASSET_BUDGET_BYTES = 1_500_000;
 export const PROOF_FIXTURES = {
   'ground-behind': { hero: { x: 1, y: 0, elevation: 0 }, heroOffsetX: 28, prop: { x: 2, y: 0, elevation: 0 }, relation: 'behind' },
   'ground-front': { hero: { x: 3, y: 0, elevation: 0 }, heroOffsetX: -28, prop: { x: 2, y: 0, elevation: 0 }, relation: 'front' },

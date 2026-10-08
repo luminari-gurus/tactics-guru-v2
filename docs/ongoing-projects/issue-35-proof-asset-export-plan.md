@@ -137,7 +137,7 @@ Each increment is one commit on the branch; commit messages carry the session tr
 
 - Export `MAX_BOARD_SCALE` from `src/geometry/iso.ts`.
 - Add `PROOF_EXPORT` (`maxBoardZoom`, `canvasDensityCap: 1`, `domDensityCap: 2`) and `PROOF_COLD_ASSET_BUDGET_BYTES` to `src/diagnostics/proofAssets.ts` with comments citing #20 L4 and tech design §5.5.
-- Add `tests/unit/helpers/imageDimensions.ts` and `tests/unit/proofAssetExports.test.ts` (D-E). Run `npx vitest run tests/unit/proofAssetExports.test.ts` and record the RED output.
+- Add `tests/unit/proofAssetExports.test.ts` (D-E) with the PNG/WebP header reader inlined (one consumer, so no `tests/unit/helpers/`). Run `npx vitest run tests/unit/proofAssetExports.test.ts` and record the RED output.
 - Tighten `tests/assets.spec.ts` (portrait 96 × 96) and `tests/grass-surface.spec.ts` (new file, 348). Run those two specs on the desktop project and record the RED output.
 
 ### Increment 2: the exports (`chore`)
@@ -166,8 +166,8 @@ sha256sum public/proof/fighter-portrait-96.webp public/proof/tree-grass-v1-480.w
 
 ### Increment 4: evidence (`docs`)
 
-- "Before" screenshots: `git stash` is not used; instead build `origin/main` in a worktree (`git worktree add tmp/main-8794ae4 8794ae4`), run `npx playwright test tests/assets.spec.ts` there for the two mobile projects, and keep its four fixture screenshots per orientation. "After": the same spec on the branch. Montage per orientation with `convert ... +append / -append`, then `pngquant`, into `docs/qa/issue-35/`.
-- Portrait at 3×: Playwright with `deviceScaleFactor: 3` on the Pixel 7 profile, element screenshot of `#proof-portrait` before and after, side by side.
+- "Before" screenshots: taken on this branch at `8024f26` (identical to `8794ae4` except for this plan file) before increment 1 touched any test or asset: `npm run build && npx playwright test tests/assets.spec.ts --project=mobile-portrait --project=mobile-landscape`, four fixture screenshots per orientation kept in the session scratchpad. No worktree needed. "After": the same spec on the finished branch. Montage per orientation with `convert ... +append / -append`, then `pngquant`, into `docs/qa/issue-35/`.
+- Portrait at 3×: `tmp/portrait-3x.mjs` (git-ignored; its 10 lines are reproduced in the QA note) launches Playwright Chromium with the Pixel 7 profile at `deviceScaleFactor: 3` against a `vite preview` on port 4175 and takes an element screenshot of `#proof-portrait` (144 × 144 device px). "Before" captured at `8024f26`; "after" on the finished branch; side by side in the note.
 - Local collector run for the branch: `npm run build && npm run measure:fit -- docs/qa/issue-35/fit-local-<sha>.json` (local mode refuses a `dist` from another commit, so build first).
 - Write `docs/qa/issue-35-proof-asset-export.md` (D-F). Update README line "`public/proof/`: the four canonical images …" to describe originals plus exports, and the #20 note's L4 row with the local number and a placeholder for the deployed one.
 
@@ -234,3 +234,14 @@ Record as "Android phone, four browsers" and "pass as reported"; versions are no
 ### 2026-10-08: plan written, branch linked
 
 Branch created and linked; live deploy measured (§1); trial conversions run in the session scratchpad to size the decisions (D-A to D-C); nothing under `public/` or `src/` changed yet.
+
+### 2026-10-08: ablation pass and increment 1 (RED)
+
+Ablation against the code changed three mechanics, no outcomes: "before" screenshots are taken from the current HEAD build instead of a `8794ae4` worktree; the image-header reader lives inside the unit test instead of a helpers folder; PNG fallbacks are not pre-generated (commands stay in D-C, run only if the device check fails). Before captures done at `8024f26` (eight fixture screenshots, two orientations; portrait at 3× = 144 × 144 device px) and held in the session scratchpad until increment 4 writes the montages.
+
+Increment 1 committed: `MAX_BOARD_SCALE` exported; `PROOF_EXPORT` (`maxBoardZoom` 6, `canvasDensityCap` 1, `domDensityCap` 2, `portraitCssPx` 48) and `PROOF_COLD_ASSET_BUDGET_BYTES` 1,500,000 added; unit test and the two spec tightenings in place. RED recorded:
+
+- `npx vitest run tests/unit/proofAssetExports.test.ts`: 3 failed, 1 passed. Tree `{1233, 1276}` ≠ `{480, 497}`; portrait `{1254, 1254}` ≠ `{96, 96}`; cold manifest 5,751,408 bytes > 1,500,000. The allowlist assertion passes already.
+- `npx playwright test tests/assets.spec.ts tests/grass-surface.spec.ts --project=desktop`: 2 failed, 1 passed. Portrait `{1254, 1254}` ≠ `{96, 96}`; grass `image.decode()` threw `EncodingError: The source image cannot be decoded` because `/proof/grass-material-v1-348.png` does not exist yet.
+
+Next: increment 2 (run the D-C conversions, record hashes), then increment 3 (wire the URLs, go GREEN).

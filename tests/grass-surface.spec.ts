@@ -5,7 +5,7 @@ test('square grass material projects all corners exactly onto the shared tile ge
   await expect(page.getByRole('status')).toHaveText('Ready');
   const asset = await page.evaluate(async () => {
     const image = new Image();
-    image.src = '/proof/grass-material-v1.png';
+    image.src = '/proof/grass-material-v1-348.png';
     await image.decode();
     const canvas = document.createElement('canvas');
     canvas.width = image.naturalWidth;
@@ -21,6 +21,8 @@ test('square grass material projects all corners exactly onto the shared tile ge
     }
     return { width: canvas.width, height: canvas.height, transparentSamples };
   });
+  // 348 = ceil((80 + 2 × bleed) / √2 × 6 max board zoom × canvas density 1): the #35 export of the square material.
+  expect(asset.width).toBe(348);
   expect(asset.width).toBe(asset.height);
   expect(asset.transparentSamples).toBe(0);
   // Phaser stores transform matrices as float32; 0.001 CSS pixel allows rounding, not visible drift.
