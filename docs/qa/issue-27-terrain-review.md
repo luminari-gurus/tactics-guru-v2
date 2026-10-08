@@ -1,7 +1,11 @@
 # Issue 27: first terrain candidate review
 
-Status: implementation begun; **not approved, not integrated, issue remains open**.
+Status: **v2 visually approved by Brian on 2026-10-08; not integrated, issue remains open**.
 Prepared from current origin/main `3f98bef` after #26 and #2 closed. The merged contract explicitly permits review of existing newly generated terrain sources. This revision reuses those sources rather than generating unrelated materials.
+
+## Approval receipt
+
+Brian responded “looks good” to the displayed v2 candidate set on 2026-10-08. `manifest-v2.json` records visual approval with exact source/runtime filenames, SHA-256 hashes and terrain IDs (grass, grass_path, stone, forest, water). This supersedes earlier pending visual-approval statements for v2. The documented residual edge discontinuities remain; visual approval does not establish the seamless-repeat criterion or authorize a completion claim. Runtime integration remains separate.
 
 ## Current revision: v2 (2026-10-08)
 
