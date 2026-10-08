@@ -5,7 +5,7 @@ test('square grass material projects all corners exactly onto the shared tile ge
   await expect(page.getByRole('status')).toHaveText('Ready');
   const asset = await page.evaluate(async () => {
     const image = new Image();
-    image.src = '/proof/grass-material-v1.png';
+    image.src = '/proof/grass-material-v1-348.png';
     await image.decode();
     const canvas = document.createElement('canvas');
     canvas.width = image.naturalWidth;
@@ -21,6 +21,7 @@ test('square grass material projects all corners exactly onto the shared tile ge
     }
     return { width: canvas.width, height: canvas.height, transparentSamples };
   });
+  // The export's pixel size is held to the #35 rule by tests/unit/proofAssetExports.test.ts; here it must be square and opaque.
   expect(asset.width).toBe(asset.height);
   expect(asset.transparentSamples).toBe(0);
   // Phaser stores transform matrices as float32; 0.001 CSS pixel allows rounding, not visible drift.
