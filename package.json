@@ -14,7 +14,7 @@
     "test": "playwright test",
     "test:unit": "vitest run",
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
-    "validate:content": "vitest run tests/unit/content.test.ts"
+    "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"
