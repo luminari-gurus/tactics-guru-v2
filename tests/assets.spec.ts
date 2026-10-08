@@ -6,7 +6,8 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.getByRole('img', { name: 'Fighter portrait' })).toBeVisible();
-  expect(await page.locator('#proof-portrait').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+  // The portrait is the 96 × 96 export (48 CSS px × DOM density cap 2, issue #35), decoded by the DOM image.
+  expect(await page.locator('#proof-portrait').evaluate((image: HTMLImageElement) => ({ complete: image.complete, width: image.naturalWidth, height: image.naturalHeight }))).toEqual({ complete: true, width: 96, height: 96 });
   for (const elevation of ['Ground', 'Raised']) {
     for (const relation of ['Behind', 'In front']) {
       await page.getByRole('button', { name: `${elevation}: ${relation}`, exact: true }).click();

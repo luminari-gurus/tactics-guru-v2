@@ -8,7 +8,7 @@ export const TILE_HEIGHT = 40;
 export const ELEVATION_STEP = 24;
 export const BASE_THICKNESS = 12;
 export const BOARD_MARGIN = 16;
-const MAX_BOARD_SCALE = 1.5;
+export const MAX_BOARD_SCALE = 1.5;
 
 /** Projects a tile's top-surface center; positive grid axes extend toward the viewer. */
 export function projectTile(tile: Tile): Point {
