@@ -81,7 +81,7 @@ export type AssetRecord = AssetMetadata & (
   | { readonly kind: 'unit-sprite' | 'prop'; readonly anchor: { readonly x: number; readonly y: number } }
   | { readonly kind: 'portrait' }
 );
-/** Complete keyed catalogs are checked with `satisfies`; semantic validation is a later task. */
+/** Complete keyed catalogs can be checked with `satisfies`; unknown input must pass validateContent. */
 export interface ContentCatalog {
   readonly maps: Readonly<Record<MapId, MapRecord>>;
   readonly heroes: Readonly<Record<HeroId, HeroRecord>>;

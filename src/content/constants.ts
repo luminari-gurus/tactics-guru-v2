@@ -1,4 +1,4 @@
-/** Inclusive safe-integer limits; runtime validation belongs to subsequent content work. */
+/** Inclusive safe-integer limits enforced by runtime content validation. */
 export const CONTENT_BOUNDS = {
   mapWidth: { min: 1, max: 32 }, mapHeight: { min: 1, max: 32 },
   coordinate: { min: 0, max: 31 }, elevation: { min: 0, max: 4 },

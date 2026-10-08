@@ -3,7 +3,7 @@ import type { AssetRecord, ContentCatalog, MapRecord, SpawnRecord, UnitStats } f
 
 // Tiny synthetic fixture, deliberately not the authored battle map or production catalog.
 export const mapFixture = {
-  id: 'map:contract-fixture', width: 1, height: 1,
+  id: 'map:contract_fixture', width: 1, height: 1,
   cells: [{ x: 0, y: 0, elevation: 0, terrainId: 'grass' }],
   spawns: [{ id: 1, side: 'heroes', unitId: 'fighter', x: 0, y: 0 }],
 } as const satisfies MapRecord;
@@ -11,7 +11,7 @@ export const statsFixture = {
   maxHp: 18, move: 4, jump: 1, accuracy: 4, armorClass: 14, power: 3, dexterity: 0, will: 1,
 } as const satisfies UnitStats;
 export const surfaceFixture = {
-  id: 'asset:fixture-grass', kind: 'terrain-surface',
+  id: 'asset:fixture_grass', kind: 'terrain-surface',
   sourcePath: '/fixtures/grass-source.png', runtimePath: '/fixtures/grass.png',
   sourceWidth: 1024, sourceHeight: 1024, runtimeWidth: 256, runtimeHeight: 256,
   format: 'png', textureSpec: TERRAIN_TEXTURE_SPEC,
@@ -28,11 +28,13 @@ const invalidSurface: AssetRecord = { ...surfaceFixture, provenance: { origin: '
 void invalidSpawn;
 void invalidSurface;
 
+const { textureSpec: surfaceOnlySpec, ...imageFixture } = surfaceFixture;
+void surfaceOnlySpec;
 const spriteFixture = {
-  ...surfaceFixture, id: 'asset:fixture-sprite', kind: 'unit-sprite', anchor: { x: 128, y: 240 },
+  ...imageFixture, id: 'asset:fixture_sprite', kind: 'unit-sprite', anchor: { x: 128, y: 240 },
 } as const satisfies AssetRecord;
 const portraitFixture = {
-  ...surfaceFixture, id: 'asset:fixture-portrait', kind: 'portrait',
+  ...imageFixture, id: 'asset:fixture_portrait', kind: 'portrait',
 } as const satisfies AssetRecord;
 const fixtureArt = { spriteAssetId: spriteFixture.id, portraitAssetId: portraitFixture.id };
 const fixtureTerrain = { surfaceAssetId: surfaceFixture.id, moveCost: 1, walkable: true, blocksLineOfSight: false };
