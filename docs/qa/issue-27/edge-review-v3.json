@@ -1,0 +1,47 @@
+{
+  "method": "Mean absolute RGB channel difference, 0-255; wrap compares first/last column or row; interior compares all adjacent pixels. Diagnostic only, no pass threshold or proof of feature continuity.",
+  "metrics": {
+    "grass_path": {
+      "v2": {
+        "wrapXMAE": 11.46,
+        "wrapYMAE": 12.55,
+        "interiorXMAE": 13.84,
+        "interiorYMAE": 13.43
+      },
+      "v3": {
+        "wrapXMAE": 14.32,
+        "wrapYMAE": 13.9,
+        "interiorXMAE": 16.3,
+        "interiorYMAE": 16.25
+      }
+    },
+    "stone": {
+      "v2": {
+        "wrapXMAE": 15.32,
+        "wrapYMAE": 17.86,
+        "interiorXMAE": 16.79,
+        "interiorYMAE": 16.85
+      },
+      "v3": {
+        "wrapXMAE": 15.99,
+        "wrapYMAE": 13.91,
+        "interiorXMAE": 18.02,
+        "interiorYMAE": 19.07
+      }
+    },
+    "water": {
+      "v2": {
+        "wrapXMAE": 5.79,
+        "wrapYMAE": 13.82,
+        "interiorXMAE": 5.39,
+        "interiorYMAE": 8.86
+      },
+      "v3": {
+        "wrapXMAE": 4.86,
+        "wrapYMAE": 5.78,
+        "interiorXMAE": 6.37,
+        "interiorYMAE": 9.83
+      }
+    }
+  }
+}
