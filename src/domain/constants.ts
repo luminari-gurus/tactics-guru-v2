@@ -14,3 +14,5 @@ export const RULE_BOUNDS = {
 export const D20_SIDES = 20;
 export const UINT32_RANGE = 0x100000000;
 export const RNG_WARMUP_DRAWS = 12;
+/** Legacy cardinal enumeration; search breaks frontier ties by cost, y, then x. */
+export const MOVEMENT_DIRECTIONS = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }] as const;
