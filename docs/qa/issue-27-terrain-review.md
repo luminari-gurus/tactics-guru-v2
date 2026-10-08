@@ -1,13 +1,28 @@
 # Issue 27: first terrain candidate review
 
-Status: **v1 restored as the selected visual baseline; edge repair pending; not integrated, issue remains open**.
+Status: **scripted v1 edge repair prepared for exact-export review; not integrated, issue remains open**.
 Prepared from current origin/main `3f98bef` after #26 and #2 closed. The merged contract explicitly permits review of existing newly generated terrain sources. This revision reuses those sources rather than generating unrelated materials.
+
+## Current edge repair
+
+Brian explicitly authorized scripted image editing on 2026-10-08 after ImageGen failed to preserve the interior. The offline [repair script](issue-27/repair_edges.py) applies a symmetric cosine blend to corresponding pixels at opposite boundaries. It changes only the outer 64 source pixels / 16 runtime pixels. Weight is 0.5 at the boundary, tapering to zero at the inner strip limit. Horizontal and vertical passes include corners. The central 896×896 source rectangle and central 224×224 runtime rectangle remain **bit-for-bit identical to v1**.
+
+All five materials use consistent treatment. Source and runtime files are repaired independently from their exact v1 counterparts, preserving each resolution’s original central pixels; there is no regeneration, rotation or global palette change. NumPy 2.0.2 and Pillow 10.2.0 are offline tooling only, not app/build dependencies. Original generation provenance and prompts remain in the current [manifest](issue-27/manifest-v1-edge.json), together with original reference hashes, repair method, changed filenames and hashes. Total runtime bytes: 679,985.
+
+- [Contact sheet](issue-27/contact-v1-edge.png)
+- [Runtime 3×3 repeats](issue-27/repeat-v1-edge.png)
+- [Mixed adjacency](issue-27/adjacent-v1-edge.png)
+- [V1 / repaired comparison](issue-27/comparison-v1-edge.png): original left, repaired right.
+
+Opposite border pixels now match exactly in both axes for every source/runtime export, eliminating abrupt color jumps at wrapping boundaries. Visual repeats retain the original natural variation and path layout. Blending softens detail and can produce ghosted slab/ripple shapes inside boundary strips, especially stone; exact border equality does not prove continuous feature shapes or eliminate recognizable repeating motifs. The original images remain intact for comparison. The new filenames/hashes require Brian’s review and approval; approval is null. No final seamless-repeat acceptance or integration is claimed before that review.
+
+Verification: `python3 docs/qa/issue-27/repair_edges.py` passed all five IDs, ten dimensions/RGB PNG checks, v1 input hashes, exact central-pixel preservation and equality of opposing borders after saving/reopening. [edge-proof-v1.json](issue-27/edge-proof-v1.json) records the checks. `git diff --check` passed. Application code/configuration/runtime assets are unchanged, so the prior 81 unit tests, 99 browser tests, strict type-check and build results below remain applicable. No physical-device or battle-renderer acceptance is claimed.
 
 ## Selected baseline
 
 Brian selected v1 as the best-looking revision and requested removal of the v2/v3 attempts. Those candidate images, raw outputs, manifests, prompts, diagnostics and review previews have been deleted from the current branch tree. Their earlier visual approval does not apply to v1; no approval receipt is inferred. The original five v1 source/runtime pairs and hashes remain unchanged.
 
-A further boundary-only ImageGen attempt changed interior pixels and retained visible joins, so it was rejected and not added to the review package. Seamless-repeat acceptance remains unverified.
+A further boundary-only ImageGen attempt changed interior pixels and retained visible joins, so it was rejected and not added to the review package. This rejected ImageGen trial did not establish seamless-repeat acceptance.
 
 ## Review package
 

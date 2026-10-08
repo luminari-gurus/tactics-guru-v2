@@ -1,0 +1,170 @@
+{
+  "issue": 27,
+  "approval": null,
+  "assets": [
+    {
+      "terrainId": "grass",
+      "assetId": "asset:terrain_grass",
+      "status": "pending-review",
+      "originalSource": "public/textures/terrain/grass-top-down-v1.png",
+      "originalSourceSha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
+      "source": "docs/qa/issue-27/candidates/grass-source-v1-edge.png",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "sourceSha256": "ecddc2478d7757bd00b83ec5d532509999c2f8be60a6bdb55974b3892d7903b8",
+      "runtime": "docs/qa/issue-27/candidates/grass-runtime-v1-edge.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8",
+      "runtimeBytes": 140320,
+      "generationTool": "Built-in image_gen",
+      "generationModel": null,
+      "generationDate": "2026-10-07",
+      "prompt": "Use case: stylized-concept\nAsset type: reusable battle grid material texture\nPrimary request: Create a single square opaque top-down texture of short meadow grass, muted sage and olive greens.\nStyle/medium: hand-painted tactical RPG terrain, restrained natural colors, crisp readable shapes at small tile scale.\nComposition/framing: exact orthographic straight-down view, full-bleed square, surface reaches every edge, flat material only.\nLighting: soft uniform diffuse lighting, no directional cast shadows.\nConstraints: no isometric perspective, no diamond shape, no tile border, no extruded sides, no horizon, no text, no grid, no watermark. Opposite edges should blend when repeated. Keep texture detail moderately sized.",
+      "referenceAssetIds": [],
+      "rightsNote": "Project-generated with built-in image_gen; model and third-party license not recorded. Original production notes state no legacy PNG generation inputs.",
+      "productionNotes": "Pillow 10.2.0 RGB opaque PNG; Lanczos original 1254 square to 1024 source, then 256 runtime. No rotation, edge repair, or artistic edits. North remains image-up. Existing generated artwork reused per merged contract; approval and seamlessness remain pending. Scripted repair authorized by Brian on 2026-10-08. Source and runtime repaired independently from exact v1 files; no interior regeneration, rotation or palette change. Source bands 64px; runtime bands 16px. Prior v1 generation provenance retained. New exact exports require review.",
+      "sourceReference": "docs/qa/issue-27/candidates/grass-source-v1.png",
+      "sourceReferenceSha256": "f3c6d1a48719d43ea19beb1a25970c50fd7843338eba668d608080a2e9346775",
+      "runtimeReference": "docs/qa/issue-27/candidates/grass-runtime-v1.png",
+      "runtimeReferenceSha256": "39a737caf2797f6ff97bbd81b8d7e62f9f6016bc213181dbaf4ceceabb4647da"
+    },
+    {
+      "terrainId": "grass_path",
+      "assetId": "asset:terrain_grass_path",
+      "status": "pending-review",
+      "originalSource": "public/textures/terrain/grass_path-top-down-v1.png",
+      "originalSourceSha256": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
+      "source": "docs/qa/issue-27/candidates/grass_path-source-v1-edge.png",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "sourceSha256": "d9b4398c3b734bfe709d364e792693b41fb9d88521769b36553e6d77af9fdfa8",
+      "runtime": "docs/qa/issue-27/candidates/grass_path-runtime-v1-edge.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9",
+      "runtimeBytes": 139394,
+      "generationTool": "Built-in image_gen",
+      "generationModel": null,
+      "generationDate": "2026-10-07",
+      "prompt": "Use case: stylized-concept\nAsset type: reusable battle grid material texture\nPrimary request: Create a single square opaque top-down texture of worn tan earth path running vertically through meadow grass, path reaches top and bottom edges.\nStyle/medium: hand-painted tactical RPG terrain, restrained natural colors, crisp readable shapes at small tile scale.\nComposition/framing: exact orthographic straight-down view, full-bleed square, surface reaches every edge, flat material only.\nLighting: soft uniform diffuse lighting, no directional cast shadows.\nConstraints: no isometric perspective, no diamond shape, no tile border, no extruded sides, no horizon, no text, no grid, no watermark. Opposite edges should blend when repeated. Keep texture detail moderately sized.",
+      "referenceAssetIds": [],
+      "rightsNote": "Project-generated with built-in image_gen; model and third-party license not recorded. Original production notes state no legacy PNG generation inputs.",
+      "productionNotes": "Pillow 10.2.0 RGB opaque PNG; Lanczos original 1254 square to 1024 source, then 256 runtime. No rotation, edge repair, or artistic edits. North remains image-up. Existing generated artwork reused per merged contract; approval and seamlessness remain pending. Scripted repair authorized by Brian on 2026-10-08. Source and runtime repaired independently from exact v1 files; no interior regeneration, rotation or palette change. Source bands 64px; runtime bands 16px. Prior v1 generation provenance retained. New exact exports require review.",
+      "sourceReference": "docs/qa/issue-27/candidates/grass_path-source-v1.png",
+      "sourceReferenceSha256": "dd78ce1078ad411d77b475e0908b09a99da359d0a22276b86d54c375bccca844",
+      "runtimeReference": "docs/qa/issue-27/candidates/grass_path-runtime-v1.png",
+      "runtimeReferenceSha256": "de60bcbd10e87100c5f67a4e08aacb425cf38fb3886d0184239994ea56c4ad0c"
+    },
+    {
+      "terrainId": "stone",
+      "assetId": "asset:terrain_stone",
+      "status": "pending-review",
+      "originalSource": "public/textures/terrain/stone-top-down-v1.png",
+      "originalSourceSha256": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
+      "source": "docs/qa/issue-27/candidates/stone-source-v1-edge.png",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "sourceSha256": "a4964fc33b9487c25b56955d0c0442fb7e78d46713ac490ca0ff73134607b254",
+      "runtime": "docs/qa/issue-27/candidates/stone-runtime-v1-edge.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a",
+      "runtimeBytes": 142882,
+      "generationTool": "Built-in image_gen",
+      "generationModel": null,
+      "generationDate": "2026-10-07",
+      "prompt": "Use case: stylized-concept\nAsset type: reusable battle grid material texture\nPrimary request: Create a single square opaque top-down texture of weathered gray stone paving, irregular fitted slabs with subtle moss in cracks.\nStyle/medium: hand-painted tactical RPG terrain, restrained natural colors, crisp readable shapes at small tile scale.\nComposition/framing: exact orthographic straight-down view, full-bleed square, surface reaches every edge, flat material only.\nLighting: soft uniform diffuse lighting, no directional cast shadows.\nConstraints: no isometric perspective, no diamond shape, no tile border, no extruded sides, no horizon, no text, no grid, no watermark. Opposite edges should blend when repeated. Keep texture detail moderately sized.",
+      "referenceAssetIds": [],
+      "rightsNote": "Project-generated with built-in image_gen; model and third-party license not recorded. Original production notes state no legacy PNG generation inputs.",
+      "productionNotes": "Pillow 10.2.0 RGB opaque PNG; Lanczos original 1254 square to 1024 source, then 256 runtime. No rotation, edge repair, or artistic edits. North remains image-up. Existing generated artwork reused per merged contract; approval and seamlessness remain pending. Scripted repair authorized by Brian on 2026-10-08. Source and runtime repaired independently from exact v1 files; no interior regeneration, rotation or palette change. Source bands 64px; runtime bands 16px. Prior v1 generation provenance retained. New exact exports require review.",
+      "sourceReference": "docs/qa/issue-27/candidates/stone-source-v1.png",
+      "sourceReferenceSha256": "b108a0dcf0f5e30eeb8df554c4b7987b251a8f447c54fda36a97ec1992a4e401",
+      "runtimeReference": "docs/qa/issue-27/candidates/stone-runtime-v1.png",
+      "runtimeReferenceSha256": "c010d4184a6baea13b0dc8c06707a4d971a6b4af4a172a8e6c18772d0aa1e2e2"
+    },
+    {
+      "terrainId": "forest",
+      "assetId": "asset:terrain_forest",
+      "status": "pending-review",
+      "originalSource": "public/textures/terrain/forest-top-down-v1.png",
+      "originalSourceSha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
+      "source": "docs/qa/issue-27/candidates/forest-source-v1-edge.png",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "sourceSha256": "41af49a534e10853b200ed88b87a3cffe29a2c722ba49cf1a682b17ee5ba1855",
+      "runtime": "docs/qa/issue-27/candidates/forest-runtime-v1-edge.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26",
+      "runtimeBytes": 139184,
+      "generationTool": "Built-in image_gen",
+      "generationModel": null,
+      "generationDate": "2026-10-07",
+      "prompt": "Use case: stylized-concept\nAsset type: reusable battle grid material texture\nPrimary request: Create a single square opaque top-down texture of forest floor, dark moss, pine needles and sparse fallen leaves.\nStyle/medium: hand-painted tactical RPG terrain, restrained natural colors, crisp readable shapes at small tile scale.\nComposition/framing: exact orthographic straight-down view, full-bleed square, surface reaches every edge, flat material only.\nLighting: soft uniform diffuse lighting, no directional cast shadows.\nConstraints: no isometric perspective, no diamond shape, no tile border, no extruded sides, no horizon, no text, no grid, no watermark. Opposite edges should blend when repeated. Keep texture detail moderately sized.",
+      "referenceAssetIds": [],
+      "rightsNote": "Project-generated with built-in image_gen; model and third-party license not recorded. Original production notes state no legacy PNG generation inputs.",
+      "productionNotes": "Pillow 10.2.0 RGB opaque PNG; Lanczos original 1254 square to 1024 source, then 256 runtime. No rotation, edge repair, or artistic edits. North remains image-up. Existing generated artwork reused per merged contract; approval and seamlessness remain pending. Scripted repair authorized by Brian on 2026-10-08. Source and runtime repaired independently from exact v1 files; no interior regeneration, rotation or palette change. Source bands 64px; runtime bands 16px. Prior v1 generation provenance retained. New exact exports require review.",
+      "sourceReference": "docs/qa/issue-27/candidates/forest-source-v1.png",
+      "sourceReferenceSha256": "22bd977ccb93477a8fb97f8b09bec7411a5fb99e5db273a842f4d89d3ad1f223",
+      "runtimeReference": "docs/qa/issue-27/candidates/forest-runtime-v1.png",
+      "runtimeReferenceSha256": "0542ca461c1601052bbbbb78b7d72c8c897e4649a6032c294da3852b56a9f46e"
+    },
+    {
+      "terrainId": "water",
+      "assetId": "asset:terrain_water",
+      "status": "pending-review",
+      "originalSource": "public/textures/terrain/water-top-down-v1.png",
+      "originalSourceSha256": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
+      "source": "docs/qa/issue-27/candidates/water-source-v1-edge.png",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "sourceSha256": "37765429bc45966d827ed25d3e8a016b99737612e8ec08acfb36044c1d06d3a5",
+      "runtime": "docs/qa/issue-27/candidates/water-runtime-v1-edge.png",
+      "runtimeSize": [
+        256,
+        256
+      ],
+      "runtimeSha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622",
+      "runtimeBytes": 118205,
+      "generationTool": "Built-in image_gen",
+      "generationModel": null,
+      "generationDate": "2026-10-07",
+      "prompt": "Use case: stylized-concept\nAsset type: reusable battle grid material texture\nPrimary request: Create a single square opaque top-down texture of blue teal water surface with soft small ripples, no shore.\nStyle/medium: hand-painted tactical RPG terrain, restrained natural colors, crisp readable shapes at small tile scale.\nComposition/framing: exact orthographic straight-down view, full-bleed square, surface reaches every edge, flat material only.\nLighting: soft uniform diffuse lighting, no directional cast shadows.\nConstraints: no isometric perspective, no diamond shape, no tile border, no extruded sides, no horizon, no text, no grid, no watermark. Opposite edges should blend when repeated. Keep texture detail moderately sized.",
+      "referenceAssetIds": [],
+      "rightsNote": "Project-generated with built-in image_gen; model and third-party license not recorded. Original production notes state no legacy PNG generation inputs.",
+      "productionNotes": "Pillow 10.2.0 RGB opaque PNG; Lanczos original 1254 square to 1024 source, then 256 runtime. No rotation, edge repair, or artistic edits. North remains image-up. Existing generated artwork reused per merged contract; approval and seamlessness remain pending. Scripted repair authorized by Brian on 2026-10-08. Source and runtime repaired independently from exact v1 files; no interior regeneration, rotation or palette change. Source bands 64px; runtime bands 16px. Prior v1 generation provenance retained. New exact exports require review.",
+      "sourceReference": "docs/qa/issue-27/candidates/water-source-v1.png",
+      "sourceReferenceSha256": "ccbcedd352bce4cc673005b658e67152357e2e3aac346997296af3de53e49f54",
+      "runtimeReference": "docs/qa/issue-27/candidates/water-runtime-v1.png",
+      "runtimeReferenceSha256": "a9285bae29931b8d51d2dbf228346ce787ae98f5380059f6ff72f91a3d4594bf"
+    }
+  ],
+  "revision": "v1-edge-repaired",
+  "repair": {
+    "script": "docs/qa/issue-27/repair_edges.py",
+    "method": "symmetric opposing-edge cosine blend, then rounded RGB PNG",
+    "sourceBandPixels": 64,
+    "runtimeBandPixels": 16,
+    "centralPreservation": "central 87.5% on each axis; bit-for-bit v1 pixels",
+    "note": "Equal border pixels remove color jumps; inspect blending/ghosting and repeated motifs visually."
+  }
+}
