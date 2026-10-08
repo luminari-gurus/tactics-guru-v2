@@ -68,10 +68,12 @@ for (const viewport of VIEWPORTS) {
     await page.locator('#fit-snapshot').scrollIntoViewIfNeeded();
     await page.getByRole('button', { name: 'Refresh measurements' }).click();
     expect(JSON.parse(await page.locator('#fit-report').innerText()).viewport).toEqual({ width: viewport.width, height: viewport.height, dpr: await page.evaluate(() => devicePixelRatio) });
-    const board = await page.evaluate(() => window.fitDiagnostics().board!);
-    const panelAfter = await page.locator('#fit-panel').evaluate(element => element.getBoundingClientRect().bottom);
-    expect(board.bounds.top).toBeGreaterThanOrEqual(panelAfter);
-    expect(board.bounds.bottom).toBeLessThanOrEqual(viewport.height);
+    // Refreshing the report resizes the panel; ResizeObserver fits the board asynchronously.
+    await expect.poll(() => page.evaluate(() => {
+      const board = window.fitDiagnostics().board!;
+      const panelBottom = document.querySelector('#fit-panel')!.getBoundingClientRect().bottom;
+      return board.bounds.top >= panelBottom && board.bounds.bottom <= innerHeight;
+    })).toBe(true);
     await page.screenshot({ path: test.info().outputPath(`layout-${viewport.width}x${viewport.height}.png`) });
     expect(errors).toEqual([]);
   });

@@ -1,7 +1,8 @@
+import { TERRAIN_MATERIALS } from '../terrain/materials';
 import { BOARD_SIZE } from './boardFixture';
-// Selected diagnostic assets only; sources and anchors: docs/qa/issue-16-assets.md.
+// Ground textures and separate props; provenance: docs/art/terrain-textures.md and docs/qa/issue-16-assets.md.
 export const PROOF_IMAGES = [
-  { kind: 'image', key: 'grass', url: '/proof/grass-material-v1.png' },
+  ...TERRAIN_MATERIALS.map(material => ({ kind: 'image' as const, ...material })),
   { kind: 'image', key: 'tree', url: '/proof/tree-grass-v1.png' },
   { kind: 'image', key: 'fighter', url: '/proof/fighter.png' },
   { kind: 'image', key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
