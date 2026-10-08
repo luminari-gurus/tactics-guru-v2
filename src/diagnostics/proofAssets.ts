@@ -3,11 +3,15 @@ import { MAX_ZOOM } from '../geometry/picking';
 import { TERRAIN_MATERIALS } from '../terrain/materials';
 import { BOARD_SIZE } from './boardFixture';
 // Ground textures and separate props; provenance: docs/art/terrain-textures.md and docs/qa/issue-16-assets.md.
+// Tree and portrait are the #35 display-size exports of the #16 originals, which stay beside them under public/proof/
+// (docs/qa/issue-35-proof-asset-export.md; rule in PROOF_EXPORT below). cwebp 1.3.2 from a Lanczos resize, metadata stripped:
+//   tree-grass-v1-480.webp   480 × 497, q85, lossless alpha, 54,200 bytes, sha256 d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32
+//   fighter-portrait-96.webp  96 × 96,  q90,                  4,568 bytes, sha256 e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8
 export const PROOF_IMAGES = [
   ...TERRAIN_MATERIALS.map(material => ({ kind: 'image' as const, ...material })),
-  { kind: 'image', key: 'tree', url: '/proof/tree-grass-v1.png' },
+  { kind: 'image', key: 'tree', url: '/proof/tree-grass-v1-480.webp' },
   { kind: 'image', key: 'fighter', url: '/proof/fighter.png' },
-  { kind: 'image', key: 'fighter-portrait', url: '/proof/fighter-portrait.png' },
+  { kind: 'image', key: 'fighter-portrait', url: '/proof/fighter-portrait-96.webp' },
 ] as const;
 // Generated unlock tone (issue #19, docs/qa/issue-19-lifecycle.md):
 // ffmpeg 8.1.1, 880 Hz sine, 150 ms, 10 ms fades, mono 44.1 kHz, bitexact, no metadata.
