@@ -1,0 +1,4527 @@
+{
+  "measuredAt": "2026-10-08T11:18:35.935Z",
+  "sourceCommit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+  "sourceDirty": false,
+  "measuredBuild": {
+    "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+    "dirty": false
+  },
+  "browserVersion": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "release": "6.6.114.1-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.15.0"
+  },
+  "conditions": {
+    "url": "https://tactics-guru-v2.pages.dev",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "host network to the deployed origin over HTTPS, CDN and TLS included; no throttling",
+    "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "first >=120 active scene update intervals; nearest-rank p50/p95; cap 600; no interaction workload"
+  },
+  "buildFiles": null,
+  "samples": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 1103.6999999955297,
+        "sceneReadyMs": 1347.8999999985099,
+        "controlsUsableMs": 1441.3999999985099,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.19999999552965
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:45.250Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 434
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 103.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 105.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 106.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363656,
+            "encodedBodyBytes": 363356,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 559.2000000029802
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 165.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 128.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 229.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 143.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 167.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 230
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 137.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 219.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 227.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 206.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 226.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 183.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 104.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 93.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 140.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 80.39999999850988
+          }
+        ],
+        "totalTransferBytes": 1781569
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 397.1000000014901,
+        "sceneReadyMs": 645.7000000029802,
+        "controlsUsableMs": 729.7000000029802,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.80000000447035,
+          "maxMs": 18.299999997019768
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:48.018Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 234.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 129.40000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 80.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 81.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 80.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 83.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 84.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 85.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 86.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 104.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 89.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 89.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 93.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 168.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 92.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 92
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 95.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 241.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 81
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 80
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 82.60000000149012
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 746.3999999985099,
+        "sceneReadyMs": 990.3000000044703,
+        "controlsUsableMs": 1066.1000000014901,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.299999997019768
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:51.132Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 335.8999999985099
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 108.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 34.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 118.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 341.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 211
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 227.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 215.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 94.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 220.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 227.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 132.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 227
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 227.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 194.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 165.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 83.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 94.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 47.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 47.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 46.20000000298023
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 245.09999999403954,
+        "sceneReadyMs": 326.29999999701977,
+        "controlsUsableMs": 413.69999999552965,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:53.565Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 133.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 42.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 43
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 43.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 36.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 46.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 45.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 46
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 62.400000005960464
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 48.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 57.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 58.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 62.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 55.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 61
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 61.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 54.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 60.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 58.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 56.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 58.29999999701977
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 615,
+        "sceneReadyMs": 807.3999999985099,
+        "controlsUsableMs": 889.7999999970198,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:56.501Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 414.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 99.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 89
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 96.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 127.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 112.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 133.59999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 147.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 175.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 180.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 181.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 176.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 178.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 177.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 62.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 100.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 126.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 149.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 58.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 28.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 21.100000001490116
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 196.79999999701977,
+        "sceneReadyMs": 258.29999999701977,
+        "controlsUsableMs": 345,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.299999997019768
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.5,
+          "transform": {
+            "scale": 1.5,
+            "x": 640,
+            "y": 474.0681265206813
+          },
+          "selected": null,
+          "bounds": {
+            "left": 398.5,
+            "right": 881.5,
+            "top": 393.93187347931877,
+            "bottom": 702.0681265206813
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:17:58.868Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 88.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 30.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 29.099999994039536
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 30.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 29.299999997019768
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 23.700000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 25.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 28
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 27.700000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 29.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 31.299999997019768
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 31.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 31.399999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 31.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 33
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 31.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 33
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 33.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 25.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 26.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 31.899999998509884
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 379.80000000447035,
+        "sceneReadyMs": 851,
+        "controlsUsableMs": 937.9000000059605,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.200000002980232
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:01.864Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 179.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 33.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 34.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 33.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 133.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 254.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 158.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 196.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 253.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 246
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 254.40000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 102.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 97.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 102.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 178.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 105.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 189
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 93.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 86
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 85.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 81.70000000298023
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 345.3999999985099,
+        "sceneReadyMs": 617.2000000029802,
+        "controlsUsableMs": 703.6000000014901,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.900000005960464,
+          "maxMs": 17.200000002980232
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:04.597Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 192.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 82.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 84.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 84.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 84.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 82.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 82.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 83.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 83.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 83.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 84.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 82
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 82.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 83.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 86.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 153.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 86.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 89.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 86.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 86.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 85.39999999850988
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 782.1999999955297,
+        "sceneReadyMs": 1342.5,
+        "controlsUsableMs": 1540.5,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 17,
+          "maxMs": 18
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:08.194Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 381.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 89.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 90.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 87.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363656,
+            "encodedBodyBytes": 363356,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 333.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 314.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 314.6000000014901
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 315.59999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 315.8999999985099
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 157.40000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 283.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 221.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 190.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 175.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 230.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 202.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 188.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 91.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 91.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 92.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 191
+          }
+        ],
+        "totalTransferBytes": 1781569
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 526.7999999970198,
+        "sceneReadyMs": 930.1999999955297,
+        "controlsUsableMs": 1015.5,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.19999999552965
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:11.245Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 378
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 82.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 196.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 267.3999999985099
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 80.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 89.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 89.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 91.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 91.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 92.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 98.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 83.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 84.59999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 87.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 87
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 88.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 91.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 199.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 183.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 180.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 82.5
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 622.3999999985099,
+        "sceneReadyMs": 898,
+        "controlsUsableMs": 954.3999999985099,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.100000001490116
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:14.246Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 403.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 91
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 95.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 93.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 148.59999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 66.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 68.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 134.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 153.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 156
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 154.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 51
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 61.399999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 117.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 118.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 71.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 33.399999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 69.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 27.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 27.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 21
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 223.70000000298023,
+        "sceneReadyMs": 366.1000000014901,
+        "controlsUsableMs": 426.20000000298023,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17.19999999552965
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 1.1801242236024845,
+          "transform": {
+            "scale": 1.1801242236024845,
+            "x": 206,
+            "y": 614.3341368071613
+          },
+          "selected": null,
+          "bounds": {
+            "left": 16,
+            "right": 396,
+            "top": 551.2869812052611,
+            "bottom": 793.7130187947389
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003144799211440841,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:16.695Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 412,
+          "height": 839,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 85.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 27.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 26.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 28.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 72.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 25.200000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 25
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 26
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 26
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 26.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 28.200000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 27.200000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 30
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 30.100000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 30.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 29.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 30
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 68.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 20.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 22.299999997019768
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 24.399999998509884
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 1742,
+        "sceneReadyMs": 2127.2999999970198,
+        "controlsUsableMs": 2215.1999999955297,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 18.600000001490116
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:20.964Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 1451.6999999955297
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 771.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 773
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 91.40000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 224.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 166.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 131.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 181.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 186.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 147.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 167.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 102
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 93.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 176.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 196
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 94.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 95.09999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 89.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 90.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 91.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 87
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 362.79999999701977,
+        "sceneReadyMs": 650.1999999955297,
+        "controlsUsableMs": 731.5999999940395,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.80000000447035,
+          "maxMs": 17.100000001490116
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:24.597Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 208.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 88.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 90.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 92.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 83.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 84.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 86.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 88.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 87.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 89.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 88.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 84.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 86
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 87.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 87.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 90.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 88.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 86.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 80.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 79.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 80.80000000447035
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 708.1999999955297,
+        "sceneReadyMs": 1252.8999999985099,
+        "controlsUsableMs": 1334.8999999985099,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:27.980Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 376.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 90.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 87.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 89.40000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363890,
+            "encodedBodyBytes": 363590,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 261.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 143.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 241.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 264.3999999985099
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 234.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 263.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 264.1000000014901
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 101.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 116.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 110.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 257
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 90.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 99
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 90.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 88.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 90.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 81.09999999403954
+          }
+        ],
+        "totalTransferBytes": 1781803
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 320,
+        "sceneReadyMs": 574.3999999985099,
+        "controlsUsableMs": 666.2000000029802,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:30.680Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 174.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 77.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 78.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 78.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 78.70000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 76.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 78.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 77.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 78.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 79.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 80.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 75.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 78.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 78.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 82.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 78.90000000596046
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 82.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 77.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 78.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 80.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 85.10000000149012
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 366.70000000298023,
+        "sceneReadyMs": 737.5,
+        "controlsUsableMs": 793.2999999970198,
+        "frames": {
+          "count": 121,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:33.513Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 175.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 1884,
+            "encodedBodyBytes": 1584,
+            "decodedBodyBytes": 3685,
+            "durationMs": 36.79999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 1204,
+            "encodedBodyBytes": 904,
+            "decodedBodyBytes": 2194,
+            "durationMs": 35.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 1180,
+            "encodedBodyBytes": 880,
+            "decodedBodyBytes": 1827,
+            "durationMs": 37.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 363656,
+            "encodedBodyBytes": 363356,
+            "decodedBodyBytes": 1394876,
+            "durationMs": 126.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 141958,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 150.5
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 141035,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 144.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 144608,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 151.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 140795,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 184.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 119504,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 152.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 141952,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 167.20000000298023
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 130499,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 88.29999999701977
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 96284,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 95.60000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 138226,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 75.10000000149012
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 142872,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 66.69999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 54500,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 79.89999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 33
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 4868,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 124.09999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 1762,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 32.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 4068,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 39.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 29.69999999552965
+          }
+        ],
+        "totalTransferBytes": 1781569
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 210.09999999403954,
+        "sceneReadyMs": 357.3999999985099,
+        "controlsUsableMs": 407.5,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 16.899999998509884,
+          "maxMs": 17
+        },
+        "board": {
+          "tileCount": 16,
+          "elevations": [
+            0,
+            1,
+            2
+          ],
+          "scale": 0.8889381233023277,
+          "transform": {
+            "scale": 0.8889381233023277,
+            "x": 457.5,
+            "y": 260.8814052580462
+          },
+          "selected": null,
+          "bounds": {
+            "left": 314.38096214832524,
+            "right": 600.6190378516748,
+            "top": 213.390625,
+            "bottom": 396
+          }
+        },
+        "proof": {
+          "fixture": "ground-behind",
+          "relation": "behind",
+          "heroTile": {
+            "x": 1,
+            "y": 0,
+            "elevation": 0
+          },
+          "propElevation": 0,
+          "heroPosition": {
+            "x": 68,
+            "y": 20
+          },
+          "heroDepth": 14.5,
+          "propDepth": 26.5,
+          "propAlpha": 0.4,
+          "assetCount": 13,
+          "surfaceCornerError": 0.00003361701158114856,
+          "objectCount": 72
+        },
+        "audio": {
+          "state": "ready",
+          "contextState": "running",
+          "attempts": 0,
+          "playedCount": 0,
+          "lastError": null,
+          "manager": "webaudio",
+          "locked": false,
+          "device": {
+            "mp3": true,
+            "ogg": true,
+            "webAudio": true
+          },
+          "cached": {
+            "mp3": true,
+            "ogg": true
+          }
+        },
+        "lifecycle": {
+          "hidden": 0,
+          "visible": 0,
+          "blur": 0,
+          "focus": 0,
+          "moveFrozenAt": null,
+          "moveCompleted": 0
+        },
+        "capturedAt": "2026-10-08T11:18:35.930Z",
+        "build": {
+          "commit": "1908452c68575c91345c814913b3d40fa4cd10a2",
+          "dirty": false
+        },
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36",
+        "viewport": {
+          "width": 915,
+          "height": 412,
+          "dpr": 2.625
+        },
+        "visibility": "visible",
+        "navigationType": "reload",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "https://tactics-guru-v2.pages.dev/",
+            "transferBytes": 1271,
+            "encodedBodyBytes": 971,
+            "decodedBodyBytes": 2764,
+            "durationMs": 115.59999999403954
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-DBaR7Wm-.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 23.600000001490116
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/index-vYhN6ezP.css",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 24
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/browser-t3jhzqIN.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 74.39999999850988
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/assets/start-BsNf3mlO.js",
+            "transferBytes": 300,
+            "encodedBodyBytes": 0,
+            "decodedBodyBytes": 0,
+            "durationMs": 22.799999997019768
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141658,
+            "decodedBodyBytes": 141658,
+            "durationMs": 19.099999994039536
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/stone-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 144308,
+            "decodedBodyBytes": 144308,
+            "durationMs": 19.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/grass_path-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140735,
+            "decodedBodyBytes": 140735,
+            "durationMs": 19.900000005960464
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/forest-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 140495,
+            "decodedBodyBytes": 140495,
+            "durationMs": 20.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/water-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 119204,
+            "decodedBodyBytes": 119204,
+            "durationMs": 20.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/cliff-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 141652,
+            "decodedBodyBytes": 141652,
+            "durationMs": 21.399999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/mud-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 130199,
+            "decodedBodyBytes": 130199,
+            "durationMs": 23.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/sand-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 95984,
+            "decodedBodyBytes": 95984,
+            "durationMs": 111.19999999552965
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/lava-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 142572,
+            "decodedBodyBytes": 142572,
+            "durationMs": 27.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/textures/terrain/runtime/ash-top-down-v1.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 137926,
+            "decodedBodyBytes": 137926,
+            "durationMs": 48.30000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/tree-grass-v1-480.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 54200,
+            "decodedBodyBytes": 54200,
+            "durationMs": 27.200000002980232
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 61.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 21.299999997019768
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.mp3",
+            "transferBytes": 300,
+            "encodedBodyBytes": 1462,
+            "decodedBodyBytes": 1462,
+            "durationMs": 42.899999998509884
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/unlock-tone.ogg",
+            "transferBytes": 300,
+            "encodedBodyBytes": 3768,
+            "decodedBodyBytes": 3768,
+            "durationMs": 21.80000000447035
+          },
+          {
+            "url": "https://tactics-guru-v2.pages.dev/proof/fighter-portrait-96.webp",
+            "transferBytes": 300,
+            "encodedBodyBytes": 4568,
+            "decodedBodyBytes": 4568,
+            "durationMs": 22.100000001490116
+          }
+        ],
+        "totalTransferBytes": 7271
+      },
+      "errors": []
+    }
+  ]
+}
