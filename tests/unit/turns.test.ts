@@ -1,10 +1,13 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
-import type { ContentCatalog, MapRecord, TerrainId } from '../../src/content/types';
-import type { BattleState } from '../../src/domain/types';
+import type { CellPosition, ContentCatalog, MapRecord, TerrainId } from '../../src/content/types';
+import type { AbilityId, BattleEvent, BattleState, Command } from '../../src/domain/types';
 import { contentVersion, readBattleState, readReplay } from '../../src/domain/battle';
 import { rollDie, seedRng } from '../../src/domain/rng';
-import { createBattle, endTurn, orderInitiative, restartBattle } from '../../src/domain/turns';
+import { moveUnit, previewMovement } from '../../src/domain/grid';
+import { previewAttack, resolveAttack } from '../../src/domain/combat';
+import { manhattanDistance } from '../../src/domain/targeting';
+import { createBattle, dispatch, endTurn, orderInitiative, replayBattle, restartBattle } from '../../src/domain/turns';
 
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 function freeze<T>(value: T): T {
@@ -141,5 +144,91 @@ describe('restart', () => {
     expect(restartBattle(freeze(waited.state), catalog)).toEqual(fresh);
     expect(restartBattle({ ...withHp(snapshot(), { 3: 0, 4: 0 }), outcome: 'playerWin' }, catalog)).toEqual(fresh);
     expect(restartBattle({ ...snapshot(), outcome: 'playerWin' }, catalog)).toEqual({ ok: false, reason: 'invalidState' });
+  });
+});
+
+describe('dispatch and replay', () => {
+  it('routes each command type to its resolver and rejects anything else', () => {
+    const s = snapshot();
+    const commands = [{ type: 'move', unitId: 1, to: { x: 1, y: 0 } }, { type: 'endTurn', unitId: 1 },
+      { type: 'useAbility', unitId: 1, abilityId: 'ability:basic_attack', target: { unitId: 3 } }] as const;
+    const fresh = { ...s, units: s.units.map(u => ({ ...u, hasMoved: false, hasActed: false })) };
+    expect(dispatch(fresh, commands[0], catalog)).toEqual(moveUnit(fresh, commands[0], catalog));
+    expect(dispatch(fresh, commands[1], catalog)).toEqual(endTurn(fresh, commands[1], catalog));
+    expect(dispatch(fresh, commands[2], catalog)).toEqual(resolveAttack(fresh, commands[2], catalog));
+    expect(dispatch(fresh, commands[2], catalog)).toEqual({ ok: false, reason: 'outOfRange' });
+    for (const input of [null, { type: 'restart' }, { type: 'endTurn', unitId: 1, now: 0 }])
+      expect(dispatch(fresh, input, catalog)).toEqual({ ok: false, reason: 'malformedCommand' });
+  });
+
+  // A greedy script stands in for players and #9's AI: attack if possible, else move to the first cell
+  // (cost, y, x order) that allows an attack, else to the cell closest to an enemy, then attack and Wait.
+  function playBattle(seed: number) {
+    const created = createBattle(map.id, seed, catalog); assert(created.ok);
+    let state = created.state;
+    const commands: Command[] = [], events: BattleEvent[] = [];
+    const apply = (command: Command) => {
+      const result = dispatch(state, command, catalog); assert(result.ok, JSON.stringify(result));
+      commands.push(command); events.push(...result.events); state = result.state;
+    };
+    const attackFrom = (s: BattleState, unitId: number) => {
+      const abilityId: AbilityId = s.units.find(u => u.id === unitId)!.defId === 'goblin_archer' ? 'ability:shortbow_shot' : 'ability:basic_attack';
+      return s.units.map(t => ({ type: 'useAbility' as const, unitId, abilityId, target: { unitId: t.id } }))
+        .find(command => previewAttack(s, command, catalog).ok);
+    };
+    while (state.outcome === 'ongoing' && commands.length < 500) {
+      const unitId = state.initiative[state.activeIndex];
+      const actor = state.units.find(u => u.id === unitId)!;
+      if (!attackFrom(state, unitId)) {
+        const reach = previewMovement(state, unitId, catalog); assert(reach.ok);
+        const cells = reach.cells.slice(1).map(r => r.cell);
+        const nearest = (c: CellPosition) => Math.min(...state.units.filter(u => u.hp > 0 && u.side !== actor.side).map(u => manhattanDistance(c, u.cell)));
+        const to = cells.find(c => { const moved = moveUnit(state, { type: 'move', unitId, to: c }, catalog); return moved.ok && attackFrom(moved.state, unitId); }) ??
+          cells.reduce<CellPosition | undefined>((best, c) => best === undefined || nearest(c) < nearest(best) ? c : best, undefined);
+        if (to) apply({ type: 'move', unitId, to });
+      }
+      const attack = attackFrom(state, unitId);
+      if (attack) apply(attack);
+      if (state.outcome === 'ongoing') apply({ type: 'endTurn', unitId });
+    }
+    return { initial: created.state, state, commands, events };
+  }
+
+  it('replays a full seeded battle command by command to the identical state and events', () => {
+    vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('entropy'); });
+    vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock'); });
+    try {
+      const played = playBattle(7);
+      expect(played.state.outcome).not.toBe('ongoing');
+      expect(new Set(played.commands.map(c => c.type))).toEqual(new Set(['move', 'useAbility', 'endTurn']));
+      const replay = { format: 1, versions: played.initial.versions, initial: played.initial, commands: played.commands };
+      const replayed = replayBattle(freeze(copy(replay)), catalog);
+      expect(replayed).toEqual({ ok: true, state: played.state, events: played.events });
+      expect(replayBattle(JSON.parse(JSON.stringify(replay)), catalog)).toEqual(replayed);
+      expect(readBattleState(played.state, catalog).ok).toBe(true);
+
+      // Whole-battle invariants: one ending, one defeat per fallen unit, and no defeated unit ever starts a turn.
+      expect(played.events.filter(e => e.type === 'battleEnded')).toEqual([{ type: 'battleEnded', outcome: played.state.outcome }]);
+      expect(played.events.at(-1)?.type).toBe('battleEnded');
+      const defeated = played.events.filter(e => e.type === 'defeated').map(e => e.unitId);
+      expect(defeated.length).toBeGreaterThanOrEqual(2); // so a side kept fighting after a loss
+      expect(defeated.sort()).toEqual(played.state.units.filter(u => u.hp === 0).map(u => u.id));
+      const fallen = new Set<number>();
+      for (const e of played.events) {
+        if (e.type === 'defeated') fallen.add(e.unitId);
+        if (e.type === 'turnStarted') expect(fallen.has(e.unitId)).toBe(false);
+      }
+    } finally { vi.restoreAllMocks(); }
+  });
+  it('names the first command that does not apply, and rejects a bad envelope', () => {
+    const played = playBattle(7);
+    const replay = { format: 1, versions: played.initial.versions, initial: played.initial, commands: played.commands };
+    const index = played.commands.findIndex(c => c.type === 'useAbility');
+    const tampered = copy(replay); tampered.commands.splice(index, 0, tampered.commands[index]);
+    expect(replayBattle(tampered, catalog)).toEqual({ ok: false, reason: 'invalidReplay', index: index + 1, rejection: 'alreadyActed' });
+    const extended = { ...copy(replay), commands: [...replay.commands, { type: 'endTurn', unitId: played.state.initiative[played.state.activeIndex] }] };
+    expect(replayBattle(extended, catalog)).toEqual({ ok: false, reason: 'invalidReplay', index: replay.commands.length, rejection: 'battleOver' });
+    expect(replayBattle({ ...copy(replay), initial: played.state }, catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
+    expect(replayBattle({ ...copy(replay), commands: [{ type: 'restart' }] }, catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
   });
 });

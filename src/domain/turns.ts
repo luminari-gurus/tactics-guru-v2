@@ -1,8 +1,10 @@
 import type { ContentCatalog, MapId } from '../content/types';
-import { contentVersion, previewCommand, readBattleState } from './battle';
+import { contentVersion, previewCommand, readBattleState, readReplay, type ReplayRead } from './battle';
+import { resolveAttack } from './combat';
 import { D20_SIDES, RNG_VERSION, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION } from './constants';
+import { moveUnit } from './grid';
 import { isIntegerIn, rollDie, seedRng } from './rng';
-import type { BattleEvent, CommandResult, UnitState } from './types';
+import type { BattleEvent, BattleState, CommandResult, RejectionReason, UnitState } from './types';
 
 export type InitiativeEntry = { readonly unitId: number; readonly side: UnitState['side']; readonly natural: number; readonly dexterity: number };
 /** Legacy TurnManager.gd:101-108: total, Dexterity, player side, lower ID. IDs are unique, so the order is total. */
@@ -60,4 +62,23 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
 export function restartBattle(state: unknown, catalog: ContentCatalog): CommandResult {
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   return createBattle(checked.state.mapId, checked.state.seed, catalog);
+}
+/** One entry point for every command; the type is read only after the shared intent check. */
+export function dispatch(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
+  const intent = previewCommand(state, input, catalog); if (!intent.ok) return intent;
+  const resolve = { move: moveUnit, useAbility: resolveAttack, endTurn }[intent.command.type];
+  return resolve(state, intent.command, catalog);
+}
+export type ReplayRun = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Extract<ReplayRead, { ok: false }> |
+  { readonly ok: false; readonly reason: 'invalidReplay'; readonly index: number; readonly rejection: RejectionReason };
+/** Re-executes recorded commands from the initial boundary; creation's initiative events are not repeated. */
+export function replayBattle(input: unknown, catalog: ContentCatalog): ReplayRun {
+  const read = readReplay(input, catalog); if (!read.ok) return read;
+  let state = read.replay.initial; const events: BattleEvent[] = [];
+  for (const [index, command] of read.replay.commands.entries()) {
+    const result = dispatch(state, command, catalog);
+    if (!result.ok) return { ok: false, reason: 'invalidReplay', index, rejection: result.reason };
+    state = result.state; events.push(...result.events);
+  }
+  return { ok: true, state, events };
 }
