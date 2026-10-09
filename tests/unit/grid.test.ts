@@ -5,11 +5,13 @@ import type { BattleState } from '../../src/domain/types';
 import { contentVersion } from '../../src/domain/battle';
 import { seedRng } from '../../src/domain/rng';
 import { previewMovement, previewMove, moveUnit } from '../../src/domain/grid';
-function fixture() {
+// contentVersion hashes each catalog object once, so map edits are applied before the hash.
+function fixture(edit: (cells: { elevation: number; terrainId: import('../../src/content/types').TerrainId }[]) => void = () => {}) {
   const catalog: ContentCatalog = JSON.parse(JSON.stringify(catalogFixture));
   const map = { id: 'map:grid_fixture' as const, width: 4, height: 3,
     cells: Array.from({length:12}, (_,i) => ({x:i%4,y:Math.floor(i/4),elevation:0,terrainId:'grass' as import('../../src/content/types').TerrainId})),
     spawns: [{id:1,side:'heroes' as const,unitId:'fighter' as const,x:0,y:0},{id:2,side:'enemies' as const,unitId:'goblin_grunt' as const,x:3,y:2}] };
+  edit(map.cells);
   const c = {...catalog,maps:{[map.id]:map}};
   const state: BattleState = {format:1,versions:{rules:1,rng:1,content:contentVersion(c)},seed:1,rng:seedRng(1),mapId:map.id,
     units:[{id:1,side:'player',defId:'fighter',cell:{x:0,y:0},hp:18,hasMoved:false,hasActed:false},{id:2,side:'enemy',defId:'goblin_grunt',cell:{x:3,y:2},hp:18,hasMoved:false,hasActed:false}],initiative:[1,2],activeIndex:0,round:1,outcome:'ongoing',commandCount:0};
@@ -28,18 +30,13 @@ it('orders equal-cost paths by cost, y, x and isolates pure previews', () => {
   } finally {vi.restoreAllMocks();}
 });
 it('enforces uphill Jump and cost boundaries while allowing unrestricted downhill', () => {
-  const {catalog,map,state}=fixture(); map.cells[1].elevation=1;
-  const s={...state,versions:{...state.versions,content:contentVersion(catalog)}};
-  expect(previewMove(s,command(1,0),catalog)).toMatchObject({ok:true,cost:2});
-  map.cells[1].elevation=2; const s2={...s,versions:{...s.versions,content:contentVersion(catalog)}};
-  expect(previewMove(s2,command(1,0),catalog)).toEqual({ok:false,reason:'unreachable'});
-  map.cells[0].elevation=4; map.cells[1].elevation=0;
-  const s3={...s,versions:{...s.versions,content:contentVersion(catalog)}};
-  expect(previewMove(s3,command(1,0),catalog)).toMatchObject({ok:true,cost:1});
+  const move = (edit: Parameters<typeof fixture>[0]) => { const {catalog,state}=fixture(edit); return previewMove(state,command(1,0),catalog); };
+  expect(move(cells=>{cells[1].elevation=1;})).toMatchObject({ok:true,cost:2});
+  expect(move(cells=>{cells[1].elevation=2;})).toEqual({ok:false,reason:'unreachable'});
+  expect(move(cells=>{cells[0].elevation=4;})).toMatchObject({ok:true,cost:1});
 });
 it('rejects same cell, bounds, blocked, occupied, and over-budget destinations without mutation', () => {
-  const {catalog,map,state}=fixture(); map.cells[1].terrainId='water';
-  const s={...state,versions:{...state.versions,content:contentVersion(catalog)}}; const before=JSON.stringify(s);
+  const {catalog,state:s}=fixture(cells=>{cells[1].terrainId='water';}); const before=JSON.stringify(s);
   for(const [x,y,reason] of [[0,0,'sameCell'],[4,0,'outOfBounds'],[1,0,'notWalkable'],[3,2,'occupied'],[3,0,'unreachable']] as const)
     expect(moveUnit(s,command(x,y),catalog)).toEqual({ok:false,reason});
   expect(JSON.stringify(s)).toBe(before);
@@ -58,16 +55,17 @@ it('moves atomically, derives current occupancy and rejects stale overlapping sn
 });
 
 it('uses weighted shortest routes, exact allowance and zero Jump on flat ground', () => {
-  const {catalog,map,state}=fixture();
-  const c={...catalog,heroes:{...catalog.heroes,fighter:{...catalog.heroes.fighter,stats:{...catalog.heroes.fighter.stats,jump:0}}},terrains:{...catalog.terrains,stone:{...catalog.terrains.stone,moveCost:4}}};
-  map.cells[1].terrainId='stone';
-  const s={...state,versions:{...state.versions,content:contentVersion(c)}};
+  const variant = (edit: Parameters<typeof fixture>[0]) => {
+    const {catalog,state}=fixture(edit);
+    const c={...catalog,heroes:{...catalog.heroes,fighter:{...catalog.heroes.fighter,stats:{...catalog.heroes.fighter.stats,jump:0}}},terrains:{...catalog.terrains,stone:{...catalog.terrains.stone,moveCost:4}}};
+    return {c,s:{...state,versions:{...state.versions,content:contentVersion(c)}}};
+  };
+  const {c,s}=variant(cells=>{cells[1].terrainId='stone';});
   expect(previewMove(s,command(1,0),c)).toMatchObject({ok:true,cost:4});
   const p=previewMove(s,command(2,0),c); assert(p.ok);
   expect(p.cost).toBe(4); expect(p.path).toEqual([{x:0,y:0},{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:2,y:0}]);
-  map.cells[4].elevation=1;
-  const s2={...s,versions:{...s.versions,content:contentVersion(c)}};
-  expect(previewMove(s2,command(0,1),c)).toEqual({ok:false,reason:'unreachable'});
+  const raised=variant(cells=>{cells[1].terrainId='stone'; cells[4].elevation=1;});
+  expect(previewMove(raised.s,command(0,1),raised.c)).toEqual({ok:false,reason:'unreachable'});
 });
 it('blocks traversal through either side and releases the previous cell after a move', () => {
   const {catalog,state}=fixture();

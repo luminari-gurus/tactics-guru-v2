@@ -11,8 +11,16 @@ function cell(v: unknown): v is { x: number; y: number } {
 }
 const unitId = (v: unknown): v is number => isIntegerIn(v, CONTENT_BOUNDS.spawnId);
 const prefixedId = (v: unknown, prefix: string): v is string => typeof v === 'string' && new RegExp(`^${prefix}:[a-z][a-z0-9]*(?:_[a-z0-9]+)*$`).test(v);
-/** Hash an already validated catalog; this is not the content validator owned by #28. */
-export function contentVersion(catalog: ContentCatalog): string { return hashCatalog(catalog); }
+const hashed = new WeakMap<ContentCatalog, string>();
+/**
+ * Hash an already validated catalog; this is not the content validator owned by #28. Every snapshot check needs it, so each
+ * catalog object is hashed once. Catalogs are immutable: to change content, build a new catalog.
+ */
+export function contentVersion(catalog: ContentCatalog): string {
+  let version = hashed.get(catalog);
+  if (version === undefined) { version = hashCatalog(catalog); hashed.set(catalog, version); }
+  return version;
+}
 function versions(v: unknown, content: string): v is Versions {
   return shape(v, ['rules','rng','content']) && v.rules === RULES_VERSION && v.rng === RNG_VERSION && v.content === content;
 }
