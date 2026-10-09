@@ -38,14 +38,14 @@ function guardSetup(natural: number) {
   return { catalog, state: { ...state, rng: seedRng(seed), activeIndex: state.initiative.indexOf(1),
     units: state.units.map(u => u.id === 1 ? { ...u, cell: { x: 2, y: 0 } } : u) } };
 }
-it('Guarded Strike trades four accuracy for defense on a miss, hit or critical without changing damage', () => {
-  for (const natural of [1, 11, 12, 20]) {
+it('Guarded Strike trades two accuracy for defense on a miss, hit or critical without changing damage', () => {
+  for (const natural of [1, 9, 10, 11, 12, 20]) {
     const { catalog, state } = guardSetup(natural); const before = structuredClone(state);
     const preview = previewAttack(state, guardedStrike, catalog); assert(preview.ok);
-    expect(preview).toMatchObject({ bonus: 0, damage: 5, criticalDamage: 10 });
+    expect(preview).toMatchObject({ bonus: 2, damage: 5, criticalDamage: 10 });
     const result = dispatch(state, guardedStrike, catalog); assert(result.ok);
-    expect(result.events.find(e => e.type === 'attackRolled')).toMatchObject({ bonus: 0,
-      result: natural === 20 ? 'critical' : natural >= 12 ? 'hit' : 'miss' });
+    expect(result.events.find(e => e.type === 'attackRolled')).toMatchObject({ bonus: 2,
+      result: natural === 20 ? 'critical' : natural >= 10 ? 'hit' : 'miss' });
     expect(result.state.units.find(u => u.id === 1)).toMatchObject({ guarded: true, hasActed: true });
     expect(result.events).toContainEqual({ type: 'guarded', unitId: 1 });
     expect(result.state.rng).toEqual(rollDie(state.rng, 20).rng);
@@ -91,14 +91,14 @@ it('rejected Guarded Strike never grants defense or consumes action/RNG; snapsho
 });
 it('validates the exact defensive tradeoff and applies its penalty only once to an already Guarded attacker', () => {
   const { catalog, state } = guardSetup(12);
-  for (const patch of [{ attackPenalty: 0 }, { attackPenalty: -4 }, { armorClassBonus: 3 }, { kind: 'attack' }]) {
+  for (const patch of [{ attackPenalty: 0 }, { attackPenalty: 4 }, { attackPenalty: -2 }, { armorClassBonus: 3 }, { kind: 'attack' }]) {
     expect(validateContent({ ...catalog, abilities: { ...catalog.abilities,
       'ability:guarded_strike': { ...catalog.abilities['ability:guarded_strike'], ...patch } } }).ok).toBe(false);
   }
   const guarded = { ...state, units: state.units.map(u => u.id === 1 ? { ...u, guarded: true as const } : u) };
   const before = structuredClone(guarded); const contentBefore = structuredClone(catalog);
   for (const abilityId of ['ability:basic_attack', 'ability:guarded_strike'] as const) {
-    expect(previewAttack(guarded, { ...guardedStrike, abilityId }, catalog)).toMatchObject({ ok: true, bonus: 0 });
+    expect(previewAttack(guarded, { ...guardedStrike, abilityId }, catalog)).toMatchObject({ ok: true, bonus: 2 });
   }
   const attacked = dispatch(guarded, guardedStrike, catalog); assert(attacked.ok);
   expect(dispatch(attacked.state, guardedStrike, catalog)).toEqual({ ok: false, reason: 'alreadyActed' });
@@ -283,4 +283,16 @@ it('Magic Missile accepts its five-tile edge and rejects separated targets and m
   expect(dispatch(separated, { ...missile, target: { missileTargets: [4,5] } }, catalog)).toEqual({ ok: false, reason: 'targetsTooFarApart' });
   for (const missileTargets of [[], Array(2), [4,NaN], [4,4,4,4,4,4]])
     expect(dispatch(state, { ...missile, target: { missileTargets } }, catalog)).toEqual({ ok: false, reason: 'malformedCommand' });
+});
+
+it('Guarded Strike tradeoff changes content identity and rejects old snapshots/replays', () => {
+  const legacy = structuredClone(battleCatalog);
+  const profile = legacy.abilities['ability:guarded_strike']; assert(profile.kind === 'guardedAttack');
+  // Deliberately model the superseded catalog, without treating it as current validated content.
+  Object.assign(profile, { attackPenalty: 4 });
+  const created = createBattle('map:forest_ruins', 17, battleCatalog); assert(created.ok);
+  expect(contentVersion(legacy)).not.toBe(contentVersion(battleCatalog));
+  const old = { ...created.state, versions: { ...created.state.versions, content: contentVersion(legacy) } };
+  expect(readBattleState(old, battleCatalog)).toEqual({ ok: false, reason: 'invalidState' });
+  expect(replayBattle({ format: 1, versions: old.versions, initial: old, commands: [] }, battleCatalog).ok).toBe(false);
 });

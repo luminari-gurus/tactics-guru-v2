@@ -9,7 +9,7 @@ export interface Versions {
 export type UnitState = {
   readonly id: number; readonly cell: CellPosition; readonly hp: number;
   readonly hasMoved: boolean; readonly hasActed: boolean;
-  /** Fighting Defensively is active until this unit's next turn; absence means inactive. */
+  /** Guarded Strike is active until this unit's next turn; absence means inactive. */
   readonly guarded?: true;
 } & ({ readonly side: 'player'; readonly defId: HeroId } | { readonly side: 'enemy'; readonly defId: EnemyId });
 /** Snapshot data only: no duplicated grid/stats or scene references. */

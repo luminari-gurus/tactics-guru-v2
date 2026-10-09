@@ -1,5 +1,5 @@
 import type { ContentCatalog } from '../content/types';
-import { FIGHTING_DEFENSIVELY, MAGIC_MISSILE } from '../content/constants';
+import { GUARDED_STRIKE_TRADEOFF, MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
 import { CRITICAL_DAMAGE_MULTIPLIER, D20_SIDES, HEIGHT_ATTACK_MODIFIER, MIN_HIT_DAMAGE, NATURAL_AUTO_MISS, NATURAL_CRITICAL, RULE_BOUNDS } from './constants';
 import { rollDie } from './rng';
@@ -35,9 +35,9 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   const rise = elevation(catalog, snapshot, actor) - elevation(catalog, snapshot, target);
   const height = rise > 0 ? HEIGHT_ATTACK_MODIFIER : rise < 0 ? -HEIGHT_ATTACK_MODIFIER : 0;
   const damage = Math.max(MIN_HIT_DAMAGE, profile.baseDamage + stats(catalog, actor).power + (rise > 0 ? profile.uphillDamage : 0));
-  const penalty = profile.kind === 'guardedAttack' || actor.guarded ? FIGHTING_DEFENSIVELY.attackPenalty : 0;
+  const penalty = profile.kind === 'guardedAttack' || actor.guarded ? GUARDED_STRIKE_TRADEOFF.attackPenalty : 0;
   return { ok: true, command, targetId, bonus: stats(catalog, actor).accuracy + height - penalty,
-    armorClass: stats(catalog, target).armorClass + (target.guarded ? FIGHTING_DEFENSIVELY.armorClassBonus : 0),
+    armorClass: stats(catalog, target).armorClass + (target.guarded ? GUARDED_STRIKE_TRADEOFF.armorClassBonus : 0),
     damage, criticalDamage: damage * CRITICAL_DAMAGE_MULTIPLIER };
 }
 /** One d20 from the snapshot RNG; acting never ends the turn. The target was living, so HP 0 here is its one defeat. */

@@ -46,7 +46,7 @@ Brian confirmed **a lean playable loop first, selectively bringing back proven f
 
 One authored forest board: Forest Ruins, 12×12, heights 0 to 2 (§4.3). Three fixed heroes against the legacy trio of two Goblin Grunts and one Goblin Archer; the encounter choice is D4. Cardinal weighted movement, occupancy and Jump; initiative; one move and one action per turn, in either order; Basic Attack and one signature per hero; greedy legal AI; win/loss, restart, turn queue, log, inspection and touch-safe preview/confirm/cancel. A small set of existing art and SFX, mute, and a nonblocking loading/error screen. No save or resume in the first tranche: issue #11 lists it as a follow-up.[52]
 
-Signatures: Guarded Strike, High Shot and Magic Missile provide defensive melee, elevation-sensitive ranged attacks and reliable rolled force damage. Their semantics are in §6.2. Brian approved Guarded Strike's Fighting Defensively mapping and replaced Ember Burst with 3.5E Magic Missile on 2026-10-09. The abilities current main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
+Signatures: Guarded Strike, High Shot and Magic Missile provide defensive melee, elevation-sensitive ranged attacks and reliable rolled force damage. Their semantics are in §6.2. Brian revised Guarded Strike to a fixed Combat Expertise-inspired −2/+2 tradeoff (#49) and replaced Ember Burst with 3.5E Magic Missile on 2026-10-09. The abilities current main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
 
 ### Explicitly outside combat MVP
 
@@ -204,7 +204,7 @@ The implemented slice uses three discriminated ability kinds in `src/content/typ
 ```ts
 type Ability =
   | (AttackFields & { kind: 'attack' })           // Basic Attack, Shortbow, High Shot
-  | (AttackFields & { kind: 'guardedAttack'; attackPenalty: 4; armorClassBonus: 2 })
+  | (AttackFields & { kind: 'guardedAttack'; attackPenalty: 2; armorClassBonus: 2 })
   | { kind: 'magicMissile'; id: AbilityId; owners: readonly UnitId[];
       casterLevel: number; rangeMin: number; rangeMax: number };
 ```
@@ -495,12 +495,12 @@ The target keeps the baseline rules unless a decision in the plan's register cha
 | Height modifier | +2 to hit when the attacker's cell is higher, −2 when lower; not scaled by the difference. |
 | Damage | Ordinary attacks deal max(1, ability base + Power + modifiers); a critical doubles the result. Magic Missile instead rolls 1d4+1 per missile, without those bonuses or criticals. A unit at 0 HP is defeated and leaves its cell at once. |
 | Basic Attack | Range 1, base damage 2. |
-| Guarded Strike | Approved Fighting Defensively mapping: range 1, base damage 2, −4 to attack rolls and +2 dodge AC until the start of the Fighter's next turn. Granted whenever the strike resolves, including on a miss. The −4 penalty applies once to the activating attack and any further attacks while Guarded. The +2 AC applies after resolution, hit or miss (D5), and repeated Guarded Strike effects do not stack with themselves. Basic Attack keeps normal accuracy, creating an offense/defense tradeoff (D6). See `docs/signature-abilities.md` for the 3.5E source and scope. |
+| Guarded Strike | Approved fixed Combat Expertise-inspired mapping: range 1, base damage 2, −2 to attack rolls and +2 dodge AC until the start of the Fighter's next turn. Granted whenever the strike resolves, including on a miss. The −2 penalty applies once to the activating attack and any further attacks while Guarded. The +2 AC applies after resolution, hit or miss (D5), and repeated Guarded Strike effects do not stack with themselves. Basic Attack keeps normal accuracy, creating an offense/defense tradeoff (D6). See `docs/signature-abilities.md` for the 3.5E source and scope. |
 | High Shot | Range 2 to 5, base damage 2; +2 damage when the Ranger's cell is higher than the target's, on top of the +2 to hit. |
 | Magic Missile | Approved 3.5E replacement for Ember Burst: automatic hit, 1d4+1 force damage per missile, no attack roll, critical or saving throw. No Power or elevation damage bonus. One missile at caster levels 1–2, two at 3–4, three at 5–6, four at 7–8, five at 9+. Creature targets are designated before rolling; missiles can share a target or be divided. Tabletop range is 100 ft. + 10 ft./level and multiple targets must be within 15 ft. of each other. The starting Mage is caster level 1; Brian requested Ranger-like range, implemented as Manhattan range 1–5 tiles and 3-tile target spread; see `docs/signature-abilities.md` for source, line-of-effect requirements and RNG contract. |
 | Shortbow Shot | Range 2 to 4, base damage 2, ordinary attack roll. |
 
-**Fighting Defensively source and slice mapping.** In the 3.5E SRD, both [attacking as a standard action](https://www.d20srd.org/srd/combat/actionsInCombat.htm#fightingDefensivelyasaStandardAction) and [taking a full attack](https://www.d20srd.org/srd/combat/actionsInCombat.htm#fightingDefensivelyasaFullRoundAction) can be done defensively: all attack rolls in the round take −4, in exchange for +2 dodge AC for that same round. The defense does not depend on hitting. The approved game mapping above retains range 1 and base damage 2, grants Guarded after the strike resolves even on a miss, and expires it at the Fighter's next turn start. The −4 integration and Basic Attack choice are already recorded as approved in `docs/signature-abilities.md` (D6); they are not new decisions introduced by this source citation. Full attacks remain outside this slice.
+**Combat Expertise source and slice mapping.** [Combat Expertise](https://www.d20srd.org/srd/feats.htm#combatExpertise) is a Fighter bonus feat with an equal melee attack-penalty/dodge-AC exchange. The game uses a fixed two-point exchange, preserving range 1, base damage 2, Guarded on a resolved hit or miss and expiry before the Fighter's next turn. The penalty applies once while Guarded. Intelligence 13, base attack bonus limits, a variable exchange selector and full attacks remain outside this slice; duration follows the game's existing turn mapping. Issue #49 supersedes the prior Fighting Defensively −4/+2 decision; Fighting Defensively itself remains a distinct tabletop rule, not the current ability source.
 
 **Stacking scope.** “Does not stack” means repeated applications of Guarded Strike do not accumulate additional AC or attack penalties. It is not a general ban on combining dodge bonuses: the [SRD dodge-bonus rule](https://www.d20srd.org/srd/theBasics.htm#dodgeBonus) allows dodge bonuses from distinct sources to stack. Other sources and their interactions remain outside this slice; this mapping does not add a general stacking system.
 
@@ -566,7 +566,7 @@ Computed from §6.2 and the §4.3 stat blocks; "expectation" is mean damage mult
 | Situation | To hit | Hits on | Faces | Damage / critical | Expectation |
 |---|---|---|---|---|---|
 | Fighter, Basic Attack, on a Grunt | +4 vs AC 12 | 8+ | 13 (65%) | 5 / 10 | 70 |
-| Fighter, Guarded Strike, on a Grunt | +0 vs AC 12 | 12+ | 9 (45%) | 5 / 10 | 50 |
+| Fighter, Guarded Strike, on a Grunt | +2 vs AC 12 | 10+ | 11 (55%) | 5 / 10 | 60 |
 | Ranger, High Shot on a Grunt, level ground | +5 vs AC 12 | 7+ | 14 (70%) | 4 / 8 | 60 |
 | Ranger, High Shot on a Grunt, Ranger higher | +7 vs AC 12 | 5+ | 16 (80%) | 6 / 12 | 102 |
 | Ranger, High Shot on the Archer, Ranger lower | +3 vs AC 11 | 8+ | 13 (65%) | 4 / 8 | 56 |
@@ -843,11 +843,11 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | D2 | Numeric loading and frame budgets | #2, then #11 |
 | D4 | Encounter: the legacy trio or the current seeded roster | #3 |
 | D5 | Resolved: Guarded on miss; Ember Burst replaced by Magic Missile | Resolved for #8 |
-| D6 | Resolved: Guarded Strike trades −4 accuracy for +2 AC | #8 |
+| D6 | Resolved: Guarded Strike trades −2 accuracy for +2 AC | #8 |
 | D8 | Selecting cells covered by raised terrain | #2, #6 |
 | D9 | Production host and cutover target | after #11 |
 | D10 | Analytics | after #11 |
-| D11 | Guarded Strike −4/+2 and Magic Missile 1d4+1 approved; starting caster level 1, range 1–5 tiles and 3-tile spread recorded | Tuning #10 |
+| D11 | Guarded Strike −2/+2 and Magic Missile 1d4+1 approved; starting caster level 1, range 1–5 tiles and 3-tile spread recorded | Tuning #10 |
 
 **Design questions raised by this revision.** They are not yet in the plan's register; add them when confirmed.
 

@@ -17,7 +17,7 @@ interface AttackFields {
 }
 export type AttackAbility = AttackFields & (
   | { readonly kind: 'attack' }
-  | { readonly kind: 'guardedAttack'; readonly attackPenalty: 4; readonly armorClassBonus: 2 }
+  | { readonly kind: 'guardedAttack'; readonly attackPenalty: 2; readonly armorClassBonus: 2 }
 );
 export interface MagicMissileAbility {
   readonly id: AbilityId; readonly kind: 'magicMissile'; readonly owners: readonly UnitId[];
