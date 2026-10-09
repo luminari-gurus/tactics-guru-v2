@@ -117,12 +117,12 @@ describe('battle foundation boundary', () => {
     const initial=fixture(); initial.rng=nextUint32(nextUint32(initial.rng).rng).rng;
     expect(battle.readReplay({format:1,versions:initial.versions,initial,commands:[]},catalog).ok).toBe(true);
   });
-  it('replay envelope pins versions, seed, initial cursor and accepted commands', () => {
+  it('replay envelope pins versions, initial cursor and accepted commands', () => {
     const initial = fixture(); const input = freeze({ format: 1, versions: initial.versions, initial, commands: [{type:'endTurn',unitId:1}] });
     const a = battle.readReplay(input,catalog); const b = battle.readReplay(copy(input),catalog);
     assert(a.ok); expect(a).toEqual(b); expect(a.replay.initial).not.toBe(input.initial);
     expect(a.replay.commands[0]).not.toBe(input.commands[0]);
-    for (const mutate of [(r:any)=>r.versions.rng++, (r:any)=>r.initial.seed++, (r:any)=>r.initial.rng.cursor=-1, (r:any)=>r.commands[0].unitId=0, (r:any)=>r.commands=Array(10001).fill({type:'endTurn',unitId:1}), (r:any)=>r.extra=1]) {
+    for (const mutate of [(r:any)=>r.versions.rng++, (r:any)=>r.initial.rng.cursor=-1, (r:any)=>r.commands[0].unitId=0, (r:any)=>r.commands=Array(10001).fill({type:'endTurn',unitId:1}), (r:any)=>r.extra=1]) {
       const bad = copy(input); mutate(bad); expect(battle.readReplay(bad,catalog).ok).toBe(false);
     }
   });

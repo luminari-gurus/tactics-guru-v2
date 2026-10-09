@@ -1,7 +1,7 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
 import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, UINT32_RANGE } from './constants';
-import { isIntegerIn, isRngState, seedRng } from './rng';
+import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashCatalog } from './contentIdentity';
 
@@ -82,14 +82,13 @@ export function previewCommand(state: unknown, input: unknown, catalog: ContentC
   return { ok: true, command: clone(input) };
 }
 export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { readonly ok: false; readonly reason: 'invalidReplay' };
-/** Accepted log shape is checked, not simulated; replayBattle (turns.ts) re-executes it. */
+/** Accepted log shape is checked, not simulated; replayBattle (turns.ts) checks `initial` against its seed and re-executes it. */
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||
     !isDenseArray(input.commands, RULE_BOUNDS.maxReplayCommands) ||
     !input.commands.every(isCommand)) return bad;
   const checked = readBattleState(input.initial, catalog);
-  if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min ||
-    (checked.state.rng.cursor === 0 && JSON.stringify(checked.state.rng.words) !== JSON.stringify(seedRng(checked.state.seed).words))) return bad;
+  if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min) return bad;
   return { ok: true, replay: { format: STATE_FORMAT_VERSION, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) } };
 }
