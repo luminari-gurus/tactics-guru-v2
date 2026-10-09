@@ -1,6 +1,6 @@
 # Turn flow and combat (#7)
 
-`src/domain/turns.ts`, `src/domain/combat.ts` and `src/domain/targeting.ts` add battle creation, the turn lifecycle, ordinary d20 attacks, defeat, the battle outcome, command dispatch and replay. Like #4 and #5, every API takes an untrusted snapshot and command plus a trusted, already validated catalog. It returns either one fresh snapshot with its events, or a typed rejection that changes nothing and draws nothing. Only two things touch the RNG: initiative at creation and the single d20 of an accepted attack, both through `rollDie` on the snapshot's own state.
+`src/domain/turns.ts`, `src/domain/combat.ts` and `src/domain/targeting.ts` add battle creation, the turn lifecycle, ordinary d20 attacks, defeat, the battle outcome, command dispatch and replay. Like #4 and #5, every API takes an untrusted snapshot and command plus a trusted, already validated catalog. It returns either one fresh snapshot with its events, or a typed rejection that changes nothing and draws nothing. Initiative, accepted d20 attacks and Magic Missile's d4 damage rolls use `rollDie` on the snapshot's own state. Rejected commands and previews draw nothing.
 
 Order, defeat and outcome are decided when a command resolves. Legacy deferred the outcome check while combat or movement animated ([BattleController.gd:1904-1908](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L1904-L1908)). Here the session (#10) only animates the events it is given, and timer APIs do not compile in `src/domain` (ES2022-only `tsconfig.domain.json`).
 
@@ -70,7 +70,7 @@ Each command re-validates its snapshot against the content version. `contentVers
 
 ## Not included
 
-- Signatures, the Dex-save path, statuses and Guarded: #8.
+- The three signatures and Guarded expiry are implemented for #8. Magic Missile adds its 1d4+1 automatic-hit path. Magic Missile replaces the previously planned Ember Burst Dex-save path (decision 2026-10-09); see `docs/signature-abilities.md`.
 - Enemy AI: #9.
 - The session, input, HUD, animation, the restart button and where its new seed comes from: #10.
 - Undo move, initiative tempo, adjacency accuracy, typed damage, immunities and saves.

@@ -6,6 +6,24 @@ export type AssetId = `asset:${string}`;
 export type HeroId = typeof HERO_IDS[number];
 export type EnemyId = typeof ENEMY_IDS[number];
 export type UnitId = HeroId | EnemyId;
+export type AbilityId = `ability:${string}`;
+interface AttackFields {
+  readonly id: AbilityId;
+  readonly owners: readonly UnitId[];
+  readonly rangeMin: number;
+  readonly rangeMax: number;
+  readonly baseDamage: number;
+  readonly uphillDamage: number;
+}
+export type AttackAbility = AttackFields & (
+  | { readonly kind: 'attack' }
+  | { readonly kind: 'guardedAttack'; readonly attackPenalty: 4; readonly armorClassBonus: 2 }
+);
+export interface MagicMissileAbility {
+  readonly id: AbilityId; readonly kind: 'magicMissile'; readonly owners: readonly UnitId[];
+  readonly casterLevel: number; readonly rangeMin: number; readonly rangeMax: number;
+}
+export type Ability = AttackAbility | MagicMissileAbility;
 export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number];
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */
@@ -83,6 +101,7 @@ export type AssetRecord = AssetMetadata & (
 );
 /** Complete keyed catalogs can be checked with `satisfies`; unknown input must pass validateContent. */
 export interface ContentCatalog {
+  readonly abilities: Readonly<Record<AbilityId, Ability>>;
   readonly maps: Readonly<Record<MapId, MapRecord>>;
   readonly heroes: Readonly<Record<HeroId, HeroRecord>>;
   readonly enemies: Readonly<Record<EnemyId, EnemyRecord>>;

@@ -45,7 +45,10 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
   let previous = 0;
   const units: UnitState[] = [];
   for (const u of input.units) {
-    if (!shape(u, ['id','defId','side','cell','hp','hasMoved','hasActed']) || !unitId(u.id) || u.id <= previous ||
+    const unitKeys = ['id','defId','side','cell','hp','hasMoved','hasActed'];
+    if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
+    if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
+      !unitId(u.id) || u.id <= previous ||
       !cell(u.cell) || u.cell.x >= map.width || u.cell.y >= map.height ||
       typeof u.hasMoved !== 'boolean' || typeof u.hasActed !== 'boolean') return bad;
     const definition = u.side === 'player' && HERO_IDS.some(id => id === u.defId) ? catalog.heroes[u.defId as keyof typeof catalog.heroes] :
@@ -75,7 +78,7 @@ function isCommand(input: unknown): input is Command {
   if (shape(input, ['type','unitId'])) return input.type === 'endTurn' && unitId(input.unitId);
   if (shape(input, ['type','unitId','to'])) return input.type === 'move' && unitId(input.unitId) && cell(input.to);
   if (!shape(input, ['type','unitId','abilityId','target']) || input.type !== 'useAbility' || !unitId(input.unitId) || !prefixedId(input.abilityId, 'ability')) return false;
-  return (shape(input.target, ['unitId']) && unitId(input.target.unitId)) || (shape(input.target, ['cell']) && cell(input.target.cell));
+  return (shape(input.target, ['missileTargets']) && isDenseArray(input.target.missileTargets, 5) && input.target.missileTargets.length > 0 && input.target.missileTargets.every(unitId)) || (shape(input.target, ['unitId']) && unitId(input.target.unitId)) || (shape(input.target, ['cell']) && cell(input.target.cell));
 }
 /** Foundation intent preview only: NOT movement/ability legality or resolution. No RNG access. */
 export function previewCommand(state: unknown, input: unknown, catalog: ContentCatalog): CommandPreview {

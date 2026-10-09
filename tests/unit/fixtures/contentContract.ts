@@ -1,4 +1,5 @@
 import { TERRAIN_TEXTURE_SPEC } from '../../../src/content/constants';
+import { attackAbilities } from '../../../src/content/abilities';
 import type { AssetRecord, ContentCatalog, MapRecord, SpawnRecord, UnitStats } from '../../../src/content/types';
 
 // Tiny synthetic fixture, deliberately not the authored battle map or production catalog.
@@ -39,6 +40,7 @@ const portraitFixture = {
 const fixtureArt = { spriteAssetId: spriteFixture.id, portraitAssetId: portraitFixture.id };
 const fixtureTerrain = { surfaceAssetId: surfaceFixture.id, moveCost: 1, walkable: true, blocksLineOfSight: false };
 export const catalogFixture = {
+  abilities: attackAbilities,
   maps: { [mapFixture.id]: mapFixture },
   heroes: {
     fighter: { id: 'fighter', kind: 'hero', stats: statsFixture, ...fixtureArt },

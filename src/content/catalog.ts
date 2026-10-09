@@ -1,10 +1,12 @@
 import { battleAssets } from './assets';
+import { attackAbilities } from './abilities';
 import { forestRuins } from './forestRuins';
 import type { ContentCatalog } from './types';
 import { validateContent } from './validate';
 
 // Baseline evidence and deliberate map adaptations: docs/first-battle-content.md.
 const authoredCatalog = {
+  abilities: attackAbilities,
   maps: { 'map:forest_ruins': forestRuins },
   heroes: {
     fighter: {
