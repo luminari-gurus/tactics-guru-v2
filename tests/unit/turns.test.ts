@@ -7,7 +7,8 @@ import { rollDie, seedRng } from '../../src/domain/rng';
 import { moveUnit, previewMovement } from '../../src/domain/grid';
 import { previewAttack, resolveAttack } from '../../src/domain/combat';
 import { manhattanDistance } from '../../src/domain/targeting';
-import { createBattle, dispatch, endTurn, orderInitiative, replayBattle, restartBattle } from '../../src/domain/turns';
+import * as turns from '../../src/domain/turns';
+import { createBattle, dispatch, endTurn, orderInitiative, replayBattle } from '../../src/domain/turns';
 
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 function freeze<T>(value: T): T {
@@ -137,13 +138,19 @@ describe('end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137)', () => {
   });
 });
 
-describe('restart', () => {
-  it('returns the seed\'s fresh battle from a mid-battle or finished snapshot', () => {
-    const fresh = createBattle(map.id, 7, catalog); assert(fresh.ok);
-    const waited = endTurn(fresh.state, wait(fresh.state.initiative[0]), catalog); assert(waited.ok);
-    expect(restartBattle(freeze(waited.state), catalog)).toEqual(fresh);
-    expect(restartBattle({ ...withHp(snapshot(), { 3: 0, 4: 0 }), outcome: 'playerWin' }, catalog)).toEqual(fresh);
-    expect(restartBattle({ ...snapshot(), outcome: 'playerWin' }, catalog)).toEqual({ ok: false, reason: 'invalidState' });
+describe('restart (D7: a new battle with a new seed)', () => {
+  it('starts a valid fresh battle on the same map from a finished or mid-battle snapshot, with the session\'s new seed', () => {
+    const first = createBattle(map.id, 7, catalog); assert(first.ok);
+    const finished = freeze({ ...withHp(snapshot(), { 3: 0, 4: 0 }), outcome: 'playerWin' as const });
+    for (const from of [finished, first.state]) {
+      const restarted = createBattle(from.mapId, 8, catalog); assert(restarted.ok);
+      expect(restarted.state).toMatchObject({ seed: 8, round: 1, activeIndex: 0, commandCount: 0, outcome: 'ongoing' });
+      expect(restarted.state.units).toEqual(first.state.units);
+      expect(restarted.state.rng).not.toEqual(first.state.rng);
+      expect(readBattleState(restarted.state, catalog).ok).toBe(true);
+      expect(readReplay({ format: 1, versions: restarted.state.versions, initial: restarted.state, commands: [] }, catalog).ok).toBe(true);
+    }
+    expect(Object.keys(turns)).not.toContain('restartBattle'); // restart is not a domain operation; the session supplies the seed
   });
 });
 

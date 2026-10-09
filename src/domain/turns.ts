@@ -12,7 +12,10 @@ export function orderInitiative(entries: readonly InitiativeEntry[]): number[] {
   return [...entries].sort((a, b) => (b.natural + b.dexterity) - (a.natural + a.dexterity) || b.dexterity - a.dexterity ||
     Number(b.side === 'player') - Number(a.side === 'player') || a.unitId - b.unitId).map(e => e.unitId);
 }
-/** Fresh battle at the replay `initial` boundary: one d20 + Dexterity per unit, rolled in ID order. */
+/**
+ * Fresh battle at the replay `initial` boundary: one d20 + Dexterity per unit, rolled in ID order. Restart is a new
+ * battle too (D7): the session calls this with a new seed, where legacy reused the seed (BattleController.gd:124,1336-1346).
+ */
 export function createBattle(mapId: MapId, seed: number, catalog: ContentCatalog): CommandResult {
   if (!isIntegerIn(seed, RULE_BOUNDS.uint32) || !Object.hasOwn(catalog.maps, mapId)) return { ok: false, reason: 'invalidState' };
   const units: UnitState[] = [...catalog.maps[mapId].spawns].sort((a, b) => a.id - b.id).map(s => {
@@ -57,11 +60,6 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
   return { ok: true, state: { ...snapshot, activeIndex: index, round, commandCount: snapshot.commandCount + 1,
     units: snapshot.units.map(u => u.id === next ? { ...u, hasMoved: false, hasActed: false } : u) },
     events: [{ type: 'turnEnded', unitId: intent.command.unitId }, { type: 'turnStarted', unitId: next, round }] };
-}
-/** Legacy restart reuses the seed (BattleController.gd:124,1336-1346); a new-seed restart is createBattle with the session's seed (D7, #10). */
-export function restartBattle(state: unknown, catalog: ContentCatalog): CommandResult {
-  const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
-  return createBattle(checked.state.mapId, checked.state.seed, catalog);
 }
 /** One entry point for every command; the type is read only after the shared intent check. */
 export function dispatch(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
