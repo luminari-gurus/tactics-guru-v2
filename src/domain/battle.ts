@@ -3,7 +3,7 @@ import type { ContentCatalog } from '../content/types';
 import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, UINT32_RANGE } from './constants';
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
-import { hashCatalog } from './contentIdentity';
+import { hashJson, rulesContent } from './contentIdentity';
 
 import { hasShape as shape, isDenseArray } from './validation';
 function cell(v: unknown): v is { x: number; y: number } {
@@ -14,11 +14,11 @@ const prefixedId = (v: unknown, prefix: string): v is string => typeof v === 'st
 const hashed = new WeakMap<ContentCatalog, string>();
 /**
  * Hash an already validated catalog; this is not the content validator owned by #28. Every snapshot check needs it, so each
- * catalog object is hashed once. Catalogs are immutable: to change content, build a new catalog.
+ * catalog object is hashed once. Catalogs are immutable: to change content, build a new catalog. Art is not hashed.
  */
 export function contentVersion(catalog: ContentCatalog): string {
   let version = hashed.get(catalog);
-  if (version === undefined) { version = hashCatalog(catalog); hashed.set(catalog, version); }
+  if (version === undefined) { version = hashJson(rulesContent(catalog)); hashed.set(catalog, version); }
   return version;
 }
 function versions(v: unknown, content: string): v is Versions {
