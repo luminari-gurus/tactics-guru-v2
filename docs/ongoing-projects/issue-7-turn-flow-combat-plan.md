@@ -134,7 +134,7 @@ If the reviewer prefers Shortbow Shot and LOS in #8 or #9, we drop the archer ro
 7. `sameSide`: allies and self (legacy: `attacker.side == target.side`)
 8. `outOfRange`: Manhattan distance outside `[rangeMin, rangeMax]`
 9. `blockedLos`
-10. exhausted `commandCount` → `invalidState`
+10. exhausted `commandCount` or RNG → `invalidState`. The RNG case covers a cursor at its maximum and also one draw short of it when that draw falls in `rollDie`'s rejection band. Both are crafted-snapshot cases, but an untrusted replay can carry one, so they must reject with a type rather than throw.
 
 Steps 6–9 follow `TargetingService.gd:28-49`.
 
@@ -160,7 +160,7 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 
 ### D-F. Preview shares the resolver's rules
 
-`previewAttack(state, command, catalog)` runs every check in D-D except the counter guard, draws no RNG and changes nothing. On success it returns the isolated `command` plus integers only: `bonus`, `armorClass`, `damage` and `criticalDamage`.
+`previewAttack(state, command, catalog)` runs every check in D-D except the counter guard, draws no RNG and changes nothing. On success it returns the isolated `command` plus integers only: `targetId`, `bonus`, `armorClass`, `damage` and `criticalDamage`.
 
 `resolveAttack` calls `previewAttack` first, so legality and numbers cannot drift between the two. Hit chance and expected damage (`CombatResolver.gd:1114-1171`) are AI scoring and belong to #9, which can derive them from these four integers (§3.0). #9 evaluates attacks from other cells by previewing on the snapshot that `moveUnit` returns, so no "from cell" variant is needed.
 
@@ -222,33 +222,46 @@ Each increment starts with a failing spec, run and recorded before the implement
   - rejects `notActiveUnit`, `unknownUnit`, `malformedCommand` (a move, an extra field), `battleOver`, an exhausted `commandCount` and an exhausted `round`. An exhausted `round` with no wrap is accepted.
 - `restartBattle`: from a mid-battle and from a finished snapshot it equals the seed's `createBattle`; an invalid snapshot returns `invalidState`.
 
-### [ ] Increment 3: combat (`feat`)
+### [x] Increment 3: combat (`feat`)
 
-RED: `tests/unit/combat.test.ts`. Roll and damage cases, re-derived from `test_combat_resolver.gd:66-155` and resolved through the real snapshot path. To get a chosen natural, the fixture state's RNG comes from a seed found by scanning `rollDie(seedRng(s), 20)`; the RNG is never stubbed.
+`tests/unit/combat.test.ts` (12 tests), then the five rule constants in `constants.ts` and `src/domain/combat.ts` (D-A, D-D, D-E, D-F): `previewAttack`, `resolveAttack`. Every case resolves through the real snapshot path. A chosen natural comes from a seed found by scanning `rollDie(seedRng(s), 20)`; the RNG is never stubbed.
 
-- Natural 10 with +4 against AC 14 hits for 5 (base 2 + power 3); natural 9 misses (total 13).
-- Total equal to AC hits; AC − 1 misses.
-- Natural 1 at accuracy 20 against AC 1 misses.
-- Natural 20 at accuracy −10 against AC 30 is a critical for 10.
-- Floor and doubling order with power −5: a hit deals 1, a critical deals 2 (`test_combat_resolver.gd:116-130`).
-- Height (`test_m4_height_attack.gd:21-74`):
-  - +2, −2 and 0, with an elevation difference of 4 still giving exactly ±2;
-  - natural 10 with +0 against AC 12 hits from above and misses from below.
-- `outOfRange` at `rangeMin − 1` and `rangeMax + 1` for both profiles, and acceptance at `rangeMin` and `rangeMax`; a shortbow shot past a living unit is not blocked.
-- Every rejection in the D-D order, each leaving the input unchanged and drawing nothing:
-  - `abilityNotOwned`: the archer using `basic_attack`, and the grunt using `shortbow_shot`;
-  - `sameSide`: an ally and self;
-  - `blockedLos`: a shortbow over forest;
-  - `targetDefeated`: a defeated target.
-- Accepted attack:
-  - draws exactly one d20 (the RNG equals an independent `rollDie` on the same state);
-  - events in order; `hasActed` set;
-  - a move after the attack still accepted; a second attack rejected.
-- Defeat: one `defeated` event, HP floored at 0, the cell released (an ally can move into it), the unit skipped by `endTurn`, and an attack on it rejected.
-- Outcome: the last enemy down gives `playerWin` and exactly one `battleEnded`, and every later command rejects `battleOver`. The mirror case with an enemy attacker gives `playerLoss`.
-- `previewAttack` returns the numbers resolution uses, is pure (frozen input, throwing `Math.random`), and rejects exactly as resolution does.
+- Numbers:
+  - natural 10 with +4 against AC 14 hits for 5 (14 against 14); natural 9 misses (13);
+  - natural 1 at total 21 against AC 1 misses; natural 20 at total 10 against AC 30 is a critical for 10;
+  - power −5 deals 1 on a hit and 2 on a critical (floor, then doubling);
+  - height: +2 and −2, still ±2 at a difference of 4, and 0 on level ground. The legacy pair (natural 10, +0 against AC 12) hits from above and misses from below.
+- Legality: 19 rejection cases, each identical in preview and resolution, with a frozen input, no change and `Math.random` throwing. The cases are chosen so that each one also breaks a later check, which pins the D-D order. They include:
+  - an already-defeated actor (`unitDefeated`);
+  - a diagonal melee target (`outOfRange`);
+  - both `abilityNotOwned` directions;
+  - ally and self (`sameSide`);
+  - a shortbow over forest (`blockedLos`).
+- Range: Shortbow Shot at distances 1–5 gives exactly 2–4 accepted, and a living unit in the line does not block.
+- Counters: an exhausted `commandCount`, an RNG cursor at its maximum, and one draw short with a rejected draw all reject as `invalidState`; one draw short with an accepted draw resolves.
+- Resolution:
+  - the preview values are pinned;
+  - the events and full state are exact, with the RNG equal to one independent `rollDie`;
+  - the result passes `readBattleState`;
+  - move-then-attack and attack-then-move are both legal; a second attack rejects.
+- Defeat and outcome:
+  - HP floors at 0 and `defeated` is emitted once;
+  - the cell is occupied before the defeat and free after it (the ranger moves in);
+  - attacking the defeated unit rejects, and `endTurn` skips it;
+  - `playerWin` and `playerLoss` each emit one `battleEnded`, and every later command (end turn, move, attack, preview) rejects `battleOver`.
 
-Then `src/domain/combat.ts` (D-A, D-D, D-E, D-F).
+Mutation check (scratch, not committed): nine single-rule breaks were run against the three new spec files. Eight fail:
+
+- the cursor-only RNG guard;
+- `>` instead of `>=` against AC;
+- height scaled by the difference;
+- no damage floor;
+- no `sameSide` check;
+- no side tie-break;
+- no flag clear;
+- the integer LOS rounding.
+
+The ninth, emitting `defeated` without the `damage > 0` guard, survives because the guard is redundant: the preview already rejects defeated targets. It was removed.
 
 ### [ ] Increment 4: dispatch and replay (`feat`)
 
@@ -323,3 +336,13 @@ RED: `npm run test:unit -- tests/unit/targeting.test.ts` failed on the missing `
 ### 2026-10-09: increment 2 (creation and turns)
 
 RED: `npm run test:unit -- tests/unit/turns.test.ts` failed with `Cannot find module '../../src/domain/turns'`. GREEN: 8/8 pass. The first `npm run typecheck` caught a test-only lookup table missing `mage` (TS7053). With that fixed, the type-check passes.
+
+### 2026-10-09: increment 3 (combat)
+
+RED: `npm run test:unit -- tests/unit/combat.test.ts` failed with `Cannot find module '../../src/domain/combat'`. Three spec cases were fixed before the module existed:
+
+- an active unit at 0 HP is an invalid snapshot, so the defeated-actor case uses a non-active unit;
+- the range sweep needed cells at distance exactly 2 and 5;
+- a typo in a target ID.
+
+GREEN: 12/12 pass. Writing the counter case showed that checking only `cursor === max` still let a crafted snapshot throw from `rollDie` one draw early, so `resolveAttack` now maps the RNG's exhaustion to `invalidState` (D-D item 10). `npm run test:unit`: 17 files, 176 tests (150 baseline + 26). `npm run typecheck` passes.
