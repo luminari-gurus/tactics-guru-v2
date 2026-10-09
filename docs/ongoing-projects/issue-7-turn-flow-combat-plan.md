@@ -1,6 +1,6 @@
 # Issue #7 plan: basic turn flow, attacks and battle outcomes
 
-Status: plan written 2026-10-09 on `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0`, created with `gh issue develop` so it is linked on the issue's Development panel); implementation not started. Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: increment 1 (§4).
+Status: implementation in progress on `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0`, created with `gh issue develop` so it is linked on the issue's Development panel). The plan was ablated before coding (§3.0); §9 records each increment's commit as it lands. Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: the first unchecked increment in §4.
 
 Issue: [#7 P1: Implement basic turn flow, attacks and battle outcomes](https://github.com/luminari-gurus/tactics-guru-v2/issues/7).
 Parent: epic #1. Dependency: #5 (closed 2026-10-08 via PR #40). Downstream: #8 and #9 depend on #7; #10 depends on #6, #7, #8 and #9.
@@ -69,16 +69,32 @@ Checked against GitHub, `origin/main` and the legacy reference on 2026-10-09.
 
 ## 3. Design decisions
 
+### 3.0 Ablation pass (2026-10-09, before any code)
+
+Each part of the first draft was checked against the four acceptance criteria and the repository rules: if it is left out, what fails? The text below already reflects the result.
+
+- **LOS uses the legacy float formula, not an integer re-derivation (D-G).** The restart plan (§3.4 porting hazards) expects `Math.round` over the legacy lerp, proven by test vectors. Written in the same operation order, the JavaScript doubles are identical to Godot's, and `Math.round` equals `roundi` on non-negative values. The port is therefore bit-for-bit legacy, which drops the 208-pair divergence and the exhaustive float-oracle test the integer port needed.
+- **Modules follow the issue's suggested paths.** The profile table lives in `combat.ts` (no `attacks.ts`); dispatch and replay live in `turns.ts` (no `dispatch.ts`). Neither `combat.ts` nor `grid.ts` imports `turns.ts`, so there is no cycle. Tests are `targeting`, `turns` and `combat`, as the issue suggests.
+- **Profile fields that never vary are dropped (D-A).** `accuracyModifier`, `damageModifier`, `requiresLineOfSight` and `target` are the same in both rows; #8 adds each one with the first row that needs it.
+- **Preview fields with no #7 consumer are dropped (D-F).** `hitNaturals`, `expectedDamageTwentieths`, `defeatsOnHit/Critical` and the per-term breakdown are AI scoring for #9. The preview keeps what the resolver uses.
+- **The replay result type stays next to its function** in `turns.ts`, like `StateRead` and `ReplayRead` in `battle.ts`; `types.ts` is unchanged.
+- **Kept, with the reason:**
+  - the minimum-damage floor: the restart plan's targeting row says "Keep … minimum hit damage". It is tested like `test_combat_resolver.gd:116-130`, with power −5 on a fixture catalog, because power ≥ 0 in real content makes it unreachable.
+  - `orderInitiative` exported: AC 1's tie-breaks need exact rolls.
+  - `restartBattle`: AC 4.
+  - The counter-exhaustion guards: without them an accepted command could return a snapshot `readBattleState` rejects.
+  - `createBattle` re-reading its result: AC 4 asks for a valid fresh state, and the re-read makes that true by construction.
+
 ### D-A. Two ordinary attacks live in a typed domain table
 
-`src/domain/attacks.ts` holds a readonly, typed table of **attack profiles** and which unit definitions own them. It holds only the two ordinary d20 attacks from §3.4:
+`src/domain/combat.ts` holds a readonly, typed table of **attack profiles** and which unit definitions own them. It holds only the two ordinary d20 attacks from §3.4:
 
 | Profile | Range | Base damage | Accuracy mod | Damage mod | LOS | Owned by | Source |
 | -- | -- | -- | -- | -- | -- | -- | -- |
 | `ability:basic_attack` | 1–1 | 2 | 0 | 0 | required | fighter, ranger, mage, goblin_grunt | `content/abilities/basic_attack.tres`; `CombatResolver.gd:33-38,1392-1408` |
 | `ability:shortbow_shot` | 2–4 | 2 | 0 | 0 | required | goblin_archer | `CombatResolver.gd:49-50,634-640`; §3.4 stat table ("Slice abilities") |
 
-Why both: the archer has no Basic Attack in the baseline, so a Basic-Attack-only #7 would give it a melee attack it should not have, or no attack at all. Both rows resolve through the same function, so the second row costs one table entry plus the LOS rule. #9 needs both rows, and the `blockedLos` and `abilityNotOwned` rejections are already declared. The resolver takes a profile, not an ID switch, so #8 adds its three signatures as table rows (or moves the table into its catalog) without a new code path. The profile shape is `{ id, rangeMin, rangeMax, baseDamage, accuracyModifier, damageModifier, requiresLineOfSight, target: 'enemyUnit' }`.
+Why both: the archer has no Basic Attack in the baseline, so a Basic-Attack-only #7 would give it a melee attack it should not have, or no attack at all. Both rows resolve through the same function, so the second row costs one table entry plus the LOS rule. #9 needs both rows, and the `blockedLos` and `abilityNotOwned` rejections are already declared. The resolver looks up a profile, not an ID switch. The profile shape is `{ rangeMin, rangeMax, baseDamage, owners }`, keyed by ability ID. Both rows have accuracy and damage modifiers of 0, require LOS and target an enemy unit, so those stay rules rather than fields until #8 brings a row that differs (§3.0).
 
 If the reviewer prefers Shortbow Shot and LOS in #8 or #9, we drop the archer row and the LOS code in a single commit (see §7 item 2).
 
@@ -105,7 +121,7 @@ If the reviewer prefers Shortbow Shot and LOS in #8 or #9, we drop the archer ro
 
 ### D-D. Attack resolution
 
-`resolveAttack(state, command, catalog)` in `src/domain/combat.ts` handles `useAbility` for the profiles in D-A.
+`resolveAttack(state, command, catalog)` in `src/domain/combat.ts` handles `useAbility` for the profiles in D-A. It calls `previewAttack` (D-F) for every check and number, then rolls.
 
 **Rejection order**, after the existing common checks in `previewCommand` (`malformedCommand`, `invalidState`, `battleOver`, `unknownUnit`, `unitDefeated`, `notActiveUnit`):
 
@@ -125,11 +141,11 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 **Numbers** (`CombatResolver.gd:1051-1060,1089-1111,1188-1194,1236-1260`):
 
 - `heightModifier` = +2 when the attacker's cell elevation is higher than the target's, −2 when lower, else 0. It is not scaled by the difference.
-- `bonus = accuracy + profile.accuracyModifier + heightModifier`; `total = natural + bonus`.
+- `bonus = accuracy + heightModifier`; `total = natural + bonus`. (Legacy also adds the ability's accuracy modifier, status and adjacency terms; all are 0 or deferred in this slice.)
 - Natural 1 always misses. Natural 20 is always a critical hit. Otherwise `total >= armorClass` hits (equal hits).
-- On a hit, damage is `max(1, baseDamage + power + damageModifier)`; a critical doubles it after the floor. `hp = max(0, hp − damage)`.
+- On a hit, damage is `max(1, baseDamage + power)`; a critical doubles it after the floor (`CombatResolver.gd:1249-1251`). `hp = max(0, hp − damage)`.
 - Named constants in `constants.ts`: `HEIGHT_ATTACK_MODIFIER = 2`, `NATURAL_AUTO_MISS = 1`, `NATURAL_CRITICAL = D20_SIDES`, `MIN_HIT_DAMAGE = 1`, `CRITICAL_DAMAGE_MULTIPLIER = 2`.
-- With the content bounds (`power ≥ 0`) and base damage 2, the 1-damage floor cannot be reached through either profile. It is implemented anyway, because the legacy rule has it and #8 may need it, and it is tested on the pure damage function.
+- With the content bounds (`power ≥ 0`) and base damage 2, the 1-damage floor cannot be reached with real content. The restart plan keeps it, so it is implemented and tested as legacy does: a fixture catalog with power −5 (the domain trusts its catalog; bounds are the content validator's job).
 
 **RNG.** An accepted attack calls `rollDie(state.rng, D20_SIDES)` exactly once. The new RNG state appears only in the returned snapshot.
 
@@ -144,37 +160,27 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 
 ### D-F. Preview shares the resolver's rules
 
-`previewAttack(state, command, catalog)` runs the same checks as `resolveAttack`, draws no RNG and changes nothing. It returns integers only:
+`previewAttack(state, command, catalog)` runs every check in D-D except the counter guard, draws no RNG and changes nothing. On success it returns the isolated `command` plus integers only: `bonus`, `armorClass`, `damage` and `criticalDamage`.
 
-- the breakdown `{ accuracy, abilityModifier, heightModifier, bonus }`, plus `armorClass`;
-- `hitNaturals`: how many of the 20 naturals hit. It is always between 1 and 19, because 20 always hits and 1 never does;
-- `damage` and `criticalDamage`;
-- `expectedDamageTwentieths`: the sum, over the hitting naturals, of the damage each would deal (so the expected damage is this number divided by 20);
-- `defeatsOnHit` and `defeatsOnCritical`.
+`resolveAttack` calls `previewAttack` first, so legality and numbers cannot drift between the two. Hit chance and expected damage (`CombatResolver.gd:1114-1171`) are AI scoring and belong to #9, which can derive them from these four integers (§3.0). #9 evaluates attacks from other cells by previewing on the snapshot that `moveUnit` returns, so no "from cell" variant is needed.
 
-This follows `CombatResolver.gd:1114-1171`, with the float `hit_chance` and `expected_damage` replaced by integer numerators, as §6 of the restart plan asks for AI scoring. `resolveAttack` calls `previewAttack` first, so legality and numbers cannot drift between the two. #9 evaluates attacks from other cells by previewing on the snapshot that `moveUnit` returns, so no "from cell" variant is needed.
-
-### D-G. Targeting: Manhattan range and an integer-exact LOS port
+### D-G. Targeting: Manhattan range and the legacy LOS sampling
 
 `src/domain/targeting.ts`:
 
 - Range is the Manhattan distance between cells (`TargetingService.gd:135-136`).
 - LOS samples the cells strictly between attacker and target. Let `steps = max(|dx|, |dy|)`. For each `step` in `1 … steps−1`, legacy takes `roundi(lerpf(from, to, step/steps))` per axis, drops the endpoints and deduplicates (`TargetingService.gd:79-107`). Only terrain with `blocksLineOfSight` blocks; units and height never do.
-- The port avoids floats. Every lerp value here is nonnegative, so Godot's round-half-away-from-zero equals round-half-up, and each coordinate is `floor((2·(from·steps + delta·step) + steps) / (2·steps))`.
-- Pinned vectors: all eight directions, plus the half-way cases. `(0,0)→(2,1)` passes `(1,1)`; `(0,1)→(2,0)` passes `(1,1)`; `(0,0)→(4,1)` passes `(1,0),(2,1),(3,1)`.
-- Measured for this plan (scratch script, 2026-10-09): across all 1,048,576 cell pairs on a 32 × 32 grid, the integer rule and a float oracle written like the legacy code (`from + (to − from) * (step / steps)`, then `Math.round`) disagree on 208 pairs.
-  - Every disagreement is a line of 22, 26 or 28 steps, with Manhattan distance 33 or more. The first is `(0,0)→(11,22)`: at step 15 the exact x is 7.5, but the float `11 · (15/22)` evaluates to 7.499999999999999 and rounds to 7 instead of 8.
-  - None fall inside a 12 × 12 map, and the longest slice range is 5 (High Shot, #8).
-  - The integer rule is the exact geometric rounding, so it stands.
-- The test asserts that the two rules agree for every pair with Manhattan distance ≤ 32, and pins `(0,0)→(11,22)` as the documented first divergence.
+- The port keeps the legacy arithmetic: `Math.round(from + (to − from) * (step / steps))`, in the same operation order as Godot's `lerpf`, so the doubles are identical. Every value is non-negative, where `Math.round` (half up) equals `roundi` (half away from zero). This is the approach the restart plan's porting-hazards list expects, proven by vectors.
+- Pinned vectors: all eight directions, plus the half-way cases. `(0,0)→(2,1)` passes `(1,1)`; `(0,1)→(2,0)` passes `(1,1)`; `(0,0)→(4,1)` passes `(1,0),(2,1),(3,1)`. Also pinned: `(0,0)→(11,22)` at step 15, where the float lerp gives 7.499999999999999 and legacy samples x = 7 rather than the exact 7.5 → 8. This proves the port reproduces legacy rounding rather than exact geometry.
+- Why not an integer formula: it was drafted first, and a scratch comparison (2026-10-09) found it disagrees with legacy on 208 of the 1,048,576 cell pairs of a 32 × 32 grid (lines of 22–28 steps). No slice range reaches those lines, but the float port matches legacy everywhere for less proof (§3.0).
 
-### D-H. Dispatch and replay in their own module
+### D-H. Dispatch and replay in `turns.ts`
 
-`src/domain/dispatch.ts`:
+`src/domain/turns.ts` (§3.0):
 
 - `dispatch(state, command, catalog): CommandResult` routes `move` to `moveUnit`, `useAbility` to `resolveAttack` and `endTurn` to `endTurn`. A malformed command still returns `malformedCommand` through the shared check.
-- `replayBattle(input, catalog)` validates the envelope with `readReplay`, then folds `dispatch` over the commands. It returns `{ ok: true, state, events }` with all events in order. Otherwise it returns `{ ok: false, reason: 'invalidReplay', index, rejection }`, naming the first command that did not apply. The result type goes in `types.ts`.
-- The module imports `grid.ts`, `turns.ts` and `combat.ts`; `battle.ts` imports none of them, so there is no cycle.
+- `replayBattle(input, catalog)` validates the envelope with `readReplay`, then folds `dispatch` over the commands. It returns `{ ok: true, state, events }` with all events in order (initiative events are not repeated; they belong to creation). A bad envelope returns `readReplay`'s `invalidReplay`; a command that does not apply returns `{ ok: false, reason: 'invalidReplay', index, rejection }` naming the first one. The result type sits next to the function.
+- `turns.ts` imports `grid.ts` and `combat.ts`; neither of them, nor `battle.ts`, imports `turns.ts`, so there is no cycle.
 
 ### D-I. Restart, and D7 left to the session
 
@@ -186,17 +192,23 @@ This follows `CombatResolver.gd:1114-1171`, with the float `hit_chance` and `exp
 
 ## 4. Work breakdown
 
-Each increment starts with a failing spec, run and recorded before the implementation exists. One commit per increment unless the review trail reads better split. Test files follow the issue's suggested names; `dispatch.test.ts` is added for D-H.
+Each increment starts with a failing spec, run and recorded before the implementation exists. One commit per increment, pushed when it lands; §9 records the SHA and the RED/GREEN evidence. Test files follow the issue's suggested names.
 
-### Increment 1: targeting (`feat`)
+### [ ] Increment 1: targeting (`feat`)
 
-RED: `tests/unit/targeting.test.ts`. It covers the range boundaries (`rangeMin−1`, `rangeMin`, `rangeMax`, `rangeMax+1`), the eight-direction and half-way LOS vectors, and the integer-vs-float agreement up to Manhattan 32 with the pinned first divergence. It checks that a blocking terrain blocks, that a unit or a height-4 cell between the two does not, and that adjacent cells are never blocked. Then `src/domain/attacks.ts` (D-A) and `src/domain/targeting.ts` (D-G).
+RED: `tests/unit/targeting.test.ts`.
 
-### Increment 2: creation and turns (`feat`)
+- Manhattan range: `rangeMin−1`, `rangeMin`, `rangeMax`, `rangeMax+1` are judged against both profiles' ranges.
+- LOS vectors: the eight directions, the half-way cases, and the `(0,0)→(11,22)` legacy-rounding pin (D-G).
+- Blocking terrain blocks. A unit or a height-4 cell between the two cells does not block. Adjacent and same-cell pairs have no cells between them.
+
+Then `src/domain/targeting.ts` (D-G).
+
+### [ ] Increment 2: creation and turns (`feat`)
 
 RED: `tests/unit/turns.test.ts`.
 
-- `orderInitiative` with the `test_turn_manager.gd:43-95` situations, re-derived:
+- `orderInitiative` with the `test_turn_manager.gd` situations, re-derived:
   - rolls 10, 7, 20 with dexterity 0, 5, −1 give order 3, 2, 1;
   - a dexterity tie, a player-side tie and a final ID tie.
 - `createBattle` units and HP. The naturals equal an independent `rollDie` sequence from `seedRng(seed)` in ID order, and the events come in that order.
@@ -205,7 +217,7 @@ RED: `tests/unit/turns.test.ts`.
 - `endTurn`:
   - advances and clears the next unit's flags;
   - adds 1 to `round` on the wrap;
-  - skips defeated units, including a skip across the wrap that adds 1 to `round` only once (`test_turn_manager.gd:154-183`);
+  - skips defeated units, including a skip across the wrap that adds 1 to `round` only once;
   - Wait with no move and no action is accepted;
   - `notActiveUnit` and `battleOver` reject;
   - exhausted counters reject as `invalidState`;
@@ -214,62 +226,56 @@ RED: `tests/unit/turns.test.ts`.
 
 Then `src/domain/turns.ts` (D-B, D-C, D-I).
 
-### Increment 3: combat (`feat`)
+### [ ] Increment 3: combat (`feat`)
 
-RED: `tests/unit/combat.test.ts`. Pure roll and damage table, re-derived from `test_combat_resolver.gd:66-155` within content bounds:
+RED: `tests/unit/combat.test.ts`. Roll and damage cases, re-derived from `test_combat_resolver.gd:66-155` and resolved through the real snapshot path. To get a chosen natural, the fixture state's RNG comes from a seed found by scanning `rollDie(seedRng(s), 20)`; the RNG is never stubbed.
 
-- Natural 10 with +4 against AC 14 hits for 5 (base 2 + power 3); natural 9 misses.
+- Natural 10 with +4 against AC 14 hits for 5 (base 2 + power 3); natural 9 misses (total 13).
 - Total equal to AC hits; AC − 1 misses.
 - Natural 1 at accuracy 20 against AC 1 misses.
 - Natural 20 at accuracy −10 against AC 30 is a critical for 10.
-- The floor and the doubling order, on the pure damage function.
-- `hitNaturals` stays within 1–19 across the accuracy and AC bounds.
+- Floor and doubling order with power −5: a hit deals 1, a critical deals 2 (`test_combat_resolver.gd:116-130`).
 - Height (`test_m4_height_attack.gd:21-74`):
   - +2, −2 and 0, with an elevation difference of 4 still giving exactly ±2;
   - natural 10 with +0 against AC 12 hits from above and misses from below.
-
-Through the snapshot:
-
-- Every rejection in the D-D order, each leaving the RNG cursor and input unchanged:
+- Every rejection in the D-D order, each leaving the input unchanged and drawing nothing:
   - `abilityNotOwned`: the archer using `basic_attack`, and the grunt using `shortbow_shot`;
   - `sameSide`: an ally and self;
   - `blockedLos`: a shortbow over forest;
   - `targetDefeated`: a defeated target.
 - Accepted attack:
-  - draws exactly one d20 (the cursor advances by what an independent `rollDie` on the same state reports);
+  - draws exactly one d20 (the RNG equals an independent `rollDie` on the same state);
   - events in order; `hasActed` set;
   - a move after the attack still accepted; a second attack rejected.
-- Defeat: one `defeated` event, the cell released (an ally can move into it), the unit skipped by `endTurn`, and an attack on it rejected.
+- Defeat: one `defeated` event, HP floored at 0, the cell released (an ally can move into it), the unit skipped by `endTurn`, and an attack on it rejected.
 - Outcome: the last enemy down gives `playerWin` and exactly one `battleEnded`, and every later command rejects `battleOver`. The mirror case with an enemy attacker gives `playerLoss`.
-- `previewAttack` matches the resolved numbers for the drawn natural. It is pure (frozen input, throwing `Math.random`). Known case: +4 against AC 14 with 5 damage gives `hitNaturals = 11` and `expectedDamageTwentieths = 60`.
+- `previewAttack` returns the numbers resolution uses, is pure (frozen input, throwing `Math.random`), and rejects exactly as resolution does.
 
-Then `src/domain/combat.ts` (D-D, D-E, D-F). To get a chosen natural in an integration test, build the fixture state with an RNG from a seed found by scanning `rollDie(seedRng(s), 20)`. Do not stub the RNG.
+Then `src/domain/combat.ts` (D-A, D-D, D-E, D-F).
 
-### Increment 4: dispatch and replay (`feat`)
+### [ ] Increment 4: dispatch and replay (`feat`)
 
-RED: `tests/unit/dispatch.test.ts`:
+RED: more cases in `tests/unit/turns.test.ts`:
 
-- routing for each command type;
-- a malformed command;
-- a **full seeded battle**: fighter and grunt adjacent on a small synthetic map, created with `createBattle(seed)`, alternating attack and `endTurn` until one side falls. The commands are recorded into a `Replay`; `replayBattle` reproduces the identical final state and event stream, also after a JSON round trip;
-- a second scripted battle that includes moves;
+- routing for each command type, and a malformed command;
+- a **full seeded battle**: fighter and grunt on a small synthetic map, created with `createBattle(seed)`, moving into reach and then alternating attack and `endTurn` until one side falls. The commands are recorded into a `Replay`; `replayBattle` reproduces the identical final state and event stream, also after a JSON round trip;
 - a tampered command mid-log fails with its index;
 - the whole-replay checks: one `battleEnded`, one `defeated` per fallen unit, and a defeated unit never active.
 
-Then `src/domain/dispatch.ts` (D-H) and the replay result type in `types.ts`.
+Then `dispatch` and `replayBattle` in `src/domain/turns.ts` (D-H).
 
-### Increment 5: task note and PR (`docs`)
+### [ ] Increment 5: task note and PR (`docs`)
 
 - Add `docs/turn-flow-combat.md` in the style of `docs/battle-foundation.md` and `docs/grid-movement.md`: the rules, the rejection order, the legacy citations, the verification commands, and what is not claimed.
-- Update the `readReplay` comment in `battle.ts` and the "#7 supplies replay dispatch" notes in `types.ts` and `battle-foundation.md`, so they point at `dispatch.ts`.
-- Open the PR (§8). Do not delete this plan in the PR; it goes at close-out, as with #35.
+- Update the `readReplay` comment in `battle.ts`, the `Replay` comment in `types.ts`, and the "#7" forward references in `battle-foundation.md` and `grid-movement.md`, so they point at `turns.ts`.
+- Run the §5 gate, push, and open the PR (§8). Do not delete this plan in the PR; it goes at close-out, as with #35.
 
 ## 5. Validation gate (run before the PR, name each in the PR)
 
 | Check | Command | Expectation |
 | -- | -- | -- |
 | RED evidence | each increment's focused file before its module exists | fails on the missing import, recorded per increment |
-| Focused | `npm run test:unit -- tests/unit/targeting.test.ts tests/unit/turns.test.ts tests/unit/combat.test.ts tests/unit/dispatch.test.ts` | all pass |
+| Focused | `npm run test:unit -- tests/unit/targeting.test.ts tests/unit/turns.test.ts tests/unit/combat.test.ts` | all pass |
 | Full unit | `npm run test:unit` | the 150 baseline tests plus the new ones, all pass |
 | Types | `npm run typecheck` | app and ES2022-only domain/content checks pass |
 | Build | `npm run build` | passes; the existing Phaser chunk-size warning is the only warning |
@@ -288,12 +294,12 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 ## 7. Risks and open points
 
 1. **D7 is open.** The domain supports same-seed and new-seed restart; #10 picks. Legacy behaviour (same seed) is the documented default, not a decision.
-2. **Shortbow Shot and LOS in #7 (D-A)** may read as scope growth. Ask dubstylee in the PR. Fallback: drop the archer row and the LOS code in a single commit, leaving the archer without an attack until #8/#9.
+2. **Shortbow Shot and LOS in #7 (D-A)** may read as scope growth. Ask dubstylee in the PR. Fallback: drop the archer row and `targeting.ts`'s LOS function in a single commit, leaving the archer without an attack until #8/#9.
 3. **Ability IDs become contract.** `ability:basic_attack` and `ability:shortbow_shot` appear in replays, so #8's catalog must keep them.
 4. **`RULES_VERSION` stays 1 (D-J).** The reviewer may want a bump; it is a one-line change plus fixture updates.
 5. **Enemy turns need an explicit `endTurn`.** This differs from the legacy controller, which ends the enemy turn itself. The domain rule is the same for both sides, which is simpler to replay; #9 must append the command.
 6. **PR #43 merge order.** If it merges first, add one smoke test that runs `createBattle` on the real forest-ruins map (six units, valid initiative, `readReplay` accepts it). Optional, not a dependency.
-7. **The LOS port is exact where legacy was not.** The two rules disagree only on lines of 22 or more steps (D-G), far outside any slice range or map. If a reviewer wants bit-for-bit legacy behaviour instead, the float formula is deterministic in JavaScript (IEEE-754 arithmetic and `Math.round` are specified exactly), and swapping it in is a one-function change. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
+7. **The LOS port keeps legacy float rounding (D-G).** It reproduces legacy exactly, including the rare lines (22+ steps) where the float lerp rounds an exact half down. If a reviewer prefers exact geometry instead, the integer formula `floor((2·(from·steps + delta·step) + steps)/(2·steps))` is a one-function swap; it differs from legacy only on lines no slice range reaches. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
 8. **Shared checkout.** Another session may commit to this working tree. Re-check `git log -1` and `git status` in the same command as each commit, and stage paths explicitly. A worktree for the branch avoids the problem entirely.
 
 ## 8. Branch and process
@@ -308,3 +314,7 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 ### 2026-10-09: plan written
 
 #7 assigned to us with a handling comment. The plan was written from `main` `73d17c0` (unit baseline 150/150) and the legacy snapshot verified against `e9433f6`. Branch `issue-7-turn-flow-combat` created from `73d17c0` and linked on the issue; this plan is its first commit. No code yet.
+
+### 2026-10-09: ablation pass
+
+Before any code, the plan was simplified against the acceptance criteria (§3.0). The changes: LOS keeps the legacy float rounding; the modules follow the issue's paths (`targeting`, `turns`, `combat`); profile fields and preview fields with no #7 consumer were dropped; the replay result type moved next to its function. No acceptance criterion lost a test. Next: increment 1.
