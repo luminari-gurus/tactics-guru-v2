@@ -14,7 +14,9 @@ Legacy links below are pinned at `e9433f6b608ae6b2d95418615cce9cf17dadcf74` of `
 
 Creation emits one `initiativeRolled` per unit in roll order, then `turnStarted` for round 1. The result is checked by `readBattleState` before it is returned, and it is the round-one, command-count-zero `initial` boundary a replay starts from. An unknown map or a seed outside uint32 is `invalidState`.
 
-`restartBattle(state, catalog)` accepts a mid-battle or finished snapshot and returns `createBattle` with the same map and seed. Legacy restart reloads with the same seed ([BattleController.gd:124](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L124)). A new-seed restart is `createBattle` with a seed the session supplies. Which one the game offers is D7, owned by #10; this slice does not decide it.
+**Restart is a new battle with a new seed** (D7, decided by dubstylee on 2026-10-09). The session calls `createBattle` again with the same map and a seed it supplies, because the domain never makes entropy. Legacy restart reloaded with the same seed ([BattleController.gd:124](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L124)), so a retry dealt the same dice in the same order; that is deliberately not kept. A seed override for testing still reproduces a battle, because the session passes the override as the seed.
+
+Resuming a saved battle is different: the snapshot carries the RNG state, so play continues from the next draw. Saves are a follow-up.
 
 ## Turns
 
@@ -68,7 +70,7 @@ Each command re-validates its snapshot, including the catalog hash, at about 0.7
 
 - Signatures, the Dex-save path, statuses and Guarded: #8.
 - Enemy AI: #9.
-- The session, input, HUD, animation, the restart button and the D7 seed choice: #10.
+- The session, input, HUD, animation, the restart button and where its new seed comes from: #10.
 - Undo move, initiative tempo, adjacency accuracy, typed damage, immunities and saves.
 
 `RULES_VERSION` stays 1. No replay could execute before this slice; the PR flags the bump for review.

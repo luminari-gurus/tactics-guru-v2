@@ -253,7 +253,7 @@ chooseEnemyCommands(state, catalog): Command[]    // pure, no RNG (§6.5)
 
 - **State.** JSON-compatible, integers only, no class instances. Tiles are not in the state: terrain and height never change in the slice, so they are read from the catalog. Runtime HP is never stored in immutable definitions. A unit is defeated exactly when its HP is 0; there is no separate flag to fall out of step. Defeated units stay in `units` and in `initiative`, are skipped, and lose their statuses. Unit IDs are the integers given in the encounter's placements.
 - **Versions.** `rules` and `rng` are integers raised by hand when resolution, the AI or the generator change. `content` is not hand-kept: it is a hash of the validated catalog, so a changed stat cannot go unnoticed. Diagnostics print all three, and a replay refuses a log recorded under different ones.
-- **Commands** carry intent only: actor, target unit or cell. No computed damage, no caller-supplied path. The domain recomputes legality, cost and path. `endTurn` is the legacy Wait. Restart is not a command: the session calls `createBattle` again (D7 decides the seed).
+- **Commands** carry intent only: actor, target unit or cell. No computed damage, no caller-supplied path. The domain recomputes legality, cost and path. `endTurn` is the legacy Wait. Restart is not a command: the session calls `createBattle` again with a new seed (D7, resolved 2026-10-09).
 - **Mutation isolation.** `dispatch` never modifies its arguments. Unit tests deep-freeze the input state and the catalog.
 - **State validation.** A validator for `BattleState` rejects unsafe or non-integer numbers, unknown IDs and broken invariants (two living units on one cell, HP out of range, an active index outside the order).[52] Tests run it after every command; a later replay or save loads through it.
 - **Results.** A rejection carries a reason code and nothing else changes: no RNG draw, no action or movement spent, no partial state. This reuses the existing advanced tests' atomicity principle without retaining their effects.[33] Reason codes are a closed union, checked in a fixed order so that the first failure is the one reported, by `dispatch` and by preview alike:
@@ -764,7 +764,7 @@ Boot and loading failures; move, attack, signature, end turn, outcome and restar
 
 ### 10.4 Test seams and diagnostics
 
-- **Seed.** A query parameter overrides the seed, for example `?seed=12345`. It accepts an unsigned 32-bit decimal integer; anything else is ignored and reported in the log. While the override is present, Restart reuses it whatever D7 decides. The seed is always shown in the log.
+- **Seed.** A query parameter overrides the seed, for example `?seed=12345`. It accepts an unsigned 32-bit decimal integer; anything else is ignored and reported in the log. While the override is present, Restart reuses it; otherwise each restart takes a new seed (D7). The seed is always shown in the log.
 - **State.** The HUD exposes mode, active unit, round and outcome as text and `data-*` attributes. A read-only hook returns the presented view (§2.1): units with cell, HP and statuses, the selection, the legal cells and targets, and whether playback is running. Tests read those instead of hard-coding cells per seed.
 - **Board coordinates.** The same hook converts a cell to client coordinates, so tests tap cells without hard-coded pixels. It exposes no way to change state. Because the suite runs against the production build, the hook ships in production.
 - **Motion.** With the reduced-motion preference, which Playwright can emulate, playback is near-instant.
@@ -827,7 +827,7 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 
 4.2.1 fixes resize, ESM, stencil and delayed tweens; pin it and avoid custom rendering internals. Phaser 4 removes the old pipelines and unifies FX/masks into filters; Canvas is deprecated. Do not silently target Phaser 3 or promise unsupported-device performance.[38][39][72]
 
-**Resolved by Brian:** one replayable tactical battle; deployed loading/mobile problems as the restart motivation; isometric presentation and basic rules retained; iPhone Safari, iPhone Chrome, Android Chrome and desktop in both orientations; fresh runtime without legacy import; the new repository. **Open:** D1–D11. The plan's register (§2) is authoritative; in short:
+**Resolved by Brian:** one replayable tactical battle; deployed loading/mobile problems as the restart motivation; isometric presentation and basic rules retained; iPhone Safari, iPhone Chrome, Android Chrome and desktop in both orientations; fresh runtime without legacy import; the new repository. **Open:** the decisions below; D7 (the restart seed) was resolved on 2026-10-09: a restart takes a new seed. The plan's register (§2) is authoritative; in short:
 
 | # | Decision | Blocks |
 |---|---|---|
@@ -836,7 +836,6 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | D4 | Encounter: the legacy trio or the current seeded roster | #3 |
 | D5 | Guarded on a missed strike; Ember Burst and allies | #8 |
 | D6 | Fighter's Basic Attack versus Guarded Strike | #8 |
-| D7 | Restart: same seed or a new one | #7, #10 |
 | D8 | Selecting cells covered by raised terrain | #2, #6 |
 | D9 | Production host and cutover target | after #11 |
 | D10 | Analytics | after #11 |

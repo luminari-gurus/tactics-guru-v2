@@ -67,6 +67,7 @@ The following details clarify approved scope or remain implementation proposals:
 4. **Platforms/orientations — resolved:** iPhone Safari, iPhone Chrome, Android Chrome, desktop; portrait and landscape. Remaining QA details: representative physical devices, OS/browser versions, desktop browsers and realistic network conditions.
 5. **Legacy compatibility — resolved:** fresh new runtime; no legacy importer in scope.
 6. **Repository choice — resolved by Brian:** use https://github.com/luminari-gurus/tactics-guru-v2 for the new Phaser project. Preserve the original Godot repository/history as reference. The repository now holds the scaffold commit and the tracker; these plans sit on a separate `docs` branch, and merging them into `main` is a separate decision.[51][52]
+7. **Restart seed (D7) — resolved by dubstylee, 2026-10-09:** a restart starts a new battle with a new seed that the session supplies. Legacy's same-seed restart is not kept. #7 provides `createBattle(mapId, seed, catalog)`; the restart control and the seed source are #10.
 
 Core product/repository choices are resolved, and implementation is tracked by Epic #1 and its child issues. This plan is design input to those issues. The decisions below are still open; each one blocks the issue named.
 
@@ -77,7 +78,6 @@ Core product/repository choices are resolved, and implementation is tracked by E
 | D4 | Encounter: the legacy grunt/archer/grunt trio (recommended) or the current seeded roster | They are different content; the roster pulls in heal/hex abilities and elite units (§3.3). | #3 |
 | D5 | Two places where legacy UI text and rules disagree: does a missed Guarded Strike still grant Guarded, and can Ember Burst hurt allies? | Code grants Guarded whenever the strike resolves, while the UI says "hit, then Guarded". The resolver never damages allies, while the UI warns "Ember Burst will hit an ally" (§3.4). | #8 |
 | D6 | Fighter's Basic Attack versus Guarded Strike | In the baseline the signature is never worse than the basic attack, so the Fighter has no real choice (§3.4). | #8 |
-| D7 | Restart: replay the same seed or roll a new one | Legacy restart reuses the seed, so the same inputs replay the same dice (§3.4). | #7, #10 |
 | D8 | How the player selects cells covered by raised terrain without camera rotation | The tiles of five walkable cells on the chosen map are covered at the default orientation (§4.2). | #2, #6 |
 | D9 | Production host and cutover target | The beta host is Access-protected; no production target is recorded. | after #11 |
 | D10 | Analytics | Optional; default off. | after #11 |
