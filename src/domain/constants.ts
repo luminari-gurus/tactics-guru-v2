@@ -1,4 +1,7 @@
-/** Bump manually when the foundation contracts or generator change. */
+/**
+ * Bump manually when the foundation contracts or generator change. Once the game records replays (#10), also bump when a
+ * rules change would make a recorded replay play out differently. None exist yet, so #5 and #7 kept 1.
+ */
 export const RULES_VERSION = 1;
 export const RNG_VERSION = 1;
 export const STATE_FORMAT_VERSION = 1;

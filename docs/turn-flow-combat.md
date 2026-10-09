@@ -20,13 +20,13 @@ Resuming a saved battle is different: the snapshot carries the RNG state, so pla
 
 ## Turns
 
-Each turn allows one move and one action, in either order. Acting never ends a turn: `endTurn` (the legacy Wait) is the only way, for both sides, and Wait with no move or action is legal. The legacy controller ended an enemy turn after its AI's single command; here #9 appends `endTurn` to the AI's choice, so replays need one rule.
+Each turn allows one move and one action, in either order. Acting never ends a turn: `endTurn` (the legacy Wait) is the only way, for both sides, and Wait with no move or action is legal. Enemy turns end the same way. The legacy controller ended an enemy turn itself after its AI's command. Here the AI's command list (#9) ends with `endTurn`, so replays record every turn end and follow one rule for both sides.
 
 `endTurn` emits `turnEnded`, then steps through the initiative order, skipping units at 0 HP and adding one round each time it wraps. It clears the next unit's `hasMoved` and `hasActed` and emits `turnStarted` ([TurnManager.gd:64-73,90-94,119-137](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L64-L137)). An ongoing battle has a living unit on each side, so it stops within one wrap. It draws no RNG. An exhausted `commandCount` or `round` is `invalidState`.
 
 ## Attacks
 
-`combat.ts` holds the slice's two ordinary attacks. Both need line of sight, target one enemy unit and add no accuracy or damage modifier of their own. Their IDs appear in replays, so #8's ability catalog must keep them.
+`combat.ts` holds the slice's two ordinary attacks. Both need line of sight, target one enemy unit and add no accuracy or damage modifier of their own. Shortbow Shot and line of sight belong to this slice because the archer has no other attack; without them a full battle would have an enemy that can only move and Wait. The IDs are recorded in replays, so they are contract: #8's ability catalog keeps them.
 
 | Ability | Range | Base damage | Owned by |
 | -- | -- | -- | -- |
@@ -73,7 +73,7 @@ Each command re-validates its snapshot, including the catalog hash, at about 0.7
 - The session, input, HUD, animation, the restart button and where its new seed comes from: #10.
 - Undo move, initiative tempo, adjacency accuracy, typed damage, immunities and saves.
 
-`RULES_VERSION` stays 1. No replay could execute before this slice; the PR flags the bump for review.
+`RULES_VERSION` stays 1. No replay or save has been recorded outside tests, so a bump would protect nothing. Once #10 records replays, bump it whenever a rules change would make a recorded replay play out differently.
 
 ## Verification commands
 
