@@ -79,7 +79,7 @@ Each command re-validates its snapshot against the content version. `contentVers
 
 ## Hand-off
 
-- **#8** keeps the two attack IDs and the single attack path. A new profile field arrives with the first profile that needs it, and Guarded's AC bonus becomes one more term in the existing breakdown, not a second formula.
+- **#8** keeps the two attack IDs and the single attack path. A new profile field arrives with the first profile that needs it. Guarded's +2 AC is added where `previewAttack` computes `armorClass`, so preview, resolution and the `attackRolled` event all get it through that one path; there is no second formula. `attackRolled` reports only the summed AC, so if the HUD must show the +2 on its own, #8 or #10 adds that field then.
 - **#9** gets `previewMovement`, `previewAttack`, `dispatch` and `endTurn`. To score an attack from another cell, it previews on the snapshot `moveUnit` returns, so no "from cell" variant is needed. Each enemy turn's command list ends with `endTurn`.
 - **#10** gets `createBattle`, which is also its restart, and the event stream to animate. Defeated units stay in the snapshot at their last cell, so the renderer must hide or mark them.
 - **The authored catalog (#29)** was not on `main` when #7 merged. Once it is, a smoke test is worth adding: run `createBattle` on its map, check that every spawn becomes a unit with a valid initiative, and check that `readReplay` accepts the result.
