@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect, it } from 'vitest';
-import { contentVersion, previewCommand } from '../../src/domain/battle';
+import { previewCommand } from '../../src/domain/battle';
+import { hashJson } from '../../src/domain/contentIdentity';
 import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog } from '../../src/content/types';
 
@@ -15,7 +16,7 @@ for (const text of ['plain', 'é元宝', '🌲⚔️', 'x'.repeat(2000), '\ud800
   const catalog: ContentCatalog = { ...catalogFixture, assets: { ...catalogFixture.assets,
     'asset:fixture_grass': { ...catalogFixture.assets['asset:fixture_grass'], provenance: { ...catalogFixture.assets['asset:fixture_grass'].provenance, prompt: text } } } };
   const expected = 'sha256:' + createHash('sha256').update(canonical(catalog), 'utf8').digest('hex');
-  expect(contentVersion(catalog)).toBe(expected);
+  expect(hashJson(catalog)).toBe(expected);
 });
 it('command validation rejects getter fields without evaluating them', () => {
   for (const key of ['type','unitId','to']) {

@@ -1,9 +1,9 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
 import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, UINT32_RANGE } from './constants';
-import { isIntegerIn, isRngState, seedRng } from './rng';
+import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
-import { hashCatalog } from './contentIdentity';
+import { hashJson, rulesContent } from './contentIdentity';
 
 import { hasShape as shape, isDenseArray } from './validation';
 function cell(v: unknown): v is { x: number; y: number } {
@@ -11,8 +11,16 @@ function cell(v: unknown): v is { x: number; y: number } {
 }
 const unitId = (v: unknown): v is number => isIntegerIn(v, CONTENT_BOUNDS.spawnId);
 const prefixedId = (v: unknown, prefix: string): v is string => typeof v === 'string' && new RegExp(`^${prefix}:[a-z][a-z0-9]*(?:_[a-z0-9]+)*$`).test(v);
-/** Hash an already validated catalog; this is not the content validator owned by #28. */
-export function contentVersion(catalog: ContentCatalog): string { return hashCatalog(catalog); }
+const hashed = new WeakMap<ContentCatalog, string>();
+/**
+ * Hash an already validated catalog; this is not the content validator owned by #28. Every snapshot check needs it, so each
+ * catalog object is hashed once. Catalogs are immutable: to change content, build a new catalog. Art is not hashed.
+ */
+export function contentVersion(catalog: ContentCatalog): string {
+  let version = hashed.get(catalog);
+  if (version === undefined) { version = hashJson(rulesContent(catalog)); hashed.set(catalog, version); }
+  return version;
+}
 function versions(v: unknown, content: string): v is Versions {
   return shape(v, ['rules','rng','content']) && v.rules === RULES_VERSION && v.rng === RNG_VERSION && v.content === content;
 }
@@ -75,6 +83,7 @@ export function previewCommand(state: unknown, input: unknown, catalog: ContentC
   const checked = readBattleState(state, catalog);
   if (!checked.ok) return checked;
   if (checked.state.outcome !== 'ongoing') return { ok: false, reason: 'battleOver' };
+  if (checked.state.commandCount === RULE_BOUNDS.commandCount.max) return { ok: false, reason: 'commandLimit' };
   const actor = checked.state.units.find(u => u.id === input.unitId);
   if (!actor) return { ok: false, reason: 'unknownUnit' };
   if (actor.hp === 0) return { ok: false, reason: 'unitDefeated' };
@@ -82,14 +91,13 @@ export function previewCommand(state: unknown, input: unknown, catalog: ContentC
   return { ok: true, command: clone(input) };
 }
 export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { readonly ok: false; readonly reason: 'invalidReplay' };
-/** Accepted log shape is checked, not simulated; #7 supplies replay dispatch. */
+/** Accepted log shape is checked, not simulated; replayBattle (turns.ts) checks `initial` against its seed and re-executes it. */
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||
-    !isDenseArray(input.commands, RULE_BOUNDS.maxReplayCommands) ||
+    !isDenseArray(input.commands, RULE_BOUNDS.commandCount.max) ||
     !input.commands.every(isCommand)) return bad;
   const checked = readBattleState(input.initial, catalog);
-  if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min ||
-    (checked.state.rng.cursor === 0 && JSON.stringify(checked.state.rng.words) !== JSON.stringify(seedRng(checked.state.seed).words))) return bad;
+  if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min) return bad;
   return { ok: true, replay: { format: STATE_FORMAT_VERSION, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) } };
 }
