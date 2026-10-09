@@ -19,7 +19,7 @@ export const ATTACK_BOUNDS = {
   rangeMin: { min: 1, max: 20 }, rangeMax: { min: 1, max: 20 },
   baseDamage: { min: 1, max: 20 }, uphillDamage: { min: 0, max: 20 },
 } as const;
-export const FIGHTING_DEFENSIVELY = { attackPenalty: 4, armorClassBonus: 2 } as const;
+export const GUARDED_STRIKE_TRADEOFF = { attackPenalty: 2, armorClassBonus: 2 } as const;
 export const TERRAIN_TEXTURE_SPEC = {
   sourceWidth: 1024, sourceHeight: 1024, runtimeWidth: 256, runtimeHeight: 256,
   format: 'png', orientation: 'top-down', cellsPerTexture: 1,

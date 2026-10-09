@@ -1,4 +1,4 @@
-import { ATTACK_BOUNDS, CONTENT_BOUNDS, ENEMY_IDS, FIGHTING_DEFENSIVELY, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import { ATTACK_BOUNDS, CONTENT_BOUNDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 import type { ContentCatalog } from './types';
 import { attackAbilities } from './abilities';
 import { hasShape, isDenseArray, isPlainRecord, type JsonRecord } from '../domain/validation';
@@ -66,7 +66,7 @@ export function validateContent(input: unknown): ContentValidation {
     const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
     if (!expected || ability.kind !== expected.kind) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
     if (ability.kind === 'guardedAttack') for (const field of ['attackPenalty','armorClassBonus'] as const)
-      if (ability[field] !== FIGHTING_DEFENSIVELY[field]) fail('number', `${path}.${field}`, `Expected ${FIGHTING_DEFENSIVELY[field]}.`);
+      if (ability[field] !== GUARDED_STRIKE_TRADEOFF[field]) fail('number', `${path}.${field}`, `Expected ${GUARDED_STRIKE_TRADEOFF[field]}.`);
     if (ability.kind === 'magicMissile') {
       for (const [field, max] of [['casterLevel',20],['rangeMin',20],['rangeMax',20]] as const)
         if (typeof ability[field] !== 'number' || !Number.isSafeInteger(ability[field]) || ability[field] < 1 || ability[field] > max)
