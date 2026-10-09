@@ -9,9 +9,13 @@ const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!
 const audioButton = document.querySelector<HTMLButtonElement>('#audio-play')!;
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
+const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
+if (contentSmoke) {
+  document.querySelectorAll('#fit-panel > :not(.fit-controls), .fit-controls > :not(#fit-status)').forEach(element => { (element as HTMLElement).hidden = true; });
+}
 
 function setStatus(state: 'loading' | 'ready' | 'error'): void {
-  statusLabel.textContent = state === 'ready' ? 'Ready' : 'Loading';
+  statusLabel.textContent = state === 'ready' ? (contentSmoke ? 'Content ready' : 'Ready') : 'Loading';
   container.dataset.ready = String(state === 'ready');
   container.dataset.run = String(measurements.snapshot().run);
   restartButton.disabled = state !== 'ready';

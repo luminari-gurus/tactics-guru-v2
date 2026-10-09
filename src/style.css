@@ -16,7 +16,7 @@ button, summary { min-height: 44px; box-sizing: border-box; padding: 10px 12px; 
 button { color: inherit; background: #2b3e60; border: 1px solid #677c9e; border-radius: 5px; font: inherit; }
 button:disabled { opacity: 0.5; cursor: default; }
 button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid #ffd77d; outline-offset: 2px; }
-#fit-status { flex: 1; }
+#fit-status { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 #fit-report { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 35dvh; overflow-y: auto; font-size: 12px; -webkit-user-select: text; user-select: text; }
 #board-caption { margin: 8px 0 0; color: #b3cb97; font-size: 13px; }
 
