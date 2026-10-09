@@ -3,6 +3,7 @@ import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog, MapRecord } from '../../src/content/types';
 import { nextUint32, seedRng } from '../../src/domain/rng';
 import * as battle from '../../src/domain/battle';
+import { validateContent } from '../../src/content/validate';
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 const battleMap = {
   id: 'map:battle_fixture', width: 2, height: 1,
@@ -42,9 +43,34 @@ describe('battle foundation boundary', () => {
       expect(battle.previewCommand(fixture(), { type: 'endTurn', unitId: 1 }, catalog).ok).toBe(true);
     } finally { vi.restoreAllMocks(); }
   });
+  it('versions rules data only, so an art or provenance edit keeps snapshots valid', () => {
+    const sprite = (c: any) => c.assets['asset:fixture_sprite'];
+    const art: ((c: any) => void)[] = [
+      c => { sprite(c).provenance.productionNotes = 'Typo fixed.'; },
+      c => { Object.assign(sprite(c), { runtimePath: '/fixtures/sprite-v2.png', runtimeWidth: 128, anchor: { x: 64, y: 120 } }); },
+      c => { c.assets['asset:fixture_sprite_v2'] = { ...sprite(c), id: 'asset:fixture_sprite_v2' }; c.heroes.fighter.spriteAssetId = 'asset:fixture_sprite_v2'; },
+      c => { c.assets['asset:fixture_portrait_v2'] = { ...c.assets['asset:fixture_portrait'], id: 'asset:fixture_portrait_v2' }; c.enemies.goblin_grunt.portraitAssetId = 'asset:fixture_portrait_v2'; },
+      c => { c.assets['asset:fixture_grass_v2'] = { ...c.assets['asset:fixture_grass'], id: 'asset:fixture_grass_v2' }; c.terrains.grass.surfaceAssetId = 'asset:fixture_grass_v2'; },
+      c => { c.assets['asset:fixture_prop'] = { ...sprite(c), id: 'asset:fixture_prop', kind: 'prop' }; c.maps[battleMap.id].cells[0].propAssetId = 'asset:fixture_prop'; },
+    ];
+    const rules: ((c: any) => void)[] = [
+      c => { c.heroes.fighter.stats.armorClass = 15; }, c => { c.terrains.grass.blocksLineOfSight = true; },
+      c => { c.maps[battleMap.id].cells[1].elevation = 1; }, c => { c.maps[battleMap.id].spawns[1].unitId = 'goblin_archer'; },
+    ];
+    for (const edit of art) {
+      const edited = copy(catalog); edit(edited);
+      expect(validateContent(edited).ok, edit.toString()).toBe(true);
+      expect(battle.contentVersion(edited), edit.toString()).toBe(battle.contentVersion(catalog));
+      expect(battle.readBattleState(fixture(), edited).ok).toBe(true);
+    }
+    for (const edit of rules) {
+      const edited = copy(catalog); edit(edited);
+      expect(battle.contentVersion(edited), edit.toString()).not.toBe(battle.contentVersion(catalog));
+    }
+  });
   it('rejects unsafe numbers, identifiers, unknown fields and broken invariants', () => {
     const mutations: ((s: any) => void)[] = [
-      s => s.seed = -1, s => s.round = 0, s => s.round = 1.5, s => s.commandCount = Number.MAX_SAFE_INTEGER + 1,
+      s => s.seed = -1, s => s.round = 0, s => s.round = 1.5, s => s.commandCount = Number.MAX_SAFE_INTEGER + 1, s => s.commandCount = 10001,
       s => s.activeIndex = 2, s => s.activeIndex = NaN, s => s.rng.words[0] = Infinity,
       s => s.rng.words.push(0), s => s.rng.cursor = -1,
       s => s.units[0].hp = 19, s => s.units[0].hp = -1, s => s.units[0].cell.x = 2,
@@ -117,12 +143,12 @@ describe('battle foundation boundary', () => {
     const initial=fixture(); initial.rng=nextUint32(nextUint32(initial.rng).rng).rng;
     expect(battle.readReplay({format:1,versions:initial.versions,initial,commands:[]},catalog).ok).toBe(true);
   });
-  it('replay envelope pins versions, seed, initial cursor and accepted commands', () => {
+  it('replay envelope pins versions, initial cursor and accepted commands', () => {
     const initial = fixture(); const input = freeze({ format: 1, versions: initial.versions, initial, commands: [{type:'endTurn',unitId:1}] });
     const a = battle.readReplay(input,catalog); const b = battle.readReplay(copy(input),catalog);
     assert(a.ok); expect(a).toEqual(b); expect(a.replay.initial).not.toBe(input.initial);
     expect(a.replay.commands[0]).not.toBe(input.commands[0]);
-    for (const mutate of [(r:any)=>r.versions.rng++, (r:any)=>r.initial.seed++, (r:any)=>r.initial.rng.cursor=-1, (r:any)=>r.commands[0].unitId=0, (r:any)=>r.commands=Array(10001).fill({type:'endTurn',unitId:1}), (r:any)=>r.extra=1]) {
+    for (const mutate of [(r:any)=>r.versions.rng++, (r:any)=>r.initial.rng.cursor=-1, (r:any)=>r.commands[0].unitId=0, (r:any)=>r.commands=Array(10001).fill({type:'endTurn',unitId:1}), (r:any)=>r.extra=1]) {
       const bad = copy(input); mutate(bad); expect(battle.readReplay(bad,catalog).ok).toBe(false);
     }
   });
