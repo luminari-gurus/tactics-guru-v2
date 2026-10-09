@@ -263,16 +263,20 @@ Mutation check (scratch, not committed): nine single-rule breaks were run agains
 
 The ninth, emitting `defeated` without the `damage > 0` guard, survives because the guard is redundant: the preview already rejects defeated targets. It was removed.
 
-### [ ] Increment 4: dispatch and replay (`feat`)
+### [x] Increment 4: dispatch and replay (`feat`)
 
-RED: more cases in `tests/unit/turns.test.ts`:
+Three more tests in `tests/unit/turns.test.ts` (11 in total there), then `dispatch` and `replayBattle` in `src/domain/turns.ts` (D-H).
 
-- routing for each command type, and a malformed command;
-- a **full seeded battle**: fighter and grunt on a small synthetic map, created with `createBattle(seed)`, moving into reach and then alternating attack and `endTurn` until one side falls. The commands are recorded into a `Replay`; `replayBattle` reproduces the identical final state and event stream, also after a JSON round trip;
-- a tampered command mid-log fails with its index;
-- the whole-replay checks: one `battleEnded`, one `defeated` per fallen unit, and a defeated unit never active.
-
-Then `dispatch` and `replayBattle` in `src/domain/turns.ts` (D-H).
+- Routing: each command type gives exactly its resolver's result. `null`, `{ type: 'restart' }` and an extra field are rejected as `malformedCommand`.
+- **Full seeded battle.** The four-unit `turns` fixture runs with seed 7. A greedy script stands in for players and #9's AI: attack if it can; otherwise move to the first cell from which it can attack, else to the cell nearest an enemy; then attack and Wait.
+  - The run is 44 commands of all three types and ends `playerWin` in round 6. The archer falls first and the grunt fights on.
+  - `replayBattle` reproduces the identical final state and event stream from a frozen copy and after a JSON round trip, with `Math.random` and `Date.now` throwing.
+  - Whole-battle checks: exactly one `battleEnded`, which is the last event; one `defeated` per fallen unit, with at least two; and no `turnStarted` for a unit after its `defeated`.
+- Failures:
+  - a duplicated attack is named by its index with `alreadyActed`;
+  - a command after the end is named with `battleOver`;
+  - a finished snapshot as `initial`, or an unknown command type, is the envelope's `invalidReplay`.
+- Mutation check (scratch): an off-by-one index, dropped events and a misrouted `endTurn` all fail.
 
 ### [ ] Increment 5: task note and PR (`docs`)
 
@@ -310,7 +314,8 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 5. **Enemy turns need an explicit `endTurn`.** This differs from the legacy controller, which ends the enemy turn itself. The domain rule is the same for both sides, which is simpler to replay; #9 must append the command.
 6. **PR #43 merge order.** If it merges first, add one smoke test that runs `createBattle` on the real forest-ruins map (six units, valid initiative, `readReplay` accepts it). Optional, not a dependency.
 7. **The LOS port keeps legacy float rounding (D-G).** It reproduces legacy exactly, including the rare lines (22+ steps) where the float lerp rounds an exact half down. If a reviewer prefers exact geometry instead, the integer formula `floor((2·(from·steps + delta·step) + steps)/(2·steps))` is a one-function swap; it differs from legacy only on lines no slice range reaches. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
-8. **Shared checkout.** Another session may commit to this working tree. Re-check `git log -1` and `git status` in the same command as each commit, and stage paths explicitly. A worktree for the branch avoids the problem entirely.
+8. **Replay cost.** Each dispatched command re-validates its snapshot, and `readBattleState` hashes the whole catalog each time. Measured on the fixture catalog: about 0.7 ms per command (0.18 ms per hash), so the 44-command test battle replays in about 30 ms. The real catalog (#29) is larger. A 10,000-command replay (the envelope's limit) could take tens of seconds. That is fine for tests and debugging; if #10 replays on load, memoise `contentVersion` per catalog object there. Nothing in #7 needs it faster, so `battle.ts` is unchanged.
+9. **Shared checkout.** Another session may commit to this working tree. Re-check `git log -1` and `git status` in the same command as each commit, and stage paths explicitly. A worktree for the branch avoids the problem entirely.
 
 ## 8. Branch and process
 
@@ -346,3 +351,7 @@ RED: `npm run test:unit -- tests/unit/combat.test.ts` failed with `Cannot find m
 - a typo in a target ID.
 
 GREEN: 12/12 pass. Writing the counter case showed that checking only `cursor === max` still let a crafted snapshot throw from `rollDie` one draw early, so `resolveAttack` now maps the RNG's exhaustion to `invalidState` (D-D item 10). `npm run test:unit`: 17 files, 176 tests (150 baseline + 26). `npm run typecheck` passes.
+
+### 2026-10-09: increment 4 (dispatch and replay)
+
+RED: with the new cases in `tests/unit/turns.test.ts`, 3 failed (`dispatch is not a function`) and the 8 existing tests passed. GREEN: 11/11 pass. A throwaway probe (reverted, never committed) measured the seed-7 battle: 44 commands, `playerWin`, round 6, archer then grunt defeated; replay about 0.7 ms per command (§7 item 8). `npm run test:unit`: 17 files, 179 tests (150 + 29). `npm run typecheck` passes.
