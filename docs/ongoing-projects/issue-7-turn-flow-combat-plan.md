@@ -1,6 +1,6 @@
 # Issue #7 plan: basic turn flow, attacks and battle outcomes
 
-Status: implementation complete and verified; [PR #44](https://github.com/luminari-gurus/tactics-guru-v2/pull/44) is open and ready for review from `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0` with `gh issue develop`, so it is linked on the issue's Development panel and merging closes #7). Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: review follow-up on PR #44 per §8, then merge and close-out (fold anything durable into `docs/turn-flow-combat.md` and delete this file).
+Status: implementation complete and verified, and all five review questions resolved on 2026-10-09 (§7). [PR #44](https://github.com/luminari-gurus/tactics-guru-v2/pull/44) is open and ready for code review from `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0` with `gh issue develop`, so it is linked on the issue's Development panel and merging closes #7). Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: code-review follow-up on PR #44 per §8, then merge and close-out (fold anything durable into `docs/turn-flow-combat.md` and delete this file).
 
 Issue: [#7 P1: Implement basic turn flow, attacks and battle outcomes](https://github.com/luminari-gurus/tactics-guru-v2/issues/7).
 Parent: epic #1. Dependency: #5 (closed 2026-10-08 via PR #40). Downstream: #8 and #9 depend on #7; #10 depends on #6, #7, #8 and #9.
@@ -25,7 +25,7 @@ Checked against GitHub, `origin/main` and the legacy reference on 2026-10-09.
 | #29 | Open, assigned to dubstylee, PR #43 open (head `85f67fc`) | Adds `src/content/{assets,catalog,forestRuins}.ts` and the authored 12 × 12 map. No combat rules. Not a dependency (guardrail: do not build on unmerged work). No file overlap with this plan: we do not touch `src/content/`, `package.json` or the content docs. |
 | #8 | Open, depends on #7 | Signatures (Guarded Strike, High Shot, Ember Burst), the ability catalog, Guarded expiry, D5, D6, D11. Builds on the attack path defined here. |
 | #9 | Open, depends on #7 and #8 | AI. Consumes `previewAttack`, `previewMovement` and `dispatch` from here. |
-| #10 | Open, depends on #6–#9 | Session, UI, animation lock, restart button, and the D7 seed choice. |
+| #10 | Open, depends on #6–#9 | Session, UI, animation lock, restart button (D7 resolved: a new seed per restart, which the session supplies). |
 | #3, #6, #11, #30 | Open | Untouched. |
 
 ### Branches and PRs
@@ -62,7 +62,7 @@ Checked against GitHub, `origin/main` and the legacy reference on 2026-10-09.
 
 - Signatures (Guarded Strike, High Shot, Ember Burst), the Dex-save path, Guarded expiry, statuses: #8.
 - AI choice and enemy-turn sequencing: #9.
-- Session, input mode, animation lock, HUD, the restart button and the D7 seed choice: #10.
+- Session, input mode, animation lock, HUD, the restart button and its seed source: #10. (D7 itself was decided on 2026-10-09: restart takes a new seed.)
 - Undo move (legacy `KEY_U`). It is not in the §3.4 baseline and #5 excluded it.
 - Initiative tempo reordering, adjacency accuracy, typed damage and status immunities. §3.1 and §3.4 of the restart plan defer them, and the issue's out-of-scope list excludes tempo.
 - Saves and resume; the real authored catalog (#29) as a dependency.
@@ -82,7 +82,7 @@ Each part of the first draft was checked against the four acceptance criteria an
 - **Kept, with the reason:**
   - the minimum-damage floor: the restart plan's targeting row says "Keep … minimum hit damage". It is tested like `test_combat_resolver.gd:116-130`, with power −5 on a fixture catalog, because power ≥ 0 in real content makes it unreachable.
   - `orderInitiative` exported: AC 1's tie-breaks need exact rolls.
-  - `restartBattle`: AC 4.
+  - Restart: AC 4. Once D7 was decided (a new battle with a new seed), `createBattle` covers it and `restartBattle` was removed (D-I).
   - The counter-exhaustion guards: without them an accepted command could return a snapshot `readBattleState` rejects.
   - `createBattle` re-reading its result: AC 4 asks for a valid fresh state, and the re-read makes that true by construction.
 
@@ -97,7 +97,7 @@ Each part of the first draft was checked against the four acceptance criteria an
 
 Why both: the archer has no Basic Attack in the baseline, so a Basic-Attack-only #7 would give it a melee attack it should not have, or no attack at all. Both rows resolve through the same function, so the second row costs one table entry plus the LOS rule. #9 needs both rows, and the `blockedLos` and `abilityNotOwned` rejections are already declared. The resolver looks up a profile, not an ID switch. The profile shape is `{ rangeMin, rangeMax, baseDamage, owners }`, keyed by ability ID. Both rows have accuracy and damage modifiers of 0, require LOS and target an enemy unit, so those stay rules rather than fields until #8 brings a row that differs (§3.0).
 
-If the reviewer prefers Shortbow Shot and LOS in #8 or #9, we drop the archer row and the LOS code in a single commit (see §7 item 2).
+**Decided 2026-10-09 (the user said dubstylee left this to us):** Shortbow Shot and LOS stay in #7 (§7 item 2).
 
 ### D-B. Battle creation rolls initiative
 
@@ -183,13 +183,21 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 - `replayBattle(input, catalog)` validates the envelope with `readReplay`, then folds `dispatch` over the commands. It returns `{ ok: true, state, events }` with all events in order (initiative events are not repeated; they belong to creation). A bad envelope returns `readReplay`'s `invalidReplay`; a command that does not apply returns `{ ok: false, reason: 'invalidReplay', index, rejection }` naming the first one. The result type sits next to the function.
 - `turns.ts` imports `grid.ts` and `combat.ts`; neither of them, nor `battle.ts`, imports `turns.ts`, so there is no cycle.
 
-### D-I. Restart, and D7 left to the session
+### D-I. Restart is a new battle with a new seed (D7 decided)
 
-`restartBattle(state, catalog)` reads the snapshot (mid-battle or finished) and returns `createBattle(state.mapId, state.seed, catalog)`. Legacy restart reloads with the same seed (`BattleController.gd:124,1336-1346`), so the same inputs replay the same dice. A new-seed restart is just `createBattle` with a seed the session supplies; the domain never makes entropy. D7 ("replay the same seed or roll a new one") stays open for #10, and the domain supports both without a flag. The PR says so and does not claim D7 is decided.
+The first version had `restartBattle(state, catalog)` return `createBattle(state.mapId, state.seed, catalog)`, as legacy did (`BattleController.gd:124,1336-1346`), and left D7 to #10.
 
-### D-J. `RULES_VERSION` stays 1
+**D7 was decided on 2026-10-09.** dubstylee, relayed by the user from Discord: "Yeah we want a new seed when starting a new battle."
 
-#5 added movement rules without a bump. No replay could have been executed before #7, because dispatch did not exist. Bump once the slice ships. Flag this in the PR for the reviewer.
+- A restart is a new battle: the session calls `createBattle(state.mapId, newSeed, catalog)`. The domain never makes entropy, so #10 supplies the seed.
+- `restartBattle` was removed rather than given a seed parameter. With the seed coming from outside, it would only read `mapId` from a snapshot the session already holds. The draft design already says "the session calls `createBattle` again" (`tech_design.phaser4.draft.md` §4.2).
+- The domain does not reject a repeated seed. The draft's `?seed=` override deliberately reuses its seed across restarts.
+- Resuming a saved battle is a different case: the snapshot carries the RNG state, so no seed choice arises. Saves are a follow-up.
+- Recorded in the restart plan's register (resolved item 7; the D7 row removed, as D3 was) and in the draft design (§4.2, the seed override, the decision table).
+
+### D-J. `RULES_VERSION` stays 1 (decided)
+
+**Decided 2026-10-09.** #5 added movement rules without a bump. No replay or save has been recorded outside tests, because there is no session yet, so a bump would protect nothing and only churn fixtures. The policy is now in the `constants.ts` comment: once #10 records replays, bump whenever a rules change would make a recorded replay play out differently.
 
 ## 4. Work breakdown
 
@@ -206,7 +214,7 @@ Each increment starts with a failing spec, run and recorded before the implement
 
 ### [x] Increment 2: creation and turns (`feat`)
 
-`tests/unit/turns.test.ts` (8 tests), then `src/domain/turns.ts` (D-B, D-C, D-I): `orderInitiative`, `createBattle`, `endTurn`, `restartBattle`.
+`tests/unit/turns.test.ts` (8 tests), then `src/domain/turns.ts` (D-B, D-C, D-I): `orderInitiative`, `createBattle`, `endTurn`, and `restartBattle` (later removed by the D7 decision, see D-I).
 
 - `orderInitiative`: the four `test_turn_manager.gd:43-95` cases (total; Dexterity tie; player-side tie; ID tie), each also with reversed input.
 - `createBattle`:
@@ -221,7 +229,7 @@ Each increment starts with a failing spec, run and recorded before the implement
   - Wait with no move or action; the next unit's flags are cleared and the ending unit's flags are kept; the RNG is untouched; the frozen input is unchanged;
   - the wrap adds 1 to `round`; a defeated unit is skipped, including across the wrap (round added once);
   - rejects `notActiveUnit`, `unknownUnit`, `malformedCommand` (a move, an extra field), `battleOver`, an exhausted `commandCount` and an exhausted `round`. An exhausted `round` with no wrap is accepted.
-- `restartBattle`: from a mid-battle and from a finished snapshot it equals the seed's `createBattle`; an invalid snapshot returns `invalidState`.
+- Restart, after D7: from a finished and from a mid-battle snapshot, `createBattle` with the same map and a new seed gives a valid fresh battle (round 1, full HP, a different RNG, accepted by `readReplay`). The module no longer exports `restartBattle`.
 
 ### [x] Increment 3: combat (`feat`)
 
@@ -315,19 +323,21 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 ## 6. Hand-off to the next issues
 
 - **#8** gets the profile shape and the single attack path. It adds three signatures as profiles or moves the table into its catalog, keeping the IDs `ability:basic_attack` and `ability:shortbow_shot`. It adds Guarded's AC term as a new item in the breakdown, not a second formula. D5, D6 and D11 stay with it.
-- **#9** gets `previewMovement`, `previewAttack` (integer scores), `dispatch` and the explicit `endTurn`. It appends `endTurn` to each enemy decision. Replays record AI commands; they do not recompute them.
-- **#10** gets `createBattle`, `restartBattle`, the event stream to animate, and D7. Events describe what happened. The session animates them and never decides order or outcome. Defeated units stay in the snapshot at their last cell, so the renderer must hide or mark them.
+- **#9** gets `previewMovement`, `previewAttack` (integer scores), `dispatch` and the explicit `endTurn`. Its command list for an enemy turn ends with `endTurn` (decided, §7 item 5). Replays record AI commands; they do not recompute them.
+- **#10** gets `createBattle` (also its restart: same map, new seed from the session, D-I) and the event stream to animate. Events describe what happened. The session animates them and never decides order or outcome. Defeated units stay in the snapshot at their last cell, so the renderer must hide or mark them.
 - **#11** gets nothing device-specific from #7.
 
 ## 7. Risks and open points
 
-1. **D7 is open.** The domain supports same-seed and new-seed restart; #10 picks. Legacy behaviour (same seed) is the documented default, not a decision.
-2. **Shortbow Shot and LOS in #7 (D-A)** may read as scope growth. Ask dubstylee in the PR. Fallback: drop the archer row and `targeting.ts`'s LOS function in a single commit, leaving the archer without an attack until #8/#9.
-3. **Ability IDs become contract.** `ability:basic_attack` and `ability:shortbow_shot` appear in replays, so #8's catalog must keep them.
-4. **`RULES_VERSION` stays 1 (D-J).** The reviewer may want a bump; it is a one-line change plus fixture updates.
-5. **Enemy turns need an explicit `endTurn`.** This differs from the legacy controller, which ends the enemy turn itself. The domain rule is the same for both sides, which is simpler to replay; #9 must append the command.
+The five review questions were resolved on 2026-10-09. D7 was decided by dubstylee; the user said dubstylee left the other four to us.
+
+1. **D7: resolved, new seed.** See D-I.
+2. **Shortbow Shot and LOS stay in #7.** The archer's only attack is Shortbow Shot. Without it, a full battle has an enemy that can only move and Wait, and #9 has nothing to score for it. LOS is part of that ability (`requires_los`), and #4 already declared `blockedLos`. The cost is about 25 lines plus tests.
+3. **Ability IDs are contract.** `ability:basic_attack` and `ability:shortbow_shot` are recorded in replays, so #8's catalog keeps them. This is now stated in the `combat.ts` table comment, where #8 will edit.
+4. **`RULES_VERSION` stays 1.** See D-J; the bump policy is in the `constants.ts` comment.
+5. **Enemy turns end with an explicit `endTurn`.** The draft design's AI returns a command list (`chooseEnemyCommands(state, catalog): Command[]`), so #9 ends it with `endTurn`. Legacy's controller ending the enemy turn itself was session behaviour, not a rule. One rule for both sides keeps every turn end in the replay.
 6. **PR #43 merge order.** If it merges first, add one smoke test that runs `createBattle` on the real forest-ruins map (six units, valid initiative, `readReplay` accepts it). Optional, not a dependency.
-7. **The LOS port keeps legacy float rounding (D-G).** It reproduces legacy exactly, including the rare lines (22+ steps) where the float lerp rounds an exact half down. If a reviewer prefers exact geometry instead, the integer formula `floor((2·(from·steps + delta·step) + steps)/(2·steps))` is a one-function swap; it differs from legacy only on lines no slice range reaches. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
+7. **The LOS port keeps legacy float rounding (D-G).** It reproduces legacy exactly, including the rare lines (22+ steps) where the float lerp rounds an exact half down. If exact geometry is ever preferred, the integer formula `floor((2·(from·steps + delta·step) + steps)/(2·steps))` is a one-function swap; it differs from legacy only on lines no slice range reaches. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
 8. **Replay cost.** Each dispatched command re-validates its snapshot, and `readBattleState` hashes the whole catalog each time. Measured on the fixture catalog: about 0.7 ms per command (0.18 ms per hash), so the 44-command test battle replays in about 30 ms. The real catalog (#29) is larger. A 10,000-command replay (the envelope's limit) could take tens of seconds. That is fine for tests and debugging; if #10 replays on load, memoise `contentVersion` per catalog object there. Nothing in #7 needs it faster, so `battle.ts` is unchanged.
 9. **Shared checkout.** Another session may commit to this working tree. Re-check `git log -1` and `git status` in the same command as each commit, and stage paths explicitly. A worktree for the branch avoids the problem entirely.
 
@@ -336,7 +346,7 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 - Branch: `issue-7-turn-flow-combat`, created 2026-10-09 with `gh issue develop 7 --base main --name issue-7-turn-flow-combat --checkout`. It is on the issue's Development panel, so the merge closes #7. That is fine, because every acceptance box must be verified before the PR is marked ready. If `main` moves before the PR, merge `main` into the branch rather than rebasing.
 - No `Closes` line and no completion claim until all four acceptance criteria are verified (issue guardrail). Mark each box with its test names in the PR body.
 - Commit and push: the user's goal for this session (2026-10-09) asked for the git process to be managed through to a PR ready for review, so each increment was committed and pushed as it landed. No tags (merge conventions: none). Review follow-up per the usual rules: a RED spec first, one fix commit per finding, inline replies with the SHA, resolved threads, left ready to merge. Merge with a merge commit; keep the branch.
-- No formal reviewer request, assignee or label: recent PRs (#38–#42) carry none, and their bodies @-mention no one. The PR body lists the questions for the reviewer (dubstylee implemented #4 and #5 and filed #8–#10, the issues that consume this API).
+- No formal reviewer request, assignee or label: recent PRs (#38–#42) carry none, and their bodies @-mention no one. The PR body records the five resolved review questions (§7 items 1–5).
 
 ## 9. Updates
 
@@ -377,3 +387,15 @@ Added the task note and repointed the stale "#7" forward references in code comm
 ### 2026-10-09: PR opened
 
 [PR #44](https://github.com/luminari-gurus/tactics-guru-v2/pull/44) was opened ready for review from head `40c8ca1`. GitHub lists it in #7's `closedByPullRequestsReferences`, and it reports MERGEABLE. Its body maps each acceptance criterion to test names and lists the five review questions (§7 items 1–5). It requests no reviewer, assignee or label, matching recent PRs. The branch holds seven commits: the plan, the ablation pass, four `feat` increments and the docs. Nothing is left open on the implementation side.
+
+### 2026-10-09: review questions resolved
+
+The user relayed dubstylee's Discord answer on D7: "Yeah we want a new seed when starting a new battle." Per the user, the other four were left to us.
+
+- `887bb71` (D7): RED first; the new restart spec failed only on `restartBattle` still being exported. Removing it made `createBattle` the restart path, and the decision is recorded in the restart plan and the draft design (D-I).
+- The next commit records the other four decisions:
+  - `constants.ts` comment: the `RULES_VERSION` bump policy;
+  - `combat.ts` comment: ability IDs are contract;
+  - the task note: Shortbow rationale, enemy `endTurn`, `RULES_VERSION`;
+  - this plan: D-A, D-I, D-J, §6, §7.
+- Gate: unit tests 179/179 and the typecheck pass. `npm run build` was rerun on the final tree. The browser suite was not rerun, because nothing the app imports changed: `src/domain` is reached only through `src/content/validate.ts`'s use of `domain/validation`.

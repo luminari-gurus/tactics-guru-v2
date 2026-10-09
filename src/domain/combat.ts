@@ -9,6 +9,7 @@ type AttackProfile = { readonly rangeMin: number; readonly rangeMax: number; rea
 /**
  * The slice's two ordinary d20 attacks (basic_attack.tres; CombatResolver.gd:32-49,1392-1408). Both need line of sight,
  * target one enemy unit and have no accuracy or damage modifier; #8 adds fields with the first profile that differs.
+ * Replays record these IDs, so they are contract: #8's catalog keeps them.
  */
 const ATTACK_PROFILES: Readonly<Record<string, AttackProfile>> = {
   'ability:basic_attack': { rangeMin: 1, rangeMax: 1, baseDamage: 2, owners: ['fighter', 'ranger', 'mage', 'goblin_grunt'] },
