@@ -82,7 +82,7 @@ export function previewCommand(state: unknown, input: unknown, catalog: ContentC
   return { ok: true, command: clone(input) };
 }
 export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { readonly ok: false; readonly reason: 'invalidReplay' };
-/** Accepted log shape is checked, not simulated; #7 supplies replay dispatch. */
+/** Accepted log shape is checked, not simulated; replayBattle (turns.ts) re-executes it. */
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||

@@ -91,8 +91,8 @@ Each part of the first draft was checked against the four acceptance criteria an
 
 | Profile | Range | Base damage | Accuracy mod | Damage mod | LOS | Owned by | Source |
 | -- | -- | -- | -- | -- | -- | -- | -- |
-| `ability:basic_attack` | 1–1 | 2 | 0 | 0 | required | fighter, ranger, mage, goblin_grunt | `content/abilities/basic_attack.tres`; `CombatResolver.gd:33-38,1392-1408` |
-| `ability:shortbow_shot` | 2–4 | 2 | 0 | 0 | required | goblin_archer | `CombatResolver.gd:49-50,634-640`; §3.4 stat table ("Slice abilities") |
+| `ability:basic_attack` | 1–1 | 2 | 0 | 0 | required | fighter, ranger, mage, goblin_grunt | `content/abilities/basic_attack.tres`; `CombatResolver.gd:32-37,1392-1408` |
+| `ability:shortbow_shot` | 2–4 | 2 | 0 | 0 | required | goblin_archer | `CombatResolver.gd:48-49,630-640,1392-1408`; §3.4 stat table ("Slice abilities") |
 
 Why both: the archer has no Basic Attack in the baseline, so a Basic-Attack-only #7 would give it a melee attack it should not have, or no attack at all. Both rows resolve through the same function, so the second row costs one table entry plus the LOS rule. #9 needs both rows, and the `blockedLos` and `abilityNotOwned` rejections are already declared. The resolver looks up a profile, not an ID switch. The profile shape is `{ rangeMin, rangeMax, baseDamage, owners }`, keyed by ability ID. Both rows have accuracy and damage modifiers of 0, require LOS and target an enemy unit, so those stay rules rather than fields until #8 brings a row that differs (§3.0).
 
@@ -278,11 +278,12 @@ Three more tests in `tests/unit/turns.test.ts` (11 in total there), then `dispat
   - a finished snapshot as `initial`, or an unknown command type, is the envelope's `invalidReplay`.
 - Mutation check (scratch): an off-by-one index, dropped events and a misrouted `endTurn` all fail.
 
-### [ ] Increment 5: task note and PR (`docs`)
+### [x] Increment 5: task note and PR (`docs`)
 
-- Add `docs/turn-flow-combat.md` in the style of `docs/battle-foundation.md` and `docs/grid-movement.md`: the rules, the rejection order, the legacy citations, the verification commands, and what is not claimed.
-- Update the `readReplay` comment in `battle.ts`, the `Replay` comment in `types.ts`, and the "#7" forward references in `battle-foundation.md` and `grid-movement.md`, so they point at `turns.ts`.
-- Run the §5 gate, push, and open the PR (§8). Do not delete this plan in the PR; it goes at close-out, as with #35.
+- Added `docs/turn-flow-combat.md`, with pinned legacy links.
+- Pointed the forward references at `turns.ts`: the `readReplay` comment in `battle.ts`, the `Replay` and `AbilityId` comments in `types.ts`, `battle-foundation.md` (two places) and `grid-movement.md`.
+- Corrected two legacy line citations (Basic Attack `CombatResolver.gd:32-37`, Shortbow Shot `:48-49`).
+- Ran the §5 gate on the final tree, pushed, and opened the PR (§8 and the status line).
 
 ## 5. Validation gate (run before the PR, name each in the PR)
 
@@ -297,6 +298,18 @@ Three more tests in `tests/unit/turns.test.ts` (11 in total there), then `dispat
 | Whitespace | `git diff --check` | clean |
 
 There is no CI besides the Cloudflare Pages preview. The local runs are the evidence.
+
+**Results on the final tree (2026-10-09):**
+
+| Check | Result |
+| -- | -- |
+| RED evidence | Recorded for each increment in §9. |
+| Focused tests | 29 passed: 6 targeting, 11 turns, 12 combat. |
+| `npm run test:unit` | 17 files, 179 tests (150 baseline + 29). |
+| `npm run typecheck` | Passed. |
+| `npm run build` | Passed; the only warning is the existing Phaser chunk-size one. |
+| `npm test` | 99 passed in 2.7 min, Playwright's Chromium on this WSL2 host. Built from the tree before the last two comment-only citation fixes, which change no runtime code. |
+| `git diff --check` | Clean. |
 
 ## 6. Hand-off to the next issues
 
@@ -321,8 +334,8 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 
 - Branch: `issue-7-turn-flow-combat`, created 2026-10-09 with `gh issue develop 7 --base main --name issue-7-turn-flow-combat --checkout`. It is on the issue's Development panel, so the merge closes #7. That is fine, because every acceptance box must be verified before the PR is marked ready. If `main` moves before the PR, merge `main` into the branch rather than rebasing.
 - No `Closes` line and no completion claim until all four acceptance criteria are verified (issue guardrail). Mark each box with its test names in the PR body.
-- Commit and push only when asked. Review follow-up per the usual rules: a RED spec first, one fix commit per finding, inline replies with the SHA, resolved threads, left ready to merge. Merge with a merge commit; keep the branch.
-- Request review from dubstylee, who implemented #4 and #5 and filed #8–#10, the issues that consume this API.
+- Commit and push: the user's goal for this session (2026-10-09) asked for the git process to be managed through to a PR ready for review, so each increment was committed and pushed as it landed. No tags (merge conventions: none). Review follow-up per the usual rules: a RED spec first, one fix commit per finding, inline replies with the SHA, resolved threads, left ready to merge. Merge with a merge commit; keep the branch.
+- No formal reviewer request, assignee or label: recent PRs (#38–#42) carry none, and their bodies @-mention no one. The PR body lists the questions for the reviewer (dubstylee implemented #4 and #5 and filed #8–#10, the issues that consume this API).
 
 ## 9. Updates
 
@@ -355,3 +368,7 @@ GREEN: 12/12 pass. Writing the counter case showed that checking only `cursor ==
 ### 2026-10-09: increment 4 (dispatch and replay)
 
 RED: with the new cases in `tests/unit/turns.test.ts`, 3 failed (`dispatch is not a function`) and the 8 existing tests passed. GREEN: 11/11 pass. A throwaway probe (reverted, never committed) measured the seed-7 battle: 44 commands, `playerWin`, round 6, archer then grunt defeated; replay about 0.7 ms per command (§7 item 8). `npm run test:unit`: 17 files, 179 tests (150 + 29). `npm run typecheck` passes.
+
+### 2026-10-09: increment 5 (docs) and the gate
+
+Added the task note and repointed the stale "#7" forward references in code comments and the #4/#5 notes. The full gate passed (§5 results). `origin/main` is still `73d17c0`, so no merge was needed. Next: the PR (status line).

@@ -7,7 +7,7 @@ import type { BattleEvent, BattleState, Command, CommandResult, Rejection, UnitS
 
 type AttackProfile = { readonly rangeMin: number; readonly rangeMax: number; readonly baseDamage: number; readonly owners: readonly UnitId[] };
 /**
- * The slice's two ordinary d20 attacks (basic_attack.tres; CombatResolver.gd:49-50,634-640). Both need line of sight,
+ * The slice's two ordinary d20 attacks (basic_attack.tres; CombatResolver.gd:32-49,1392-1408). Both need line of sight,
  * target one enemy unit and have no accuracy or damage modifier; #8 adds fields with the first profile that differs.
  */
 const ATTACK_PROFILES: Readonly<Record<string, AttackProfile>> = {
