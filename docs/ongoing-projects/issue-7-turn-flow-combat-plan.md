@@ -194,15 +194,14 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 
 Each increment starts with a failing spec, run and recorded before the implementation exists. One commit per increment, pushed when it lands; §9 records the SHA and the RED/GREEN evidence. Test files follow the issue's suggested names.
 
-### [ ] Increment 1: targeting (`feat`)
+### [x] Increment 1: targeting (`feat`)
 
-RED: `tests/unit/targeting.test.ts`.
+`tests/unit/targeting.test.ts` (6 tests), then `src/domain/targeting.ts` (D-G): `manhattanDistance`, `lineCellsBetween`, `lineOfSightBlocked(catalog, mapId, from, to)`.
 
-- Manhattan range: `rangeMin−1`, `rangeMin`, `rangeMax`, `rangeMax+1` are judged against both profiles' ranges.
-- LOS vectors: the eight directions, the half-way cases, and the `(0,0)→(11,22)` legacy-rounding pin (D-G).
-- Blocking terrain blocks. A unit or a height-4 cell between the two cells does not block. Adjacent and same-cell pairs have no cells between them.
-
-Then `src/domain/targeting.ts` (D-G).
+- Manhattan distance; the LOS vectors in the eight directions, the half-way cases, and the `(0,0)→(11,22)` legacy-rounding pin.
+- A sampled sweep over the 32 × 32 content bounds shows each line yields `steps − 1` distinct cells and never an endpoint. That is why the port drops legacy's dedup and endpoint checks.
+- Blocking terrain between the cells blocks. Blocking terrain on an endpoint, an adjacent pair, height 4 and non-blocking terrain do not block. On `(0,0)→(2,1)` the half-way rounding decides which cell matters.
+- Moved to increment 3, because they need profiles and units: the `rangeMin−1 … rangeMax+1` boundaries (as `outOfRange`) and "a unit between does not block" (a shortbow shot past a living unit).
 
 ### [ ] Increment 2: creation and turns (`feat`)
 
@@ -238,6 +237,7 @@ RED: `tests/unit/combat.test.ts`. Roll and damage cases, re-derived from `test_c
 - Height (`test_m4_height_attack.gd:21-74`):
   - +2, −2 and 0, with an elevation difference of 4 still giving exactly ±2;
   - natural 10 with +0 against AC 12 hits from above and misses from below.
+- `outOfRange` at `rangeMin − 1` and `rangeMax + 1` for both profiles, and acceptance at `rangeMin` and `rangeMax`; a shortbow shot past a living unit is not blocked.
 - Every rejection in the D-D order, each leaving the input unchanged and drawing nothing:
   - `abilityNotOwned`: the archer using `basic_attack`, and the grunt using `shortbow_shot`;
   - `sameSide`: an ally and self;
@@ -318,3 +318,7 @@ There is no CI besides the Cloudflare Pages preview. The local runs are the evid
 ### 2026-10-09: ablation pass
 
 Before any code, the plan was simplified against the acceptance criteria (§3.0). The changes: LOS keeps the legacy float rounding; the modules follow the issue's paths (`targeting`, `turns`, `combat`); profile fields and preview fields with no #7 consumer were dropped; the replay result type moved next to its function. No acceptance criterion lost a test. Next: increment 1.
+
+### 2026-10-09: increment 1 (targeting)
+
+RED: `npm run test:unit -- tests/unit/targeting.test.ts` failed on the missing `src/domain/targeting` import (no tests ran). GREEN: 6/6 pass. The domain-boundary tests and `npm run typecheck` pass.
