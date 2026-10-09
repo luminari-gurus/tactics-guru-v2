@@ -64,7 +64,7 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 `replayBattle(replay, catalog)` validates the envelope with `readReplay`. It then rebuilds `createBattle(initial.mapId, initial.seed)` and rejects the replay unless `initial` matches it exactly, compared as sorted-key JSON so key order does not matter. A replay therefore cannot start from chosen HP, dice, initiative, flags or outcome. Then it re-executes the commands. It returns the final snapshot and every event in order; creation's initiative events are not repeated. A bad envelope is `invalidReplay`. A command that does not apply is `invalidReplay` with its `index` and the `rejection`. AI commands are recorded, not recomputed.
 
-Each command re-validates its snapshot, including the catalog hash, at about 0.7 ms per command on the test fixture. That is fast enough for tests and debugging; a session that replays long logs can memoise the content version per catalog.
+Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed.
 
 ## Not included
 

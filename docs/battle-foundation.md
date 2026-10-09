@@ -16,7 +16,7 @@ The accepted §6.4 proposal is **sfc32 v1**, seeded as `[0, seed, 0, 1]` with tw
 
 ## Version identity
 
-Format, rules and RNG versions are named manual integers. Content version is `sha256:` plus a lowercase SHA-256 digest of canonical JSON (recursively sorted object keys, array order preserved, JSON string escaping, UTF-8 encoding). All catalog data, including stats and asset provenance, contributes. There is no hand-kept content revision that can silently miss a changed stat. The pure implementation has independent Node crypto oracle comparisons for ordinary text, non-ASCII, astral Unicode, multi-block text and escaped lone surrogates. A digest identifies data; it does not certify content validity or prevent forged state.
+Format, rules and RNG versions are named manual integers. Content version is `sha256:` plus a lowercase SHA-256 digest of canonical JSON (recursively sorted object keys, array order preserved, JSON string escaping, UTF-8 encoding). All catalog data, including stats and asset provenance, contributes. There is no hand-kept content revision that can silently miss a changed stat. `contentVersion` hashes each catalog object once and caches the digest (#7), because every snapshot check needs it; a catalog must therefore not be edited after use, only replaced. The pure implementation has independent Node crypto oracle comparisons for ordinary text, non-ASCII, astral Unicode, multi-block text and escaped lone surrogates. A digest identifies data; it does not certify content validity or prevent forged state.
 
 ## Commands, previews and replay
 

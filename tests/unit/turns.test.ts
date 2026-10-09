@@ -1,8 +1,10 @@
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
+import { CONTENT_BOUNDS } from '../../src/content/constants';
 import type { CellPosition, ContentCatalog, MapRecord, TerrainId } from '../../src/content/types';
 import type { AbilityId, BattleEvent, BattleState, Command } from '../../src/domain/types';
 import { contentVersion, readBattleState, readReplay } from '../../src/domain/battle';
+import { RULE_BOUNDS } from '../../src/domain/constants';
 import { rollDie, seedRng } from '../../src/domain/rng';
 import { moveUnit, previewMovement } from '../../src/domain/grid';
 import { previewAttack, resolveAttack } from '../../src/domain/combat';
@@ -260,5 +262,25 @@ describe('dispatch and replay', () => {
       expect(readReplay(envelope(initial), catalog).ok).toBe(true);
       expect(replayBattle(envelope(initial), catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
     }
+  });
+  it('replays the longest accepted log on the largest map within five seconds', () => {
+    const side = CONTENT_BOUNDS.mapWidth.max;
+    const largest: MapRecord = { id: 'map:largest_fixture', width: side, height: side,
+      cells: Array.from({ length: side * side }, (_, i) => ({ x: i % side, y: Math.floor(i / side), elevation: 0, terrainId: 'grass' as TerrainId })),
+      spawns: [
+        { id: 1, side: 'heroes', unitId: 'fighter', x: 0, y: 0 }, { id: 2, side: 'heroes', unitId: 'ranger', x: 1, y: 0 },
+        { id: 3, side: 'heroes', unitId: 'mage', x: 0, y: 1 }, { id: 4, side: 'enemies', unitId: 'goblin_grunt', x: side - 1, y: side - 1 },
+        { id: 5, side: 'enemies', unitId: 'goblin_grunt', x: side - 2, y: side - 1 }, { id: 6, side: 'enemies', unitId: 'goblin_archer', x: side - 1, y: side - 2 },
+      ] };
+    const content: ContentCatalog = { ...catalog, maps: { [largest.id]: largest } };
+    const created = createBattle(largest.id, 7, content); assert(created.ok);
+    const order = created.state.initiative; // nobody falls, so each Wait passes to the next unit in order
+    const commands = Array.from({ length: RULE_BOUNDS.maxReplayCommands }, (_, i) => wait(order[i % order.length]));
+    const started = performance.now();
+    const replayed = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, content);
+    const elapsed = performance.now() - started;
+    assert(replayed.ok);
+    expect(replayed.state.commandCount).toBe(commands.length);
+    expect(elapsed).toBeLessThan(5000);
   });
 });
