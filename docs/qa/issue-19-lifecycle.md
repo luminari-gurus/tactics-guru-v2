@@ -1,6 +1,6 @@
 # Issue #19: proof-scene audio unlock and browser lifecycle
 
-Implemented from `origin/main` at `55908a5` on `issue-19-audio-lifecycle`. Implementation commits: `24a5507` (tone asset and catalog), `c76d3a5` (audio reducer and adapter), `c87ca47` (lifecycle), `6a10a13` (layout and page gestures), `9c3fbf2` (browser tests). Plan and decision history: `docs/ongoing-projects/issue-19-audio-lifecycle-plan.md`.
+Implemented from `origin/main` at `55908a5` on `issue-19-audio-lifecycle`. Implementation commits: `24a5507` (tone asset and catalog), `c76d3a5` (audio reducer and adapter), `c87ca47` (lifecycle), `6a10a13` (layout and page gestures), `9c3fbf2` (browser tests). Plan and decision history: `docs/ongoing-projects/issue-19-audio-lifecycle-plan.md`, retired in `4b49ccb` after #19 closed; read it with `git show 4b49ccb^:docs/ongoing-projects/issue-19-audio-lifecycle-plan.md`.
 
 This note is the evidence for the PR. Section 6 is the physical-device checklist that #20 executes; nothing in Chromium emulation closes those items.
 
