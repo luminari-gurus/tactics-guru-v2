@@ -1,6 +1,6 @@
 # Issue #35: proof assets re-exported at display size
 
-Evidence for [#35](https://github.com/luminari-gurus/tactics-guru-v2/issues/35) (parent #2, follow-up from #20). The three large PNGs under `public/proof/` were re-exported by hand at the size the proof scene draws them, following restart plan §5.1 and tech design §7.2, and the scene now loads the exports. The originals stay at their paths. Branch `issue-35-proof-asset-export`: `00a8dea` (RED tests and the rule constants), `5cc6cf5` (the exports), `1330f58` (the scene loads them), then this note; the review fixes are `cf7cb74` (decode failure reported, finding 1), `41a1ea9` (§9, §10 and the plan corrected, finding 2), `2b017d9` (L4 gate on the wire, finding 3) and `2664246` (grass export held to the rule, finding 4), with their evidence in §6. Sections 1 to 4 are the export record, 5 the budget arithmetic, 6 the verification, 7 the screenshots, 8 the collector runs, 9 the device record, 10 scope and limitations.
+Evidence for [#35](https://github.com/luminari-gurus/tactics-guru-v2/issues/35) (parent #2, follow-up from #20). The three large PNGs under `public/proof/` were re-exported by hand at the size the proof scene draws them, following restart plan §5.1 and tech design §7.2, and the scene now loads the exports. The originals stay at their paths. Branch `issue-35-proof-asset-export`: `00a8dea` (RED tests and the rule constants), `5cc6cf5` (the exports), `1330f58` (the scene loads them), then this note; the review fixes are `cf7cb74` (decode failure reported, finding 1), `41a1ea9` (§9, §10 and the plan corrected, finding 2), `2b017d9` (L4 gate on the wire, finding 3) and `2664246` (grass export held to the rule, finding 4), with their evidence in §6. Sections 1 to 4 are the export record, 5 the budget arithmetic, 6 the verification, 7 the screenshots, 8 the collector runs, 9 the device record, 10 scope and limitations. "Plan" below (plan §1, D-A to D-C, §7.4) is `docs/ongoing-projects/issue-35-proof-asset-export-plan.md`, retired in `306aa93` after #35 closed; read it with `git show 306aa93^:docs/ongoing-projects/issue-35-proof-asset-export-plan.md`.
 
 ## 1. Sources
 
@@ -168,9 +168,22 @@ Cold transfer by resource (desktop, first sample; identical bytes in every cold 
 
 Against the live deploy of `9feb1df` measured for the plan on the same host the same morning (cold assets 5,756,208; cold usable medians 1,758 / 1,793 / 1,695 ms; warm 463 / 754 / 700 ms): cold usable medians fall to 911 / 1,189 / 1,076 ms (L1 ≤ 2,500 passes, worst sample 1,479), and the warm medians are 549 / 671 / 664 ms with a worst sample of 714, inside L2's 750 where the morning run had mobile-portrait at 754. The warm change is reported, not attributed: warm reloads transfer only revalidations, so the decode of two much smaller images is the only candidate this change offers.
 
-### 8.3 Main deploy after merge
+### 8.3 Main deploy after merge, `1908452`
 
-Pending: `npm run measure:fit -- docs/qa/issue-35/fit-main-<sha>.json --url https://tactics-guru-v2.pages.dev` once Pages serves the merge commit; this is the run the acceptance criterion names.
+`npm run measure:fit -- docs/qa/issue-35/fit-main-1908452.json --url https://tactics-guru-v2.pages.dev`, 2026-10-08 11:17–11:18 UTC, same host, network and conditions as §8.2: [fit-main-1908452.json](issue-35/fit-main-1908452.json). `measuredBuild` `1908452`, `dirty: false`, read from the served bundle and equal to the merge commit of PR #37 on `main` (the Pages auto-deploy served `9feb1df` until about three minutes after the merge). 18 samples, zero console or page errors. This is the run the second acceptance criterion names.
+
+| Profile | Cache | Transferred bytes (median of three) | Controls usable ms (min..max) | Frame p50 / p95 ms |
+| --- | --- | ---: | ---: | ---: |
+| desktop | cold | 1,781,803 | 1,066 (890..1,441) | 16.7 / 16.9 |
+| desktop | warm | 7,271 | 414 (345..730) | 16.7 / 16.9 |
+| mobile-portrait | cold | 1,781,803 | 954 (938..1,541) | 16.7 / 16.9 |
+| mobile-portrait | warm | 7,271 | 704 (426..1,016) | 16.7 / 16.9 |
+| mobile-landscape | cold | 1,781,803 | 1,335 (793..2,215) | 16.7 / 16.9 |
+| mobile-landscape | warm | 7,271 | 666 (408..732) | 16.7 / 16.9 |
+
+**Assets on a cold load are 1,412,374 bytes in all nine cold samples, the same figure as the loopback and preview runs: L4 passes on `main` with 87,626 bytes to spare.** The 234-byte spread in the cold totals is again the Phaser chunk's transfer size (363,656 to 363,890 bytes, CDN response headers). Per resource (desktop, first sample): the ten terrain textures 1,337,733 (128–230 ms each), `tree-grass-v1-480.webp` 54,500 (207 ms), `fighter.png` 9,143, `fighter-portrait-96.webp` 4,868 + 300 (105 and 80 ms), two tones 5,830, Phaser chunk 363,656 (559 ms, the slowest request), HTML 1,271 and the three small code files 4,268: code 369,195 (L3 passes). Warm reloads transfer 7,271 bytes in every warm sample, as on the preview.
+
+Timing on this run is noisier than §8.2: cold usable medians 1,066 / 954 / 1,335 ms (L1 ≤ 2,500 passes; worst sample 2,215 ms in mobile-landscape, whose three cold samples span 793–2,215 ms), warm medians 414 / 704 / 666 ms (inside L2's 750 by median) with one warm mobile-portrait sample at 1,016 ms above the 750 limit, where §8.2's worst warm sample was 714 and the `9feb1df` morning run's 754. The bytes in those samples are identical to their neighbours, so the spread is request timing on the host and CDN during the run, not content; it is reported, not attributed, as in §8.2. Cold assets, the figure this issue owns, did not vary.
 
 ## 9. Device record
 
@@ -192,5 +205,5 @@ Android: the user ran the five rows on a physical Android phone in Brave, Chrome
 - `dist/` is about 43 MB because `public/` is copied verbatim: PR #32's ten terrain sources (about 33 MB) and the three proof originals kept here (7.4 MB) are never requested by the scene, so they do not count toward L4, but the §5.1 release ZIP cap of 20 MiB would reject the folder. That is #3's `check-dist` step; moving the originals out of `public/` is a one-line change if the maintainer prefers it now.
 - The canvas density cap of 1 describes today's renderer. If the DPR-capped canvas of tech design §5.5 is adopted, the tree must be re-exported (cap 2 gives 960 × 993, which cannot meet L4 with the current terrain set) or L4 revisited.
 - Chromium emulation is not device acceptance: the WebP decode question for the portrait and the 3× readability are settled only by the §9 rows. All rows are settled, pass as reported (Android four browsers, desktop, iPhone Safari, iPhone Chrome). A decode failure is visible as the §9 error message from `cf7cb74`; the PNG fallbacks and their commands stay in §3 and are not needed.
-- Warm medians against L2 are reported in §8.2 for the preview deploy without attributing the change; the loopback figures in §8.1 are not comparable to the deployed ones.
-- §8.2 measures the Pages preview of this branch; the main-deploy run the acceptance criterion names (§8.3) can only happen after the merge.
+- Warm medians against L2 are reported in §8.2 for the preview deploy and §8.3 for the `main` deploy without attributing the change; the loopback figures in §8.1 are not comparable to the deployed ones. One warm sample in §8.3 (mobile-portrait, 1,016 ms) is above L2's 750 ms at identical bytes; L2 is a #20 budget, asserted by no code, and this note records the sample rather than re-running until it passes.
+- §8.2 measures the Pages preview of the branch and §8.3 the `main` deploy of the merge commit `1908452`; the cold asset bytes are identical in all three collector runs.

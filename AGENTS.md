@@ -9,3 +9,7 @@ Example:  Media gen API Keys to create assets for the game
 ## `docs/ongoing-projects`
 
 Human documentation workspace, meant to be in intervals folded into the main docs
+
+## Attribution
+
+** NEVER add co-authors, attributions, `Claude-Session`, or signed-off-by lines.
