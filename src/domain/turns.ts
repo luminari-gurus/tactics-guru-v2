@@ -1,6 +1,7 @@
 import type { ContentCatalog, MapId } from '../content/types';
 import { contentVersion, previewCommand, readBattleState, readReplay, type ReplayRead } from './battle';
 import { resolveAttack } from './combat';
+import { canonical } from './contentIdentity';
 import { D20_SIDES, RNG_VERSION, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION } from './constants';
 import { moveUnit } from './grid';
 import { isIntegerIn, rollDie, seedRng } from './rng';
@@ -69,10 +70,15 @@ export function dispatch(state: unknown, input: unknown, catalog: ContentCatalog
 }
 export type ReplayRun = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Extract<ReplayRead, { ok: false }> |
   { readonly ok: false; readonly reason: 'invalidReplay'; readonly index: number; readonly rejection: RejectionReason };
-/** Re-executes recorded commands from the initial boundary; creation's initiative events are not repeated. */
+/**
+ * Re-executes recorded commands from the initial boundary; creation's initiative events are not repeated. `initial` must be
+ * exactly the battle its map and seed create, so a replay cannot start from chosen HP, dice, order or flags.
+ */
 export function replayBattle(input: unknown, catalog: ContentCatalog): ReplayRun {
   const read = readReplay(input, catalog); if (!read.ok) return read;
-  let state = read.replay.initial; const events: BattleEvent[] = [];
+  const created = createBattle(read.replay.initial.mapId, read.replay.initial.seed, catalog);
+  if (!created.ok || canonical(created.state) !== canonical(read.replay.initial)) return { ok: false, reason: 'invalidReplay' };
+  let state = created.state; const events: BattleEvent[] = [];
   for (const [index, command] of read.replay.commands.entries()) {
     const result = dispatch(state, command, catalog);
     if (!result.ok) return { ok: false, reason: 'invalidReplay', index, rejection: result.reason };

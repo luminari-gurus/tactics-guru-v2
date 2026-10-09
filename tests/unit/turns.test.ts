@@ -238,4 +238,27 @@ describe('dispatch and replay', () => {
     expect(replayBattle({ ...copy(replay), initial: played.state }, catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
     expect(replayBattle({ ...copy(replay), commands: [{ type: 'restart' }] }, catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
   });
+  it('replays only from the battle its map and seed create, whatever the key order', () => {
+    const created = createBattle(map.id, 7, catalog); assert(created.ok);
+    const genuine = created.state;
+    const envelope = (initial: unknown, commands: Command[] = []) => ({ format: 1, versions: genuine.versions, initial, commands });
+    const reordered = (v: unknown): unknown => Array.isArray(v) ? v.map(reordered) :
+      v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).reverse().map(([k, x]) => [k, reordered(x)])) : v;
+    const honest = replayBattle(envelope(genuine, [wait(genuine.initiative[0])]), catalog); assert(honest.ok);
+    expect(replayBattle(envelope(reordered(genuine), [wait(genuine.initiative[0])]), catalog)).toEqual(honest);
+    // Each forgery is a valid round-one snapshot, so only the replay's own check can catch it.
+    const forgeries: BattleState[] = [
+      { ...withHp(genuine, { 3: 0, 4: 0 }), outcome: 'playerWin' },
+      withHp(genuine, { 3: 1, 4: 1 }),
+      { ...genuine, rng: { ...genuine.rng, words: [0x12345678, 0x9abcdef0, 0x0fedcba9, genuine.rng.words[3]] } },
+      { ...genuine, initiative: [...genuine.initiative].reverse() },
+      { ...genuine, units: genuine.units.map(u => ({ ...u, hasMoved: true, hasActed: true })) },
+      { ...genuine, activeIndex: 1 },
+      { ...genuine, seed: 8 },
+    ];
+    for (const initial of forgeries) {
+      expect(readReplay(envelope(initial), catalog).ok).toBe(true);
+      expect(replayBattle(envelope(initial), catalog)).toEqual({ ok: false, reason: 'invalidReplay' });
+    }
+  });
 });
