@@ -18,7 +18,7 @@ export interface BattleState {
   readonly activeIndex: number; readonly round: number;
   readonly outcome: 'ongoing' | 'playerWin' | 'playerLoss'; readonly commandCount: number;
 }
-/** Ability identities are syntactic intent only until #8 supplies its catalog. */
+/** Ability identities are syntactic intent; combat.ts resolves the two #7 attacks until #8 supplies its catalog. */
 export type AbilityId = `ability:${string}`;
 export type Command =
   | { readonly type: 'move'; readonly unitId: number; readonly to: CellPosition }
@@ -44,7 +44,7 @@ export type BattleEvent =
   | { readonly type: 'defeated'; readonly unitId: number }
   | { readonly type: 'battleEnded'; readonly outcome: Exclude<BattleState['outcome'], 'ongoing'> };
 export type CommandResult = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Rejection;
-/** Initial boundary + accepted intents; replay execution arrives with #7 dispatch. */
+/** Initial boundary + accepted intents; replayBattle (turns.ts) re-executes them. */
 export interface Replay {
   readonly format: typeof STATE_FORMAT_VERSION; readonly versions: Versions;
   readonly initial: BattleState; readonly commands: readonly Command[];
