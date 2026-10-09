@@ -48,7 +48,6 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
   if (intent.command.type !== 'endTurn') return { ok: false, reason: 'malformedCommand' };
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state;
-  if (snapshot.commandCount === RULE_BOUNDS.commandCount.max) return { ok: false, reason: 'invalidState' };
   let index = snapshot.activeIndex, round = snapshot.round;
   do {
     index = (index + 1) % snapshot.initiative.length;

@@ -3,6 +3,7 @@ import { catalogFixture } from './fixtures/contentContract';
 import type { CellPosition, ContentCatalog, MapRecord, TerrainId, UnitId, UnitStats } from '../../src/content/types';
 import type { BattleState, UnitState } from '../../src/domain/types';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
+import { RULE_BOUNDS } from '../../src/domain/constants';
 import { rollDie, seedRng } from '../../src/domain/rng';
 import { moveUnit } from '../../src/domain/grid';
 import { endTurn } from '../../src/domain/turns';
@@ -134,9 +135,11 @@ describe('attack legality (legacy TargetingService.gd:28-49)', () => {
     const { catalog, state } = setup({ activeIndex: 3 }); // the grunt stands at (2,1), between the archer and the fighter
     expect(resolveAttack(state, attack(4, 1, 'shortbow_shot'), catalog).ok).toBe(true);
   });
-  it('rejects exhausted command and RNG counters as invalid state instead of throwing', () => {
+  it('rejects a battle at the command limit, and an exhausted RNG as invalid state instead of throwing', () => {
     const { catalog, state } = setup();
-    expect(resolveAttack({ ...state, commandCount: Number.MAX_SAFE_INTEGER }, attack(1, 3), catalog)).toEqual({ ok: false, reason: 'invalidState' });
+    const limit = { ...state, commandCount: RULE_BOUNDS.commandCount.max };
+    expect(resolveAttack(limit, attack(1, 3), catalog)).toEqual({ ok: false, reason: 'commandLimit' });
+    expect(previewAttack(limit, attack(1, 3), catalog)).toEqual({ ok: false, reason: 'commandLimit' });
     const exhausted = { ...state, rng: { words: [state.rng.words[0], state.rng.words[1], state.rng.words[2], 12], cursor: Number.MAX_SAFE_INTEGER } };
     // One draw left, but that draw (2^32 - 9) falls in the rejection band, so the d20 needs a second draw.
     const redraw = { ...state, rng: { words: [0x100000000 - 20, 0, 0, 11], cursor: Number.MAX_SAFE_INTEGER - 1 } };

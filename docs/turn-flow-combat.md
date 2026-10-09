@@ -22,7 +22,9 @@ Resuming a saved battle is different: the snapshot carries the RNG state, so pla
 
 Each turn allows one move and one action, in either order. Acting never ends a turn: `endTurn` (the legacy Wait) is the only way, for both sides, and Wait with no move or action is legal. Enemy turns end the same way. The legacy controller ended an enemy turn itself after its AI's command. Here the AI's command list (#9) ends with `endTurn`, so replays record every turn end and follow one rule for both sides.
 
-`endTurn` emits `turnEnded`, then steps through the initiative order, skipping units at 0 HP and adding one round each time it wraps. It clears the next unit's `hasMoved` and `hasActed` and emits `turnStarted` ([TurnManager.gd:64-73,90-94,119-137](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L64-L137)). An ongoing battle has a living unit on each side, so it stops within one wrap. It draws no RNG. An exhausted `commandCount` or `round` is `invalidState`.
+`endTurn` emits `turnEnded`, then steps through the initiative order, skipping units at 0 HP and adding one round each time it wraps. It clears the next unit's `hasMoved` and `hasActed` and emits `turnStarted` ([TurnManager.gd:64-73,90-94,119-137](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L64-L137)). An ongoing battle has a living unit on each side, so it stops within one wrap. It draws no RNG. An exhausted `round` is `invalidState`.
+
+A battle accepts at most 10 000 commands (`RULE_BOUNDS.commandCount.max`). That is also the longest log `readReplay` accepts, so every battle's whole log replays. At the limit every command, and every preview, rejects `commandLimit` in the shared intent check. There is no draw rule: six units that only Wait reach the limit after about 1 667 rounds, and what the player sees then is up to #10.
 
 ## Attacks
 
@@ -33,9 +35,9 @@ Each turn allows one move and one action, in either order. Acting never ends a t
 | `ability:basic_attack` | 1 | 2 | fighter, ranger, mage, goblin_grunt |
 | `ability:shortbow_shot` | 2–4 | 2 | goblin_archer |
 
-After the shared intent checks (`malformedCommand`, `invalidState`, `battleOver`, `unknownUnit`, `unitDefeated`, `notActiveUnit`), an attack rejects in this order: `alreadyActed`, `unknownAbility`, `abilityNotOwned`, `wrongTargetKind` (a cell target), `missingTarget`, `targetDefeated`, `sameSide` (allies and self), `outOfRange`, `blockedLos`. The target checks follow [TargetingService.gd:28-49](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TargetingService.gd#L28-L49).
+After the shared intent checks (`malformedCommand`, `invalidState`, `battleOver`, `commandLimit`, `unknownUnit`, `unitDefeated`, `notActiveUnit`), an attack rejects in this order: `alreadyActed`, `unknownAbility`, `abilityNotOwned`, `wrongTargetKind` (a cell target), `missingTarget`, `targetDefeated`, `sameSide` (allies and self), `outOfRange`, `blockedLos`. The target checks follow [TargetingService.gd:28-49](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TargetingService.gd#L28-L49).
 
-An exhausted command counter or RNG cursor is then `invalidState`. That includes a cursor one draw short of the limit when that draw needs a rejection-sampling redraw, so a crafted snapshot cannot make resolution throw.
+An exhausted RNG cursor is then `invalidState`. That includes a cursor one draw short of the limit when that draw needs a rejection-sampling redraw, so a crafted snapshot cannot make resolution throw.
 
 Range is Manhattan distance. Line of sight samples the cells strictly between attacker and target the way [TargetingService.gd:91-107](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TargetingService.gd#L91-L107) does: the same float lerp, so the same doubles. `Math.round` equals Godot's `roundi` on these non-negative values, so exact halves round up, and `(0,0)→(2,1)` passes through `(1,1)`.
 

@@ -51,7 +51,6 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   const preview = previewAttack(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state; const { command, targetId } = preview;
-  if (snapshot.commandCount === RULE_BOUNDS.commandCount.max) return { ok: false, reason: 'invalidState' };
   let roll: ReturnType<typeof rollDie>;
   // A validated RNG throws only when its cursor runs out, which a redraw can reach one step early.
   try { roll = rollDie(snapshot.rng, D20_SIDES); } catch { return { ok: false, reason: 'invalidState' }; }

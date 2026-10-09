@@ -132,7 +132,7 @@ describe('end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137)', () => {
     expect(endTurn(s, { type: 'move', unitId: 1, to: { x: 1, y: 0 } }, catalog)).toEqual({ ok: false, reason: 'malformedCommand' });
     expect(endTurn(s, { type: 'endTurn', unitId: 1, extra: true }, catalog)).toEqual({ ok: false, reason: 'malformedCommand' });
     expect(endTurn({ ...withHp(s, { 3: 0, 4: 0 }), outcome: 'playerWin' }, wait(1), catalog)).toEqual({ ok: false, reason: 'battleOver' });
-    expect(endTurn({ ...s, commandCount: Number.MAX_SAFE_INTEGER }, wait(1), catalog)).toEqual({ ok: false, reason: 'invalidState' });
+    expect(endTurn({ ...s, commandCount: RULE_BOUNDS.commandCount.max }, wait(1), catalog)).toEqual({ ok: false, reason: 'commandLimit' });
     expect(endTurn({ ...s, activeIndex: 3, round: Number.MAX_SAFE_INTEGER }, wait(4), catalog)).toEqual({ ok: false, reason: 'invalidState' });
     expect(endTurn({ ...s, round: Number.MAX_SAFE_INTEGER }, wait(1), catalog).ok).toBe(true);
     expect(endTurn({ ...s, round: 0 }, wait(1), catalog)).toEqual({ ok: false, reason: 'invalidState' });
@@ -275,12 +275,25 @@ describe('dispatch and replay', () => {
     const content: ContentCatalog = { ...catalog, maps: { [largest.id]: largest } };
     const created = createBattle(largest.id, 7, content); assert(created.ok);
     const order = created.state.initiative; // nobody falls, so each Wait passes to the next unit in order
-    const commands = Array.from({ length: RULE_BOUNDS.maxReplayCommands }, (_, i) => wait(order[i % order.length]));
+    const commands = Array.from({ length: RULE_BOUNDS.commandCount.max }, (_, i) => wait(order[i % order.length]));
     const started = performance.now();
     const replayed = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, content);
     const elapsed = performance.now() - started;
     assert(replayed.ok);
     expect(replayed.state.commandCount).toBe(commands.length);
     expect(elapsed).toBeLessThan(5000);
+  });
+  it('stops a battle at the replay limit, so its last accepted command still replays', () => {
+    const created = createBattle(map.id, 7, catalog); assert(created.ok);
+    let state = created.state; const commands: Command[] = [];
+    while (state.commandCount < RULE_BOUNDS.commandCount.max) {
+      const command = wait(state.initiative[state.activeIndex]);
+      const result = dispatch(state, command, catalog); assert(result.ok); state = result.state; commands.push(command);
+    }
+    const next = wait(state.initiative[state.activeIndex]);
+    expect(dispatch(state, next, catalog)).toEqual({ ok: false, reason: 'commandLimit' });
+    expect(previewMovement(state, next.unitId, catalog)).toEqual({ ok: false, reason: 'commandLimit' });
+    const replayed = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, catalog);
+    assert(replayed.ok); expect(replayed.state).toEqual(state);
   });
 });

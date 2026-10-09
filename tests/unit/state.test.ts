@@ -44,7 +44,7 @@ describe('battle foundation boundary', () => {
   });
   it('rejects unsafe numbers, identifiers, unknown fields and broken invariants', () => {
     const mutations: ((s: any) => void)[] = [
-      s => s.seed = -1, s => s.round = 0, s => s.round = 1.5, s => s.commandCount = Number.MAX_SAFE_INTEGER + 1,
+      s => s.seed = -1, s => s.round = 0, s => s.round = 1.5, s => s.commandCount = Number.MAX_SAFE_INTEGER + 1, s => s.commandCount = 10001,
       s => s.activeIndex = 2, s => s.activeIndex = NaN, s => s.rng.words[0] = Infinity,
       s => s.rng.words.push(0), s => s.rng.cursor = -1,
       s => s.units[0].hp = 19, s => s.units[0].hp = -1, s => s.units[0].cell.x = 2,

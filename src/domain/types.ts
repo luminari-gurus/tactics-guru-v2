@@ -25,7 +25,7 @@ export type Command =
   | { readonly type: 'useAbility'; readonly unitId: number; readonly abilityId: AbilityId;
       readonly target: { readonly unitId: number } | { readonly cell: CellPosition } }
   | { readonly type: 'endTurn'; readonly unitId: number };
-export type RejectionReason = 'malformedCommand' | 'invalidState' | 'battleOver' | 'unknownUnit' |
+export type RejectionReason = 'malformedCommand' | 'invalidState' | 'battleOver' | 'commandLimit' | 'unknownUnit' |
   'unitDefeated' | 'notActiveUnit' | 'alreadyMoved' | 'outOfBounds' | 'sameCell' | 'notWalkable' |
   'occupied' | 'unreachable' | 'alreadyActed' | 'unknownAbility' | 'abilityNotOwned' |
   'wrongTargetKind' | 'missingTarget' | 'targetDefeated' | 'sameSide' | 'outOfRange' | 'blockedLos';

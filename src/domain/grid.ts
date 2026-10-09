@@ -1,6 +1,6 @@
 import type { CellPosition, ContentCatalog } from '../content/types';
 import { previewCommand, readBattleState } from './battle';
-import { MOVEMENT_DIRECTIONS, RULE_BOUNDS } from './constants';
+import { MOVEMENT_DIRECTIONS } from './constants';
 import type { BattleState, Command, CommandResult, Rejection } from './types';
 
 type ReachableCell = { readonly cell: CellPosition; readonly cost: number };
@@ -68,7 +68,6 @@ export function moveUnit(state: unknown, input: unknown, catalog: ContentCatalog
   const preview = previewMove(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state;
-  if (snapshot.commandCount === RULE_BOUNDS.commandCount.max) return { ok: false, reason: 'invalidState' };
   return { ok: true, state: { ...snapshot, commandCount: snapshot.commandCount + 1,
     units: snapshot.units.map(u => u.id === preview.command.unitId ? { ...u, cell: { ...preview.command.to }, hasMoved: true } : u) },
     events: [{ type: 'moved', unitId: preview.command.unitId, path: preview.path }] };

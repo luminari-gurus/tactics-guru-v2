@@ -9,10 +9,10 @@ export const RULE_BOUNDS = {
   uint32: { min: 0, max: 0xffffffff },
   cursor: { min: 0, max: Number.MAX_SAFE_INTEGER },
   round: { min: 1, max: Number.MAX_SAFE_INTEGER },
-  commandCount: { min: 0, max: Number.MAX_SAFE_INTEGER },
+  /** One bound for a battle and its replay: a battle accepts at most this many commands, so its whole log always replays. */
+  commandCount: { min: 0, max: 10000 },
   dieSides: { min: 1, max: 0x100000000 },
   hp: { min: 0 },
-  maxReplayCommands: 10000,
 } as const;
 export const D20_SIDES = 20;
 export const UINT32_RANGE = 0x100000000;

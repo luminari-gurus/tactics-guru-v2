@@ -83,6 +83,7 @@ export function previewCommand(state: unknown, input: unknown, catalog: ContentC
   const checked = readBattleState(state, catalog);
   if (!checked.ok) return checked;
   if (checked.state.outcome !== 'ongoing') return { ok: false, reason: 'battleOver' };
+  if (checked.state.commandCount === RULE_BOUNDS.commandCount.max) return { ok: false, reason: 'commandLimit' };
   const actor = checked.state.units.find(u => u.id === input.unitId);
   if (!actor) return { ok: false, reason: 'unknownUnit' };
   if (actor.hp === 0) return { ok: false, reason: 'unitDefeated' };
@@ -94,7 +95,7 @@ export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { read
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||
-    !isDenseArray(input.commands, RULE_BOUNDS.maxReplayCommands) ||
+    !isDenseArray(input.commands, RULE_BOUNDS.commandCount.max) ||
     !input.commands.every(isCommand)) return bad;
   const checked = readBattleState(input.initial, catalog);
   if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min) return bad;
