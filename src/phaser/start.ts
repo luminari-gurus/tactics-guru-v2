@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import { FitScene } from './FitScene';
+import { ContentSmokeScene } from './ContentSmokeScene';
 
 export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void): () => void {
-  const scene = new FitScene(status, error);
+  const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
+  const scene = contentSmoke ? new ContentSmokeScene(status, error) : new FitScene(status, error);
   new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
