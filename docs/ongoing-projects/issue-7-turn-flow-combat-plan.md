@@ -100,14 +100,14 @@ If the reviewer prefers Shortbow Shot and LOS in #8 or #9, we drop the archer ro
 
 ### D-B. Battle creation rolls initiative
 
-`createBattle(catalog, mapId, seed)` in `src/domain/turns.ts`:
+`createBattle(mapId, seed, catalog)` in `src/domain/turns.ts` (catalog last, like every other domain API):
 
 - Units come from the map's spawns, sorted by spawn ID, with `hp = maxHp` and both flags false. `rng = seedRng(seed)`.
 - One d20 per unit **in ascending unit ID**, drawn with `rollDie(rng, D20_SIDES)`; `total = natural + dexterity` (`TurnManager.gd:8-27`).
 - Order: higher total, then higher dexterity, then player before enemy, then lower ID (`TurnManager.gd:101-108`). IDs are unique, so this is a total order and the code does not rely on sort stability (§6 of the restart plan).
 - The order is static for the battle; tempo reordering is deferred.
 - Events: one `initiativeRolled` per unit in roll order, then `turnStarted { unitId: first, round: 1 }`.
-- The result is the replay `initial` boundary that `readReplay` already expects: round 1, `commandCount` 0, nonzero RNG cursor. An unknown map or an invalid seed is rejected as `invalidState`, matching how `readBattleState` reports bad input.
+- The result is the replay `initial` boundary that `readReplay` already expects: round 1, `commandCount` 0, nonzero RNG cursor. An unknown map or an invalid seed is rejected as `invalidState`, matching how `readBattleState` reports bad input. The built snapshot goes through `readBattleState` before it is returned, so content that cannot form a valid battle also returns `invalidState`.
 - Pure helper `orderInitiative(entries)` is exported so the legacy ordering cases can be tested with exact rolls.
 
 ### D-C. Turn lifecycle: one move, one action, explicit end
@@ -184,7 +184,7 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 
 ### D-I. Restart, and D7 left to the session
 
-`restartBattle(state, catalog)` reads the snapshot (mid-battle or finished) and returns `createBattle(catalog, state.mapId, state.seed)`. Legacy restart reloads with the same seed (`BattleController.gd:124,1336-1346`), so the same inputs replay the same dice. A new-seed restart is just `createBattle` with a seed the session supplies; the domain never makes entropy. D7 ("replay the same seed or roll a new one") stays open for #10, and the domain supports both without a flag. The PR says so and does not claim D7 is decided.
+`restartBattle(state, catalog)` reads the snapshot (mid-battle or finished) and returns `createBattle(state.mapId, state.seed, catalog)`. Legacy restart reloads with the same seed (`BattleController.gd:124,1336-1346`), so the same inputs replay the same dice. A new-seed restart is just `createBattle` with a seed the session supplies; the domain never makes entropy. D7 ("replay the same seed or roll a new one") stays open for #10, and the domain supports both without a flag. The PR says so and does not claim D7 is decided.
 
 ### D-J. `RULES_VERSION` stays 1
 
@@ -203,27 +203,24 @@ Each increment starts with a failing spec, run and recorded before the implement
 - Blocking terrain between the cells blocks. Blocking terrain on an endpoint, an adjacent pair, height 4 and non-blocking terrain do not block. On `(0,0)→(2,1)` the half-way rounding decides which cell matters.
 - Moved to increment 3, because they need profiles and units: the `rangeMin−1 … rangeMax+1` boundaries (as `outOfRange`) and "a unit between does not block" (a shortbow shot past a living unit).
 
-### [ ] Increment 2: creation and turns (`feat`)
+### [x] Increment 2: creation and turns (`feat`)
 
-RED: `tests/unit/turns.test.ts`.
+`tests/unit/turns.test.ts` (8 tests), then `src/domain/turns.ts` (D-B, D-C, D-I): `orderInitiative`, `createBattle`, `endTurn`, `restartBattle`.
 
-- `orderInitiative` with the `test_turn_manager.gd` situations, re-derived:
-  - rolls 10, 7, 20 with dexterity 0, 5, −1 give order 3, 2, 1;
-  - a dexterity tie, a player-side tie and a final ID tie.
-- `createBattle` units and HP. The naturals equal an independent `rollDie` sequence from `seedRng(seed)` in ID order, and the events come in that order.
-- The created state passes `readBattleState`, and passes `readReplay` as `initial`. The same seed gives an equal result. Run with `Math.random` and `Date.now` stubbed to throw.
-- Unknown map and invalid seed reject.
+- `orderInitiative`: the four `test_turn_manager.gd:43-95` cases (total; Dexterity tie; player-side tie; ID tie), each also with reversed input.
+- `createBattle`:
+  - units come from spawns listed out of ID order;
+  - the naturals equal an independent `rollDie` sequence, and the returned RNG equals the RNG after those draws;
+  - events come in roll order, then `turnStarted`;
+  - the result passes `readBattleState` and `readReplay`;
+  - the same seed gives an equal result and a different seed gives a different RNG;
+  - `Math.random` and `Date.now` throw throughout;
+  - a seed outside uint32 and an unknown map (including `constructor`) reject.
 - `endTurn`:
-  - advances and clears the next unit's flags;
-  - adds 1 to `round` on the wrap;
-  - skips defeated units, including a skip across the wrap that adds 1 to `round` only once;
-  - Wait with no move and no action is accepted;
-  - `notActiveUnit` and `battleOver` reject;
-  - exhausted counters reject as `invalidState`;
-  - frozen inputs are unchanged.
-- `restartBattle` from a mid-battle and from a finished snapshot equals the original `createBattle` output.
-
-Then `src/domain/turns.ts` (D-B, D-C, D-I).
+  - Wait with no move or action; the next unit's flags are cleared and the ending unit's flags are kept; the RNG is untouched; the frozen input is unchanged;
+  - the wrap adds 1 to `round`; a defeated unit is skipped, including across the wrap (round added once);
+  - rejects `notActiveUnit`, `unknownUnit`, `malformedCommand` (a move, an extra field), `battleOver`, an exhausted `commandCount` and an exhausted `round`. An exhausted `round` with no wrap is accepted.
+- `restartBattle`: from a mid-battle and from a finished snapshot it equals the seed's `createBattle`; an invalid snapshot returns `invalidState`.
 
 ### [ ] Increment 3: combat (`feat`)
 
@@ -322,3 +319,7 @@ Before any code, the plan was simplified against the acceptance criteria (§3.0)
 ### 2026-10-09: increment 1 (targeting)
 
 RED: `npm run test:unit -- tests/unit/targeting.test.ts` failed on the missing `src/domain/targeting` import (no tests ran). GREEN: 6/6 pass. The domain-boundary tests and `npm run typecheck` pass.
+
+### 2026-10-09: increment 2 (creation and turns)
+
+RED: `npm run test:unit -- tests/unit/turns.test.ts` failed with `Cannot find module '../../src/domain/turns'`. GREEN: 8/8 pass. The first `npm run typecheck` caught a test-only lookup table missing `mage` (TS7053). With that fixed, the type-check passes.
