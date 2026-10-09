@@ -77,6 +77,13 @@ Each command re-validates its snapshot against the content version. `contentVers
 
 `RULES_VERSION` stays 1. No replay or save has been recorded outside tests, so a bump would protect nothing. Once #10 records replays, bump it whenever a rules change would make a recorded replay play out differently.
 
+## Hand-off
+
+- **#8** keeps the two attack IDs and the single attack path. A new profile field arrives with the first profile that needs it, and Guarded's AC bonus becomes one more term in the existing breakdown, not a second formula.
+- **#9** gets `previewMovement`, `previewAttack`, `dispatch` and `endTurn`. To score an attack from another cell, it previews on the snapshot `moveUnit` returns, so no "from cell" variant is needed. Each enemy turn's command list ends with `endTurn`.
+- **#10** gets `createBattle`, which is also its restart, and the event stream to animate. Defeated units stay in the snapshot at their last cell, so the renderer must hide or mark them.
+- **The authored catalog (#29)** was not on `main` when #7 merged. Once it is, a smoke test is worth adding: run `createBattle` on its map, check that every spawn becomes a unit with a valid initiative, and check that `readReplay` accepts the result.
+
 ## Verification commands
 
 - Focused: `npm run test:unit -- tests/unit/targeting.test.ts tests/unit/turns.test.ts tests/unit/combat.test.ts`
