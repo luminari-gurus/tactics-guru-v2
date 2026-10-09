@@ -3,6 +3,7 @@ import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog, MapRecord } from '../../src/content/types';
 import { nextUint32, seedRng } from '../../src/domain/rng';
 import * as battle from '../../src/domain/battle';
+import { validateContent } from '../../src/content/validate';
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 const battleMap = {
   id: 'map:battle_fixture', width: 2, height: 1,
@@ -41,6 +42,31 @@ describe('battle foundation boundary', () => {
       expect(battle.readBattleState(fixture(), catalog).ok).toBe(true);
       expect(battle.previewCommand(fixture(), { type: 'endTurn', unitId: 1 }, catalog).ok).toBe(true);
     } finally { vi.restoreAllMocks(); }
+  });
+  it('versions rules data only, so an art or provenance edit keeps snapshots valid', () => {
+    const sprite = (c: any) => c.assets['asset:fixture_sprite'];
+    const art: ((c: any) => void)[] = [
+      c => { sprite(c).provenance.productionNotes = 'Typo fixed.'; },
+      c => { Object.assign(sprite(c), { runtimePath: '/fixtures/sprite-v2.png', runtimeWidth: 128, anchor: { x: 64, y: 120 } }); },
+      c => { c.assets['asset:fixture_sprite_v2'] = { ...sprite(c), id: 'asset:fixture_sprite_v2' }; c.heroes.fighter.spriteAssetId = 'asset:fixture_sprite_v2'; },
+      c => { c.assets['asset:fixture_portrait_v2'] = { ...c.assets['asset:fixture_portrait'], id: 'asset:fixture_portrait_v2' }; c.enemies.goblin_grunt.portraitAssetId = 'asset:fixture_portrait_v2'; },
+      c => { c.assets['asset:fixture_grass_v2'] = { ...c.assets['asset:fixture_grass'], id: 'asset:fixture_grass_v2' }; c.terrains.grass.surfaceAssetId = 'asset:fixture_grass_v2'; },
+      c => { c.assets['asset:fixture_prop'] = { ...sprite(c), id: 'asset:fixture_prop', kind: 'prop' }; c.maps[battleMap.id].cells[0].propAssetId = 'asset:fixture_prop'; },
+    ];
+    const rules: ((c: any) => void)[] = [
+      c => { c.heroes.fighter.stats.armorClass = 15; }, c => { c.terrains.grass.blocksLineOfSight = true; },
+      c => { c.maps[battleMap.id].cells[1].elevation = 1; }, c => { c.maps[battleMap.id].spawns[1].unitId = 'goblin_archer'; },
+    ];
+    for (const edit of art) {
+      const edited = copy(catalog); edit(edited);
+      expect(validateContent(edited).ok, edit.toString()).toBe(true);
+      expect(battle.contentVersion(edited), edit.toString()).toBe(battle.contentVersion(catalog));
+      expect(battle.readBattleState(fixture(), edited).ok).toBe(true);
+    }
+    for (const edit of rules) {
+      const edited = copy(catalog); edit(edited);
+      expect(battle.contentVersion(edited), edit.toString()).not.toBe(battle.contentVersion(catalog));
+    }
   });
   it('rejects unsafe numbers, identifiers, unknown fields and broken invariants', () => {
     const mutations: ((s: any) => void)[] = [
