@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
+import { createBattle, dispatch, replayBattle } from '../../src/domain/turns';
+import type { BattleEvent, Command } from '../../src/domain/types';
 import { validateContent } from '../../src/content/validate';
 
 describe('authored first battle', () => {
@@ -28,4 +30,59 @@ describe('authored first battle', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors.some(e => e.code === code)).toBe(true);
   });
+});
+
+it('scripts elevation and forest LOS on the authored map and replays every accepted command', () => {
+  const created = createBattle('map:forest_ruins', 1, battleCatalog);
+  assert(created.ok);
+  const initial = created.state;
+  let state = initial;
+  const commands: Command[] = [];
+  const events: BattleEvent[] = [];
+  const apply = (command: Command) => {
+    const result = dispatch(state, command, battleCatalog);
+    assert(result.ok, JSON.stringify({ command, result }));
+    commands.push(command);
+    events.push(...result.events);
+    state = result.state;
+    return result.events;
+  };
+  const turn = (unitId: number) => {
+    for (let skipped = 0; state.initiative[state.activeIndex] !== unitId; skipped++) {
+      assert(skipped < initial.units.length);
+      apply({ type: 'endTurn', unitId: state.initiative[state.activeIndex] });
+    }
+  };
+  const move = (unitId: number, x: number, y: number) => {
+    turn(unitId);
+    apply({ type: 'move', unitId, to: { x, y } });
+    apply({ type: 'endTurn', unitId });
+  };
+
+  // Grunt approaches the ledge; Ranger attacks from elevation 1 onto elevation 0.
+  move(6, 7, 7);
+  move(6, 4, 7);
+  move(6, 3, 7);
+  move(2, 3, 8);
+  turn(2);
+  const attackEvents = apply({ type: 'useAbility', unitId: 2, abilityId: 'ability:basic_attack', target: { unitId: 6 } });
+  expect(attackEvents).toContainEqual(expect.objectContaining({ type: 'attackRolled', unitId: 2, targetId: 6, bonus: 7 }));
+  apply({ type: 'endTurn', unitId: 2 });
+
+  // Archer and Fighter approach opposite sides of the forest at (1,3).
+  move(5, 6, 2);
+  move(5, 3, 2);
+  move(1, 2, 6);
+  move(1, 2, 3);
+  move(1, 0, 3);
+  move(5, 2, 3);
+  turn(5);
+  const before = structuredClone(state);
+  const blocked: Command = { type: 'useAbility', unitId: 5, abilityId: 'ability:shortbow_shot', target: { unitId: 1 } };
+  expect(dispatch(state, blocked, battleCatalog)).toEqual({ ok: false, reason: 'blockedLos' });
+  expect(state).toEqual(before);
+  // Rejected attempts are not part of the accepted replay log.
+  apply({ type: 'endTurn', unitId: 5 });
+  expect(replayBattle({ format: initial.format, versions: initial.versions, initial, commands }, battleCatalog))
+    .toEqual({ ok: true, state, events });
 });
