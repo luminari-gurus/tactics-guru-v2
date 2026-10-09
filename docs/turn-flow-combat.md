@@ -41,7 +41,7 @@ An exhausted RNG cursor is then `invalidState`. That includes a cursor one draw 
 
 Range is Manhattan distance. Line of sight samples the cells strictly between attacker and target the way [TargetingService.gd:91-107](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TargetingService.gd#L91-L107) does: the same float lerp, so the same doubles. `Math.round` equals Godot's `roundi` on these non-negative values, so exact halves round up, and `(0,0)→(2,1)` passes through `(1,1)`.
 
-The port reproduces legacy rounding exactly, including the rare long line where the double lerp lands just under a half: on `(0,0)→(11,22)` legacy samples x = 7 at step 15, not the exact 7.5 → 8. Only terrain marked `blocksLineOfSight` blocks; units and height never do.
+The port reproduces legacy rounding exactly, including the rare long line where the double lerp lands just under a half: on `(0,0)→(11,22)` legacy samples x = 7 at step 15, not the exact 7.5 → 8. If exact geometry is ever wanted, the integer formula `floor((2·(from·steps + delta·step) + steps) / (2·steps))` per axis is a one-function swap in `lineCellsBetween`. It differs from legacy on 208 of the 1,048,576 cell pairs of a 32 × 32 grid, all on lines of 22 to 28 steps, which no slice range reaches. Only terrain marked `blocksLineOfSight` blocks; units and height never do.
 
 The numbers ([CombatResolver.gd:1051-1060,1236-1260](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L1236-L1260)):
 
@@ -66,7 +66,7 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 `replayBattle(replay, catalog)` validates the envelope with `readReplay`. It then rebuilds `createBattle(initial.mapId, initial.seed)` and rejects the replay unless `initial` matches it exactly, compared as sorted-key JSON so key order does not matter. A replay therefore cannot start from chosen HP, dice, initiative, flags or outcome. Then it re-executes the commands. It returns the final snapshot and every event in order; creation's initiative events are not repeated. A bad envelope is `invalidReplay`. A command that does not apply is `invalidReplay` with its `index` and the `rejection`. AI commands are recorded, not recomputed.
 
-Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed.
+Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed. Do not enforce this with a deep `Object.freeze`. PR #44's review tried it, and that replay took about 1.8 s instead of 0.5 s, because V8 is slower on frozen arrays.
 
 ## Not included
 
@@ -93,6 +93,6 @@ Each command re-validates its snapshot against the content version. `contentVers
 - Existing browser regressions: `npm test` (build first; the config serves `dist`)
 - Whitespace: `git diff --check`
 
-Each focused file was written first and failed on its missing module, or for dispatch on the missing export, before the implementation landed.
+Each focused file was written first and failed on its missing module, or for dispatch on the missing export, before the implementation landed. The working plan, with each increment's RED/GREEN log and the PR #44 review fixes, was retired in `8da671c` after #7 closed; read it with `git show 8da671c^:docs/ongoing-projects/issue-7-turn-flow-combat-plan.md`.
 
 The specs pin the legacy cases from `test_turn_manager.gd`, `test_combat_resolver.gd` and `test_m4_height_attack.gd`. They also cover every rejection in order, the roll and range boundaries, and a scripted 2v2 battle created from a seed and replayed command by command to the identical state and events. Domain tests run with `Math.random` and `Date.now` stubbed to throw. This slice is domain-only: it does not wire a playable battle, and it makes no claim about physical devices.
