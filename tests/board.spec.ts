@@ -4,7 +4,7 @@ test('shows the complete elevated board in both orientations and after restart',
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   for (const [orientation, viewport] of Object.entries({ portrait: { width: 390, height: 844 }, landscape: { width: 844, height: 390 } })) {
     await page.setViewportSize(viewport);

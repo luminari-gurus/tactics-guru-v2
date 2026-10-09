@@ -4,7 +4,7 @@ test('proof controls survive repeated restart and expose distinct ready markers'
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const restart = page.getByRole('button', { name: 'Restart proof scene' });
   await expect(restart).toBeEnabled();
   await expect(page.getByRole('status')).toHaveText('Ready');
@@ -44,7 +44,7 @@ test('proof controls survive repeated restart and expose distinct ready markers'
 
 test('shows loading before boot and a controlled error if the engine module cannot load', async ({ page }) => {
   await page.route('**/assets/start-*.js', route => route.abort());
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toContainText('Error');
   await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeDisabled();
 });
@@ -53,7 +53,7 @@ test('shell initially displays loading while the engine is delayed', async ({ pa
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/assets/start-*.js', async route => { await gate; await route.continue(); });
-  await page.goto('/', { waitUntil: 'commit' });
+  await page.goto('/?scene=proof', { waitUntil: 'commit' });
   await expect(page.getByRole('status')).toHaveText('Loading');
   await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeDisabled();
   release();

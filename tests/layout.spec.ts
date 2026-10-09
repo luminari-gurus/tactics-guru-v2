@@ -17,7 +17,7 @@ async function controlBoxes(page: Page): Promise<Box[]> {
   return page.evaluate(selector => {
     for (const details of document.querySelectorAll<HTMLDetailsElement>('#fit-panel details')) details.open = true;
     const panel = document.querySelector('#fit-panel')!.getBoundingClientRect();
-    return [...document.querySelectorAll<HTMLElement>(selector)].map(element => {
+    return [...document.querySelectorAll<HTMLElement>(selector)].filter(element => element.getClientRects().length > 0).map(element => {
       element.scrollIntoView({ block: 'nearest' });
       const rect = element.getBoundingClientRect();
       const visible = rect.top >= panel.top - 1 && rect.bottom <= panel.bottom + 1 && rect.left >= 0 && rect.right <= innerWidth && rect.bottom <= innerHeight;
@@ -31,7 +31,7 @@ for (const viewport of VIEWPORTS) {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await page.goto('/');
+    await page.goto('/?scene=proof');
     await expect(page.getByRole('status')).toHaveText('Ready');
     await page.getByLabel('Move destination').selectOption('raised-front');
     await expect.poll(() => page.locator('canvas').evaluate(canvas => {
@@ -80,7 +80,7 @@ for (const viewport of VIEWPORTS) {
 }
 
 test('page gestures are suppressed in CSS and the canvas has no context menu', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   expect(await page.evaluate(() => ({
     body: getComputedStyle(document.body).overscrollBehavior,

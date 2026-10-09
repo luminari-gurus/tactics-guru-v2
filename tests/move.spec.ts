@@ -5,7 +5,7 @@ import { proofDepth } from '../src/diagnostics/proofAssets';
 test('actual move controls reject repeated input, complete, and cancel on repeated restart', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.locator('#fit-status')).toHaveText('Ready');
   const start = page.getByRole('button', { name: 'Start diagnostic move', exact: true });
   const state = page.locator('#move-status');

@@ -17,7 +17,7 @@ const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
   const status = page.locator('#audio-status');
   await expect(page.getByRole('status')).toHaveText('Ready');
@@ -54,7 +54,7 @@ test('a context that will not resume is reported as blocked with retry, then pla
       return Promise.reject(new Error('resume refused by test'));
     };
   });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
   const status = page.locator('#audio-status');
   await expect(page.getByRole('status')).toHaveText('Ready');
@@ -81,7 +81,7 @@ test('a missing tone file leaves the board usable and the audio control unavaila
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.route('**/proof/unlock-tone.mp3', route => route.abort());
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#audio-status')).toHaveText('Unavailable: Could not load unlock-tone');
   await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
@@ -100,7 +100,7 @@ test('a missing tone file leaves the board usable and the audio control unavaila
 
 test('restart during playback resets the audio control for the new run without errors', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
   const status = page.locator('#audio-status');
   await expect(page.getByRole('status')).toHaveText('Ready');
@@ -130,7 +130,7 @@ test('a resume() that never settles is reported as blocked with retry, then play
       return new Promise<void>(() => {});
     };
   });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
   const status = page.locator('#audio-status');
   await expect(page.getByRole('status')).toHaveText('Ready');
@@ -156,7 +156,7 @@ test('a stalled tone request never holds the board; the control reports unavaila
   page.on('pageerror', error => errors.push(error.message));
   // Never fulfilled, never aborted: the request neither completes nor errors on its own.
   await page.route('**/proof/unlock-tone.mp3', () => {});
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#audio-status')).toHaveText('Loading');
@@ -192,7 +192,7 @@ test('the control follows the audio context: a body gesture unlock reads Ready a
       }
     };
   });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
   const status = page.locator('#audio-status');
   await expect(page.getByRole('status')).toHaveText('Ready');

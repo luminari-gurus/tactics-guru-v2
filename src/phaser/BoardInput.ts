@@ -1,9 +1,14 @@
-import type { BoardRenderer } from './BoardRenderer';
 import { DRAG_THRESHOLD } from '../geometry/picking';
 import type { Point } from '../geometry/iso';
 
+export interface BoardInputTarget {
+  pan(dx: number, dy: number): void;
+  zoom(factor: number, anchor: Point): void;
+  select(point: Point): void;
+}
+
 /** CSS coordinates are converted through the canvas rectangle, independent of DPR. */
-export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardRenderer, size: () => {width:number;height:number}): () => void {
+export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarget, size: () => {width:number;height:number}): () => void {
   const pointers = new Map<number, { start: Point; point: Point }>();
   let gesture = false;
   const previousTouchAction = canvas.style.touchAction;
@@ -50,6 +55,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardRenderer, 
   };
   const wheel = (event: WheelEvent): void => {
     event.preventDefault();
+    if (pointers.size) gesture = true;
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
   const reset = (): void => {

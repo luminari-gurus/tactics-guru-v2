@@ -3,7 +3,7 @@ import { MOVE_DURATION_MS, MOVE_PATH, sampleMove } from '../diagnostics/scripted
 import { FIT_MARKS, measurements, setBoardDiagnostics, setLifecycleDiagnostics, setProofDiagnostics, type LifecycleDiagnostics } from '../diagnostics/browser';
 import { AUDIO_LOAD_TIMEOUT_MS, PROOF_AUDIO, PROOF_IMAGES, PROOF_FIXTURES, type ProofFixture } from '../diagnostics/proofAssets';
 import { bindBoardInput } from './BoardInput';
-import { BoardRenderer } from './BoardRenderer';
+import { ProofBoardRenderer } from './ProofBoardRenderer';
 import { PROOF_AUDIO_KEYS, ProofAudio } from './ProofAudio';
 
 export const FIT_SCENE_KEY = 'fit';
@@ -43,7 +43,7 @@ export class FitScene extends Phaser.Scene {
     // missing path) never emits FILE_LOAD_ERROR: Phaser's File.onProcessError only logs. Report the missing texture here.
     const missing = PROOF_IMAGES.find(asset => !this.textures.exists(asset.key));
     if (missing) { this.error(`Could not load proof asset ${missing.key}`); return; }
-    const board = new BoardRenderer(this);
+    const board = new ProofBoardRenderer(this);
     // The board never waits on audio: the tone and the OGG probe load in a second loader pass, each with an
     // XHR timeout so a request that neither completes nor errors becomes a load error, and the audio control
     // stays at Loading until that pass settles.

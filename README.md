@@ -1,6 +1,8 @@
 # Tactics Guru v2
 
-Minimal Phaser 4 + TypeScript + Vite browser-project scaffold. The only scene is a restartable proof-of-fit diagnostic with a fixed elevated isometric board, loading/error status and timing diagnostics; gameplay, legacy assets, saves, and deployment are not implemented. The original Godot project is untouched. Design plans are maintained outside this repository.
+Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Design plans are maintained outside this repository.
+
+The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.
 
 ## Requirements
 
@@ -31,7 +33,7 @@ npm run build
 npm test
 ```
 
-Tests serve the production build, verify boot, repeated restart, loading/error states and timing markers without console/page errors, check desktop/mobile-emulated viewport resizing in both orientations, and cover the proof board, assets, input, hero move, audio unlock, hidden/visible lifecycle and panel layout (99 checks across the three projects). Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 
@@ -41,11 +43,13 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 
 ## Layout
 
-- `src/main.ts`: diagnostic shell, status and controls
-- `src/phaser/{start,FitScene,BoardRenderer}.ts`: Phaser game, proof scene and shape-based tile renderer
+- `src/main.ts`: shell, scene-specific controls and status
+- `src/phaser/{start,BattleScene,BoardRenderer}.ts`: Phaser game, snapshot controller and authored-board renderer
+- `src/phaser/{FitScene,ProofBoardRenderer}.ts`: retained proof scene and its fixture renderer
 - `src/phaser/{BoardInput,ProofAudio}.ts`: scene-owned pointer/wheel input and the unlock-tone adapter
 - `src/diagnostics/audioState.ts`: pure audio state reducer (no Phaser or DOM), unit-tested
 - `src/geometry/iso.ts`: pure projection, joined tile faces, stable depth order and viewport fitting
+- `src/geometry/{boardPresentation,canopy,picking}.ts`: pure authored render data, art bounds/occlusion and visible-face picking
 - `src/diagnostics/boardFixture.ts`: immutable authored 4×4 fixture with elevations 0, 1 and 2
 - `src/diagnostics/`: navigation-relative timings, transfer sizes and bounded active frame sampling
 - `src/style.css`: full-viewport canvas container, capped scrolling panel, page-gesture rules
@@ -58,7 +62,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 
 ## Proof-scene measurements
 
-Open **Measurements** and use **Refresh measurements** for a JSON snapshot, or call `window.fitDiagnostics()` in browser developer tools. Timings are milliseconds relative to navigation start (`0`); `fit:scene-start`, `fit:scene-ready` and `fit:controls-usable` are Performance API marks for the current scene run. Scene-ready means scene creation and asset loading have completed (there are no external assets yet); controls-usable follows the first rendered frame and enables restart. Restart clears the old marks and sample, while timestamps stay relative to the same navigation. Hidden periods reset the previous-frame timestamp so resume gaps do not inflate frame samples.
+At `/?scene=proof`, open **Measurements** and use **Refresh measurements** for a JSON snapshot, or call `window.fitDiagnostics()` in browser developer tools. Timings are milliseconds relative to navigation start (`0`); `fit:scene-start`, `fit:scene-ready` and `fit:controls-usable` are Performance API marks for the current scene run. Scene-ready means scene creation and asset loading have completed; controls-usable follows the first rendered frame and enables restart. Restart clears the old marks and sample, while timestamps stay relative to the same navigation. Hidden periods reset the previous-frame timestamp so resume gaps do not inflate frame samples. `measure:fit` selects the proof URL automatically and records it as `conditions.sceneUrl`.
 
 Frame statistics use the first 600 active scene-update intervals after controls are usable, with nearest-rank p50/p95. This is an idle-shell baseline, not a GPU benchmark or combat performance result. Resource entries report transferred bytes (including response headers), encoded body bytes and decoded body bytes; zero transfer on same-origin assets can indicate a cache hit. Report cache/network conditions alongside the snapshot.
 
@@ -72,6 +76,14 @@ npm run measure:fit
 The collector starts its own localhost production preview on port 4174, runs three fresh-context cold loads and same-context warm reloads for desktop and both mobile-emulated orientations, then writes `test-results/fit-baseline.json`. An optional output path follows `npm run measure:fit -- /absolute/path/result.json`. To measure a deployed origin instead, add `--url` (or set `FIT_URL`): `npm run measure:fit -- /absolute/path/result.json --url https://tactics-guru-v2.pages.dev`; no preview is started, `buildFiles` is `null`, and `measuredBuild` records the commit baked into the served bundle. In local mode the collector refuses a `dist` built from a commit other than the checked-out source. Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` as above if using installed Chrome. Do not run other browser workloads during measurement. The JSON includes source/build commit and dirty state, browser version, network/cache method, exact build-file sizes/SHA-256 hashes, and all samples. A normal build requires the Git checkout to capture its source identity.
 
 Local preview uses loopback HTTP and negotiates HTTP content compression; actual beta compression, network latency, physical devices and gameplay workload require later evidence in #20 and #11. See [the initial baseline](docs/qa/issue-14-baseline.md) and [the deployed measurements and physical-device gate for #20](docs/qa/issue-20-fit-gate.md), which proposes budgets; none is asserted by code.
+
+## Authored battle board
+
+The default scene displays all 144 Forest Ruins cells, elevations 0/1/2 and six authored units. Sprite foot origins come from validated asset metadata; terrain images stay top-down inputs mapped onto 80×40 diamonds. Columns share a deterministic depth order with picking, reserving layers for the surface, highlights and occupants. Forest cells use vector trunks and foliage; only a nearer foliage canopy overlapping living unit art fades to 35%. Trees and sprites pass input through to the visible solid tile beneath them.
+
+Gold outlines/rings show the active unit, an inset white outline shows selection, and teal surfaces show the domain's reachable-cell preview. **Move selected** commits a legal move through `dispatch`; selecting or completing a drag/pinch never commits gameplay. **Next turn** advances either side for board inspection; enemy AI, attacks and combat animation are outside this renderer's scope. **Restart battle** creates a fresh snapshot with the next deterministic session seed (the first load starts at 1).
+
+Tap/click selects visible top or side faces; drag pans and wheel/pinch zooms from the fitted size to 4× fit. Resize refits below the controls while retaining zoom and selection. Coordinates use the canvas CSS rectangle, independently of DPR. The scene removes input, resize/observer and button bindings on shutdown and reuses loaded textures on restart. Browser state evidence is available in `#game.dataset.battleReport`; screenshots and validation notes are described in [issue #6 QA](docs/qa/issue-6-authored-board.md). Physical-device acceptance remains unverified.
 
 ## Diagnostic board
 

@@ -10,12 +10,20 @@ const audioButton = document.querySelector<HTMLButtonElement>('#audio-play')!;
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
 const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
+const battle = !contentSmoke && new URLSearchParams(location.search).get('scene') !== 'proof';
+if (battle) {
+  document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(element => { element.hidden = true; });
+  document.querySelector<HTMLElement>('#battle-controls')!.hidden = false;
+  document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
+  document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom';
+  restartButton.textContent = 'Restart battle';
+}
 if (contentSmoke) {
   document.querySelectorAll('#fit-panel > :not(.fit-controls), .fit-controls > :not(#fit-status)').forEach(element => { (element as HTMLElement).hidden = true; });
 }
 
 function setStatus(state: 'loading' | 'ready' | 'error'): void {
-  statusLabel.textContent = state === 'ready' ? (contentSmoke ? 'Content ready' : 'Ready') : 'Loading';
+  statusLabel.textContent = state === 'ready' ? (contentSmoke ? 'Content ready' : battle ? 'Battle ready' : 'Ready') : 'Loading';
   container.dataset.ready = String(state === 'ready');
   container.dataset.run = String(measurements.snapshot().run);
   restartButton.disabled = state !== 'ready';
@@ -23,6 +31,7 @@ function setStatus(state: 'loading' | 'ready' | 'error'): void {
   opacitySlider.disabled = state !== 'ready';
   // The scene-owned audio adapter enables this button itself once the tone is loaded.
   if (state !== 'ready') audioButton.disabled = true;
+  if (state !== 'ready') document.querySelectorAll<HTMLButtonElement>('#battle-controls button').forEach(button => { button.disabled = true; });
   document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
 
