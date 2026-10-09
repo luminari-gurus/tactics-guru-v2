@@ -3,6 +3,7 @@ import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog } from '../../src/content/types';
 import type { BattleState } from '../../src/domain/types';
 import { contentVersion } from '../../src/domain/battle';
+import { RULE_BOUNDS } from '../../src/domain/constants';
 import { seedRng } from '../../src/domain/rng';
 import { previewMovement, previewMove, moveUnit } from '../../src/domain/grid';
 // contentVersion hashes each catalog object once, so map edits are applied before the hash.
@@ -79,12 +80,12 @@ it('blocks traversal through either side and releases the previous cell after a 
   const reset={...moved.state,units:moved.state.units.map(u=>({...u,hasMoved:false}))};
   expect(previewMove(reset,command(0,0),catalog)).toMatchObject({ok:true,cost:1});
 });
-it('rejects invalid actor and intent boundaries and command counter exhaustion', () => {
+it('rejects invalid actor and intent boundaries and a battle at the command limit', () => {
   const {catalog,state}=fixture();
   for (const input of [null,{type:'endTurn',unitId:1},command(-1,0),command(0.5,0)])
     expect(moveUnit(state,input,catalog)).toEqual({ok:false,reason:'malformedCommand'});
   expect(previewMove(state,{...command(1,0),unitId:2},catalog)).toEqual({ok:false,reason:'notActiveUnit'});
-  expect(moveUnit({...state,commandCount:Number.MAX_SAFE_INTEGER},command(1,0),catalog)).toEqual({ok:false,reason:'invalidState'});
+  expect(moveUnit({...state,commandCount:RULE_BOUNDS.commandCount.max},command(1,0),catalog)).toEqual({ok:false,reason:'commandLimit'});
 });
 it('living allies block while defeated units release occupancy', () => {
   const {catalog,map,state}=fixture();
