@@ -180,7 +180,7 @@ Steps 6–9 follow `TargetingService.gd:28-49`.
 `src/domain/turns.ts` (§3.0):
 
 - `dispatch(state, command, catalog): CommandResult` routes `move` to `moveUnit`, `useAbility` to `resolveAttack` and `endTurn` to `endTurn`. A malformed command still returns `malformedCommand` through the shared check.
-- `replayBattle(input, catalog)` validates the envelope with `readReplay`, then folds `dispatch` over the commands. It returns `{ ok: true, state, events }` with all events in order (initiative events are not repeated; they belong to creation). A bad envelope returns `readReplay`'s `invalidReplay`; a command that does not apply returns `{ ok: false, reason: 'invalidReplay', index, rejection }` naming the first one. The result type sits next to the function.
+- `replayBattle(input, catalog)` validates the envelope with `readReplay`, requires `initial` to equal `createBattle(mapId, seed)` as sorted-key JSON (review finding 1), then folds `dispatch` over the commands. It returns `{ ok: true, state, events }` with all events in order (initiative events are not repeated; they belong to creation). A bad envelope returns `readReplay`'s `invalidReplay`; a command that does not apply returns `{ ok: false, reason: 'invalidReplay', index, rejection }` naming the first one. The result type sits next to the function.
 - `turns.ts` imports `grid.ts` and `combat.ts`; neither of them, nor `battle.ts`, imports `turns.ts`, so there is no cycle.
 
 ### D-I. Restart is a new battle with a new seed (D7 decided)
@@ -338,7 +338,7 @@ The five review questions were resolved on 2026-10-09. D7 was decided by dubstyl
 5. **Enemy turns end with an explicit `endTurn`.** The draft design's AI returns a command list (`chooseEnemyCommands(state, catalog): Command[]`), so #9 ends it with `endTurn`. Legacy's controller ending the enemy turn itself was session behaviour, not a rule. One rule for both sides keeps every turn end in the replay.
 6. **PR #43 merge order.** If it merges first, add one smoke test that runs `createBattle` on the real forest-ruins map (six units, valid initiative, `readReplay` accepts it). Optional, not a dependency.
 7. **The LOS port keeps legacy float rounding (D-G).** It reproduces legacy exactly, including the rare lines (22+ steps) where the float lerp rounds an exact half down. If exact geometry is ever preferred, the integer formula `floor((2·(from·steps + delta·step) + steps)/(2·steps))` is a one-function swap; it differs from legacy only on lines no slice range reaches. Shortbow Shot (range 2–4) does reach exact half-way lines such as `(0,0)→(2,1)`, where both rules agree, so the pinned vectors matter from #7 on.
-8. **Replay cost.** Each dispatched command re-validates its snapshot, and `readBattleState` hashes the whole catalog each time. Measured on the fixture catalog: about 0.7 ms per command (0.18 ms per hash), so the 44-command test battle replays in about 30 ms. The real catalog (#29) is larger. A 10,000-command replay (the envelope's limit) could take tens of seconds. That is fine for tests and debugging; if #10 replays on load, memoise `contentVersion` per catalog object there. Nothing in #7 needs it faster, so `battle.ts` is unchanged.
+8. **Replay cost: fixed (review finding 2).** Each dispatched command re-validates its snapshot, and `readBattleState` hashed the whole catalog three or four times per command; the longest accepted log on a 32 × 32 map took 88.7 s. `contentVersion` now caches the digest per catalog object (`8d5198d`), and the same replay takes about 0.5 s.
 9. **Shared checkout.** Another session may commit to this working tree. Re-check `git log -1` and `git status` in the same command as each commit, and stage paths explicitly. A worktree for the branch avoids the problem entirely.
 
 ## 8. Branch and process
@@ -399,3 +399,25 @@ The user relayed dubstylee's Discord answer on D7: "Yeah we want a new seed when
   - the task note: Shortbow rationale, enemy `endTurn`, `RULES_VERSION`;
   - this plan: D-A, D-I, D-J, §6, §7.
 - Gate: unit tests 179/179 and the typecheck pass. `npm run build` was rerun on the final tree. The browser suite was not rerun, because nothing the app imports changed: `src/domain` is reached only through `src/content/validate.ts`'s use of `domain/validation`.
+
+### 2026-10-09: review findings fixed
+
+The user's adversarial review of `92217cc` (review 5469099711) had four findings. Each got a RED spec first and its own commit:
+
+1. **`ddbda3d` (High): replay from a forged `initial`.**
+   - RED: *replays only from the battle its map and seed create, whatever the key order* failed. A throwaway probe showed all seven forgeries replaying as `ok`: a win with no commands, enemies at 1 HP, chosen RNG words, a reversed initiative, spent flags, another active index and another seed.
+   - Fix: `replayBattle` rebuilds `createBattle(mapId, seed)` and compares it with `initial` as sorted-key JSON (`canonical`, now exported). The dead `cursor === 0` branch in `readReplay` went.
+   - Mutation: comparing with plain `JSON.stringify` fails the key-order case.
+2. **`8d5198d` (High): the catalog hash ran three or four times per command.**
+   - RED: *replays the longest accepted log on the largest map within five seconds* took 88.7 s.
+   - Fix: `contentVersion` caches per catalog object. The same replay now takes 0.53 s.
+   - The review's deep-freeze was tried and dropped: it made the replay 1.86 s, because V8 slows down on frozen arrays. Three grid tests that edited a hashed map now edit before the hash.
+3. **`4af46e7` (Medium): commands past the 10 000 replay cap.**
+   - RED: *stops a battle at the replay limit, so its last accepted command still replays* failed, because command 10 001 was accepted.
+   - Fix: one bound, `RULE_BOUNDS.commandCount.max = 10000`, checked once in `previewCommand` as the new reason `commandLimit`. The three per-resolver counter checks went.
+4. **`c56370d` (Medium, pre-existing from #4): the content version hashed art.**
+   - RED: *versions rules data only, so an art or provenance edit keeps snapshots valid* failed on a provenance typo fix.
+   - Fix: `rulesContent` drops asset records and asset references. Art is removed rather than rules fields listed, so #8's abilities count by default.
+   - Mutation: removing any one of the four exclusions fails the spec.
+
+Gate on the final tree: `npm run test:unit` 17 files, 183 passed (179 + 4); `npm run typecheck` and `npm run build` passed (only the Phaser chunk-size warning); `npm test` 99 passed in 2.7 min; `git diff --check` clean. `origin/main` is still `e36c72d`, so no rebase or merge was needed.
