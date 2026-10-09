@@ -1,5 +1,6 @@
-import { CONTENT_BOUNDS, ENEMY_IDS, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import { ATTACK_BOUNDS, CONTENT_BOUNDS, ENEMY_IDS, FIGHTING_DEFENSIVELY, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 import type { ContentCatalog } from './types';
+import { attackAbilities } from './abilities';
 import { hasShape, isDenseArray, isPlainRecord, type JsonRecord } from '../domain/validation';
 
 export type ContentErrorCode = 'shape' | 'id' | 'duplicateId' | 'number' | 'reference' | 'cells' | 'duplicateCell' | 'coordinate' | 'walkability' | 'occupiedSpawn';
@@ -28,14 +29,15 @@ export function validateContent(input: unknown): ContentValidation {
     fail('shape', path, 'Expected a dense data array.'); return false;
   };
   const prefixedId = (v: unknown, prefix: string): v is string => typeof v === 'string' && new RegExp(`^${prefix}:[a-z][a-z0-9]*(?:_[a-z0-9]+)*$`).test(v);
-  const groups = ['maps', 'heroes', 'enemies', 'terrains', 'assets'] as const;
+  const groups = ['maps', 'heroes', 'enemies', 'terrains', 'assets', 'abilities'] as const;
   if (!shape(input, groups, '$')) return { ok: false, errors };
-  const catalogs: Record<typeof groups[number], JsonRecord> = { maps: {}, heroes: {}, enemies: {}, terrains: {}, assets: {} };
+  const catalogs: Record<typeof groups[number], JsonRecord> = { maps: {}, heroes: {}, enemies: {}, terrains: {}, assets: {}, abilities: {} };
   for (const group of groups) {
     const v = input[group];
     if (!isPlainRecord(v) || !hasShape(v, Object.keys(v))) { fail('shape', group, 'Expected a catalog of plain enumerable data entries.'); continue; }
     catalogs[group] = v;
-    const fixed = group === 'heroes' ? HERO_IDS : group === 'enemies' ? ENEMY_IDS : group === 'terrains' ? FIRST_MAP_TERRAIN_IDS : undefined;
+    const fixed = group === 'heroes' ? HERO_IDS : group === 'enemies' ? ENEMY_IDS : group === 'terrains' ? FIRST_MAP_TERRAIN_IDS :
+      group === 'abilities' ? Object.keys(attackAbilities) : undefined;
     if (fixed) for (const id of fixed) if (!Object.hasOwn(v, id)) fail('id', `${group}.${id}`, 'Required definition is missing.');
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
@@ -56,6 +58,31 @@ export function validateContent(input: unknown): ContentValidation {
     if (isPlainRecord(value) && hasShape(value, Object.keys(value)) && (!kind || value.kind === kind)) return value;
     fail('reference', path, `Expected an existing ${kind ?? group} reference in ${group}.`); return undefined;
   };
+  for (const [id, ability] of entries('abilities')) {
+    const path = `abilities.${id}`;
+    const keys = ability.kind === 'magicMissile' ? ['id','kind','owners','casterLevel','rangeMin','rangeMax'] : ['id','kind','owners','rangeMin','rangeMax','baseDamage','uphillDamage'];
+    if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
+    if (!shape(ability, keys, path)) continue;
+    const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
+    if (!expected || ability.kind !== expected.kind) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (ability.kind === 'guardedAttack') for (const field of ['attackPenalty','armorClassBonus'] as const)
+      if (ability[field] !== FIGHTING_DEFENSIVELY[field]) fail('number', `${path}.${field}`, `Expected ${FIGHTING_DEFENSIVELY[field]}.`);
+    if (ability.kind === 'magicMissile') {
+      for (const [field, max] of [['casterLevel',20],['rangeMin',20],['rangeMax',20]] as const)
+        if (typeof ability[field] !== 'number' || !Number.isSafeInteger(ability[field]) || ability[field] < 1 || ability[field] > max)
+          fail('number', `${path}.${field}`, `Expected an integer in [1,${max}].`);
+    } else for (const field of ['rangeMin','rangeMax','baseDamage','uphillDamage'] as const) {
+      const value = ability[field];
+      const { min, max } = ATTACK_BOUNDS[field];
+      if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max)
+        fail('number', `${path}.${field}`, `Expected a safe integer in [${min},${max}].`);
+    }
+    if (typeof ability.rangeMin === 'number' && typeof ability.rangeMax === 'number' && ability.rangeMin > ability.rangeMax)
+      fail('number', path, 'Minimum range must not exceed maximum range.');
+    if (array(ability.owners, `${path}.owners`) && (!expected ||
+      ability.owners.length !== expected.owners.length || ability.owners.some((owner, i) => owner !== expected.owners[i])))
+      fail('reference', `${path}.owners`, 'Expected the approved ability owners in their defined order.');
+  }
   for (const group of ['heroes', 'enemies'] as const) for (const [id, unit] of entries(group)) {
     const path = `${group}.${id}`;
     if (!shape(unit, ['id','kind','stats','spriteAssetId','portraitAssetId'], path)) continue;

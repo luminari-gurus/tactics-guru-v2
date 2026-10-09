@@ -46,7 +46,7 @@ Brian confirmed **a lean playable loop first, selectively bringing back proven f
 
 One authored forest board: Forest Ruins, 12×12, heights 0 to 2 (§4.3). Three fixed heroes against the legacy trio of two Goblin Grunts and one Goblin Archer; the encounter choice is D4. Cardinal weighted movement, occupancy and Jump; initiative; one move and one action per turn, in either order; Basic Attack and one signature per hero; greedy legal AI; win/loss, restart, turn queue, log, inspection and touch-safe preview/confirm/cancel. A small set of existing art and SFX, mute, and a nonblocking loading/error screen. No save or resume in the first tranche: issue #11 lists it as a follow-up.[52]
 
-Candidate signatures: Guarded Strike, High Shot and Ember Burst preserve the original frontline/range/AoE contrast. Their exact semantics are in §6.2; D5, D6 and D11 are open on them. The abilities current main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
+Signatures: Guarded Strike, High Shot and Magic Missile provide defensive melee, elevation-sensitive ranged attacks and reliable rolled force damage. Their semantics are in §6.2. Brian approved Guarded Strike's Fighting Defensively mapping and replaced Ember Burst with 3.5E Magic Missile on 2026-10-09. The abilities current main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
 
 ### Explicitly outside combat MVP
 
@@ -199,18 +199,19 @@ Terrain (ID, positive move cost, walkable, LOS block, asset key); Class (ID, rol
 
 Presentation data belongs to the definition. The legacy view keeps display names, hotkeys, icon types and blurbs in its own dictionaries, so adding an ability means editing `BattleView.gd` as well as the content (`:138-189,210-227`; the legacy contributor guide lists that step).[17][77] In the target, an ability's name, blurb, icon kind, hotkey slot and sound cues are fields of the ability definition, and the HUD renders whatever the catalog holds.
 
-The slice needs exactly two effect shapes. A sketch; names are settled in the PR for #3 and #8:
+The implemented slice uses three discriminated ability kinds in `src/content/types.ts`:
 
 ```ts
-type AbilityDef =
-  | { kind: 'attack'; id: string; rangeMin: number; rangeMax: number; baseDamage: number;
-      highGroundBonusDamage?: number;            // High Shot
-      selfStatusOnResolve?: string;              // Guarded Strike; see D5
-      ui: AbilityUi }
-  | { kind: 'areaSave'; id: string; rangeMin: number; rangeMax: number; radius: number;
-      save: 'dex'; damageOnFail: number; affects: 'enemies';   // Ember Burst; see D5
-      ui: AbilityUi };
+type Ability =
+  | (AttackFields & { kind: 'attack' })           // Basic Attack, Shortbow, High Shot
+  | (AttackFields & { kind: 'guardedAttack'; attackPenalty: 4; armorClassBonus: 2 })
+  | { kind: 'magicMissile'; id: AbilityId; owners: readonly UnitId[];
+      casterLevel: number; rangeMin: number; rangeMax: number };
 ```
+
+`AttackFields` supplies identity, owners, range, base damage and uphill damage. Magic Missile's
+1d4+1 damage and five-missile cap are named rule constants, not freely editable effect fields.
+Presentation metadata remains separate from these pure rule profiles.
 
 An unknown `kind` or an unknown field fails validation. Do not add a generic effect list until a second ability needs one.
 
@@ -268,7 +269,7 @@ chooseEnemyCommands(state, catalog): Command[]    // pure, no RNG (§6.5)
 
   The target-related order follows the legacy targeting service, which returns those reasons as strings (`TargetingService.gd:13-52`); a rejected move there is only a bare `false` (`BattleController.gd:326-330`).[56][57]
 - **Events** are ordered and typed. `createBattle` emits `initiativeRolled` for each unit in ID order (natural roll and total), then the first `turnStarted`. A move emits `moved` with the path. An ability emits `abilityUsed` first, even when it affects nobody; then `attackRolled` (natural roll, bonus, total, target AC, miss/hit/critical), or one `saveRolled` per target (natural roll, modifier, total, DC, saved), each followed at once by its `damaged` (the damage dealt, not capped by remaining HP, and HP after) and `defeated`; then `statusApplied`; then `battleEnded` if the battle is over. `endTurn` emits `turnEnded`, then `turnStarted` for the next living unit, then `statusExpired` for anything that lapses at that start. Every event names the units involved by ID, and `turnStarted` carries the round. The log, the animations and the sound cues are all derived from this list, one command at a time.
-- **Preview** answers four questions without RNG or mutation, from the same functions resolution uses: which cells a unit can reach and at what cost; the path and cost of one move; which targets or centre cells an ability may choose; and what one use of an ability will do. For an attack that is bonus, target AC, the lowest natural roll that hits, the number of hitting faces out of 20, damage and critical damage; for an area, the DC, the covered cells and per target the number of failing faces. Percentages are faces × 5 and are always exact. The count is clamped by the natural-roll rules: never more than 19 hitting faces and never fewer than 1. An illegal query returns the reason code `dispatch` would give.
+- **Preview** answers four questions without RNG or mutation, from the same functions resolution uses: which cells a unit can reach and at what cost; the path and cost of one move; which creatures an ability may target; and what one use of an ability will do. For an attack that is bonus, target AC, the lowest natural roll that hits, the number of hitting faces out of 20, damage and critical damage; for Magic Missile, the missile count, target assignments and 2–5 damage range per missile. Attack percentages are faces × 5 and are always exact. The attack count is clamped by the natural-roll rules: never more than 19 hitting faces and never fewer than 1. An illegal query returns the reason code `dispatch` would give.
 - **Enemy commands.** `chooseEnemyCommands` is called once, at the start of an enemy's turn. It returns an optional move, an optional ability use and a final `endTurn`. The session dispatches them in order and stops as soon as a result ends the battle. Called at any other time it returns an empty list, which the session treats as a defect.
 - **Command log.** The session keeps the versions, the encounter ID, the seed and every accepted command, the enemies' included. That record reproduces the battle without re-running the AI and is the bug-report format (§10.4); it is bounded by battle length and is not part of the pure state.
 
@@ -297,7 +298,7 @@ Derived on 2026-10-06 from the resource: 131 cells are walkable; 122 can be reac
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | Fighter | (1,8) | 18 | 4 | 1 | 4 | 14 | 3 | 0 | 1 | Basic Attack, Guarded Strike |
 | 2 | Ranger | (2,8), on the ledge | 12 | 4 | 1 | 5 | 12 | 2 | 2 | 0 | Basic Attack, High Shot |
-| 3 | Mage | (1,9) | 11 | 4 | 1 | 3 | 11 | 4 | 1 | 2 | Basic Attack, Ember Burst |
+| 3 | Mage | (1,9) | 11 | 4 | 1 | 3 | 11 | 4 | 1 | 2 | Basic Attack, Magic Missile |
 | 4 | Goblin Grunt | (8,4) | 9 | 4 | 1 | 4 | 12 | 2 | 1 | 0 | Basic Attack |
 | 5 | Goblin Archer | (9,2), on the platform | 8 | 4 | 1 | 4 | 11 | 2 | 2 | 0 | Shortbow Shot |
 | 6 | Goblin Grunt | (8,5) | 9 | 4 | 1 | 4 | 12 | 2 | 1 | 0 | Basic Attack |
@@ -489,15 +490,19 @@ The target keeps the baseline rules unless a decision in the plan's register cha
 | Path choice | Lowest cost. Frontier ordered by cost, then y, then x; neighbours tried in the order +x, −x, +y, −y; a route replaces a known one only if strictly cheaper. Implement exactly this so equal-cost paths match the legacy scenarios. |
 | Range | Manhattan distance within the ability's minimum and maximum. |
 | Line of sight | Sample the cells between the two ends (§6.3). Only terrain flagged as blocking stops it; units and height never do. Every slice ability requires it. |
-| Area shape | Manhattan diamond of the given radius, cells ordered by y then x; cells off the map are dropped. |
+| Area shape | No area-targeting signature in this slice: Magic Missile designates creature targets. |
 | Attack roll | d20 + Accuracy + height modifier + status modifiers against AC + status AC. A total equal to the AC hits. Natural 1 always misses; natural 20 always hits and is critical. One d20 per attack. |
 | Height modifier | +2 to hit when the attacker's cell is higher, −2 when lower; not scaled by the difference. |
-| Damage | max(1, ability base + Power + modifiers); a critical doubles the result. No damage dice in the slice. A unit at 0 HP is defeated and leaves its cell at once. |
+| Damage | Ordinary attacks deal max(1, ability base + Power + modifiers); a critical doubles the result. Magic Missile instead rolls 1d4+1 per missile, without those bonuses or criticals. A unit at 0 HP is defeated and leaves its cell at once. |
 | Basic Attack | Range 1, base damage 2. |
-| Guarded Strike | Range 1, base damage 2, then the Fighter gains Guarded: +2 AC until the start of the Fighter's next turn. Granted whenever the strike resolves, including on a miss (D5). It cannot stack in the slice: it has lapsed before the Fighter can strike again. As pinned it is never worse than Basic Attack for the Fighter (D6). |
+| Guarded Strike | Approved Fighting Defensively mapping: range 1, base damage 2, −4 to attack rolls and +2 dodge AC until the start of the Fighter's next turn. Granted whenever the strike resolves, including on a miss. The −4 penalty applies once to the activating attack and any further attacks while Guarded. The +2 AC applies after resolution, hit or miss (D5), and repeated Guarded Strike effects do not stack with themselves. Basic Attack keeps normal accuracy, creating an offense/defense tradeoff (D6). See `docs/signature-abilities.md` for the 3.5E source and scope. |
 | High Shot | Range 2 to 5, base damage 2; +2 damage when the Ranger's cell is higher than the target's, on top of the +2 to hit. |
-| Ember Burst | Centre cell at range 2 to 4 from the Mage with line of sight to the centre; radius 1. The centre may be any cell on the map, including one that blocks movement or sight, and the area is not clipped by line of sight. Each enemy in the area rolls d20 + Dex against 10 + the Mage's Power; a total equal to that number saves. A failure takes a flat 3, a success nothing. One roll per target in ascending unit ID; no natural 1 or 20 rule. Allies are not affected (D5). Casting on an area with no enemy is legal, rolls nothing and spends the action. |
+| Magic Missile | Approved 3.5E replacement for Ember Burst: automatic hit, 1d4+1 force damage per missile, no attack roll, critical or saving throw. No Power or elevation damage bonus. One missile at caster levels 1–2, two at 3–4, three at 5–6, four at 7–8, five at 9+. Creature targets are designated before rolling; missiles can share a target or be divided. Tabletop range is 100 ft. + 10 ft./level and multiple targets must be within 15 ft. of each other. The starting Mage is caster level 1; Brian requested Ranger-like range, implemented as Manhattan range 1–5 tiles and 3-tile target spread; see `docs/signature-abilities.md` for source, line-of-effect requirements and RNG contract. |
 | Shortbow Shot | Range 2 to 4, base damage 2, ordinary attack roll. |
+
+**Fighting Defensively source and slice mapping.** In the 3.5E SRD, both [attacking as a standard action](https://www.d20srd.org/srd/combat/actionsInCombat.htm#fightingDefensivelyasaStandardAction) and [taking a full attack](https://www.d20srd.org/srd/combat/actionsInCombat.htm#fightingDefensivelyasaFullRoundAction) can be done defensively: all attack rolls in the round take −4, in exchange for +2 dodge AC for that same round. The defense does not depend on hitting. The approved game mapping above retains range 1 and base damage 2, grants Guarded after the strike resolves even on a miss, and expires it at the Fighter's next turn start. The −4 integration and Basic Attack choice are already recorded as approved in `docs/signature-abilities.md` (D6); they are not new decisions introduced by this source citation. Full attacks remain outside this slice.
+
+**Stacking scope.** “Does not stack” means repeated applications of Guarded Strike do not accumulate additional AC or attack penalties. It is not a general ban on combining dodge bonuses: the [SRD dodge-bonus rule](https://www.d20srd.org/srd/theBasics.htm#dodgeBonus) allows dodge bonuses from distinct sources to stack. Other sources and their interactions remain outside this slice; this mapping does not add a general stacking system.
 
 Dropped from current main's attack path: adjacency accuracy modifiers, typed damage, status immunities, marks and taunts. Expected numbers in legacy tests that exercise them do not transfer. The legacy ability definition also carries per-ability accuracy and damage modifiers; they are zero for all five slice abilities, so the sketch in §4.1 omits them.
 
@@ -507,7 +512,7 @@ Dropped from current main's attack path: adjacency accuracy modifiers, typed dam
 2. **Line of sight in integers.** The legacy code interpolates in floating point and rounds halves away from zero (`TargetingService.gd:91-107`).[57] The target samples, for step s from 1 to n − 1 with n = max(|dx|, |dy|), the cell `( ⌊(2(x₀n + dx·s) + n) / 2n⌋, ⌊(2(y₀n + dy·s) + n) / 2n⌋ )`, excluding the two ends; with n of 0 or 1 there is nothing between and the line is clear. Checked exhaustively on 2026-10-06: on a 12×12 board this gives the same cells as the legacy formula for all 20,592 ordered pairs, and the result is the same in both directions. On a 24×24 board the floating-point form already disagrees with exact arithmetic for 8 ordered pairs and becomes direction-dependent, so the integer form is also the safe one for larger maps. Exact half-way samples are common: they occur in 1,584 of the 5,612 ordered pairs at Manhattan distance 2 to 5 on this board. So the tie rule matters: halves round up.
 3. **One expected-damage measure in the AI** (T8, §6.5).
 4. **Occupancy derived, not stored** (§2.4).
-5. **Preview and resolution share code.** One function evaluates an attack or an area; resolution is that evaluation plus the rolls. The legacy UI warns that Ember Burst "will hit an ally" although its resolver never damages allies (`BattleView.gd:3090-3093,5724-5750`); a shared evaluation removes that class of mismatch.[17]
+5. **Preview and resolution share code.** One function evaluates a legal attack or Magic Missile cast; resolution adds the rolls. Magic Missile preview reports 2–5 damage per missile without RNG use. Legacy Ember Burst's inconsistent ally warning (`BattleView.gd:3090-3093,5724-5750`) is historical; its area/save path is not part of the replacement.[17]
 
 ### 6.4 Random numbers
 
@@ -518,6 +523,7 @@ Requirements (plan §6): the state is a small fixed set of unsigned 32-bit integ
 - State `[a, b, c, counter]`. One step: `t = a + b + counter; counter += 1; a = b ^ (b >>> 9); b = c + (c << 3); c = rotl(c, 21) + t; return t`, all modulo 2³².
 - Seeding from a 32-bit seed, as the reference does for a 64-bit seed whose high half is zero: state `[0, seed, 0, 1]`, then discard 12 outputs.
 - d20: draw a value; if it is 4294967280 or more, draw again; otherwise `value mod 20 + 1`.
+- Magic Missile d4: use the same bounded-roll helper with four sides, then add 1 damage. Four divides 2³² exactly, so each missile consumes one raw draw without a rejection-sampling redraw.
 - The fourth word is a draw counter, so it doubles as the cursor: draws so far = `counter − 13`.
 - The app layer makes the seed with `crypto.getRandomValues`, shows it in the log and diagnostics, and accepts an override for tests (§10.4).
 
@@ -555,11 +561,12 @@ score = damage·wDamage + (canAttack ? wCanAttack : 0) + missingHp·wLowHp
 
 ### 6.6 Check values
 
-Computed from §6.2 and the §4.3 stat blocks; "expectation" is the sum of damage over the 20 faces.
+Computed from §6.2 and the §4.3 stat blocks; "expectation" is mean damage multiplied by 20. For ordinary attacks this is the sum of damage over the 20 attack faces; for Magic Missile it is five times the sum over the four damage faces, per missile.
 
 | Situation | To hit | Hits on | Faces | Damage / critical | Expectation |
 |---|---|---|---|---|---|
-| Fighter, Basic Attack or Guarded Strike, on a Grunt | +4 vs AC 12 | 8+ | 13 (65%) | 5 / 10 | 70 |
+| Fighter, Basic Attack, on a Grunt | +4 vs AC 12 | 8+ | 13 (65%) | 5 / 10 | 70 |
+| Fighter, Guarded Strike, on a Grunt | +0 vs AC 12 | 12+ | 9 (45%) | 5 / 10 | 50 |
 | Ranger, High Shot on a Grunt, level ground | +5 vs AC 12 | 7+ | 14 (70%) | 4 / 8 | 60 |
 | Ranger, High Shot on a Grunt, Ranger higher | +7 vs AC 12 | 5+ | 16 (80%) | 6 / 12 | 102 |
 | Ranger, High Shot on the Archer, Ranger lower | +3 vs AC 11 | 8+ | 13 (65%) | 4 / 8 | 56 |
@@ -569,8 +576,7 @@ Computed from §6.2 and the §4.3 stat blocks; "expectation" is the sum of damag
 | Grunt on the Ranger | +4 vs AC 12 | 8+ | 13 (65%) | 4 / 8 | 56 |
 | Grunt on the Mage | +4 vs AC 11 | 7+ | 14 (70%) | 4 / 8 | 60 |
 | Archer, Shortbow Shot on the Mage, Archer higher | +6 vs AC 11 | 5+ | 16 (80%) | 4 / 8 | 68 |
-| Ember Burst on a Grunt (DC 14, Dex +1) | — | fails on 12 or less | 12 fail (60%) | 3 | 36 |
-| Ember Burst on the Archer (DC 14, Dex +2) | — | fails on 11 or less | 11 fail (55%) | 3 | 33 |
+| Magic Missile, per missile on an eligible unprotected creature | Automatic | No attack roll | 100% | 1d4+1 (2–5), no critical | Mean damage 3.5; ×20 expectation 70 |
 
 ## 7. Assets, audio and content workflow
 
@@ -631,6 +637,8 @@ This minimal loading and failure surface is needed first by #2 (no WebGL) and #3
 Domain events name what happened; the audio adapter maps them to cues. There are no sound calls in the domain.
 
 Baseline cue routing for the slice (`BattleController.gd:2155-2229`, `AudioFeedback.gd:3-64`):[56][86]
+
+The following table records legacy sound candidates. Ember Burst cues are historical and excluded from the revised slice; Magic Missile release/impact cues remain to be chosen in #10, with no save or empty-area miss cue.
 
 | When | Cue | Legacy file | Level (dB) | Pitch |
 |---|---|---|---|---|
@@ -738,7 +746,7 @@ The workflow proposed in PR #12 runs `npm ci`, `npm run build` and `npm test`.[5
 
 ### 10.2 Unit tests (Vitest, node environment)
 
-Content validation with representative malformed inputs; RNG vectors and state round-trip through JSON (§6.4); occupancy, weighted paths, Jump and the equal-cost tie order; a move to a cell that became occupied after it was previewed; line-of-sight vectors in all eight directions including exact halves, and symmetry (§6.3); area shape; initiative ties and skipping; d20 edges at natural 1, natural 20 and total equal to AC; the Dex-save path; the three signatures and Guarded expiry; pure previews that leave the RNG untouched; rejected commands that leave the state deep-equal; legal AI choices, occupied chokepoints, unreachable targets, the Wait fallback and tie order; outcome exactly once.
+Content validation with representative malformed inputs; RNG vectors and state round-trip through JSON (§6.4); occupancy, weighted paths, Jump and the equal-cost tie order; a move to a cell that became occupied after it was previewed; line-of-sight vectors in all eight directions including exact halves, and symmetry (§6.3); Magic Missile target assignments; initiative ties and skipping; d20 edges at natural 1, natural 20 and total equal to AC; Magic Missile automatic hits, 1d4+1 damage bounds and seeded missile ordering; the three signatures and Guarded expiry; pure previews that leave the RNG untouched; rejected commands that leave the state deep-equal; legal AI choices, occupied chokepoints, unreachable targets, the Wait fallback and tie order; outcome exactly once.
 
 The gesture reducer and the session's mode machine are pure and are unit-tested here too (§2.1, §5.7).
 
@@ -834,12 +842,12 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | D1 | Minimum browser versions and the physical device list | #2, #11 |
 | D2 | Numeric loading and frame budgets | #2, then #11 |
 | D4 | Encounter: the legacy trio or the current seeded roster | #3 |
-| D5 | Guarded on a missed strike; Ember Burst and allies | #8 |
-| D6 | Fighter's Basic Attack versus Guarded Strike | #8 |
+| D5 | Resolved: Guarded on miss; Ember Burst replaced by Magic Missile | Resolved for #8 |
+| D6 | Resolved: Guarded Strike trades −4 accuracy for +2 AC | #8 |
 | D8 | Selecting cells covered by raised terrain | #2, #6 |
 | D9 | Production host and cutover target | after #11 |
 | D10 | Analytics | after #11 |
-| D11 | Final ability names and balance numbers | #8, #10 |
+| D11 | Guarded Strike −4/+2 and Magic Missile 1d4+1 approved; starting caster level 1, range 1–5 tiles and 3-tile spread recorded | Tuning #10 |
 
 **Design questions raised by this revision.** They are not yet in the plan's register; add them when confirmed.
 

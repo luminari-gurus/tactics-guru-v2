@@ -57,9 +57,15 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
     }
   } while (snapshot.units.find(u => u.id === snapshot.initiative[index])!.hp === 0);
   const next = snapshot.initiative[index];
+  const expires = snapshot.units.find(u => u.id === next)!.guarded;
   return { ok: true, state: { ...snapshot, activeIndex: index, round, commandCount: snapshot.commandCount + 1,
-    units: snapshot.units.map(u => u.id === next ? { ...u, hasMoved: false, hasActed: false } : u) },
-    events: [{ type: 'turnEnded', unitId: intent.command.unitId }, { type: 'turnStarted', unitId: next, round }] };
+    units: snapshot.units.map(u => {
+      if (u.id !== next) return u;
+      const { guarded, ...unit } = u;
+      return { ...unit, hasMoved: false, hasActed: false };
+    }) },
+    events: [{ type: 'turnEnded', unitId: intent.command.unitId },
+      ...(expires ? [{ type: 'guardExpired' as const, unitId: next }] : []), { type: 'turnStarted', unitId: next, round }] };
 }
 /** One entry point for every command; the type is read only after the shared intent check. */
 export function dispatch(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
