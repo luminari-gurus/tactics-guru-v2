@@ -1,6 +1,6 @@
 # Issue #7 plan: basic turn flow, attacks and battle outcomes
 
-Status: implementation in progress on `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0`, created with `gh issue develop` so it is linked on the issue's Development panel). The plan was ablated before coding (§3.0); §9 records each increment's commit as it lands. Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: the first unchecked increment in §4.
+Status: implementation complete and verified; [PR #44](https://github.com/luminari-gurus/tactics-guru-v2/pull/44) is open and ready for review from `issue-7-turn-flow-combat` (branched from `origin/main` `73d17c0` with `gh issue develop`, so it is linked on the issue's Development panel and merging closes #7). Owner: moshehbenavraham (assigned on the tracker 2026-10-09, handling comment [6077491133](https://github.com/luminari-gurus/tactics-guru-v2/issues/7#issuecomment-6077491133)). Next step: review follow-up on PR #44 per §8, then merge and close-out (fold anything durable into `docs/turn-flow-combat.md` and delete this file).
 
 Issue: [#7 P1: Implement basic turn flow, attacks and battle outcomes](https://github.com/luminari-gurus/tactics-guru-v2/issues/7).
 Parent: epic #1. Dependency: #5 (closed 2026-10-08 via PR #40). Downstream: #8 and #9 depend on #7; #10 depends on #6, #7, #8 and #9.
@@ -34,6 +34,7 @@ Checked against GitHub, `origin/main` and the legacy reference on 2026-10-09.
 | -- | -- | -- |
 | `origin/main` `73d17c0` | Current | Base. `npm run test:unit` on it: 14 files, 150 tests, all passing (run 2026-10-09). |
 | PR #43 (dubstylee, `codex/issue-29-authored-content`) | Open | See #29 above. If it merges before our PR, §7 item 6 adds one optional smoke test on the real catalog. |
+| PR #44 (ours, `issue-7-turn-flow-combat`) | Open, ready for review | This work. Head `40c8ca1` when opened; the plan update recording it follows. |
 | PR #39 (ours, `issue-35-close-out`) | Open, docs only | Deletes the #19 and #35 plan files from this directory. No overlap with this file. |
 | PR #12 (dubstylee, `feat/signed-main-deploy`) | Open | Unrelated. |
 
@@ -372,3 +373,7 @@ RED: with the new cases in `tests/unit/turns.test.ts`, 3 failed (`dispatch is no
 ### 2026-10-09: increment 5 (docs) and the gate
 
 Added the task note and repointed the stale "#7" forward references in code comments and the #4/#5 notes. The full gate passed (§5 results). `origin/main` is still `73d17c0`, so no merge was needed. Next: the PR (status line).
+
+### 2026-10-09: PR opened
+
+[PR #44](https://github.com/luminari-gurus/tactics-guru-v2/pull/44) was opened ready for review from head `40c8ca1`. GitHub lists it in #7's `closedByPullRequestsReferences`, and it reports MERGEABLE. Its body maps each acceptance criterion to test names and lists the five review questions (§7 items 1–5). It requests no reviewer, assignee or label, matching recent PRs. The branch holds seven commits: the plan, the ablation pass, four `feat` increments and the docs. Nothing is left open on the implementation side.
