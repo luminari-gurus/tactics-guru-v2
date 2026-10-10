@@ -173,7 +173,9 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
 test('restart during initial enemy animation discards the old run and its callbacks',async({page})=>{
   await page.goto('/');await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
-  const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
+  // An enemy end-turn commit advances initiative before its presentation completes.
+  const first=await session(page),command=first.replay.commands.at(-1);
+  expect(command).toBeDefined();expect(first.state.units.find(u=>u.id===command!.unitId)!.side).toBe('enemy');
   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

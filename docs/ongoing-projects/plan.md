@@ -8,10 +8,11 @@
 | Parent / acceptance trackers | [#57](https://github.com/luminari-gurus/tactics-guru-v2/issues/57), [#11](https://github.com/luminari-gurus/tactics-guru-v2/issues/11), [#1](https://github.com/luminari-gurus/tactics-guru-v2/issues/1) |
 | Owner | `moshehbenavraham` |
 | Branch | `work/issue-62-battle-audio` |
+| Review | [Draft PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63), final validation pending |
 | Main baseline | `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a` |
 | Current runtime source | `ca1923a` (Web Audio retry and fixed clock anchors), committed and pushed |
-| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 9/13 tasks complete; full regression, final measurement and publication gates remain |
-| Current step | Final full validation waiting for shared-host CPU capacity; implementation and targeted checks complete |
+| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 11/13 tasks complete; final measurement and publication audit remain |
+| Current step | Browser coverage complete (206 full-run passes + corrected restart rechecks 3/3); final raw measurement running |
 | QA / raw comparison | [Report](../qa/issue-62-battle-audio.md), [72 samples](../qa/issue-62/baseline-candidate.json) |
 
 The user explicitly requested implementation of this concrete plan, use of ablation and OpenSpec, autonomous issue resolution, commits/pushes and a reviewable PR. That supersedes the earlier planning-only approval checkpoint. No additional implementation approval is pending.
@@ -92,9 +93,8 @@ The [physical matrix](../qa/issue-62-battle-audio.md#physical-device-handoff-for
 
 ## Resume and delivery procedure
 
-- No task browser process is live. Full attempts and their terminal counts are recorded in QA. Latest clean runtime/build is `ca1923a`; unit 288/288, targeted interruption/unlock 9/9 and all 13 desktop audio cases pass. The shared host is running an unrelated large C++ compilation (observed load 57); leave it untouched. Wait for host capacity, then run the complete configured browser suite. Do not increase product/assertion deadlines to hide host contention.
-- Test-only runner option `npm test -- --timeout=60000` is available for existing composite board workflows; default 30 s runs and interruptions remain documented. Use normal untraced execution; trace only an unresolved focused case. Current source/test code needs no further change unless new evidence requires one.
-- After the full suite, run the collector against `/tmp/guru-issue62-baseline/dist` (clean `9f785df`) and `/tmp/guru-issue62-candidate/dist` (clean `ca1923a`) into `docs/qa/issue-62/final-baseline-candidate.json`. Preserve the initial capture and all three warm first-player failures. Record host conditions; do not run competing task browsers or disturb the unrelated preview on port 4175.
-- Update exact results in this plan and QA; mark OpenSpec tasks 3.3, 4.1 and 4.2 when their checks finish. Audit AC1–AC6, documentation links, strict OpenSpec, whitespace and the complete issue-specific diff.
-- Publish a draft PR against main with `Refs #62`, QA links, validation and explicit physical/performance gaps. After final validation, verify remote head, PR/issue/branch links, mark task 4.4 and publish the final handoff update. Keep the OpenSpec change unarchived until merged/accepted.
-- Published runtime commits: planning `7959063`, implementation `2d87b64`, HTML5 repair `5b22bf5`, late callback guard `a0beaab`, collector/evidence/comparison allowance `6cd67e2`, Web Audio retry/clock fixture `ca1923a`. No release tag is warranted for an unmerged review branch; the repository had no tag convention to advance. Do not merge, close issues or alter deployment.
+- Browser full process `39323` is terminal: 206 passed / 1 existing assertion failure (25.9 minutes). Corrected initial-enemy actor assertion passed 3/3 across profiles; runtime remains `ca1923a`. All 207 configured cases have passing coverage across full/recheck results; no clean single-run 207-pass result is claimed. Exact commands/failures are in QA; reuse these valid results.
+- Current measurement process: session `5124`, baseline `/tmp/guru-issue62-baseline/dist` (clean `9f785df`), candidate `/tmp/guru-issue62-candidate/dist` (clean `ca1923a`), output `docs/qa/issue-62/final-baseline-candidate.json`. Before start: no compiler processes, approximately 64% CPU idle, no competing task browser. Poll it, validate all 72 samples and retain the original capture/failures.
+- Once capture finishes, update the measurement tables and final handoff in plan/QA, then mark task 4.2. Recheck local document links, strict OpenSpec and whitespace; commit/push only issue-specific files.
+- Draft PR #63 is published against main with `Refs #62`. Update its validation and measurement details, verify the remote head and links, then mark task 4.4 and publish the final handoff update. Keep the OpenSpec change unarchived until merged/accepted; physical audio and #11 F1/F2 acceptance remain explicit.
+- Remove only the two task-owned temporary worktrees after capturing evidence. Preserve the unrelated worktree and pre-existing preview on 4175. No release tag is warranted for an unmerged review branch; do not merge, close issues or alter deployment.
