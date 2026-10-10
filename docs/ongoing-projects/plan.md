@@ -12,9 +12,9 @@
 | Base | `origin/main` at `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a` |
 | OpenSpec change | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md) |
 | Planning date | 2026-10-10 |
-| Scope of this pickup | Create/claim the issue, prepare this plan and OpenSpec artifacts, then commit/publish a linked branch. Application implementation has not started. |
+| Scope of this pickup | Implement the approved battle-audio plan, verify it, and publish a reviewable PR with honest device/performance gaps. |
 
-The user explicitly approved creating and claiming the battle-audio child after the backlog review. That approval authorizes this planning/publishing pickup; implementation follows review of this concrete plan.
+The user explicitly approved creating and claiming the battle-audio child after the backlog review. The subsequent explicit request to fix/implement/continue this plan authorizes implementation and PR delivery; no additional approval checkpoint remains.
 
 ## Selection and readiness evidence
 
@@ -50,7 +50,7 @@ Use eight reproducibly generated short MP3 files, no more than 32 KiB total, wit
 
 ## Implementation sequence and affected files
 
-1. After explicit plan approval, record the implementation baseline and check #61's merge status. Add RED-first pure policy cases, implement cue mapping and document/generate the small asset set.
+1. Record the implementation baseline and check #61's merge status. Add RED-first pure policy cases, implement cue mapping and document/generate the small asset set.
 2. Implement and test the adapter's token policy, bounded optional loading, gesture unlock, failure containment, playback sequence and lifecycle teardown.
 3. Integrate accepted batches and sound controls without changing session/domain semantics. Exercise real controls, failures, all signatures, outcomes and repeated restart in browser tests; keep proof-audio regressions intact.
 4. Run configured integration checks, measure comparable loading/byte deltas, document physical-device results/gaps, then deliver a scoped PR and QA handoff. Keep unverified criteria visible.
@@ -83,7 +83,7 @@ Use eight reproducibly generated short MP3 files, no more than 32 KiB total, wit
 
 ## Validation commands and evidence boundaries
 
-These commands are the implementation verification plan, not completed test results. New test files named below do not exist yet. All package scripts are present in the inspected `package.json`.
+These commands are the implementation verification plan; results are tracked below and in the QA note. All package scripts are present in the inspected `package.json`.
 
 ```sh
 npm run test:unit -- tests/unit/battleCues.test.ts tests/unit/battleAudio.test.ts
@@ -112,11 +112,26 @@ Main risks are browser unlock timing, late loader/context callbacks after restar
 
 Excluded: music/voice, broad art packs, new gameplay rules, save/resume, rewards, renderer/performance rewrites, backend, dependency/toolchain upgrades and deployment infrastructure. Import no external legacy plan and add no attribution/co-author/sign-off trailers.
 
-The planning deliverable consists only of this file and `openspec/changes/issue-62-battle-audio/`. Validate the artifacts, publish `work/issue-62-battle-audio`, commit/push those files, and verify the issue's branch link and remote plan content. Implementation begins only after review/approval of this concrete plan; keep all implementation tasks unchecked until their stated evidence exists.
+The original planning-only deliverable was published as `7959063`. The current user request authorizes implementation and PR delivery. Keep OpenSpec tasks unchecked until their stated evidence exists. Leave the change unarchived until merge/acceptance, and use a draft PR with `Refs #62` while physical acceptance is unverified.
 
-## Planning validation and delivery state
+## Original planning validation (historical)
 
 - OpenSpec 1.14.1 is installed globally for the current Node environment with `npm install --global @fission-ai/openspec@1.14.1`; `openspec --version` reports `1.14.1`. All four planning artifacts are complete and `openspec validate issue-62-battle-audio --strict` passes.
 - All six planning files were checked for relative-link targets, trailing whitespace and forbidden attribution trailers; no issues were found. `git diff --check` also passes. No application source or test was changed, and implementation tests have not been run for this documentation-only pickup.
 - GitHub readback confirms #62 is open, assigned to `moshehbenavraham`, labeled `enhancement` and `ready for work`, with the claim comment posted. The remote main comparison is identical to the recorded base.
 - Publication target: [work/issue-62-battle-audio](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-62-battle-audio), with this plan at [docs/ongoing-projects/plan.md](https://github.com/luminari-gurus/tactics-guru-v2/blob/work/issue-62-battle-audio/docs/ongoing-projects/plan.md). Native issue linkage and remote contents are verified after push; this planning commit contains only the six task-specific documentation files.
+
+## Implementation progress (2026-10-10)
+
+- Authorization: current user request explicitly directs implementation of this plan using ablation and OpenSpec, autonomous issue resolution, commits/pushes and reviewable PR delivery.
+- Baseline: clean branch `79590637e2a58bd620fc283f41511bedc240aebf`; remote main remains `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`. PR #61 is open/unmerged. A detached baseline worktree at `/tmp/guru-issue62-baseline` supports same-host measurements without importing #61.
+- Ablation: **Outcome** is all six issue criteria with explicit hardware gaps. **Non-goals** remain unchanged. **Files** follow the table above plus a reproducible asset recipe/measurement harness if needed. **Proof** is RED/GREEN policy/lifecycle tests, real controls, required suites and comparable raw loading evidence. The existing plan is minimal; no generic audio service, new runtime dependency, or proof-adapter refactor is warranted.
+- Current step: cue policy RED tests, then bounded Phaser adapter. OpenSpec checkboxes remain the task source of truth; QA results live in `docs/qa/issue-62-battle-audio.md`.
+
+- Loader refinement: local Phaser `AudioFile.onProcess` has unguarded decoder callbacks and console-error reporting. Use owned abortable fetch/decode and existing Phaser cache/sound APIs, preserving HTML5 fallback. This removes shared loader cleanup/retry coupling and keeps the same acceptance criteria. Eight cues now total 11741 bytes. Policy RED/GREEN and asset inventory pass (8 tests).
+
+- Adapter RED/GREEN: 24 focused tests plus strict typecheck pass. Scene/HUD/diagnostics integration is implemented; browser controls and HTML5/no-audio coverage are next before marking integration tasks complete.
+
+- Integration status: initial desktop audio suite passed 12 tests, including actual-control losses and victories with identical sound-on/off state, RNG and replay. Touch activation, per-action cue assertions and late decode checks were then added; the full configured suite (207 tests) is running. Unit suite: 284 passed; content: 77 passed; strict typecheck/build/OpenSpec validation/diff check pass. Existing large-chunk warning retained.
+- Device handoff: all eight physical browser/orientation rows are explicitly unverified in the QA note; #11 retains physical audibility and frame certification. No physical result is inferred from headless tests.
+- Next steps: finish all browser projects and address failures, commit the implementation, rebuild with a clean source identifier, run `scripts/measure-battle-audio.ts` sequentially against the detached baseline, record raw evidence and unchanged-budget results, then commit/push QA and prepare the draft PR.
