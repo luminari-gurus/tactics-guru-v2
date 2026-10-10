@@ -20,6 +20,7 @@ export interface BattleAudioSnapshot {
 export class BattleAudio {
   private live = true;
   private enabled: boolean;
+  private blurred = false;
   private load: BattleAudioSnapshot['load'] = 'loading';
   private error: string|null = null;
   private generation = 0;
@@ -38,13 +39,20 @@ export class BattleAudio {
   private loadTimer?: Timer;
   private requests = new Map<AbortController, Timer>();
   private media = new Map<string, {tag: HTMLAudioElement; url: string; cleanup: ()=>void}>();
+  private readonly priorPauseOnBlur?: boolean;
 
   constructor(private readonly host: Host, private readonly catalog: ContentCatalog, enabled: boolean,
     private readonly changed: (snapshot: BattleAudioSnapshot)=>void) {
     this.enabled = enabled;
+    if(!this.context()) {
+      // HTML5's automatic focus resume ignores stop(), so this adapter owns blur for its lifetime.
+      this.priorPauseOnBlur=host.sound.pauseOnBlur;host.sound.pauseOnBlur=false;
+    }
     this.context()?.addEventListener('statechange', this.onContext);
     host.sound.on('unlocked', this.onContext);
     document.addEventListener('visibilitychange', this.onVisibility);
+    window.addEventListener('blur', this.onBlur);
+    window.addEventListener('focus', this.onFocus);
     void this.loadCues();
   }
 
@@ -53,7 +61,7 @@ export class BattleAudio {
   snapshot(): BattleAudioSnapshot {
     const context = this.contextState();
     const status = this.load === 'unavailable' ? 'unavailable' : !this.enabled ? 'muted' : document.hidden ? 'hidden'
-      : this.unlockTimer ? 'unlocking' : this.error || context !== 'running' || this.host.sound.locked ? 'blocked'
+      : this.unlockTimer ? 'unlocking' : this.error || this.blurred || context !== 'running' || this.host.sound.locked ? 'blocked'
       : this.load === 'loading' ? 'loading' : 'ready';
     return {enabled:this.enabled,status,load:this.load,context,error:this.error,generation:this.generation,lastToken:this.lastToken,
       started:this.started,completed:this.completed,dropped:this.dropped,active:this.active,recent:[...this.recent],ownedSounds:this.sounds.size};
@@ -78,7 +86,7 @@ export class BattleAudio {
   }
   /** Called directly in the DOM activation handler, before any await. */
   unlock(): void {
-    if (!this.live || !this.enabled || document.hidden || this.load === 'unavailable') return;
+    if (!this.live || !this.enabled || document.hidden || this.blurred || this.load === 'unavailable') return;
     this.cancelUnlock(); this.stop(); this.error = null;
     const attempt = this.attempt;
     this.unlockTimer = setTimeout(()=>{
@@ -87,6 +95,8 @@ export class BattleAudio {
     }, UNLOCK_TIMEOUT_MS);
     try {
       const context = this.context();
+      // Owned media bypasses Phaser's loader, which normally refreshes its HTML5 lock.
+      if (!context) this.host.sound.unlock();
       // HTML5 media is primed silently inside the gesture; never queue a historical cue.
       const resumed = context ? context.resume() : Promise.all([...this.media.values()].map(({tag})=>{
         tag.muted = true;
@@ -117,6 +127,8 @@ export class BattleAudio {
     if(this.contextState() !== 'running') { this.cancelUnlock(); this.stop(); }
     this.notify(); // Visibility/running transitions never drain a queue.
   };
+  private readonly onBlur = () => { this.blurred=true;this.cancelUnlock();this.stop();this.notify(); };
+  private readonly onFocus = () => { this.blurred=false;this.notify(); };
   private clearActive() {
     clearTimeout(this.playTimer);this.playTimer=undefined;
     if(this.active) {
@@ -210,6 +222,9 @@ export class BattleAudio {
     this.context()?.removeEventListener('statechange',this.onContext);
     this.host.sound.off('unlocked',this.onContext);
     document.removeEventListener('visibilitychange',this.onVisibility);
+    window.removeEventListener('blur',this.onBlur);
+    window.removeEventListener('focus',this.onFocus);
+    if(this.priorPauseOnBlur !== undefined) this.host.sound.pauseOnBlur=this.priorPauseOnBlur;
     for(const sound of this.sounds.values()) {try {sound.destroy();} catch { /* Continue releasing other owned sounds. */ }}
     this.sounds.clear();this.releaseMedia();
   }

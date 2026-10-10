@@ -9,22 +9,39 @@ const move: readonly BattleEvent[] = Object.freeze([{type:'moved',unitId:1,path:
 class Sound extends EventEmitter {
   play=vi.fn(()=>true); stop=vi.fn(); destroy=vi.fn();
 }
-function fixture(cached=true) {
+function fixture(cached=true, html5=false) {
   const document = Object.assign(new EventTarget(),{hidden:false}); vi.stubGlobal('document',document);
+  const window=new EventTarget();vi.stubGlobal('window',window);
   const context=Object.assign(new EventTarget(), {state:'running',resume:vi.fn(()=>Promise.resolve()),decodeAudioData:vi.fn(()=>Promise.resolve({duration:.2}))});
   const sounds:Sound[]=[];
   const cache=new Map<string,unknown>(cached?Object.values(BATTLE_CUES).map(c=>[c.key,{}]):[]);
-  const sound=Object.assign(new EventEmitter(),{context,locked:false,add:vi.fn(()=>{const s=new Sound();sounds.push(s);return s;})});
+  const sound=Object.assign(new EventEmitter(),{...(!html5?{context}:{}),locked:html5,pauseOnBlur:true,unlock:vi.fn(),add:vi.fn(()=>{const s=new Sound();sounds.push(s);return s;})});
+  sound.unlock.mockImplementation(()=>{sound.locked=false;});
   const host={sound,cache:{audio:{exists:(k:string)=>cache.has(k),add:(k:string,v:unknown)=>cache.set(k,v),remove:(k:string)=>cache.delete(k)}},game:{config:{audio:{}},device:{audio:{mp3:true,webAudio:true,audioData:true}}}};
   const render=vi.fn();
   const audio=new BattleAudio(host as unknown as ConstructorParameters<typeof BattleAudio>[0],catalog,false,render);
-  return {audio,document,context,sounds,sound,cache,render};
+  return {audio,document,window,context,sounds,sound,cache,render};
 }
 beforeEach(()=>{vi.useFakeTimers();vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)})));});
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
 
 describe('scene audio lifetime',()=>{
+  it('refreshes Phaser HTML5 lock state in the enabling gesture',async()=>{
+    const f=fixture(true,true);await flush();f.audio.setEnabled(true);
+    expect(f.sound.unlock).toHaveBeenCalledTimes(1);await flush();
+    expect(f.audio.snapshot().status).toBe('ready');f.audio.present(1,move);
+    expect(f.audio.snapshot().started).toBe(1);f.audio.destroy();
+  });
+  it('drops HTML5 feedback on blur even without an AudioContext state event',async()=>{
+    const f=fixture(true,true);await flush();f.audio.setEnabled(true);await flush();
+    expect(f.sound.pauseOnBlur).toBe(false);
+    f.audio.present(1,move);f.window.dispatchEvent(new Event('blur'));
+    expect(f.sounds[0].stop).toHaveBeenCalled();f.audio.present(2,move);
+    f.window.dispatchEvent(new Event('focus'));f.audio.present(2,move);
+    expect(f.audio.snapshot()).toMatchObject({active:null,started:1});f.audio.destroy();
+    expect(f.sound.pauseOnBlur).toBe(true);
+  });
   it('consumes muted/duplicate/old batches and only plays future batches once',async()=>{
     const f=fixture(); f.audio.present(1,move); f.audio.setEnabled(true); await flush();
     f.audio.present(1,move);f.audio.present(0,move);expect(f.sounds).toHaveLength(0);
