@@ -25,6 +25,6 @@ None. Combat rules and existing controls are unchanged.
 
 Affected areas: `src/diagnostics/{browser,measurements}.ts`, `src/phaser/BattleScene.ts`, `src/phaser/BoardInput.ts` if needed for timing, `scripts/measure-fit{,-options}.ts`, existing unit/browser measurement and battle tests, and `docs/qa/issue-11-battle.md` plus raw evidence. No new runtime dependency is planned.
 
-Caller: `dubstylee`. Base: `main` at `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`. Published branch: `work/issue-11-device-performance`. Change: `issue-11-device-performance`. Approval: pending; implementation has not started.
+Caller: `dubstylee`. Base: `main` at `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`. Published branch: `work/issue-11-device-performance`. Change: `issue-11-device-performance`. Approval: caller explicitly replied “Approved” to the published plan at `144fde6` on 2026-10-10.
 
 Prerequisite #10 is closed and PR #55 merged into main. Existing #20/#35 proof budgets and prior device reports are references, not battle acceptance. Exclude saves/resume, short route, inventory/equipment, procedural generation, advanced combat, editor, analytics, backend, new art/audio and external legacy plans. Physical hardware access and authenticated deployed captures remain delivery risks; missing evidence keeps the issue open and the eventual PR draft.

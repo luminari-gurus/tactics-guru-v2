@@ -2,7 +2,7 @@
 
 ## 1. Approval and scene capture
 
-- [ ] 1.1 Record explicit caller approval of this published plan in proposal.md before implementation; verify the conversation approval identifies this change.
+- [x] 1.1 Record explicit caller approval of this published plan in proposal.md before implementation; verify the conversation approval identifies this change.
 - [ ] 1.2 Add RED-first scene-option/readiness and mixed-build/error tests to existing measurement tests, then implement proof-default/battle collector support; verify focused unit tests and both scene captures, and document actual invocation in the issue-11 QA note.
 
 ## 2. Battle performance evidence

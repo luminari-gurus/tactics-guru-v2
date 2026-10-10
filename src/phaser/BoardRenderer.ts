@@ -199,12 +199,18 @@ export class BoardRenderer {
     this.publish();
   }
 
-  pan(dx: number, dy: number): void { this.applyView({ ...this.view, x: this.view.x + dx, y: this.view.y + dy }); }
+  pan(dx: number, dy: number): boolean {
+    const before = this.view;
+    this.applyView({ ...before, x: before.x + dx, y: before.y + dy });
+    return this.view.x !== before.x || this.view.y !== before.y;
+  }
 
-  zoom(factor: number, anchor: Point): void {
+  zoom(factor: number, anchor: Point): boolean {
+    const before = this.view;
     const point = screenToBoard(anchor, this.view);
     const scale = Math.max(this.fitScale, Math.min(this.fitScale * MAX_ZOOM, this.view.scale * factor));
     this.applyView({ x: anchor.x - point.x * scale, y: anchor.y - point.y * scale, scale });
+    return this.view.scale !== before.scale || this.view.x !== before.x || this.view.y !== before.y;
   }
 
   select(point: Point): void {
