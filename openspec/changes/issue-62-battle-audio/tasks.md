@@ -17,7 +17,7 @@ Issue: [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). Branc
 ## 3. Battle and accessible control integration
 
 - [x] 3.1 Wire one audio call to each committed `BattleScene.present` batch and destroy the adapter with its scene; retain sound preference on the scene instance and leave presentation completion independent; verify browser controls execute the same seeded battle/replay with sound on and off (AC1, AC3).
-- [ ] 3.2 Add the HUD sound control/status and bounded battle-audio diagnostics; verify real pointer/keyboard activation, initial disabled state, mute during player/enemy presentation, restart preference, reload reset, modal focus and no canvas click-through in desktop/portrait/landscape browser cases (AC2).
+- [x] 3.2 Add the HUD sound control/status and bounded battle-audio diagnostics; verify real pointer/keyboard activation, initial disabled state, mute during player/enemy presentation, restart preference, reload reset, modal focus and no canvas click-through in desktop/portrait/landscape browser cases (AC2).
 - [ ] 3.3 Add `tests/battle-audio.spec.ts` actual-control coverage for movement, basic attacks, all signatures, unit/battle outcomes, preview/cancel silence, unlock failures, failed media, background/resume and at least five restarts; verify the focused suite and existing proof-audio/battle-loop regressions pass without console/page errors, and record results in the QA note (AC1–AC4, AC6).
 
 ## 4. Integrated validation and acceptance handoff

@@ -1,10 +1,36 @@
 # Issue #62 battle audio QA
 
-Implementation authorized by the user request to implement `docs/ongoing-projects/plan.md` using ablation and OpenSpec. Baseline main: `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; planning branch: `79590637e2a58bd620fc283f41511bedc240aebf`. On 2026-10-10 remote main matched that revision and PR #61 remained open/unmerged. No unmerged code is required. Initial worktree was clean.
+Implementation authorized by the user request to implement `docs/ongoing-projects/plan.md` using ablation and OpenSpec. Baseline main: `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; initial worktree clean. Remote main still matched that revision and [PR #61](https://github.com/luminari-gurus/tactics-guru-v2/pull/61) remained open/unmerged at the latest check. No unmerged code or deployment change is required.
 
-## Verification in progress
+Final runtime revision: `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8`. Full browser validation and final measurements are in progress. Hardware audibility and #11 frame acceptance remain explicitly unverified.
 
-Results will be recorded as executed. Automated counters do not prove hardware audibility.
+## Verification
+
+| Command | Result |
+| --- | --- |
+| `npm run test:unit` | 25 files, 288 tests passed; includes 28 focused policy/adapter checks |
+| `npm run validate:content` | 2 files, 77 tests passed |
+| `npm run typecheck` | Passed |
+| `npm run build` | Passed; existing Vite warning for a minified chunk over 500 kB retained |
+| `npm test -- tests/battle-audio.spec.ts --grep "mute, hidden\|gesture unlock"` | 9 passed across all profiles, 34.0 s, final `ca1923a` build |
+| `npm test` | Current final-build run in progress; prior results and failures retained below |
+| `openspec validate issue-62-battle-audio --strict` | Passed |
+| `git diff --check` | Passed |
+
+Successful flows assert no unexpected console/page errors. Missing-media scenarios intentionally receive a 404 or bad bytes; expected resource failures are distinct from application exceptions. Rendered controls were inspected in [portrait](issue-62/portrait.png) and [landscape](issue-62/landscape.png); targets remain at least 44 px and the existing panel scrolls in short landscape.
+
+## Acceptance audit
+
+| Criterion | Implementation and proof |
+| --- | --- |
+| AC1 | Pure accepted-event mapping; committed token hook beside HUD log. Policy fixtures cover every signature, attack result, grouping, outcomes and four-cue cap. Legal UI win/loss comparisons check exact sound-on/off state, RNG/replay and per-action cues. |
+| AC2 | HUD opt-in, accessible pressed/status/retry controls; real pointer, keyboard and touch tests, modal capture, preview/cancel silence, player/enemy mute, five restarts and reload reset. |
+| AC3 | Consume-before-eligibility tokens, one active cue, bounded sequence; generation/attempt guards, blur/hide/context suppression and teardown. Fake clocks, native HTML5 play counts and actual-control lifecycle cases cover late callbacks and no resume backlog. |
+| AC4 | Optional owned requests/decode, useful unavailable/blocked status and explicit retry. Browser missing/corrupt/stalled/unsupported/late media and rejected/pending unlock scenarios keep legal commands usable. |
+| AC5 | Eight cues, fixed typed manifest, existing Phaser cache/sound APIs, no new runtime dependency or domain changes. Raw comparable measurements preserve all samples and unchanged budgets. |
+| AC6 | RED-first regressions plus configured unit/content/browser/typecheck/build/spec/diff checks; exact final browser result pending below. Physical matrix is explicit; no hardware audibility or frame certification is inferred. |
+
+The ablation outcome is one pure mapper and one disposable scene adapter, reusing existing HUD styles and legal-control test helpers. `src/domain`, `BattleSession`, `ProofAudio`, package manifests and lockfile are unchanged. Audio never joins the animation-completion promise or dispatches a command.
 
 ## Cue recipe and mapping
 
@@ -25,17 +51,33 @@ Movement → move; recorded attack result → miss/hit/critical (including Guard
 
 Total: 11741 bytes (limit 32768).
 
-Policy RED: missing `battleCues` module. GREEN: `npm run test:unit -- tests/unit/battleCues.test.ts`, 7 tests passed, including full seeded battle equality.
+## Lifecycle bounds and ownership
 
-## Adapter lifecycle evidence
+Timeouts: 5 s per fetch/body, 6.5 s overall including decode, 2 s gesture unlock, cue logical duration + 500 ms for playback. Scene restart retries unavailable media; unlock/playback failures permit Retry sound. There are no automatic request retries or feedback backlogs.
 
-RED: `npm run test:unit -- tests/unit/battleAudio.test.ts` failed on the missing adapter module. GREEN: `npm run test:unit -- tests/unit/battleCues.test.ts tests/unit/battleAudio.test.ts` passed 24 tests; `npm run typecheck` passed. Fake-clock checks cover deduplication, muted/loading/hidden/interrupted consumption, late completion/unlock, rejected/thrown/pending resume, failed/stalled playback, missing/corrupt/stalled requests/decode, and five destroyed loading controllers. Initial desktop integration passed all 12 tests, including HTML5 fallback, unsupported audio, failures, repeated restarts and full seed 1/2 sound-on/off battle equality. The final suite adds explicit touch, per-action cue and late decode checks.
+Requests abort on failure/shutdown; decoder results cannot populate cache after invalidation. Decoded Web Audio cache survives restarts. Sound instances, HTML5 tags/object URLs, event listeners and timers belong to the scene adapter and are released. HTML5 temporarily delegates blur handling to the adapter through the public `pauseOnBlur` setting, restored on teardown. Web Audio availability follows its live context state, avoiding Phaser's stale initial lock after a rejected gesture.
 
-Timeouts: 5 s per fetch/body, 6.5 s overall including decode, 2 s gesture unlock, cue logical duration + 500 ms for playback. No automatic fetch retries; scene restart retries unavailable audio. Playback/unlock failures allow explicit Retry sound. Requests are aborted on failure/shutdown; decoder results cannot populate cache after invalidation. Decoded Web Audio cache survives restarts; sound objects and HTML5 media/URLs are owned and destroyed per scene.
+Asset regeneration with ffmpeg 8.1.1 reproduced all eight SHA-256 values exactly.
+
+## Failures found and repaired
+
+- Original policy and adapter RED runs failed on missing modules. GREEN began with 24 focused tests; subsequent lifecycle regressions bring that set to 28.
+- First full browser attempt (initial `2d87b64` source, precommit build identified as dirty `7959063`): 90 passed, 1 failed, 1 interrupted, 115 not run. Touch HTML5 stayed locked because owned loading bypassed Phaser's loader refresh. A unit regression failed RED; the enabling gesture now calls the manager's existing unlock method.
+- HTML5 focus automatically replayed Phaser's private paused-sound list. A RED blur regression led to the public `pauseOnBlur` ownership policy, with native media play counts proving no focus replay. The test's seed-3 enemy-turn assumption caused 3 failures / 3 passes; two intermediate capture-listener approaches each caused 3 HTML5 failures / 3 mute passes and were removed. The final policy passed 6/6 across profiles (31.5 s).
+- A late HTML5 priming promise paused a newer cue after retry. RED observed 7 pause calls instead of 6; the existing live/attempt guard now runs before touching media. All 27 then-current focused and 287 full unit tests passed.
+- Full configured run on clean `5b22bf5`: 206 passed, 1 failure (21.7 minutes). The landscape seed-1 sound-on/off comparison reached its 240 s aggregate allowance during the second progressing battle, at round 7. The comparison now has 360 s, twice the existing single-battle 180 s allowance. Its per-turn 10 s assertion and product budgets are unchanged. Final-guard landscape recheck on `6cd67e2`: 3/3 passed in 1.5 minutes; that comparison took 1.3 minutes.
+- Next full run on clean `6cd67e2`: 14 passed, 2 failed, 1 interrupted, 190 not run. Playwright's `clock.pauseAt(Date.now()+100)` target had passed by the next protocol call. Fixed future clock anchors remove that fixture race. Three traced desktop repetitions of interruption/retry then passed 6/6 (1.1 minutes).
+- The other failure exposed a real Web Audio retry defect: Phaser removes its body unlock listeners after rejection and can leave its initial manager lock set even after a later direct resume succeeds. A new unit test and deterministic real-control browser test both failed RED (blocked instead of ready). The redundant Web Audio manager-lock predicate was removed; live context state is authoritative, while HTML5 retains its lock check. On clean `ca1923a`, all 288 unit tests and nine interruption/rejected/pending-unlock browser checks pass.
+
+- The first final-build full run (`ca1923a`) stopped at 32 passed, 2 failed, 1 interrupted, 172 not run (6.5 minutes). Both failures were 30 s aggregate deadlines in existing composite board tests: four restarts plus two orientation screenshots, and multiple DPR/resize/pan/drag combinations. They expired at `Wait / End turn` and `mouse.move` respectively, with usable battle controls; all 13 desktop audio cases had passed. Final validation uses `npm test -- --timeout=60000` to give those composite workflows a 60 s runner allowance. Per-assertion deadlines, explicit 180/360 s battle allowances, 10 s per-turn checks, audio watchdogs and product budgets are unchanged. No existing board test or repository runner configuration was edited. A trace-every-action attempt was stopped after 11 passes / 1 interrupted / 195 not run after substantial canvas/snapshot overhead was observed; later host inspection also found unrelated CPU saturation, so tracing alone is not established as the cause; no test failed in that attempt. Tracing is reserved for a focused unresolved failure.
+
+- The normal 60 s runner attempt was stopped at 9 passed / 1 interrupted / 197 not run (1.7 minutes) after host inspection showed many unrelated `cc1plus` processes and load average 57.31. Unchanged proof cases had risen from approximately 1 s to 10 s. No unrelated process was modified. Final browser validation and performance capture wait for host capacity; this interrupted run supplies no new failure claim. Logs: `/tmp/guru-issue62-complete-browser.log` (trace attempt), `/tmp/guru-issue62-browser-60s.log` (normal attempt).
+
+Prior local logs: `/tmp/guru-issue62-final-browser.log` (206/1), `/tmp/guru-issue62-recheck-landscape.log` (3/3), `/tmp/guru-issue62-green-browser.log` (14/2, stopped), `/tmp/guru-issue62-clock-unlock-recheck.log` (6/6), `/tmp/guru-issue62-manager-lock-red.log` (deterministic browser RED), `/tmp/guru-issue62-final-unlock-check.log` (9/9). No incomplete run is claimed as a full-suite success.
 
 ## Physical-device handoff for #11
 
-Build under review: issue-62 branch (final commit/PR recorded below). No physical devices or audible output observation are available in this environment. Chromium runs with headless muted output; desktop, Pixel 7 portrait and landscape are automated emulations only.
+Runtime build under review: clean `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8` on `work/issue-62-battle-audio`; PR link follows the publication audit. No physical devices or audible output observation are available in this environment. Chromium runs with headless muted output; desktop, Pixel 7 portrait and landscape are automated emulations only.
 
 | Browser/device | Orientation | Device / OS / build evidence | Gesture / audible cues / mute / background-interruption-resume / restart / controls |
 | --- | --- | --- | --- |
@@ -50,33 +92,7 @@ Build under review: issue-62 branch (final commit/PR recorded below). No physica
 
 Handoff: #11 should run each row on the PR build, record device/OS/browser/full served commit, and observe distinct movement/attack/signature/defeat/outcome cues after Enable sound, immediate mute, background/OS interruption/resume without stale feedback, and five restarts with usable controls. Record failures without replacing them with playback counters. Existing #11 F1 idle p50/p95 and F2 workload failures remain open; #61 is unmerged and no equivalent battle frame collector exists on this baseline. Do not infer frame acceptance from audio tests.
 
-## Integrated checks (in progress)
-
-- `npm run test:unit`: 25 files, 287 tests passed after the final late-priming regression.
-- `npm run validate:content`: 2 files, 77 tests passed.
-- `npm run typecheck`: passed.
-- `npm run build`: passed; existing Vite warning for a minified chunk over 500 kB retained.
-- `npm test -- tests/battle-audio.spec.ts --project desktop`: initial 12 tests passed in 3.1 minutes.
-- `openspec validate issue-62-battle-audio --strict` and `git diff --check`: passed.
-- Full configured browser suite: running, final result to follow.
-
-Expected failure evidence: the policy/adapter RED runs failed on missing modules before implementation. The missing-media browser scenario intentionally receives a 404 (expected browser resource error); corrupt bytes and stalled decode are contained without application exceptions. Injected failures are distinct from unexpected console/page errors in successful flows.
-
-Rendered control evidence: [portrait](issue-62/portrait.png), [landscape](issue-62/landscape.png), inspected from the full desktop HUD regression. Controls remain at least 44 px and the existing panel scrolls in short landscape. Asset regeneration with ffmpeg 8.1.1 reproduced all eight SHA-256 values exactly.
-
-Initial source checkpoint: `2d87b64568cb2a64cf1d528e66de37a38954c841`. The first full browser attempt served that runtime source from its precommit build (`7959063`, dirty). The initial repaired measurement/full-suite build is `5b22bf53405316f0e474f98beffae45cc31e0aac`. The final late-callback guard is in `a0beaab`; current clean full-suite and measurement build is `6cd67e257775298a9379a24cdb1c8ef1ab159c70`.
-
-## Failure found and repaired during full validation
-
-The first full run passed 90 tests, then was deliberately stopped after the portrait HTML5 fallback remained blocked (one failure, one interrupted battle, 115 not run). The failure was real: Phaser initializes HTML5 sound as locked on touch devices; its loader normally refreshes that state, but owned media loading bypasses that hook. The enabling gesture now calls the existing manager `unlock()` before silently priming media. A new regression test failed RED (0 unlock calls instead of 1), then all 25 focused policy/adapter tests passed GREEN. Final full-suite results will supersede this incomplete run; its failure is retained here.
-
-Further lifecycle review found that Phaser's HTML5 manager resumes its paused sound list on window focus without an AudioContext event. A second RED regression demonstrated the missing blur stop. The final adapter owns HTML5 blur handling using the public `pauseOnBlur` setting (saved/restored per scene), suppresses batches while blurred, and never plays a focus backlog. The browser fallback test counts native media `play()` calls across blur/focus to detect automatic replay independently of adapter counters. Focused unit total is now 26.
-
-The explicit enemy-mute test initially assumed seed 3 opened on an enemy turn; it actually opens on a player. That test-only failure was repaired by advancing real Wait controls with a controlled clock until a committed enemy presentation is observed. All three profiles passed the corrected enemy-mute check.
-
-Final fallback regression command: `npm test -- tests/battle-audio.spec.ts --grep 'HTML5|mute, hidden'` — 6 passed across desktop/portrait/landscape (31.5 s). This includes real commands, immediate mute during player and enemy presentation, context/visibility suspension, HTML5 unlock and native media play-call equality across focus. An intermediate capture-listener approach was removed: it also captured DOM control blur, then still allowed Phaser's saved resume list to replay. The final public-manager policy avoids both dependencies; the proof adapter and Web Audio manager policy remain unchanged.
-
-## Comparable baseline/candidate measurements
+## Initial comparable baseline/candidate measurements
 
 [Raw 72 samples, resource transfers, file hashes and build identities](issue-62/baseline-candidate.json). Baseline: clean `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; candidate: clean `5b22bf53405316f0e474f98beffae45cc31e0aac`. Chromium 153.0.8010.12 on the same Linux/WSL host, sequential runs with no competing task browser, localhost, unthrottled CPU/network. Three fresh-context cold loads and same-context warm reloads per profile and sound mode; no routing (preserves HTTP cache). Baseline has no audio toggle; its requested-on rows remain silent controls. Candidate enables with a trusted click after Ready; reload starts muted before that click. All 72 samples have complete timestamps and zero unexpected console/page errors. Every enabled candidate sample is ready and started one cue; every muted sample started zero.
 
@@ -124,15 +140,3 @@ Medians of three, milliseconds, **Ready / first player turn**:
 Ready medians across all profiles/modes rose from 202.8 to 223.8 ms cold and 183.3 to 203.3 ms warm. Preserve the slower samples; a single-host comparison does not identify causation or prove physical performance. 3 candidate warm first-player samples exceed 750 ms; those rows remain in the raw evidence. The 750 ms limit is unchanged; Ready and first-player availability are reported separately rather than treating them as interchangeable gates. Final #11 usability/frame acceptance remains open.
 
 F1 idle p50 ≤16.7 ms / p95 ≤20 ms and F2 workload p95 ≤33.4 ms remain unchanged and unverified for this build: merged main has no battle frame sampler. Existing failures in [PR #61](https://github.com/luminari-gurus/tactics-guru-v2/pull/61) are retained under #11; these loading results do not clear them.
-
-Final callback audit: an HTML5 priming promise could settle after retry and pause the newer cue. A RED regression observed every old tag receiving an extra pause (7 calls instead of 6). The callback now checks the same live/attempt guard before touching media; all 27 focused tests pass. This narrow HTML5-only correction is verified separately from the already-running 207-test suite, with final HTML5 browser rechecks and a refreshed clean measurement capture to follow.
-
-Intermediate targeted-run counts are retained for clarity: the seed-3 test assumption produced 3 failures / 3 passes; the initial capture listener and the later capture-filter variant each produced 3 HTML5 failures / 3 mute passes. Those implementations were replaced, not accepted. The final public-manager policy then passed 6/6. The later stale-priming unit regression passed 27/27 focused and 287/287 full unit tests after its guard fix.
-
-The full landscape sound-on/off loss comparison reached its 240 s aggregate test timeout during the second battle (round 7), while individual turn checks continued to advance. The comparator now uses 360 s: two times the existing battle-loop suite's 180 s allowance for a full legal UI battle. The 10 s per-turn progress assertion and all product loading/frame budgets are unchanged. The corrected case passed in 1.3 minutes on the final clean build.
-
-Completed full configured run on clean `5b22bf5`: **206 passed, 1 aggregate comparison timeout**, 21.7 minutes. All desktop/portrait cases and the other landscape cases passed. The corrected landscape comparator and final HTML5/mute guards passed 3/3 in 1.5 minutes on clean `6cd67e2`. A fresh full configured suite is running on that build; no full-suite success is claimed for the earlier run.
-
-The next full run on `6cd67e2` was stopped after **14 passed, 2 failed, 1 interrupted, 190 not run**. The interruption test failed in Playwright `clock.pauseAt` (cannot fast-forward to the past): its `Date.now()+100` target elapsed between protocol requests. The fixture now uses fixed future clock anchors, without changing product timeouts or its command assertions. A later rejected-unlock retry remained blocked without an error message and is under traced recheck. Log: `/tmp/guru-issue62-green-browser.log`.
-
-The fixed-clock interruption and original rejected-unlock test passed 6/6 in three traced desktop repetitions. Inspection then identified the intermittent retry cause: Phaser removes body-gesture unlock listeners after rejection, leaving its initial `locked` latch set even after a later direct resume succeeds. A new unit test reproduced blocked-vs-ready RED; forcing the initial suspended state in the real-control browser test reproduced the same failure deterministically (1 failed). The adapter now uses the live Web Audio context state as its authority; HTML5 still derives state from its manager lock. No new manager mutation or workaround listener was added.
