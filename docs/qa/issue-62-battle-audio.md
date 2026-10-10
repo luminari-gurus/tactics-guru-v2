@@ -2,7 +2,7 @@
 
 Implementation authorized by the user request to implement `docs/ongoing-projects/plan.md` using ablation and OpenSpec. Baseline main: `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; initial worktree clean. Remote main still matched that revision and [PR #61](https://github.com/luminari-gurus/tactics-guru-v2/pull/61) remained open/unmerged at the latest check. No unmerged code or deployment change is required.
 
-Final runtime revision: `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8`. All configured browser cases have passing coverage (206 in the full run plus the corrected restart case rechecked across all profiles); final measurements are in progress. Hardware audibility and #11 frame acceptance remain explicitly unverified.
+Final runtime revision: `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8`. All configured browser cases have passing coverage (206 in the full run plus the corrected restart case rechecked across all profiles); final measurements and their limitations are recorded below. Hardware audibility and #11 frame acceptance remain explicitly unverified.
 
 ## Verification
 
@@ -142,3 +142,58 @@ Medians of three, milliseconds, **Ready / first player turn**:
 Ready medians across all profiles/modes rose from 202.8 to 223.8 ms cold and 183.3 to 203.3 ms warm. Preserve the slower samples; a single-host comparison does not identify causation or prove physical performance. 3 candidate warm first-player samples exceed 750 ms; those rows remain in the raw evidence. The 750 ms limit is unchanged; Ready and first-player availability are reported separately rather than treating them as interchangeable gates. Final #11 usability/frame acceptance remains open.
 
 F1 idle p50 ≤16.7 ms / p95 ≤20 ms and F2 workload p95 ≤33.4 ms remain unchanged and unverified for this build: merged main has no battle frame sampler. Existing failures in [PR #61](https://github.com/luminari-gurus/tactics-guru-v2/pull/61) are retained under #11; these loading results do not clear them.
+
+## Contended runtime refresh
+
+The [contended refresh](issue-62/contended-baseline-candidate.json) compares clean baseline `9f785df` with clean runtime `ca1923a`, using the same collector, host, Chromium, profiles, cache sequence and unthrottled setup as the initial capture. No other task browser runs concurrently. Before capture there were no compiler processes and approximately 64% CPU idle. An unrelated C++ workload resumed during baseline collection (observed at 2026-10-10 21:25 UTC: nine compiler processes, load average 23.97). This shared-host variation is a limitation of the refreshed timing comparison: retain every sample, report observed deltas without assigning them to audio, and do not infer #11 performance acceptance. Asset/code bytes and hashes are independent of that contention. The initial capture and its failures remain separately available.
+
+The refresh contains 72 complete, error-free samples with the expected clean build identities and enabled/muted playback counts. It records **five baseline and one candidate warm Ready samples above 750 ms**, plus 15 baseline and eight candidate warm first-player samples above 750 ms. Cold Ready maxima were 1012.7 / 714.4 ms (baseline / candidate); warm Ready maxima 920.1 / 958.3 ms; warm first-player maxima 1834.5 / 1620.4 ms. These failures remain in the raw file. Code is 389236 / 391852 gzip bytes and cues 0 / 11741 bytes.
+
+A final capture starts after the unrelated compilation finishes again (zero compiler processes, 97.3% CPU idle). The collector now records per-sample system CPU busy percentage and load averages so reviewers can see contention instead of assuming stable conditions. This adds observation to the task-specific collector only; application/test behavior is unchanged.
+
+## Final comparable configuration capture
+
+[Final 72 samples with per-sample host activity](issue-62/final-baseline-candidate.json), captured 2026-10-10 21:31:55 UTC. Clean baseline `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; clean runtime `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8`; Chromium 153.0.8010.12. The hardware, browser, profile, cache and legal-command sequence match the earlier method. All 72 tuples are unique and complete, with zero unexpected errors. All 18 enabled candidate samples are ready and start one cue; all 18 muted samples start zero.
+
+Per-sample system CPU busy percentages (including browser work) are baseline 46.0–60.4%, median 51.3%, and candidate 39.4–76.9%, median 57.0%. These readings make host variation visible; they do not isolate an audio CPU cost or establish physical performance. No loading, transfer or frame budget was relaxed.
+
+Medians of three, milliseconds, **Ready / first player turn**:
+
+| Profile | Requested sound | Cache | Baseline | Candidate |
+| --- | --- | --- | ---: | ---: |
+| desktop | off | cold | 221.1 / 639.1 | 261.8 / 676.6 |
+| desktop | off | warm | 213.8 / 606.0 | 212.3 / 630.7 |
+| desktop | on | cold | 215.2 / 616.5 | 215.5 / 621.8 |
+| desktop | on | warm | 209.0 / 618.6 | 205.2 / 613.9 |
+| mobile-portrait | off | cold | 203.6 / 596.4 | 219.1 / 636.9 |
+| mobile-portrait | off | warm | 197.6 / 608.3 | 200.6 / 605.5 |
+| mobile-portrait | on | cold | 210.9 / 618.9 | 278.3 / 682.0 |
+| mobile-portrait | on | warm | 185.0 / 583.9 | 257.0 / 670.4 |
+| mobile-landscape | off | cold | 205.7 / 594.4 | 225.0 / 627.3 |
+| mobile-landscape | off | warm | 182.2 / 567.1 | 345.8 / 801.3 |
+| mobile-landscape | on | cold | 201.8 / 592.8 | 309.8 / 753.3 |
+| mobile-landscape | on | warm | 206.3 / 591.4 | 326.5 / 769.9 |
+
+| Budget / measure | Baseline | Candidate | Assessment |
+| --- | ---: | ---: | --- |
+| Cue file bytes ≤32768 | 0 | 11741 | Pass |
+| Gzip JS+CSS bytes ≤400000 | 389236 | 391852 | Pass, +2616 |
+| Cold scene asset transfer ≤1500000 | 834688 | 848829 | Pass, +14141 |
+| Total cold transfer | 1226521 | 1243278 | +16757 including headers |
+| Total warm transfer | 6900 | 9300 | +2400 including cache validations |
+| Cold Ready maximum ≤2500 ms | 255.7 | 2302.2 | Ready proxy passes |
+| Warm Ready maximum ≤750 ms | 216.4 | 559.1 | Ready proxy passes |
+| Cold first-player maximum | 667.9 | 2832.2 | One candidate sample exceeds 2500 ms |
+| Warm first-player maximum | 639.1 | 975.5 | Four candidate samples exceed 750 ms |
+| Move handler maximum | 3.7 | 2.9 | Synchronous response only |
+| Confirm handler maximum | 3.6 | 11.9 | Synchronous response only |
+
+The first-player failures are all landscape: warm sound-off repetitions 2/3 (848.9/801.3 ms), warm sound-on repetitions 1/2 (769.9/975.5 ms), and cold sound-on repetition 3 (2832.2 ms). Ready and first-player availability remain distinct; passing the Ready proxy does not clear these later usability observations. The initial capture's three warm first-player failures and the contended capture's warm Ready failures are preserved, not replaced. #11 must resolve/accept the intended usability signal and obtain frame/device evidence before first-battle performance acceptance.
+
+Reproduce the final comparison after building the exact revisions in isolated worktrees:
+
+```sh
+node --experimental-strip-types scripts/measure-battle-audio.ts /tmp/guru-issue62-baseline/dist /tmp/guru-issue62-candidate/dist docs/qa/issue-62/final-baseline-candidate.json
+```
+
+Use a new output path for subsequent measurements to preserve this evidence. The collector records build identities, resource/file hashes, cold/warm timing, handler response, playback states and host activity. The two task-owned worktrees can be recreated from the revisions above after cleanup.

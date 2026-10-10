@@ -5,12 +5,15 @@ import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
-import { platform, release, cpus } from 'node:os';
+import { platform, release, cpus, loadavg } from 'node:os';
 import { createServer, type AddressInfo } from 'node:net';
 import { chromium, devices } from '@playwright/test';
 
 const [baseline,candidate,output]=process.argv.slice(2);
 if(!baseline || !candidate || !output)throw Error('Expected baseline dist, candidate dist, output JSON');
+function cpuTimes() {
+  return cpus().reduce((sum,cpu)=>({total:sum.total+Object.values(cpu.times).reduce((a,b)=>a+b,0),idle:sum.idle+cpu.times.idle}),{total:0,idle:0});
+}
 const probe=createServer();
 await new Promise<void>((done,fail)=>{probe.once('error',fail);probe.listen(0,'127.0.0.1',done);});
 const port=(probe.address() as AddressInfo).port;
@@ -75,6 +78,7 @@ try {
           page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(15000);
           page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
           for(const cache of ['cold','warm']) {
+            const cpuBefore=cpuTimes();
             if(cache==='cold')await page.goto(url);else await page.reload();
             await page.waitForFunction(()=>document.querySelector<HTMLElement>('#game')?.dataset.ready==='true');
             if(sound && label==='candidate')await page.locator('#battle-sound').click();
@@ -83,7 +87,9 @@ try {
             await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
             await page.waitForFunction(()=>document.querySelector<HTMLElement>('#game')?.dataset.phase==='player');
             const evidence=await page.evaluate(()=>({timings:(window as unknown as {__audioMeasure:unknown}).__audioMeasure,diagnostics:window.fitDiagnostics()}));
-            samples.push({label,profile,soundRequested:sound,soundEffective:label==='candidate'&&sound,repetition,cache,...evidence,errors:[...errors]});
+            const cpuAfter=cpuTimes();
+            const hostActivity={loadAverage:loadavg(),cpuBusyPercent:100*(1-(cpuAfter.idle-cpuBefore.idle)/(cpuAfter.total-cpuBefore.total))};
+            samples.push({label,profile,soundRequested:sound,soundEffective:label==='candidate'&&sound,repetition,cache,hostActivity,...evidence,errors:[...errors]});
             console.log(`${label} ${profile} sound=${sound} ${repetition} ${cache}`);
           }
         } finally {await context.close();}
