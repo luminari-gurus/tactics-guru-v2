@@ -86,6 +86,8 @@ try {
         for (let repetition = 1; repetition <= 3; repetition++) {
           const context = await browser.newContext(profile.options);
           const page = await context.newPage();
+          page.setDefaultTimeout(18000);
+          page.setDefaultNavigationTimeout(30000);
           const errors: string[] = [];
           let currentCache = 'cold';
           try {
