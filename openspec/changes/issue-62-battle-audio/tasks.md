@@ -25,7 +25,7 @@ Issue: [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). Branc
 - [x] 4.1 Run the configured unit/content/browser suites, strict typecheck, production build, OpenSpec strict validation and diff check using the commands in the human plan; record actual counts, warnings and failures in the QA report (AC6).
 - [x] 4.2 Capture comparable baseline/candidate code, cue, cold/warm readiness and first-interaction data under identical host/browser/cache conditions, retaining build identifiers and raw samples; verify the 32 KiB cue cap and unchanged agreed limits, report any regression and preserve existing #11 frame failures. Use only available merged instrumentation; document any unavailable measurement instead of depending on #61 (AC5, AC6).
 - [x] 4.3 Record audio unlock, audibility, mute, suspend/resume and restart results for iPhone Safari/Chrome, Android Chrome and desktop in both orientations when available; verify each row has device/build evidence or is explicitly unverified, and prepare a concise linked handoff for #11 (AC6).
-- [ ] 4.4 Audit AC1–AC6 against the committed implementation and QA evidence, push only issue-specific changes and open/reuse the PR; verify its issue/branch links and use a draft with `Refs #62` while any acceptance requirement is unverified. Do not close #57/#11/#1 by proxy.
+- [x] 4.4 Audit AC1–AC6 against the committed implementation and QA evidence, push only issue-specific changes and open/reuse the PR; verify its issue/branch links and use a draft with `Refs #62` while any acceptance requirement is unverified. Do not close #57/#11/#1 by proxy.
 
 ## Workflow follow-up
 

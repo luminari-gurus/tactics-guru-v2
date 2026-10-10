@@ -149,7 +149,7 @@ The [contended refresh](issue-62/contended-baseline-candidate.json) compares cle
 
 The refresh contains 72 complete, error-free samples with the expected clean build identities and enabled/muted playback counts. It records **five baseline and one candidate warm Ready samples above 750 ms**, plus 15 baseline and eight candidate warm first-player samples above 750 ms. Cold Ready maxima were 1012.7 / 714.4 ms (baseline / candidate); warm Ready maxima 920.1 / 958.3 ms; warm first-player maxima 1834.5 / 1620.4 ms. These failures remain in the raw file. Code is 389236 / 391852 gzip bytes and cues 0 / 11741 bytes.
 
-A final capture starts after the unrelated compilation finishes again (zero compiler processes, 97.3% CPU idle). The collector now records per-sample system CPU busy percentage and load averages so reviewers can see contention instead of assuming stable conditions. This adds observation to the task-specific collector only; application/test behavior is unchanged.
+A final capture started after the unrelated compilation finished again (zero compiler processes, 97.3% CPU idle). The collector now records per-sample system CPU busy percentage and load averages so reviewers can see contention instead of assuming stable conditions. This adds observation to the task-specific collector only; application/test behavior is unchanged.
 
 ## Final comparable configuration capture
 
@@ -197,3 +197,7 @@ node --experimental-strip-types scripts/measure-battle-audio.ts /tmp/guru-issue6
 ```
 
 Use a new output path for subsequent measurements to preserve this evidence. The collector records build identities, resource/file hashes, cold/warm timing, handler response, playback states and host activity. The two task-owned worktrees can be recreated from the revisions above after cleanup.
+
+## Publication audit
+
+[Draft PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) targets main, references #62 and is linked from that issue. Its body matches the exact full-run/recheck results and retained budget/device limitations. The existing automatic Cloudflare Pages PR check passed. OpenSpec is 13/13 tracked tasks complete and remains unarchived. Final asset/build hashes, 216 sample records, local document links, strict OpenSpec and whitespace were verified before publication. The task-owned baseline/candidate worktrees were removed after committing the evidence; the unrelated worktree and preview on 4175 remain intact.
