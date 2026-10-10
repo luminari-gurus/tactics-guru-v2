@@ -56,3 +56,5 @@ Approved by the caller in this conversation on 2026-10-10: “Approved”. Imple
 - `git diff --check` and `git diff --cached --check`: passed.
 - `openspec validate issue-9-deterministic-enemy-turns --strict`: passed.
 - All four issue acceptance criteria and every capability scenario have direct test evidence in `tests/unit/ai.test.ts`; no issue #9 acceptance gaps remain. UI composition is #10 and physical-device acceptance is #11.
+
+- Delivery: [PR #54](https://github.com/luminari-gurus/tactics-guru-v2/pull/54) opened against main and attached to this task. Implementation commit: `741ee01`.

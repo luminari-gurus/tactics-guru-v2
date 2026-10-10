@@ -17,7 +17,7 @@
 
 - [x] 3.1 Run `npm run test:unit`, `npm run typecheck`, `npm run build`, `npm test` (configured desktop and both mobile orientations; use installed Chrome executable if needed), and `git diff --check`; record actual results and any limits.
 - [x] 3.2 Compare every issue criterion and capability scenario against implementation/evidence, rerun `openspec validate issue-9-deterministic-enemy-turns --strict`, and verify the diff contains only task-specific work.
-- [ ] 3.3 Commit and push implementation, reuse any existing branch PR or create one against main and attach it to this task; verify PR links and test results. Use Closes #9 only if all criteria are verified; otherwise draft with Refs #9 and explicit gaps.
+- [x] 3.3 Commit and push implementation, reuse any existing branch PR or create one against main and attach it to this task; verify PR links and test results. Use Closes #9 only if all criteria are verified; otherwise draft with Refs #9 and explicit gaps.
 
 ## Workflow follow-up
 
