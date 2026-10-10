@@ -1,0 +1,4 @@
+interface:
+  display_name: "Work work work"
+  short_description: "Pick a ready issue, plan with OpenSpec, implement and PR"
+  default_prompt: "Use $work-work-work to select and claim the best ready issue, publish a branch, and prepare an OpenSpec plan for my approval before implementation and a PR."
