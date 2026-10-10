@@ -42,6 +42,25 @@ describe('scene audio lifetime',()=>{
     expect(f.audio.snapshot()).toMatchObject({active:null,started:1});f.audio.destroy();
     expect(f.sound.pauseOnBlur).toBe(true);
   });
+  it('ignores late HTML5 priming promises after an explicit retry',async()=>{
+    let retry=false;const late:(()=>void)[]=[],tags:Media[]=[];
+    class Media {
+      dataset:Record<string,string>={};src='';muted=false;currentTime=0;preload='';
+      oncanplaythrough:(()=>void)|null=null;onerror:(()=>void)|null=null;
+      constructor(){tags.push(this);}
+      load(){queueMicrotask(()=>this.oncanplaythrough?.());}
+      pause=vi.fn();removeAttribute(){this.src='';}
+      play(){return retry?Promise.resolve():new Promise<void>(resolve=>late.push(resolve));}
+    }
+    vi.stubGlobal('Audio',Media);
+    const f=fixture(false,true);await flush();expect(f.audio.snapshot().load).toBe('ready');
+    f.audio.setEnabled(true);await vi.advanceTimersByTimeAsync(UNLOCK_TIMEOUT_MS);
+    expect(f.audio.snapshot().status).toBe('blocked');retry=true;f.audio.unlock();await flush();
+    expect(f.audio.snapshot().status).toBe('ready');f.audio.present(1,move);
+    const pauses=tags.map(t=>t.pause.mock.calls.length);late.forEach(resolve=>resolve());await flush();
+    expect(tags.map(t=>t.pause.mock.calls.length)).toEqual(pauses);
+    expect(f.audio.snapshot()).toMatchObject({active:'move',started:1});f.audio.destroy();
+  });
   it('consumes muted/duplicate/old batches and only plays future batches once',async()=>{
     const f=fixture(); f.audio.present(1,move); f.audio.setEnabled(true); await flush();
     f.audio.present(1,move);f.audio.present(0,move);expect(f.sounds).toHaveLength(0);
