@@ -1,12 +1,129 @@
 import { expect, test, type Page } from '@playwright/test';
 import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
-import { pickTile, screenToBoard } from '../src/geometry/picking';
-import { projectTile, tileFaces, type Point } from '../src/geometry/iso';
+import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
+import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 }
+
+async function settledReport(page: Page) {
+  // Let panel layout, ResizeObserver and the next render finish before using coordinates.
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+  return report(page);
+}
+
+test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('status')).toHaveText('Battle ready');
+  const initial = await settledReport(page);
+  const local = projectTile({ x: 11, y: 11, elevation: 0 });
+  await page.mouse.move(initial.transform.x + local.x * initial.transform.scale, initial.transform.y + local.y * initial.transform.scale);
+  await page.mouse.wheel(0, -100);
+  await expect.poll(async () => (await report(page)).transform.scale).toBeGreaterThan(initial.transform.scale);
+  const zoomed = await settledReport(page);
+  const start = { x: zoomed.transform.x + local.x * zoomed.transform.scale, y: zoomed.transform.y + local.y * zoomed.transform.scale };
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 50, start.y - 20, { steps: 5 });
+  await page.mouse.up();
+  const panned = await settledReport(page);
+  expect(panned.transform.x).toBeGreaterThan(zoomed.transform.x);
+  expect(panned.selectionEvents).toBe(0);
+  const panelBefore = await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().height);
+  for (const cell of [{ x: 11, y: 11, elevation: 0 }, null, { x: 0, y: 0, elevation: 0 }, { x: 11, y: 11, elevation: 0 }]) {
+    const current = await settledReport(page);
+    const point = cell ? projectTile(cell) : { x: 0, y: 0 };
+    const screen = cell ? { x: current.transform.x + point.x * current.transform.scale, y: current.transform.y + point.y * current.transform.scale }
+      : { x: 5, y: current.viewport.height - 5 };
+    expect(screen.x).toBeGreaterThanOrEqual(0);
+    expect(screen.x).toBeLessThan(current.viewport.width);
+    expect(screen.y).toBeGreaterThanOrEqual(0);
+    expect(screen.y).toBeLessThan(current.viewport.height);
+    expect(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.tagName, screen)).toBe('CANVAS');
+    // Clear with a real canvas click outside the board, not a controller shortcut.
+    await page.mouse.click(screen.x, screen.y);
+    await expect.poll(async () => (await report(page)).selected).toEqual(cell);
+    await expect(page.locator('#battle-selection')).toHaveText(cell ? `Selected (${cell.x}, ${cell.y})` : 'Select a tile');
+    const after = await settledReport(page);
+    if (initial.viewport.width === 412 && initial.viewport.height === 839 && cell?.x === 11) {
+      expect(await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().height)).toBeGreaterThan(panelBefore);
+    }
+    expect(after.transform.x).toBeCloseTo(panned.transform.x, 5);
+    expect(after.transform.y).toBeCloseTo(panned.transform.y, 5);
+    expect(after.transform.scale).toBeCloseTo(panned.transform.scale, 5);
+    expect(after.commandCount).toBe(0);
+  }
+  // Active-unit labels have different lengths too; ending a turn is the only command.
+  const activeLabels = new Set<string>();
+  for (let turn = 0; turn < initial.units.length; turn++) {
+    await page.getByRole('button', { name: 'Next turn' }).click();
+    const after = await settledReport(page);
+    activeLabels.add((await page.locator('#battle-active').textContent())!);
+    expect(after.transform).toEqual(panned.transform);
+    expect(after.commandCount).toBe(turn + 1);
+  }
+  expect(activeLabels.size).toBeGreaterThan(1);
+  await page.getByRole('button', { name: 'Restart battle' }).click();
+  await expect(page.getByRole('status')).toHaveText('Battle ready');
+  const restarted = await settledReport(page);
+  expect(restarted.selected).toBeNull();
+  expect(restarted.selectionEvents).toBe(0);
+  expect(restarted.commandCount).toBe(0);
+  expect(restarted.objectCount).toBe(initial.objectCount);
+  expect(restarted.transform).toEqual(initial.transform);
+  await page.mouse.click(restarted.transform.x + local.x * restarted.transform.scale, restarted.transform.y + local.y * restarted.transform.scale);
+  expect((await settledReport(page)).selectionEvents).toBe(1);
+});
+
+test('authored camera keeps zoom bounds and refits on real orientation changes', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('status')).toHaveText('Battle ready');
+  for (const viewport of [{ width: 412, height: 839 }, { width: 915, height: 412 }]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(async () => (await report(page)).viewport).toEqual(viewport);
+    await page.getByRole('button', { name: 'Restart battle' }).click();
+    await expect(page.getByRole('status')).toHaveText('Battle ready');
+    const fitted = await settledReport(page);
+    await page.mouse.move(viewport.width - 5, viewport.height - 5);
+    for (let wheel = 0; wheel < 8; wheel++) {
+      // Chromium scales native wheel deltas by emulated DPR; exceed the input
+      // clamp deliberately, and settle each event rather than assuming delivery.
+      await page.mouse.wheel(0, -10000);
+      await settledReport(page);
+    }
+    await expect.poll(async () => (await report(page)).transform.scale).toBeCloseTo(fitted.transform.scale * MAX_ZOOM, 5);
+    // A genuine viewport change preserves relative zoom, not absolute scale.
+    const nextViewport = { width: viewport.height, height: viewport.width };
+    await page.setViewportSize(nextViewport);
+    await expect.poll(async () => (await report(page)).viewport).toEqual(nextViewport);
+    const panelBottom = await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().bottom);
+    const localBounds = {
+      left: (fitted.bounds.left - fitted.transform.x) / fitted.transform.scale,
+      right: (fitted.bounds.right - fitted.transform.x) / fitted.transform.scale,
+      top: (fitted.bounds.top - fitted.transform.y) / fitted.transform.scale,
+      bottom: (fitted.bounds.bottom - fitted.transform.y) / fitted.transform.scale,
+    };
+    const nextFit = fitBoard(localBounds, nextViewport, panelBottom);
+    expect((await settledReport(page)).transform.scale).toBeCloseTo(nextFit.scale * MAX_ZOOM, 5);
+    await page.mouse.move(nextViewport.width - 5, nextViewport.height - 5);
+    for (let wheel = 0; wheel < 8; wheel++) {
+      await page.mouse.wheel(0, 10000);
+      await settledReport(page);
+    }
+    await expect.poll(async () => (await report(page)).transform.scale).toBeCloseTo(nextFit.scale, 5);
+    expect((await settledReport(page)).commandCount).toBe(0);
+    // Refit at minimum zoom must keep the entire board clear of controls.
+    await page.setViewportSize(viewport);
+    await expect.poll(async () => (await report(page)).viewport).toEqual(viewport);
+    const resized = await settledReport(page);
+    expect(resized.bounds.left).toBeGreaterThanOrEqual(15);
+    expect(resized.bounds.right).toBeLessThanOrEqual(viewport.width - 15);
+    expect(resized.bounds.bottom).toBeLessThanOrEqual(viewport.height - 15);
+    expect(resized.bounds.top).toBeGreaterThanOrEqual(await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().bottom + 15));
+  }
+});
 
 test('default authored board renders canonical units, highlights and stable restarts', async ({ page }) => {
   const errors: string[] = [];
@@ -78,7 +195,6 @@ test('picks authored elevated tops and visible side faces through unit and canop
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   const { tiles } = buildBoardPresentation(battleCatalog, 'map:forest_ruins');
-  const view = (await report(page)).transform;
   for (const elevation of [0, 1, 2]) {
     for (const face of ['top', 'left', 'right'] as const) {
       const tile = tiles.find(tile => {
@@ -90,6 +206,7 @@ test('picks authored elevated tops and visible side faces through unit and canop
       expect(tile).toBeDefined();
       const vertices: readonly Point[] = tileFaces(tile!)[face];
       const point = { x: vertices.reduce<number>((sum, p) => sum + p.x, 0) / 4, y: vertices.reduce<number>((sum, p) => sum + p.y, 0) / 4 };
+      const view = (await settledReport(page)).transform;
       await page.mouse.click(view.x + point.x * view.scale, view.y + point.y * view.scale);
       expect((await report(page)).selected).toEqual({ x: tile!.x, y: tile!.y, elevation });
     }
@@ -98,6 +215,7 @@ test('picks authored elevated tops and visible side faces through unit and canop
   const value = await report(page);
   const unit = value.units[0];
   const point = projectTile(unit.tile);
+  const view = (await settledReport(page)).transform;
   await page.mouse.click(view.x + point.x * view.scale, view.y + point.y * view.scale);
   const intended = pickTile(tiles, point)!;
   expect((await report(page)).selected).toEqual({ x: intended.x, y: intended.y, elevation: intended.elevation });

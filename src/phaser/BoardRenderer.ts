@@ -130,12 +130,20 @@ export class BoardRenderer {
   }
 
   fit(width: number, height: number, panelBottom: number): void {
+    // Responsive panel layout can precede Phaser's fullscreen resize event.
+    // Do not mix its new DOM geometry with stale viewport dimensions: the
+    // following scale resize fits the settled viewport with the original zoom.
+    if (width !== window.innerWidth || height !== window.innerHeight) return;
     const layout = fitBoard(this.bounds, { width, height }, panelBottom);
+    const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
     const zoom = this.view.scale / this.fitScale;
     this.viewport = { width, height };
     this.panelBottom = panelBottom;
     this.fitScale = layout.scale;
-    this.applyView({ ...layout, scale: layout.scale * zoom });
+    // Panel text/layout changes are not navigation: retain the camera, clamping
+    // only where the new available area or zoom limits require it. Real viewport
+    // changes still refit the board and preserve relative zoom.
+    this.applyView(viewportChanged ? { ...layout, scale: layout.scale * zoom } : this.view);
   }
 
   private applyView(view: View): void {
