@@ -57,13 +57,13 @@ Alternative considered: binding battle audio to `#audio-play` or persisting pref
 
 ### 4. Treat loading and playback as disposable optional work
 
-After the content load has completed, start a separate optional load pass for missing cue files, with an overall bounded load/decode deadline as well as the established five-second per-request timeout. Do not add audio to the fatal content load plan or delay `onReady`. If any required cue is unusable, report the adapter unavailable and keep the battle usable; timeout must cover a decode/completion that never arrives, not just XHR.
+After the content load has completed, start adapter-owned fetches for missing cue files, with a 6.5-second overall load/decode deadline and five-second per-request timeout. Decode with the existing manager context and populate Phaser audio cache only while the adapter is live. For HTML5 fallback, prepare owned media tags and prime them silently in the enabling gesture; their URLs/tags are released on teardown. Do not add audio to the fatal content load plan or delay `onReady`. If any required cue is unusable, report the adapter unavailable and keep the battle usable; timeout must cover a decode/completion that never arrives, not just XHR.
 
-Use attempt/generation guards for unlock and loading callbacks. Stop active sounds, clear the pending short sequence and invalidate callbacks on mute, hide, interruption and shutdown. Remove only owned loader/context/visibility listeners and timers; do not stop a shared loader globally. Loader cache entries can survive a restart, but newly created sound instances belong to that adapter and are destroyed. Handle a loader already active after restart with a finite deadline and generation guards.
+Use attempt/generation guards for unlock and loading callbacks. Stop active sounds, clear the pending short sequence and invalidate callbacks on mute, hide, interruption and shutdown. Abort owned requests and remove owned media/context/visibility listeners and timers; do not touch the content loader. Web Audio cache entries can survive a restart, but newly created sound instances belong to that adapter and are destroyed. Generation guards ignore decode completion after timeout or restart. No automatic retry; a new scene retries failed loading.
 
 A completion callback starts the next cue only if its generation and eligibility still match. Bound each playback by its documented cue duration plus grace, and contain false returns/exceptions. Becoming visible or running updates status but never starts old sound. Gameplay cancellation and scene readiness remain independent.
 
-Alternative considered: blocking scene creation on audio and awaiting completion. Both would make optional media failures capable of freezing play.
+Inspection-driven refinement: Phaser AudioFile.onProcess callbacks are unguarded and log decode errors; the shared loader complicates cancellation across scene restart. Adapter-owned requests/decode remove that coupling while retaining Phaser sound/cache APIs. Blocking scene creation on audio or awaiting playback would make optional media failures capable of freezing play.
 
 ### 5. Keep cue assets and observability small
 

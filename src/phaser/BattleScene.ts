@@ -3,16 +3,18 @@ import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
 import { BattleSession, type Presentation } from '../app/BattleSession';
 import { previewMove, previewMovement } from '../domain/grid';
-import { measurements } from '../diagnostics/browser';
+import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import { BattleHud, actionCommand, previewText, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
+import { BattleAudio } from './BattleAudio';
 
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
 export class BattleScene extends Phaser.Scene {
   private seed = 1;
+  private soundEnabled = false;
   constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void) {super('battle');}
   create():void {
     this.status('loading');measurements.begin(performance.now());
@@ -57,7 +59,7 @@ export class BattleScene extends Phaser.Scene {
     const dialogs=new BattleDialogs(()=>removeInput.reset(),restart);
     const present=async(step:Presentation|null)=>{
       if(!step){refresh();return;}
-      clear();selected=null;removeInput.reset();hud.append(step.events);
+      clear();selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       // Suspension may finish presentation early, but never resolve the command again.
       await animation.done;if(!live)return;animation=null;
@@ -71,7 +73,11 @@ export class BattleScene extends Phaser.Scene {
       action:a=>{session.cancel();action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
       target:select,review,cancel:()=>{clear();refresh();},
       wait:()=>{if(session.phase==='player' && !dialogs.open){session.prepare({type:'endTurn',unitId:session.active.id});void present(session.confirm());}},
+      sound:()=>{this.soundEnabled=!this.soundEnabled;audio.setEnabled(this.soundEnabled);},
+      retrySound:()=>audio.unlock(),
     });
+    const audio=new BattleAudio(this,catalog,this.soundEnabled,snapshot=>hud.renderSound(snapshot));
+    setBattleAudioDiagnostics(()=>audio.snapshot());
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
       if(event.key==='Escape'){clear();refresh();event.preventDefault();return;}
@@ -90,7 +96,7 @@ export class BattleScene extends Phaser.Scene {
     const onReady=()=>{if(!live)return;ready=true;this.status('ready');refresh();if(session.phase==='player'){initialFit=false;fit();board.resetView();}pump();};
     this.game.events.once(Phaser.Core.Events.POST_RENDER,onReady);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      live=false;ready=false;session.dispose();animation?.cancel();dialogs.dispose();hud.dispose();removeInput();observer.disconnect();
+      live=false;ready=false;audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();dialogs.dispose();hud.dispose();removeInput();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;

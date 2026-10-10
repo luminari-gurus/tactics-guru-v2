@@ -1,5 +1,6 @@
 import type { AudioState } from './audioState';
 import { FitMeasurements } from './measurements';
+import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 
 export interface BoardDiagnostics {
   transform: { x: number; y: number; scale: number };
@@ -23,6 +24,8 @@ export interface AudioDiagnostics extends AudioState {
 /** A provider, not a value: `contextState`, `locked` and `cached` must be read when the snapshot is taken. */
 let audio: (() => AudioDiagnostics) | null = null;
 export function setAudioDiagnostics(provider: (() => AudioDiagnostics) | null): void { audio = provider; }
+let battleAudio: (() => BattleAudioSnapshot) | null = null;
+export function setBattleAudioDiagnostics(provider: (() => BattleAudioSnapshot) | null): void { battleAudio = provider; }
 /** Per scene run. `moveFrozenAt` is the tween progress (0–1) when the page was last hidden during a move. */
 export interface LifecycleDiagnostics { hidden: number; visible: number; blur: number; focus: number; moveFrozenAt: number | null; moveCompleted: number; }
 let lifecycle: LifecycleDiagnostics | null = null;
@@ -46,6 +49,7 @@ export function diagnosticsSnapshot() {
     board: board ? { ...board, elevations: [...board.elevations], bounds: { ...board.bounds } } : null,
     proof: proof ? { ...proof } : null,
     audio: audio?.() ?? null,
+    battleAudio: battleAudio?.() ?? null,
     lifecycle: lifecycle ? { ...lifecycle } : null,
     capturedAt: new Date().toISOString(),
     build: __BUILD_INFO__,
