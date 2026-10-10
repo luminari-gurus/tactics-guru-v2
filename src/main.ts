@@ -15,7 +15,7 @@ if (battle) {
   document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(element => { element.hidden = true; });
   document.querySelector<HTMLElement>('#battle-controls')!.hidden = false;
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
-  document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom';
+  document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
   restartButton.textContent = 'Restart battle';
 }
 if (contentSmoke) {
@@ -46,12 +46,12 @@ function showError(message: string): void {
 restartButton.addEventListener('click', () => {
   if (restartButton.disabled || !restart) return;
   setStatus('loading');
-  try { restart(); } catch { showError('Could not restart the proof scene'); }
+  try { restart(); } catch { showError('Could not restart the scene'); }
 });
 snapshotButton.addEventListener('click', () => { report.textContent = JSON.stringify(diagnosticsSnapshot(), null, 2); });
 window.fitDiagnostics = diagnosticsSnapshot;
-window.addEventListener('error', () => showError('The proof scene encountered a runtime error'));
-window.addEventListener('unhandledrejection', () => showError('The proof scene encountered an asynchronous error'));
+window.addEventListener('error', () => showError('The scene encountered a runtime error'));
+window.addEventListener('unhandledrejection', () => showError('The scene encountered an asynchronous error'));
 
 try {
   const { startProof } = await import('./phaser/start');

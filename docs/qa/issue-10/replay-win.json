@@ -1,0 +1,1155 @@
+{
+  "state": {
+    "format": 1,
+    "versions": {
+      "rules": 1,
+      "rng": 1,
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+    },
+    "seed": 2,
+    "rng": {
+      "words": [
+        325502426,
+        336722355,
+        1402380674,
+        32
+      ],
+      "cursor": 19
+    },
+    "mapId": "map:forest_ruins",
+    "units": [
+      {
+        "id": 1,
+        "cell": {
+          "x": 5,
+          "y": 6
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "player",
+        "defId": "fighter",
+        "hp": 10,
+        "guarded": true
+      },
+      {
+        "id": 2,
+        "cell": {
+          "x": 2,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "player",
+        "defId": "ranger",
+        "hp": 12
+      },
+      {
+        "id": 3,
+        "cell": {
+          "x": 1,
+          "y": 6
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "player",
+        "defId": "mage",
+        "hp": 3
+      },
+      {
+        "id": 4,
+        "cell": {
+          "x": 6,
+          "y": 6
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 0
+      },
+      {
+        "id": 5,
+        "cell": {
+          "x": 3,
+          "y": 4
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "enemy",
+        "defId": "goblin_archer",
+        "hp": 0
+      },
+      {
+        "id": 6,
+        "cell": {
+          "x": 2,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": true,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 0
+      }
+    ],
+    "initiative": [
+      5,
+      6,
+      2,
+      1,
+      4,
+      3
+    ],
+    "activeIndex": 5,
+    "round": 3,
+    "outcome": "playerWin",
+    "commandCount": 38
+  },
+  "replay": {
+    "format": 1,
+    "versions": {
+      "rules": 1,
+      "rng": 1,
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+    },
+    "initial": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          2744299216,
+          2772463645,
+          391717936,
+          19
+        ],
+        "cursor": 6
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 1,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 9
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 8,
+            "y": 4
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 9,
+            "y": 2
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 8,
+            "y": 5
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 0,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 0
+    },
+    "commands": [
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 5,
+          "y": 2
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "move",
+        "unitId": 6,
+        "to": {
+          "x": 5,
+          "y": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 3,
+          "y": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 6,
+          "y": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "move",
+        "unitId": 3,
+        "to": {
+          "x": 1,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            4
+          ]
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 3,
+          "y": 4
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "move",
+        "unitId": 6,
+        "to": {
+          "x": 4,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 1
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 5,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 4
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "useAbility",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 1
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            4
+          ]
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "useAbility",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "move",
+        "unitId": 6,
+        "to": {
+          "x": 2,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 4
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            5
+          ]
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "type": "moved",
+      "unitId": 5,
+      "path": [
+        {
+          "x": 9,
+          "y": 2
+        },
+        {
+          "x": 8,
+          "y": 2
+        },
+        {
+          "x": 7,
+          "y": 2
+        },
+        {
+          "x": 6,
+          "y": 2
+        },
+        {
+          "x": 5,
+          "y": 2
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 6,
+      "path": [
+        {
+          "x": 8,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 6
+        },
+        {
+          "x": 6,
+          "y": 6
+        },
+        {
+          "x": 5,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 1
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 6,
+      "natural": 5,
+      "bonus": 7,
+      "total": 12,
+      "armorClass": 12,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 6,
+      "damage": 6,
+      "hp": 3
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 1,
+          "y": 8
+        },
+        {
+          "x": 1,
+          "y": 7
+        },
+        {
+          "x": 1,
+          "y": 6
+        },
+        {
+          "x": 2,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 4,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 4,
+      "path": [
+        {
+          "x": 8,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 6
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 4
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 3,
+      "path": [
+        {
+          "x": 1,
+          "y": 9
+        },
+        {
+          "x": 1,
+          "y": 8
+        },
+        {
+          "x": 1,
+          "y": 7
+        },
+        {
+          "x": 1,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          4
+        ]
+      }
+    },
+    {
+      "type": "missileRolled",
+      "unitId": 3,
+      "targetId": 4,
+      "missile": 1,
+      "natural": 2,
+      "damage": 3
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 3,
+      "hp": 6
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 3
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 5,
+      "path": [
+        {
+          "x": 5,
+          "y": 2
+        },
+        {
+          "x": 4,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 3
+        },
+        {
+          "x": 3,
+          "y": 4
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 5,
+      "targetId": 3,
+      "natural": 8,
+      "bonus": 4,
+      "total": 12,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 3,
+      "damage": 4,
+      "hp": 7
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 6,
+      "path": [
+        {
+          "x": 5,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 6,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 1
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 6,
+      "targetId": 1,
+      "natural": 14,
+      "bonus": 4,
+      "total": 18,
+      "armorClass": 14,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 1,
+      "damage": 4,
+      "hp": 14
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 2
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 5,
+      "natural": 17,
+      "bonus": 7,
+      "total": 24,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 5,
+      "damage": 6,
+      "hp": 2
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 7
+        },
+        {
+          "x": 4,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 1,
+      "targetId": 4,
+      "natural": 8,
+      "bonus": 2,
+      "total": 10,
+      "armorClass": 12,
+      "result": "miss"
+    },
+    {
+      "type": "guarded",
+      "unitId": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 4,
+      "round": 2
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 4,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 1
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 4,
+      "targetId": 1,
+      "natural": 14,
+      "bonus": 4,
+      "total": 18,
+      "armorClass": 16,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 1,
+      "damage": 4,
+      "hp": 10
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 4
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 2
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          4
+        ]
+      }
+    },
+    {
+      "type": "missileRolled",
+      "unitId": 3,
+      "targetId": 4,
+      "missile": 1,
+      "natural": 2,
+      "damage": 3
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 3,
+      "hp": 3
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 3
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 5,
+      "targetId": 3,
+      "natural": 9,
+      "bonus": 4,
+      "total": 13,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 3,
+      "damage": 4,
+      "hp": 3
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 3
+    },
+    {
+      "type": "moved",
+      "unitId": 6,
+      "path": [
+        {
+          "x": 4,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 2,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 6,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 6,
+      "targetId": 3,
+      "natural": 4,
+      "bonus": 4,
+      "total": 8,
+      "armorClass": 11,
+      "result": "miss"
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 6,
+      "natural": 9,
+      "bonus": 7,
+      "total": 16,
+      "armorClass": 12,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 6,
+      "damage": 6,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 6
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "guardExpired",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 1,
+      "targetId": 4,
+      "natural": 12,
+      "bonus": 2,
+      "total": 14,
+      "armorClass": 12,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 5,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 4
+    },
+    {
+      "type": "guarded",
+      "unitId": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          5
+        ]
+      }
+    },
+    {
+      "type": "missileRolled",
+      "unitId": 3,
+      "targetId": 5,
+      "missile": 1,
+      "natural": 3,
+      "damage": 4
+    },
+    {
+      "type": "damaged",
+      "unitId": 5,
+      "damage": 4,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 5
+    },
+    {
+      "type": "battleEnded",
+      "outcome": "playerWin"
+    }
+  ],
+  "pending": null,
+  "phase": "ended"
+}

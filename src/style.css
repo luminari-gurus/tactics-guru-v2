@@ -31,3 +31,19 @@ button[aria-pressed="true"] { border-color: #ffd77d; background: #46546c; }
 
 #move-destination { min-height: 44px; max-width: 100%; color: inherit; background: #2b3e60; border: 1px solid #677c9e; border-radius: 5px; }
 #move-status { font-size: 13px; }
+
+/* Battle HUD uses the existing safe-area panel and reserves board space below it. */
+#battle-party { display: flex; gap: 6px; }
+#battle-party button { display: flex; gap: 6px; align-items: center; flex: 1; min-width: 44px; font-size: 12px; padding: 5px; text-align: left; }
+#battle-party button[aria-current="true"] { border-color: #ffd77d; }
+#battle-party img { flex-shrink: 0; border-radius: 4px; }
+#battle-active, #battle-selection, #battle-preview { margin: 6px 0; font-size: 13px; }
+#battle-target { width: 100%; min-height: 44px; min-width: 44px; color: inherit; background: #172033; font: inherit; }
+#battle-log { max-height: 110px; overflow-y: auto; padding-left: 24px; font-size: 12px; }
+#battle-controls .fit-controls { gap: 6px; }
+#battle-controls button, dialog button { min-width: 44px; }
+#battle-controls label { font-size: 12px; }
+canvas:focus-visible { outline: 3px solid #ffd77d; outline-offset: -3px; }
+dialog { max-width: min(450px, calc(100vw - 48px)); max-height: calc(100dvh - 48px); overflow-y: auto; color: #f6f1e7; background: #172033; border: 2px solid #ffd77d; border-radius: 8px; padding: 20px; }
+dialog::backdrop { background: #0009; }
+@media (max-width: 450px) { #battle-party button { flex-direction: column; align-items: flex-start; } }
