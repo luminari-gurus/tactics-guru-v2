@@ -3,6 +3,7 @@ import type { BattleEvent, Command, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
+import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 
 export type Action = 'move' | 'basic' | 'signature';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -50,9 +51,12 @@ export class BattleHud {
   private readonly abort=new AbortController();
   private readonly party = new Map<number,HTMLButtonElement>();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition)=>void;review:()=>void;cancel:()=>void;wait:()=>void}) {
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition)=>void;review:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void}) {
     this.root.innerHTML=`<div id="battle-party" aria-label="Heroes"></div><p id="battle-active"></p><div class="fit-controls battle-actions"><button id="battle-move" data-action="move">Move</button><button data-action="basic">Basic attack</button><button data-action="signature">Signature</button><button id="battle-next">Wait / End turn</button></div><label for="battle-target">Target (or select a board cell)</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="fit-controls"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div><details id="battle-log-panel"><summary>Battle log</summary><ol id="battle-log" aria-label="Battle log"></ol></details>`;
     const signal=this.abort.signal;
+    this.root.insertAdjacentHTML('afterbegin','<div class="fit-controls"><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><span id="battle-sound-status" aria-live="polite">Sound off</span></div>');
+    this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
+    this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>b.addEventListener('click',()=>callbacks.action(b.dataset.action as Action),{signal}));
     this.target=this.root.querySelector('#battle-target')!;
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}},{signal});
@@ -68,6 +72,13 @@ export class BattleHud {
     }
   }
   private unitLabel(u:UnitState) {const def=u.side==='player'?this.session.catalog.heroes[u.defId]:this.session.catalog.enemies[u.defId];return `${displayName(u.defId)} #${u.id} · HP ${u.hp}/${def.stats.maxHp}${u.guarded?' · Guarded':''}`;}
+  renderSound(snapshot:BattleAudioSnapshot) {
+    const button=this.root.querySelector<HTMLButtonElement>('#battle-sound')!;
+    button.textContent=snapshot.enabled?'Mute':'Enable sound';button.setAttribute('aria-pressed',String(snapshot.enabled));
+    this.root.querySelector<HTMLButtonElement>('#battle-sound-retry')!.hidden=snapshot.status!=='blocked';
+    const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
+    this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
+  }
   render(action:Action|null, selected:CellPosition|null, message:string) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     for(const u of s.state.units.filter(u=>u.side==='player')) { const b=this.party.get(u.id)!;b.querySelector('span')!.textContent=this.unitLabel(u);b.setAttribute('aria-current',String(u.id===actor.id)); }

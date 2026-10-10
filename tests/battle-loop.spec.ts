@@ -18,24 +18,11 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
 });
 
-import type { Page } from '@playwright/test';
-import { playerDecision } from './helpers/battlePolicy';
+import { playerDecision, session, playCommand } from './helpers/battlePolicy';
 import { battleCatalog as catalog } from '../src/content/catalog';
 import { replayBattle } from '../src/domain/turns';
-import type { BattleState, Command, Replay, BattleEvent } from '../src/domain/types';
+import type { Command } from '../src/domain/types';
 
-async function session(page:Page):Promise<{state:BattleState;replay:Replay;events:BattleEvent[];phase:string}> {
-  return JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
-}
-async function playCommand(page:Page,command:Command){
-  if(command.type==='endTurn') {await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();return;}
-  const snapshot=(await session(page)).state;
-  await page.getByRole('button',{name:command.type==='move'?'Move':command.abilityId==='ability:basic_attack'?'Basic attack':/^Signature:/,exact:command.type==='move' || command.type==='useAbility' && command.abilityId==='ability:basic_attack'}).click();
-  const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
-  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
-  await page.getByRole('button',{name:'Review action'}).click();
-  await page.getByRole('button',{name:'Confirm',exact:true}).click();
-}
 for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
   test(`complete legal authored battle seed ${seed} reaches ${outcome} through controls and replays`,async({page})=>{
     test.setTimeout(180000);const errors:string[]=[];
@@ -186,7 +173,9 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
 test('restart during initial enemy animation discards the old run and its callbacks',async({page})=>{
   await page.goto('/');await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
-  const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
+  // An enemy end-turn commit advances initiative before its presentation completes.
+  const first=await session(page),command=first.replay.commands.at(-1);
+  expect(command).toBeDefined();expect(first.state.units.find(u=>u.id===command!.unitId)!.side).toBe('enemy');
   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

@@ -1,8 +1,9 @@
+import type { Page } from '@playwright/test';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import { previewMovement, moveUnit } from '../../src/domain/grid';
 import { previewAttack, previewMagicMissile } from '../../src/domain/combat';
 import { manhattanDistance } from '../../src/domain/targeting';
-import type { BattleState, Command } from '../../src/domain/types';
+import type { BattleState, Command, Replay, BattleEvent } from '../../src/domain/types';
 
 /** Test-only player policy. Browser tests enact its decision using real controls. */
 export function playerDecision(state:BattleState):Command {
@@ -33,4 +34,17 @@ export function playerDecision(state:BattleState):Command {
     if(closer.length)return {type:'move',unitId:actor.id,to:closer[0].cell};
   }
   return wait;
+}
+
+export async function session(page:Page):Promise<{state:BattleState;replay:Replay;events:BattleEvent[];phase:string}> {
+  return JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+}
+export async function playCommand(page:Page,command:Command){
+  if(command.type==='endTurn') {await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();return;}
+  const snapshot=(await session(page)).state;
+  await page.getByRole('button',{name:command.type==='move'?'Move':command.abilityId==='ability:basic_attack'?'Basic attack':/^Signature:/,exact:command.type==='move' || command.type==='useAbility' && command.abilityId==='ability:basic_attack'}).click();
+  const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
+  await page.getByRole('button',{name:'Review action'}).click();
+  await page.getByRole('button',{name:'Confirm',exact:true}).click();
 }
