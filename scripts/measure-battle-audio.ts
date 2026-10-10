@@ -6,10 +6,15 @@ import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { platform, release, cpus } from 'node:os';
+import { createServer, type AddressInfo } from 'node:net';
 import { chromium, devices } from '@playwright/test';
 
 const [baseline,candidate,output]=process.argv.slice(2);
 if(!baseline || !candidate || !output)throw Error('Expected baseline dist, candidate dist, output JSON');
+const probe=createServer();
+await new Promise<void>((done,fail)=>{probe.once('error',fail);probe.listen(0,'127.0.0.1',done);});
+const port=(probe.address() as AddressInfo).port;
+await new Promise<void>((done,fail)=>probe.close(error=>error?fail(error):done()));
 async function inventory(dir:string):Promise<{path:string;bytes:number;gzipBytes:number;sha256:string}[]> {
   const result=[];
   for(const file of await readdir(dir,{withFileTypes:true})) {
@@ -23,14 +28,19 @@ const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROM
 const samples:unknown[]=[],builds:unknown[]=[];
 try {
   for(const [label,directory] of [['baseline',baseline],['candidate',candidate]]) {
-    const dist=resolve(directory),port=4175,url=`http://127.0.0.1:${port}`;
+    const dist=resolve(directory),url=`http://127.0.0.1:${port}`;
     const files=await inventory(dist);
     builds.push({label,dist,files,compressedCodeBytes:files.filter(f=>/\.(js|css)$/.test(f.path)).reduce((n,f)=>n+f.gzipBytes,0),cueBytes:files.filter(f=>f.path.includes('/audio/battle/')).reduce((n,f)=>n+f.bytes,0)});
     const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port',String(port),'--strictPort','--outDir',dist],{stdio:'pipe'});
     let serverOutput='';server.stdout.on('data',d=>serverOutput+=d);server.stderr.on('data',d=>serverOutput+=d);
+    let exited=false;
+    const stopped=new Promise<void>(done=>{
+      server.once('exit',()=>{exited=true;done();});
+      server.once('error',error=>{serverOutput+=error.message;exited=true;done();});
+    });
     try {
       for(let i=0;;i++) {
-        if(server.exitCode!==null || i>100)throw Error(`Preview failed: ${serverOutput}`);
+        if(exited || i>100)throw Error(`Preview failed: ${serverOutput}`);
         try {if(serverOutput.includes(url) && (await fetch(url)).ok)break;}catch{}
         await new Promise(r=>setTimeout(r,100));
       }
@@ -62,6 +72,7 @@ try {
             });
           });
           const page=await context.newPage(),errors:string[]=[];
+          page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(15000);
           page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
           for(const cache of ['cold','warm']) {
             if(cache==='cold')await page.goto(url);else await page.reload();
@@ -77,7 +88,7 @@ try {
           }
         } finally {await context.close();}
       }
-    } finally {server.kill();await new Promise<void>(r=>server.once('exit',()=>r()));}
+    } finally {if(!exited)server.kill();await stopped;}
   }
 } finally {
   await browser.close();await mkdir(dirname(output),{recursive:true});
