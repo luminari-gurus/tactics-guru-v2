@@ -24,7 +24,7 @@ const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!
 
 test('hidden and visible while idle count once each, keep rendering and never start audio', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   expect(await lifecycle(page)).toEqual({ hidden: 0, visible: 0, blur: 0, focus: 0, moveFrozenAt: null, moveCompleted: 0 });
   for (let cycle = 1; cycle <= 3; cycle++) {
@@ -44,7 +44,7 @@ test('hidden and visible while idle count once each, keep rendering and never st
 
 test('a move in flight freezes while hidden and completes exactly once after resume, also after restart', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const start = page.getByRole('button', { name: 'Start diagnostic move', exact: true });
   const status = page.locator('#move-status');
@@ -95,7 +95,7 @@ test('a move in flight freezes while hidden and completes exactly once after res
 
 test('a pointer held down across hide and show cannot pan or select on resume', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const view = await page.evaluate(() => window.fitDiagnostics().board!.transform);
   const point = { x: view.x, y: view.y + 120 * view.scale };
@@ -122,7 +122,7 @@ test('a pointer held down across hide and show cannot pan or select on resume', 
 
 test('window blur and focus are counted and never start or repeat audio', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const blurFocus = () => page.evaluate(() => { window.dispatchEvent(new Event('blur')); window.dispatchEvent(new Event('focus')); });
   await blurFocus();

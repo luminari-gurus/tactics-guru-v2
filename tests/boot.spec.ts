@@ -4,7 +4,7 @@ test('boots a Phaser scene and fits the viewport after resize', async ({ page })
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page).toHaveTitle('Tactics Guru v2');
   await expect(page.locator('#game[data-ready="true"] canvas')).toBeVisible();
   for (const viewport of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {

@@ -1,192 +1,204 @@
-import { terrainTextureKey } from '../terrain/materials';
 import Phaser from 'phaser';
-import { BOARD_FIXTURE, BOARD_TERRAINS } from '../diagnostics/boardFixture';
-import { PROOF_IMAGES, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
-import { setProofDiagnostics, setBoardDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
+import type { CellPosition, ContentCatalog, MapId } from '../content/types';
+import type { BattleState } from '../domain/types';
+import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
+import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
+import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
 
-import { constrainView, pickTile, screenToBoard, MAX_ZOOM, type View } from '../geometry/picking';
+const REACHABLE_COLOR = 0x46d7c7;
+const ACTIVE_COLOR = 0xffd36a;
+const SELECTED_COLOR = 0xffffff;
+const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 
-const ELEVATED_EDGE_COLOR = 0x263c29;
-const ELEVATED_EDGE_WIDTH = 1;
-const OCCUPANT_LAYER = 2.5;
-const DEFAULT_OCCLUDING_TREE_ALPHA = 0.4;
-
+/** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
-  private readonly hero: Phaser.GameObjects.Image;
-  private readonly prop: Phaser.GameObjects.Image;
+  private readonly board;
+  private readonly byCell;
   private readonly bounds: Bounds;
-  private occludingTreeAlpha = DEFAULT_OCCLUDING_TREE_ALPHA;
+  private readonly highlights = new Map<string, Phaser.GameObjects.Graphics>();
+  private readonly images = new Map<number, Phaser.GameObjects.Image>();
+  private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
+  private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
+  private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private view: View = { x: 0, y: 0, scale: 1 };
   private viewport = { width: 1, height: 1 };
   private panelBottom = 0;
   private fitScale = 1;
+  private snapshot: BattleState | undefined;
+  private reachable: readonly CellPosition[] = [];
   private selected: Tile | null = null;
-  private readonly selection: Phaser.GameObjects.Graphics;
-  private heroTile: Tile = PROOF_FIXTURES['ground-behind'].hero;
-  private fixture: ProofFixture = 'ground-behind';
-  private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
-  private readonly surfaceMasks: Phaser.GameObjects.Graphics[] = [];
+  private selectionEvents = 0;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(private readonly scene: Phaser.Scene, private readonly catalog: ContentCatalog, private readonly mapId: MapId,
+    private readonly onSelect: (cell: CellPosition | null) => void) {
+    this.board = buildBoardPresentation(catalog, mapId);
+    this.byCell = new Map(this.board.tiles.map(tile => [cellKey(tile), tile]));
     this.root = scene.add.container();
-    this.selection = scene.add.graphics();
-    const surfaceSide = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / Math.SQRT2;
-    const drawFace = (graphics: Phaser.GameObjects.Graphics, points: readonly Point[], color: number): void => {
-      const vertices = points.map(point => new Phaser.Math.Vector2(point.x, point.y));
-      graphics.fillStyle(color, 1).fillPoints(vertices, true);
-      graphics.lineStyle(1, 0x203844, 1).strokePoints(vertices, true);
-    };
-    for (const tile of orderTiles(BOARD_FIXTURE)) {
-      const graphics = scene.add.graphics().setDepth(proofDepth(tile, 0));
+    for (const tile of orderTiles(this.board.tiles)) {
       const faces = tileFaces(tile);
-      drawFace(graphics, faces.left, 0x3b535e);
-      drawFace(graphics, faces.right, 0x4e6d72);
-      drawFace(graphics, faces.top, 0x638b82);
+      const column = scene.add.graphics().setDepth(tile.depth);
+      for (const [points, color] of [[faces.left, 0x354538], [faces.right, 0x4c6050], [faces.top, 0x5b7157]] as const) {
+        column.fillStyle(color).fillPoints(points.map(p => new Phaser.Math.Vector2(p.x, p.y)), true);
+      }
       const point = projectTile(tile);
-      const surface = scene.add.container(point.x, point.y)
-        .setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(proofDepth(tile, 1));
-      const grass = scene.add.image(0, 0, terrainTextureKey(tile.terrain ?? BOARD_TERRAINS[`${tile.x},${tile.y}`])).setOrigin(0.5)
-        .setDisplaySize(surfaceSide, surfaceSide).setRotation(Math.PI / 4);
-      surface.add(grass);
-      this.surfaces.push({ tile, image: grass });
-      // Rotate a square by exactly 45 degrees, then squash vertically to the grid's 2:1 diamond.
-      const mask = scene.add.graphics().setVisible(false);
-      mask.fillStyle(0xffffff).fillPoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
-      grass.setMask(mask.createGeometryMask());
-      this.surfaceMasks.push(mask);
-      this.root.add([graphics, surface]);
-      if (tile.elevation > 0) {
-        const border = scene.add.graphics().setDepth(proofDepth(tile, 2));
-        border.lineStyle(ELEVATED_EDGE_WIDTH, ELEVATED_EDGE_COLOR, 0.95)
-          .strokePoints(faces.top.map(vertex => new Phaser.Math.Vector2(vertex.x, vertex.y)), true);
-        this.root.add(border);
+      const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
+      const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
+        .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
+      surface.add(image);
+      this.surfaces.push({ tile, image });
+      const highlight = scene.add.graphics().setDepth(tile.depth + 2);
+      this.highlights.set(cellKey(tile), highlight);
+      this.root.add([column, surface, highlight]);
+      if (tile.terrain === 'forest') {
+        const trunk = scene.add.graphics().setDepth(tile.depth + OCCUPANT_LAYER);
+        trunk.fillStyle(0x63452d).fillRect(point.x - 4, point.y - 40, 8, 40);
+        const foliage = scene.add.graphics().setDepth(tile.depth + OCCUPANT_LAYER);
+        // Vector foliage shares the pure occlusion bounds and needs no new art assets.
+        foliage.fillStyle(0x183f30).fillEllipse(point.x, point.y - 50, CANOPY_ART.radius * 2, 64);
+        foliage.fillStyle(0x2b6641).fillEllipse(point.x - 8, point.y - 55, 34, 42);
+        foliage.fillStyle(0x3b7e4b).fillEllipse(point.x + 8, point.y - 61, 30, 35);
+        this.root.add([trunk, foliage]);
+        this.canopies.push({ tile, graphics: foliage });
       }
     }
-    this.prop = scene.add.image(0, 0, 'tree').setOrigin(0.5, PROOF_ART.tree.originY).setDisplaySize(PROOF_ART.tree.width, PROOF_ART.tree.height);
-    this.hero = scene.add.image(0, 0, 'fighter').setOrigin(0.5, PROOF_ART.fighter.originY).setDisplaySize(PROOF_ART.fighter.width, PROOF_ART.fighter.height);
-    this.root.add([this.prop, this.hero]);
-    // Include every fixture and the full art rectangles (even transparent padding).
-    const bounds = boardBounds(BOARD_FIXTURE);
-    const rectangles = Object.keys(PROOF_FIXTURES).map(fixture => {
-      this.showFixture(fixture as ProofFixture);
-      return this.root.getBounds();
-    });
+    for (const occupant of this.board.occupants) {
+      const asset = catalog.assets[occupant.assetId];
+      const image = scene.add.image(0, 0, occupant.assetId)
+        .setOrigin(occupant.anchor.x / asset.runtimeWidth, occupant.anchor.y / asset.runtimeHeight)
+        .setDisplaySize(UNIT_ART.width, UNIT_ART.height);
+      const ring = scene.add.graphics();
+      this.images.set(occupant.id, image);
+      this.rings.set(occupant.id, ring);
+      this.root.add([ring, image]);
+    }
+    // Reserve sprite space on every cell so moving never escapes the fitted bounds.
+    const rectangles = [boardBounds(this.board.tiles), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
+      ...this.board.tiles.flatMap(tile => this.board.occupants.map(occupant => {
+        const asset = catalog.assets[occupant.assetId];
+        return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
+      }))];
     this.bounds = {
-      left: Math.min(bounds.left, ...rectangles.map(rect => rect.left)),
-      top: Math.min(bounds.top, ...rectangles.map(rect => rect.top)),
-      right: Math.max(bounds.right, ...rectangles.map(rect => rect.right)),
-      bottom: Math.max(bounds.bottom, ...rectangles.map(rect => rect.bottom)),
+      left: Math.min(...rectangles.map(r => r.left)), right: Math.max(...rectangles.map(r => r.right)),
+      top: Math.min(...rectangles.map(r => r.top)), bottom: Math.max(...rectangles.map(r => r.bottom)),
     };
-    this.showFixture('ground-behind');
-    this.root.add(this.selection);
   }
 
-  setOccludingOpacity(alpha: number): void {
-    if (!Number.isFinite(alpha)) return;
-    this.occludingTreeAlpha = Math.max(0, Math.min(1, alpha));
-    this.updateOcclusion();
-  }
-
-  showFixture(fixture: ProofFixture): void {
-    this.fixture = fixture;
-    const value = PROOF_FIXTURES[fixture];
-    this.heroTile = value.hero;
-    const hero = projectTile(value.hero);
-    const prop = projectTile(value.prop);
-    this.hero.setPosition(hero.x + value.heroOffsetX, hero.y).setDepth(proofDepth(value.hero, OCCUPANT_LAYER));
-    this.prop.setPosition(prop.x, prop.y).setDepth(proofDepth(value.prop, OCCUPANT_LAYER));
-    this.updateOcclusion();
-  }
-
-  moveHero(tile: Tile): void {
-    this.heroTile = tile;
-    const point = projectTile(tile);
-    this.hero.setPosition(point.x, point.y).setDepth(proofDepth(tile, OCCUPANT_LAYER));
-    this.updateOcclusion();
-  }
-
-  private updateOcclusion(): void {
-    const occludesHero = this.hero.depth < this.prop.depth
-      && Phaser.Geom.Rectangle.Overlaps(this.hero.getBounds(), this.prop.getBounds());
-    this.prop.setAlpha(occludesHero ? this.occludingTreeAlpha : 1);
-    this.root.sort('depth');
-    this.publishDiagnostics();
-  }
-
-  private publishDiagnostics(): void {
-    const value = PROOF_FIXTURES[this.fixture];
-    const rootMatrix = this.root.getWorldTransformMatrix();
-    const bleedScale = (TILE_WIDTH + PROOF_ART.grass.horizontalBleed * 2) / TILE_WIDTH;
-    const errors = this.surfaces.flatMap(({ tile, image }) => {
-      const halfWidth = image.width / 2 / bleedScale;
-      const halfHeight = image.height / 2 / bleedScale;
-      const corners = [
-        { x: -halfWidth, y: -halfHeight }, { x: halfWidth, y: -halfHeight },
-        { x: halfWidth, y: halfHeight }, { x: -halfWidth, y: halfHeight },
-      ];
-      const matrix = image.getWorldTransformMatrix();
-      return tileFaces(tile).top.map((point, index) => {
-        const expected = rootMatrix.transformPoint(point.x, point.y);
-        const actual = matrix.transformPoint(corners[index].x, corners[index].y);
-        return Math.hypot(expected.x - actual.x, expected.y - actual.y);
+  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null): void {
+    this.snapshot = snapshot;
+    this.reachable = reachable;
+    this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
+    const activeId = snapshot.initiative[snapshot.activeIndex];
+    const active = snapshot.units.find(unit => unit.id === activeId)!;
+    const reachableKeys = new Set(reachable.map(cellKey));
+    for (const tile of this.board.tiles) {
+      const graphics = this.highlights.get(cellKey(tile))!.clear();
+      const vertices = tileFaces(tile).top.map(p => new Phaser.Math.Vector2(p.x, p.y));
+      graphics.lineStyle(0.8, 0x17291f, 0.6).strokePoints(vertices, true);
+      if (reachableKeys.has(cellKey(tile)) && cellKey(tile) !== cellKey(active.cell)) {
+        graphics.fillStyle(REACHABLE_COLOR, 0.26).fillPoints(vertices, true);
+        graphics.lineStyle(1.5, REACHABLE_COLOR, 0.85).strokePoints(vertices, true);
+      }
+      if (cellKey(tile) === cellKey(active.cell)) graphics.lineStyle(3, ACTIVE_COLOR).strokePoints(vertices, true);
+      if (this.selected === tile) {
+        const point = projectTile(tile);
+        const inset = vertices.map(p => new Phaser.Math.Vector2(point.x + (p.x - point.x) * 0.78, point.y + (p.y - point.y) * 0.78));
+        graphics.lineStyle(2.5, SELECTED_COLOR).strokePoints(inset, true);
+      }
+    }
+    for (const unit of snapshot.units) {
+      const tile = this.byCell.get(cellKey(unit.cell))!;
+      const point = projectTile(tile);
+      const depth = tile.depth;
+      this.images.get(unit.id)!.setPosition(point.x, point.y).setDepth(depth + OCCUPANT_LAYER).setVisible(unit.hp > 0);
+      const ring = this.rings.get(unit.id)!.clear().setDepth(depth + 2.25).setVisible(unit.hp > 0);
+      ring.lineStyle(unit.id === activeId ? 3 : 2, unit.id === activeId ? ACTIVE_COLOR : unit.side === 'player' ? 0x6ddbf5 : 0xf17a73)
+        .strokeEllipse(point.x, point.y, 26, 12);
+    }
+    for (const canopy of this.canopies) {
+      const overlaps = snapshot.units.some(unit => {
+        if (unit.hp <= 0) return false;
+        const tile = this.byCell.get(cellKey(unit.cell))!;
+        const image = this.images.get(unit.id)!;
+        return canopyOccludes(canopy.tile, tile, unitBounds(tile, { x: image.originX, y: image.originY }), this.catalog.maps[this.mapId].height);
       });
-    });
-    setProofDiagnostics({ fixture: this.fixture, relation: this.hero.depth < this.prop.depth ? 'behind' : 'front', heroTile: { ...this.heroTile }, propElevation: value.prop.elevation,
-      heroPosition: { x: this.hero.x, y: this.hero.y }, heroDepth: this.hero.depth, propDepth: this.prop.depth, propAlpha: this.prop.alpha, assetCount: PROOF_IMAGES.length,
-      surfaceCornerError: Math.max(...errors),
-      objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
+      canopy.graphics.setAlpha(overlaps ? CANOPY_ART.fadedAlpha : 1);
+    }
+    this.root.sort('depth');
+    this.publish();
   }
 
-  fit(width: number, height: number, panelBottom: number): BoardDiagnostics {
+  fit(width: number, height: number, panelBottom: number): void {
+    // Responsive panel layout can precede Phaser's fullscreen resize event.
+    // Do not mix its new DOM geometry with stale viewport dimensions: the
+    // following scale resize fits the settled viewport with the original zoom.
+    if (width !== window.innerWidth || height !== window.innerHeight) return;
     const layout = fitBoard(this.bounds, { width, height }, panelBottom);
+    const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
+    const zoom = this.view.scale / this.fitScale;
     this.viewport = { width, height };
     this.panelBottom = panelBottom;
-    const zoom = this.view.scale / this.fitScale;
     this.fitScale = layout.scale;
-    this.applyView({ ...layout, scale: layout.scale * zoom });
-    return this.diagnostics();
-  }
-
-  private diagnostics(): BoardDiagnostics {
-    const { x, y, scale } = this.view;
-    return { tileCount: BOARD_FIXTURE.length,
-      elevations: [...new Set(BOARD_FIXTURE.map(tile => tile.elevation))].sort(),
-      scale, transform: { ...this.view }, selected: this.selected ? { ...this.selected } : null,
-      bounds: { left: x + this.bounds.left * scale, right: x + this.bounds.right * scale,
-        top: y + this.bounds.top * scale, bottom: y + this.bounds.bottom * scale } };
+    // Panel text/layout changes are not navigation: retain the camera, clamping
+    // only where the new available area or zoom limits require it. Real viewport
+    // changes still refit the board and preserve relative zoom.
+    this.applyView(viewportChanged ? { ...layout, scale: layout.scale * zoom } : this.view);
   }
 
   private applyView(view: View): void {
     this.view = constrainView(view, this.bounds, this.viewport, this.panelBottom, this.fitScale);
-    const { x, y, scale } = this.view;
-    this.root.setPosition(x, y).setScale(scale);
-    for (const mask of this.surfaceMasks) mask.setPosition(x, y).setScale(scale);
-    this.publishDiagnostics();
-    setBoardDiagnostics(this.diagnostics());
+    this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
+    this.publish();
   }
 
   pan(dx: number, dy: number): void { this.applyView({ ...this.view, x: this.view.x + dx, y: this.view.y + dy }); }
 
   zoom(factor: number, anchor: Point): void {
-    const local = screenToBoard(anchor, this.view);
+    const point = screenToBoard(anchor, this.view);
     const scale = Math.max(this.fitScale, Math.min(this.fitScale * MAX_ZOOM, this.view.scale * factor));
-    this.applyView({ x: anchor.x - local.x * scale, y: anchor.y - local.y * scale, scale });
+    this.applyView({ x: anchor.x - point.x * scale, y: anchor.y - point.y * scale, scale });
   }
 
   select(point: Point): void {
-    this.selectTile(pickTile(BOARD_FIXTURE, screenToBoard(point, this.view)));
+    this.selectionEvents++;
+    const tile = pickTile(this.board.tiles, screenToBoard(point, this.view));
+    this.onSelect(tile ? { x: tile.x, y: tile.y } : null);
   }
 
-  selectTile(tile: Tile | null): void {
-    this.selected = tile;
-    this.selection.clear();
-    if (this.selected) {
-      this.selection.setDepth(proofDepth(this.selected, 2.2));
-      this.selection.lineStyle(3, 0xffe070, 1).strokePoints(tileFaces(this.selected).top.map(p => new Phaser.Math.Vector2(p.x, p.y)), true);
-      this.root.sort('depth');
-    }
-    setBoardDiagnostics(this.diagnostics());
+  private publish(): void {
+    if (!this.snapshot) return;
+    const matrix = this.root.getWorldTransformMatrix();
+    const surfaceErrors = this.surfaces.flatMap(({ tile, image }) => {
+      const half = image.width / 2;
+      const corners = [{ x: -half, y: -half }, { x: half, y: -half }, { x: half, y: half }, { x: -half, y: half }];
+      return tileFaces(tile).top.map((point, i) => {
+        const expected = matrix.transformPoint(point.x, point.y);
+        const actual = image.getWorldTransformMatrix().transformPoint(corners[i].x, corners[i].y);
+        return Math.hypot(actual.x - expected.x, actual.y - expected.y);
+      });
+    });
+    const units = this.snapshot.units.map(unit => {
+      const image = this.images.get(unit.id)!;
+      const tile = this.byCell.get(cellKey(unit.cell))!;
+      const projected = projectTile(tile);
+      const expected = matrix.transformPoint(projected.x, projected.y);
+      const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
+      return { id: unit.id, unitId: unit.defId, side: unit.side, tile: { ...unit.cell, elevation: tile.elevation },
+        assetId: image.texture.key, origin: { x: image.originX, y: image.originY }, depth: image.depth,
+        position: { x: image.x, y: image.y }, anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
+    });
+    const { x, y, scale } = this.view;
+    document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
+      viewport: this.viewport, transform: this.view, tiles: this.board.tiles, units,
+      activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
+      reachable: this.reachable, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
+      selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
+      depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
+      surfaceCornerError: Math.max(...surfaceErrors),
+      canopies: this.canopies.map(({ tile, graphics }) => ({ tile, depth: graphics.depth, alpha: graphics.alpha })),
+      bounds: { left: x + this.bounds.left * scale, right: x + this.bounds.right * scale,
+        top: y + this.bounds.top * scale, bottom: y + this.bounds.bottom * scale },
+    });
   }
 }

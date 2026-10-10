@@ -9,6 +9,12 @@ export const ELEVATION_STEP = 24;
 export const BASE_THICKNESS = 12;
 export const BOARD_MARGIN = 16;
 export const MAX_BOARD_SCALE = 1.5;
+export const COLUMN_DEPTH_STRIDE = 3;
+
+/** Match orderTiles, reserving each column's layers before the next column. */
+export function tileDepth(tile: { readonly x: number; readonly y: number }, boardHeight: number, layer = 0): number {
+  return ((tile.x + tile.y) * boardHeight + tile.y) * COLUMN_DEPTH_STRIDE + layer;
+}
 
 /** Projects a tile's top-surface center; positive grid axes extend toward the viewer. */
 export function projectTile(tile: Tile): Point {
@@ -31,7 +37,7 @@ export function tileFaces(tile: Tile) {
 }
 
 /** Draw complete columns back to front. Elevation changes geometry, not grid depth. */
-export function orderTiles(tiles: readonly Tile[]): Tile[] {
+export function orderTiles<T extends Tile>(tiles: readonly T[]): T[] {
   return [...tiles].sort((a, b) => (a.x + a.y) - (b.x + b.y) || a.y - b.y || a.x - b.x);
 }
 

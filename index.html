@@ -15,6 +15,14 @@
         <button id="fit-restart" type="button" disabled>Restart proof scene</button>
         <img id="proof-portrait" alt="Fighter portrait" width="48" height="48" hidden />
       </div>
+      <div id="battle-controls" hidden>
+        <p id="battle-active"></p>
+        <div class="fit-controls">
+          <button id="battle-move" disabled>Move selected</button>
+          <button id="battle-next" disabled>Next turn</button>
+          <span id="battle-selection" aria-live="polite">Select a tile</span>
+        </div>
+      </div>
       <details id="fit-board-controls" open>
         <summary>Board controls</summary>
         <div class="fit-controls" aria-label="Occlusion fixtures">

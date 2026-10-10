@@ -10,6 +10,8 @@ import { buildIdentity, collectorConditions, parseMeasureArgs } from './measure-
 // with --url (or FIT_URL) it measures that deployed origin and reads the served build from the page.
 const options = parseMeasureArgs(process.argv.slice(2), process.env);
 const { output, url } = options;
+const proofUrl = new URL(url);
+proofUrl.searchParams.set('scene', 'proof');
 const server = options.remote ? null : spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'pipe' });
 let serverError = '';
 let previewListening = false;
@@ -61,7 +63,7 @@ try {
           page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
           // No routing/interception: Playwright routing would disable the HTTP cache.
           for (const cache of ['cold', 'warm'] as const) {
-            if (cache === 'cold') await page.goto(url);
+            if (cache === 'cold') await page.goto(proofUrl.href);
             else await page.reload();
             await page.getByRole('button', { name: 'Restart proof scene' }).waitFor();
             await page.waitForFunction(() => window.fitDiagnostics?.().controlsUsableMs !== null && window.fitDiagnostics?.().frames.count >= 120);
@@ -80,7 +82,7 @@ try {
       measuredBuild,
       browserVersion: browser.version(),
       host: { platform: platform(), release: release(), arch: arch(), cpu: cpus()[0]?.model, node: process.version },
-      conditions: collectorConditions(options),
+      conditions: { ...collectorConditions(options), sceneUrl: proofUrl.href },
       buildFiles: options.remote ? null : await buildFiles('dist'),
       samples,
     };

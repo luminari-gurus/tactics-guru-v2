@@ -3,7 +3,7 @@ import { pickTile, screenToBoard } from '../src/geometry/picking';
 import { BOARD_FIXTURE } from '../src/diagnostics/boardFixture';
 
 test('picks visible cells through art after transforms, resize and restart', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   for (const viewport of [{width:390,height:844},{width:844,height:390}]) {
     await page.setViewportSize(viewport);
@@ -36,7 +36,7 @@ test('picks visible cells through art after transforms, resize and restart', asy
 
 test('touch tap selects, pinch and its trailing pointer do not', async ({page,browserName}) => {
   test.skip(browserName !== 'chromium');
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const view = await page.evaluate(() => window.fitDiagnostics().board!.transform);
   const x = view.x, y = view.y+120*view.scale;
@@ -55,7 +55,7 @@ test('touch tap selects, pinch and its trailing pointer do not', async ({page,br
 });
 
 test('selection survives a live device pixel ratio change', async ({page}) => {
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const session = await page.context().newCDPSession(page);
   const viewport = page.viewportSize()!;

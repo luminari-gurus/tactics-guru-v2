@@ -1,4 +1,4 @@
-import { MAX_BOARD_SCALE } from '../geometry/iso';
+import { MAX_BOARD_SCALE, tileDepth } from '../geometry/iso';
 import { MAX_ZOOM } from '../geometry/picking';
 import { TERRAIN_MATERIALS } from '../terrain/materials';
 import { BOARD_SIZE } from './boardFixture';
@@ -57,5 +57,5 @@ export const PROOF_FIXTURES = {
 export type ProofFixture = keyof typeof PROOF_FIXTURES;
 // Tile columns get one slot, then art, then occupants. Elevation never changes depth.
 export function proofDepth(tile: { x: number; y: number }, layer: number): number {
-  return ((tile.x + tile.y) * BOARD_SIZE + tile.y) * 3 + layer;
+  return tileDepth(tile, BOARD_SIZE, layer);
 }

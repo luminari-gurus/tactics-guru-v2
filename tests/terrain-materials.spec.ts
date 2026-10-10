@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { TERRAIN_MATERIALS } from '../src/terrain/materials';
 
 test('every terrain source decodes as an opaque square and maps to a rendered tile', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   for (const material of TERRAIN_MATERIALS) {
     const dimensions = await page.evaluate(async url => {

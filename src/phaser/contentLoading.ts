@@ -40,6 +40,7 @@ export function loadContentAssets(scene: Phaser.Scene, catalog: ContentCatalog, 
   });
   scene.load.on('loaderror', onError);
   scene.load.once('complete', onComplete);
-  for (const asset of Object.values(catalog.assets)) scene.load.image(asset.id, asset.runtimePath, { responseType: 'blob', timeout: CONTENT_LOAD_TIMEOUT_MS });
-  scene.load.start();
+  const pending = Object.values(catalog.assets).filter(asset => !scene.textures.exists(asset.id));
+  for (const asset of pending) scene.load.image(asset.id, asset.runtimePath, { responseType: 'blob', timeout: CONTENT_LOAD_TIMEOUT_MS });
+  if (pending.length) scene.load.start(); else onComplete();
 }

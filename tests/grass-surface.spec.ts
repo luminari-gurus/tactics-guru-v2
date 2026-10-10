@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('square grass material projects all corners exactly onto the shared tile geometry', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toHaveText('Ready');
   const asset = await page.evaluate(async () => {
     const image = new Image();

@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { bindBoardInput } from '../../src/phaser/BoardInput';
-import type { BoardRenderer } from '../../src/phaser/BoardRenderer';
+import type { BoardInputTarget } from '../../src/phaser/BoardInput';
 
 interface Fake {
   canvas: HTMLCanvasElement;
@@ -36,8 +36,8 @@ function fake(): Fake {
   return { canvas, listeners, documentListeners, captured, released, document, board };
 }
 
-function board(fake: Fake): BoardRenderer {
-  return { pan: (dx: number) => { fake.board.pans.push(dx); }, select: () => { fake.board.selections++; } } as unknown as BoardRenderer;
+function board(fake: Fake): BoardInputTarget {
+  return { pan: (dx: number) => { fake.board.pans.push(dx); }, select: () => { fake.board.selections++; }, zoom: () => {} };
 }
 
 function pointer(type: string, id: number, x: number, y: number): PointerEvent {
@@ -54,6 +54,18 @@ it('removes every listener and restores touch style on shutdown', () => {
   expect(f.listeners.size).toBe(0);
   expect(f.documentListeners.size).toBe(0);
   expect(f.canvas.style.touchAction).toBe('auto');
+});
+
+it('suppresses a trailing release after wheel zoom while a pointer is held', () => {
+  const f = fake();
+  bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));
+  f.listeners.get('pointerdown')!(pointer('pointerdown', 1, 100, 100));
+  f.listeners.get('wheel')!({ clientX: 100, clientY: 100, deltaY: -100, preventDefault() {} } as unknown as Event);
+  f.listeners.get('pointerup')!(pointer('pointerup', 1, 100, 100));
+  expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerdown')!(pointer('pointerdown', 2, 100, 100));
+  f.listeners.get('pointerup')!(pointer('pointerup', 2, 100, 100));
+  expect(f.board.selections).toBe(1);
 });
 
 it('drops a pointer that is down when the page is hidden so resume cannot pan without a press', () => {
