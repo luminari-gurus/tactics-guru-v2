@@ -100,7 +100,10 @@ export class BattleAudio {
       // HTML5 media is primed silently inside the gesture; never queue a historical cue.
       const resumed = context ? context.resume() : Promise.all([...this.media.values()].map(({tag})=>{
         tag.muted = true;
-        return tag.play().then(()=>{tag.pause();tag.currentTime=0;tag.muted=false;});
+        return tag.play().then(()=>{
+          if(!this.live || attempt !== this.attempt) return;
+          tag.pause();tag.currentTime=0;tag.muted=false;
+        });
       }));
       void resumed.then(()=>{
         if (!this.live || attempt !== this.attempt) return;
