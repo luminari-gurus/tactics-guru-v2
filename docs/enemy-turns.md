@@ -1,6 +1,6 @@
 # Enemy turns (#9)
 
-`planEnemyTurn(snapshot, unitId, catalog)` chooses commands for the living active enemy. It accepts equivalent unit-array permutations by sorting a copied array before the shared snapshot checks; it leaves inputs and RNG unchanged. Shared intent rejections are preserved; an active player returns `notEnemyUnit`. The catalog must be trusted and immutable, as for other domain APIs.
+`planEnemyTurn(snapshot, unitId, catalog)` chooses commands for the living active enemy. It accepts equivalent unit-array permutations by sorting a copied array before the shared snapshot checks; it leaves inputs and RNG unchanged. Before copying or sorting, it validates the original record/array shapes and ID descriptors so hidden fields, custom prototypes and accessors reject without evaluating getters. Only unit order is normalized; all remaining snapshot checks stay with the shared reader. Shared intent rejections are preserved; an active player returns `notEnemyUnit`. The catalog must be trusted and immutable, as for other domain APIs.
 
 Candidates use `previewMovement`, `moveUnit` snapshots and `previewAttack`. Owned ordinary attacks only are considered. Expected damage is the sum of damage across the 20 d20 faces, including natural 1 misses and natural 20 criticals. The preview supplies all accuracy, AC, height and damage modifiers.
 

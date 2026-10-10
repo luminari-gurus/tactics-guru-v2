@@ -6,6 +6,7 @@ import { moveUnit, previewMovement } from './grid';
 import { manhattanDistance } from './targeting';
 import { dispatch } from './turns';
 import type { BattleEvent, BattleState, Command, Rejection } from './types';
+import { isDenseArray, isPlainRecord } from './validation';
 
 export type EnemyRejection = Rejection | { readonly ok: false; readonly reason: 'notEnemyUnit' };
 export type EnemyPlan = { readonly ok: true; readonly commands: readonly Command[] } | EnemyRejection;
@@ -15,10 +16,18 @@ export type EnemyRun = ({ readonly ok: true; readonly state: BattleState } |
 
 /** The shared reader requires ID order; accept equivalent permutations without mutating the caller's units. */
 function readEnemyState(input: unknown, catalog: ContentCatalog) {
-  if (input === null || typeof input !== 'object' || !('units' in input) || !Array.isArray(input.units) ||
-    !input.units.every(u => u !== null && typeof u === 'object' && typeof u.id === 'number'))
-    return { ok: false, reason: 'invalidState' } as const;
-  return readBattleState({ ...input, units: [...input.units].sort((a, b) => a.id - b.id) }, catalog);
+  // Check descriptors before copying: spread would erase hidden fields/prototypes and invoke getters.
+  if (!isPlainRecord(input) || !Reflect.ownKeys(input).every(key => {
+    const descriptor = Object.getOwnPropertyDescriptor(input, key)!;
+    return descriptor.enumerable && Object.hasOwn(descriptor, 'value');
+  }) || !Object.hasOwn(input, 'units') || !isDenseArray(input.units) || !input.units.every(u => {
+    if (!isPlainRecord(u)) return false;
+    const id = Object.getOwnPropertyDescriptor(u, 'id');
+    return id !== undefined && id.enumerable && Object.hasOwn(id, 'value') && typeof id.value === 'number';
+  })) return { ok: false, reason: 'invalidState' } as const;
+  // Only IDs are inspected here; the shared reader still owns all remaining state/unit validation.
+  const units = [...input.units] as { id: number }[];
+  return readBattleState({ ...input, units: units.sort((a, b) => a.id - b.id) }, catalog);
 }
 type Position = { readonly cell: CellPosition; readonly cost: number; readonly state: BattleState; readonly move?: Command };
 type AttackCandidate = Position & { readonly command: Extract<Command, { type: 'useAbility' }>; readonly score: number; readonly targetId: number };

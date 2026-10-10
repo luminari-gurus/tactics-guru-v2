@@ -92,6 +92,31 @@ describe('enemy candidate selection', () => {
       expect(planEnemyTurn({ ...state, units }, 3, catalog)).toEqual({ ok: false, reason: 'invalidState' });
     }
   });
+  it.each(['hidden field', 'record prototype', 'array field', 'array prototype', 'units getter', 'array getter', 'id getter', 'other getter'])(
+    'rejects %s before normalization without evaluating accessors', kind => {
+      const { state, catalog } = setup();
+      const getter = vi.fn(() => { throw Error('untrusted getter executed'); });
+      if (kind === 'hidden field') Object.defineProperty(state, 'unexpected', { value: true });
+      if (kind === 'record prototype') Object.setPrototypeOf(state, { unexpected: true });
+      if (kind === 'array field') Object.defineProperty(state.units, 'extra', { value: true, enumerable: true });
+      if (kind === 'array prototype') Object.setPrototypeOf(state.units, Object.create(Array.prototype));
+      if (kind === 'units getter') Object.defineProperty(state, 'units', { enumerable: true, get: getter });
+      if (kind === 'array getter') Object.defineProperty(state.units, '0', { enumerable: true, get: getter });
+      if (kind === 'id getter') Object.defineProperty(state.units[0], 'id', { enumerable: true, get: getter });
+      if (kind === 'other getter') Object.defineProperty(state, 'round', { enumerable: true, get: getter });
+      expect(readBattleState(state, catalog)).toEqual({ ok: false, reason: 'invalidState' });
+      expect(planEnemyTurn(state, 3, catalog)).toEqual({ ok: false, reason: 'invalidState' });
+      expect(runEnemyTurn(state, 3, catalog)).toEqual({ ok: false, reason: 'invalidState',
+        state: undefined, commands: [], events: [] });
+      expect(getter).not.toHaveBeenCalled();
+    });
+  it('normalizes reversed units for execution without mutating the input', () => {
+    const { state, catalog } = setup();
+    const reversed = { ...state, units: [...state.units].reverse() };
+    const before = JSON.stringify(reversed);
+    expect(runEnemyTurn(reversed, 3, catalog)).toEqual(runEnemyTurn(state, 3, catalog));
+    expect(JSON.stringify(reversed)).toBe(before);
+  });
   it('ignores defeated targets and rejects completed battles', () => {
     const { state, catalog } = setup(true);
     const one = changeUnit(state, 1, { hp: 0 });
