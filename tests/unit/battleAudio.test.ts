@@ -103,6 +103,16 @@ describe('scene audio lifetime',()=>{
     f.audio.setEnabled(true);f.audio.destroy();const count=f.render.mock.calls.length;resolve();await flush();
     expect(f.render).toHaveBeenCalledTimes(count);expect(vi.getTimerCount()).toBe(0);expect(f.sound.listenerCount('unlocked')).toBe(0);
   });
+  it('uses the running Web Audio context after Phaser abandons a rejected body unlock',async()=>{
+    const f=fixture();f.sound.locked=true;f.context.state='suspended';
+    f.context.resume.mockRejectedValue(Error('refused'));f.audio.setEnabled(true);await flush();
+    expect(f.audio.snapshot().status).toBe('blocked');f.audio.present(1,move);
+    f.context.resume.mockImplementation(()=>{f.context.state='running';return Promise.resolve();});
+    f.audio.unlock();await flush();
+    expect(f.sound.locked).toBe(true);expect(f.audio.snapshot().status).toBe('ready');
+    f.audio.present(1,move);expect(f.audio.snapshot().started).toBe(0);
+    f.audio.present(2,move);expect(f.audio.snapshot().started).toBe(1);f.audio.destroy();
+  });
   it.each(['refused','throw','stalled'] as const)('contains %s playback and clears its sequence',async mode=>{
     const f=fixture();f.audio.setEnabled(true);await flush();
     f.sound.add.mockImplementation(()=>{const s=new Sound();if(mode==='refused')s.play.mockReturnValue(false);if(mode==='throw')s.play.mockImplementation(()=>{throw Error('play failed');});f.sounds.push(s);return s;});

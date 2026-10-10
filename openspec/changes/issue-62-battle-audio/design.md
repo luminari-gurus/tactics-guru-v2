@@ -51,7 +51,7 @@ Keep a boolean preference on the existing `BattleScene` instance, initialized to
 
 Expose the control through `BattleHud` callbacks and state rendering. Keep mute available during player/enemy presentation and avoid including it in gameplay action-disable logic. Give it an accessible pressed state and a short status for loading, blocked or unavailable sound; muted/enabled preference is distinct from actual context readiness. The modal's existing focus capture still applies.
 
-Request `AudioContext.resume()` synchronously inside the user's enabling/retry handler, before yielding. The proof's two-second wall-clock unlock watchdog is the starting bound. A timeout or rejection updates sound status and permits another gesture. A successful unlock only enables future cues. HTML5 sound fallback uses Phaser's existing lock/play result checks; a no-audio manager reports unavailable without throwing.
+Request `AudioContext.resume()` synchronously inside the user's enabling/retry handler, before yielding. The proof's two-second wall-clock unlock watchdog is the starting bound. A timeout or rejection updates sound status and permits another gesture. A successful unlock only enables future cues. Web Audio availability follows the live AudioContext state: Phaser removes its body unlock listeners on rejection and can leave its initial manager lock stale after an explicit retry succeeds. HTML5 sound fallback uses Phaser's existing lock/play result checks; a no-audio manager reports unavailable without throwing.
 
 Alternative considered: binding battle audio to `#audio-play` or persisting preference across reloads. The former is hidden in battle mode and owned by the proof adapter; the latter adds storage behavior outside this task.
 

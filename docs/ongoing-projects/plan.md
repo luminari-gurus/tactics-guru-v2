@@ -9,9 +9,9 @@
 | Owner | `moshehbenavraham` |
 | Branch | `work/issue-62-battle-audio` |
 | Main baseline | `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a` |
-| Current runtime source | `a0beaab` (late HTML5 guard), committed and pushed; full suite still serving `5b22bf5` |
+| Current runtime source | `a0beaab` (late HTML5 guard); current clean build `6cd67e2`, committed and pushed |
 | OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 8/13 tasks complete (measurement task reopened for the final guard build) |
-| Current step | Full suite finished: 206 passed / 1 aggregate test timeout; targeted recheck, final capture and PR remain |
+| Current step | Landscape recheck 3/3 passed; full rerun exposed clock race and stale Web Audio lock; both repaired, final validation restarts next |
 | QA / raw comparison | [Report](../qa/issue-62-battle-audio.md), [72 samples](../qa/issue-62/baseline-candidate.json) |
 
 The user explicitly requested implementation of this concrete plan, use of ablation and OpenSpec, autonomous issue resolution, commits/pushes and a reviewable PR. That supersedes the earlier planning-only approval checkpoint. No additional implementation approval is pending.
@@ -50,7 +50,7 @@ Inspection justified two implementation refinements: owned abortable fetch/decod
 
 `src/domain`, `BattleSession`, `ProofAudio`, package manifests and lockfile are unchanged. Audio is called beside the HUD log; only the existing animation promise completes a presentation. Request timeout is 5 s, overall load/decode 6.5 s, unlock 2 s, and playback cue duration + 500 ms. Failed loading retries on a new scene; unlock/playback failures permit explicit Retry sound. No automatic backlog or request retries.
 
-The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1 is proven by policy fixtures and desktop complete wins/losses with identical sound-on/off state/replay; the final all-profile run is pending. AC2–AC4 have focused unit and browser proof, including all-profile fallback/mute checks; full regressions are pending. AC5 measurements and AC6 physical-gap documentation are complete; the final suite and publication audit remain.
+The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1 is proven by policy fixtures and desktop complete wins/losses with identical sound-on/off state/replay; the final all-profile run is pending. AC2–AC4 have focused unit and browser proof, including all-profile fallback/mute checks; full regressions are pending. AC5 initial measurements and AC6 physical-gap documentation are complete; final measurements, the full current-build suite and publication audit remain.
 
 ## Verification results and commands
 
@@ -63,7 +63,7 @@ The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) rema
 | `npm run build` | Passed; existing >500 kB chunk warning retained |
 | `npm test -- tests/battle-audio.spec.ts --project desktop` | Initial 12-test implementation suite passed; final suite adds more assertions |
 | `npm test -- tests/battle-audio.spec.ts --grep 'HTML5\|mute, hidden'` | Final six targeted checks passed across desktop/portrait/landscape |
-| `npm test` | 206 passed / 1 aggregate timeout on `5b22bf5`; corrected comparison and final HTML5 guard recheck next |
+| `npm test` | 206 passed / 1 aggregate timeout on `5b22bf5`; landscape recheck passed 3/3 on `6cd67e2`; full current-build suite running |
 | `openspec validate issue-62-battle-audio --strict` | Passed |
 | `git diff --check` | Passed |
 
@@ -92,14 +92,11 @@ The [physical matrix](../qa/issue-62-battle-audio.md#physical-device-handoff-for
 
 ## Resume and delivery procedure
 
-- Full browser process `99724` / PID `1922848` is terminal: 206 passed / 1 aggregate comparison timeout. Log: `/tmp/guru-issue62-final-browser.log`. Run the corrected landscape seed-1 comparison and final HTML5/mute cases against the current build, then capture final clean measurements. Reuse the unaffected full-suite results and state full/recheck results separately.
-- Baseline worktree: `/tmp/guru-issue62-baseline`; candidate clean runtime worktree: `/tmp/guru-issue62-candidate`. The comparison is finished; raw evidence is committed with final QA. The collector now selects a free port and handles an already-exited preview child. It preserved the unrelated pre-existing server on port 4175.
-- After the full run: update its exact result in this plan and QA; mark verified OpenSpec tasks 3.2, 3.3 and 4.1. Audit AC1–AC6 and the complete diff, validate documentation links/OpenSpec/whitespace and confirm only task-owned changes remain.
-- Commit/push remaining collector/evidence/docs changes; open the PR against main with `Refs #62`, QA links, validation and explicit physical/performance gaps. Verify remote head, PR/issue/branch links, then mark task 4.4 and publish the final handoff update. Keep the OpenSpec change unarchived until merged/accepted.
-- Existing commits: planning `7959063`, implementation `2d87b64`, fallback repair `5b22bf5`. No release tag is warranted for an unmerged review branch; the repository had no tag convention to advance. Do not merge, close issues or alter deployment.
+- Full browser process `4300` is terminal: 14 passed, 2 failed, 1 interrupted, 190 not run; log `/tmp/guru-issue62-green-browser.log`. Traced desktop recheck `97926` is terminal: 6/6 passed after the clock fixture repair. A deterministic initial-lock browser reproduction then failed RED; runtime now removes the redundant Web Audio manager-lock check. Build this correction and run targeted checks, then the full configured suite. Earlier full process `99724` is terminal: 206 passed / 1 aggregate comparison timeout, retained in `/tmp/guru-issue62-final-browser.log` and QA.
+- The corrected landscape seed-1 comparison and final HTML5/mute paths passed 3/3 (1.5 minutes) on `6cd67e2`. Log: `/tmp/guru-issue62-recheck-landscape.log`. The full suite now verifies the final guard and comparison allowance across every profile.
+- After the full suite, run the collector against `/tmp/guru-issue62-baseline/dist` (clean `9f785df`) and `/tmp/guru-issue62-candidate/dist` (clean `6cd67e2`) into `docs/qa/issue-62/final-baseline-candidate.json`. Preserve the initial capture and all three warm first-player failures. Do not run competing task browsers or disturb the unrelated preview on port 4175.
+- Update exact results in this plan and QA; mark OpenSpec tasks 3.2, 3.3, 4.1 and 4.2 only when their checks finish. Audit AC1–AC6, documentation links, strict OpenSpec, whitespace and the complete issue-specific diff.
+- Commit/push the remaining evidence/docs; open a draft PR against main with `Refs #62`, QA links, validation and explicit physical/performance gaps. Verify remote head, PR/issue/branch links, then mark task 4.4 and publish the final handoff update. Keep the OpenSpec change unarchived until merged/accepted.
+- Published commits: planning `7959063`, implementation `2d87b64`, HTML5 repair `5b22bf5`, late callback guard `a0beaab`, collector/evidence/comparison allowance `6cd67e2`. No release tag is warranted for an unmerged review branch; the repository had no tag convention to advance. Do not merge, close issues or alter deployment.
 
-### Latest continuation note
-
-A final HTML5 callback audit reproduced late priming settlement pausing a newer cue after retry (RED). The callback now checks live/attempt before touching its media; 27 focused tests and typecheck pass. The full process above is still testing build `5b22bf5`; finish that run, then build the correction and run the affected HTML5/mute browser checks across all profiles. Reuse unaffected full-suite results, rerun the unit suite, and refresh clean baseline/candidate measurements because the bundle bytes changed. Preserve the earlier raw samples and their three warm first-player failures; do not replace them with a favorable later run.
-
-- Full-run follow-up: landscape seed-1 sound-on/off comparison timed out at its aggregate 240 s during the second advancing battle. Its allowance is now 360 s (two existing 180 s battle allowances), with the 10 s per-turn invariant retained. Finish the current run and recheck this exact case plus the final HTML5 guard path; record full and rerun results separately.
+Latest failure audit: interruption fixture attempted to pause at a 100 ms future Date read, which was already in the past by the next protocol request. It now uses fixed clock anchors, retaining all playback/command assertions and budgets. The later retry failure was traced to Phaser retaining its initial manager lock after rejection. A deterministic unit and real-control browser test reproduced it RED. Live AudioContext state is now the Web Audio authority; HTML5 retains the manager lock. Full validation and measurements must use this final correction.
