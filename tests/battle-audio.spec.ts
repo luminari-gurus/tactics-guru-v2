@@ -50,9 +50,10 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
 });
 
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
-  const found=errors(page);await page.clock.install();await page.goto('/');await ready(page);await enable(page);
+  // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
+  const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);await enable(page);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.clock.pauseAt(start+60000);
   const before=(await session(page)).state.commandCount;
   await page.locator('#dialog-confirm').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
@@ -72,7 +73,7 @@ test('mute, hidden and context interruptions discard active feedback while comma
   await ready(page);await page.locator('#battle-sound').click();expect((await audio(page)).enabled).toBe(false);
   await enable(page);
   await page.locator('#fit-restart').click();await ready(page); // Seed 2 begins with a player.
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
+  await page.clock.pauseAt(start+120000);
   let enemy:Awaited<ReturnType<typeof session>>|undefined;
   for(let i=0;i<12;i++) {
     const current=await session(page),command=current.replay.commands.at(-1);
@@ -92,6 +93,9 @@ for(const mode of ['reject','pending'] as const) test(`gesture unlock ${mode} re
   const found=errors(page);
   await page.addInitScript(mode=>{
     const original=AudioContext.prototype.resume;
+    const state=Object.getOwnPropertyDescriptor(BaseAudioContext.prototype,'state')!.get!;
+    // Guarantee Phaser sees the initial lock, even when headless autoplay starts running.
+    Object.defineProperty(AudioContext.prototype,'state',{get(){return window.__allowAudio?state.call(this):'suspended';}});
     AudioContext.prototype.resume=function(){return window.__allowAudio?original.call(this):mode==='reject'?Promise.reject(Error('refused')):new Promise(()=>{});};
   },mode);
   await page.goto('/');await ready(page);await page.locator('#battle-sound').click();

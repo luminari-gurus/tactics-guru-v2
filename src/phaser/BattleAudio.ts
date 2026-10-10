@@ -57,11 +57,13 @@ export class BattleAudio {
   }
 
   private context(): AudioContext|null { return 'context' in this.host.sound ? this.host.sound.context : null; }
+  // Phaser can retain its initial Web Audio lock after a rejected body-gesture attempt.
+  // The live context is authoritative; only HTML5 needs the manager's lock flag.
   private contextState(): string { return this.context()?.state ?? (this.host.sound.locked ? 'locked' : 'running'); }
   snapshot(): BattleAudioSnapshot {
     const context = this.contextState();
     const status = this.load === 'unavailable' ? 'unavailable' : !this.enabled ? 'muted' : document.hidden ? 'hidden'
-      : this.unlockTimer ? 'unlocking' : this.error || this.blurred || context !== 'running' || this.host.sound.locked ? 'blocked'
+      : this.unlockTimer ? 'unlocking' : this.error || this.blurred || context !== 'running' ? 'blocked'
       : this.load === 'loading' ? 'loading' : 'ready';
     return {enabled:this.enabled,status,load:this.load,context,error:this.error,generation:this.generation,lastToken:this.lastToken,
       started:this.started,completed:this.completed,dropped:this.dropped,active:this.active,recent:[...this.recent],ownedSounds:this.sounds.size};
