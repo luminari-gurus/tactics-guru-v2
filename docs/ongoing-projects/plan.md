@@ -8,11 +8,11 @@
 | Parent / acceptance trackers | [#57](https://github.com/luminari-gurus/tactics-guru-v2/issues/57), [#11](https://github.com/luminari-gurus/tactics-guru-v2/issues/11), [#1](https://github.com/luminari-gurus/tactics-guru-v2/issues/1) |
 | Owner | `moshehbenavraham` |
 | Branch | `work/issue-62-battle-audio` |
-| Review | [Draft PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63), final validation pending |
+| Review | [Draft PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63), ready for review; acceptance gaps explicit |
 | Main baseline | `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a` |
 | Current runtime source | `ca1923a` (Web Audio retry and fixed clock anchors), committed and pushed |
-| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 12/13 tasks complete; final publication audit remains |
-| Current step | Implementation and evidence complete; final PR/head verification and handoff publication remain |
+| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 13/13 tasks complete; unarchived for review and acceptance |
+| Current step | Implemented, verified, pushed and ready for review; physical/usability/frame acceptance remains with #11 |
 | QA / raw comparison | [Report](../qa/issue-62-battle-audio.md), [initial](../qa/issue-62/baseline-candidate.json), [contended](../qa/issue-62/contended-baseline-candidate.json), [final](../qa/issue-62/final-baseline-candidate.json) captures |
 
 The user explicitly requested implementation of this concrete plan, use of ablation and OpenSpec, autonomous issue resolution, commits/pushes and a reviewable PR. That supersedes the earlier planning-only approval checkpoint. No additional implementation approval is pending.
@@ -51,7 +51,7 @@ Inspection justified two implementation refinements: owned abortable fetch/decod
 
 `src/domain`, `BattleSession`, `ProofAudio`, package manifests and lockfile are unchanged. Audio is called beside the HUD log; only the existing animation promise completes a presentation. Request timeout is 5 s, overall load/decode 6.5 s, unlock 2 s, and playback cue duration + 500 ms. Failed loading retries on a new scene; unlock/playback failures permit explicit Retry sound. No automatic backlog or request retries.
 
-The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1–AC4 have policy/lifecycle and actual-control proof across all profiles. AC5 measurements and AC6 physical-gap documentation are complete; the publication audit remains. Runtime is `ca1923a`; the final existing-test actor assertion correction is `799f28d`.
+The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1–AC4 have policy/lifecycle and actual-control proof across all profiles. AC5 measurements and AC6 physical-gap documentation are complete; the publication audit is complete. Runtime is `ca1923a`; the final existing-test actor assertion correction is `799f28d`.
 
 ## Verification results and commands
 
@@ -93,9 +93,10 @@ Main lacks #61's battle frame instrumentation: F1 p50 ≤16.7 ms / p95 ≤20 ms 
 
 Keep PR #63 a draft with `Refs #62` while those acceptance gaps remain. #57/#11/#1 remain open; the OpenSpec change stays unarchived until merged and accepted.
 
-## Delivery audit remaining
+## Review handoff
 
-- Verify all raw samples, local links, asset hashes, strict OpenSpec and whitespace. Commit/push the task-specific collector/evidence/docs changes.
-- Update draft PR #63 with the exact full-run/recheck result, budget evidence and remaining hardware/usability/frame gaps. Verify its head equals the pushed branch and its base remains main; then complete OpenSpec task 4.4 and publish the final handoff note.
-- Both browser and measurement processes are terminal. Remove only `/tmp/guru-issue62-baseline` and `/tmp/guru-issue62-candidate` after confirming evidence is committed. Preserve the unrelated worktree and pre-existing preview on 4175.
-- No release tag is warranted for this unmerged review branch. Do not merge, close issues or alter deployment as part of this handoff.
+- [PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) is open as a draft against main, references #62 and has a verified issue backlink. The PR body records exact validation counts and performance/physical gaps. All 13 tracked OpenSpec tasks are complete; the change remains unarchived.
+- Runtime proof and final captures identify `ca1923a`; `799f28d` corrects only the existing-test actor assertion; `204a19b` adds the final raw evidence and collector host activity. Later handoff changes are documentation/task status only. The full run plus focused rechecks cover all configured browser cases; do not repeat unaffected green checks without new evidence.
+- Review the cue mapping, optional media lifetime, committed-batch integration and QA. #11 owns physical audio observations, first-player usability acceptance and F1/F2 frame results. Preserve all three raw captures and use a new output path for any follow-up measurement.
+- The two task-owned measurement worktrees were removed after their hashes/evidence were verified and committed. The unrelated worktree and preview on 4175 were preserved. No task browser or measurement process remains active.
+- No release tag was created for this unmerged review branch. No merge, issue closure, manual deployment, deployment configuration change or OpenSpec archive was performed.
