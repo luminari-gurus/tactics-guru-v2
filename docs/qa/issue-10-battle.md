@@ -55,6 +55,16 @@ Counts include both sides. [Loss record](issue-10/replay-loss.json) and [win rec
 
 Retained screenshots: [portrait](issue-10/portrait.png), [short landscape](issue-10/landscape.png), [victory](issue-10/victory.png), [defeat](issue-10/defeat.png).
 
+## Independent review follow-up — PR #55
+
+The Linux review reproduced four browser failures at `54820f5`: the lock test sampled a one-step animation after it could finish, and the portrait restart test required the previous seed's camera origin despite a different HUD height. Both were test assumptions, not runtime defects.
+
+- Pause the Playwright clock before confirming the move, assert presentation/disabled controls and exactly one accepted command, then restart during held presentation and resume. Forced pointer clicks are confined to the paused-clock interval because animation-based actionability cannot settle there; normal UI handlers still execute. No production test hook was added.
+- Compute fresh camera fit from the original local board/art extent and current panel boundary. Assert reset scale/x/y precisely; retain existing same-session camera checks.
+- RED: original focused run reproduced 4 failures / 2 passes. GREEN: both corrected tests repeated twice on all three profiles, **12 passed**, without retries.
+- Full Linux validation: **260 unit tests**, **77 content tests**, both strict type checks/build, `openspec validate --all --strict`, and `git diff --check` passed. `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/playwright-browsers/chromium-1228/chrome-linux64/chrome npm test`: **168 passed (12.2 minutes)**.
+- Independent follow-up review found no concrete blockers. Only tests and this QA note changed; existing bundle warning and physical-device/performance limits remain.
+
 ## Acceptance limits and #11 hand-off
 
 Browser evidence uses installed Chrome and Chromium mobile emulation. No physical iPhone Safari/Chrome or Android hardware acceptance, deployed loading/frame budgets, production deployment, new assets/audio or AI/rule rebalance is claimed. #6 remains open for its device gate; #11 must validate full battles, audio/lifecycle/device behavior and deployed performance. Deferred: saves/resume, short route, inventory/equipment, procedural generation, advanced combat, editor, analytics and backend.

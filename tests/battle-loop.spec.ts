@@ -66,6 +66,7 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
 }
 
 test('keyboard selection, confirmation lock, touch and restart discard old gestures and previews',async({page})=>{
+  await page.clock.install();
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.getByRole('button',{name:'Move',exact:true}).click();
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
@@ -80,10 +81,17 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
   await page.getByRole('button',{name:'Review action'}).click();
   await page.keyboard.press('Tab');expect(await page.evaluate(()=>document.activeElement?.closest('dialog')!==null)).toBe(true);
-  await page.locator('#dialog-confirm').click();
+  // Freeze RAF/timers before accepting the move: lock assertions and Restart
+  // must run during presentation, even when the selected path is only one step.
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  // With RAF paused, skip animation-based actionability checks, not the UI handlers.
+  await page.locator('#dialog-confirm').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   await expect(page.getByRole('button',{name:'Basic attack',exact:true})).toBeDisabled();
-  await page.getByRole('button',{name:'Restart battle',exact:true}).click();
+  expect((await session(page)).replay.commands).toHaveLength(initial.replay.commands.length+1);
+  await expect(page.getByRole('button',{name:'Restart battle',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});
+  await page.clock.resume();
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const fresh=await session(page);expect(fresh.state.seed).toBe(2);expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);

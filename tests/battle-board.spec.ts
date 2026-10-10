@@ -74,7 +74,21 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
   expect(freshSession.replay.initial.seed).toBe(2);
   expect(freshSession.replay.commands.every((c:any)=>freshSession.state.units.find((u:any)=>u.id===c.unitId).side==='enemy')).toBe(true);
   expect(restarted.objectCount).toBe(initial.objectCount);
-  expect(restarted.transform).toEqual(initial.transform);
+  // A different seed/active hero can change HUD height. Reset must fit the
+  // current available area rather than reuse the prior seed's absolute origin.
+  const panelBottom=await page.locator('#fit-panel').evaluate(el=>el.getBoundingClientRect().bottom);
+  // Reported bounds are screen-space and include canopy/unit art; recover the
+  // unchanged map's local extent from the original fit, not the reset transform.
+  const localBounds={
+    left:(initial.bounds.left-initial.transform.x)/initial.transform.scale,
+    right:(initial.bounds.right-initial.transform.x)/initial.transform.scale,
+    top:(initial.bounds.top-initial.transform.y)/initial.transform.scale,
+    bottom:(initial.bounds.bottom-initial.transform.y)/initial.transform.scale,
+  };
+  const expectedFit=fitBoard(localBounds,restarted.viewport,panelBottom);
+  expect(restarted.transform.scale).toBeCloseTo(expectedFit.scale,5);
+  expect(restarted.transform.x).toBeCloseTo(expectedFit.x,5);
+  expect(restarted.transform.y).toBeCloseTo(expectedFit.y,5);
   await page.mouse.click(restarted.transform.x + local.x * restarted.transform.scale, restarted.transform.y + local.y * restarted.transform.scale);
   expect((await settledReport(page)).selectionEvents).toBe(1);
 });
