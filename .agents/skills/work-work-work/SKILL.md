@@ -1,13 +1,14 @@
 ---
 name: work-work-work
-description: Select the best ready-for-work GitHub issue, assign the caller, publish a branch, prepare an OpenSpec plan, wait for approval, then implement and open a PR. Use when the user invokes /work-work-work or asks to pick up the next ready backlog issue.
+description: Refresh backlog readiness, select the best ready-for-work GitHub issue, assign the caller, publish a branch, prepare an OpenSpec plan, wait for approval, then implement and open a PR. Use when the user invokes /work-work-work or asks to pick up the next ready backlog issue.
 ---
 
 # Work work work
 
-Invoking this workflow authorizes issue assignment, branch publication, and PR
-creation. Implementation requires explicit approval of the concrete OpenSpec
-plan. Creating this skill or discussing it does not invoke the workflow.
+Invoking this workflow authorizes evidence-backed backlog readiness labeling,
+issue assignment, branch publication, and PR creation. Implementation requires
+explicit approval of the concrete OpenSpec plan. Creating this skill or
+discussing it does not invoke the workflow.
 
 ## Select and claim
 
@@ -15,21 +16,41 @@ plan. Creating this skill or discussing it does not invoke the workflow.
    repository and default branch with `gh repo view --json nameWithOwner,defaultBranchRef`.
    Resolve the caller with `gh api user --jq .login`, unless the user explicitly
    identifies a different GitHub login. Do not guess the caller from Git author settings.
-2. Read the entire open backlog with pagination (`gh api --paginate` or a limit
-   verified to include all results), including bodies, labels and assignees.
-   Candidates must have the exact `ready for work` label. Inspect relevant
-   comments, GitHub dependency relationships, and open PRs. Verify prerequisites
-   against merged work on the default branch; a readiness label alone is insufficient.
-   Exclude blocked issues, unresolved prerequisites, issues assigned to other
-   people, and work already covered by an active branch/PR or this caller's
-   ongoing task. Never treat a parent/epic reference as a blocking dependency.
-3. Prefer issues that unblock the most actionable downstream work, then critical
+2. **Refresh backlog readiness before selecting any issue.** Read the entire
+   open backlog with pagination (`gh api --paginate` or a limit verified to
+   include all results), including bodies, labels and assignees. Do not filter
+   the initial scan to issues already labeled `ready for work`: check new and
+   previously unready issues for newly satisfied prerequisites. Inspect relevant
+   comments, GitHub dependency relationships, merged work on the default branch,
+   and active branches/open PRs. Never treat a parent/epic reference as a blocker.
+   An unmerged prerequisite PR is not a completed prerequisite.
+
+   Promote an issue only when its implementation scope and acceptance criteria
+   are concrete and verifiable, every actual prerequisite is complete, and no
+   unresolved product decision or blocker remains. Do not relabel another
+   person's assigned work or issues already covered by an active branch/PR.
+   Re-read each proposed promotion immediately before updating it to catch
+   changed status, assignments, dependencies or ongoing work. Add only the exact
+   `ready for work` label with
+   `gh issue edit <number> --repo <owner/repo> --add-label "ready for work"`;
+   preserve all existing labels/assignees and do not close issues. Read back the
+   exact issue to verify the label, and record the issue link plus evidence for
+   its readiness. If evidence is incomplete, leave it unchanged and report the
+   gap rather than guessing or broadening scope. If the label/update cannot be
+   performed, report the blocker; do not claim promotion succeeded.
+3. Refresh the backlog after the readiness pass so newly promoted issues compete
+   with existing ready issues. Candidates must have the exact `ready for work`
+   label; a label alone is insufficient. Recheck prerequisites against merged
+   work on the default branch. Exclude blocked issues, unresolved prerequisites,
+   issues assigned to other people, and work already covered by an active
+   branch/PR or this caller's ongoing task.
+4. Prefer issues that unblock the most actionable downstream work, then critical
    path/release priority, then a clearly scoped and verifiable implementation.
    Use transitive dependencies when evidenced; do not invent links. Break equal
    choices by oldest issue number. Briefly explain the selection using issue
    links and concrete dependencies. If no eligible issue remains, report that
    and stop without assignment or branch creation.
-4. Re-read the selected issue immediately before claiming to catch changed
+5. Re-read the selected issue immediately before claiming to catch changed
    assignments/status. Assign with `gh issue edit <number> --add-assignee <login>`
    and verify the assignment. If it was claimed by someone else, reselect.
    Preserve labels and existing assignees; do not close the issue.
