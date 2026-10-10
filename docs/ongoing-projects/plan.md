@@ -11,9 +11,9 @@
 | Review | [Draft PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63), final validation pending |
 | Main baseline | `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a` |
 | Current runtime source | `ca1923a` (Web Audio retry and fixed clock anchors), committed and pushed |
-| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 11/13 tasks complete; final measurement and publication audit remain |
-| Current step | Browser coverage complete (206 full-run passes + corrected restart rechecks 3/3); final raw measurement running |
-| QA / raw comparison | [Report](../qa/issue-62-battle-audio.md), [72 samples](../qa/issue-62/baseline-candidate.json) |
+| OpenSpec | [`issue-62-battle-audio`](../../openspec/changes/issue-62-battle-audio/proposal.md), spec-driven, 12/13 tasks complete; final publication audit remains |
+| Current step | Implementation and evidence complete; final PR/head verification and handoff publication remain |
+| QA / raw comparison | [Report](../qa/issue-62-battle-audio.md), [initial](../qa/issue-62/baseline-candidate.json), [contended](../qa/issue-62/contended-baseline-candidate.json), [final](../qa/issue-62/final-baseline-candidate.json) captures |
 
 The user explicitly requested implementation of this concrete plan, use of ablation and OpenSpec, autonomous issue resolution, commits/pushes and a reviewable PR. That supersedes the earlier planning-only approval checkpoint. No additional implementation approval is pending.
 
@@ -51,50 +51,51 @@ Inspection justified two implementation refinements: owned abortable fetch/decod
 
 `src/domain`, `BattleSession`, `ProofAudio`, package manifests and lockfile are unchanged. Audio is called beside the HUD log; only the existing animation promise completes a presentation. Request timeout is 5 s, overall load/decode 6.5 s, unlock 2 s, and playback cue duration + 500 ms. Failed loading retries on a new scene; unlock/playback failures permit explicit Retry sound. No automatic backlog or request retries.
 
-The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1 is proven by policy fixtures and desktop complete wins/losses with identical sound-on/off state/replay; the final all-profile run is pending. AC2–AC4 have focused unit and browser proof, including all-profile fallback/mute checks; full regressions are pending. AC5 initial measurements and AC6 physical-gap documentation are complete; final measurements, the full current-build suite and publication audit remain.
+The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the checkbox source of truth. AC1–AC4 have policy/lifecycle and actual-control proof across all profiles. AC5 measurements and AC6 physical-gap documentation are complete; the publication audit remains. Runtime is `ca1923a`; the final existing-test actor assertion correction is `799f28d`.
 
 ## Verification results and commands
 
-| Command | Latest result |
+| Command | Result |
 | --- | --- |
-| `npm run test:unit -- tests/unit/battleCues.test.ts tests/unit/battleAudio.test.ts` | 28 passed within the full unit run; policy/adapter, HTML5 and Web Audio regressions failed RED first |
-| `npm run test:unit` | 288 passed in 25 files |
+| `npm run test:unit` | 288 passed in 25 files, including 28 focused policy/adapter cases |
 | `npm run validate:content` | 77 passed |
-| `npm run typecheck` | Passed |
+| `npm run typecheck` | Passed, including the final test-only correction |
 | `npm run build` | Passed; existing >500 kB chunk warning retained |
-| `npm test -- tests/battle-audio.spec.ts --project desktop` | Initial 12-test implementation suite passed; final suite adds more assertions |
-| `npm test -- tests/battle-audio.spec.ts --grep 'HTML5\|mute, hidden'` | Final six targeted checks passed across desktop/portrait/landscape |
-| `npm test` | 206 passed / 1 aggregate timeout on `5b22bf5`; landscape recheck passed 3/3 on `6cd67e2`; full current-build suite running |
+| `npm test` | Final runtime: 206 passed / 1 incorrect existing-test actor assertion (25.9 min); all 39 battle-audio cases passed |
+| `npm test -- tests/battle-loop.spec.ts --grep "restart during initial enemy"` | Corrected assertion: 3/3 passed across profiles (5.9 s) |
+| `npm test -- tests/battle-audio.spec.ts --grep "mute, hidden\|gesture unlock"` | 9/9 passed across profiles (34.0 s) |
 | `openspec validate issue-62-battle-audio --strict` | Passed |
 | `git diff --check` | Passed |
 
-The full suite includes the focused `tests/battle-audio.spec.ts tests/audio.spec.ts tests/battle-loop.spec.ts` regression set. Do not rerun a separate complete copy of that subset after the full suite passes unless a relevant change/failure requires it.
+All 207 configured browser cases have passing coverage across the full run and targeted rechecks; no single clean 207-pass full run is claimed. The last failure was in an existing test: enemy end-turn commits advance initiative before presentation ends, so the actor must come from the committed command. The correction changes only that assertion. Reuse the 206 unaffected results; do not rerun them without new evidence.
 
-Failures were fixed and retained in QA: the first full run stopped after 90 passes when touch HTML5 stayed locked; one in-progress battle was interrupted and 115 tests had not run. Subsequent focused checks exposed the engine focus-resume behavior and a test-only assumption about seed 3's initiative. The final implementation and corrected legal-control test passed all six targeted checks. Missing-media tests intentionally generate a resource failure; successful paths require no unexpected console/page errors.
+The [QA report](../qa/issue-62-battle-audio.md#failures-found-and-repaired) retains all RED and intermediate failures, including repaired HTML5/Web Audio defects, the fixed clock fixture, aggregate deadlines during unrelated host compilation and interrupted attempts. Existing composite board tests passed unchanged with normal defaults after host capacity recovered. No product loading/frame limit or per-turn assertion was relaxed. Expected missing-media resource failures remain distinct from unexpected console/page errors.
 
 ## Measurements and acceptance boundaries
 
-Clean baseline/candidate captures use the same host and Chromium 153.0.8010.12, localhost, no CPU/network throttling, no routing, three repetitions, three profiles, both sound modes and cold/warm caches. Both served revisions and every resource/file hash are in the [raw evidence](../qa/issue-62/baseline-candidate.json). All 72 samples have complete timings and no unexpected errors.
+The [QA report](../qa/issue-62-battle-audio.md#final-comparable-configuration-capture) contains all 216 raw samples from three captures, exact clean revisions, file/resource hashes, methods and failures. Final configuration comparison uses main `9f785df` and runtime `ca1923a`, Chromium 153.0.8010.12, the same host/profiles/cache/command sequence, three repetitions and both sound modes. All final samples have complete timings and zero unexpected errors; playback counters match sound preference. Per-sample CPU activity records the variation in this shared host.
 
 | Measure / unchanged limit | Baseline | Candidate |
 | --- | ---: | ---: |
 | Cue files ≤32768 B | 0 | 11741 |
-| Compressed JS/CSS ≤400000 B | 389236 | 391851 |
+| Compressed JS/CSS ≤400000 B | 389236 | 391852 |
 | Cold scene asset transfer ≤1500000 B | 834688 | 848829 |
 | Total cold transfer | 1226521 | 1243278 |
 | Total warm transfer | 6900 | 9300 |
-| Cold Ready maximum ≤2500 ms | 254.4 | 355.7 |
-| Warm Ready maximum ≤750 ms | 244.2 | 388.2 |
-| Warm first player turn maximum | 656.1 | 959.6 |
+| Cold Ready maximum ≤2500 ms | 255.7 | 2302.2 |
+| Warm Ready maximum ≤750 ms | 216.4 | 559.1 |
+| Cold first-player maximum | 667.9 | 2832.2 |
+| Warm first-player maximum | 639.1 | 975.5 |
 
-Ready observes `data-ready=true` (bound controls/canvas/restart), while first-player availability includes initial enemy animation. Three sound-enabled portrait warm samples exceed 750 ms for that later signal. Preserve that result; do not equate these signals or claim final #11 usability acceptance. Move/Confirm measurements cover synchronous handler response, not frame/display latency. Main lacks #61's battle frame instrumentation: F1 p50 ≤16.7 ms / p95 ≤20 ms and F2 p95 ≤33.4 ms remain unverified here, with #61's existing failures still open. No budget was relaxed.
+Ready observes bound controls/canvas/restart; first-player availability includes initial enemy animation. One final cold first-player sample exceeds 2500 ms and four warm samples exceed 750 ms. The initial capture's three warm first-player failures and the contended refresh's warm Ready failures remain recorded. Do not treat these signals as interchangeable or infer an audio cause from shared-host timing variation. Handler measurements cover synchronous response, not input-to-frame/display latency.
 
-The [physical matrix](../qa/issue-62-battle-audio.md#physical-device-handoff-for-11) explicitly marks iPhone Safari, iPhone Chrome, Android Chrome and desktop in both orientations unverified. Headless counters and emulation do not prove audibility. #11 needs device/OS/browser/served-build observations for gesture, audible cues, mute, interruption/background/resume, restart and controls. Use a draft PR with `Refs #62` while these acceptance gaps remain; keep #57/#11/#1 open.
+Main lacks #61's battle frame instrumentation: F1 p50 ≤16.7 ms / p95 ≤20 ms and F2 p95 ≤33.4 ms remain unverified here, with #61's existing failures open. The [physical matrix](../qa/issue-62-battle-audio.md#physical-device-handoff-for-11) marks iPhone Safari/Chrome, Android Chrome and desktop in both orientations unverified. Headless counters and emulation do not prove audibility. #11 needs device/OS/browser/served-build observations for gesture, audible cues, mute, interruption/background/resume, restart, usable controls and performance.
 
-## Resume and delivery procedure
+Keep PR #63 a draft with `Refs #62` while those acceptance gaps remain. #57/#11/#1 remain open; the OpenSpec change stays unarchived until merged and accepted.
 
-- Browser full process `39323` is terminal: 206 passed / 1 existing assertion failure (25.9 minutes). Corrected initial-enemy actor assertion passed 3/3 across profiles; runtime remains `ca1923a`. All 207 configured cases have passing coverage across full/recheck results; no clean single-run 207-pass result is claimed. Exact commands/failures are in QA; reuse these valid results.
-- Current measurement process: session `5124`, baseline `/tmp/guru-issue62-baseline/dist` (clean `9f785df`), candidate `/tmp/guru-issue62-candidate/dist` (clean `ca1923a`), output `docs/qa/issue-62/final-baseline-candidate.json`. Before start: no compiler processes, approximately 64% CPU idle, no competing task browser. Poll it, validate all 72 samples and retain the original capture/failures.
-- Once capture finishes, update the measurement tables and final handoff in plan/QA, then mark task 4.2. Recheck local document links, strict OpenSpec and whitespace; commit/push only issue-specific files.
-- Draft PR #63 is published against main with `Refs #62`. Update its validation and measurement details, verify the remote head and links, then mark task 4.4 and publish the final handoff update. Keep the OpenSpec change unarchived until merged/accepted; physical audio and #11 F1/F2 acceptance remain explicit.
-- Remove only the two task-owned temporary worktrees after capturing evidence. Preserve the unrelated worktree and pre-existing preview on 4175. No release tag is warranted for an unmerged review branch; do not merge, close issues or alter deployment.
+## Delivery audit remaining
+
+- Verify all raw samples, local links, asset hashes, strict OpenSpec and whitespace. Commit/push the task-specific collector/evidence/docs changes.
+- Update draft PR #63 with the exact full-run/recheck result, budget evidence and remaining hardware/usability/frame gaps. Verify its head equals the pushed branch and its base remains main; then complete OpenSpec task 4.4 and publish the final handoff note.
+- Both browser and measurement processes are terminal. Remove only `/tmp/guru-issue62-baseline` and `/tmp/guru-issue62-candidate` after confirming evidence is committed. Preserve the unrelated worktree and pre-existing preview on 4175.
+- No release tag is warranted for this unmerged review branch. Do not merge, close issues or alter deployment as part of this handoff.
