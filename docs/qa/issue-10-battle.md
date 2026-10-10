@@ -58,3 +58,7 @@ Retained screenshots: [portrait](issue-10/portrait.png), [short landscape](issue
 ## Acceptance limits and #11 hand-off
 
 Browser evidence uses installed Chrome and Chromium mobile emulation. No physical iPhone Safari/Chrome or Android hardware acceptance, deployed loading/frame budgets, production deployment, new assets/audio or AI/rule rebalance is claimed. #6 remains open for its device gate; #11 must validate full battles, audio/lifecycle/device behavior and deployed performance. Deferred: saves/resume, short route, inventory/equipment, procedural generation, advanced combat, editor, analytics and backend.
+
+## Delivery
+
+Implementation commit `46d2bfe` published on the approved work branch. [PR #55](https://github.com/luminari-gurus/tactics-guru-v2/pull/55) targets main, is open for review and is attached to this task. All four issue criteria have browser/session evidence above. OpenSpec remains unarchived pending merge.

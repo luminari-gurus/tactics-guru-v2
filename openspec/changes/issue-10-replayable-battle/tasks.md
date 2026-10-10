@@ -22,7 +22,7 @@
 
 - [x] 4.1 Adapt authored-board/layout regressions to automatic enemies and preview flow without dropping camera/projection/DPR/canopy/cleanup coverage; add complete authored win and loss tests whose legal player policies use real controls, verify accepted records replay to equal state/events, and record actual seeds/actions and screenshots in docs/qa/issue-10-battle.md.
 - [x] 4.2 Run focused unit/browser checks, then npm run test:unit, npm run validate:content, npm run typecheck, npm run build, configured npm test with the installed Chromium executable when required, git diff --check and openspec validate issue-10-replayable-battle --strict; record actual results and physical-device/performance limits with criterion-by-criterion evidence and #11 hand-off.
-- [ ] 4.3 Commit only approved issue changes, push and create/reuse a PR against main with approval and validation evidence; verify the PR and attach it to this task. Use Closes #10 only if all its criteria are verified, otherwise draft with Refs #10 and remaining gaps.
+- [x] 4.3 Commit only approved issue changes, push and create/reuse a PR against main with approval and validation evidence; verify the PR and attach it to this task. Use Closes #10 only if all its criteria are verified, otherwise draft with Refs #10 and remaining gaps.
 
 ## Workflow follow-up
 
