@@ -31,4 +31,4 @@ New `src/domain/ai.ts`, `tests/unit/ai.test.ts`, and `docs/enemy-turns.md`; exis
 - Branch: `work/issue-9-deterministic-enemy-turns`.
 - Change: `issue-9-deterministic-enemy-turns`.
 - #7 and #8 are closed and their implementation is on main. #9's comment confirms the preview/dispatch hand-off. GitHub reports no blocking relationships; no open PR or task covers #9. #6 is already implemented by merged PR #51.
-- Approval: pending. No implementation starts until this plan is explicitly approved.
+- Approval: caller explicitly approved this plan on 2026-10-10 in this conversation.
