@@ -34,4 +34,4 @@ New `src/app/BattleSession.ts`, `src/ui/hud.ts`, `src/ui/dialogs.ts`, focused un
 - Branch: `work/issue-10-replayable-battle`.
 - Change: `issue-10-replayable-battle`.
 - Prerequisites: #6 renderer (PR #51), #7 combat (main `2ed8a8d`), #8 signatures (PR #47), #9 AI (PR #54), all verified on main. #6 stays open for physical-device acceptance; its merged renderer supplies this integration. #10 has no GitHub blocking relationships or active implementation PR. #1 is the parent epic, not a blocker. #11 waits for this battle integration.
-- Approval: pending explicit caller approval of these artifacts.
+- Approval: caller explicitly approved published plan `9b896c8` in this conversation on 2026-10-10.

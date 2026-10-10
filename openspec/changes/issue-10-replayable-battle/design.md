@@ -40,4 +40,4 @@ Add `tests/unit/battleSession.test.ts`, `tests/unit/battleControls.test.ts` wher
 
 ## Migration Plan
 
-After approval implement in this branch, run focused RED/GREEN and configured checks, publish the PR against main. No storage migration or production action; revert the task commit to restore prior battle controls. Keep OpenSpec unarchived until merge. Approval is pending; no application code or tests are implemented by this planning change.
+After approval implement in this branch, run focused RED/GREEN and configured checks, publish the PR against main. No storage migration or production action; revert the task commit to restore prior battle controls. Keep OpenSpec unarchived until merge. Caller approved plan `9b896c8` on 2026-10-10; implementation follows this approved scope.

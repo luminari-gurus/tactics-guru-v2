@@ -1,6 +1,6 @@
 /**
- * Bump manually when the foundation contracts or generator change. Once the game records replays (#10), also bump when a
- * rules change would make a recorded replay play out differently. None exist yet, so #5 and #7 kept 1.
+ * Bump manually when the foundation contracts or generator change. The battle session (#10) records replays in memory. Also bump when a
+ * rules change would make a recorded replay play out differently; UI orchestration does not change rules.
  */
 export const RULES_VERSION = 1;
 export const RNG_VERSION = 1;

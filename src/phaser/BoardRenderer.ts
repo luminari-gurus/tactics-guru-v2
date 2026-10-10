@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { CellPosition, ContentCatalog, MapId } from '../content/types';
-import type { BattleState } from '../domain/types';
+import type { BattleEvent, BattleState } from '../domain/types';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
@@ -85,13 +85,14 @@ export class BoardRenderer {
     };
   }
 
-  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null): void {
+  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = []): void {
     this.snapshot = snapshot;
     this.reachable = reachable;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
     const activeId = snapshot.initiative[snapshot.activeIndex];
     const active = snapshot.units.find(unit => unit.id === activeId)!;
     const reachableKeys = new Set(reachable.map(cellKey));
+    const pathKeys = new Set(path.map(cellKey));
     for (const tile of this.board.tiles) {
       const graphics = this.highlights.get(cellKey(tile))!.clear();
       const vertices = tileFaces(tile).top.map(p => new Phaser.Math.Vector2(p.x, p.y));
@@ -101,6 +102,7 @@ export class BoardRenderer {
         graphics.lineStyle(1.5, REACHABLE_COLOR, 0.85).strokePoints(vertices, true);
       }
       if (cellKey(tile) === cellKey(active.cell)) graphics.lineStyle(3, ACTIVE_COLOR).strokePoints(vertices, true);
+      if (pathKeys.has(cellKey(tile))) graphics.lineStyle(2.5, 0xb9b1ff).strokePoints(vertices, true);
       if (this.selected === tile) {
         const point = projectTile(tile);
         const inset = vertices.map(p => new Phaser.Math.Vector2(point.x + (p.x - point.x) * 0.78, point.y + (p.y - point.y) * 0.78));
@@ -129,6 +131,46 @@ export class BoardRenderer {
     this.publish();
   }
 
+  /** Tween view objects only; snapshots and command results remain unchanged. */
+  animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
+    this.present(before, [], null);
+    const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
+    const visualEvents = events.filter(e=>['attackRolled','damaged','guarded','defeated','missileRolled'].includes(e.type));
+    const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
+    const duration=move ? Math.max(1,move.path.length-1)*STEP_MS : visualEvents.length ? COMBAT_MS : TURN_MS;
+    const marker={progress:0};
+    const labels:Phaser.GameObjects.Text[]=[];
+    for(const event of visualEvents) {
+      const id='unitId' in event ? event.unitId : undefined;
+      const unit=before.units.find(u=>u.id===id); if(!unit) continue;
+      const tile=this.byCell.get(cellKey(unit.cell))!;const p=projectTile(tile);
+      const label=event.type==='damaged'?`−${event.damage}`:event.type==='attackRolled'?event.result:event.type==='guarded'?'Guarded':event.type==='defeated'?'Defeated':'';
+      if(label){const text=this.scene.add.text(p.x,p.y-65,label,{fontSize:'16px',color:'#ffffff',backgroundColor:'#172033'}).setOrigin(0.5).setDepth(10000);this.root.add(text);labels.push(text);}
+    }
+    let complete!:()=>void;const done=new Promise<void>(resolve=>{complete=resolve;});let finished=false;
+    const finish=()=>{if(finished)return;finished=true;labels.forEach(l=>l.destroy());this.present(after,[],null);complete();};
+    const tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
+      if(!move)return;
+      const progress=marker.progress*(move.path.length-1),i=Math.min(Math.floor(progress),move.path.length-2);
+      if(i<0)return;
+      const a=this.byCell.get(cellKey(move.path[i]))!,b=this.byCell.get(cellKey(move.path[i+1]))!;
+      const p=projectTile(a),q=projectTile(b),t=progress-i;
+      this.images.get(move.unitId)!.setPosition(p.x+(q.x-p.x)*t,p.y+(q.y-p.y)*t).setDepth((t<0.5?a:b).depth+OCCUPANT_LAYER);
+      const movingTile={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,elevation:a.elevation+(b.elevation-a.elevation)*t};
+      for(const canopy of this.canopies){
+        const overlaps=before.units.some(unit=>{
+          if(unit.hp<=0)return false;
+          const tile=unit.id===move.unitId?movingTile:this.byCell.get(cellKey(unit.cell))!;
+          const image=this.images.get(unit.id)!;
+          return canopyOccludes(canopy.tile,tile,unitBounds(tile,{x:image.originX,y:image.originY}),this.catalog.maps[this.mapId].height);
+        });
+        canopy.graphics.setAlpha(overlaps?CANOPY_ART.fadedAlpha:1);
+      }
+      this.root.sort('depth');
+    },onComplete:finish});
+    return {done,cancel:()=>{tween.stop();finish();}};
+  }
+
   fit(width: number, height: number, panelBottom: number): void {
     // Responsive panel layout can precede Phaser's fullscreen resize event.
     // Do not mix its new DOM geometry with stale viewport dimensions: the
@@ -144,6 +186,11 @@ export class BoardRenderer {
     // only where the new available area or zoom limits require it. Real viewport
     // changes still refit the board and preserve relative zoom.
     this.applyView(viewportChanged ? { ...layout, scale: layout.scale * zoom } : this.view);
+  }
+
+  /** A fresh battle is centered after its initial automatic turns settle the HUD. */
+  resetView(): void {
+    this.applyView(fitBoard(this.bounds, this.viewport, this.panelBottom));
   }
 
   private applyView(view: View): void {

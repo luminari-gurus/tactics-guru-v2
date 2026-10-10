@@ -98,3 +98,18 @@ it('leaves pointer state alone while the page stays visible', () => {
   f.listeners.get('pointermove')!(pointer('pointermove', 1, 130, 100));
   expect(f.board.pans).toEqual([30]);
 });
+
+it('modal guards and explicit reset discard held pointers before input is re-enabled',()=>{
+  const f=fake();let enabled=true;
+  const cleanup=bindBoardInput(f.canvas,board(f),()=>({width:400,height:600}),()=>enabled);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100));
+  enabled=false;cleanup.reset();
+  f.listeners.get('pointermove')!(pointer('pointermove',1,150,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',1,150,100));
+  expect(f.board.pans).toEqual([]);expect(f.board.selections).toBe(0);expect(f.captured.size).toBe(0);
+  enabled=true;
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100));expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,100,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',2,100,100));expect(f.board.selections).toBe(1);
+  cleanup();
+});
