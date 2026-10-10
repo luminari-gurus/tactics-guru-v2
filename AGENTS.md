@@ -13,3 +13,10 @@ Human documentation workspace, meant to be in intervals folded into the main doc
 ## Attribution
 
 ** NEVER add co-authors, attributions, `Claude-Session`, or signed-off-by lines.
+
+## `/work-work-work`
+
+When the user submits `/work-work-work`, read and follow
+`.agents/skills/work-work-work/SKILL.md`. This is a repository message alias,
+not a registered native slash-menu command. Codex also supports invoking the
+same workflow as `$work-work-work` through its skill selector.
