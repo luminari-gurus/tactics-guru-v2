@@ -73,14 +73,17 @@ test('mute, hidden and context interruptions discard active feedback while comma
   await enable(page);
   await page.locator('#fit-restart').click();await ready(page); // Seed 2 begins with a player.
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+100));
-  await page.locator('#fit-restart').click({force:true});
-  await page.clock.runFor(80); // Seed 3's initial enemy move is now presenting.
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
-  const enemy=await session(page);
-  expect(enemy.state.units.find(u=>u.id===enemy.state.initiative[enemy.state.activeIndex])!.side).toBe('enemy');
+  let enemy:Awaited<ReturnType<typeof session>>|undefined;
+  for(let i=0;i<12;i++) {
+    const current=await session(page),command=current.replay.commands.at(-1);
+    if(current.phase==='presenting' && command && current.state.units.find(u=>u.id===command.unitId)!.side==='enemy') {enemy=current;break;}
+    if(current.phase==='player')await page.locator('#battle-next').click({force:true});
+    await page.clock.runFor(48);
+  }
+  expect(enemy).toBeDefined();
   await expect(page.locator('#battle-sound')).toBeEnabled();
   await page.locator('#battle-sound').click({force:true});
-  expect(await audio(page)).toMatchObject({enabled:false,active:null});expect((await session(page)).state).toEqual(enemy.state);
+  expect(await audio(page)).toMatchObject({enabled:false,active:null});expect((await session(page)).state).toEqual(enemy!.state);
   await page.clock.resume();await ready(page);
   expect(found).toEqual([]);
 });
@@ -117,12 +120,26 @@ for(const mode of ['missing','corrupt','stalled','decode-stalled'] as const) tes
 
 test('HTML5 fallback loads and plays future cues after a gesture',async({page})=>{
   const found=errors(page);
-  await page.addInitScript(()=>{Object.defineProperty(window,'AudioContext',{value:undefined});Object.defineProperty(window,'webkitAudioContext',{value:undefined});});
+  await page.addInitScript(()=>{
+    Object.defineProperty(window,'AudioContext',{value:undefined});Object.defineProperty(window,'webkitAudioContext',{value:undefined});
+    const original=HTMLMediaElement.prototype.play;window.__mediaPlays=0;
+    HTMLMediaElement.prototype.play=function(){window.__mediaPlays!++;return original.call(this);};
+  });
   await page.goto('/');await ready(page);await enable(page);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
   await expect.poll(()=>audio(page)).toMatchObject({started:1,completed:1,active:null});
-  await page.locator('#fit-restart').click();await ready(page);expect((await audio(page)).enabled).toBe(true);expect(found).toEqual([]);
+  await page.locator('#fit-restart').click();await ready(page);expect((await audio(page)).enabled).toBe(true);
+  await expect.poll(()=>audio(page)).toMatchObject({load:'ready'});
+  // Blur in the same event after the real Confirm handler starts the cue, before it can finish.
+  await page.evaluate(()=>document.addEventListener('click',e=>{if((e.target as HTMLElement).id==='dialog-confirm')window.dispatchEvent(new Event('blur'));}));
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  expect(await audio(page)).toMatchObject({status:'blocked',active:null});
+  const plays=await page.evaluate(()=>window.__mediaPlays);
+  await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.waitForTimeout(200);
+  expect(await page.evaluate(()=>window.__mediaPlays)).toBe(plays);expect((await audio(page)).active).toBeNull();expect(found).toEqual([]);
 });
+
+declare global { interface Window { __mediaPlays?: number } }
 
 test('unsupported audio has a useful nonfatal status',async({page})=>{
   const found=errors(page);await page.addInitScript(()=>{HTMLMediaElement.prototype.canPlayType=()=>'';});

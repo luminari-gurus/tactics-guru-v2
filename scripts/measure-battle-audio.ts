@@ -50,9 +50,16 @@ try {
             });observer.observe(document,{subtree:true,attributes:true,childList:true});
             document.addEventListener('click',event=>{
               const id=(event.target as HTMLElement).id;
-              if(id==='battle-move') {evidence.firstInputMs=performance.now();queueMicrotask(()=>evidence.inputResponseMs=performance.now()-evidence.firstInputMs!);}
-              if(id==='dialog-confirm') {evidence.confirmMs=performance.now();queueMicrotask(()=>evidence.commitResponseMs=performance.now()-evidence.confirmMs!);}
+              if(id==='battle-move')evidence.firstInputMs=performance.now();
+              if(id==='dialog-confirm')evidence.confirmMs=performance.now();
             },true);
+            // Bubbling occurs after the target's synchronous HUD/command handler. A microtask
+            // scheduled in capture can run before the target listener and would under-measure it.
+            document.addEventListener('click',event=>{
+              const id=(event.target as HTMLElement).id;
+              if(id==='battle-move')evidence.inputResponseMs=performance.now()-evidence.firstInputMs!;
+              if(id==='dialog-confirm')evidence.commitResponseMs=performance.now()-evidence.confirmMs!;
+            });
           });
           const page=await context.newPage(),errors:string[]=[];
           page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
@@ -74,5 +81,5 @@ try {
   }
 } finally {
   await browser.close();await mkdir(dirname(output),{recursive:true});
-  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move button and confirm handler through microtask after synchronous render',audio:'enabled after readiness; reload defaults to muted',frames:'No merged battle frame instrumentation; F1/F2 remain unverified here'},budgets:{coldReadyMs:2500,warmReadyMs:750,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
+  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move and Confirm capture-to-bubble synchronous handler response; not frame/display latency',audio:'enabled after readiness; reload defaults to muted',frames:'No merged battle frame instrumentation; F1/F2 remain unverified here'},budgets:{coldReadyMs:2500,warmReadyMs:750,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
 }

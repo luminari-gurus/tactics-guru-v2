@@ -61,3 +61,17 @@ Handoff: #11 should run each row on the PR build, record device/OS/browser/full 
 - Full configured browser suite: running, final result to follow.
 
 Expected failure evidence: the policy/adapter RED runs failed on missing modules before implementation. The missing-media browser scenario intentionally receives a 404 (expected browser resource error); corrupt bytes and stalled decode are contained without application exceptions. Injected failures are distinct from unexpected console/page errors in successful flows.
+
+Rendered control evidence: [portrait](issue-62/portrait.png), [landscape](issue-62/landscape.png), inspected from the full desktop HUD regression. Controls remain at least 44 px and the existing panel scrolls in short landscape. Asset regeneration with ffmpeg 8.1.1 reproduced all eight SHA-256 values exactly.
+
+Implementation source build: `2d87b64568cb2a64cf1d528e66de37a38954c841` (clean detached build for measurement). The full browser suite initially serves the same runtime source from the precommit build (`7959063`, dirty); the later clean build differs only in baked build identity.
+
+## Failure found and repaired during full validation
+
+The first full run passed 90 tests, then was deliberately stopped after the portrait HTML5 fallback remained blocked (one failure, one interrupted battle, 115 not run). The failure was real: Phaser initializes HTML5 sound as locked on touch devices; its loader normally refreshes that state, but owned media loading bypasses that hook. The enabling gesture now calls the existing manager `unlock()` before silently priming media. A new regression test failed RED (0 unlock calls instead of 1), then all 25 focused policy/adapter tests passed GREEN. Final full-suite results will supersede this incomplete run; its failure is retained here.
+
+Further lifecycle review found that Phaser's HTML5 manager resumes its paused sound list on window focus without an AudioContext event. A second RED regression demonstrated the missing blur stop. The final adapter owns HTML5 blur handling using the public `pauseOnBlur` setting (saved/restored per scene), suppresses batches while blurred, and never plays a focus backlog. The browser fallback test counts native media `play()` calls across blur/focus to detect automatic replay independently of adapter counters. Focused unit total is now 26.
+
+The explicit enemy-mute test initially assumed seed 3 opened on an enemy turn; it actually opens on a player. That test-only failure was repaired by advancing real Wait controls with a controlled clock until a committed enemy presentation is observed. All three profiles passed the corrected enemy-mute check.
+
+Final fallback regression command: `npm test -- tests/battle-audio.spec.ts --grep 'HTML5|mute, hidden'` — 6 passed across desktop/portrait/landscape (31.5 s). This includes real commands, immediate mute during player and enemy presentation, context/visibility suspension, HTML5 unlock and native media play-call equality across focus. An intermediate capture-listener approach was removed: it also captured DOM control blur, then still allowed Phaser's saved resume list to replay. The final public-manager policy avoids both dependencies; the proof adapter and Web Audio manager policy remain unchanged.
