@@ -168,7 +168,8 @@ test('late decode from a destroyed scene cannot alter replacement controls or pl
 });
 
 for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`seed ${seed}: sound on/off legal battles match with committed cues and ${outcome}`,async({page})=>{
-  test.setTimeout(240000);const found=errors(page);let silent:Awaited<ReturnType<typeof session>>|undefined;
+  // Two full UI battles, each with the existing battle-loop suite's 180 s allowance.
+  test.setTimeout(360000);const found=errors(page);let silent:Awaited<ReturnType<typeof session>>|undefined;
   const heard=new Set<BattleCue>();
   for(const enabled of [false,true]) {
     await page.goto('/');await ready(page);
