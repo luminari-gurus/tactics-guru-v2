@@ -55,12 +55,16 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
   // Active-unit labels have different lengths too; ending a turn is the only command.
   const activeLabels = new Set<string>();
   for (let turn = 0; turn < initial.units.length; turn++) {
+    const beforeCount = (await report(page)).commandCount;
     await page.getByRole('button', { name: 'Wait / End turn' }).click();
+    // The renderer reports the pre-tween snapshot during animation. Wait for the
+    // accepted command and settled player phase before asserting rendered state.
+    await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state.commandCount).toBeGreaterThan(beforeCount);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const after = await settledReport(page);
     activeLabels.add((await page.locator('#battle-active').textContent())!);
     expect(after.transform).toEqual(panned.transform);
-    expect(after.commandCount).toBeGreaterThan(initial.commandCount);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect(after.commandCount).toBeGreaterThan(beforeCount);
   }
   expect(activeLabels.size).toBeGreaterThan(1);
   await page.getByRole('button', { name: 'Restart battle' }).click();
