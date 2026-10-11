@@ -50,3 +50,7 @@ Run focused tests, `npm run test:unit`, full configured `npm test` with installe
 ## Migration Plan
 
 No storage or deployment migration. Prototype only after caller approval, commit source/build identities for evidence, then retain or revert runtime based on the recorded decision. Deliver a normal PR only if every criterion is verified; otherwise a draft with Refs #68 and explicit limitations. Do not merge or archive before merge.
+
+## Experiment disposition
+
+Completed the approved experiment with clean baseline e955e9d and prototype dbe9eba. The prototype reduces mobile-emulated draw submissions 457→313 but raises initial nominal texture bytes 6,057,032→9,605,192, adds generation cost and provides no convincing frame/loading gain. One prototype idle median of 16.8 ms misses the unchanged 16.7 ms limit. Retain baseline runtime; see docs/qa/issue-68-baked-tiles.md and raw comparison evidence. This rejection outcome was explicitly within the approved scope. No runtime or browser-test delta remains against the baseline.

@@ -1,0 +1,1276 @@
+{
+  "method": "Per-sample nearest-rank percentiles; worst row per group. Renderer draw counts from instrumented rAF windows, excluding first 100 ms. Nominal level-0 RGBA texture bytes exclude driver/mipmap overhead.",
+  "timing": {
+    "baseline": {
+      "battle": {
+        "build": {
+          "commit": "e955e9d9f182a76f057ea69057c7a1ac6c0bd682",
+          "dirty": false
+        },
+        "browser": "155.0.8059.40",
+        "host": {
+          "platform": "darwin",
+          "release": "27.0.0",
+          "arch": "arm64",
+          "cpu": "Apple M5 Pro",
+          "node": "v26.11.0"
+        },
+        "groups": [
+          {
+            "profile": "desktop",
+            "cache": "cold",
+            "usableMs": [
+              582.5,
+              466.59999999403954,
+              468.40000000596046
+            ],
+            "idleMedianMs": [
+              16.599999994039536,
+              16.599999994039536,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.5,
+              18.299999982118607,
+              18.400000005960464
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.200000017881393,
+                "zoom": 18.5,
+                "move": 18.19999998807907,
+                "startup": 18.400000005960464
+              },
+              {
+                "pan": 17.400000005960464,
+                "zoom": 19.30000001192093,
+                "move": 18.19999998807907,
+                "startup": 18.900000005960464
+              },
+              {
+                "pan": 18.19999998807907,
+                "zoom": 21.30000001192093,
+                "move": 18.19999998807907,
+                "startup": 19.599999994039536
+              }
+            ]
+          },
+          {
+            "profile": "desktop",
+            "cache": "warm",
+            "usableMs": [
+              455.60000002384186,
+              457,
+              456.30000001192093
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.599999994039536,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.30000001192093,
+              18.299999982118607
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.200000017881393,
+                "zoom": 18.900000005960464,
+                "move": 18.69999998807907,
+                "startup": 18.30000001192093
+              },
+              {
+                "pan": 18.30000001192093,
+                "zoom": 18.5,
+                "move": 18.400000005960464,
+                "startup": 18.69999998807907
+              },
+              {
+                "pan": 18.80000001192093,
+                "zoom": 18.599999994039536,
+                "move": 18.19999998807907,
+                "startup": 18.5
+              }
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "cold",
+            "usableMs": [
+              479.10000002384186,
+              469.80000001192093,
+              468.40000000596046
+            ],
+            "idleMedianMs": [
+              16.599999994039536,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.200000017881393,
+              18.5,
+              18.599999994039536
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.399999976158142,
+                "zoom": 18.30000001192093,
+                "move": 18.400000005960464,
+                "startup": 18
+              },
+              {
+                "pan": 18.200000017881393,
+                "zoom": 18.5,
+                "move": 18.099999994039536,
+                "startup": 18.399999976158142
+              },
+              {
+                "pan": 18.30000001192093,
+                "zoom": 18.100000023841858,
+                "move": 18.5,
+                "startup": 17.80000001192093
+              }
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "warm",
+            "usableMs": [
+              445.2000000178814,
+              454.90000000596046,
+              472.80000001192093
+            ],
+            "idleMedianMs": [
+              16.600000023841858,
+              16.600000023841858,
+              16.600000023841858
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.399999976158142,
+              18.5
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.599999994039536,
+                "zoom": 18.5,
+                "move": 17.69999998807907,
+                "startup": 17.599999994039536
+              },
+              {
+                "pan": 17.900000005960464,
+                "zoom": 18.400000005960464,
+                "move": 18.400000005960464,
+                "startup": 17.30000001192093
+              },
+              {
+                "pan": 17.80000001192093,
+                "zoom": 18.599999994039536,
+                "move": 18.700000017881393,
+                "startup": 18.299999982118607
+              }
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "cold",
+            "usableMs": [
+              469.39999997615814,
+              469.59999999403954,
+              470
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.69999998807907,
+              16.600000023841858
+            ],
+            "idleP95Ms": [
+              18.5,
+              18.400000005960464,
+              18.5
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.099999994039536,
+                "zoom": 19.80000001192093,
+                "move": 18.299999982118607,
+                "startup": 18.099999994039536
+              },
+              {
+                "pan": 18.900000005960464,
+                "zoom": 19.899999976158142,
+                "move": 18.400000005960464,
+                "startup": 17.80000001192093
+              },
+              {
+                "pan": 18.5,
+                "zoom": 19.299999982118607,
+                "move": 18.400000005960464,
+                "startup": 18.099999994039536
+              }
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "warm",
+            "usableMs": [
+              458.7000000178814,
+              472.59999999403954,
+              460.40000000596046
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.700000017881393,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.69999998807907,
+              18.5,
+              18.5
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.19999998807907,
+                "zoom": 18.599999994039536,
+                "move": 18.200000017881393,
+                "startup": 18.69999998807907
+              },
+              {
+                "pan": 18.19999998807907,
+                "zoom": 19,
+                "move": 18.100000023841858,
+                "startup": 18.099999994039536
+              },
+              {
+                "pan": 18.399999976158142,
+                "zoom": 18.799999982118607,
+                "move": 18.80000001192093,
+                "startup": 17.900000005960464
+              }
+            ]
+          }
+        ]
+      },
+      "proof": {
+        "build": {
+          "commit": "e955e9d9f182a76f057ea69057c7a1ac6c0bd682",
+          "dirty": false
+        },
+        "browser": "155.0.8059.40",
+        "host": {
+          "platform": "darwin",
+          "release": "27.0.0",
+          "arch": "arm64",
+          "cpu": "Apple M5 Pro",
+          "node": "v26.11.0"
+        },
+        "groups": [
+          {
+            "profile": "desktop",
+            "cache": "cold",
+            "usableMs": [
+              225.7000000178814,
+              104.09999999403954,
+              99.59999999403954
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.600000023841858,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.200000017881393,
+              18.599999994039536,
+              18.399999976158142
+            ]
+          },
+          {
+            "profile": "desktop",
+            "cache": "warm",
+            "usableMs": [
+              76.5,
+              94.5,
+              88.30000001192093
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.599999994039536,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.599999994039536,
+              18.19999998807907
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "cold",
+            "usableMs": [
+              116.69999998807907,
+              118.2999999821186,
+              118.90000000596046
+            ],
+            "idleMedianMs": [
+              16.599999994039536,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.30000001192093,
+              18.19999998807907,
+              18.19999998807907
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "warm",
+            "usableMs": [
+              124.80000001192093,
+              108.40000000596046,
+              108.2999999821186
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.30000001192093,
+              18.400000005960464,
+              18.399999976158142
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "cold",
+            "usableMs": [
+              119.10000002384186,
+              119.90000000596046,
+              132.09999999403954
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.599999994039536,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.30000001192093,
+              18.400000005960464
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "warm",
+            "usableMs": [
+              108.39999997615814,
+              109,
+              96.09999999403954
+            ],
+            "idleMedianMs": [
+              16.600000023841858,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.600000023841858,
+              18.299999982118607,
+              18.30000001192093
+            ]
+          }
+        ]
+      }
+    },
+    "prototype": {
+      "battle": {
+        "build": {
+          "commit": "dbe9eba2654b1bc3271e9fba8070d0016921ce7e",
+          "dirty": false
+        },
+        "browser": "155.0.8059.40",
+        "host": {
+          "platform": "darwin",
+          "release": "27.0.0",
+          "arch": "arm64",
+          "cpu": "Apple M5 Pro",
+          "node": "v26.11.0"
+        },
+        "groups": [
+          {
+            "profile": "desktop",
+            "cache": "cold",
+            "usableMs": [
+              596.1999999880791,
+              469.30000001192093,
+              468.90000000596046
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.5,
+              18.30000001192093
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.5,
+                "zoom": 18.599999994039536,
+                "move": 18.599999994039536,
+                "startup": 18.200000017881393
+              },
+              {
+                "pan": 17.80000001192093,
+                "zoom": 18.900000005960464,
+                "move": 17.80000001192093,
+                "startup": 18.30000001192093
+              },
+              {
+                "pan": 18.69999998807907,
+                "zoom": 18.099999994039536,
+                "move": 18.19999998807907,
+                "startup": 18.5
+              }
+            ]
+          },
+          {
+            "profile": "desktop",
+            "cache": "warm",
+            "usableMs": [
+              457.5,
+              458.09999999403954,
+              457.80000001192093
+            ],
+            "idleMedianMs": [
+              16.600000023841858,
+              16.69999998807907,
+              16.600000023841858
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.30000001192093,
+              18.599999994039536
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.099999994039536,
+                "zoom": 18.100000023841858,
+                "move": 18,
+                "startup": 19.299999982118607
+              },
+              {
+                "pan": 18.700000017881393,
+                "zoom": 19.5,
+                "move": 18.299999982118607,
+                "startup": 17.799999982118607
+              },
+              {
+                "pan": 17.799999982118607,
+                "zoom": 18.200000017881393,
+                "move": 17.900000005960464,
+                "startup": 18.5
+              }
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "cold",
+            "usableMs": [
+              467.39999997615814,
+              469.09999999403954,
+              468.2000000178814
+            ],
+            "idleMedianMs": [
+              16.700000017881393,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.599999994039536,
+              18.400000005960464,
+              18.400000005960464
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.099999994039536,
+                "zoom": 19,
+                "move": 17.900000005960464,
+                "startup": 18
+              },
+              {
+                "pan": 18.30000001192093,
+                "zoom": 18.80000001192093,
+                "move": 18.30000001192093,
+                "startup": 18.19999998807907
+              },
+              {
+                "pan": 18.099999994039536,
+                "zoom": 18.299999982118607,
+                "move": 18.400000005960464,
+                "startup": 17.899999976158142
+              }
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "warm",
+            "usableMs": [
+              446.2999999821186,
+              457.80000001192093,
+              459.59999999403954
+            ],
+            "idleMedianMs": [
+              16.80000001192093,
+              16.69999998807907,
+              16.700000017881393
+            ],
+            "idleP95Ms": [
+              18.700000017881393,
+              18.5,
+              18.5
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.100000023841858,
+                "zoom": 18.5,
+                "move": 18.400000005960464,
+                "startup": 18.30000001192093
+              },
+              {
+                "pan": 18.19999998807907,
+                "zoom": 18.700000017881393,
+                "move": 18.5,
+                "startup": 18.599999994039536
+              },
+              {
+                "pan": 18.399999976158142,
+                "zoom": 18.799999982118607,
+                "move": 18.400000005960464,
+                "startup": 17.5
+              }
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "cold",
+            "usableMs": [
+              480.30000001192093,
+              467.5,
+              469
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.69999998807907,
+              16.700000017881393
+            ],
+            "idleP95Ms": [
+              18.30000001192093,
+              18.400000005960464,
+              18.19999998807907
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 18.099999994039536,
+                "zoom": 18.900000005960464,
+                "move": 18.400000005960464,
+                "startup": 17.799999982118607
+              },
+              {
+                "pan": 18.400000005960464,
+                "zoom": 19.200000017881393,
+                "move": 18.099999994039536,
+                "startup": 18.200000017881393
+              },
+              {
+                "pan": 18.400000005960464,
+                "zoom": 18.299999982118607,
+                "move": 18.299999982118607,
+                "startup": 18.30000001192093
+              }
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "warm",
+            "usableMs": [
+              457.5,
+              458.39999997615814,
+              446.30000001192093
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.5,
+              18.19999998807907,
+              18.599999994039536
+            ],
+            "workloadP95Ms": [
+              {
+                "pan": 17.600000023841858,
+                "zoom": 18.399999976158142,
+                "move": 18.400000005960464,
+                "startup": 17.700000017881393
+              },
+              {
+                "pan": 18.299999982118607,
+                "zoom": 18.5,
+                "move": 17.599999994039536,
+                "startup": 18
+              },
+              {
+                "pan": 18.5,
+                "zoom": 19.400000005960464,
+                "move": 18.599999994039536,
+                "startup": 17.900000005960464
+              }
+            ]
+          }
+        ]
+      },
+      "proof": {
+        "build": {
+          "commit": "dbe9eba2654b1bc3271e9fba8070d0016921ce7e",
+          "dirty": false
+        },
+        "browser": "155.0.8059.40",
+        "host": {
+          "platform": "darwin",
+          "release": "27.0.0",
+          "arch": "arm64",
+          "cpu": "Apple M5 Pro",
+          "node": "v26.11.0"
+        },
+        "groups": [
+          {
+            "profile": "desktop",
+            "cache": "cold",
+            "usableMs": [
+              233,
+              105.39999997615814,
+              101.7999999821186
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.600000023841858,
+              16.600000023841858
+            ],
+            "idleP95Ms": [
+              18.19999998807907,
+              18.400000005960464,
+              18.30000001192093
+            ]
+          },
+          {
+            "profile": "desktop",
+            "cache": "warm",
+            "usableMs": [
+              78.69999998807907,
+              94.59999999403954,
+              88
+            ],
+            "idleMedianMs": [
+              16.600000023841858,
+              16.69999998807907,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.200000017881393,
+              18.399999976158142,
+              18.400000005960464
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "cold",
+            "usableMs": [
+              119.59999999403954,
+              119.80000001192093,
+              116.7000000178814
+            ],
+            "idleMedianMs": [
+              16.600000023841858,
+              16.600000023841858,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.399999976158142,
+              18.400000005960464
+            ]
+          },
+          {
+            "profile": "mobile-portrait",
+            "cache": "warm",
+            "usableMs": [
+              108.80000001192093,
+              107.30000001192093,
+              106.5
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.600000023841858,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18,
+              18.400000005960464
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "cold",
+            "usableMs": [
+              119.5,
+              130.7000000178814,
+              119.10000002384186
+            ],
+            "idleMedianMs": [
+              16.69999998807907,
+              16.600000023841858,
+              16.69999998807907
+            ],
+            "idleP95Ms": [
+              18.400000005960464,
+              18.30000001192093,
+              18.400000005960464
+            ]
+          },
+          {
+            "profile": "mobile-landscape",
+            "cache": "warm",
+            "usableMs": [
+              109.7000000178814,
+              122.90000000596046,
+              108.90000000596046
+            ],
+            "idleMedianMs": [
+              16.599999994039536,
+              16.69999998807907,
+              16.599999994039536
+            ],
+            "idleP95Ms": [
+              18.299999982118607,
+              18.19999998807907,
+              18.200000017881393
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "renderer": {
+    "baseline": {
+      "desktop": {
+        "build": {
+          "commit": "e955e9d9f182a76f057ea69057c7a1ac6c0bd682",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 615,
+        "initialNominalTextureBytes": 6057032,
+        "restartsNominalTextureBytes": [
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544
+        ],
+        "staticTileTextures": [],
+        "staticGenerationMs": null,
+        "restartStaticGenerationMs": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "windows": {
+          "idle": {
+            "count": 234,
+            "medianDraws": 39.0,
+            "medianVertices": 6768.0
+          },
+          "zoom": {
+            "count": 28,
+            "medianDraws": 39.0,
+            "medianVertices": 7260.0
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 39.0,
+            "medianVertices": 7260.0
+          },
+          "selection": {
+            "count": 26,
+            "medianDraws": 39.0,
+            "medianVertices": 7260.0
+          },
+          "move": {
+            "count": 40,
+            "medianDraws": 39.0,
+            "medianVertices": 7260.0
+          }
+        },
+        "errors": []
+      },
+      "portrait": {
+        "build": {
+          "commit": "e955e9d9f182a76f057ea69057c7a1ac6c0bd682",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 615,
+        "initialNominalTextureBytes": 6057032,
+        "restartsNominalTextureBytes": [
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544
+        ],
+        "staticTileTextures": [],
+        "staticGenerationMs": null,
+        "restartStaticGenerationMs": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "windows": {
+          "idle": {
+            "count": 235,
+            "medianDraws": 457,
+            "medianVertices": 6768
+          },
+          "zoom": {
+            "count": 27,
+            "medianDraws": 457,
+            "medianVertices": 6936
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 457.0,
+            "medianVertices": 6936.0
+          },
+          "selection": {
+            "count": 27,
+            "medianDraws": 457,
+            "medianVertices": 6936
+          },
+          "move": {
+            "count": 42,
+            "medianDraws": 457.0,
+            "medianVertices": 6936.0
+          }
+        },
+        "errors": []
+      },
+      "landscape": {
+        "build": {
+          "commit": "e955e9d9f182a76f057ea69057c7a1ac6c0bd682",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 615,
+        "initialNominalTextureBytes": 6057032,
+        "restartsNominalTextureBytes": [
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544,
+          7273544
+        ],
+        "staticTileTextures": [],
+        "staticGenerationMs": null,
+        "restartStaticGenerationMs": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "windows": {
+          "idle": {
+            "count": 234,
+            "medianDraws": 457.0,
+            "medianVertices": 6414.0
+          },
+          "zoom": {
+            "count": 27,
+            "medianDraws": 457,
+            "medianVertices": 6570
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 457.0,
+            "medianVertices": 6570.0
+          },
+          "selection": {
+            "count": 27,
+            "medianDraws": 457,
+            "medianVertices": 6570
+          },
+          "move": {
+            "count": 41,
+            "medianDraws": 457,
+            "medianVertices": 6570
+          }
+        },
+        "errors": []
+      }
+    },
+    "prototype": {
+      "desktop": {
+        "build": {
+          "commit": "dbe9eba2654b1bc3271e9fba8070d0016921ce7e",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 327,
+        "initialNominalTextureBytes": 9605192,
+        "restartsNominalTextureBytes": [
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704
+        ],
+        "staticTileTextures": [
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_forest-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-2",
+            "width": 480,
+            "height": 600,
+            "nominalBytes": 1152000
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_water-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          }
+        ],
+        "staticGenerationMs": 7.5,
+        "restartStaticGenerationMs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "windows": {
+          "idle": {
+            "count": 234,
+            "medianDraws": 39.0,
+            "medianVertices": 5904.0
+          },
+          "zoom": {
+            "count": 28,
+            "medianDraws": 39.0,
+            "medianVertices": 6396.0
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 39.0,
+            "medianVertices": 6396.0
+          },
+          "selection": {
+            "count": 26,
+            "medianDraws": 39.0,
+            "medianVertices": 6396.0
+          },
+          "move": {
+            "count": 40,
+            "medianDraws": 39.0,
+            "medianVertices": 6396.0
+          }
+        },
+        "errors": []
+      },
+      "portrait": {
+        "build": {
+          "commit": "dbe9eba2654b1bc3271e9fba8070d0016921ce7e",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 327,
+        "initialNominalTextureBytes": 9605192,
+        "restartsNominalTextureBytes": [
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704
+        ],
+        "staticTileTextures": [
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_forest-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-2",
+            "width": 480,
+            "height": 600,
+            "nominalBytes": 1152000
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_water-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          }
+        ],
+        "staticGenerationMs": 6.800000011920929,
+        "restartStaticGenerationMs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "windows": {
+          "idle": {
+            "count": 234,
+            "medianDraws": 313.0,
+            "medianVertices": 5904.0
+          },
+          "zoom": {
+            "count": 26,
+            "medianDraws": 313.0,
+            "medianVertices": 6072.0
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 313.0,
+            "medianVertices": 6072.0
+          },
+          "selection": {
+            "count": 27,
+            "medianDraws": 313,
+            "medianVertices": 6072
+          },
+          "move": {
+            "count": 40,
+            "medianDraws": 313.0,
+            "medianVertices": 6072.0
+          }
+        },
+        "errors": []
+      },
+      "landscape": {
+        "build": {
+          "commit": "dbe9eba2654b1bc3271e9fba8070d0016921ce7e",
+          "dirty": false
+        },
+        "gpu": {
+          "vendor": "Google Inc. (Apple)",
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+        },
+        "maxTextureSize": 16384,
+        "objects": 327,
+        "initialNominalTextureBytes": 9605192,
+        "restartsNominalTextureBytes": [
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704,
+          10821704
+        ],
+        "staticTileTextures": [
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_forest-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-2",
+            "width": 480,
+            "height": 600,
+            "nominalBytes": 1152000
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_stone-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass_path-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_grass-1",
+            "width": 480,
+            "height": 456,
+            "nominalBytes": 875520
+          },
+          {
+            "key": "battle-tile-v1-asset:terrain_water-0",
+            "width": 480,
+            "height": 312,
+            "nominalBytes": 599040
+          }
+        ],
+        "staticGenerationMs": 7.0999999940395355,
+        "restartStaticGenerationMs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "windows": {
+          "idle": {
+            "count": 234,
+            "medianDraws": 313.0,
+            "medianVertices": 5550.0
+          },
+          "zoom": {
+            "count": 27,
+            "medianDraws": 313,
+            "medianVertices": 5706
+          },
+          "pan": {
+            "count": 32,
+            "medianDraws": 313.0,
+            "medianVertices": 5706.0
+          },
+          "selection": {
+            "count": 28,
+            "medianDraws": 313.0,
+            "medianVertices": 5706.0
+          },
+          "move": {
+            "count": 41,
+            "medianDraws": 313,
+            "medianVertices": 5706
+          }
+        },
+        "errors": []
+      }
+    }
+  }
+}

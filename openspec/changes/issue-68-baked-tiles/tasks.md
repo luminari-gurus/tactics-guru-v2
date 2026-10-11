@@ -10,15 +10,15 @@ Caller approved plan commit 523e50e on 2026-10-11; implementation authorized. Is
 
 ## 2. Shared tile prototype and correctness
 
-- [ ] 2.1 Implement actual terrain/elevation shared canvas variants in BoardRenderer.ts (adjacent helper only if needed), preserving density 6 and independent dynamic layers; verify actual variant keys/dimensions, one shared texture per pair, renderer texture limits, and generation timing with focused cache/browser checks.
-- [ ] 2.2 Adapt surface diagnostics to actual baked image geometry and extend tests/battle-board.spec.ts for matching terrain corners, texture reuse and at least six restarts with constant cache bytes/count; retain fit/max-zoom and portrait/landscape visual comparisons proving terrain orientation, seams and depth order.
-- [ ] 2.3 Run existing battle-board, battle-loop, input and lifecycle checks as applicable; verify elevated top/side picking, transformed selection, overlays, legal movement, canopy fading and safe restart with no errors. Document results and any visual/resource limitations alongside prototype details.
+- [x] 2.1 Implement actual terrain/elevation shared canvas variants in BoardRenderer.ts (adjacent helper only if needed), preserving density 6 and independent dynamic layers; verify actual variant keys/dimensions, one shared texture per pair, renderer texture limits, and generation timing with focused cache/browser checks.
+- [x] 2.2 Adapt surface diagnostics to actual baked image geometry and extend tests/battle-board.spec.ts for matching terrain corners, texture reuse and at least six restarts with constant cache bytes/count; retain fit/max-zoom and portrait/landscape visual comparisons proving terrain orientation, seams and depth order.
+- [x] 2.3 Run existing battle-board, battle-loop, input and lifecycle checks as applicable; verify elevated top/side picking, transformed selection, overlays, legal movement, canopy fading and safe restart with no errors. Document results and any visual/resource limitations alongside prototype details.
 
 ## 3. Comparison and disposition
 
-- [ ] 3.1 Capture a build-identified prototype sequentially with identical v3 battle/proof workloads and matching instrumentation/profile/seed conditions; retain raw timing and CPU/renderer traces, generation cost, variant memory and cold/warm usable time. Verify clean consistent build identities and explicitly record unavailable GPU metrics.
-- [ ] 3.2 Compare distributions and observed variability, renderer work and startup/memory costs without relaxing budgets or inferring an FPS gain from a 60 fps baseline; document adopt/reject decision against design.md criteria. Repeat matched measurements only if variance prevents a defensible decision.
-- [ ] 3.3 Keep the justified prototype or restore baseline runtime on rejection; retain reproducible experiment evidence/tooling and report the final code choice. Verify every issue criterion/spec scenario has linked evidence and that no rejected runtime change remains in the final diff.
+- [x] 3.1 Capture a build-identified prototype sequentially with identical v3 battle/proof workloads and matching instrumentation/profile/seed conditions; retain raw timing and CPU/renderer traces, generation cost, variant memory and cold/warm usable time. Verify clean consistent build identities and explicitly record unavailable GPU metrics.
+- [x] 3.2 Compare distributions and observed variability, renderer work and startup/memory costs without relaxing budgets or inferring an FPS gain from a 60 fps baseline; document adopt/reject decision against design.md criteria. Repeat matched measurements only if variance prevents a defensible decision.
+- [x] 3.3 Keep the justified prototype or restore baseline runtime on rejection; retain reproducible experiment evidence/tooling and report the final code choice. Verify every issue criterion/spec scenario has linked evidence and that no rejected runtime change remains in the final diff.
 
 ## 4. Final integration and delivery
 

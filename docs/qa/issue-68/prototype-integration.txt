@@ -1,0 +1,65 @@
+
+> tactics-guru-v2@0.0.0 test
+> playwright test tests/battle-loop.spec.ts tests/input.spec.ts tests/lifecycle.spec.ts
+
+[WebServer] (node:93241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 48 tests using 1 worker
+
+(node:93280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (1.2s)
+  ✓   2 [desktop] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.1s)
+  ✓   3 [desktop] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✓   4 [desktop] › tests/battle-loop.spec.ts:56:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.2s)
+  ✓   5 [desktop] › tests/battle-loop.spec.ts:93:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.1s)
+  ✓   6 [desktop] › tests/battle-loop.spec.ts:108:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓   7 [desktop] › tests/battle-loop.spec.ts:141:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✓   8 [desktop] › tests/battle-loop.spec.ts:174:1 › restart during initial enemy animation discards the old run and its callbacks (498ms)
+  ✓   9 [desktop] › tests/battle-loop.spec.ts:191:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓  10 [desktop] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (1.0s)
+  ✓  11 [desktop] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (334ms)
+  ✓  12 [desktop] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (218ms)
+  ✓  13 [desktop] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (321ms)
+  ✓  14 [desktop] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓  15 [desktop] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (528ms)
+  ✓  16 [desktop] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.1s)
+(node:93349) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [mobile-portrait] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (1.2s)
+  ✓  18 [mobile-portrait] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.2s)
+  ✓  19 [mobile-portrait] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✓  20 [mobile-portrait] › tests/battle-loop.spec.ts:56:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.2s)
+  ✓  21 [mobile-portrait] › tests/battle-loop.spec.ts:93:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.2s)
+  ✓  22 [mobile-portrait] › tests/battle-loop.spec.ts:108:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓  23 [mobile-portrait] › tests/battle-loop.spec.ts:141:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✓  24 [mobile-portrait] › tests/battle-loop.spec.ts:174:1 › restart during initial enemy animation discards the old run and its callbacks (503ms)
+  ✓  25 [mobile-portrait] › tests/battle-loop.spec.ts:191:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓  26 [mobile-portrait] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (1.0s)
+  ✓  27 [mobile-portrait] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (437ms)
+  ✓  28 [mobile-portrait] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (224ms)
+  ✓  29 [mobile-portrait] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (322ms)
+  ✓  30 [mobile-portrait] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓  31 [mobile-portrait] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (533ms)
+  ✓  32 [mobile-portrait] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.2s)
+(node:93425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  33 [mobile-landscape] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (1.2s)
+  ✓  34 [mobile-landscape] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.2s)
+  ✓  35 [mobile-landscape] › tests/battle-loop.spec.ts:27:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✓  36 [mobile-landscape] › tests/battle-loop.spec.ts:56:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.2s)
+  ✓  37 [mobile-landscape] › tests/battle-loop.spec.ts:93:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.2s)
+  ✓  38 [mobile-landscape] › tests/battle-loop.spec.ts:108:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓  39 [mobile-landscape] › tests/battle-loop.spec.ts:141:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✓  40 [mobile-landscape] › tests/battle-loop.spec.ts:174:1 › restart during initial enemy animation discards the old run and its callbacks (500ms)
+  ✓  41 [mobile-landscape] › tests/battle-loop.spec.ts:191:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓  42 [mobile-landscape] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (1.0s)
+  ✓  43 [mobile-landscape] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (334ms)
+  ✓  44 [mobile-landscape] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (222ms)
+  ✓  45 [mobile-landscape] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (321ms)
+  ✓  46 [mobile-landscape] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓  47 [mobile-landscape] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (641ms)
+  ✓  48 [mobile-landscape] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.1s)
+
+  48 passed (2.9m)
