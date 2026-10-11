@@ -175,7 +175,13 @@ export class BoardRenderer {
       if(label){const text=this.scene.add.text(p.x,p.y-65,label,{fontSize:'16px',color:'#ffffff',backgroundColor:'#172033'}).setOrigin(0.5).setDepth(10000);this.root.add(text);labels.push(text);}
     }
     let complete!:()=>void;const done=new Promise<void>(resolve=>{complete=resolve;});let finished=false;
-    const finish=()=>{if(finished)return;finished=true;labels.forEach(l=>l.destroy());this.present(after,[],null);complete();};
+    const finish=()=>{
+      if(finished)return;finished=true;labels.forEach(l=>l.destroy());
+      // Scene shutdown destroys the display list before canceling this presentation.
+      // Resolve cancellation without touching images whose scene/texture binding is gone.
+      if(this.root.scene)this.present(after,[],null);
+      complete();
+    };
     const tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
       if(!move)return;
       const progress=marker.progress*(move.path.length-1),i=Math.min(Math.floor(progress),move.path.length-2);

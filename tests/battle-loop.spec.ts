@@ -185,6 +185,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
 });
 
 test('restart during initial enemy animation discards the old run and its callbacks',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto('/');await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
@@ -195,6 +196,7 @@ test('restart during initial enemy animation discards the old run and its callba
   const replay=replayBattle(fresh.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(fresh.state);
   expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
   await expect(page.locator('canvas')).toHaveCount(1);await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test('battle diagnostics record real selection, gestures and movement and reset on restart',async({page})=>{

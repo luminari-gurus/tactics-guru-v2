@@ -1,0 +1,23 @@
+
+> tactics-guru-v2@0.0.0 test
+> playwright test tests/battle-loop.spec.ts --grep restart during initial|keyboard selection
+
+[WebServer] (node:83057) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:83096) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.4s)
+  ✓  2 [desktop] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (505ms)
+(node:83119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [mobile-portrait] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.3s)
+  ✓  4 [mobile-portrait] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (504ms)
+(node:83181) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [mobile-landscape] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.3s)
+  ✓  6 [mobile-landscape] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (507ms)
+
+  6 passed (10.5s)
