@@ -6,11 +6,25 @@ Implementation started 2026-10-11 from planning head `cc4859d`, based on merged 
 
 `tests/helpers/saveFixtures.ts` is shared by tests and the measurement harness. Authored seeds 1 and 2 use the existing `BattleSession` and `playerDecision` policy. It captures empty starts, the first accepted enemy/player commands during presentation, the first active Guarded boundary, and legal seed-1 loss/seed-2 win. The maximum fixture uses the existing turn test's 32x32, six-spawn, seed-7 setup with 10,000 accepted Wait commands, retaining the independently dispatched final state. It uses the authored catalog's stats, validates its synthetic map, and carries a separate catalog digest. Every fixture is semantically replayed and compared to its retained state during construction.
 
-## Progress
+## Contract and focused verification
 
-- Fixture construction and initial comparison succeeded for eight fixtures; application typecheck passed.
-- Preliminary measurements select snapshots: about 1.1 KB versus 301 KB at the command limit, and about 0.07 ms versus 564 ms median decode on this host. Final pinned raw measurements follow after committing the harness. These are host observations, not mobile budgets.
-- Codec, rejection/continuation tests and integrated verification remain pending.
+The retained [raw comparison](issue-69/comparison.json) was measured at clean commit `bc53bba1afe6f3ec24ec416f22eb0fa78dd508e6`, Node v24.19.0, Windows x64, Intel Core Ultra 9 285H. Snapshot versus replay at 10,000 commands: 1,130 versus 301,272 code units/UTF-8 bytes; median decode approximately 0.07 versus 703 ms. Legal win/loss replay medians are about 3.60/8.45 ms; snapshots about 0.12/0.10 ms. The selected [snapshot format](../battle-save-format.md) has the exact same envelope overhead as the measured candidate. These are host observations, not mobile budgets.
+
+The codec is pure and unused by application code (source search finds only its own definitions). It retains no replay variant. The semantic replay path is exercised by fixture construction and a correctly shaped illegal-command regression. The format document records the trust boundary, limitations of snapshot invariants/checksums, and all deferred storage/session/UI/device acceptance. GitHub readback confirmed parent #58 remains open.
+
+Commands completed successfully:
+
+```text
+node node_modules/vitest/vitest.mjs run tests/unit/saveEnvelope.test.ts
+# 16 tests passed.
+node node_modules/vitest/vitest.mjs run tests/unit/saveEnvelope.test.ts tests/unit/turns.test.ts tests/unit/battleSession.test.ts tests/unit/rng.test.ts tests/unit/ai.test.ts tests/unit/domainBoundary.test.ts
+# 89 tests across 6 files passed.
+node node_modules/typescript/bin/tsc --noEmit
+node node_modules/typescript/bin/tsc --noEmit -p tsconfig.domain.json
+# Both typechecks passed.
+```
+
+Configured full unit/content, build/browser, strict OpenSpec and final whitespace validation remain pending.
 
 ## Reproduction
 

@@ -14,6 +14,8 @@ Issue [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69) is a na
 
 ## Decisions
 
+Implementation decision (2026-10-11): retain snapshots. The clean `bc53bba` comparison measured 1,130 bytes / about 0.07 ms median decode against 301,272 bytes / about 703 ms for replay at 10,000 commands. See [format contract](../../../docs/battle-save-format.md) and [raw evidence](../../../docs/qa/issue-69/comparison.json). The format has a 16,384-code-unit input cap and 128-code-unit map-ID cap, with existing domain bounds for all other fields. This is an internal representation choice already authorized by the plan; no runtime resume or new scope is added.
+
 1. **Compare existing primitives before adding a format.** Benchmark validated snapshots and initial-state/accepted-command replay with identical domain fixtures. Use normal, ended, presentation-boundary and maximum-command cases; record raw sizes and costs. Choose one based on those results rather than preserving two formats. The comparison is a required investigation, not a premature fixed encoding choice.
 2. **Place the pure contract under the existing domain boundary.** A small `src/domain/saveEnvelope.ts` can reuse `readBattleState`, `readReplay`, `replayBattle`, `canonical` and `hashJson`. The current ES2022-only typecheck and boundary tests apply automatically. Avoid a storage package whose purity would require duplicate enforcement.
 3. **Make serialized text the external input.** Enforce an explicit finite length bound before parse, then validate envelope shape/version and bounded payload before canonicalization/hash/reconstruction. Reuse existing collection/number/state bounds; never recurse/hash arbitrary unknown objects first. Return typed failures, preserving original text for a future adapter's recovery/export policy.
@@ -35,4 +37,4 @@ No existing save data or key is touched. This child introduces a pure unused-by-
 
 ## Open Questions
 
-The required benchmark determines the final representation and justified finite text cap; record both before implementing the selected codec. These internal choices preserve the same external contract and are part of the planned investigation. Child creation and plan publication are authorized; implementation remains a separate next step.
+The representation and finite cap are now resolved by the evidence and contract above. The user authorized implementation on 2026-10-11. Storage and live session behavior remain separate work under #58.

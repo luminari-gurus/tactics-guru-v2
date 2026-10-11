@@ -2,7 +2,7 @@
 
 ## Scope and status
 
-Implementation authorized by the user's 2026-10-11 request. Working in the existing clean issue worktree, with main refreshed and unchanged at `e955e9d`. OpenSpec apply is ready (0/9). Current task: fixture provenance and candidate measurements. The planning-only statements below describe the original publication, now superseded by this authorization. Keep this section and the root handoff current after each implementation stage.
+Implementation authorized by the user's 2026-10-11 request. Working in the existing clean issue worktree, with main refreshed and unchanged at `e955e9d`. OpenSpec apply is ready (7/9). Snapshot codec and format/adapter contract are implemented. Sixteen save tests, 89 focused domain/session tests and both typechecks pass. Current task: configured full unit/content/build/browser gates, final audit and PR publication. The planning-only statements below describe the original publication, now superseded by this authorization. Keep this section and the root handoff current after each implementation stage.
 
 Progress: task 1.1 complete. Eight shared fixtures build successfully and replay to their independently captured states; typecheck passed. The first comparison selects snapshots because replay reaches roughly 301 KB and 564 ms median decode at 10,000 commands versus roughly 1.1 KB and 0.07 ms for snapshots on this host. Commit the harness, retain a pinned run, then specify/implement the selected contract. See [QA report](../../qa/issue-69-save-envelope.md).
 
