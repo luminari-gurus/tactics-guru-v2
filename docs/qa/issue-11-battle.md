@@ -80,15 +80,14 @@ The caller reports that iPhone Chrome/Safari look good, followed by the browser 
 
 Caller report received 2026-10-10 for https://15a9d5a6.tactics-guru-v2.pages.dev:
 
-- Device subsequently identified by the caller as iPhone 16 Pro running iOS 27.0.1. The meaning of “desktop and landscape” remains unspecified.
-- Chrome 155.0.8059.37: reported working on “desktop and landscape.” Whether this means desktop hardware or iPhone orientations needs clarification.
-- Safari: version unknown, reported “working fine desktop/landscape,” with the same device/orientation ambiguity.
-- No problems reported. Win/loss/restart, individual gesture/layout/resume checks, console inspection and physical timing were not individually confirmed. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
+- Device subsequently identified by the caller as iPhone 16 Pro running iOS 27.0.1. The caller clarified that “desktop and landscape” meant portrait and landscape on this iPhone; it supplies no desktop-computer evidence.
+- Chrome 155.0.8059.37 and Safari (version unknown): caller reports movement, attacks, features, panning and zooming working in both portrait and landscape. “Features” was not itemized, so it does not individually certify all three signatures or other checklist items.
+- The caller explicitly did not complete a full battle. Victory, defeat and restart after outcomes remain unverified. No problems were reported in the exercised checks; detailed safe-area/browser-toolbar behavior, suspension/resume, console inspection and physical timing remain unverified. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
 
 | Browser | Portrait | Landscape | Device / OS / browser / build / conditions |
 | --- | --- | --- | --- |
-| iPhone Safari | Unverified | Unverified | Caller: iPhone 16 Pro, iOS 27.0.1; Safari version unknown; qualitative report above |
-| iPhone Chrome | Unverified | Unverified | Caller: iPhone 16 Pro, iOS 27.0.1; Chrome 155.0.8059.37; qualitative report above |
+| iPhone Safari | Partial: movement, attacks, features, pan/zoom reported working | Partial: same checks | Caller: iPhone 16 Pro, iOS 27.0.1; Safari version unknown; full battle not completed |
+| iPhone Chrome | Partial: movement, attacks, features, pan/zoom reported working | Partial: same checks | Caller: iPhone 16 Pro, iOS 27.0.1; Chrome 155.0.8059.37; full battle not completed |
 | Android Chrome | Unverified | Unverified | Not supplied |
 | Desktop | Physical/manual unverified | Physical/manual unverified | Automated host metadata comes from captures |
 
@@ -126,7 +125,7 @@ The temporary remote config inherited `playwright.config.ts`, used `testDir: '..
 
 | Issue acceptance criterion | Evidence / unresolved gate |
 | --- | --- |
-| Physical win/loss/restart, four browsers × two orientations | Matrix pending; automatic battle tests are supporting evidence only |
+| Physical win/loss/restart, four browsers × two orientations | Partial iPhone Safari/Chrome checks reported in both orientations; no full battle completed; outcomes/restarts and Android/desktop evidence pending; automatic battle tests are supporting evidence only |
 | Gestures, safe areas, chrome resizing, audio, suspension, errors | Existing and added battle checks; physical checklist pending; battle audio absent |
 | Reproducible deployed budgets and proof baseline comparison | 18 local and 18 preview battle samples plus 18 proof samples; F1/F2 fail; main URL lacks diagnostics |
 | Actual action/AI/outcome automation, viewport/DPR, approved deployment | Existing full battle/picking/layout suite plus new diagnostics regression; preview build verified; main URL is older; 171 configured tests passed |
@@ -139,4 +138,4 @@ Only the existing separately approved beta release path is allowed. Do not insta
 
 ## Delivery status
 
-Implementation and evidence collection are ready for draft review. OpenSpec progress is 10/11 tasks: physical-device task 3.4 remains unchecked because the caller will supply results later. Performance F1/F2 and battle audio remain unmet issue acceptance gates even though their failures are measured and recorded. #11 and the epic remain open; no `Closes` reference is justified. No merge or OpenSpec archive has been performed.
+Implementation and evidence collection are ready for draft review. OpenSpec progress is 10/11 tasks: physical-device task 3.4 remains unchecked. The caller supplied partial iPhone Safari/Chrome evidence in both orientations, without completing a full battle; remaining physical acceptance is pending. Performance F1/F2 and battle audio remain unmet issue acceptance gates even though their failures are measured and recorded. #11 and the epic remain open; no `Closes` reference is justified. No merge or OpenSpec archive has been performed.
