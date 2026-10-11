@@ -58,9 +58,10 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const replayPath=test.info().outputPath('replay.json');
     writeFileSync(replayPath,JSON.stringify(final,null,2));
     await test.info().attach('replay',{path:replayPath,contentType:'application/json'});
-    if(seed===1){await page.keyboard.press('Escape');await expect(page.locator('#battle-active')).toContainText('Defeat');await page.locator('#fit-restart').click();}
-    else await page.locator('#dialog-restart').click();
+    await page.locator('#dialog-restart').click();
     await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(page.locator('#fit-status')).toHaveText('Battle ready');
     expect(await page.locator('canvas').count()).toBe(1);expect(errors).toEqual([]);
   });
 }
