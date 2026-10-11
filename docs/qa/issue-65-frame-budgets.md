@@ -107,3 +107,5 @@ Final production build and browser tests use clean corrected runtime `f36c98e`; 
 | `openspec validate issue-65-frame-budgets --strict` | Pass |
 
 Final scope contains shared column/highlight texture caching, one disposed-render guard, comparable bounded raw measurements, workload separation, focused existing-test assertions and task evidence. Profiling harness is retained as reproduction evidence; task-created ignored working copies are removed. Every issue criterion is verified against the specified deployed automated gate and configured checks; historical failures and local p50 limitations remain explicit. Physical-device certification, the historical intermittent Safari report and audio delivery remain separate work. No production configuration, merge, manual issue closure or OpenSpec archive is performed.
+
+Delivery PR: https://github.com/luminari-gurus/tactics-guru-v2/pull/67, open for review against main. Final runtime is `f36c98e`; later evidence/tracking commits do not change application, collector or tests. No merge or manual issue closure performed.

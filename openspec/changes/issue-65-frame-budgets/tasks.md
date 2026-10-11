@@ -21,7 +21,7 @@ Caller approved plan commit `5d64d74` on 2026-10-11. Work only on `work/issue-65
 
 - [x] 4.1 Run full configured unit/content/browser tests, both strict typechecks, production build, diff and strict OpenSpec checks; record exact commands/results and any failure. Confirm the final diff contains only #65 work and no temporary profiler machinery without a durable consumer.
 - [x] 4.2 Through the existing approved release path, verify the clean served candidate build and collect paired proof/battle deployed evidence for all three profiles and three cold/warm pairs each. Verify every idle sample against F1, each pan/zoom/move window against F2, cold/warm usable times and code/assets against L1–L4, selection/pan first-render responses and zero unexpected errors; retain every failed/incomplete capture and physical/engine-proxy limitations.
-- [ ] 4.3 Compare every issue criterion and spec scenario with final evidence in QA; leave unverified criteria unfinished. Commit/push only task files and reuse/create the PR with exact approval/validation evidence. Use Closes #65 only if all criteria pass; otherwise draft with Refs #65 and concrete remaining gates. Verify PR attachment and links.
+- [x] 4.3 Compare every issue criterion and spec scenario with final evidence in QA; leave unverified criteria unfinished. Commit/push only task files and reuse/create the PR with exact approval/validation evidence. Use Closes #65 only if all criteria pass; otherwise draft with Refs #65 and concrete remaining gates. Verify PR attachment and links.
 
 ## Workflow follow-up
 
