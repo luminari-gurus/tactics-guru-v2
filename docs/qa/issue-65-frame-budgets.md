@@ -76,3 +76,34 @@ Every specification scenario maps to these rows: deployed idle to AC3; actual wo
 The first complete browser run on `0d36301` recorded 165 passes and six failures (7.2 min): both restart-during-presentation cases failed in all three profiles. [Complete failure log](issue-65/browser-initial-failure.txt), [exact stack](issue-65/restart-stack.txt). This intermediate runtime has passing measured performance but fails gameplay restart acceptance and is not deliverable. Phaser destroys display-list children before the scene's shutdown callback cancels the animation. The old cancellation completion redraw now invokes `Image.setTexture` after those images have lost their scene binding, causing `Cannot read properties of undefined (reading sys)`.
 
 The correction checks whether the root still belongs to a scene before the final redraw, while still destroying owned labels and resolving cancellation exactly once. Normal/hidden completion still redraws; disposed scene callbacks cannot mutate the new run. No cancellation API, extra lifecycle adapter or domain change was added. Existing failures are the meaningful RED regression; the strengthened restart test additionally asserts zero page errors. [Focused GREEN](issue-65/restart-green.txt): both cases pass in all three profiles, six tests in 10.5 s. Final full-suite and exact-build budget captures follow; all earlier failures remain retained. This addresses a regression exposed by this rendering change and does not claim the physical Safari #66 cause or fix.
+
+## Final corrected runtime
+
+Delivered runtime is `f36c98e01f97d8975d29a3ceff5caa1879894ed9`, clean, containing the presentation-shutdown guard. The previous `0d36301` captures remain intermediate evidence and are not a gameplay acceptance claim. Because runtime changed, paired [final local proof](issue-65/final-local-proof.json)/[battle](issue-65/final-local-battle.json) and [final deployed proof](issue-65/final-deployed-proof.json)/[battle](issue-65/final-deployed-battle.json) were captured once each, 18 samples per capture. Served/collector identities agree; source/build dirty flags are false. No other browser workload ran during these captures.
+
+| Final battle gate | Local maximum | Deployed maximum | Disposition |
+| --- | --- | --- | --- |
+| F1 p50/p95 | 16.8/18.6 ms | 16.7/18.8 ms | Deployed passes; local p50 failures retained |
+| F2 pan/zoom/move p95 | 18.5/20.4/19.1 ms | 18.6/19.2/18.8 ms | Every window passes unchanged ≤33.4 |
+| L1 cold usable | 598.1 ms | 862.2 ms | Pass ≤2500 |
+| L2 warm usable | 462.1 ms | 625.0 ms | Pass ≤750 |
+| L3 cold code | 391160 bytes | 392972 bytes | Pass ≤400000 |
+| L4 cold assets | 834688 bytes | 834688 bytes | Pass ≤1500000 |
+
+Every applicable gate on all 18 final deployed samples passes; all 18 pan, 18 zoom and 36 movement windows pass. All recorded selection/pan changes reach the next render callback, with zero browser errors. Two final local portrait samples have p50 16.8 ms (first warm, second cold); these join the earlier local failure in the per-sample assessment. No universal local/host/device F1 guarantee is claimed. Final deployed proof remains at worst p50/p95 16.7/18.5 ms, cold/warm usable 836.5/269.4 ms and assets 1412374 bytes.
+
+## Final configured verification and delivery
+
+Final production build and browser tests use clean corrected runtime `f36c98e`; subsequent changes only preserve evidence and update documentation/OpenSpec tracking. Application/collector/test code is unchanged after that runtime commit. Final full configured browser run: **171 passed in 6.7 min** across desktop, Pixel 7 portrait and landscape. It includes legal victories/defeats and all approved signatures, replay equality, picking at transformed viewports/DPR, presentation suspension, modal/gesture lock and repeated restart, including both formerly failing presentation-restart cases. Unit suite **265 passed**, content validation **77 passed**, both strict TypeScript configurations and production build pass. Existing Phaser large-chunk and runner color-environment warnings remain; no new runtime dependency.
+
+| Actual final command | Result / retained log |
+| --- | --- |
+| `npm run test:unit` | [265 passed](issue-65/unit-final.txt) |
+| `npm run validate:content` | [77 passed](issue-65/content-final.txt) |
+| `npm run typecheck` | [Both strict configurations pass](issue-65/typecheck-final.txt) |
+| `npm run build` | [Production build passes](issue-65/build-final.txt) |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test` | [171 passed, 6.7 min](issue-65/browser-final.txt) |
+| `git diff --check` | Pass |
+| `openspec validate issue-65-frame-budgets --strict` | Pass |
+
+Final scope contains shared column/highlight texture caching, one disposed-render guard, comparable bounded raw measurements, workload separation, focused existing-test assertions and task evidence. Profiling harness is retained as reproduction evidence; task-created ignored working copies are removed. Every issue criterion is verified against the specified deployed automated gate and configured checks; historical failures and local p50 limitations remain explicit. Physical-device certification, the historical intermittent Safari report and audio delivery remain separate work. No production configuration, merge, manual issue closure or OpenSpec archive is performed.
