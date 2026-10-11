@@ -38,7 +38,7 @@ export class BattleAudio {
   private unlockTimer?: Timer;
   private loadTimer?: Timer;
   private requests = new Map<AbortController, Timer>();
-  private media = new Map<string, {tag: HTMLAudioElement; url: string; cleanup: ()=>void}>();
+  private media = new Map<string, {tag: HTMLAudioElement; url: string; cleanup: ()=>void; primed: boolean}>();
   private readonly priorPauseOnBlur?: boolean;
 
   constructor(private readonly host: Host, private readonly catalog: ContentCatalog, enabled: boolean,
@@ -64,7 +64,7 @@ export class BattleAudio {
     const context = this.contextState();
     const status = this.load === 'unavailable' ? 'unavailable' : !this.enabled ? 'muted' : document.hidden ? 'hidden'
       : this.unlockTimer ? 'unlocking' : this.error || this.blurred || context !== 'running' ? 'blocked'
-      : this.load === 'loading' ? 'loading' : 'ready';
+      : this.load === 'loading' ? 'loading' : [...this.media.values()].some(media=>!media.primed) ? 'blocked' : 'ready';
     return {enabled:this.enabled,status,load:this.load,context,error:this.error,generation:this.generation,lastToken:this.lastToken,
       started:this.started,completed:this.completed,dropped:this.dropped,active:this.active,recent:[...this.recent],ownedSounds:this.sounds.size};
   }
@@ -100,11 +100,13 @@ export class BattleAudio {
       // Owned media bypasses Phaser's loader, which normally refreshes its HTML5 lock.
       if (!context) this.host.sound.unlock();
       // HTML5 media is primed silently inside the gesture; never queue a historical cue.
-      const resumed = context ? context.resume() : Promise.all([...this.media.values()].map(({tag})=>{
+      const resumed = context ? context.resume() : Promise.all([...this.media.values()].map(media=>{
+        const {tag}=media;
         tag.muted = true;
         return tag.play().then(()=>{
           if(!this.live || attempt !== this.attempt) return;
           tag.pause();tag.currentTime=0;tag.muted=false;
+          media.primed=true;
         });
       }));
       void resumed.then(()=>{
@@ -126,14 +128,20 @@ export class BattleAudio {
   private block(message: string) { this.error=message; this.stop(); this.notify(); }
   private readonly onVisibility = () => {
     if(document.hidden) { this.cancelUnlock(); this.stop(); }
+    else this.recover();
     this.notify();
   };
   private readonly onContext = () => {
-    if(this.contextState() !== 'running') { this.cancelUnlock(); this.stop(); }
+    if(this.contextState() !== 'running') this.stop();
+    this.recover();
     this.notify(); // Visibility/running transitions never drain a queue.
   };
   private readonly onBlur = () => { this.blurred=true;this.cancelUnlock();this.stop();this.notify(); };
-  private readonly onFocus = () => { this.blurred=false;this.notify(); };
+  private readonly onFocus = () => { this.blurred=false;this.recover();this.notify(); };
+  private recover() {
+    // One bounded automatic attempt; refusal/timeout requires an explicit retry gesture.
+    if(this.context() && this.contextState() !== 'running' && !this.error && !this.unlockTimer) this.unlock();
+  }
   private clearActive() {
     clearTimeout(this.playTimer);this.playTimer=undefined;
     if(this.active) {
@@ -192,14 +200,14 @@ export class BattleAudio {
       }));
       if(!this.live || this.load !== 'loading') return;
       for(const value of decoded) if(value) this.host.cache.audio.add(value.key,value.data);
-      this.load='ready';clearTimeout(this.loadTimer);this.loadTimer=undefined;this.notify();
+      this.load='ready';clearTimeout(this.loadTimer);this.loadTimer=undefined;this.recover();this.notify();
     } catch {this.loadFailed('Could not load or decode battle audio.');}
   }
   private prepareMedia(key: string, bytes: ArrayBuffer): Promise<HTMLAudioElement[]> {
     return new Promise((resolve,reject)=>{
       const tag=new Audio(),url=URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
       const cleanup=()=>{tag.oncanplaythrough=null;tag.onerror=null;};
-      this.media.set(key,{tag,url,cleanup});
+      this.media.set(key,{tag,url,cleanup,primed:false});
       tag.oncanplaythrough=()=>{cleanup();resolve([tag]);};
       tag.onerror=()=>{cleanup();reject(Error('Unsupported media'));};
       tag.preload='auto';tag.dataset.locked='false';tag.dataset.used='false';tag.src=url;tag.load();

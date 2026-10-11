@@ -84,4 +84,14 @@ Alternative considered: a large library or music track. Both add load and mainte
 
 ## Migration Plan
 
+## PR #63 review refinements (2026-10-11)
+
+The branch is rebased onto merged main `d60659d`; the scene retains both #61's performance callbacks and audio teardown. The current user authorizes implementation and a ready PR. The original baseline observations and measurement files remain historical evidence; #11 is now closed, with physical certification in #64, frame work in #65 and intermittent Safari restart investigation in #66.
+
+Phaser 4.2.1 resumes Web Audio from focus, every focused frame, and a delayed game-visible callback. Battle startup disables those automatic hooks once for the game, including loading and restart gaps. The adapter owns recovery through context, visibility and focus events, using its existing two-second unlock watchdog, and stops/discards on blur without engine auto-pause/resume. Rejection or timeout leaves Retry sound available and stops automatic attempts until an explicit gesture. Scene teardown removes adapter listeners/timers; game-scoped hook suppression remains through restart. HTML5 restores its prior pauseOnBlur setting at scene teardown. The global fatal handler remains unchanged for unrelated failures. No audio service or dependency is introduced.
+
+Each owned HTML5 tag records successful priming by the current gesture attempt. Newly loaded/replacement tags are unprimed even when the global manager is unlocked and the preference is enabled. Loading completion exposes blocked/Retry until all current tags have been primed. Late or failed priming cannot mark a replacement ready.
+
+The measurement inventory records normalized relative file paths and computes cue totals from `audio/battle/` within that inventory. Test both path conventions and the eight actual files; keep old Linux captures byte-for-byte intact. Review fixes refine the existing requirements rather than relaxing them. Ready-for-review status follows the current user request; hardware audibility and broader performance acceptance remain explicitly with the follow-up issues.
+
 No saved data or public API migration is required. Land the adapter, cues and controls as one reviewed change after plan approval. Validation uses local builds and any separately authorized existing preview/release path; this task does not install or alter deployment. Rollback removes the audio integration/control and assets, leaving the existing silent battle and its state/replay behavior intact.

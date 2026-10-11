@@ -6,6 +6,8 @@ The replayable battle on main has no audio feedback even though the proof scene 
 
 ## What Changes
 
+Review update (2026-10-11): PR #61 is merged into main `d60659d`, and this branch has been rebased onto it. The user now requests all PR #63 review findings repaired and the PR ready to merge. Review repairs cover bounded engine recovery, current-element HTML5 priming, portable cue-byte measurement, and safe PR issue references. The original planning baseline below remains historical. #11's remaining acceptance now lives in #64 (physical devices), #65 (frame budgets) and #66 (Safari restart); none is certified by this audio repair.
+
 - Add short, distinct movement, attack-result, magic-missile, unit-defeat and battle-outcome cues derived from accepted event batches, with bounded playback and no replay of old events.
 - Add an accessible Enable sound / Mute control. Sound starts disabled, requests unlock in the activation gesture, and retains the preference across in-page restarts only.
 - Make optional audio loading and playback nonfatal; suppress stale or duplicate cues through mute, interruption, backgrounding, unlock and scene teardown.

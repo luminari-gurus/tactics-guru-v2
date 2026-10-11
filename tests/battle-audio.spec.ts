@@ -105,6 +105,96 @@ for(const mode of ['reject','pending'] as const) test(`gesture unlock ${mode} re
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});expect(found).toEqual([]);
 });
 
+for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode} after successful unlock stays nonfatal and bounded`,async({page})=>{
+  const found=errors(page);
+  await page.addInitScript(mode=>{
+    const Original=AudioContext, resume=Original.prototype.resume;
+    window.AudioContext=new Proxy(Original,{construct(target,args){
+      const context=new target(...args);window.__battleContext=context;return context;
+    }});
+    window.__resumeCalls=0;
+    Original.prototype.resume=function(){
+      if(!window.__resumeFailure)return resume.call(this);
+      window.__resumeCalls!++;
+      return mode==='reject'?Promise.reject(new DOMException('Resume refused','NotAllowedError')):new Promise<void>((resolve,reject)=>{
+        window.__releaseResume=()=>{void resume.call(this).then(resolve,reject);};
+      });
+    };
+  },mode);
+  await page.goto('/');await ready(page);await enable(page);
+  await page.evaluate(async()=>{window.__resumeFailure=true;await window.__battleContext!.suspend();window.dispatchEvent(new Event('focus'));});
+  await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',active:null});
+  await expect(page.locator('#battle-sound-retry')).toBeVisible();
+  // Exercise the engine's delayed visible handler as well as focused frame recovery.
+  await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new Event('focus'));
+  });
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(()=>window.__resumeCalls)).toBe(1);
+  await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+  await expect(page.locator('#battle-next')).toBeEnabled();await expect(page.locator('#fit-restart')).toBeEnabled();
+  const before=(await session(page)).state.commandCount;
+  await page.locator('#battle-next').click();await ready(page);
+  expect((await session(page)).state.commandCount).toBeGreaterThan(before);
+  const started=(await audio(page)).started;
+  await page.evaluate(()=>{window.__resumeFailure=false;});await page.locator('#battle-sound-retry').click();
+  await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started});
+  await page.locator('#fit-restart').click();await ready(page);
+  const afterRestart=await audio(page);
+  await page.evaluate(()=>window.__releaseResume?.());await page.waitForTimeout(100);
+  expect(await audio(page)).toEqual(afterRestart);
+  expect((await audio(page)).enabled).toBe(true);expect(found).toEqual([]);
+});
+
+for(const early of [true,false]) test(`HTML5 per-element permission survives ${early?'early enable':'enabled restart'}`,async({page})=>{
+  const found=errors(page);
+  await page.addInitScript(()=>{
+    Object.defineProperty(window,'AudioContext',{value:undefined});Object.defineProperty(window,'webkitAudioContext',{value:undefined});
+    const original=HTMLMediaElement.prototype.play,primed=new WeakSet<HTMLMediaElement>();
+    let gesture=false;
+    // A gesture lasts only through dispatch, not through later media/network callbacks.
+    for(const event of ['click','keydown','touchend'])document.addEventListener(event,e=>{
+      if(!e.isTrusted)return;gesture=true;setTimeout(()=>{gesture=false;},0);
+    },true);
+    window.__mediaPolicy={primed:0,rejected:0};
+    HTMLMediaElement.prototype.play=function(){
+      if(this.muted && gesture && !primed.has(this)){primed.add(this);window.__mediaPolicy!.primed++;}
+      if(!primed.has(this)){window.__mediaPolicy!.rejected++;return Promise.reject(new DOMException('Element requires a gesture','NotAllowedError'));}
+      return original.call(this);
+    };
+  });
+  let release!:()=>void;const held=new Promise<void>(resolve=>{release=resolve;});
+  if(early)await page.route('**/audio/battle/**',async route=>{await held;await route.continue();});
+  await page.goto('/');await ready(page);
+  if(early){await page.locator('#battle-sound').click();release();}
+  else {await enable(page);await page.locator('#fit-restart').click();await ready(page);}
+  await expect.poll(()=>audio(page)).toMatchObject({enabled:true,load:'ready',status:'blocked',started:0});
+  await expect(page.locator('#battle-sound-retry')).toBeVisible();
+  const primed=early?0:8;
+  expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed,rejected:0});
+  await page.locator('#battle-next').click();await ready(page);
+  expect((await audio(page)).started).toBe(0);
+  await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
+  expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed:primed+8,rejected:0});
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await expect.poll(async()=>(await audio(page)).completed).toBeGreaterThan(0);
+  expect(await page.evaluate(()=>window.__mediaPolicy!.rejected)).toBe(0);expect(found).toEqual([]);
+});
+
+test('unrelated asynchronous failures still reach the fatal application handler',async({page})=>{
+  await page.goto('/');await ready(page);
+  await page.evaluate(()=>{void Promise.reject(Error('unrelated application failure'));});
+  await expect(page.locator('#fit-status')).toContainText('asynchronous error');
+  await expect(page.locator('#fit-restart')).toBeDisabled();
+});
+
+declare global { interface Window {
+  __battleContext?:AudioContext;__resumeFailure?:boolean;__resumeCalls?:number;__releaseResume?:()=>void;
+  __mediaPolicy?:{primed:number;rejected:number};
+} }
+
 for(const mode of ['missing','corrupt','stalled','decode-stalled'] as const) test(`${mode} optional media leaves legal controls usable`,async({page})=>{
   const found:string[]=[];page.on('pageerror',e=>found.push(e.message));
   if(mode==='decode-stalled')await page.addInitScript(()=>{AudioContext.prototype.decodeAudioData=()=>new Promise(()=>{});});
@@ -133,7 +223,8 @@ test('HTML5 fallback loads and plays future cues after a gesture',async({page})=
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
   await expect.poll(()=>audio(page)).toMatchObject({started:1,completed:1,active:null});
   await page.locator('#fit-restart').click();await ready(page);expect((await audio(page)).enabled).toBe(true);
-  await expect.poll(()=>audio(page)).toMatchObject({load:'ready'});
+  await expect.poll(()=>audio(page)).toMatchObject({load:'ready',status:'blocked'});
+  await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready'});
   // Blur in the same event after the real Confirm handler starts the cue, before it can finish.
   await page.evaluate(()=>document.addEventListener('click',e=>{if((e.target as HTMLElement).id==='dialog-confirm')window.dispatchEvent(new Event('blur'));}));
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();

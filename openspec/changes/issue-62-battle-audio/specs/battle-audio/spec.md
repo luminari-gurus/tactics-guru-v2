@@ -60,6 +60,12 @@ Sound SHALL start disabled on page load. A visible keyboard-, touch- and mouse-o
 - **WHEN** the player uses the sound control in portrait or landscape, including during an enemy presentation
 - **THEN** its state is accessible, its target is usable and activation cannot reach the canvas or confirm an underlying action
 
+#### Scenario: HTML5 elements arrive after enable or restart
+
+- **WHEN** enabling precedes media loading or an enabled restart creates replacement media elements
+- **THEN** the preference stays enabled but playback remains blocked with a Retry control until every current element is successfully primed in an explicit gesture
+- **AND** suppressed batches and stale priming promises never play or unlock replacement elements
+
 ### Requirement: Lifecycle suppression and cleanup
 
 Audio SHALL stop or suppress playback when hidden, interrupted, muted or locked. Returning to visibility or unlocking SHALL discard stale cues and allow only future eligible events. Teardown SHALL release scene-owned sounds, listeners and timers, and invalidate pending asynchronous work without leaving gameplay input locked.
@@ -94,9 +100,15 @@ Audio loading and unlock attempts SHALL be bounded and SHALL NOT gate battle rea
 - **WHEN** the browser rejects unlock or never settles the request
 - **THEN** the request ends in a bounded blocked state, permits another explicit gesture and never dispatches a gameplay command or stale cue
 
+#### Scenario: Engine recovery after successful unlock
+
+- **WHEN** an already-unlocked context is interrupted and focus, visibility or frame recovery encounters a rejected or pending resume
+- **THEN** recovery is bounded, repeated automatic attempts stop, Retry sound is exposed and legal battle/restart controls remain usable
+- **AND** unrelated application failures still reach the fatal handler
+
 ### Requirement: Bounded resources and honest acceptance evidence
 
-The initial cue files SHALL total no more than 32 KiB. Audio SHALL introduce no runtime dependency or domain coupling. Validation SHALL retain comparable loading/transfer measurements and failures against unchanged agreed budgets, distinguish automated playback from audible device evidence, and keep unresolved physical-device and existing frame-budget gaps visible in #11.
+The initial cue files SHALL total no more than 32 KiB. Audio SHALL introduce no runtime dependency or domain coupling. Validation SHALL retain comparable loading/transfer measurements and failures against unchanged agreed budgets, distinguish automated playback from audible device evidence, and keep unresolved physical-device and existing frame-budget gaps visible in #11's follow-ups #64 and #65.
 
 #### Scenario: Budget comparison
 
@@ -107,3 +119,8 @@ The initial cue files SHALL total no more than 32 KiB. Audio SHALL introduce no 
 
 - **WHEN** automated tests pass but a supported physical browser/orientation has not been checked
 - **THEN** that row remains unverified in the audio QA handoff and is not represented as first-battle acceptance
+
+#### Scenario: Windows measurement inventory
+
+- **WHEN** the same cue inventory is represented with Windows or POSIX separators
+- **THEN** the collector reports the same nonzero cue-byte total matching the actual files

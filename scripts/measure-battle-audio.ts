@@ -1,10 +1,9 @@
 // Task-specific same-host comparison. Build both trees first; no routing (which disables HTTP cache).
 // node --experimental-strip-types scripts/measure-battle-audio.ts BASELINE_DIST CANDIDATE_DIST OUTPUT.json
 import { spawn } from 'node:child_process';
-import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
-import { resolve, join, dirname } from 'node:path';
-import { createHash } from 'node:crypto';
-import { gzipSync } from 'node:zlib';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { inventory, cueBytes } from './battle-audio-inventory.ts';
 import { platform, release, cpus, loadavg } from 'node:os';
 import { createServer, type AddressInfo } from 'node:net';
 import { chromium, devices } from '@playwright/test';
@@ -18,22 +17,13 @@ const probe=createServer();
 await new Promise<void>((done,fail)=>{probe.once('error',fail);probe.listen(0,'127.0.0.1',done);});
 const port=(probe.address() as AddressInfo).port;
 await new Promise<void>((done,fail)=>probe.close(error=>error?fail(error):done()));
-async function inventory(dir:string):Promise<{path:string;bytes:number;gzipBytes:number;sha256:string}[]> {
-  const result=[];
-  for(const file of await readdir(dir,{withFileTypes:true})) {
-    const path=join(dir,file.name);
-    if(file.isDirectory())result.push(...await inventory(path));
-    else {const bytes=await readFile(path);result.push({path,bytes:bytes.length,gzipBytes:gzipSync(bytes).length,sha256:createHash('sha256').update(bytes).digest('hex')});}
-  }
-  return result;
-}
 const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
 const samples:unknown[]=[],builds:unknown[]=[];
 try {
   for(const [label,directory] of [['baseline',baseline],['candidate',candidate]]) {
     const dist=resolve(directory),url=`http://127.0.0.1:${port}`;
     const files=await inventory(dist);
-    builds.push({label,dist,files,compressedCodeBytes:files.filter(f=>/\.(js|css)$/.test(f.path)).reduce((n,f)=>n+f.gzipBytes,0),cueBytes:files.filter(f=>f.path.includes('/audio/battle/')).reduce((n,f)=>n+f.bytes,0)});
+    builds.push({label,dist,files,compressedCodeBytes:files.filter(f=>/\.(js|css)$/.test(f.path)).reduce((n,f)=>n+f.gzipBytes,0),cueBytes:cueBytes(files)});
     const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port',String(port),'--strictPort','--outDir',dist],{stdio:'pipe'});
     let serverOutput='';server.stdout.on('data',d=>serverOutput+=d);server.stderr.on('data',d=>serverOutput+=d);
     let exited=false;
@@ -98,5 +88,5 @@ try {
   }
 } finally {
   await browser.close();await mkdir(dirname(output),{recursive:true});
-  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move and Confirm capture-to-bubble synchronous handler response; not frame/display latency',audio:'enabled after readiness; reload defaults to muted',frames:'No merged battle frame instrumentation; F1/F2 remain unverified here'},budgets:{coldReadyMs:2500,warmReadyMs:750,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
+  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move and Confirm capture-to-bubble synchronous handler response; not frame/display latency',audio:'enabled after readiness; reload defaults to muted',frames:'Merged battle frame diagnostics are present; this short audio workload does not certify F1/F2 acceptance (tracked in #65)'},budgets:{coldReadyMs:2500,warmReadyMs:750,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
 }

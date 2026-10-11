@@ -27,6 +27,15 @@ Issue: [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). Branc
 - [x] 4.3 Record audio unlock, audibility, mute, suspend/resume and restart results for iPhone Safari/Chrome, Android Chrome and desktop in both orientations when available; verify each row has device/build evidence or is explicitly unverified, and prepare a concise linked handoff for #11 (AC6).
 - [x] 4.4 Audit AC1–AC6 against the committed implementation and QA evidence, push only issue-specific changes and open/reuse the PR; verify its issue/branch links and use a draft with `Refs #62` while any acceptance requirement is unverified. Do not close #57/#11/#1 by proxy.
 
+## 5. PR #63 review repairs
+
+- [x] 5.1 Contain Web Audio automatic focus, per-frame and visibility recovery through the existing bounded adapter; prove rejection, pending recovery, explicit retry, teardown and unrelated fatal-error behavior with real Phaser regressions (AC3, AC4).
+- [x] 5.2 Track gesture priming of current HTML5 tags independently of preference/manager lock; prove early enable and enabled restart suppress cues until a successful explicit retry under per-element policy (AC2, AC3).
+- [x] 5.3 Make collector inventory paths portable and verify POSIX/Windows cue totals against the eight real files without changing historical captures (AC5).
+- [ ] 5.4 Run configured local validation after the rebase, update QA and current follow-up ownership, repair PR closing-keyword metadata, publish review responses and leave PR #63 ready for review against current main (AC6).
+
 ## Workflow follow-up
+
+The current user request to leave a ready PR supersedes the original draft-publication instruction in 4.4. Physical audio evidence remains explicitly unverified under #64, performance acceptance under #65 and the separate Safari restart investigation under #66. #11's automated milestone is closed; the parent epics remain open.
 
 - Keep this change unarchived until implementation is merged and its applicable acceptance requirements are satisfied.
