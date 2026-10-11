@@ -82,11 +82,11 @@ Caller report received 2026-10-10 for https://15a9d5a6.tactics-guru-v2.pages.dev
 
 - Device subsequently identified by the caller as iPhone 16 Pro running iOS 27.0.1. The caller clarified that “desktop and landscape” meant portrait and landscape on this iPhone; it supplies no desktop-computer evidence.
 - Chrome 155.0.8059.37 and Safari (version unknown): caller reports movement, attacks, features, panning and zooming working in both portrait and landscape. “Features” was not itemized, so it does not individually certify all three signatures or other checklist items.
-- The caller subsequently completed a losing battle in Safari. Pressing Restart battle produced an error; refreshing the page was required to start another battle. Safari defeat is confirmed, but restart after defeat **failed**. Error wording, orientation and whether this used the same preview are awaiting confirmation. Victory and Chrome outcomes/restarts remain unverified. Detailed safe-area/browser-toolbar behavior, suspension/resume, console inspection and physical timing remain unverified. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
+- The caller subsequently completed a losing battle in Safari. Pressing Restart battle produced an error; refreshing the page was required to start another battle. On the next losing battle, restart succeeded and the caller could not reproduce the error message. Safari defeat and one successful restart are confirmed, alongside one earlier restart failure. The failure is intermittent and its cause remains unknown; the successful retry does not establish a fix. Error wording, orientation and whether this used the same preview remain unspecified. Victory and Chrome outcomes/restarts remain unverified. Detailed safe-area/browser-toolbar behavior, suspension/resume, console inspection and physical timing remain unverified. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
 
 | Browser | Portrait | Landscape | Device / OS / browser / build / conditions |
 | --- | --- | --- | --- |
-| iPhone Safari | Partial: movement, attacks, features, pan/zoom reported working | Partial: same checks | Caller: iPhone 16 Pro, iOS 27.0.1; Safari version unknown; defeat confirmed, restart failed (outcome orientation unspecified) |
+| iPhone Safari | Partial: movement, attacks, features, pan/zoom reported working | Partial: same checks | Caller: iPhone 16 Pro, iOS 27.0.1; Safari version unknown; defeat confirmed; one restart failed, next succeeded (outcome orientation unspecified) |
 | iPhone Chrome | Partial: movement, attacks, features, pan/zoom reported working | Partial: same checks | Caller: iPhone 16 Pro, iOS 27.0.1; Chrome 155.0.8059.37; full battle not completed |
 | Android Chrome | Unverified | Unverified | Not supplied |
 | Desktop | Physical/manual unverified | Physical/manual unverified | Automated host metadata comes from captures |
@@ -102,7 +102,7 @@ Run each orientation independently, using real controls:
 
 ### Safari restart failure investigation
 
-The physical Safari report is an unresolved acceptance failure. The existing seed-1 loss test dismissed the outcome dialog and restarted from the outer button, whereas the caller used Restart battle after defeat. The regression now restarts directly from the outcome dialog for both loss and victory and checks that the next run reaches player phase with `Battle ready`, in addition to seed progression and no page errors.
+The physical Safari report is an unresolved intermittent acceptance failure: the first reported restart after defeat required a refresh, but the next succeeded and the error could not be reproduced. The existing seed-1 loss test dismissed the outcome dialog and restarted from the outer button, whereas the caller used Restart battle after defeat. The regression now restarts directly from the outcome dialog for both loss and victory and checks that the next run reaches player phase with `Battle ready`, in addition to seed progression and no page errors.
 
 On 2026-10-10, the strengthened seed-1 loss test passed once locally and once against https://15a9d5a6.tactics-guru-v2.pages.dev using Playwright WebKit 26.6 (v2359), iPhone 13 emulation, about 1.1 minutes per run. These desktop-engine runs do not reproduce or negate the iPhone 16 Pro / iOS 27.0.1 failure. No application fix is claimed. Exact error wording, outcome orientation and deployment confirmation remain needed.
 
@@ -135,7 +135,7 @@ The temporary remote config inherited `playwright.config.ts`, used `testDir: '..
 
 | Issue acceptance criterion | Evidence / unresolved gate |
 | --- | --- |
-| Physical win/loss/restart, four browsers × two orientations | Partial iPhone checks in both orientations; Safari defeat confirmed, restart failed; victory, Chrome outcomes/restarts and Android/desktop evidence pending; automatic battle tests are supporting evidence only |
+| Physical win/loss/restart, four browsers × two orientations | Partial iPhone checks in both orientations; Safari defeat confirmed, one restart failed and the next succeeded; intermittent failure unresolved; victory, Chrome outcomes/restarts and Android/desktop evidence pending; automatic battle tests are supporting evidence only |
 | Gestures, safe areas, chrome resizing, audio, suspension, errors | Existing and added battle checks; physical checklist pending; battle audio absent |
 | Reproducible deployed budgets and proof baseline comparison | 18 local and 18 preview battle samples plus 18 proof samples; F1/F2 fail; main URL lacks diagnostics |
 | Actual action/AI/outcome automation, viewport/DPR, approved deployment | Existing full battle/picking/layout suite plus new diagnostics regression; preview build verified; main URL is older; 171 configured tests passed |
@@ -148,4 +148,4 @@ Only the existing separately approved beta release path is allowed. Do not insta
 
 ## Delivery status
 
-Implementation and evidence collection are ready for draft review. OpenSpec progress is 10/11 tasks: physical-device task 3.4 remains unchecked. The caller supplied partial iPhone Safari/Chrome evidence in both orientations and subsequently confirmed Safari defeat with a failed restart requiring page refresh. The restart failure and remaining physical acceptance are unresolved. Performance F1/F2 and battle audio remain unmet issue acceptance gates even though their failures are measured and recorded. #11 and the epic remain open; no `Closes` reference is justified. No merge or OpenSpec archive has been performed.
+Implementation and evidence collection are ready for draft review. OpenSpec progress is 10/11 tasks: physical-device task 3.4 remains unchecked. The caller supplied partial iPhone Safari/Chrome evidence in both orientations and subsequently confirmed Safari defeat with one failed restart requiring page refresh, followed by a successful restart after the next defeat. The intermittent restart failure and remaining physical acceptance are unresolved. Performance F1/F2 and battle audio remain unmet issue acceptance gates even though their failures are measured and recorded. #11 and the epic remain open; no `Closes` reference is justified. No merge or OpenSpec archive has been performed.
