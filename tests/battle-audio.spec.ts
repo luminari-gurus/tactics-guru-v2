@@ -141,7 +141,7 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   const started=(await audio(page)).started;
   await page.evaluate(()=>{window.__resumeFailure=false;});await page.locator('#battle-sound-retry').click();
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started});
-  await page.locator('#fit-restart').click();await ready(page);
+  await page.locator('#fit-restart').click();await expect(page.locator('#game')).toHaveAttribute('data-run','2');await ready(page);
   const afterRestart=await audio(page);
   await page.evaluate(()=>window.__releaseResume?.());await page.waitForTimeout(100);
   expect(await audio(page)).toEqual(afterRestart);

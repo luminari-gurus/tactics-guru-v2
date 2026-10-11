@@ -32,7 +32,7 @@ Issue: [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). Branc
 - [x] 5.1 Contain Web Audio automatic focus, per-frame and visibility recovery through the existing bounded adapter; prove rejection, pending recovery, explicit retry, teardown and unrelated fatal-error behavior with real Phaser regressions (AC3, AC4).
 - [x] 5.2 Track gesture priming of current HTML5 tags independently of preference/manager lock; prove early enable and enabled restart suppress cues until a successful explicit retry under per-element policy (AC2, AC3).
 - [x] 5.3 Make collector inventory paths portable and verify POSIX/Windows cue totals against the eight real files without changing historical captures (AC5).
-- [ ] 5.4 Run configured local validation after the rebase, update QA and current follow-up ownership, repair PR closing-keyword metadata, publish review responses and leave PR #63 ready for review against current main (AC6).
+- [x] 5.4 Run configured local validation after the rebase, update QA and current follow-up ownership, repair PR closing-keyword metadata, publish review responses and leave PR #63 ready for review against current main (AC6).
 
 ## Workflow follow-up
 

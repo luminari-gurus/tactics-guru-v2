@@ -1,5 +1,59 @@
 # Issue #62 battle audio QA
 
+## Current PR #63 review repair — 2026-10-11
+
+The branch is rebased onto main `d60659d03b940c20e380eeda3f226ba2b649ef6f` (merged #61), with runtime repair `515ac85be1fd8e0294394e2f8805fc8788d7c901`. The rebase retains the new performance hooks alongside audio teardown; `git range-diff` found only that expected integration adjustment in the original ten commits. The sections below this update preserve the original implementation evidence and its then-current issue/PR states.
+
+All four [review findings](https://github.com/luminari-gurus/tactics-guru-v2/pull/63#issuecomment-6109723285) were valid:
+
+| Finding | Reproduction and repair |
+| --- | --- |
+| Web Audio recovery | Both rejected and pending post-unlock recovery regressions made 35 resume calls on the old runtime. Phaser also had an unhandled delayed visibility resume. Battle startup disables these engine hooks for the game lifetime, including scene-loading/restart gaps; the adapter uses its existing two-second watchdog and requires explicit retry after failure. Real Phaser regressions cover focus, visibility, frame recovery, legal Wait/restart, late settlement and unchanged unrelated fatal-error handling. |
+| HTML5 per-element permission | Early enable incorrectly reported ready with no primed elements; enabled restart could start an unprimed cue. Each current tag now records successful gesture priming, and loading/replacement exposes Retry until all tags are primed. A trusted-gesture per-element policy shim proves suppression, retry and subsequent native playback in both cases; it is not physical Safari evidence. |
+| Windows cue inventory | The original predicate returned 0 for the eight actual Windows paths; files total 11,741 bytes. Normalized relative inventory paths and a shared inventory module yield 11,741 for both path conventions. The regression also rejects unrelated directories. Historical Linux JSON is unchanged. |
+| Epic-closing metadata | The live PR's rendered tooltip and GraphQL `closingIssuesReferences` included #57. Replacing the negated closing-keyword clause removed #57; the intended #62 link remains. Neither issue state was changed. |
+
+Commands run on Windows with Node 24.19.0 and headless Edge 155.0.4283.45 (the browser's exact reported version is also retained in the new measurement file):
+
+- `npm test -- tests/battle-audio.spec.ts --project=desktop --grep 'automatic recovery|per-element permission' --reporter=line`: four expected RED failures before runtime repair.
+- `npm test -- tests/battle-audio.spec.ts --grep 'automatic recovery|per-element permission|unrelated asynchronous|HTML5 fallback|mute, hidden' --reporter=line`: 21 passed, 1.1 minutes.
+- `npm run test:unit`: 293 passed in 26 files. `npm run validate:content`: 77 passed.
+- `npm run build -- --outDir tmp/pr63-tools/candidate-dist`: both TypeScript configurations and production build passed. Existing large-chunk warning remains.
+- `npm test -- --reporter=line,json`: 220 passed / 5 failed in 12.4 minutes, all 225 configured cases exercised with one worker and normal timeouts. The failures were in the new late-callback test: it captured the old scene immediately after Restart. Adding the existing data-run=2 synchronization fixed the assertion; `npm test -- tests/battle-audio.spec.ts --grep "automatic recovery" --reporter=line,json` passed all six mode/profile combinations in 32.6 seconds. [Per-case results and retained failures](issue-62/pr63-validation.json) verify passing coverage of all 225 unique cases. Runtime code did not change, and no single clean 225-pass full rerun is claimed.
+- `openspec validate issue-62-battle-audio --strict` and `git diff --check`: passed.
+
+The user requests a ready PR after these repairs. #11's automated milestone is now closed; physical certification belongs to #64, frame budgets/usability to #65, and the separate intermittent Safari restart investigation to #66. All physical battle-audio rows remain unverified. Parent epics #57 and #1 remain open. The ready PR does not certify audible hardware output or those broader acceptance gaps, and no historical failure is reclassified.
+
+Publication: [all four findings answered](https://github.com/luminari-gurus/tactics-guru-v2/pull/63#issuecomment-6110106240); PR #63 is open and draft=false, with GitHub reporting MERGEABLE against main `d60659d`. No inline review threads or formal review submissions were present; the findings were in a top-level comment. The PR description contains current validation and follow-up ownership, and only #62 remains in its closing-issue list. OpenSpec is 17/17 tracked tasks complete and remains unarchived. Local/remote parity and clean status are verified after publication; remote CI is not a waiting gate.
+
+### Review-repair measurement
+
+[New 72-sample capture](issue-62/pr63-baseline-candidate.json): Windows 10.0.26300, Intel Core Ultra 9 285H, Edge 155.0.4283.45; identical configured desktop/portrait/landscape profiles, three repetitions, both sound preferences and cold/warm caches. All tuples are unique, every timing is populated, and every sample reports the expected clean source identity: baseline `d60659d` and candidate `515ac85`. All 18 enabled candidate samples start one cue; all 18 muted samples start none. No application errors or Ready/first-player loading-limit failures occurred in this capture. Earlier failures remain intact in the three historical captures below.
+
+| Measure / unchanged limit | Main baseline | Repaired candidate |
+| --- | ---: | ---: |
+| Cue bytes ≤32768 | 0 | 11741 |
+| Compressed JS/CSS ≤400000 | 389873 | 392635 |
+| Cold scene assets ≤1500000 | 834688 | 848829 |
+| Total cold transfer | 1227170 | 1244072 |
+| Total warm transfer | 6900 | 9300 |
+| Cold Ready maximum ≤2500 ms | 271.8 | 197.8 |
+| Warm Ready maximum ≤750 ms | 150.9 | 147.4 |
+| Cold first-player maximum | 597.7 | 524.3 |
+| Warm first-player maximum | 483.7 | 476.0 |
+
+This short audio workload records merged frame instrumentation but does not certify the broader F1/F2 workload budgets or physical devices. The raw browser version is authoritative; configured emulation user-agent strings come from Playwright device descriptors. The full browser suite used the same runtime source before its commit, stamped `1422ce3`/dirty; this separate comparison uses the clean `515ac85` build. Later changes are the test synchronization and documentation only.
+
+Reproduce from clean builds of those revisions, with `PLAYWRIGHT_CHROMIUM_EXECUTABLE` set to the same Edge executable on this host:
+
+```sh
+node --experimental-strip-types scripts/measure-battle-audio.ts BASELINE_DIST CANDIDATE_DIST NEW_OUTPUT.json
+```
+
+Do not overwrite the retained captures. Asset hashes and inventory paths are embedded in the new JSON. The temporary baseline worktree was removed after the publication audit. Automatic approval review blocked deletion of the task-created, ignored `tmp/pr63-tools` folder, so its local tooling, build copies and logs remain; the pre-existing `tmp/pr63-review` folder was preserved. Neither folder is part of the application or PR diff.
+
+## Original implementation evidence — 2026-10-10
+
 Implementation authorized by the user request to implement `docs/ongoing-projects/plan.md` using ablation and OpenSpec. Baseline main: `9f785dfd3e9ce703ff8ab46210f84c38890c6f2a`; initial worktree clean. Remote main still matched that revision and [PR #61](https://github.com/luminari-gurus/tactics-guru-v2/pull/61) remained open/unmerged at the latest check. No unmerged code or deployment change is required.
 
 Final runtime revision: `ca1923a6ca34971af57af3608f0b0dd2b43fb6f8`. All configured browser cases have passing coverage (206 in the full run plus the corrected restart case rechecked across all profiles); final measurements and their limitations are recorded below. Hardware audibility and #11 frame acceptance remain explicitly unverified.
