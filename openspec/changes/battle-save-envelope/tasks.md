@@ -17,8 +17,8 @@ Issue [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69), a chil
 ## 3. Adapter handoff and integrated validation
 
 - [x] 3.1 Document the future storage/session handoff and remaining #58 backup/write-recovery, storage-error, namespacing, recovery-UI, restart and device acceptance; verify the codec has no live UI/session/storage integration and the parent remains open (AC6).
-- [ ] 3.2 Run focused save/turn/session/RNG/AI/boundary checks, configured unit/content checks, both typechecks, production build, configured browser regressions, strict OpenSpec and whitespace validation. Retain exact results and clearly separate host fixtures from browser-persistence/hardware claims (AC7).
-- [ ] 3.3 Audit AC1–AC7 against final code, format document, raw measurements and QA results; verify one representation remains, all limitations are explicit and no full save/resume or parent-epic completion is claimed (AC1–AC7).
+- [x] 3.2 Run focused save/turn/session/RNG/AI/boundary checks, configured unit/content checks, both typechecks, production build, configured browser regressions, strict OpenSpec and whitespace validation. Retain exact results and clearly separate host fixtures from browser-persistence/hardware claims (AC7).
+- [x] 3.3 Audit AC1–AC7 against final code, format document, raw measurements and QA results; verify one representation remains, all limitations are explicit and no full save/resume or parent-epic completion is claimed (AC1–AC7).
 
 ## Workflow follow-up
 

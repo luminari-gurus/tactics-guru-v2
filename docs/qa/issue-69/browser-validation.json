@@ -1,0 +1,216 @@
+{
+  "servedBuild": "1b310be852e032d47742a40c1b8a7d8e4925e668",
+  "repairedTestCommit": "3841ae2bfcf02bb61b54286a3cf8d5bd2cca60bd",
+  "browser": "Microsoft Edge 155.0.4283.45",
+  "baseURL": "http://127.0.0.1:4173",
+  "workers": 1,
+  "timeouts": "unchanged repository configuration",
+  "original": {
+    "command": "npm test -- --reporter=line,json",
+    "reportPath": "tmp/issue-69-browser.json",
+    "reportSha256": "7bed4455bd27b34d86706c6e04ca413d32032a4babf3f0e0ef5db364334a6e16",
+    "stats": {
+      "startTime": "2026-10-11T16:59:01.755Z",
+      "duration": 754162.061,
+      "expected": 223,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "failures": [
+      {
+        "key": "mobile-portrait:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-portrait",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "unexpected",
+        "results": [
+          {
+            "status": "failed",
+            "duration": 1207,
+            "errors": [
+              {
+                "location": {
+                  "file": "C:\\Users\\apexw\\.codex\\worktrees\\save-envelope-plan\\Tactics-Guru\\tests\\battle-board.spec.ts",
+                  "column": 32,
+                  "line": 62
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m2\u001b[39m\nReceived:   \u001b[31m2\u001b[39m\n\n  60 |     activeLabels.add((await page.locator('#battle-active').textContent())!);\n  61 |     expect(after.transform).toEqual(panned.transform);\n> 62 |     expect(after.commandCount).toBeGreaterThan(initial.commandCount);\n     |                                ^\n  63 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  64 |   }\n  65 |   expect(activeLabels.size).toBeGreaterThan(1);\n    at C:\\Users\\apexw\\.codex\\worktrees\\save-envelope-plan\\Tactics-Guru\\tests\\battle-board.spec.ts:62:32"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "mobile-landscape:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-landscape",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "unexpected",
+        "results": [
+          {
+            "status": "failed",
+            "duration": 1256,
+            "errors": [
+              {
+                "location": {
+                  "file": "C:\\Users\\apexw\\.codex\\worktrees\\save-envelope-plan\\Tactics-Guru\\tests\\battle-board.spec.ts",
+                  "column": 32,
+                  "line": 62
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m2\u001b[39m\nReceived:   \u001b[31m2\u001b[39m\n\n  60 |     activeLabels.add((await page.locator('#battle-active').textContent())!);\n  61 |     expect(after.transform).toEqual(panned.transform);\n> 62 |     expect(after.commandCount).toBeGreaterThan(initial.commandCount);\n     |                                ^\n  63 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  64 |   }\n  65 |   expect(activeLabels.size).toBeGreaterThan(1);\n    at C:\\Users\\apexw\\.codex\\worktrees\\save-envelope-plan\\Tactics-Guru\\tests\\battle-board.spec.ts:62:32"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "repair": {
+    "command": "npm test -- tests/battle-board.spec.ts --grep \"selection labels retain\" --repeat-each=3 --reporter=line,json",
+    "reportPath": "tmp/issue-69-camera-recheck.json",
+    "reportSha256": "5a94ee679ac5e8e1cfb9934017afecacdb8b0822158cae49d5b83231d8a2f4e4",
+    "stats": {
+      "startTime": "2026-10-11T17:11:54.289Z",
+      "duration": 64093.293,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "key": "desktop:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "desktop",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6519,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "desktop:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "desktop",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6118,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "desktop:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "desktop",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6598,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-portrait:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-portrait",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5857,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-portrait:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-portrait",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5953,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-portrait:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-portrait",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6285,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-landscape:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-landscape",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6248,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-landscape:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-landscape",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 6320,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "key": "mobile-landscape:battle-board.spec.ts:selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-landscape",
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5804,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "coverage": {
+    "configured": 225,
+    "covered": 225,
+    "missing": [],
+    "note": "Original 223 passes and two failures; only the failing test was edited. Its three project variants then passed three times each. Application and other browser-test code are unchanged. This is combined coverage, not a green rerun of the complete suite."
+  }
+}
