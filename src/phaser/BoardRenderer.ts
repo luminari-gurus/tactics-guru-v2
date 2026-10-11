@@ -9,6 +9,7 @@ import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
 const SELECTED_COLOR = 0xffffff;
+type TileTexture = Phaser.Textures.CanvasTexture & { customData: { terrainCorners: readonly Point[] } };
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 
 /** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
@@ -21,7 +22,9 @@ export class BoardRenderer {
   private readonly images = new Map<number, Phaser.GameObjects.Image>();
   private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
-  private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
+  private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image; corners: readonly Point[] }[] = [];
+  private staticGenerationMs = 0;
+  private readonly staticTextures = new Map<string, {key: string; width: number; height: number; nominalBytes: number}>();
   private view: View = { x: 0, y: 0, scale: 1 };
   private viewport = { width: 1, height: 1 };
   private panelBottom = 0;
@@ -38,25 +41,17 @@ export class BoardRenderer {
     this.root = scene.add.container();
     for (const tile of orderTiles(this.board.tiles)) {
       const point = projectTile(tile);
-      // Repeated immutable column shapes share a texture; depth and placement stay per tile.
-      const columnBounds = {left:-TILE_WIDTH/2, top:-TILE_HEIGHT/2, right:TILE_WIDTH/2, bottom:TILE_HEIGHT/2 + BASE_THICKNESS + tile.elevation * ELEVATION_STEP};
-      const columnKey = this.shapeTexture(`column-${tile.elevation}`, columnBounds, graphics => {
-        const local = tileFaces({x:0,y:0,elevation:tile.elevation});
-        graphics.translateCanvas(0, tile.elevation * ELEVATION_STEP);
-        for (const [points,color] of [[local.left,0x354538],[local.right,0x4c6050],[local.top,0x5b7157]] as const)
-          graphics.fillStyle(color).fillPoints(points.map(p=>new Phaser.Math.Vector2(p.x,p.y)),true);
-      });
-      const column = scene.add.image(point.x + columnBounds.left, point.y + columnBounds.top, columnKey)
-        .setOrigin(0).setDisplaySize(TILE_WIDTH, columnBounds.bottom - columnBounds.top).setDepth(tile.depth);
-      const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
-      const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
-        .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
-      surface.add(image);
-      this.surfaces.push({ tile, image });
+      const bounds = {left:-TILE_WIDTH/2, top:-TILE_HEIGHT/2, right:TILE_WIDTH/2, bottom:TILE_HEIGHT/2 + BASE_THICKNESS + tile.elevation * ELEVATION_STEP};
+      const texture = this.tileTexture(tile.surfaceAssetId, tile.elevation, bounds);
+      const image = scene.add.image(point.x + bounds.left, point.y + bounds.top, texture.key)
+        .setOrigin(0).setDisplaySize(TILE_WIDTH, bounds.bottom - bounds.top).setDepth(tile.depth);
+      this.surfaces.push({tile, image, corners: texture.customData.terrainCorners});
+      this.staticTextures.set(texture.key, {key: texture.key, width: texture.width, height: texture.height,
+        nominalBytes: texture.width * texture.height * 4});
       const highlight = scene.add.image(point.x - 44, point.y - 24, this.highlightTexture(0))
         .setOrigin(0).setDisplaySize(88,48).setDepth(tile.depth + 2);
       this.highlights.set(cellKey(tile), highlight);
-      this.root.add([column, surface, highlight]);
+      this.root.add([image, highlight]);
       if (tile.terrain === 'forest') {
         const trunk = scene.add.graphics().setDepth(tile.depth + OCCUPANT_LAYER);
         trunk.fillStyle(0x63452d).fillRect(point.x - 4, point.y - 40, 8, 40);
@@ -89,6 +84,40 @@ export class BoardRenderer {
       left: Math.min(...rectangles.map(r => r.left)), right: Math.max(...rectangles.map(r => r.right)),
       top: Math.min(...rectangles.map(r => r.top)), bottom: Math.max(...rectangles.map(r => r.bottom)),
     };
+  }
+
+  /** Bake only actual material/elevation variants; the game owns them across restarts. */
+  private tileTexture(assetId: string, elevation: number, bounds: Bounds): TileTexture {
+    const key = `battle-tile-v1-${assetId}-${elevation}`;
+    if (this.scene.textures.exists(key)) return this.scene.textures.get(key) as TileTexture;
+    const started = performance.now();
+    const density = MAX_BOARD_SCALE * MAX_ZOOM;
+    const texture = this.scene.textures.createCanvas(key,
+      Math.ceil((bounds.right-bounds.left)*density), Math.ceil((bounds.bottom-bounds.top)*density))! as TileTexture;
+    const ctx = texture.context;
+    ctx.scale(density, density);
+    ctx.translate(-bounds.left, -bounds.top);
+    ctx.save();
+    ctx.translate(0, elevation * ELEVATION_STEP);
+    const faces = tileFaces({x:0, y:0, elevation});
+    for (const [points, color] of [[faces.left,'#354538'],[faces.right,'#4c6050'],[faces.top,'#5b7157']] as const) {
+      ctx.beginPath(); ctx.moveTo(points[0].x,points[0].y);
+      for (const p of points.slice(1)) ctx.lineTo(p.x,p.y);
+      ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+    }
+    ctx.restore();
+    ctx.scale(1, TILE_HEIGHT / TILE_WIDTH);
+    ctx.rotate(Math.PI / 4);
+    const side = TILE_WIDTH / Math.SQRT2, half = side/2;
+    // Record corners from the actual canvas transform, then check the baked image's world transform.
+    const transform = ctx.getTransform();
+    texture.customData.terrainCorners = [{x:-half,y:-half},{x:half,y:-half},{x:half,y:half},{x:-half,y:half}]
+      .map(p=>transform.transformPoint(p));
+    ctx.drawImage(this.scene.textures.get(assetId).getSourceImage() as HTMLImageElement, -half, -half, side, side);
+    ctx.resetTransform();
+    texture.refresh();
+    this.staticGenerationMs += performance.now() - started;
+    return texture;
   }
 
   /** Local shape cache, bounded by elevations and the 16 overlay combinations.
@@ -255,9 +284,7 @@ export class BoardRenderer {
   private publish(): void {
     if (!this.snapshot) return;
     const matrix = this.root.getWorldTransformMatrix();
-    const surfaceErrors = this.surfaces.flatMap(({ tile, image }) => {
-      const half = image.width / 2;
-      const corners = [{ x: -half, y: -half }, { x: half, y: -half }, { x: half, y: half }, { x: -half, y: half }];
+    const surfaceErrors = this.surfaces.flatMap(({ tile, image, corners }) => {
       return tileFaces(tile).top.map((point, i) => {
         const expected = matrix.transformPoint(point.x, point.y);
         const actual = image.getWorldTransformMatrix().transformPoint(corners[i].x, corners[i].y);
@@ -279,7 +306,9 @@ export class BoardRenderer {
       viewport: this.viewport, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
       reachable: this.reachable, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
-      selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
+      selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length,
+      staticTileTextures: [...this.staticTextures.values()], staticGenerationMs: this.staticGenerationMs,
+      staticTileKeys: this.surfaces.map(({tile,image})=>({cell:cellKey(tile),key:image.texture.key})),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),
       canopies: this.canopies.map(({ tile, graphics }) => ({ tile, depth: graphics.depth, alpha: graphics.alpha })),

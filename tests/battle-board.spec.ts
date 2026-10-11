@@ -200,6 +200,42 @@ test('default authored board renders canonical units, highlights and stable rest
   expect(errors).toEqual([]);
 });
 
+test('baked terrain variants share bounded textures through six settled restarts', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial = await settledReport(page);
+  const variants = new Map<string, string>();
+  for (const {cell, key} of initial.staticTileKeys) {
+    const tile = initial.tiles.find((t:any)=>`${t.x},${t.y}`===cell);
+    const pair = `${tile.surfaceAssetId}/${tile.elevation}`;
+    if (variants.has(pair)) expect(key).toBe(variants.get(pair));
+    variants.set(pair, key);
+  }
+  expect(initial.staticTileTextures).toHaveLength(variants.size);
+  expect(new Set(initial.staticTileKeys.map((t:any)=>t.key)).size).toBe(variants.size);
+  expect(initial.staticGenerationMs).toBeGreaterThan(0);
+  for (const texture of initial.staticTileTextures) {
+    expect(texture.width).toBe(480);
+    expect(texture.height).toBeGreaterThanOrEqual(312);
+    expect(texture.nominalBytes).toBe(texture.width * texture.height * 4);
+  }
+  const staticBytes = initial.staticTileTextures.reduce((sum:number,t:any)=>sum+t.nominalBytes,0);
+  for (let run=0; run<6; run++) {
+    await page.getByRole('button',{name:'Restart battle'}).click();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const value = await settledReport(page);
+    expect(value.staticTileTextures).toEqual(initial.staticTileTextures);
+    expect(value.staticTileKeys).toEqual(initial.staticTileKeys);
+    expect(value.staticTileTextures.reduce((sum:number,t:any)=>sum+t.nominalBytes,0)).toBe(staticBytes);
+    expect(value.staticGenerationMs).toBe(0);
+    expect(value.surfaceCornerError).toBeLessThan(0.001);
+    await expect(page.locator('canvas')).toHaveCount(1);
+  }
+  expect(errors).toEqual([]);
+});
+
 for (const failure of ['missing', 'corrupt'] as const) {
   test(`default battle reports a controlled ${failure} canonical sprite error`, async ({ page }) => {
     const errors: string[] = [];

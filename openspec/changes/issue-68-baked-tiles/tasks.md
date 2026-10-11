@@ -5,8 +5,8 @@ Caller approved plan commit 523e50e on 2026-10-11; implementation authorized. Is
 ## 1. Approval and baseline evidence
 
 - [x] 1.1 Record explicit caller approval in design.md; verify issue/branch/base identity and unchanged approved scope before any runtime edit.
-- [ ] 1.2 Capture exact baseline battle/proof with the #65 v3 collector (18 cold/warm samples per scene), same host/browser/profile/seed conditions; retain raw build identities, startup/idle/pan/zoom/move intervals, errors and usable times under docs/qa/issue-68/ and begin the comparison report.
-- [ ] 1.3 Retain baseline fitted/max-zoom and elevated/overlay/canopy screenshots plus matched CPU/renderer traces using task-local profiling tooling; document actual dimensions/count/nominal texture memory and available or unavailable GPU evidence in the report.
+- [x] 1.2 Capture exact baseline battle/proof with the #65 v3 collector (18 cold/warm samples per scene), same host/browser/profile/seed conditions; retain raw build identities, startup/idle/pan/zoom/move intervals, errors and usable times under docs/qa/issue-68/ and begin the comparison report.
+- [x] 1.3 Retain baseline fitted/max-zoom and elevated/overlay/canopy screenshots plus matched CPU/renderer traces using task-local profiling tooling; document actual dimensions/count/nominal texture memory and available or unavailable GPU evidence in the report.
 
 ## 2. Shared tile prototype and correctness
 
