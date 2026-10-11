@@ -30,15 +30,15 @@ Battle diagnostics SHALL expose bounded visible frame samples and input-to-visib
 - **THEN** hidden intervals are excluded and stale listeners cannot add samples to the fresh run
 
 ### Requirement: Honest acceptance report
-The QA report SHALL compare battle measurements with the documented proof baseline and budgets, and record physical win/loss/restart and interaction checks for iPhone Safari, iPhone Chrome, Android Chrome and desktop in both orientations. Missing hardware, audio, console or deployed evidence MUST remain explicitly unverified.
+The QA report SHALL compare battle measurements with the documented proof baseline and budgets, identify exact automated browser engines/profiles and distinguish those results from partial physical reports. Missing hardware, audio, console or deployed evidence MUST remain explicitly unverified and assigned to linked follow-up issues. Completion of the revised automated-evidence milestone MUST NOT claim physical certification or passing failed budgets.
 
 #### Scenario: Incomplete device gate
 - **WHEN** emulated checks pass but a required physical browser has no complete evidence
-- **THEN** the corresponding gate remains open and no issue completion is claimed
+- **THEN** physical certification remains open in the linked follow-up, while the revised automated-evidence milestone may complete with that limitation explicit
 
 #### Scenario: Performance regression
 - **WHEN** any measured budget fails
-- **THEN** the raw failure is published and the regression is fixed within approved scope or explicitly left blocked
+- **THEN** the raw failure is published and its remediation remains open in the linked performance follow-up without relaxing the budget
 
 ### Requirement: Approved delivery boundaries
 Evidence collection SHALL use the separately approved existing release path without weakening production Access or depending on unmerged deployment work. The report MUST list all deferred issue scope.

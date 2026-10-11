@@ -6,7 +6,7 @@ See proposal.md for issue, branch and scope. Main contains #10 / PR #55 and real
 
 ## Goals / Non-Goals
 
-Goals: make the existing diagnostics measure the battle, preserve provenance, and give physical testers a precise record. Keep timing instrumentation in browser/Phaser presentation code, outside the pure domain.
+Goals: make the existing diagnostics measure the battle, preserve provenance, document actual automated/emulated coverage, and give physical testers a precise record. Keep timing instrumentation in browser/Phaser presentation code, outside the pure domain. The caller approved revising #11 on 2026-10-10 to an automated-validation/evidence milestone; physical certification and failed budgets remain follow-up work.
 
 Non-goals: no new telemetry service, generic benchmark framework, runtime combat automation, sound feature, gameplay rebalance or speculative performance rewrite. Scope exclusions in the proposal apply.
 
@@ -22,22 +22,22 @@ Non-goals: no new telemetry service, generic benchmark framework, runtime combat
 
 | Issue criterion | Implementation and verification |
 | --- | --- |
-| Full physical win/loss/restart in four browsers, two orientations | Device matrix and complete actual-control records; existing automated legal battle test is supporting evidence only |
-| Gesture, layout, audio, lifecycle and console | Extend real battle regression checks; matrix itemizes OS/browser behavior and absent audio |
-| Reproducible loading/transfer/interaction/frames | Scene-aware collector, bounded diagnostics, raw captures, baseline/budget table; failing/missing rows remain blocked |
+| Document exact automated engines/profiles and partial physical reports | Full Chromium desktop/Pixel 7 portrait/landscape suite; focused WebKit iPhone 13 emulation only; full physical certification deferred to #64 |
+| Gesture, layout, audio, lifecycle and console | Real-control regressions; retain partial physical checks; absent audio tracked by #62 and intermittent Safari restart by #66 |
+| Reproducible loading/transfer/interaction/frames | Scene-aware collector, bounded diagnostics, raw captures, baseline/budget table; failed frames retained for remediation in #65 |
 | Real move/attack/signature/AI/outcomes and viewport/DPR; approved deployment | Reuse battle-loop/picking/layout tests; exact authenticated served build; existing release path only |
 | Deferred scope explicit | Report lists saves/resume follow-up, short route, inventory/equipment, procedural generation, advanced combat, editor, analytics and backend |
 
 ## Risks / Trade-offs
 
-- Physical devices unavailable → implement capture/checklist first and retain draft PR with `Refs #11` until supplied evidence completes every gate.
+- Physical devices unavailable → publish exact automated coverage and partial hardware evidence; #64 remains open without physical certification.
 - Authenticated release unavailable or stale → verify served commit; report gap without altering Access, installing PR #12 or uploading via a new path.
 - Instrumentation changes timing → bounded data only, no per-frame DOM serialization; state/replay regression checks preserve behavior.
 - Existing battle audio absent or asset budget exceeded → record failure; material feature/art/rule work requires revised plan approval.
 
 ## Migration Plan
 
-No persistent data migration. Run focused RED/GREEN checks, full configured checks and local captures. Capture the intended build only through the approved existing beta release path; do not mutate production configuration. Removing scene instrumentation and collector additions rolls back this change without domain changes. Do not close #11 or the epic with missing device/performance/audio evidence.
+No persistent data migration. Run focused RED/GREEN checks, full configured checks and local captures. Capture the intended build only through the approved existing beta release path; do not mutate production configuration. Removing scene instrumentation and collector additions rolls back this change without domain changes. Under the approved revision, #11 may close once automated coverage, raw evidence and follow-up links are published; #1/#57 and physical/performance/audio/restart acceptance remain open. No merge or archive is authorized.
 
 ## Open Questions
 

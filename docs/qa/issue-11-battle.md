@@ -2,6 +2,21 @@
 
 Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/11. Approved plan: `issue-11-device-performance`, published at `144fde6`, explicitly approved by the caller on 2026-10-10. Branch: `work/issue-11-device-performance`; base main `9f785df`.
 
+## Approved scope revision and completion
+
+On 2026-10-10, the caller approved revising #11 to the completed automated-validation and reproducible-evidence milestone and closing that revised issue. This does not certify every physical device or claim that failing frame budgets passed. The original hardware/performance acceptance is retained below and transferred to [physical certification #64](https://github.com/luminari-gurus/tactics-guru-v2/issues/64), [frame-budget remediation #65](https://github.com/luminari-gurus/tactics-guru-v2/issues/65), [intermittent Safari restart #66](https://github.com/luminari-gurus/tactics-guru-v2/issues/66), and existing [battle audio #62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). First-battle epics #1/#57 remain open.
+
+### Actual automated and emulated coverage
+
+| Engine/profile | Coverage and actual result | Limitations |
+| --- | --- | --- |
+| Installed Chrome 155.0.8059.40, desktop 1280×720 | Full configured suite, plus stronger legal win/loss outcome-dialog restarts | Automated desktop browser; no caller desktop hardware certification |
+| Same Chrome, Pixel 7 emulation 412×839, DPR 2.625 | Full configured suite in portrait, plus stronger win/loss restarts | Touch/viewport emulation; not physical Android Chrome |
+| Same Chrome, Pixel 7 emulation 915×412, DPR 2.625 | Full configured suite in landscape, plus stronger win/loss restarts | Touch/viewport emulation; not physical Android Chrome |
+| Playwright WebKit 26.6 v2359, iPhone 13 emulation | One focused legal loss/outcome-dialog restart passed locally and once on `15a9d5a6` | Not a full WebKit suite, not both orientations, not physical iPhone Safari |
+
+The full configured Chromium suite passed **171 tests in 7.6 minutes** across its three profiles. It covers actual Move/Basic/signature actions, AI, legal wins/losses, deterministic replay equality, picking, layout/DPR, gestures, lifecycle and restart. The later stronger outcome-dialog restart checks passed **6 tests in 2.2 minutes** across the same profiles. Exact commands/build provenance are recorded below. No full iPhone Chrome or Safari engine/device matrix is claimed. Playwright's Pixel 7 profile uses Chromium with mobile/touch/viewport settings; it does not run Android hardware. The WebKit profile similarly supplies emulated settings on the host.
+
 ## Capture method
 
 Use a clean committed checkout and `npm run build`. Do not run other browser workloads during measurement. With the installed Chrome executable on this host:
@@ -133,7 +148,7 @@ The stronger local outcome/restart checks also passed across the three configure
 
 The temporary remote config inherited `playwright.config.ts`, used `testDir: '../tests'`, disabled `webServer`, and overrode `use.baseURL` to `https://a49bc1b1.tactics-guru-v2.pages.dev`. It was removed after the run; no persistent test/server/deployment configuration changed. Capture commands and retained failure evidence are recorded above.
 
-| Issue acceptance criterion | Evidence / unresolved gate |
+| Original issue acceptance criterion (transferred where incomplete) | Evidence / unresolved gate |
 | --- | --- |
 | Physical win/loss/restart, four browsers × two orientations | Partial iPhone checks in both orientations; Safari defeat confirmed, one restart failed and the next succeeded; intermittent failure unresolved; victory, Chrome outcomes/restarts and Android/desktop evidence pending; automatic battle tests are supporting evidence only |
 | Gestures, safe areas, chrome resizing, audio, suspension, errors | Existing and added battle checks; physical checklist pending; battle audio absent |
@@ -143,9 +158,9 @@ The temporary remote config inherited `playwright.config.ts`, used `testDir: '..
 
 Deferred: saves/resume follow-up, short route, inventory/equipment, procedural generation, advanced combat, editor, analytics and backend. No new art, audio feature or battle rules are included.
 
-Only the existing separately approved beta release path is allowed. Do not install or depend on unmerged PR #12, alter production Access, or introduce an upload/deployment mechanism. Missing intended served build, physical evidence or audio keeps #11 open and the PR draft with `Refs #11`.
+Only the existing separately approved beta release path is allowed. Do not install or depend on unmerged PR #12, alter production Access, or introduce an upload/deployment mechanism. Missing physical evidence, failed frame budgets, absent battle audio and the intermittent Safari restart remain open in the linked follow-ups; they are not passed by closing the revised #11 milestone.
 
 
 ## Delivery status
 
-Implementation and evidence collection are ready for draft review. OpenSpec progress is 10/11 tasks: physical-device task 3.4 remains unchecked. The caller supplied partial iPhone Safari/Chrome evidence in both orientations and subsequently confirmed Safari defeat with one failed restart requiring page refresh, followed by a successful restart after the next defeat. The intermittent restart failure and remaining physical acceptance are unresolved. Performance F1/F2 and battle audio remain unmet issue acceptance gates even though their failures are measured and recorded. #11 and the epic remain open; no `Closes` reference is justified. No merge or OpenSpec archive has been performed.
+The revised automated-validation/evidence scope is complete; OpenSpec progress is 11/11 after replacing the original physical-certification task with explicit evidence documentation and follow-up ownership under caller approval. The caller supplied partial iPhone Safari/Chrome checks in both orientations and Safari defeat with one failed restart followed by a successful retry. Those facts remain partial physical evidence, not full certification. #64 owns remaining hardware acceptance, #65 the failed F1/F2 budgets, #66 the intermittent restart, and #62 battle audio. Closing revised #11 does not close #1/#57, pass those gates, merge PR #61 or archive OpenSpec. Application code was unchanged by this scope revision.

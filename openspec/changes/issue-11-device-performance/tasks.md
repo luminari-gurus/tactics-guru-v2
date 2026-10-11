@@ -16,7 +16,7 @@
 - [x] 3.1 Extend existing battle-loop, input, layout and lifecycle checks where coverage is missing, using RED-first behavior regressions and real move/attack/signature/AI/win/loss controls; verify portrait/landscape/DPR, gesture suppression and suspension/restart coverage, and link actual results in the report.
 - [x] 3.2 Publish the device/OS/browser/build/network matrix and per-scenario checklist for all four required browsers in both orientations; verify every issue acceptance item has an evidence row and all deferred scope is explicit. Record absent battle audio and separate proof audio evidence honestly.
 - [x] 3.3 Capture the intended build on the approved existing authenticated beta release path; verify served commit, cold/warm/load/transfer/interaction/frame and console records, retaining failures or unavailable gates without Access/deployment changes.
-- [ ] 3.4 Obtain and record physical full win/loss/restart, gestures, layout/safe-area/toolbar, audio, suspend/resume and console evidence per browser/orientation; verify reports identify exact coverage and build. Leave this task unchecked for missing hardware or unmet gates.
+- [x] 3.4 Under the caller-approved scope revision of 2026-10-10, document exact Chromium emulation and focused WebKit coverage, retain partial physical reports without certifying hardware, and transfer incomplete physical certification (#64), frame regressions (#65), intermittent Safari restart (#66) and audio (#62) to linked follow-ups. Original full physical acceptance is deferred, not passed.
 
 ## 4. Integration and delivery
 
@@ -25,5 +25,5 @@
 
 ## Workflow follow-up
 
-- Commit/push only issue-specific changes; open and attach a PR against main. Use draft plus `Refs #11` while any acceptance gate is unresolved, and `Closes #11` only with every criterion verified.
-- Do not merge, manually close issues, or archive OpenSpec before merge.
+- Commit/push only issue-specific changes and update the existing PR against main. Revised #11 completion covers automated validation and reproducible evidence with linked failures/gaps; no physical or passing-frame claim is justified.
+- The caller explicitly authorized revising and closing #11 on 2026-10-10. Close only after the revised report and follow-up links are published. Do not merge or archive OpenSpec before merge; #1/#57 and acceptance follow-ups remain open.
