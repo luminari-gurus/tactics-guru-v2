@@ -1,0 +1,4 @@
+
+> tactics-guru-v2@0.0.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.domain.json
+

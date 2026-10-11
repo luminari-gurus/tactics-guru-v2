@@ -1,0 +1,3102 @@
+{
+  "floatNoiseToleranceMs": 1e-06,
+  "note": "Version 3. Startup-only nearest-rank percentiles use intervals ending before controls usability, independently of the post-animation tail. All intervals and timestamps are retained in the raw captures. Version 2 startup windows do not establish startup animation performance.",
+  "samples": [
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 593.7000000178814,
+      "values": {
+        "F1-p50": 16.600000023841858,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 593.7000000178814,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 256.40000000596046,
+          "untilMs": 792.9000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 21.299999982118607,
+            "maxMs": 22.400000005960464
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 19.099999994039536,
+            "maxMs": 22.400000005960464
+          },
+          "firstSampleStartedMs": 256.40000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2907.300000011921,
+          "untilMs": 3157.300000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18.69999998807907,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3241.800000011921,
+          "untilMs": 3591.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 19,
+            "maxMs": 19.099999994039536
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4064.2000000178814,
+          "untilMs": 4409.5,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.80000001192093
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 458.5,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 458.5,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 108.7000000178814,
+          "untilMs": 654.7000000178814,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 22.700000017881393,
+            "maxMs": 22.900000005960464
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.600000023841858,
+            "maxMs": 22.900000005960464
+          },
+          "firstSampleStartedMs": 108.7000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2752.300000011921,
+          "untilMs": 3002.300000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3086.800000011921,
+          "untilMs": 3435.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18,
+            "maxMs": 19.099999994039536
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3908.9000000059605,
+          "untilMs": 4253.700000017881,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.600000023841858,
+            "maxMs": 18.900000005960464
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 468.90000000596046,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.099999994039536,
+        "loadUsable": 468.90000000596046,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 125.2000000178814,
+          "untilMs": 665.4000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.5,
+            "p95Ms": 20.30000001192093,
+            "maxMs": 22.80000001192093
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18,
+            "maxMs": 22.80000001192093
+          },
+          "firstSampleStartedMs": 125.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2748.800000011921,
+          "untilMs": 2998.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.80000001192093,
+            "maxMs": 18.80000001192093
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3098.5,
+          "untilMs": 3447.5999999940395,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.799999982118607
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3920.800000011921,
+          "untilMs": 4265.5999999940395,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18,
+            "maxMs": 18.099999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 457.80000001192093,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.30000001192093,
+        "loadUsable": 457.80000001192093,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 110.30000001192093,
+          "untilMs": 655.2000000178814,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 19.900000005960464,
+            "maxMs": 21.600000023841858
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.899999976158142,
+            "maxMs": 19.900000005960464
+          },
+          "firstSampleStartedMs": 110.30000001192093
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2754.4000000059605,
+          "untilMs": 3004.4000000059605,
+          "frames": {
+            "count": 17,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.5,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3087.4000000059605,
+          "untilMs": 3436.2000000178814,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18.80000001192093,
+            "maxMs": 19.099999994039536
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3908.7000000178814,
+          "untilMs": 4255.300000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 19.19999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 464,
+      "values": {
+        "F1-p50": 16.600000023841858,
+        "F1-p95": 18.5,
+        "loadUsable": 464,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 124,
+          "untilMs": 660.1999999880791,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 20.900000005960464,
+            "maxMs": 22.19999998807907
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 20.900000005960464
+          },
+          "firstSampleStartedMs": 124
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2742.5999999940395,
+          "untilMs": 2992.5999999940395,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.69999998807907,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3077.300000011921,
+          "untilMs": 3426,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.80000001192093,
+            "maxMs": 17.900000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3898.0999999940395,
+          "untilMs": 4244.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.100000023841858,
+            "maxMs": 18.299999982118607
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 458.5,
+      "values": {
+        "F1-p50": 16.700000017881393,
+        "F1-p95": 18.30000001192093,
+        "loadUsable": 458.5,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 110.7999999821186,
+          "untilMs": 656,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 19.799999982118607,
+            "maxMs": 21.400000005960464
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.600000023841858,
+            "maxMs": 21.400000005960464
+          },
+          "firstSampleStartedMs": 110.7999999821186
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2754.7999999821186,
+          "untilMs": 3004.7999999821186,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.700000017881393,
+            "maxMs": 17.700000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3086.2999999821186,
+          "untilMs": 3437.899999976158,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3910.399999976158,
+          "untilMs": 4255.799999982119,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.19999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 469.30000001192093,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 469.30000001192093,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 130,
+          "untilMs": 668.5,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.799999982118607,
+            "maxMs": 19.19999998807907
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 17.599999994039536,
+            "maxMs": 19.19999998807907
+          },
+          "firstSampleStartedMs": 130
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2767.800000011921,
+          "untilMs": 3017.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 17,
+            "p95Ms": 18.799999982118607,
+            "maxMs": 18.799999982118607
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3098.800000011921,
+          "untilMs": 3449.300000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18.19999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3922,
+          "untilMs": 4267.699999988079,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 19.099999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 457.90000000596046,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 17.799999982118607,
+        "loadUsable": 457.90000000596046,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 115.2000000178814,
+          "untilMs": 655.4000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.200000017881393
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.399999976158142,
+            "maxMs": 18.200000017881393
+          },
+          "firstSampleStartedMs": 115.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2719.300000011921,
+          "untilMs": 2969.300000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.900000005960464,
+            "p95Ms": 17.69999998807907,
+            "maxMs": 17.69999998807907
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3054.0999999940395,
+          "untilMs": 3403.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3874.9000000059605,
+          "untilMs": 4222,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 467.7999999821186,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.200000017881393,
+        "loadUsable": 467.7999999821186,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 125.19999998807907,
+          "untilMs": 665.1999999880791,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.5,
+            "p95Ms": 18.200000017881393,
+            "maxMs": 18.5
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.5
+          },
+          "firstSampleStartedMs": 125.2999999821186
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2764.199999988079,
+          "untilMs": 3014.199999988079,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 19.200000017881393,
+            "maxMs": 19.200000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3097.0999999940395,
+          "untilMs": 3446.899999976158,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18,
+            "maxMs": 18.30000001192093
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3919.199999988079,
+          "untilMs": 4265,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 473,
+      "values": {
+        "F1-p50": 16.600000023841858,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 473,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 131.5,
+          "untilMs": 671.8000000119209,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.30000001192093
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.30000001192093
+          },
+          "firstSampleStartedMs": 131.5
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2737,
+          "untilMs": 2987,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.700000017881393,
+            "maxMs": 17.700000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3070,
+          "untilMs": 3418.4000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.900000005960464,
+            "maxMs": 18.19999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3891.0999999940395,
+          "untilMs": 4238.5,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.100000023841858,
+            "maxMs": 18.200000017881393
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 469.19999998807907,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.599999994039536,
+        "loadUsable": 469.19999998807907,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 127.2999999821186,
+          "untilMs": 666.0999999940395,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 18.600000023841858
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 18.600000023841858
+          },
+          "firstSampleStartedMs": 127.39999997615814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2749.199999988079,
+          "untilMs": 2999.199999988079,
+          "frames": {
+            "count": 17,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 19.69999998807907,
+            "maxMs": 19.69999998807907
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3097.399999976158,
+          "untilMs": 3446.7999999821186,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.399999976158142,
+            "maxMs": 18.399999976158142
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3920.7999999821186,
+          "untilMs": 4266.399999976158,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 459.80000001192093,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.5,
+        "loadUsable": 459.80000001192093,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 117.2000000178814,
+          "untilMs": 657.3000000119209,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.100000023841858,
+            "maxMs": 18.400000005960464
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18,
+            "maxMs": 18.400000005960464
+          },
+          "firstSampleStartedMs": 117.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2706.5,
+          "untilMs": 2956.5,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3040.5,
+          "untilMs": 3389.5,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 17.69999998807907,
+            "maxMs": 18.299999982118607
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3861.100000023842,
+          "untilMs": 4207.5,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.69999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 469,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.5,
+        "loadUsable": 469,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 127.10000002384186,
+          "untilMs": 666,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.399999976158142,
+            "maxMs": 18.400000005960464
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.400000005960464
+          },
+          "firstSampleStartedMs": 127.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2747.600000023842,
+          "untilMs": 2997.600000023842,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 19.099999994039536,
+            "maxMs": 19.099999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3081.9000000059605,
+          "untilMs": 3431.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 17.5,
+            "maxMs": 18
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3920.800000011921,
+          "untilMs": 4266.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.700000017881393
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 474.19999998807907,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.30000001192093,
+        "loadUsable": 474.19999998807907,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 131.90000000596046,
+          "untilMs": 671,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.399999976158142
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.599999994039536,
+            "maxMs": 18.399999976158142
+          },
+          "firstSampleStartedMs": 131.90000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2738.199999988079,
+          "untilMs": 2988.199999988079,
+          "frames": {
+            "count": 17,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.30000001192093
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3071.4000000059605,
+          "untilMs": 3421.4000000059605,
+          "frames": {
+            "count": 23,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3893.699999988079,
+          "untilMs": 4237.5999999940395,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.900000005960464
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 468.5,
+      "values": {
+        "F1-p50": 16.700000017881393,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 468.5,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 127.80000001192093,
+          "untilMs": 666.0999999940395,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.69999998807907,
+            "maxMs": 18.80000001192093
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 18.69999998807907,
+            "maxMs": 18.80000001192093
+          },
+          "firstSampleStartedMs": 127.90000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2748.800000011921,
+          "untilMs": 2998.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3080.300000011921,
+          "untilMs": 3432.199999988079,
+          "frames": {
+            "count": 23,
+            "medianMs": 16.900000005960464,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3904.800000011921,
+          "untilMs": 4248.5,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.899999976158142,
+            "maxMs": 18.599999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 456.59999999403954,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 456.59999999403954,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 113.90000000596046,
+          "untilMs": 655.2999999821186,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.5
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.5
+          },
+          "firstSampleStartedMs": 114
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2718.699999988079,
+          "untilMs": 2968.699999988079,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.5,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3052.0999999940395,
+          "untilMs": 3403.7999999821186,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.799999982118607
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3874.4000000059605,
+          "untilMs": 4221.4000000059605,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 18.5,
+            "maxMs": 18.69999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 465.69999998807907,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.5,
+        "loadUsable": 465.69999998807907,
+        "code": 391186,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 125.19999998807907,
+          "untilMs": 664.4000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 19.200000017881393
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 19.200000017881393
+          },
+          "firstSampleStartedMs": 125.19999998807907
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2762.4000000059605,
+          "untilMs": 3012.4000000059605,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3094.9000000059605,
+          "untilMs": 3445.199999988079,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.900000005960464,
+            "p95Ms": 17.799999982118607,
+            "maxMs": 18
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3917.199999988079,
+          "untilMs": 4264.300000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 18.599999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "local",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 457.59999999403954,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 457.59999999403954,
+        "code": 1500,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 115.09999999403954,
+          "untilMs": 655.8000000119209,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18.600000023841858
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18,
+            "maxMs": 18.600000023841858
+          },
+          "firstSampleStartedMs": 115.09999999403954
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2703.800000011921,
+          "untilMs": 2953.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.30000001192093
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3038,
+          "untilMs": 3388.4000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 18,
+            "maxMs": 18.400000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3859.5,
+          "untilMs": 4205.5999999940395,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 845.6999999880791,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.5,
+        "loadUsable": 845.6999999880791,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 509.69999998807907,
+          "untilMs": 1044.0999999940395,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 22.100000023841858,
+            "maxMs": 23.099999994039536
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 22.100000023841858
+          },
+          "firstSampleStartedMs": 509.69999998807907
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3159.5999999940395,
+          "untilMs": 3409.5999999940395,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3508.0999999940395,
+          "untilMs": 3857.699999988079,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.5,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4332.299999982119,
+          "untilMs": 4677.5,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 523.1999999880791,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.399999976158142,
+        "loadUsable": 523.1999999880791,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 186,
+          "untilMs": 719.1999999880791,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 20.5,
+            "maxMs": 21.19999998807907
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 21.19999998807907
+          },
+          "firstSampleStartedMs": 186.09999999403954
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2786.5,
+          "untilMs": 3036.5,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.5,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.400000005960464
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3136.300000011921,
+          "untilMs": 3485,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 19.19999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3959,
+          "untilMs": 4304.199999988079,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.700000017881393,
+            "maxMs": 17.900000005960464
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 767.1999999880791,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.299999982118607,
+        "loadUsable": 767.1999999880791,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 421.09999999403954,
+          "untilMs": 966,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 21.600000023841858,
+            "maxMs": 23.200000017881393
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 19,
+            "maxMs": 21.600000023841858
+          },
+          "firstSampleStartedMs": 421.09999999403954
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3065.199999988079,
+          "untilMs": 3315.199999988079,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3398.199999988079,
+          "untilMs": 3748.199999988079,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.900000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4220.299999982119,
+          "untilMs": 4565.5,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.900000005960464,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 561.5,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 561.5,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 221.5,
+          "untilMs": 758.9000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 19.400000005960464,
+            "maxMs": 21.399999976158142
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18.80000001192093,
+            "maxMs": 19.400000005960464
+          },
+          "firstSampleStartedMs": 221.5
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2840.4000000059605,
+          "untilMs": 3090.4000000059605,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.5,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3172.9000000059605,
+          "untilMs": 3523.0999999940395,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.5,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3997.199999988079,
+          "untilMs": 4341.699999988079,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.80000001192093,
+            "maxMs": 18.69999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 768.7000000178814,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 768.7000000178814,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 421.80000001192093,
+          "untilMs": 964.4000000059605,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 21.400000005960464,
+            "maxMs": 21.5
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.099999994039536,
+            "maxMs": 21.5
+          },
+          "firstSampleStartedMs": 421.80000001192093
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3047.800000011921,
+          "untilMs": 3297.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.900000005960464,
+            "maxMs": 18.900000005960464
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3379.9000000059605,
+          "untilMs": 3731.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4203.200000017881,
+          "untilMs": 4549.200000017881,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "desktop",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 541,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 541,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 203.90000000596046,
+          "untilMs": 739.9000000059605,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 21.19999998807907,
+            "maxMs": 22
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.600000023841858,
+            "maxMs": 21.19999998807907
+          },
+          "firstSampleStartedMs": 203.90000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2805.5999999940395,
+          "untilMs": 3055.5999999940395,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.700000017881393,
+            "maxMs": 18.700000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3138.0999999940395,
+          "untilMs": 3488.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18,
+            "maxMs": 19
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3961.2000000178814,
+          "untilMs": 4305.800000011921,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.599999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 836,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.80000001192093,
+        "loadUsable": 836,
+        "code": 392995,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 493.90000000596046,
+          "untilMs": 1033.5999999940395,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          },
+          "firstSampleStartedMs": 493.90000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3132.2999999821186,
+          "untilMs": 3382.2999999821186,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.30000001192093,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3465.2999999821186,
+          "untilMs": 3815.199999988079,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 17.700000017881393,
+            "maxMs": 17.80000001192093
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4286.9000000059605,
+          "untilMs": 4631.9000000059605,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.900000005960464
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 589.8000000119209,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.69999998807907,
+        "loadUsable": 589.8000000119209,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 251.80000001192093,
+          "untilMs": 787.5,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.299999982118607
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18.19999998807907
+          },
+          "firstSampleStartedMs": 251.80000001192093
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2854.699999988079,
+          "untilMs": 3104.699999988079,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 19,
+            "maxMs": 19
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3188,
+          "untilMs": 3537.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.69999998807907
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4010.9000000059605,
+          "untilMs": 4356.199999988079,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 17.599999994039536,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 834.7000000178814,
+      "values": {
+        "F1-p50": 16.599999994039536,
+        "F1-p95": 18.599999994039536,
+        "loadUsable": 834.7000000178814,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 487.60000002384186,
+          "untilMs": 1032.4000000059605,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 19.400000005960464
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.200000017881393,
+            "maxMs": 19.400000005960464
+          },
+          "firstSampleStartedMs": 487.60000002384186
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3130.800000011921,
+          "untilMs": 3380.800000011921,
+          "frames": {
+            "count": 17,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 19.30000001192093,
+            "maxMs": 19.30000001192093
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3480.300000011921,
+          "untilMs": 3830.600000023842,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.400000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4301.4000000059605,
+          "untilMs": 4647.100000023842,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 591.7000000178814,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.19999998807907,
+        "loadUsable": 591.7000000178814,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 251.10000002384186,
+          "untilMs": 789.5,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.69999998807907,
+            "maxMs": 19
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 19
+          },
+          "firstSampleStartedMs": 251.10000002384186
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2888.100000023842,
+          "untilMs": 3138.100000023842,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 17.5,
+            "maxMs": 17.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3221.4000000059605,
+          "untilMs": 3571.4000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4042.4000000059605,
+          "untilMs": 4389.700000017881,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.5,
+            "maxMs": 18.799999982118607
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 803,
+      "values": {
+        "F1-p50": 16.700000017881393,
+        "F1-p95": 18.399999976158142,
+        "loadUsable": 803,
+        "code": 392995,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 455.40000000596046,
+          "untilMs": 1000.3000000119209,
+          "frames": {
+            "count": 35,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18,
+            "maxMs": 18.19999998807907
+          },
+          "startupBeforeControls": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.80000001192093,
+            "maxMs": 18
+          },
+          "firstSampleStartedMs": 455.5
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3098.9000000059605,
+          "untilMs": 3348.9000000059605,
+          "frames": {
+            "count": 17,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 19.700000017881393,
+            "maxMs": 19.700000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3431.800000011921,
+          "untilMs": 3781.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.400000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4254.0999999940395,
+          "untilMs": 4599.800000011921,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.799999982118607,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-portrait",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 575.9000000059605,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.400000005960464,
+        "loadUsable": 575.9000000059605,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 233.30000001192093,
+          "untilMs": 773.2000000178814,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.5,
+            "maxMs": 18.600000023841858
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.5,
+            "maxMs": 18.600000023841858
+          },
+          "firstSampleStartedMs": 233.30000001192093
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2836.800000011921,
+          "untilMs": 3086.800000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18,
+            "maxMs": 18
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3171.5,
+          "untilMs": 3519.5999999940395,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.900000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3994.0999999940395,
+          "untilMs": 4338.300000011921,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.69999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 813.0999999940395,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.19999998807907,
+        "loadUsable": 813.0999999940395,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 474.59999999403954,
+          "untilMs": 1011.1999999880791,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.30000001192093,
+            "maxMs": 18.5
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.30000001192093,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.5
+          },
+          "firstSampleStartedMs": 474.59999999403954
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3110.0999999940395,
+          "untilMs": 3360.0999999940395,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.5,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3442.9000000059605,
+          "untilMs": 3792.5,
+          "frames": {
+            "count": 23,
+            "medianMs": 16.400000005960464,
+            "p95Ms": 18.899999976158142,
+            "maxMs": 19.200000017881393
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4265.0999999940395,
+          "untilMs": 4609.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.700000017881393,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 1,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 574.9000000059605,
+      "values": {
+        "F1-p50": 16.600000023841858,
+        "F1-p95": 18.599999994039536,
+        "loadUsable": 574.9000000059605,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 232.2000000178814,
+          "untilMs": 771.8000000119209,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.5
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.5
+          },
+          "firstSampleStartedMs": 232.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2821.2000000178814,
+          "untilMs": 3071.2000000178814,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.900000005960464,
+            "maxMs": 18.900000005960464
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3154.300000011921,
+          "untilMs": 3504.300000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.900000005960464,
+            "maxMs": 19.099999994039536
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3993,
+          "untilMs": 4338.9000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.69999998807907
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 766.1000000238419,
+      "values": {
+        "F1-p50": 16.700000017881393,
+        "F1-p95": 18.599999994039536,
+        "loadUsable": 766.1000000238419,
+        "code": 392995,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 424.2000000178814,
+          "untilMs": 962.8000000119209,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.700000017881393
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.700000017881393
+          },
+          "firstSampleStartedMs": 424.2000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3045.5,
+          "untilMs": 3295.5,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 19,
+            "maxMs": 19
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3378.5,
+          "untilMs": 3728.4000000059605,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.5
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4217.600000023842,
+          "untilMs": 4561.5,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.600000023841858,
+            "maxMs": 17.700000017881393
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 2,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 575.5,
+      "values": {
+        "F1-p50": 16.700000017881393,
+        "F1-p95": 18.299999982118607,
+        "loadUsable": 575.5,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 235.40000000596046,
+          "untilMs": 772,
+          "frames": {
+            "count": 33,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.600000023841858,
+            "maxMs": 18.899999976158142
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.5,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.899999976158142
+          },
+          "firstSampleStartedMs": 235.40000000596046
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2838.300000011921,
+          "untilMs": 3088.300000011921,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.80000001192093,
+            "p95Ms": 18.400000005960464,
+            "maxMs": 18.400000005960464
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3170.9000000059605,
+          "untilMs": 3521.800000011921,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.5,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 19.400000005960464
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 3992.600000023842,
+          "untilMs": 4338.9000000059605,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.900000005960464,
+            "p95Ms": 18,
+            "maxMs": 18.30000001192093
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "cold",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 801.1999999880791,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.599999994039536,
+        "loadUsable": 801.1999999880791,
+        "code": 392875,
+        "assets": 834688
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 2500,
+        "code": 400000,
+        "assets": 1500000
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 461.59999999403954,
+          "untilMs": 1000.2999999821186,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.299999982118607
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 18.299999982118607,
+            "maxMs": 18.299999982118607
+          },
+          "firstSampleStartedMs": 461.59999999403954
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 3099,
+          "untilMs": 3349,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "maxMs": 18.599999994039536
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3431.7999999821186,
+          "untilMs": 3781.699999988079,
+          "frames": {
+            "count": 23,
+            "medianMs": 16.30000001192093,
+            "p95Ms": 18.80000001192093,
+            "maxMs": 19
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4270.9000000059605,
+          "untilMs": 4616.5,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.400000005960464,
+            "maxMs": 18.099999994039536
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "capture": "deployed",
+      "profile": "mobile-landscape",
+      "cache": "warm",
+      "repetition": 3,
+      "build": {
+        "commit": "6f5f7a904dbb30a53c0b7ffde0168cca8e95e114",
+        "dirty": false
+      },
+      "method": {
+        "version": 3,
+        "frameObservation": "post-render"
+      },
+      "controlsUsableMs": 592.6000000238419,
+      "values": {
+        "F1-p50": 16.69999998807907,
+        "F1-p95": 18.5,
+        "loadUsable": 592.6000000238419,
+        "code": 2545,
+        "assets": 5400
+      },
+      "limits": {
+        "F1-p50": 16.7,
+        "F1-p95": 20,
+        "loadUsable": 750
+      },
+      "windows": [
+        {
+          "index": 0,
+          "action": "move",
+          "startedMs": 247.7000000178814,
+          "untilMs": 789.7000000178814,
+          "frames": {
+            "count": 34,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18,
+            "maxMs": 18.30000001192093
+          },
+          "startupBeforeControls": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.899999976158142,
+            "maxMs": 18.30000001192093
+          },
+          "firstSampleStartedMs": 247.7000000178814
+        },
+        {
+          "index": 1,
+          "action": "zoom",
+          "startedMs": 2854.2000000178814,
+          "untilMs": 3104.2000000178814,
+          "frames": {
+            "count": 16,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.200000017881393,
+            "maxMs": 18.200000017881393
+          }
+        },
+        {
+          "index": 2,
+          "action": "pan",
+          "startedMs": 3188,
+          "untilMs": 3537.7000000178814,
+          "frames": {
+            "count": 22,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.19999998807907,
+            "maxMs": 18.30000001192093
+          }
+        },
+        {
+          "index": 4,
+          "action": "move",
+          "startedMs": 4010,
+          "untilMs": 4354.800000011921,
+          "frames": {
+            "count": 21,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 17.400000005960464,
+            "maxMs": 18.5
+          }
+        }
+      ],
+      "failures": []
+    }
+  ]
+}

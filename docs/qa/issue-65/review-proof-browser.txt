@@ -1,0 +1,22 @@
+[WebServer] (node:89806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:89847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (938ms)
+  ✓  2 [desktop] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (117ms)
+  ✓  3 [desktop] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (290ms)
+(node:89873) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [mobile-portrait] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (949ms)
+  ✓  5 [mobile-portrait] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (116ms)
+  ✓  6 [mobile-portrait] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (291ms)
+(node:89894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [mobile-landscape] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (944ms)
+  ✓  8 [mobile-landscape] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (118ms)
+  ✓  9 [mobile-landscape] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (292ms)
+
+  9 passed (5.9s)

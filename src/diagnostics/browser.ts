@@ -46,6 +46,7 @@ export function diagnosticsSnapshot() {
   }));
   return {
     ...measurements.snapshot(),
+    measurementMethod: { version: 3, frameObservation: 'post-render' },
     board: board ? { ...board, elevations: [...board.elevations], bounds: { ...board.bounds } } : null,
     proof: proof ? { ...proof } : null,
     audio: audio?.() ?? null,

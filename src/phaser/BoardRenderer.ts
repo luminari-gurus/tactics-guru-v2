@@ -3,7 +3,7 @@ import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
 
 const REACHABLE_COLOR = 0x46d7c7;
@@ -17,7 +17,7 @@ export class BoardRenderer {
   private readonly board;
   private readonly byCell;
   private readonly bounds: Bounds;
-  private readonly highlights = new Map<string, Phaser.GameObjects.Graphics>();
+  private readonly highlights = new Map<string, Phaser.GameObjects.Image>();
   private readonly images = new Map<number, Phaser.GameObjects.Image>();
   private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
@@ -37,18 +37,24 @@ export class BoardRenderer {
     this.byCell = new Map(this.board.tiles.map(tile => [cellKey(tile), tile]));
     this.root = scene.add.container();
     for (const tile of orderTiles(this.board.tiles)) {
-      const faces = tileFaces(tile);
-      const column = scene.add.graphics().setDepth(tile.depth);
-      for (const [points, color] of [[faces.left, 0x354538], [faces.right, 0x4c6050], [faces.top, 0x5b7157]] as const) {
-        column.fillStyle(color).fillPoints(points.map(p => new Phaser.Math.Vector2(p.x, p.y)), true);
-      }
       const point = projectTile(tile);
+      // Repeated immutable column shapes share a texture; depth and placement stay per tile.
+      const columnBounds = {left:-TILE_WIDTH/2, top:-TILE_HEIGHT/2, right:TILE_WIDTH/2, bottom:TILE_HEIGHT/2 + BASE_THICKNESS + tile.elevation * ELEVATION_STEP};
+      const columnKey = this.shapeTexture(`column-${tile.elevation}`, columnBounds, graphics => {
+        const local = tileFaces({x:0,y:0,elevation:tile.elevation});
+        graphics.translateCanvas(0, tile.elevation * ELEVATION_STEP);
+        for (const [points,color] of [[local.left,0x354538],[local.right,0x4c6050],[local.top,0x5b7157]] as const)
+          graphics.fillStyle(color).fillPoints(points.map(p=>new Phaser.Math.Vector2(p.x,p.y)),true);
+      });
+      const column = scene.add.image(point.x + columnBounds.left, point.y + columnBounds.top, columnKey)
+        .setOrigin(0).setDisplaySize(TILE_WIDTH, columnBounds.bottom - columnBounds.top).setDepth(tile.depth);
       const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
       const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
         .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
       surface.add(image);
       this.surfaces.push({ tile, image });
-      const highlight = scene.add.graphics().setDepth(tile.depth + 2);
+      const highlight = scene.add.image(point.x - 44, point.y - 24, this.highlightTexture(0))
+        .setOrigin(0).setDisplaySize(88,48).setDepth(tile.depth + 2);
       this.highlights.set(cellKey(tile), highlight);
       this.root.add([column, surface, highlight]);
       if (tile.terrain === 'forest') {
@@ -85,6 +91,37 @@ export class BoardRenderer {
     };
   }
 
+  /** Local shape cache, bounded by elevations and the 16 overlay combinations.
+   * Six pixels per board unit preserves the maximum fitted 1.5 × 4 zoom density.
+   * Textures are owned by this game's manager and reused across scene restarts.
+   */
+  private shapeTexture(name:string, bounds:Bounds, draw:(graphics:Phaser.GameObjects.Graphics)=>void):string {
+    const key=`battle-shape-v1-${name}`;
+    if(!this.scene.textures.exists(key)) {
+      const graphics=this.scene.make.graphics({x:0,y:0},false);
+      const density=MAX_BOARD_SCALE*MAX_ZOOM;
+      graphics.scaleCanvas(density,density).translateCanvas(-bounds.left,-bounds.top);
+      draw(graphics);
+      graphics.generateTexture(key,Math.ceil((bounds.right-bounds.left)*density),Math.ceil((bounds.bottom-bounds.top)*density));
+      graphics.destroy();
+    }
+    return key;
+  }
+
+  private highlightTexture(flags:number):string {
+    return this.shapeTexture(`highlight-${flags}`,{left:-44,top:-24,right:44,bottom:24},graphics=>{
+      const vertices=tileFaces({x:0,y:0,elevation:0}).top.map(p=>new Phaser.Math.Vector2(p.x,p.y));
+      graphics.lineStyle(0.8,0x17291f,0.6).strokePoints(vertices,true);
+      if(flags&1) {
+        graphics.fillStyle(REACHABLE_COLOR,0.26).fillPoints(vertices,true);
+        graphics.lineStyle(1.5,REACHABLE_COLOR,0.85).strokePoints(vertices,true);
+      }
+      if(flags&2) graphics.lineStyle(3,ACTIVE_COLOR).strokePoints(vertices,true);
+      if(flags&4) graphics.lineStyle(2.5,0xb9b1ff).strokePoints(vertices,true);
+      if(flags&8) graphics.lineStyle(2.5,SELECTED_COLOR).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.78,p.y*0.78)),true);
+    });
+  }
+
   present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = []): void {
     this.snapshot = snapshot;
     this.reachable = reachable;
@@ -94,20 +131,10 @@ export class BoardRenderer {
     const reachableKeys = new Set(reachable.map(cellKey));
     const pathKeys = new Set(path.map(cellKey));
     for (const tile of this.board.tiles) {
-      const graphics = this.highlights.get(cellKey(tile))!.clear();
-      const vertices = tileFaces(tile).top.map(p => new Phaser.Math.Vector2(p.x, p.y));
-      graphics.lineStyle(0.8, 0x17291f, 0.6).strokePoints(vertices, true);
-      if (reachableKeys.has(cellKey(tile)) && cellKey(tile) !== cellKey(active.cell)) {
-        graphics.fillStyle(REACHABLE_COLOR, 0.26).fillPoints(vertices, true);
-        graphics.lineStyle(1.5, REACHABLE_COLOR, 0.85).strokePoints(vertices, true);
-      }
-      if (cellKey(tile) === cellKey(active.cell)) graphics.lineStyle(3, ACTIVE_COLOR).strokePoints(vertices, true);
-      if (pathKeys.has(cellKey(tile))) graphics.lineStyle(2.5, 0xb9b1ff).strokePoints(vertices, true);
-      if (this.selected === tile) {
-        const point = projectTile(tile);
-        const inset = vertices.map(p => new Phaser.Math.Vector2(point.x + (p.x - point.x) * 0.78, point.y + (p.y - point.y) * 0.78));
-        graphics.lineStyle(2.5, SELECTED_COLOR).strokePoints(inset, true);
-      }
+      const key = cellKey(tile);
+      const flags = (reachableKeys.has(key) && key !== cellKey(active.cell) ? 1 : 0)
+        | (key === cellKey(active.cell) ? 2 : 0) | (pathKeys.has(key) ? 4 : 0) | (this.selected === tile ? 8 : 0);
+      this.highlights.get(key)!.setTexture(this.highlightTexture(flags));
     }
     for (const unit of snapshot.units) {
       const tile = this.byCell.get(cellKey(unit.cell))!;
@@ -148,7 +175,13 @@ export class BoardRenderer {
       if(label){const text=this.scene.add.text(p.x,p.y-65,label,{fontSize:'16px',color:'#ffffff',backgroundColor:'#172033'}).setOrigin(0.5).setDepth(10000);this.root.add(text);labels.push(text);}
     }
     let complete!:()=>void;const done=new Promise<void>(resolve=>{complete=resolve;});let finished=false;
-    const finish=()=>{if(finished)return;finished=true;labels.forEach(l=>l.destroy());this.present(after,[],null);complete();};
+    const finish=()=>{
+      if(finished)return;finished=true;labels.forEach(l=>l.destroy());
+      // Scene shutdown destroys the display list before canceling this presentation.
+      // Resolve cancellation without touching images whose scene/texture binding is gone.
+      if(this.root.scene)this.present(after,[],null);
+      complete();
+    };
     const tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
       if(!move)return;
       const progress=marker.progress*(move.path.length-1),i=Math.min(Math.floor(progress),move.path.length-2);

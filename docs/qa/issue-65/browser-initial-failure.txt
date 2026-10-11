@@ -1,0 +1,334 @@
+
+> tactics-guru-v2@0.0.0 test
+> playwright test
+
+[WebServer] (node:80825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 171 tests using 1 worker
+
+(node:80865) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [desktop] › tests/assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable (866ms)
+  ✓    2 [desktop] › tests/assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error (223ms)
+  ✓    3 [desktop] › tests/assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error (216ms)
+  ✓    4 [desktop] › tests/assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error (212ms)
+  ✓    5 [desktop] › tests/audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time (1.3s)
+  ✓    6 [desktop] › tests/audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can (598ms)
+  ✓    7 [desktop] › tests/audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable (298ms)
+  ✓    8 [desktop] › tests/audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors (2.1s)
+  ✓    9 [desktop] › tests/audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can (2.9s)
+  ✓   10 [desktop] › tests/audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout (15.7s)
+  ✓   11 [desktop] › tests/audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt (682ms)
+  ✓   12 [desktop] › tests/battle-board.spec.ts:17:1 › selection labels retain the zoomed and panned camera without gameplay commands (6.4s)
+  ✓   13 [desktop] › tests/battle-board.spec.ts:96:1 › authored camera keeps zoom bounds and refits on real orientation changes (5.3s)
+  ✓   14 [desktop] › tests/battle-board.spec.ts:146:1 › default authored board renders canonical units, highlights and stable restarts (4.9s)
+  ✓   15 [desktop] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled missing canonical sprite error (222ms)
+  ✓   16 [desktop] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled corrupt canonical sprite error (221ms)
+  ✓   17 [desktop] › tests/battle-board.spec.ts:218:1 › picks authored elevated tops and visible side faces through unit and canopy art (1.6s)
+  ✓   18 [desktop] › tests/battle-board.spec.ts:249:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion (2.8s)
+  ✓   19 [desktop] › tests/battle-board.spec.ts:287:1 › legal player movement updates elevation, reachability and canopy occlusion (1.5s)
+  ✓   20 [desktop] › tests/battle-board.spec.ts:320:1 › touch pinch and cancelled pointer cannot select or move a unit (1.3s)
+  ✓   21 [desktop] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (998ms)
+  ✓   22 [desktop] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.2s)
+  ✓   23 [desktop] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✘   24 [desktop] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (6.0s)
+(node:80961) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   25 [desktop] › tests/battle-loop.spec.ts:106:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.2s)
+  ✓   26 [desktop] › tests/battle-loop.spec.ts:121:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓   27 [desktop] › tests/battle-loop.spec.ts:154:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✘   28 [desktop] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (5.2s)
+(node:80990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   29 [desktop] › tests/battle-loop.spec.ts:200:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.6s)
+  ✓   30 [desktop] › tests/board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart (668ms)
+  ✓   31 [desktop] › tests/boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize (445ms)
+  ✓   32 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: success (419ms)
+  ✓   33 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (251ms)
+  ✓   34 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (247ms)
+  ✓   35 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: missing (248ms)
+  ✓   36 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (233ms)
+  ✓   37 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓   38 [desktop] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (797ms)
+  ✓   39 [desktop] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (112ms)
+  ✓   40 [desktop] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (299ms)
+  ✓   41 [desktop] › tests/grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry (218ms)
+  ✓   42 [desktop] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (985ms)
+  ✓   43 [desktop] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (327ms)
+  ✓   44 [desktop] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (213ms)
+  ✓   45 [desktop] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844 (433ms)
+  ✓   46 [desktop] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390 (375ms)
+  ✓   47 [desktop] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640 (344ms)
+  ✓   48 [desktop] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412 (363ms)
+  ✓   49 [desktop] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720 (435ms)
+  ✓   50 [desktop] › tests/layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu (233ms)
+  ✓   51 [desktop] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (317ms)
+  ✓   52 [desktop] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓   53 [desktop] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (532ms)
+  ✓   54 [desktop] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.1s)
+  ✓   55 [desktop] › tests/move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart (9.8s)
+  ✓   56 [desktop] › tests/opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart (417ms)
+  ✓   57 [desktop] › tests/terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile (292ms)
+(node:81092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   58 [mobile-portrait] › tests/assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable (1.0s)
+  ✓   59 [mobile-portrait] › tests/assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error (220ms)
+  ✓   60 [mobile-portrait] › tests/assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error (216ms)
+  ✓   61 [mobile-portrait] › tests/assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error (221ms)
+  ✓   62 [mobile-portrait] › tests/audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time (1.2s)
+  ✓   63 [mobile-portrait] › tests/audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can (601ms)
+  ✓   64 [mobile-portrait] › tests/audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable (290ms)
+  ✓   65 [mobile-portrait] › tests/audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors (2.1s)
+  ✓   66 [mobile-portrait] › tests/audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can (2.9s)
+  ✓   67 [mobile-portrait] › tests/audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout (15.8s)
+  ✓   68 [mobile-portrait] › tests/audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt (764ms)
+  ✓   69 [mobile-portrait] › tests/battle-board.spec.ts:17:1 › selection labels retain the zoomed and panned camera without gameplay commands (6.4s)
+  ✓   70 [mobile-portrait] › tests/battle-board.spec.ts:96:1 › authored camera keeps zoom bounds and refits on real orientation changes (5.4s)
+  ✓   71 [mobile-portrait] › tests/battle-board.spec.ts:146:1 › default authored board renders canonical units, highlights and stable restarts (4.6s)
+  ✓   72 [mobile-portrait] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled missing canonical sprite error (226ms)
+  ✓   73 [mobile-portrait] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled corrupt canonical sprite error (217ms)
+  ✓   74 [mobile-portrait] › tests/battle-board.spec.ts:218:1 › picks authored elevated tops and visible side faces through unit and canopy art (1.6s)
+  ✓   75 [mobile-portrait] › tests/battle-board.spec.ts:249:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion (2.8s)
+  ✓   76 [mobile-portrait] › tests/battle-board.spec.ts:287:1 › legal player movement updates elevation, reachability and canopy occlusion (1.5s)
+  ✓   77 [mobile-portrait] › tests/battle-board.spec.ts:320:1 › touch pinch and cancelled pointer cannot select or move a unit (1.3s)
+  ✓   78 [mobile-portrait] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (1.0s)
+  ✓   79 [mobile-portrait] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.1s)
+  ✓   80 [mobile-portrait] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✘   81 [mobile-portrait] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (6.0s)
+(node:81231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   82 [mobile-portrait] › tests/battle-loop.spec.ts:106:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.3s)
+  ✓   83 [mobile-portrait] › tests/battle-loop.spec.ts:121:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓   84 [mobile-portrait] › tests/battle-loop.spec.ts:154:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✘   85 [mobile-portrait] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (5.2s)
+(node:81302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   86 [mobile-portrait] › tests/battle-loop.spec.ts:200:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.5s)
+  ✓   87 [mobile-portrait] › tests/board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart (790ms)
+  ✓   88 [mobile-portrait] › tests/boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize (445ms)
+  ✓   89 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: success (509ms)
+  ✓   90 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (278ms)
+  ✓   91 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (259ms)
+  ✓   92 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: missing (272ms)
+  ✓   93 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (269ms)
+  ✓   94 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓   95 [mobile-portrait] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (791ms)
+  ✓   96 [mobile-portrait] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (119ms)
+  ✓   97 [mobile-portrait] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (294ms)
+  ✓   98 [mobile-portrait] › tests/grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry (219ms)
+  ✓   99 [mobile-portrait] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (981ms)
+  ✓  100 [mobile-portrait] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (329ms)
+  ✓  101 [mobile-portrait] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (239ms)
+  ✓  102 [mobile-portrait] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844 (470ms)
+  ✓  103 [mobile-portrait] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390 (390ms)
+  ✓  104 [mobile-portrait] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640 (387ms)
+  ✓  105 [mobile-portrait] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412 (400ms)
+  ✓  106 [mobile-portrait] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720 (493ms)
+  ✓  107 [mobile-portrait] › tests/layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu (240ms)
+  ✓  108 [mobile-portrait] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (324ms)
+  ✓  109 [mobile-portrait] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓  110 [mobile-portrait] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (531ms)
+  ✓  111 [mobile-portrait] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.2s)
+  ✓  112 [mobile-portrait] › tests/move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart (9.9s)
+  ✓  113 [mobile-portrait] › tests/opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart (429ms)
+  ✓  114 [mobile-portrait] › tests/terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile (340ms)
+(node:81543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  115 [mobile-landscape] › tests/assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable (959ms)
+  ✓  116 [mobile-landscape] › tests/assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error (221ms)
+  ✓  117 [mobile-landscape] › tests/assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error (213ms)
+  ✓  118 [mobile-landscape] › tests/assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error (216ms)
+  ✓  119 [mobile-landscape] › tests/audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time (1.2s)
+  ✓  120 [mobile-landscape] › tests/audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can (601ms)
+  ✓  121 [mobile-landscape] › tests/audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable (299ms)
+  ✓  122 [mobile-landscape] › tests/audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors (2.1s)
+  ✓  123 [mobile-landscape] › tests/audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can (2.9s)
+  ✓  124 [mobile-landscape] › tests/audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout (15.8s)
+  ✓  125 [mobile-landscape] › tests/audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt (664ms)
+  ✓  126 [mobile-landscape] › tests/battle-board.spec.ts:17:1 › selection labels retain the zoomed and panned camera without gameplay commands (6.0s)
+  ✓  127 [mobile-landscape] › tests/battle-board.spec.ts:96:1 › authored camera keeps zoom bounds and refits on real orientation changes (5.3s)
+  ✓  128 [mobile-landscape] › tests/battle-board.spec.ts:146:1 › default authored board renders canonical units, highlights and stable restarts (5.1s)
+  ✓  129 [mobile-landscape] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled missing canonical sprite error (225ms)
+  ✓  130 [mobile-landscape] › tests/battle-board.spec.ts:204:3 › default battle reports a controlled corrupt canonical sprite error (221ms)
+  ✓  131 [mobile-landscape] › tests/battle-board.spec.ts:218:1 › picks authored elevated tops and visible side faces through unit and canopy art (1.6s)
+  ✓  132 [mobile-landscape] › tests/battle-board.spec.ts:249:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion (2.7s)
+  ✓  133 [mobile-landscape] › tests/battle-board.spec.ts:287:1 › legal player movement updates elevation, reachability and canopy occlusion (1.5s)
+  ✓  134 [mobile-landscape] › tests/battle-board.spec.ts:320:1 › touch pinch and cancelled pointer cannot select or move a unit (1.3s)
+  ✓  135 [mobile-landscape] › tests/battle-loop.spec.ts:4:1 › player HUD and preview cancellation preserve state and modal capture (1.0s)
+  ✓  136 [mobile-landscape] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (24.1s)
+  ✓  137 [mobile-landscape] › tests/battle-loop.spec.ts:40:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (12.1s)
+  ✘  138 [mobile-landscape] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (6.0s)
+(node:81677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  139 [mobile-landscape] › tests/battle-loop.spec.ts:106:1 › battle HUD targets fit portrait and short landscape with a bounded readable log (1.3s)
+  ✓  140 [mobile-landscape] › tests/battle-loop.spec.ts:121:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once (1.3s)
+  ✓  141 [mobile-landscape] › tests/battle-loop.spec.ts:154:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.4s)
+  ✘  142 [mobile-landscape] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (5.2s)
+(node:81708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  143 [mobile-landscape] › tests/battle-loop.spec.ts:200:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.6s)
+  ✓  144 [mobile-landscape] › tests/board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart (716ms)
+  ✓  145 [mobile-landscape] › tests/boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize (443ms)
+  ✓  146 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: success (515ms)
+  ✓  147 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (277ms)
+  ✓  148 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (275ms)
+  ✓  149 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: missing (255ms)
+  ✓  150 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (270ms)
+  ✓  151 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓  152 [mobile-landscape] › tests/engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers (921ms)
+  ✓  153 [mobile-landscape] › tests/engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load (118ms)
+  ✓  154 [mobile-landscape] › tests/engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed (292ms)
+  ✓  155 [mobile-landscape] › tests/grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry (219ms)
+  ✓  156 [mobile-landscape] › tests/input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart (981ms)
+  ✓  157 [mobile-landscape] › tests/input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not (437ms)
+  ✓  158 [mobile-landscape] › tests/input.spec.ts:57:1 › selection survives a live device pixel ratio change (323ms)
+  ✓  159 [mobile-landscape] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844 (477ms)
+  ✓  160 [mobile-landscape] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390 (388ms)
+  ✓  161 [mobile-landscape] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640 (388ms)
+  ✓  162 [mobile-landscape] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412 (393ms)
+  ✓  163 [mobile-landscape] › tests/layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720 (488ms)
+  ✓  164 [mobile-landscape] › tests/layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu (238ms)
+  ✓  165 [mobile-landscape] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (319ms)
+  ✓  166 [mobile-landscape] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+  ✓  167 [mobile-landscape] › tests/lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume (515ms)
+  ✓  168 [mobile-landscape] › tests/lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio (1.1s)
+  ✓  169 [mobile-landscape] › tests/move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart (9.9s)
+  ✓  170 [mobile-landscape] › tests/opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart (434ms)
+  ✓  171 [mobile-landscape] › tests/terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile (333ms)
+
+
+  1) [desktop] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      94 |   await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});
+      95 |   await page.clock.resume();
+    > 96 |   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+         |                                                                 ^
+      97 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      98 |   const fresh=await session(page);expect(fresh.state.seed).toBe(2);expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
+      99 |   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:96:65
+
+    Error Context: test-results/battle-loop-keyboard-selec-4ae51-d-old-gestures-and-previews-desktop/error-context.md
+
+  2) [desktop] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      189 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      190 |   const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
+    > 191 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+          |                                                                                                            ^
+      192 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
+      193 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      194 |   const fresh=await session(page);expect(fresh.replay.initial.seed).toBe(3);
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:191:108
+
+    Error Context: test-results/battle-loop-restart-during-b5894-e-old-run-and-its-callbacks-desktop/error-context.md
+
+  3) [mobile-portrait] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      94 |   await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});
+      95 |   await page.clock.resume();
+    > 96 |   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+         |                                                                 ^
+      97 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      98 |   const fresh=await session(page);expect(fresh.state.seed).toBe(2);expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
+      99 |   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:96:65
+
+    Error Context: test-results/battle-loop-keyboard-selec-4ae51-d-old-gestures-and-previews-mobile-portrait/error-context.md
+
+  4) [mobile-portrait] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      189 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      190 |   const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
+    > 191 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+          |                                                                                                            ^
+      192 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
+      193 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      194 |   const fresh=await session(page);expect(fresh.replay.initial.seed).toBe(3);
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:191:108
+
+    Error Context: test-results/battle-loop-restart-during-b5894-e-old-run-and-its-callbacks-mobile-portrait/error-context.md
+
+  5) [mobile-landscape] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      94 |   await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});
+      95 |   await page.clock.resume();
+    > 96 |   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+         |                                                                 ^
+      97 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      98 |   const fresh=await session(page);expect(fresh.state.seed).toBe(2);expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
+      99 |   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:96:65
+
+    Error Context: test-results/battle-loop-keyboard-selec-4ae51-d-old-gestures-and-previews-mobile-landscape/error-context.md
+
+  6) [mobile-landscape] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      189 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      190 |   const first=await session(page);expect(first.state.units.find(u=>u.id===first.state.initiative[first.state.activeIndex])!.side).toBe('enemy');
+    > 191 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+          |                                                                                                            ^
+      192 |   await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
+      193 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      194 |   const fresh=await session(page);expect(fresh.replay.initial.seed).toBe(3);
+        at /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2/tests/battle-loop.spec.ts:191:108
+
+    Error Context: test-results/battle-loop-restart-during-b5894-e-old-run-and-its-callbacks-mobile-landscape/error-context.md
+
+  6 failed
+    [desktop] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+    [desktop] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+    [mobile-portrait] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+    [mobile-portrait] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+    [mobile-landscape] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews 
+    [mobile-landscape] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks 
+  165 passed (7.2m)

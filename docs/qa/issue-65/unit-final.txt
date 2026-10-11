@@ -1,0 +1,13 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2
+
+
+ Test Files  23 passed (23)
+      Tests  265 passed (265)
+   Start at  09:57:46
+   Duration  1.13s (tests 61%, transform 31%, import 7%, worker 1%)
+

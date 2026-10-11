@@ -1,0 +1,25 @@
+
+> tactics-guru-v2@0.0.0 build
+> npm run typecheck && vite build
+
+
+> tactics-guru-v2@0.0.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.domain.json
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 46 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                      3.10 kB │ gzip:   1.09 kB
+dist/assets/index-D2fzDm50.css       3.25 kB │ gzip:   1.22 kB
+dist/assets/browser-C3mOaL0t.js      3.06 kB │ gzip:   1.32 kB
+dist/assets/index-Yjfs3rVx.js        4.51 kB │ gzip:   1.91 kB
+dist/assets/start-CukqFkFS.js    1,478.44 kB │ gzip: 387.62 kB
+
+✓ built in 253ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

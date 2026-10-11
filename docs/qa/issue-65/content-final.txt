@@ -1,0 +1,13 @@
+
+> tactics-guru-v2@0.0.0 validate:content
+> vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2
+
+
+ Test Files  2 passed (2)
+      Tests  77 passed (77)
+   Start at  09:57:47
+   Duration  158ms (transform 50%, tests 34%, import 14%, worker 2%)
+

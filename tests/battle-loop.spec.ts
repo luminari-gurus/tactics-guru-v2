@@ -172,6 +172,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
 });
 
 test('restart during initial enemy animation discards the old run and its callbacks',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto('/');await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   // An enemy end-turn commit advances initiative before its presentation completes.
@@ -184,6 +185,7 @@ test('restart during initial enemy animation discards the old run and its callba
   const replay=replayBattle(fresh.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(fresh.state);
   expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
   await expect(page.locator('canvas')).toHaveCount(1);await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test('battle diagnostics record real selection, gestures and movement and reset on restart',async({page})=>{
@@ -207,8 +209,13 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   await page.getByRole('button',{name:'Confirm',exact:true}).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
+  expect(diagnostics.idleIntervalsMs).toHaveLength(diagnostics.frames.count);
+  expect(diagnostics.measurementMethod).toEqual({version:3,frameObservation:'post-render'});
   expect(diagnostics.workloads.map(w=>w.action)).toEqual(expect.arrayContaining(['pan','zoom','selection','move']));
   expect(diagnostics.workloads.find(w=>w.action==='move')!.frames.count).toBeGreaterThan(0);
+  const startup=diagnostics.workloads.find(w=>w.action==='move' && w.startedMs<diagnostics.controlsUsableMs!)!;
+  expect(startup.intervalStartedMs.some((start,i)=>start+startup.intervalsMs[i]<diagnostics.controlsUsableMs!)).toBe(true);
+  expect(startup.intervalStartedMs).toHaveLength(startup.frames.count);
   for(const response of diagnostics.interactions){expect(response.renderedMs).toBeGreaterThanOrEqual(response.inputMs);expect(response.renderedFrames).toBe(1);}
   expect((await session(page)).state.commandCount).toBe(before.state.commandCount+1);
   const replay=replayBattle((await session(page)).replay,catalog);expect(replay.ok).toBe(true);

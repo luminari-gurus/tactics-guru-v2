@@ -35,6 +35,8 @@ test('proof controls survive repeated restart and expose distinct ready markers'
   expect(report.run).toBe(6);
   expect(report.controlsUsableMs).toBeGreaterThanOrEqual(report.sceneReadyMs);
   expect(report.frames.count).toBeGreaterThanOrEqual(3);
+  expect(report.idleIntervalsMs).toHaveLength(report.frames.count);
+  expect(report.measurementMethod).toEqual({version:3,frameObservation:'post-render'});
   expect(report.resources.length).toBeGreaterThan(0);
   expect(report.build.commit).toMatch(/^[a-f0-9]{40}$/);
   await page.getByText('Measurements', { exact: true }).click();

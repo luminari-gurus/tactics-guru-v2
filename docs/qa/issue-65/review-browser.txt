@@ -1,0 +1,28 @@
+[WebServer] (node:88474) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+(node:88515) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.3s)
+  ✓   2 [desktop] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (489ms)
+  ✓   3 [desktop] › tests/battle-loop.spec.ts:202:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓   4 [desktop] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (334ms)
+  ✓   5 [desktop] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+(node:88548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [mobile-portrait] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.3s)
+  ✓   7 [mobile-portrait] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (607ms)
+  ✓   8 [mobile-portrait] › tests/battle-loop.spec.ts:202:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓   9 [mobile-portrait] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (329ms)
+  ✓  10 [mobile-portrait] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.9s)
+(node:88579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 [mobile-landscape] › tests/battle-loop.spec.ts:69:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews (2.3s)
+  ✓  12 [mobile-landscape] › tests/battle-loop.spec.ts:187:1 › restart during initial enemy animation discards the old run and its callbacks (505ms)
+  ✓  13 [mobile-landscape] › tests/battle-loop.spec.ts:202:1 › battle diagnostics record real selection, gestures and movement and reset on restart (2.4s)
+  ✓  14 [mobile-landscape] › tests/lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio (437ms)
+  ✓  15 [mobile-landscape] › tests/lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart (5.8s)
+
+  15 passed (36.6s)
