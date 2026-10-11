@@ -27,3 +27,7 @@ Caller approved plan commit `5d64d74` on 2026-10-11. Work only on `work/issue-65
 
 - Do not merge, manually close the issue, or archive this change before merge.
 - Physical certification stays under #64, restart remediation under #66, audio under #62, and first-battle acceptance under #57/#1.
+
+## Review correction
+
+- [x] Correct the startup movement sampling gap identified at `ad9a499`: keep usable-idle/input readiness separate, export bounded workload interval timestamps, verify pre-controls movement through unit and real browser checks, and regenerate matched local/deployed proof/battle evidence. Runtime `6f5f7a9`; corrected QA report and `review-gate-evaluation.json` retain every sample and startup-only percentile.

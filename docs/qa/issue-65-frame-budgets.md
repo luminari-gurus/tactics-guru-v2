@@ -79,7 +79,7 @@ The correction checks whether the root still belongs to a scene before the final
 
 ## Final corrected runtime
 
-Delivered runtime is `f36c98e01f97d8975d29a3ceff5caa1879894ed9`, clean, containing the presentation-shutdown guard. The previous `0d36301` captures remain intermediate evidence and are not a gameplay acceptance claim. Because runtime changed, paired [final local proof](issue-65/final-local-proof.json)/[battle](issue-65/final-local-battle.json) and [final deployed proof](issue-65/final-deployed-proof.json)/[battle](issue-65/final-deployed-battle.json) were captured once each, 18 samples per capture. Served/collector identities agree; source/build dirty flags are false. No other browser workload ran during these captures.
+Original delivered runtime is `f36c98e01f97d8975d29a3ceff5caa1879894ed9`, clean, containing the presentation-shutdown guard. The previous `0d36301` captures remain intermediate evidence and are not a gameplay acceptance claim. Because runtime changed, paired [final local proof](issue-65/final-local-proof.json)/[battle](issue-65/final-local-battle.json) and [final deployed proof](issue-65/final-deployed-proof.json)/[battle](issue-65/final-deployed-battle.json) were captured once each, 18 samples per capture. Served/collector identities agree; source/build dirty flags are false. No other browser workload ran during these captures.
 
 | Final battle gate | Local maximum | Deployed maximum | Disposition |
 | --- | --- | --- | --- |
@@ -92,7 +92,7 @@ Delivered runtime is `f36c98e01f97d8975d29a3ceff5caa1879894ed9`, clean, containi
 
 Every measured gate on all 18 final deployed samples passes; startup movement coverage is incomplete in this v2 capture; all 18 pan, 18 zoom and 18 player movement windows pass. The 18 initial-enemy windows do not establish startup animation performance because v2 sampling begins only when controls are usable. All recorded selection/pan changes reach the next render callback, with zero browser errors. Two final local portrait samples have p50 16.8 ms (first warm, second cold); these join the earlier local failure in the per-sample assessment. No universal local/host/device F1 guarantee is claimed. Final deployed proof remains at worst p50/p95 16.7/18.5 ms, cold/warm usable 836.5/269.4 ms and assets 1412374 bytes.
 
-## Final configured verification and delivery
+## Original configured verification and delivery
 
 Final production build and browser tests use clean corrected runtime `f36c98e`; subsequent changes only preserve evidence and update documentation/OpenSpec tracking. Application/collector/test code is unchanged after that runtime commit. Final full configured browser run: **171 passed in 6.7 min** across desktop, Pixel 7 portrait and landscape. It includes legal victories/defeats and all approved signatures, replay equality, picking at transformed viewports/DPR, presentation suspension, modal/gesture lock and repeated restart, including both formerly failing presentation-restart cases. Unit suite **265 passed**, content validation **77 passed**, both strict TypeScript configurations and production build pass. Existing Phaser large-chunk and runner color-environment warnings remain; no new runtime dependency.
 
@@ -115,3 +115,27 @@ Delivery PR: https://github.com/luminari-gurus/tactics-guru-v2/pull/67, open for
 Review at `ad9a499` found that the 18 startup movement windows in the v2 deployed capture contain only the post-animation tail: controls become usable after startup presentation, and the old sampler rejected every earlier frame. Those percentiles are not evidence for startup movement. All original captures and numeric gate assessments remain retained as historical data, with this limitation applying to every v2 startup window, including baseline and profiling interpretations. Player movement, idle and loading measurements are unaffected by that specific gap.
 
 Version 3 samples visible workload intervals before controls usability, while idle sampling requires both interval endpoints to be after controls usability and input recording still requires usable controls. Hidden-page gaps and restart resets remain excluded. Each workload exports bounded, isolated `intervalStartedMs` alongside `intervalsMs`; the collector rejects a battle capture unless every startup movement window includes intervals ending before controls usability. Existing browser diagnostics verify that same condition through the real scene path. No renderer or gameplay change is included. Corrected captures and gate results follow.
+
+### Corrected version 3 results
+
+Exact clean runtime/collector/served build `6f5f7a904dbb30a53c0b7ffde0168cca8e95e114`. Paired [local proof](issue-65/review-local-proof.json)/[battle](issue-65/review-local-battle.json) and [deployed proof](issue-65/review-deployed-proof.json)/[battle](issue-65/review-deployed-battle.json) contain 18 samples each, 72 total, using the same host/browser/profiles, three cold/warm pairs and existing Pages branch-preview protocol as the earlier captures. All four capture identities agree, every source/build dirty flag is false, all method versions are 3, and there are zero browser errors or collector failures. Captures ran sequentially without concurrent browser workloads and were each collected once. Original captures were not overwritten.
+
+The [corrected per-sample assessment](issue-65/review-gate-evaluation.json) retains every workload summary and a separate startup-only summary built from raw interval pairs whose `intervalStartedMs + intervalsMs < controlsUsableMs`. Thus the startup-only percentile excludes the post-animation tail rather than relying on a passing full-window percentile. Every one of the 18 local and 18 deployed startup windows includes 21–22 such intervals. Each capture also includes 18 distinct measured player movement windows. Full movement windows remain reported independently. No threshold changed; the existing 1e-6 ms arithmetic-noise tolerance is retained.
+
+| Version 3 battle metric | Local maximum | Deployed maximum | Unchanged limit |
+| --- | --- | --- | --- |
+| Startup-only movement p95, before controls usability | 19.1 ms | 19.0 ms | ≤33.4 ms |
+| Player movement p95 | 18.6 ms | 18.6 ms | ≤33.4 ms |
+| Full movement windows p95, including tail | 22.7 ms | 22.1 ms | ≤33.4 ms |
+| Idle p50/p95 | 16.7/18.6 ms | 16.7/18.8 ms | ≤16.7/20 ms |
+| Pan/zoom p95 | 19.0/19.7 ms | 18.9/19.7 ms | ≤33.4 ms |
+| Cold usable | 593.7 ms | 845.7 ms | ≤2500 ms |
+| Warm usable | 474.2 ms | 592.6 ms | ≤750 ms |
+| Cold code transfer | 391186 bytes | 392995 bytes | ≤400000 bytes |
+| Cold asset transfer | 834688 bytes | 834688 bytes | ≤1500000 bytes |
+
+All 18 corrected deployed battle samples and all 18 corrected local battle samples pass the measured gates. Deployed proof idle remains at worst p50/p95 16.7/18.5 ms. This closes the startup evidence gap without implying that the historical v2 capture covered startup or that an unmatched startup before/after speedup was measured. Earlier local p50 failures remain in the historical assessment. Hardware timing and physical input/scanout are not certified. Audio #63 has since merged into main; these captures cover this PR branch and do not certify the combined audio integration tree.
+
+Review-fix verification: the new startup unit regression initially failed with zero workload samples before controls usability, then passed after the sampler correction. Full unit suite: **266 passed**. Both strict TypeScript configurations and [production build](issue-65/review-build.txt) pass. Real startup diagnostics plus hidden/resume/restart checks: [15 passed](issue-65/review-browser.txt) across all three profiles. Proof-scene checks: [9 passed](issue-65/review-proof-browser.txt) across all three profiles. The earlier full 171-test gameplay run remains renderer validation; this measurement-only fix uses the focused relevant browser checks. No domain, renderer or gameplay file changed.
+
+Reproduce the replacement captures with the commands above, substituting `review-local-*` and `review-deployed-*` output filenames and building exact runtime `6f5f7a9` first. The raw timestamps and nearest-rank calculation are authoritative: sort the intervals ending before controls usability, then select index `ceil(count × 0.95) - 1` for startup p95. Code/asset gates sum recorded transfer bytes, classifying navigation plus JS/CSS as code and remaining resources as assets, consistent with the original assessment. Later documentation/evidence commits do not change the measured runtime.

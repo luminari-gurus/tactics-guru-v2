@@ -1,6 +1,6 @@
 {
   "floatNoiseToleranceMs": 1e-06,
-  "note": "Only floating arithmetic noise below 1 nanosecond is ignored; no budget rounding or relaxation. Raw samples remain authoritative.",
+  "note": "Only floating arithmetic noise below 1 nanosecond is ignored; no budget rounding or relaxation. Raw samples remain authoritative. Historical version 2 startup movement windows contain only post-controls animation tails and do not establish startup performance. See review-gate-evaluation.json and timestamped version 3 captures for corrected coverage.",
   "samples": [
     {
       "capture": "candidate-battle",
