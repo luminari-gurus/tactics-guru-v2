@@ -1,0 +1,13 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-68-baked-tiles/tactics-guru-v2
+
+
+ Test Files  26 passed (26)
+      Tests  295 passed (295)
+   Start at  12:58:20
+   Duration  1.36s (tests 69%, transform 25%, import 6%, worker 1%)
+

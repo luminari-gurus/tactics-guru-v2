@@ -107,4 +107,17 @@ python3 docs/qa/issue-68/compare.py docs/qa/issue-68 /tmp/comparison.json
 | Appearance/elevation/depth/picking/overlays/movement/canopy/max zoom | Matched screenshot pairs, actual transform errors and focused existing browser checks |
 | Cost-benefit decision including valid rejection | Explicit retain-baseline disposition above; exact prototype commit and baseline-restored final files |
 
-Final validation results pending.
+Validation on clean source `65414b2`, whose runtime/tests/dependencies are byte-identical to baseline e955e9d:
+
+| Command / check | Result |
+| --- | --- |
+| `npm run test:unit` | [295 passed](issue-68/final-unit.txt) |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE=… npm test` | [225 passed across all configured profiles](issue-68/final-browser.txt), 12.7 minutes |
+| `npm run typecheck` | [Both strict configurations passed](issue-68/final-typecheck.txt) |
+| `npm run build` | [Passed](issue-68/final-build.txt); existing Phaser bundle-size warning |
+| `openspec validate issue-68-baked-tiles --strict` | Passed |
+| `git diff --check` | Passed |
+| Recompute comparison JSON / relative report links | Exact match / all exist |
+| `git diff e955e9d -- src tests scripts package.json package-lock.json` | Empty; no rejected runtime remains |
+
+Later report/task commits change documentation only. No further performance recapture is required for restoring the already measured baseline runtime. All four issue acceptance criteria are verified for this experiment's explicit rejection outcome. Physical device certification, isolated GPU elapsed timing and deployment acceptance remain outside this outcome.

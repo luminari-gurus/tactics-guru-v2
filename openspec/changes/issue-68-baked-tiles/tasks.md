@@ -22,7 +22,7 @@ Caller approved plan commit 523e50e on 2026-10-11; implementation authorized. Is
 
 ## 4. Final integration and delivery
 
-- [ ] 4.1 Run npm run test:unit, full configured npm test with installed Chromium, npm run typecheck, npm run build and git diff --check against final runtime; record actual results and hardware limitations in docs/qa/issue-68-baked-tiles.md, and rerun relevant comparisons only if runtime changed from the measured candidate.
+- [x] 4.1 Run npm run test:unit, full configured npm test with installed Chromium, npm run typecheck, npm run build and git diff --check against final runtime; record actual results and hardware limitations in docs/qa/issue-68-baked-tiles.md, and rerun relevant comparisons only if runtime changed from the measured candidate.
 - [ ] 4.2 Audit every acceptance criterion and completed checkbox; commit only issue-specific changes without attribution lines, push and create/reuse/attach the PR. Verify issue, branch and PR links; use Closes #68 only with all criteria verified, otherwise draft with Refs #68 and remaining gaps.
 
 ## Workflow follow-up
