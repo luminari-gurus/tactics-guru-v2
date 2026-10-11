@@ -221,9 +221,12 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
   expect(diagnostics.idleIntervalsMs).toHaveLength(diagnostics.frames.count);
-  expect(diagnostics.measurementMethod).toEqual({version:2,frameObservation:'post-render'});
+  expect(diagnostics.measurementMethod).toEqual({version:3,frameObservation:'post-render'});
   expect(diagnostics.workloads.map(w=>w.action)).toEqual(expect.arrayContaining(['pan','zoom','selection','move']));
   expect(diagnostics.workloads.find(w=>w.action==='move')!.frames.count).toBeGreaterThan(0);
+  const startup=diagnostics.workloads.find(w=>w.action==='move' && w.startedMs<diagnostics.controlsUsableMs!)!;
+  expect(startup.intervalStartedMs.some((start,i)=>start+startup.intervalsMs[i]<diagnostics.controlsUsableMs!)).toBe(true);
+  expect(startup.intervalStartedMs).toHaveLength(startup.frames.count);
   for(const response of diagnostics.interactions){expect(response.renderedMs).toBeGreaterThanOrEqual(response.inputMs);expect(response.renderedFrames).toBe(1);}
   expect((await session(page)).state.commandCount).toBe(before.state.commandCount+1);
   const replay=replayBattle((await session(page)).replay,catalog);expect(replay.ok).toBe(true);

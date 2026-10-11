@@ -1,6 +1,6 @@
 # Issue #65 performance evidence
 
-Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/65. Branch `work/issue-65-frame-budgets`, base `d60659d`. Caller approved plan `5d64d74` on 2026-10-11; approval recorded at `e6aec78`. All budgets remain unchanged; evidence is in progress.
+Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/65. Branch `work/issue-65-frame-budgets`, base `d60659d`. Caller approved plan `5d64d74` on 2026-10-11; approval recorded at `e6aec78`. All budgets remain unchanged. See the review correction below for the authoritative startup-movement coverage; historical v2 captures measured only the post-animation tail for initial enemy windows.
 
 ## Unchanged baseline
 
@@ -8,7 +8,7 @@ Production source/build `e6aec78` is clean and application-identical to main `d6
 
 ## Measurement changes
 
-Version 2 retains bounded raw idle intervals, samples both scenes after render and separates collector workload windows with a 50 ms settling margin. All initial enemy windows remain recorded; workloadStartIndex distinguishes the collector's player actions. Hidden/restart sampling rules, controls-usable timing and input-to-next-render timing are preserved. Historical methods/results remain unchanged. Raw export regression initially failed as expected; [RED log](issue-65/measurements-red.txt).
+Version 2 retains bounded raw idle intervals, samples both scenes after render and separates collector workload windows with a 50 ms settling margin. Initial enemy window metadata remains recorded, but v2 excludes animation intervals before controls usability; workloadStartIndex distinguishes the collector's player actions. Hidden/restart sampling rules, controls-usable timing and input-to-next-render timing are preserved. Historical methods/results remain unchanged. Raw export regression initially failed as expected; [RED log](issue-65/measurements-red.txt).
 
 ## Acceptance
 
@@ -34,7 +34,7 @@ Runtime `0d36301946ea393470a69c76c3c3096a2429b5ca`, clean. [Candidate proof](iss
 | Idle p95 | 18.7 ms | 18.8 ms | ≤20; passes |
 | Pan window p95 | 18.9 ms | 18.8 ms | ≤33.4; every window passes |
 | Zoom window p95 | 19.6 ms | 19.9 ms | ≤33.4; every window passes |
-| Move window p95 | 19.3 ms | 18.7 ms | ≤33.4; all 36 windows (initial enemy/player) pass |
+| Move window p95 | 19.3 ms | 18.7 ms | ≤33.4; 18 player windows pass; 18 initial-enemy windows measure only the post-animation tail |
 | Cold usable | 595.6 ms | 846.1 ms | ≤2500; passes |
 | Warm usable | 462.1 ms | 605.3 ms | ≤750; passes |
 | Cold code | 391162 bytes | 392995 bytes | ≤400000; passes |
@@ -90,7 +90,7 @@ Delivered runtime is `f36c98e01f97d8975d29a3ceff5caa1879894ed9`, clean, containi
 | L3 cold code | 391160 bytes | 392972 bytes | Pass ≤400000 |
 | L4 cold assets | 834688 bytes | 834688 bytes | Pass ≤1500000 |
 
-Every applicable gate on all 18 final deployed samples passes; all 18 pan, 18 zoom and 36 movement windows pass. All recorded selection/pan changes reach the next render callback, with zero browser errors. Two final local portrait samples have p50 16.8 ms (first warm, second cold); these join the earlier local failure in the per-sample assessment. No universal local/host/device F1 guarantee is claimed. Final deployed proof remains at worst p50/p95 16.7/18.5 ms, cold/warm usable 836.5/269.4 ms and assets 1412374 bytes.
+Every measured gate on all 18 final deployed samples passes; startup movement coverage is incomplete in this v2 capture; all 18 pan, 18 zoom and 18 player movement windows pass. The 18 initial-enemy windows do not establish startup animation performance because v2 sampling begins only when controls are usable. All recorded selection/pan changes reach the next render callback, with zero browser errors. Two final local portrait samples have p50 16.8 ms (first warm, second cold); these join the earlier local failure in the per-sample assessment. No universal local/host/device F1 guarantee is claimed. Final deployed proof remains at worst p50/p95 16.7/18.5 ms, cold/warm usable 836.5/269.4 ms and assets 1412374 bytes.
 
 ## Final configured verification and delivery
 
@@ -106,6 +106,12 @@ Final production build and browser tests use clean corrected runtime `f36c98e`; 
 | `git diff --check` | Pass |
 | `openspec validate issue-65-frame-budgets --strict` | Pass |
 
-Final scope contains shared column/highlight texture caching, one disposed-render guard, comparable bounded raw measurements, workload separation, focused existing-test assertions and task evidence. Profiling harness is retained as reproduction evidence; task-created ignored working copies are removed. Every issue criterion is verified against the specified deployed automated gate and configured checks; historical failures and local p50 limitations remain explicit. Physical-device certification, the historical intermittent Safari report and audio delivery remain separate work. No production configuration, merge, manual issue closure or OpenSpec archive is performed.
+Final scope contains shared column/highlight texture caching, one disposed-render guard, comparable bounded raw measurements, workload separation, focused existing-test assertions and task evidence. Profiling harness is retained as reproduction evidence; task-created ignored working copies are removed. The v2 evidence does not verify startup movement; the review correction below supersedes the earlier complete-coverage claim. Other criteria are verified against the specified deployed automated gate and configured checks; historical failures and local p50 limitations remain explicit. Physical-device certification, the historical intermittent Safari report and audio delivery remain separate work. No production configuration, merge, manual issue closure or OpenSpec archive is performed.
 
 Delivery PR: https://github.com/luminari-gurus/tactics-guru-v2/pull/67, open for review against main. Final runtime is `f36c98e`; later evidence/tracking commits do not change application, collector or tests. No merge or manual issue closure performed.
+
+## Independent review correction: startup sampling
+
+Review at `ad9a499` found that the 18 startup movement windows in the v2 deployed capture contain only the post-animation tail: controls become usable after startup presentation, and the old sampler rejected every earlier frame. Those percentiles are not evidence for startup movement. All original captures and numeric gate assessments remain retained as historical data, with this limitation applying to every v2 startup window, including baseline and profiling interpretations. Player movement, idle and loading measurements are unaffected by that specific gap.
+
+Version 3 samples visible workload intervals before controls usability, while idle sampling requires both interval endpoints to be after controls usability and input recording still requires usable controls. Hidden-page gaps and restart resets remain excluded. Each workload exports bounded, isolated `intervalStartedMs` alongside `intervalsMs`; the collector rejects a battle capture unless every startup movement window includes intervals ending before controls usability. Existing browser diagnostics verify that same condition through the real scene path. No renderer or gameplay change is included. Corrected captures and gate results follow.

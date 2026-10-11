@@ -2,7 +2,7 @@ const MAX_FRAME_SAMPLES = 600;
 const MAX_WINDOWS = 60;
 const INTERACTION_WINDOW_MS = 250;
 export type MeasurementAction = 'selection' | 'pan' | 'zoom' | 'move';
-interface Workload { action: MeasurementAction; startedMs: number; untilMs: number; samples: number[] }
+interface Workload { action: MeasurementAction; startedMs: number; untilMs: number; samples: number[]; intervalStartedMs: number[] }
 interface Response { action: MeasurementAction; inputMs: number; renderedMs: number; responseMs: number; renderedFrames: number }
 function frameSummary(samples: readonly number[]) {
   const sorted = [...samples].sort((a,b)=>a-b);
@@ -45,7 +45,7 @@ export class FitMeasurements {
   workload(action: MeasurementAction, now: number, duration = INTERACTION_WINDOW_MS): void {
     const last = this.windows.at(-1);
     if (last?.action === action && last.untilMs >= now) last.untilMs = Math.max(last.untilMs, now + duration);
-    else if (this.windows.length < MAX_WINDOWS) this.windows.push({action, startedMs:now, untilMs:now+duration, samples:[]});
+    else if (this.windows.length < MAX_WINDOWS) this.windows.push({action, startedMs:now, untilMs:now+duration, samples:[], intervalStartedMs:[]});
   }
 
   rendered(now: number, visible: boolean): void {
@@ -54,17 +54,20 @@ export class FitMeasurements {
   }
 
   frame(now: number, visible: boolean, idle = true): void {
-    if (!visible || this.usable === null) {
+    if (!visible) {
       this.previousFrame = null;
       this.pending = [];
-      if (!visible) for (const window of this.windows) window.untilMs = Math.min(window.untilMs, now);
+      for (const window of this.windows) window.untilMs = Math.min(window.untilMs, now);
       return;
     }
     if (this.previousFrame !== null && now > this.previousFrame) {
       const windows = this.windows.filter(window => window.startedMs <= now && window.untilMs >= this.previousFrame!);
       if (windows.length) {
-        for (const window of windows) if (window.samples.length < this.sampleLimit) window.samples.push(now-this.previousFrame);
-      } else if (idle && this.samples.length < this.sampleLimit) this.samples.push(now-this.previousFrame);
+        for (const window of windows) if (window.samples.length < this.sampleLimit) {
+          window.samples.push(now-this.previousFrame);
+          window.intervalStartedMs.push(this.previousFrame);
+        }
+      } else if (idle && this.usable !== null && this.previousFrame >= this.usable && this.samples.length < this.sampleLimit) this.samples.push(now-this.previousFrame);
     }
     this.previousFrame = now;
   }
@@ -78,7 +81,7 @@ export class FitMeasurements {
       controlsUsableMs: this.usable,
       frames: frameSummary(this.samples),
       idleIntervalsMs: [...this.samples],
-      workloads: this.windows.map(window => ({action:window.action, startedMs:window.startedMs, untilMs:window.untilMs, frames:frameSummary(window.samples), intervalsMs:[...window.samples]})),
+      workloads: this.windows.map(window => ({action:window.action, startedMs:window.startedMs, untilMs:window.untilMs, frames:frameSummary(window.samples), intervalsMs:[...window.samples], intervalStartedMs:[...window.intervalStartedMs]})),
       interactions: this.responses.map(response=>({...response})),
     };
   }

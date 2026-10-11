@@ -13,7 +13,7 @@ describe('proof measurements', () => {
     expect(measurements.snapshot()).toMatchObject({ run: 2, sceneStartedMs: 100, sceneReadyMs: null, controlsUsableMs: null, frames: { count: 0 } });
   });
 
-  it('samples only usable visible frames, excludes background gaps and bounds storage', () => {
+  it('samples only usable visible idle frames, excludes background gaps and bounds storage', () => {
     const measurements = new FitMeasurements(3);
     measurements.begin(0);
     measurements.frame(10, true);
@@ -80,4 +80,25 @@ it('exports bounded raw idle intervals with exact summary and isolated snapshots
   expect(m.snapshot().idleIntervalsMs).toEqual([10,20,30]);
   m.begin(200);
   expect(m.snapshot().idleIntervalsMs).toEqual([]);
+});
+
+
+it('samples startup movement before controls usability without admitting idle or input', () => {
+  const m = new FitMeasurements();
+  m.begin(0); m.sceneReady(10); m.frame(10, true, false);
+  m.workload('move', 11); m.interaction('pan', 12);
+  m.frame(20, true, false); m.frame(40, true, false);
+  expect(m.snapshot().workloads[0]).toMatchObject({
+    action: 'move', intervalsMs: [10,20], intervalStartedMs: [10,20],
+    frames: {count: 2, p95Ms: 20},
+  });
+  expect(m.snapshot()).toMatchObject({controlsUsableMs: null, idleIntervalsMs: [], interactions: []});
+  m.frame(45, false, false); m.frame(1000, true, false); m.frame(1010, true, true);
+  expect(m.snapshot().idleIntervalsMs).toEqual([]);
+  expect(m.snapshot().workloads[0].intervalsMs).toEqual([10,20]);
+  m.controlsUsable(1015); m.frame(1020, true); m.frame(1030, true);
+  expect(m.snapshot().idleIntervalsMs).toEqual([10]);
+  const snapshot = m.snapshot(); snapshot.workloads[0].intervalStartedMs[0] = 999;
+  expect(m.snapshot().workloads[0].intervalStartedMs[0]).toBe(10);
+  m.begin(2000); expect(m.snapshot().workloads).toEqual([]);
 });

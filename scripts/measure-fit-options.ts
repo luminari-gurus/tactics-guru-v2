@@ -50,8 +50,8 @@ export function collectorConditions(options: MeasureOptions) {
       ? 'cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes'
       : 'cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes',
     frames: options.scene === 'proof'
-      ? 'v2: first >=120 visible active post-render intervals; raw idle intervals; nearest-rank p50/p95; cap 600; no interaction workload'
-      : 'v2: first >=120 visible player-idle post-render intervals, then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response',
+      ? 'v3: first >=120 visible active post-render intervals; raw idle intervals; nearest-rank p50/p95; cap 600; no interaction workload'
+      : 'v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response',
   };
 }
 

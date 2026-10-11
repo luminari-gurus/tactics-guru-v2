@@ -126,6 +126,14 @@ try {
       }
     } catch (error) { captureError = error instanceof Error ? error.message : String(error); }
     const failures = captureFailures(samples);
+    if (options.scene === 'battle') for (const sample of samples) {
+      const usable = sample.diagnostics.controlsUsableMs;
+      const startup = sample.diagnostics.workloads.slice(0, sample.workloadStartIndex).filter(w => w.action === 'move');
+      if (usable === null || !startup.length || startup.some(w =>
+        !w.intervalStartedMs?.some((start, index) => start + w.intervalsMs[index] < usable))) {
+        failures.push(`Missing pre-controls startup movement intervals: ${sample.profile}/${sample.repetition}/${sample.cache}`);
+      }
+    }
     if (captureError) failures.push(captureError);
     let measuredBuild = null;
     try { measuredBuild = buildIdentity(samples); } catch { /* retained below */ }
