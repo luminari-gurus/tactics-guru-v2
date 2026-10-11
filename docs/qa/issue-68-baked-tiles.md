@@ -121,3 +121,5 @@ Validation on clean source `65414b2`, whose runtime/tests/dependencies are byte-
 | `git diff e955e9d -- src tests scripts package.json package-lock.json` | Empty; no rejected runtime remains |
 
 Later report/task commits change documentation only. No further performance recapture is required for restoring the already measured baseline runtime. All four issue acceptance criteria are verified for this experiment's explicit rejection outcome. Physical device certification, isolated GPU elapsed timing and deployment acceptance remain outside this outcome.
+
+Delivered in [PR #71](https://github.com/luminari-gurus/tactics-guru-v2/pull/71), targeting main. All 11 OpenSpec tasks are complete. No merge, manual issue closure or OpenSpec archive performed.
