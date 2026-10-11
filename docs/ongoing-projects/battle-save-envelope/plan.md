@@ -2,6 +2,10 @@
 
 ## Scope and status
 
+Implementation authorized by the user's 2026-10-11 request. Working in the existing clean issue worktree, with main refreshed and unchanged at `e955e9d`. OpenSpec apply is ready (0/9). Current task: fixture provenance and candidate measurements. The planning-only statements below describe the original publication, now superseded by this authorization. Keep this section and the root handoff current after each implementation stage.
+
+Progress: task 1.1 complete. Eight shared fixtures build successfully and replay to their independently captured states; typecheck passed. The first comparison selects snapshots because replay reaches roughly 301 KB and 564 ms median decode at 10,000 commands versus roughly 1.1 KB and 0.07 ms for snapshots on this host. Commit the harness, retain a pinned run, then specify/implement the selected contract. See [QA report](../../qa/issue-69-save-envelope.md).
+
 [Issue #69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69) is a child of [#58: Safe local battle save and resume](https://github.com/luminari-gurus/tactics-guru-v2/issues/58), implementing its first work package: a bounded versioned save contract selected from measured snapshot/replay costs. The issue's acceptance criteria are preserved in [issue.md](issue.md).
 
 Prepared on 2026-10-11 against main `e955e9d9f182a76f057ea69057c7a1ac6c0bd682`. The user explicitly approved creating and claiming this child and publishing the prepared plan. #69 is open, labelled `ready for work`, assigned to `moshehbenavraham`, and linked natively under #58. The [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/69#issuecomment-6111209952) records the scope.

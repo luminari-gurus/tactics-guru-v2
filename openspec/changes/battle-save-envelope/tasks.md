@@ -4,7 +4,7 @@ Issue [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69), a chil
 
 ## 1. Representation evidence and contract
 
-- [ ] 1.1 After the concrete plan is approved for implementation, pin the source/catalog and create deterministic normal, player/enemy, presentation-boundary, ended and 10,000-command fixtures; verify they are valid under existing domain dispatch/replay and document fixture provenance (AC1/AC4).
+- [x] 1.1 After the concrete plan is approved for implementation, pin the source/catalog and create deterministic normal, player/enemy, presentation-boundary, ended and 10,000-command fixtures; verify they are valid under existing domain dispatch/replay and document fixture provenance (AC1/AC4).
 - [ ] 1.2 Compare snapshot and replay with one reproducible harness; retain code-unit/UTF-8 sizes, encode/parse/validate/reconstruct timings, repetitions and host/runtime conditions. Select one representation and verify that the format document records the measured rationale without mobile performance claims (AC1).
 - [ ] 1.3 Specify envelope identity, independent format version, rules/content/RNG compatibility, exact payload shape, canonical digest coverage and finite limits; review supported boundary examples and reject-example fixtures against that documented contract (AC2).
 

@@ -1,4 +1,18 @@
-# Battle audio merged; next-session handoff
+# Active work: battle-save envelope (#69)
+
+## Implementation handoff — 2026-10-11
+
+The user authorized implementation of [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69), using ablation and OpenSpec, through a review-ready PR. Continue on `work/issue-69-save-envelope` in `C:/Users/apexw/.codex/worktrees/save-envelope-plan/Tactics-Guru`. Its published planning head is `cc4859d`; refreshed `origin/main` is still `e955e9d9f182a76f057ea69057c7a1ac6c0bd682`, already its ancestor. The original checkout holds unrelated Safari/environment/workflow edits; preserve them.
+
+Source of truth: [implementation plan](battle-save-envelope/plan.md), [OpenSpec tasks](../../openspec/changes/battle-save-envelope/tasks.md). OpenSpec reports `spec-driven`, ready, 0/9 complete. First step: shared deterministic fixtures and measured snapshot/replay comparison. Outcome: one bounded pure codec, continuation/rejection proof, format and QA evidence. Files: domain codec, shared test fixtures, focused tests, comparison script, format/QA documentation and these plans. Non-goals: runtime storage/session/UI, deployment, migration machinery, parent #58 closure. Proof: focused and configured tests, both typechecks, build, browser regressions, strict OpenSpec and whitespace checks.
+
+Ablation: reuse domain readers, canonical SHA-256, replay and existing battle policy. Both representations are necessary only for comparison; ship one. No new dependency or general validation framework is needed. Dependencies installed from the existing lockfile with `npm ci --ignore-scripts` (0 vulnerabilities).
+
+Local tools: `node` is available; npm CLI is `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`. OpenSpec 1.14.1 CLI is `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`. Invoke both with `node`. No release tag is appropriate for this unused-by-UI contract; preserve normal branch history and open a child-scoped PR without merging.
+
+## Historical audio/performance handoff
+
+The notes below are the prior session's record, not the current task. Main now includes PR #67 at `e955e9d`; its integration instructions below have been superseded.
 
 ## Current status — 2026-10-11
 
