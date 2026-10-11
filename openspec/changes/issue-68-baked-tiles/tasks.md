@@ -1,10 +1,10 @@
 # Tasks
 
-Approval pending. Execute only after the caller explicitly approves this published plan. Issue #68, caller dubstylee, branch work/issue-68-baked-tiles, baseline e955e9d9f182a76f057ea69057c7a1ac6c0bd682. See proposal.md for selection evidence and design.md for the acceptance mapping.
+Caller approved plan commit 523e50e on 2026-10-11; implementation authorized. Issue #68, caller dubstylee, branch work/issue-68-baked-tiles, baseline e955e9d9f182a76f057ea69057c7a1ac6c0bd682. See proposal.md for selection evidence and design.md for the acceptance mapping.
 
 ## 1. Approval and baseline evidence
 
-- [ ] 1.1 Record explicit caller approval in design.md; verify issue/branch/base identity and unchanged approved scope before any runtime edit.
+- [x] 1.1 Record explicit caller approval in design.md; verify issue/branch/base identity and unchanged approved scope before any runtime edit.
 - [ ] 1.2 Capture exact baseline battle/proof with the #65 v3 collector (18 cold/warm samples per scene), same host/browser/profile/seed conditions; retain raw build identities, startup/idle/pan/zoom/move intervals, errors and usable times under docs/qa/issue-68/ and begin the comparison report.
 - [ ] 1.3 Retain baseline fitted/max-zoom and elevated/overlay/canopy screenshots plus matched CPU/renderer traces using task-local profiling tooling; document actual dimensions/count/nominal texture memory and available or unavailable GPU evidence in the report.
 

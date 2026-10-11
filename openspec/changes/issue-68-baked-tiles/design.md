@@ -2,7 +2,7 @@
 
 ## Context
 
-See proposal.md for issue, caller, branch, base and readiness evidence. Implementation approval is pending.
+See proposal.md for issue, caller, branch, base and readiness evidence. Caller explicitly approved published plan commit `523e50ee508d76e73210ddbb8856f1ad66773087` with “Approved” on 2026-10-11. Scope is unchanged.
 
 `BoardRenderer` currently caches columns by elevation and overlays by 16 flag combinations at density `MAX_BOARD_SCALE * MAX_ZOOM` (6 pixels per board unit). Each terrain surface still uses a rotated image inside a vertically scaled container. Tile depth comes from grid ordering; overlays use depth +2, rings +2.25, occupants/canopies +2.5. Picking uses pure geometry. The published diagnostics derive surface-corner error from the actual terrain image transform; that check must stay meaningful after baking.
 
