@@ -76,7 +76,13 @@ F1 fails for the battle in both local and preview runs: deployed p50 is 26.1–3
 
 ## Physical-device record
 
-The caller can test iPhone Safari/Chrome and desktop and will report results later; Android evidence is still unavailable. All rows are pending. Historical proof-scene hardware reports do not certify the authored battle. For each row record date, tester/source, device model, OS/browser versions, URL and served commit, cache/network, orientation, screenshots/logs, raw measurements and every checklist item below.
+The caller reports that iPhone Chrome/Safari look good, followed by the browser results below. These are qualitative reports; checklist completion and device/orientation details remain unverified. Android evidence is still unavailable. Historical proof-scene hardware reports do not certify the authored battle. For each row record date, tester/source, device model, OS/browser versions, URL and served commit, cache/network, orientation, screenshots/logs, raw measurements and every checklist item below.
+
+Caller report received 2026-10-10 for https://15a9d5a6.tactics-guru-v2.pages.dev:
+
+- Chrome 155.0.8059.37: reported working on “desktop and landscape.” Device/OS and whether this means desktop hardware or iPhone orientations need clarification.
+- Safari: version unknown, reported “working fine desktop/landscape,” with the same device/orientation ambiguity.
+- No problems reported. Win/loss/restart, individual gesture/layout/resume checks, console inspection and physical timing were not individually confirmed. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
 
 | Browser | Portrait | Landscape | Device / OS / browser / build / conditions |
 | --- | --- | --- | --- |
