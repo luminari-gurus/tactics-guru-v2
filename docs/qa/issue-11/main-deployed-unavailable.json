@@ -1,0 +1,230 @@
+{
+  "measuredAt": "2026-10-10T17:47:51.596Z",
+  "sourceCommit": "ea656e742deb455897b32a04c3aa99b28f156ae1",
+  "sourceDirty": false,
+  "measuredBuild": null,
+  "browserVersion": "155.0.8059.40",
+  "host": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "arch": "arm64",
+    "cpu": "Apple M5 Pro",
+    "node": "v26.11.0"
+  },
+  "conditions": {
+    "url": "https://tactics-guru-v2.pages.dev",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "host network to the deployed origin over HTTPS, CDN and TLS included; no throttling",
+    "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "first >=120 visible player-idle post-render intervals, then real selection/pan/zoom/move windows; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+    "scene": "battle",
+    "sceneUrl": "https://tactics-guru-v2.pages.dev/?scene=battle"
+  },
+  "buildFiles": null,
+  "failures": [
+    "No samples, so no measured build",
+    "page.waitForFunction: Timeout 18000ms exceeded."
+  ],
+  "failedCapture": {
+    "profile": "desktop",
+    "repetition": 1,
+    "cache": "cold",
+    "diagnostics": {
+      "run": 1,
+      "navigationStartMs": 0,
+      "sceneStartedMs": 403.09999999403954,
+      "sceneReadyMs": null,
+      "controlsUsableMs": null,
+      "frames": {
+        "count": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "maxMs": null
+      },
+      "board": null,
+      "proof": null,
+      "audio": null,
+      "lifecycle": null,
+      "capturedAt": "2026-10-10T17:47:51.591Z",
+      "build": {
+        "commit": "9f785dfd3e9ce703ff8ab46210f84c38890c6f2a",
+        "dirty": false
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "visibility": "visible",
+      "navigationType": "navigate",
+      "sampleLimit": 600,
+      "resources": [
+        {
+          "url": "https://tactics-guru-v2.pages.dev/?scene=battle",
+          "transferBytes": 1349,
+          "encodedBodyBytes": 1049,
+          "decodedBodyBytes": 3107,
+          "durationMs": 124.20000000298023
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/assets/index-Ch5Qk6DO.js",
+          "transferBytes": 2196,
+          "encodedBodyBytes": 1896,
+          "decodedBodyBytes": 4517,
+          "durationMs": 37.69999998807907
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/assets/index-D2fzDm50.css",
+          "transferBytes": 1481,
+          "encodedBodyBytes": 1181,
+          "decodedBodyBytes": 3256,
+          "durationMs": 32.099999994039536
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/assets/browser-Bl3Qzsgp.js",
+          "transferBytes": 1180,
+          "encodedBodyBytes": 880,
+          "decodedBodyBytes": 1827,
+          "durationMs": 39.900000005960464
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/assets/start-9L3XQFPF.js",
+          "transferBytes": 385457,
+          "encodedBodyBytes": 385157,
+          "decodedBodyBytes": 1476643,
+          "durationMs": 114.70000000298023
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/terrain/grass.png",
+          "transferBytes": 140620,
+          "encodedBodyBytes": 140320,
+          "decodedBodyBytes": 140320,
+          "durationMs": 38.8999999910593
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/terrain/grass_path.png",
+          "transferBytes": 139694,
+          "encodedBodyBytes": 139394,
+          "decodedBodyBytes": 139394,
+          "durationMs": 69.29999999701977
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/terrain/forest.png",
+          "transferBytes": 139484,
+          "encodedBodyBytes": 139184,
+          "decodedBodyBytes": 139184,
+          "durationMs": 69.09999999403954
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/terrain/water.png",
+          "transferBytes": 118505,
+          "encodedBodyBytes": 118205,
+          "decodedBodyBytes": 118205,
+          "durationMs": 69.5
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/terrain/stone.png",
+          "transferBytes": 143182,
+          "encodedBodyBytes": 142882,
+          "decodedBodyBytes": 142882,
+          "durationMs": 69.29999999701977
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/source/ranger_sprite.png",
+          "transferBytes": 9393,
+          "encodedBodyBytes": 9093,
+          "decodedBodyBytes": 9093,
+          "durationMs": 25.200000002980232
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/fighter.png",
+          "transferBytes": 21059,
+          "encodedBodyBytes": 20759,
+          "decodedBodyBytes": 20759,
+          "durationMs": 30.799999997019768
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/proof/fighter.png",
+          "transferBytes": 9143,
+          "encodedBodyBytes": 8843,
+          "decodedBodyBytes": 8843,
+          "durationMs": 51.70000000298023
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/source/mage_sprite.png",
+          "transferBytes": 9865,
+          "encodedBodyBytes": 9565,
+          "decodedBodyBytes": 9565,
+          "durationMs": 52.20000000298023
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/ranger.png",
+          "transferBytes": 20187,
+          "encodedBodyBytes": 19887,
+          "decodedBodyBytes": 19887,
+          "durationMs": 52.5
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/mage.png",
+          "transferBytes": 20970,
+          "encodedBodyBytes": 20670,
+          "decodedBodyBytes": 20670,
+          "durationMs": 101.90000000596046
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/goblin_archer.png",
+          "transferBytes": 20715,
+          "encodedBodyBytes": 20415,
+          "decodedBodyBytes": 20415,
+          "durationMs": 21.599999994039536
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/source/goblin_archer_sprite.png",
+          "transferBytes": 10518,
+          "encodedBodyBytes": 10218,
+          "decodedBodyBytes": 10218,
+          "durationMs": 32.8999999910593
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/source/goblin_grunt_sprite.png",
+          "transferBytes": 9601,
+          "encodedBodyBytes": 9301,
+          "decodedBodyBytes": 9301,
+          "durationMs": 52.099999994039536
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/goblin_grunt.png",
+          "transferBytes": 20852,
+          "encodedBodyBytes": 20552,
+          "decodedBodyBytes": 20552,
+          "durationMs": 52.29999999701977
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/ranger.png",
+          "transferBytes": 300,
+          "encodedBodyBytes": 19887,
+          "decodedBodyBytes": 19887,
+          "durationMs": 20.599999994039536
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/fighter.png",
+          "transferBytes": 300,
+          "encodedBodyBytes": 20759,
+          "decodedBodyBytes": 20759,
+          "durationMs": 23
+        },
+        {
+          "url": "https://tactics-guru-v2.pages.dev/battle/portraits/mage.png",
+          "transferBytes": 300,
+          "encodedBodyBytes": 20670,
+          "decodedBodyBytes": 20670,
+          "durationMs": 26.400000005960464
+        }
+      ],
+      "totalTransferBytes": 1226351
+    },
+    "errors": []
+  },
+  "samples": []
+}

@@ -4,6 +4,7 @@ import type { CellPosition, ContentCatalog } from '../content/types';
 import { BattleSession, type Presentation } from '../app/BattleSession';
 import { previewMove, previewMovement } from '../domain/grid';
 import { measurements } from '../diagnostics/browser';
+import type { Point } from '../geometry/iso';
 import { BattleHud, actionCommand, previewText, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BoardRenderer } from './BoardRenderer';
@@ -23,6 +24,7 @@ export class BattleScene extends Phaser.Scene {
   private begin(catalog:ContentCatalog):void {
     const session=new BattleSession(catalog,FIRST_BATTLE_MAP_ID,this.seed);this.seed=(this.seed+1)>>>0;
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
+    let movingPresentation=false;
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
@@ -47,22 +49,32 @@ export class BattleScene extends Phaser.Scene {
     };
     const select=(cell:CellPosition|null)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
+      const inputMs=performance.now();
+      const changed=selected?.x!==cell?.x || selected?.y!==cell?.y;
       selected=cell;if(cell)cursor=cell;session.cancel();
       if(action && cell){const command=actionCommand(session,action,cell);message=command?describe(command):'Unavailable: choose a living target';}
       refresh();
+      if(changed)measurements.interaction('selection',inputMs);
     };
     const board=new BoardRenderer(this,catalog,FIRST_BATTLE_MAP_ID,select);
-    const removeInput=bindBoardInput(canvas,board,()=>({width:this.scale.width,height:this.scale.height}),()=>ready && !initialFit && !dialogs.open);
+    const removeInput=bindBoardInput(canvas,{
+      select:(point:Point)=>board.select(point),
+      pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
+      zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
+    },()=>({width:this.scale.width,height:this.scale.height}),()=>ready && !initialFit && !dialogs.open);
     const restart=()=>document.querySelector<HTMLButtonElement>('#fit-restart')!.click();
     const dialogs=new BattleDialogs(()=>removeInput.reset(),restart);
     const present=async(step:Presentation|null)=>{
       if(!step){refresh();return;}
       clear();selected=null;removeInput.reset();hud.append(step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
+      const moving=step.events.some(event=>event.type==='moved');movingPresentation=moving;
+      if(moving)measurements.workload('move',performance.now());
       // Suspension may finish presentation early, but never resolve the command again.
       await animation.done;if(!live)return;animation=null;
+      if(moving)measurements.workload('move',performance.now(),0);movingPresentation=false;
       session.finishPresentation(step.token);cursor=session.active.cell;refresh();
-      if(initialFit && session.phase==='player'){initialFit=false;fit();board.resetView();}
+      if(initialFit && session.phase==='player'){initialFit=false;fit();board.resetView();measurements.controlsUsable(performance.now());}
       pump();
     };
     const pump=()=>{if(live && ready && session.phase==='enemy')void present(session.nextEnemy());};
@@ -81,16 +93,24 @@ export class BattleScene extends Phaser.Scene {
       cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};selected=cursor;session.cancel();refresh();
     };
     canvas.addEventListener('keydown',key);
-    const visibility=()=>{if(document.hidden){animation?.cancel();removeInput.reset();}};
+    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();}};
     document.addEventListener('visibilitychange',visibility);
     const panel=document.querySelector<HTMLElement>('#fit-panel')!;
     const fit=()=>board.fit(this.scale.width,this.scale.height,panel.getBoundingClientRect().bottom);
     const observer=new ResizeObserver(fit);observer.observe(panel);this.scale.on(Phaser.Scale.Events.RESIZE,fit);
     refresh();fit();
-    const onReady=()=>{if(!live)return;ready=true;this.status('ready');refresh();if(session.phase==='player'){initialFit=false;fit();board.resetView();}pump();};
+    const onReady=()=>{if(!live)return;measurements.sceneReady(performance.now());ready=true;this.status('ready');refresh();if(session.phase==='player'){initialFit=false;fit();board.resetView();measurements.controlsUsable(performance.now());}pump();};
     this.game.events.once(Phaser.Core.Events.POST_RENDER,onReady);
+    const onRender=()=>{
+      if(!live || !ready)return;
+      const now=performance.now(),visible=document.visibilityState==='visible' && !document.hidden;
+      if(movingPresentation)measurements.workload('move',now);
+      measurements.frame(now,visible,session.phase==='player');
+      measurements.rendered(now,visible);
+    };
+    this.game.events.on(Phaser.Core.Events.POST_RENDER,onRender);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      live=false;ready=false;session.dispose();animation?.cancel();dialogs.dispose();hud.dispose();removeInput();observer.disconnect();
+      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);session.dispose();animation?.cancel();dialogs.dispose();hud.dispose();removeInput();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;

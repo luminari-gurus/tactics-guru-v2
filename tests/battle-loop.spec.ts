@@ -58,9 +58,10 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const replayPath=test.info().outputPath('replay.json');
     writeFileSync(replayPath,JSON.stringify(final,null,2));
     await test.info().attach('replay',{path:replayPath,contentType:'application/json'});
-    if(seed===1){await page.keyboard.press('Escape');await expect(page.locator('#battle-active')).toContainText('Defeat');await page.locator('#fit-restart').click();}
-    else await page.locator('#dialog-restart').click();
+    await page.locator('#dialog-restart').click();
     await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(page.locator('#fit-status')).toHaveText('Battle ready');
     expect(await page.locator('canvas').count()).toBe(1);expect(errors).toEqual([]);
   });
 }
@@ -194,4 +195,39 @@ test('restart during initial enemy animation discards the old run and its callba
   const replay=replayBattle(fresh.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(fresh.state);
   expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
   await expect(page.locator('canvas')).toHaveCount(1);await expect(page.getByRole('dialog')).not.toBeVisible();
+});
+
+test('battle diagnostics record real selection, gestures and movement and reset on restart',async({page})=>{
+  const errors:string[]=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await page.goto('/');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.waitForFunction(()=>window.fitDiagnostics().frames.count>=5);
+  const before=await session(page);
+  const point=await page.evaluate(()=>{const panel=document.querySelector('#fit-panel')!.getBoundingClientRect();return {x:innerWidth/2,y:panel.bottom+(innerHeight-panel.bottom)*0.65};});
+  await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
+  await page.waitForFunction(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
+  await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();
+  await page.waitForFunction(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'));
+  expect((await session(page)).state).toEqual(before.state);
+  await page.getByRole('button',{name:'Move',exact:true}).click();
+  await page.locator('#battle-target').selectOption({index:1});
+  await page.waitForFunction(()=>window.fitDiagnostics().interactions.some(i=>i.action==='selection'));
+  await page.getByRole('button',{name:'Review action'}).click();
+  await page.getByRole('button',{name:'Confirm',exact:true}).click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
+  expect(diagnostics.workloads.map(w=>w.action)).toEqual(expect.arrayContaining(['pan','zoom','selection','move']));
+  expect(diagnostics.workloads.find(w=>w.action==='move')!.frames.count).toBeGreaterThan(0);
+  for(const response of diagnostics.interactions){expect(response.renderedMs).toBeGreaterThanOrEqual(response.inputMs);expect(response.renderedFrames).toBe(1);}
+  expect((await session(page)).state.commandCount).toBe(before.state.commandCount+1);
+  const replay=replayBattle((await session(page)).replay,catalog);expect(replay.ok).toBe(true);
+  if(replay.ok)expect(replay.state).toEqual((await session(page)).state);
+  await page.getByRole('button',{name:'Restart battle',exact:true}).click();
+  await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await page.evaluate(()=>window.fitDiagnostics())).interactions).toEqual([]);
+  await expect(page.locator('canvas')).toHaveCount(1);
+  expect(errors).toEqual([]);
 });

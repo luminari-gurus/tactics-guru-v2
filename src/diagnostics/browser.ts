@@ -49,6 +49,7 @@ export function diagnosticsSnapshot() {
     lifecycle: lifecycle ? { ...lifecycle } : null,
     capturedAt: new Date().toISOString(),
     build: __BUILD_INFO__,
+    scene: new URLSearchParams(location.search).get('scene') === 'proof' ? 'proof' : 'battle',
     userAgent: navigator.userAgent,
     viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio },
     visibility: document.visibilityState,

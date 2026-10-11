@@ -39,3 +39,32 @@ describe('proof measurements', () => {
     expect(measurements.snapshot()).toMatchObject({ sceneStartedMs: 0, frames: { count: 0, medianMs: null } });
   });
 });
+
+it('keeps idle and action windows independent and records first rendered response', () => {
+  const m = new FitMeasurements(3);
+  m.begin(0); m.controlsUsable(10);
+  m.frame(10, true); m.frame(20, true);
+  m.interaction('pan', 21); m.interaction('pan', 22);
+  m.rendered(25, true);
+  m.frame(30, true); m.frame(40, true);
+  const snapshot = m.snapshot();
+  expect(snapshot.frames.count).toBe(1);
+  expect(snapshot.workloads[0]).toMatchObject({action:'pan', startedMs:21, frames:{count:2}});
+  expect(snapshot.interactions).toEqual([
+    {action:'pan', inputMs:21, renderedMs:25, responseMs:4, renderedFrames:1},
+    {action:'pan', inputMs:22, renderedMs:25, responseMs:3, renderedFrames:1},
+  ]);
+  m.frame(400, true); m.frame(410, true);
+  expect(m.snapshot().frames.count).toBe(2);
+});
+it('drops hidden pending input and resets bounded workload data on restart', () => {
+  const m = new FitMeasurements(2);
+  m.begin(0); m.controlsUsable(1); m.frame(10,true);
+  m.interaction('selection', 11); m.rendered(12,false); m.frame(12,false);
+  m.rendered(1000,true); m.frame(1000,true); m.frame(1010,true);
+  expect(m.snapshot().interactions).toEqual([]);
+  m.workload('move', 1020); m.frame(1030,true); m.frame(1040,true); m.frame(1050,true);
+  expect(m.snapshot().workloads.find(w=>w.action==='move')!.frames.count).toBe(2);
+  m.begin(2000);
+  expect(m.snapshot()).toMatchObject({interactions:[],workloads:[],frames:{count:0}});
+});
