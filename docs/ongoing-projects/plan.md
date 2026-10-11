@@ -1,41 +1,34 @@
-# Issue #62: Battle audio implementation and review handoff
+# Battle audio merged; next-session handoff
 
 ## Current status — 2026-10-11
 
-[PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) implements [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62) on `work/issue-62-battle-audio`. It has been rebased onto main `d60659d03b940c20e380eeda3f226ba2b649ef6f`, including merged PR #61. The scene conflict preserves performance instrumentation and audio teardown. Runtime repair: `515ac85be1fd8e0294394e2f8805fc8788d7c901`.
+[PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) is merged into `main` as `de7385842ee50beb936a9eb7396cd1deeb351f51`. GitHub automatically marked [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62) completed. The merge joins main `d60659d03b940c20e380eeda3f226ba2b649ef6f` and the reviewed audio head `1609de5dcf71ec9e7aee8756bd4b82a13950a00e`; its tree exactly matches that tested head.
 
-The current user explicitly authorizes all review repairs, Git history management, publication, and leaving the PR ready to merge. This supersedes the original draft-only handoff. #11's automated milestone is closed; remaining physical certification, frame budgets and intermittent Safari restart work are tracked in #64, #65 and #66. This PR does not certify those follow-ups. The parent epics (#57 and #1) remain open.
+The merge commit preserves all twelve implementation, repair and evidence commits. Main had no additional changes, so no further rebase or conflict resolution was needed. The GitHub connector returned an integration-permission error; the authorized merge was published with the repository's Git credentials using a normal fast-forward push to main, and GitHub's merged state was read back. The audio branch is retained to preserve existing evidence links. No release tag is warranted by this feature merge.
 
-## Outcome and ablation
+The audio implementation is complete. Its [QA report](../qa/issue-62-battle-audio.md), retained raw captures and [17 completed OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) remain the evidence record. Physical audibility remains unverified under #64; broader frame-budget acceptance belongs to #65 and intermittent physical Safari restart investigation to #66. #57 remains open. Live verification found #1 already closed on 2026-10-11 before this session; that historical state was preserved and does not establish completion of the open follow-ups.
 
-Preserve all six issue acceptance criteria: committed-event cues with unchanged battle/RNG/replay; accessible opt-in/mute/retry; at-most-once bounded feedback; nonfatal bounded optional audio; eight small documented cues; automated validation with honest physical-device gaps.
+## Merge validation
 
-The review needs three focused code repairs and one PR metadata correction:
+Fresh checks on the exact PR head: 293 unit tests, 77 content tests, both TypeScript checks, production build, whitespace checks and 21 focused browser cases passed. The browser run used the repository's desktop/portrait/landscape profiles, one worker and normal timeouts with installed Edge; the temporary ignored config only points the preview command directly at the installed Vite CLI because npm is absent from PATH. Existing chunk-size and color-environment warnings remain.
 
-1. Battle startup disables Phaser's unhandled focus, per-frame and delayed visibility recovery hooks once for the game. The existing adapter owns bounded context/focus/visibility recovery. Refusal/timeout exposes Retry without repeated automatic attempts, stale cues or disabled battle controls. The unrelated fatal-error handler is unchanged.
-2. Every HTML5 media element tracks successful gesture priming. Early enable and enabled restart retain preference but expose Retry until all current elements are primed. Generation/attempt guards reject stale callbacks.
-3. The collector inventories normalized relative paths and counts cue bytes consistently on Windows and POSIX. Its small inventory module is shared with a real-file regression, rather than launching a browser from the test.
-4. The PR description uses ordinary references to the epics. GitHub's closing-issue list was checked before and after: #57 was removed and the intended #62 link remains.
+The retained full-browser report was independently checked for coverage: 225 unique configured cases have a passing result across the original 220-pass/5-failure run and six-case restart-synchronization recheck. This session did not rerun the complete 225-case suite or certify physical hardware. The merge required no runtime change.
 
-**Files:** `src/phaser/start.ts`, `src/phaser/BattleAudio.ts`, `scripts/measure-battle-audio.ts`, `scripts/battle-audio-inventory.ts`, existing browser tests, one inventory unit test, OpenSpec and this QA/handoff documentation. The rebase additionally reconciles `BattleScene` with main.
+## Next session: review and integrate existing PR #67
 
-**Non-goals:** New audio services/dependencies, music/voice, domain/combat/RNG changes, renderer/performance rewrites, new storage, deployment settings or first-battle hardware certification. Keep the existing pure cue mapper and adapter; no new timer framework, configuration surface or retry queue is needed.
+[PR #67](https://github.com/luminari-gurus/tactics-guru-v2/pull/67), **Reduce battle frame cost with shared tile textures**, already implements [#65](https://github.com/luminari-gurus/tactics-guru-v2/issues/65) on `work/issue-65-frame-budgets`. Its current head is `ad9a499412532094f399067ac06940ab81c92db9`. Review this existing work before proposing another performance implementation.
 
-**Proof:** Reproduce failures first; exercise real Phaser with rejected/pending recovery after successful unlock, strict per-element gesture policy, late callbacks, restart and unrelated fatal errors. Run all configured unit/content/browser checks, typecheck/build, strict OpenSpec validation and whitespace checks. Capture the repaired collector against exact clean baseline/candidate builds; preserve all old raw evidence.
+Preparation performed here was read-only: a merge-tree preview against audio merge `de73858` completed without conflicts, and GitHub subsequently reported mergeable. No PR #67 branch update, code repair, test run, approval or merge was performed. Refresh both heads next session; mergeability alone does not prove combined behavior.
 
-## Verification and evidence
+1. Read PR #67's review state, approved OpenSpec plan and `docs/qa/issue-65-frame-budgets.md` from its branch. Its recorded 171-browser-test validation and deployed frame results concern the performance branch before audio integration.
+2. Integrate current main into that existing branch after checking for newer commits. The shared changed files are `src/diagnostics/browser.ts` and `tests/battle-loop.spec.ts`; preserve battle-audio diagnostics, the new post-render measurement metadata, committed-command enemy detection and both sets of restart/error assertions. Retain the renderer cancellation fix and audio teardown/recovery ownership.
+3. Validate the actual combined tree: configured unit/content/browser checks, typecheck/build, relevant strict OpenSpec checks and the existing matched proof/battle measurements. Include audio lifecycle/restart regressions and unchanged loading, transfer and F1/F2 limits. The prior frame evidence excludes the new audio payload, so retain both original captures and new combined evidence with exact source/served commits. Use the existing release path if publishing measurements; do not invent a deployment mechanism or relax budgets.
+4. Only then decide readiness to merge #67 and complete #65. Neither action is authorized as part of this session's handoff.
 
-[QA and retained historical evidence](../qa/issue-62-battle-audio.md) is the detailed source for commands, results, measurements and limitations. The [OpenSpec tasks](../../openspec/changes/issue-62-battle-audio/tasks.md) are the implementation checklist: 17/17 complete. The PR is open, ready for review and mergeable; the [published response](https://github.com/luminari-gurus/tactics-guru-v2/pull/63#issuecomment-6110106240) addresses all four findings.
+## Remaining acceptance after integration
 
-- Four new desktop regressions failed on the rebased old runtime: both recovery modes attempted resume 35 times; both HTML5 cases incorrectly became ready before priming.
-- The repaired focused run passed 21 cases across desktop, portrait and landscape. Tests also cover late pending recovery after restart and successful HTML5 retry before the existing blur test.
-- Unit suite: 293 passed in 26 files. Content validation: 77 passed. Both TypeScript checks and the production build pass; existing chunk-size and runner color warnings remain.
-- All 225 configured browser cases have passing coverage: 220 passed in the full run (12.4 minutes); five failures in the new restart synchronization assertion were corrected by waiting for data-run=2, then both recovery modes passed all six profile combinations (32.6 seconds). Runtime code was unchanged. No single clean 225-pass full rerun is claimed.
-- Original Windows predicate: 0 cue bytes; actual files and repaired Windows/POSIX inventories: 11,741 bytes, below 32 KiB. The new 72-sample clean-build comparison has no application errors or loading-limit failures: candidate cold/warm Ready maxima 197.8/147.4 ms, first-player maxima 524.3/476.0 ms, compressed code 392,635 bytes and cold scene assets 848,829 bytes.
-- Three original 72-sample JSON files remain byte-for-byte unchanged. Original `9f785df`/`ca1923a` measurements and failed samples are historical, not measurements of the new main/repaired runtime.
+- [#64: physical-device certification](https://github.com/luminari-gurus/tactics-guru-v2/issues/64): test the selected integrated build on physical iPhone Safari/Chrome, Android Chrome and desktop in both orientations, including actual win/loss/restart and audible unlock/mute/interruption/resume. Record exact device/browser/build/cache conditions and unavailable checks. Emulation cannot complete this ticket.
+- [#66: intermittent iPhone Safari restart](https://github.com/luminari-gurus/tactics-guru-v2/issues/66): retain the original failure and successful retry; capture the exact error and lifecycle conditions when reproducible. Neither #63's audio repairs nor #67's renderer cancellation fix establishes the cause or resolution of that physical report.
+- [#57: performance/audio readiness](https://github.com/luminari-gurus/tactics-guru-v2/issues/57) remains the open parent acceptance tracker. Avoid closing it by proxy or duplicating its existing children. Unrelated deployment PR #12 remains separate.
 
-## Git and acceptance handoff
-
-The existing implementation commits are retained for review traceability, followed by the focused repair and evidence/handoff commits. This branch targets main directly; no stacking onto the unrelated #65 branch and no release tag are needed. The rebase was published with an exact lease on the reviewed remote head `0344dc767f2ebbc95795b9e773d7f818be62cc97`. Local/remote parity and a clean tree were verified, and GitHub reports MERGEABLE with draft=false and no inline review threads. The final checklist completion is folded into the evidence commit with an exact lease. The PR was marked ready after local validation, without waiting for remote CI.
-
-Retain `Refs #62`. Hardware audibility remains unverified in the physical matrix under #64; the per-element policy shim is automated evidence, not Safari/Android hardware proof. Existing frame/usability failures remain in the evidence and #65; #66 owns the separately observed Safari restart issue. OpenSpec stays unarchived until merge/applicable acceptance. No merge, issue closure, manual deployment or attribution trailers are part of this handoff.
+Stop here. No next-phase implementation, hardware certification or manual deployment was started in this session.

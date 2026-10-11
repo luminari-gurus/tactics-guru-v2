@@ -1,5 +1,13 @@
 # Issue #62 battle audio QA
 
+## Merge completion — 2026-10-11
+
+[PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) merged into main as `de7385842ee50beb936a9eb7396cd1deeb351f51`, retaining the reviewed head `1609de5dcf71ec9e7aee8756bd4b82a13950a00e` and all twelve branch commits. Main still matched `d60659d`, so no new conflict resolution was required. The merge tree is byte-for-byte identical to the tested PR tree. GitHub reports the PR merged and #62 closed as completed.
+
+Fresh merge checks: 293 unit tests, 77 content tests, both typechecks, production build, diff checks and 21 focused audio browser cases passed (1.2 minutes, desktop/portrait/landscape, one worker, normal timeouts, installed Edge). Node invoked the installed tool entrypoints directly because npm is absent from PATH; an ignored temporary Playwright config preserves the configured profiles and changes only the preview-command invocation and local output paths. Existing large-chunk/color warnings remain. The retained `pr63-validation.json` was checked for 225 unique configured cases with passing coverage across its original full run and recheck. No new full-suite run, budget capture or physical-device test is claimed.
+
+The historical status statements below describe earlier checkpoints. Current follow-ups are #64, #65 / PR #67 and #66; #57 remains open. #1 was already closed before this merge, at 2026-10-11 01:27:14 UTC, and its state was left unchanged. Physical audibility and the broader performance/restart acceptance gaps remain unverified here. The [next-session plan](../ongoing-projects/plan.md) points to the existing performance PR; this session did not start that work or a manual deployment.
+
 ## Current PR #63 review repair — 2026-10-11
 
 The branch is rebased onto main `d60659d03b940c20e380eeda3f226ba2b649ef6f` (merged #61), with runtime repair `515ac85be1fd8e0294394e2f8805fc8788d7c901`. The rebase retains the new performance hooks alongside audio teardown; `git range-diff` found only that expected integration adjustment in the original ten commits. The sections below this update preserve the original implementation evidence and its then-current issue/PR states.

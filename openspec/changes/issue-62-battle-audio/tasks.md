@@ -36,6 +36,6 @@ Issue: [#62](https://github.com/luminari-gurus/tactics-guru-v2/issues/62). Branc
 
 ## Workflow follow-up
 
-The current user request to leave a ready PR supersedes the original draft-publication instruction in 4.4. Physical audio evidence remains explicitly unverified under #64, performance acceptance under #65 and the separate Safari restart investigation under #66. #11's automated milestone is closed; the parent epics remain open.
+The user authorized merge and completion of relevant tracking on 2026-10-11, superseding the earlier draft-only and ready-for-review handoffs. PR #63 merged into main as `de7385842ee50beb936a9eb7396cd1deeb351f51`; GitHub automatically completed #62. All 17 implementation/validation tasks are complete, and their artifacts remain available as the evidence record.
 
-- Keep this change unarchived until implementation is merged and its applicable acceptance requirements are satisfied.
+Physical audio evidence remains explicitly unverified under #64, performance acceptance under #65 / existing PR #67 and the separate Safari restart investigation under #66. #11's automated milestone is closed; #57 remains open. Live verification found #1 already closed before this session, and that state was preserved. See `docs/ongoing-projects/plan.md` for the next-session handoff; no next-phase implementation was started.
