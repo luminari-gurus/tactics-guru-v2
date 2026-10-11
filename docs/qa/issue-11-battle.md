@@ -80,6 +80,7 @@ The caller reports that iPhone Chrome/Safari look good, followed by the browser 
 
 Caller report received 2026-10-10 for https://15a9d5a6.tactics-guru-v2.pages.dev:
 
+- Device subsequently identified by the caller as iPhone 16 Pro. iOS version and the meaning of “desktop and landscape” remain unspecified.
 - Chrome 155.0.8059.37: reported working on “desktop and landscape.” Device/OS and whether this means desktop hardware or iPhone orientations need clarification.
 - Safari: version unknown, reported “working fine desktop/landscape,” with the same device/orientation ambiguity.
 - No problems reported. Win/loss/restart, individual gesture/layout/resume checks, console inspection and physical timing were not individually confirmed. Served commit and actual test date were not supplied. This deployment differs from the measured `a49bc1b1` preview above; its report does not replace those performance captures.
