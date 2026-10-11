@@ -77,6 +77,7 @@ export class FitMeasurements {
       sceneReadyMs: this.ready,
       controlsUsableMs: this.usable,
       frames: frameSummary(this.samples),
+      idleIntervalsMs: [...this.samples],
       workloads: this.windows.map(window => ({action:window.action, startedMs:window.startedMs, untilMs:window.untilMs, frames:frameSummary(window.samples), intervalsMs:[...window.samples]})),
       interactions: this.responses.map(response=>({...response})),
     };

@@ -218,6 +218,8 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   await page.getByRole('button',{name:'Confirm',exact:true}).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
+  expect(diagnostics.idleIntervalsMs).toHaveLength(diagnostics.frames.count);
+  expect(diagnostics.measurementMethod).toEqual({version:2,frameObservation:'post-render'});
   expect(diagnostics.workloads.map(w=>w.action)).toEqual(expect.arrayContaining(['pan','zoom','selection','move']));
   expect(diagnostics.workloads.find(w=>w.action==='move')!.frames.count).toBeGreaterThan(0);
   for(const response of diagnostics.interactions){expect(response.renderedMs).toBeGreaterThanOrEqual(response.inputMs);expect(response.renderedFrames).toBe(1);}

@@ -68,3 +68,16 @@ it('drops hidden pending input and resets bounded workload data on restart', () 
   m.begin(2000);
   expect(m.snapshot()).toMatchObject({interactions:[],workloads:[],frames:{count:0}});
 });
+
+it('exports bounded raw idle intervals with exact summary and isolated snapshots', () => {
+  const m = new FitMeasurements(3);
+  m.begin(0); m.controlsUsable(1);
+  for (const time of [10,20,40,70,110]) m.frame(time,true);
+  const snapshot=m.snapshot();
+  expect(snapshot.idleIntervalsMs).toEqual([10,20,30]);
+  expect(snapshot.frames).toEqual({count:3,medianMs:20,p95Ms:30,maxMs:30});
+  snapshot.idleIntervalsMs[0]=999;
+  expect(m.snapshot().idleIntervalsMs).toEqual([10,20,30]);
+  m.begin(200);
+  expect(m.snapshot().idleIntervalsMs).toEqual([]);
+});

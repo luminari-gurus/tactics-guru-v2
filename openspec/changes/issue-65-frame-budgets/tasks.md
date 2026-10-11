@@ -5,11 +5,11 @@ Caller approved plan commit `5d64d74` on 2026-10-11. Work only on `work/issue-65
 ## 1. Approval and unchanged baseline
 
 - [x] 1.1 Record explicit caller approval of this published plan in design.md; verify issue, branch and current-main integration state before any implementation.
-- [ ] 1.2 Capture unchanged base proof/battle sequentially under matched host/browser/build/cache conditions; retain command logs, served hashes, errors and raw available evidence under `docs/qa/issue-65/` and document all method differences in the task QA report.
+- [x] 1.2 Capture unchanged base proof/battle sequentially under matched host/browser/build/cache conditions; retain command logs, served hashes, errors and raw available evidence under `docs/qa/issue-65/` and document all method differences in the task QA report.
 
 ## 2. Comparable measurements
 
-- [ ] 2.1 Extend existing measurements to retain bounded idle raw intervals and comparable POST_RENDER observation in proof/battle without changing domain behavior; verify percentile/count, hidden/reset/listener isolation with focused existing unit and browser checks and document the versioned observation method.
+- [x] 2.1 Extend existing measurements to retain bounded idle raw intervals and comparable POST_RENDER observation in proof/battle without changing domain behavior; verify percentile/count, hidden/reset/listener isolation with focused existing unit and browser checks and document the versioned observation method.
 - [ ] 2.2 Separate real zoom, pan, selection and legal move windows in the existing collector, distinguishing initial enemy movement; verify actual controls, finite waits, retained failures/provenance and non-overlap with focused collector/browser checks and paired base-method captures.
 
 ## 3. Measured causes and focused fixes

@@ -166,6 +166,8 @@ export class FitScene extends Phaser.Scene {
       frameRendered = true;
       markUsable();
     };
+    const onRender = (): void => { measurements.frame(performance.now(), document.visibilityState === 'visible'); };
+    this.game.events.on(Phaser.Core.Events.POST_RENDER, onRender);
     const visibilityChanged = (): void => { measurements.frame(performance.now(), false); };
     layoutBoard();
     this.scale.on(Phaser.Scale.Events.RESIZE, layoutBoard);
@@ -194,6 +196,7 @@ export class FitScene extends Phaser.Scene {
       setProofDiagnostics(null);
       setBoardDiagnostics(null);
       this.game.events.off(Phaser.Core.Events.POST_RENDER, rendered);
+      this.game.events.off(Phaser.Core.Events.POST_RENDER, onRender);
       document.removeEventListener('visibilitychange', visibilityChanged);
     });
     // Readiness includes all four canonical assets, not just generated geometry.
@@ -201,7 +204,4 @@ export class FitScene extends Phaser.Scene {
     measurements.sceneReady(performance.now());
   }
 
-  update(): void {
-    measurements.frame(performance.now(), document.visibilityState === 'visible');
-  }
 }

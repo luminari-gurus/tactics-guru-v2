@@ -1,0 +1,41 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/measurements.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-65-frame-budgets/tactics-guru-v2
+
+ ❯ tests/unit/measurements.test.ts (6 tests | 1 failed) 4ms
+   × exports bounded raw idle intervals with exact summary and isolated snapshots 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/measurements.test.ts > exports bounded raw idle intervals with exact summary and isolated snapshots
+AssertionError: expected undefined to deeply equal [ 10, 20, 30 ]
+
+- Expected:
+[
+  10,
+  20,
+  30,
+]
+
++ Received:
+undefined
+
+ ❯ tests/unit/measurements.test.ts:77:36
+     75|   for (const time of [10,20,40,70,110]) m.frame(time,true);
+     76|   const snapshot=m.snapshot();
+     77|   expect(snapshot.idleIntervalsMs).toEqual([10,20,30]);
+       |                                    ^
+     78|   expect(snapshot.frames).toEqual({count:3,medianMs:20,p95Ms:30,maxMs:…
+     79|   snapshot.idleIntervalsMs[0]=999;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  08:57:23
+   Duration  109ms (transform 55%, tests 19%, import 19%, worker 7%)
+

@@ -32,8 +32,16 @@ async function buildFiles(directory: string): Promise<{ path: string; bytes: num
 }
 
 /** Presentation workload uses the same player controls as manual play; no state injection. */
+async function settleWorkloads(page: Page) {
+  await page.waitForFunction(() => {
+    const snapshot = window.fitDiagnostics();
+    return snapshot.workloads.every(window => window.untilMs < performance.now() - 50);
+  });
+}
 async function battleWorkload(page: Page) {
   await page.locator('#game[data-phase="player"]').waitFor();
+  await settleWorkloads(page);
+  const workloadStartIndex = await page.evaluate(() => window.fitDiagnostics().workloads.length);
   const canvas = page.locator('canvas');
   const point = await page.evaluate(() => {
     const panel = document.querySelector('#fit-panel')!.getBoundingClientRect();
@@ -42,20 +50,24 @@ async function battleWorkload(page: Page) {
   await page.mouse.move(point.x, point.y);
   await page.mouse.wheel(0, -100);
   await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
+  await settleWorkloads(page);
   await page.mouse.down();
   await page.mouse.move(point.x+40, point.y-25, {steps:8});
   await page.mouse.up();
   await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='pan'));
+  await settleWorkloads(page);
   // The first non-placeholder Move option is supplied by shared legal reachability.
   await page.getByRole('button',{name:'Move',exact:true}).click();
   await page.locator('#battle-target').selectOption({index:1});
   await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='selection'));
+  await settleWorkloads(page);
   await page.getByRole('button',{name:'Review action'}).click();
   await page.getByRole('button',{name:'Confirm',exact:true}).click();
   await page.locator('#game[data-phase="player"]').waitFor();
   await page.waitForFunction(() => window.fitDiagnostics().workloads.some(w=>w.action==='move' && w.frames.count>0));
+  await settleWorkloads(page);
   if (await canvas.count() !== 1) throw new Error('Unexpected battle canvas count');
-  return ['zoom: wheel -100', 'pan: drag +40/-25 in eight steps', 'selection: legal Move target', 'move: Review and Confirm'];
+  return { workloadStartIndex, actions: ['zoom: wheel -100', 'pan: drag +40/-25 in eight steps', 'selection: legal Move target', 'move: Review and Confirm'] };
 }
 
 try {
@@ -101,9 +113,9 @@ try {
               await page.getByRole('button', { name: target.restart }).waitFor();
               await page.waitForFunction(() => window.fitDiagnostics?.().controlsUsableMs !== null && window.fitDiagnostics?.().frames.count >= 120);
               const idleDiagnostics = await page.evaluate(() => window.fitDiagnostics());
-              const actions = options.scene === 'battle' ? await battleWorkload(page) : [];
+              const workload = options.scene === 'battle' ? await battleWorkload(page) : { actions: [], workloadStartIndex: 0 };
               const diagnostics = await page.evaluate(() => window.fitDiagnostics());
-              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, actions, errors: [...errors] });
+              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, ...workload, errors: [...errors] });
             }
           } catch (error) {
             const diagnostics = await page.evaluate(()=>window.fitDiagnostics?.() ?? null).catch(()=>null);
