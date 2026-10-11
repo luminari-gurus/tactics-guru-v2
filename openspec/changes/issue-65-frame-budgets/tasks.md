@@ -1,10 +1,10 @@
 # Tasks
 
-Implementation approval is pending. Work only on `work/issue-65-frame-budgets` for #65; preserve the existing #11 branch and unrelated work. See design.md for acceptance mapping and limits.
+Caller approved plan commit `5d64d74` on 2026-10-11. Work only on `work/issue-65-frame-budgets` for #65; preserve the existing #11 branch and unrelated work. See design.md for acceptance mapping and limits.
 
 ## 1. Approval and unchanged baseline
 
-- [ ] 1.1 Record explicit caller approval of this published plan in design.md; verify issue, branch and current-main integration state before any implementation.
+- [x] 1.1 Record explicit caller approval of this published plan in design.md; verify issue, branch and current-main integration state before any implementation.
 - [ ] 1.2 Capture unchanged base proof/battle sequentially under matched host/browser/build/cache conditions; retain command logs, served hashes, errors and raw available evidence under `docs/qa/issue-65/` and document all method differences in the task QA report.
 
 ## 2. Comparable measurements
