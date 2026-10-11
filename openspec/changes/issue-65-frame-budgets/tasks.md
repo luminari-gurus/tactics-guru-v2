@@ -10,11 +10,11 @@ Caller approved plan commit `5d64d74` on 2026-10-11. Work only on `work/issue-65
 ## 2. Comparable measurements
 
 - [x] 2.1 Extend existing measurements to retain bounded idle raw intervals and comparable POST_RENDER observation in proof/battle without changing domain behavior; verify percentile/count, hidden/reset/listener isolation with focused existing unit and browser checks and document the versioned observation method.
-- [ ] 2.2 Separate real zoom, pan, selection and legal move windows in the existing collector, distinguishing initial enemy movement; verify actual controls, finite waits, retained failures/provenance and non-overlap with focused collector/browser checks and paired base-method captures.
+- [x] 2.2 Separate real zoom, pan, selection and legal move windows in the existing collector, distinguishing initial enemy movement; verify actual controls, finite waits, retained failures/provenance and non-overlap with focused collector/browser checks and paired base-method captures.
 
 ## 3. Measured causes and focused fixes
 
-- [ ] 3.1 Profile idle, isolated pan/zoom/move and matched proof windows; retain browser traces, relevant host conditions and causal analysis in QA. Verify each proposed remedy points to measured application cost rather than sampling/host artifacts.
+- [x] 3.1 Profile idle, isolated pan/zoom/move and matched proof windows; retain browser traces, relevant host conditions and causal analysis in QA. Verify each proposed remedy points to measured application cost rather than sampling/host artifacts.
 - [ ] 3.2 Add a meaningful failing regression for each confirmed functional cause, then implement the smallest supported presentation fix; use paired performance traces for pure cost changes. Verify replay/state/events/RNG equality, visible geometry/depth/canopy behavior, transformed picking, modal input and lifecycle/restart with relevant existing checks; record actual before/after results and unchanged limits in QA.
 
 ## 4. Integrated and deployed acceptance
