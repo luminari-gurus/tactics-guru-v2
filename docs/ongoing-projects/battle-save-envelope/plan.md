@@ -2,15 +2,15 @@
 
 ## Scope and status
 
-Implementation authorized by the user's 2026-10-11 request. Working in the existing clean issue worktree, with main refreshed and unchanged at `e955e9d`. OpenSpec apply is ready (7/9). Snapshot codec and format/adapter contract are implemented. Sixteen save tests, 89 focused domain/session tests and both typechecks pass. Current task: configured full unit/content/build/browser gates, final audit and PR publication. The planning-only statements below describe the original publication, now superseded by this authorization. Keep this section and the root handoff current after each implementation stage.
+Implementation authorized by the user's 2026-10-11 request. Working in the existing issue worktree, with main refreshed and unchanged at `e955e9d`. OpenSpec apply is ready (7/9). Snapshot codec and format/adapter contract are implemented. Sixteen save tests, 89 focused domain/session tests, 311 configured unit tests, 77 content tests, both typechecks, production build and strict OpenSpec validation pass. Current task: running all 225 configured browser cases, then final acceptance audit and PR publication.
 
-Progress: task 1.1 complete. Eight shared fixtures build successfully and replay to their independently captured states; typecheck passed. The first comparison selects snapshots because replay reaches roughly 301 KB and 564 ms median decode at 10,000 commands versus roughly 1.1 KB and 0.07 ms for snapshots on this host. Commit the harness, retain a pinned run, then specify/implement the selected contract. See [QA report](../../qa/issue-69-save-envelope.md).
+Tasks 1.1–3.1 are complete. Eight shared fixtures replay to their independently captured states. The clean `bc53bba` comparison selects snapshots: 1,130 bytes and about 0.07 ms median decode at 10,000 commands versus 301,272 bytes and about 703 ms for replay on this host. The selected codec is committed as `1b310be`. A later test-only adjustment validates the changed-content and art-only catalogs; its 16 tests and application typecheck pass. See [QA report](../../qa/issue-69-save-envelope.md), [format contract](../../battle-save-format.md), and [raw comparison](../../qa/issue-69/comparison.json). No runtime code has changed since the browser build at `1b310be`.
 
 [Issue #69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69) is a child of [#58: Safe local battle save and resume](https://github.com/luminari-gurus/tactics-guru-v2/issues/58), implementing its first work package: a bounded versioned save contract selected from measured snapshot/replay costs. The issue's acceptance criteria are preserved in [issue.md](issue.md).
 
 Prepared on 2026-10-11 against main `e955e9d9f182a76f057ea69057c7a1ac6c0bd682`. The user explicitly approved creating and claiming this child and publishing the prepared plan. #69 is open, labelled `ready for work`, assigned to `moshehbenavraham`, and linked natively under #58. The [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/69#issuecomment-6111209952) records the scope.
 
-Published branch: [work/issue-69-save-envelope](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-69-save-envelope), based on that main revision and natively linked in #69's Development section. OpenSpec change: [battle-save-envelope](../../../openspec/changes/battle-save-envelope/). The full #58 epic remains open. This publication contains planning only; implementation remains unstarted and requires a subsequent implementation request.
+Branch: [work/issue-69-save-envelope](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-69-save-envelope), based on that main revision and natively linked in #69's Development section. OpenSpec change: [battle-save-envelope](../../../openspec/changes/battle-save-envelope/). The full #58 epic remains open, freshly verified during implementation. The original `cc4859d` publication was planning only; the current request authorizes implementation and a review-ready PR.
 
 ## Selection and device eligibility
 
@@ -66,8 +66,8 @@ Snapshot versus replay is an internal representation decision to make from the r
 
 A domain-state round trip does not prove that a later live session resumes a queued enemy turn correctly; that integration belongs to the next child. Platform-independent results do not certify browser storage behavior. Refresh main before publication and later implementation; avoid overlapping #68's renderer work.
 
-The plan is minimal because it reuses the existing domain and limits this child to the already-planned save-contract foundation. No runtime feature, tests or benchmark has been implemented or run by this planning task.
+The implementation remains minimal: 48 lines of pure codec reuse existing readers and hashing. Replay remains only in comparison/semantic-proof paths. No storage, session, UI, combat rule, dependency or deployment change was needed. The checksum proves integrity only; snapshot validation does not prove historical reachability.
 
 ## Planning validation
 
-OpenSpec 1.14.1 strict validation passed. All four required OpenSpec artifacts exist; implementation tasks remain unchecked. All 16 relative Markdown links resolve, and planning-file whitespace checks pass. Application test suites and benchmarks are reserved for implementation; this publication changes documentation only.
+The original planning publication passed OpenSpec 1.14.1 strict validation, 16 relative links and whitespace checks. Implementation results and remaining work are maintained at the top of this document and in the QA report. Do not interpret historical planning checks as implementation proof.

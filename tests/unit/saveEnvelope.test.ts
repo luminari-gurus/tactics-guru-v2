@@ -144,9 +144,13 @@ describe('untrusted serialized input', () => {
     }
     const changed: ContentCatalog = { ...battleCatalog, heroes: { ...battleCatalog.heroes,
       fighter: { ...battleCatalog.heroes.fighter, stats: { ...battleCatalog.heroes.fighter.stats, maxHp: 19 } } } };
+    expect(validateContent(changed).ok).toBe(true);
     expect(decodeBattleSave(encoded(), changed)).toEqual({ ok: false, reason: 'incompatible' });
     // Presentation asset changes are deliberately outside rules/content identity.
-    const artOnly = { ...battleCatalog, assets: {} };
+    const [assetId, asset] = Object.entries(battleCatalog.assets)[0];
+    const artOnly: ContentCatalog = { ...battleCatalog, assets: { ...battleCatalog.assets,
+      [assetId]: { ...asset, provenance: { ...asset.provenance, prompt: 'Presentation-only provenance revision' } } } };
+    expect(validateContent(artOnly).ok).toBe(true);
     expect(contentVersion(artOnly)).toBe(contentVersion(battleCatalog));
     expect(decodeBattleSave(encoded(), artOnly).ok).toBe(true);
   });

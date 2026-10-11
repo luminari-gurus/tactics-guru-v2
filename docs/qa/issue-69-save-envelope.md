@@ -24,7 +24,22 @@ node node_modules/typescript/bin/tsc --noEmit -p tsconfig.domain.json
 # Both typechecks passed.
 ```
 
-Configured full unit/content, build/browser, strict OpenSpec and final whitespace validation remain pending.
+Configured unit/content/build and strict OpenSpec validation also pass:
+
+```text
+npm run test:unit
+# 311 tests across 27 files passed.
+npm run validate:content
+# 77 tests across 2 files passed.
+npm run build
+# Both configured typechecks and Vite production build passed.
+node <openspec-1.14.1>/bin/openspec.js validate battle-save-envelope --strict
+# Change is valid.
+```
+
+The host's packaged `npm.cmd` has a broken relative path; its first invocation failed before running tests. An ignored `tmp/tool-bin/npm.cmd` shim invokes the installed npm 12.0.2 CLI with `node`, preserving configured scripts and dependencies. The shim directory was prepended to PATH for the successful commands and browser webServer. No package/lockfile/configuration was changed. The normal Vite large-chunk warning remains; this unused codec is not imported into the runtime bundle.
+
+Browser run in progress: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`, `PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/issue-69-browser.json`, `npm test -- --reporter=line,json`. It uses the unchanged configuration's three profiles, one worker and normal timeouts against the clean `1b310be` production build. Final browser and whitespace results remain pending.
 
 ## Reproduction
 
