@@ -80,3 +80,7 @@ node --experimental-strip-types scripts/measure-save-envelope.ts docs/qa/issue-6
 ```
 
 The existing Vite loader resolves source TypeScript without adding a dependency. Each candidate uses the same outer shape, canonical serialization and SHA-256 digest, one discarded warmup and five serial samples per fixture. Snapshot validation includes its owned-state reconstruction; the separate snapshot reconstruction timing measures only returning that state. Replay reconstruction includes `replayBattle`'s repeated structural validation and command execution. Encode validates shape; semantic replay cost is in decode. Fixture generation and catalog-hash warmup are outside timings. Each output records exact source/tree, dirty paths, runtime/OS/CPU, catalog and state/log hashes, sizes and every timing sample.
+
+## Publication
+
+[PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70) is open and non-draft against main. The connector lacked PR-creation permission (HTTP 403); the same authorized PR was created with the repository's existing GitHub credential, then read back through the connector and attached to the chat. No merge, tag or deployment was performed. Original checkout edits remain untouched. The implementation worktree is the review branch; all subsequent edits after the tested source are tests/documentation only.
