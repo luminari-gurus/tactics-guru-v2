@@ -244,7 +244,7 @@
   "implementation": {
     "index.html": {
       "raw": 3040,
-      "gzip": 1081
+      "gzip": 1082
     },
     "battle/source/mage_portrait.png": {
       "raw": 3341167,
@@ -466,9 +466,9 @@
       "raw": 1481,
       "gzip": 1268
     },
-    "assets/browser-CGyDMSVn.js": {
-      "raw": 3264,
-      "gzip": 1372
+    "assets/index-BjtFRJII.js": {
+      "raw": 1347,
+      "gzip": 718
     },
     "assets/preload-helper-DjzSQ1t3.js": {
       "raw": 1383,
@@ -478,29 +478,33 @@
       "raw": 3256,
       "gzip": 1224
     },
-    "assets/view-DhyIpuHq.js": {
-      "raw": 3457,
-      "gzip": 1739
-    },
     "assets/view-B7ToxOtF.css": {
       "raw": 1936,
       "gzip": 826
+    },
+    "assets/view-DKbkWqxP.js": {
+      "raw": 3457,
+      "gzip": 1745
     },
     "assets/rng-CkITdvgm.js": {
       "raw": 1651,
       "gzip": 789
     },
-    "assets/start-HjUNqyD3.js": {
-      "raw": 1486502,
-      "gzip": 384126
-    },
-    "assets/index-Cze7SRBa.js": {
-      "raw": 1347,
-      "gzip": 720
-    },
-    "assets/startBattleApp-BrZ2xVNa.js": {
+    "assets/startBattleApp-ByPNIRHa.js": {
       "raw": 2555,
-      "gzip": 1077
+      "gzip": 1078
+    },
+    "assets/browser-C024Lyqi.js": {
+      "raw": 3264,
+      "gzip": 1376
+    },
+    "assets/start-Biyha6mv.js": {
+      "raw": 1486502,
+      "gzip": 384125
     }
+  },
+  "implementationSource": {
+    "commit": "136cdd0551e9140a308990d36b3f7801f5b6b788",
+    "dirty": false
   }
 }

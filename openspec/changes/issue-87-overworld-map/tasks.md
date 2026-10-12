@@ -19,8 +19,8 @@
 ## 4. Integration and delivery
 
 - [x] 4.1 Run full configured unit/content/browser suites, both strict typechecks, production build, strict OpenSpec validation and git diff --check. Map every issue acceptance criterion to actual evidence and retain failures/unavailable checks in the QA guide; review final diff against approved scope.
-- [ ] 4.2 Commit only issue changes without attribution trailers and push; inspect the existing Pages branch preview for direct `/map` navigation and refresh where available, retaining URL/served build evidence. If hosted verification is unavailable, record it and leave that criterion unverified.
-- [ ] 4.3 Check for an existing branch PR, then create/reuse and attach a PR against main with issue/approved-plan links and actual checks. Use Closes #87 only when all acceptance criteria are verified; otherwise use a draft with Refs #87 and the remaining work. Verify published branch and PR identities.
+- [x] 4.2 Commit only issue changes without attribution trailers and push; inspect the existing Pages branch preview for direct `/map` navigation and refresh where available, retaining URL/served build evidence. If hosted verification is unavailable, record it and leave that criterion unverified.
+- [x] 4.3 Check for an existing branch PR, then create/reuse and attach a PR against main with issue/approved-plan links and actual checks. Use Closes #87 only when all acceptance criteria are verified; otherwise use a draft with Refs #87 and the remaining work. Verify published branch and PR identities.
 
 ## Workflow follow-up
 

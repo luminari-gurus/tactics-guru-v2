@@ -38,7 +38,7 @@ Seed 1 is the default. Generate uses entered seed; New seed gets view-owned brow
 
 ## Production bundle
 
-The final implementation build adds 6,220 raw bytes to total dist versus the approved base. Public assets are unchanged. Map-only view JS is 3,457 raw/1,739 gzip bytes and CSS is 1,936/826; shared RNG is 1,651/789. Entry/preload helpers are separately recorded. Map route does not request the Phaser/battle startup chunk; battle routes do not request the map view. [Per-file baseline and implementation sizes](issue-87/build-sizes.json). Gzip here uses Node/Python tooling and differs slightly from Vite's display; this is file size evidence, not network transfer or physical-device frame measurement.
+The committed implementation build (`136cdd0`, clean) adds 6,220 raw bytes to total dist versus the approved base. Public assets are unchanged. Map-only view JS is 3,457 raw/1,745 gzip bytes and CSS is 1,936/826; shared RNG is 1,651/789. Entry/preload helpers are separately recorded. Map route does not request the Phaser/battle startup chunk; battle routes do not request the map view. [Per-file baseline and implementation sizes](issue-87/build-sizes.json). Gzip here uses Python tooling and differs slightly from Vite's display; this is file size evidence, not network transfer or physical-device frame measurement.
 
 ## Validation status
 
@@ -49,7 +49,8 @@ The final implementation build adds 6,220 raw bytes to total dist versus the app
 - Development direct navigation and refresh pass for `/map`, `/map/`, battle, proof and content-smoke. A temporary production build at `/prototype/` passes `/prototype/map` and `/prototype/map/` directly and after refresh. [Route requests and results](issue-87/route-checks.json).
 - Battle/proof/content-smoke fail asset loading under a non-root base on both this branch and unchanged approved base source. [Baseline reproduction](issue-87/baseline-base-path.json) proves this predates #87; [separate issue #92](https://github.com/luminari-gurus/tactics-guru-v2/issues/92) captures the loading/portrait/audio fix and is verified `ready for work`. The map route has no such asset dependency. Root battle/proof behavior remains the regression contract for #87.
 - Full configured browser suite: 234/234 passed in 12.8 minutes, 78 per project. After final copy wording and a stronger inverse route-isolation assertion, the final build and all 9 focused browser checks passed again. Runtime battle/Phaser chunks stayed unchanged.
-- Hosted build verification: pending publication.
+- The committed implementation rebuilt successfully after publication. Full browser and final focused results above cover the implementation working tree; the postcommit build embeds the committed identity and changes chunk hashes without a runtime code change.
+- Hosted acceptance is blocked: Cloudflare's check for `136cdd0` failed. The branch `/map` returns an HTML response but times out waiting for map cells; no served implementation commit was verified. GitHub supplies no error details and the provider log redirects to sign-in. [Retained hosted evidence](issue-87/hosted-preview.json) and [isolated follow-up #94](https://github.com/luminari-gurus/tactics-guru-v2/issues/94). #94 remains unlabelled because log access and root cause are unresolved. PR #93 remains draft with `Refs #87`.
 
 Browser emulation is responsive/functional evidence, not physical-device certification. No production infrastructure change, deployment upload or release cutover is performed.
 
@@ -57,13 +58,15 @@ Browser emulation is responsive/functional evidence, not physical-device certifi
 
 | #87 criterion | Evidence and disposition |
 | --- | --- |
-| 1: direct route/refresh/base, battle regression | Development root and temporary `/prototype/map` preview pass direct/refresh. Root battle/proof/content-smoke pass. Existing non-root battle asset failure is baseline-confirmed and isolated in #92. Hosted `/map` verification pending. |
+| 1: direct route/refresh/base, battle regression | Development root and temporary `/prototype/map` preview pass direct/refresh. Root battle/proof/content-smoke pass. Existing non-root battle asset failure is baseline-confirmed and isolated in #92. Hosted acceptance is unverified due to the failed Pages deployment; #94 records the blocker. |
 | 2: 20×20 valid legible grid | Independent unit inspection proves 400 binary cells; browser checks count rendered cells, tile/control size and horizontal bounds on all three profiles. |
 | 3: nontrivial connected bounded generation | All 260 seed cases pass cardinal flood-fill and floor/border bounds; forced unusable RNG fixture proves capped attempts and connected deterministic fallback. |
 | 4: seed repeatability/regeneration/variation | All 256 sequential seeds differ; repeated seeds match, clock perturbation has no effect, and browser seed re-entry/extremes/new-seed/entropy failure pass. |
 | 5: comparison and battle isolation | Exact-package comparison and per-file emitted sizes retained. Native view does not instantiate Phaser; route requests omit battle startup, storage methods are untouched, and an existing battle's state and next RNG draw remain identical. |
-| 6: configured tests/build/actual results | Focused unit/browser, full unit/content, both typechecks and build pass. Full browser suite 234/234 and final focused checks 9/9 pass; hosted delivery verification pending. |
+| 6: configured tests/build/actual results | Focused unit/browser, full unit/content, both typechecks and build pass. Full browser suite 234/234 and final focused checks 9/9 pass. Provider deployment failed; hosted acceptance remains unverified. |
 
 Reproduction commands: `npm run test:unit`, `npm run validate:content`, `npm run typecheck`, `npm run build`, `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`, `openspec validate issue-87-overworld-map --strict`, and `git diff --check`. Development route checks use `npm run dev -- --port 4175 --strictPort`; prefixed build uses `vite build --base=/prototype/ --outDir=/tmp/tactics-map-base-dist` and matching preview on port 4176. Baseline source was exported with `git archive 5d8351468463a9766665f3dce1da35f074e3476f`, built with the same tooling/base and served on port 4177; its embedded build stamp came from the task configuration, while the retained source SHA identifies the code under test.
 
 Visual review: [desktop](issue-87/desktop.png), [portrait](issue-87/mobile-portrait.png), [landscape](issue-87/mobile-landscape.png). Full-page captures retain the scrollable layout; short landscape allows vertical scrolling to keep all cells legible.
+
+Delivery: [draft PR #93](https://github.com/luminari-gurus/tactics-guru-v2/pull/93), runtime implementation `136cdd0551e9140a308990d36b3f7801f5b6b788`. Later evidence/task updates are documentation only. All workflow tasks are handled, including their prescribed draft/unverified disposition; this does not claim every #87 acceptance criterion is complete. No merge, manual issue closure or OpenSpec archive occurred.
