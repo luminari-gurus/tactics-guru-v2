@@ -1,6 +1,6 @@
 # Issue #72: guarded battle storage implementation handoff
 
-Updated 2026-10-12. The user authorized implementation of the published plan, use of ablation/OpenSpec, autonomous resolution of implementation blockers, and delivery as a review-ready PR. Implementation and required local checks are complete; PR publication is the remaining delivery step.
+Updated 2026-10-12. Implementation and required local checks are complete. [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) is open, non-draft, against `main`, and ready for review. The user authorized implementation of the published plan, use of ablation/OpenSpec, autonomous resolution of implementation blockers, and PR delivery.
 
 ## Current branch and scope
 
@@ -18,12 +18,12 @@ Files: `src/persistence/battleStorage.ts`, `tests/unit/battleStorage.test.ts`, `
 
 Ablation: retain one adapter, two fixed keys and the accepted codec/fixtures. The provider seam is needed to guard acquisition and test each failure; typed results and explicit removal are required recovery boundaries. No archive key, second serializer, generalized storage framework, locks, UI route or dependency is needed. The plan is already minimal for its full acceptance; no criterion was dropped.
 
-## Verification and remaining delivery
+## Verification and review handoff
 
 1. OpenSpec `issue-72-battle-storage`, schema `spec-driven`: 8/8 tasks complete. Implementation committed as `df1159f`. Passed: 85 focused checks, 372 unit tests, 77 content checks, both typechecks, production build and the full 225-case browser suite (75 per profile, no failures/skips/flaky results). A test-only tuple-union type error was corrected before final validation. See [QA](../qa/issue-72-battle-storage.md) and [retained source/case evidence](../qa/issue-72/validation.json).
 2. Recovery/load is read-only; invalid/unreadable slots block save mutations. Preserve backup before replacing primary. Explicit removal rechecks an inspected value but is not a multi-slot transaction.
 3. Configured browsers are desktop, Pixel 7 portrait and landscape emulation, using Edge 155.0.4283.45 on Windows/Node 24.19.0. Local physical capability is Android only; #72 requires no physical platform. This unused-by-UI adapter does not establish live persistence or cross-tab/disk durability.
-4. Publish the verified implementation/evidence and create the review-ready PR against main, then record its URL and verify remote HEAD parity/clean status. Current main `5d83514` remains included without conflicts. Do not merge, tag a release, deploy or archive OpenSpec.
+4. PR #91 contains the verified implementation/evidence and closes only #72 on merge. Current main `5d83514` is included without conflicts. Next session: refresh the PR head/review comments and address concrete review feedback on this branch; do not start #73 without a new request. No merge, release tag, deployment or OpenSpec archive was performed. Branch HEAD/remote parity and clean task status are checked after the final documentation push.
 
 The original checkout contains unrelated Safari/environment/workflow edits and an Android-certification draft; leave it untouched. #58/#57 remain open. #73/#74 own the next integration/certification steps.
 

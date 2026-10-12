@@ -1,6 +1,6 @@
 # Issue #72: guarded battle storage verification
 
-Status: implementation and required local verification complete. Date: 2026-10-12. Branch: `branch/issue-72-battle-storage`. Implementation uses the [approved plan](../ongoing-projects/issue-72-battle-storage/plan.md), [API contract](../battle-storage.md) and OpenSpec `issue-72-battle-storage`.
+Status: implementation and required local verification complete; [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) is ready for review. Date: 2026-10-12. Branch: `branch/issue-72-battle-storage`. Implementation uses the [approved plan](../ongoing-projects/issue-72-battle-storage/plan.md), [API contract](../battle-storage.md) and OpenSpec `issue-72-battle-storage`.
 
 ## Scope and source
 
