@@ -69,4 +69,18 @@ After explicit approval, record it in this task's proposal, update the two docum
 
 ## Approval
 
-Pending explicit caller approval of this concrete plan. No implementation edits have been made.
+Caller explicitly approved plan commit `d405ac7e163339429dcdca0c498f2ba50d4ce0b2` on 2026-10-12. The refreshed main snapshot is `30331e6c2fd18d2051aab32b6159839f3c994e1b`; its only change since the branch base is merged PR #86’s workflow skill update. The two target documents and application tree are unchanged. Live #87 explicitly assigns this reconciliation its roadmap placement; record the independent prototype without implementing it or changing battle acceptance.
+
+## Implementation verification — 2026-10-12
+
+AC1–AC6 are satisfied by the two edited documents: matching dated main/tracker snapshots; closed implementation versus open physical gates; shared D/T registers, exact child prerequisites and scope ledgers; conditional Pages/SSH evidence and production/analytics gates; preserved approved rules and historical legacy provenance; verified links/consistency/whitespace and documentation-only PR scope. #87 was discovered in the refreshed tracker and explicitly points to #82 for roadmap reconciliation; only its independent requested scope is recorded.
+
+Actual checks:
+
+- `python3 /tmp/tg82-check.py`: 39 relative Markdown file/directory/anchor targets resolve; all numeric source references resolve in the shared 93-definition set; four shared tables match byte-for-byte. Historical legacy audit body, both October 6 revision bodies and original numbered source definitions are unchanged against `cae524e`. The temporary check script is outside the repository.
+- `openspec validate issue-82-doc-reconciliation --strict`: passed; documentation-only `skip_specs` is accepted by the installed schema.
+- `git diff --check`: passed. Changed implementation paths are only the two requested docs; other branch files are this task's approved OpenSpec records. No attribution trailers added.
+- Read-only GitHub refresh: paginated all-state issues, PR #12/#70 heads/body, merged PR history, #13/#86 merge state, #66 withdrawn-claim comment, #82 assignment/state and main `30331e6`. The pinned #12 operator-runbook path exists at `de518a77` (blob `7512e10d762468da9cbd2b488686b8a8cb9ee996`). Git confirms the game/docs tree is unchanged between initial base `cae524e` and refreshed main; only PR #86 workflow guidance differs.
+- Source comparison: package/compiler/runner/Vite configs; domain RNG/AI/content constants and approved signature contract; BattleSession/BattleScene, geometry/picking, content loader/public asset metadata and BattleAudio/cue definitions; retained #62/#65/#68 QA evidence. No new unit/browser tests, typecheck, build, device test or deployment capture were run for this documentation-only change.
+
+Limitations: private legacy sources, missing `ORIGINAL/`/discovery companion and historical external documentation/SRD links retain their provenance and are not claimed freshly verified. Live Pages headers/protection/served bytes and SSH installation remain unprobed. These do not block the documentation acceptance, which explicitly preserves those gaps; #57/#64/#66/#70 and product/operator/production gates remain unresolved as stated.

@@ -1,13 +1,31 @@
 # Tactics Guru — Browser-First Tactical Game Technical Design
 
-**Document status:** proposed `docs/tech_design.md` for the new project, revisiting the original Godot TDD. Tracked since 2026-10-06 on the `docs` branch next to the restart plan; not on `main`, and not applied to the legacy repository. Core product decisions below are approved; the engineering details are proposals that the issue named beside each one settles. This document authorizes nothing by itself. Revised 2026-10-06 against the legacy source at the pinned SHA, the scaffold, the tracker, the open release PR and the installed packages — see *Revision notes*.
-**New project repository (Brian's decision):** https://github.com/luminari-gurus/tactics-guru-v2 (public). It holds a minimal scaffold (`main` at `df693f0`), Epic #1 with child issues #2–#11, and the open release PR #12.[51][52][53] Earlier wording that the repository must not be initialized or scaffolded is superseded. Still in force: no completion claim precedes acceptance, and plans stay off `main` and out of implementation PRs. The tracker's issue texts go further and say design plans stay out of the repository until separately authorized, whereas this draft and the plan have been on a `docs` branch since 2026-10-06, at the request of the collaborator who commissioned that day's reviews. Reconcile that wording before the branch is merged, and do not base task branches on it.
+**Document status:** maintained technical design draft in `docs/tech_design.phaser4.draft.md`, already on main through PR #13. Approved #82 reconciliation, 2026-10-12: current implementation, original proposals and remaining acceptance are distinguished below. Core product decisions remain approved; this document authorizes no production action.
+**New project repository (Brian’s decision):** https://github.com/luminari-gurus/tactics-guru-v2 (public). Main at `30331e6c2fd18d2051aab32b6159839f3c994e1b` contains the playable battle, scoped unit/browser/content checks and task-specific OpenSpec changes. #1/#2–#11 are closed implementation milestones; #57/#64/#66 still own physical readiness/restart acceptance. No scaffold or plan migration is pending.
 **Reference baseline:** `luminari-gurus/tactics-guru` (private), `main` at `e9433f6b608ae6b2d95418615cce9cf17dadcf74`, inspected 2026-10-05 UTC and re-verified 2026-10-06. Local read-only mirror: `ORIGINAL/`. Legacy line numbers in this document refer to that SHA.
-**Stack (pinned in the scaffold):** Phaser **4.2.1**, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0, Node ≥ 22.12.[37][38][51] Vitest is planned and not yet a dependency; the current release is 5.0.3.[76]
-**Approved presentation/rules:** isometric board and basic tactical rules, including the baseline height/movement/d20 model. Tile footprint 64×32 logical units with an elevation step of 16, as in the legacy build; integer elevation; responsive HTML/CSS HUD.[60]
+**Stack (pinned on main):** Phaser **4.2.1**, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0 and Vitest 5.0.3; Node declared ≥22.12.0. See `package.json`; packages are unchanged by this task.
+**Approved presentation/rules:** isometric board and baseline height/movement/d20 tactics, responsive HTML/CSS HUD. Historical legacy geometry was 64×32 with elevation step 16; current pure geometry uses 80×40, step 24 and base thickness 12 (`src/geometry/iso.ts`). These are rendering constants, not a tactical-rule redesign.
 **Approved MVP:** one polished replayable tactical battle (coordinator question 1, option A). A short roguelike route is deferred, not a prerequisite.
 **Companion document:** `docs/phaser4-restart-plan.md` ("the plan") holds the legacy audit, the tracker mapping, the evidence for the release constraints and the open-decision register D1–D11. This document states the design contracts. Where the two disagree, that is a defect to fix, not a choice. The tracker's issues are the authority for scope and acceptance.[52]
-**Conventions:** *baseline* means legacy behaviour at the pinned SHA; *target* means what the new runtime implements; *proposal* means a design choice not yet made in code. D1–D11 refer to the plan's register; T1–T11 are design questions this revision raises (§12). Source numbers [1]–[77] are the plan's; [78] onward are new here.
+**Conventions:** *baseline* means legacy behaviour at the pinned SHA; *target* means the originally intended design, whose implementation status is reconciled in the current snapshot and §12; *proposal* means a design choice not yet made in code. D1–D11 refer to the plan's register; T1–T11 are historical engineering questions with current dispositions (§12). Source numbers [1]–[77] are the plan's; [78] onward are new here.
+
+### Current state (verified 2026-10-12)
+
+Read-only snapshot of v2 `main` at [`30331e6c2fd18d2051aab32b6159839f3c994e1b`](https://github.com/luminari-gurus/tactics-guru-v2/commit/30331e6c2fd18d2051aab32b6159839f3c994e1b); PR #86 changed workflow guidance only after the game baseline `cae524e`. Issue states and PRs were refreshed on 2026-10-12. This reconciliation changes documentation, not product choices or runtime behavior.
+
+| Area | Merged implementation / tracker state | Evidence and remaining acceptance |
+| --- | --- | --- |
+| Plans and tooling | Both planning documents merged in [PR #13](https://github.com/luminari-gurus/tactics-guru-v2/pull/13). Phaser 4.2.1, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0 and Vitest 5.0.3 are pinned. | [package.json](../package.json), [domain compiler config](../tsconfig.domain.json), [Vitest config](../vitest.config.ts), [OpenSpec changes](../openspec/changes). No new dependency or setup is needed. |
+| Battle milestones | #1 and #2–#11 are closed; content, state/RNG, movement, turns, signatures, legal AI, board, HUD and replay/restart exist on main. | [BattleSession](../src/app/BattleSession.ts), [battle QA](qa/issue-10-battle.md), [#11 evidence](qa/issue-11-battle.md). Closed implementation milestones do not certify the remaining hardware matrix. #6 is closed. |
+| Audio | #62 closed; [PR #63](https://github.com/luminari-gurus/tactics-guru-v2/pull/63) merged at `de738584`. Eight generated MP3 cues, explicit Enable sound/mute/retry, bounded recovery and no duplicate resume playback. | [Audio QA](qa/issue-62-battle-audio.md), [cue definitions](../src/audio/battleCues.ts). Physical audibility/lifecycle remains in #64; historical intermediate failures are retained. |
+| Performance | #65 closed; [PR #67](https://github.com/luminari-gurus/tactics-guru-v2/pull/67) merged at `e955e9d`. Shared cached column/overlay textures and corrected v3 POST_RENDER sampling. | [Frame evidence](qa/issue-65-frame-budgets.md) records deployed unchanged F1/F2/L1–L4 passes, source/build identity and earlier failures. These captures do not certify hardware or the later combined audio tree. |
+| Baked experiment | #68 closed; [PR #71](https://github.com/luminari-gurus/tactics-guru-v2/pull/71) merged at `cae524e`. Prototype **not adopted**; #67 renderer retained. | [Experiment evidence](qa/issue-68-baked-tiles.md): submission reduction did not justify memory/generation/maintenance cost; prototype source and failures remain reviewable. |
+| First-battle readiness | #57 remains open; #64 physical iPhone Safari/Chrome, Android Chrome and desktop certification plus #66 intermittent Safari restart remain open. | [#64](https://github.com/luminari-gurus/tactics-guru-v2/issues/64), [#66](https://github.com/luminari-gurus/tactics-guru-v2/issues/66). #66’s prior claim was withdrawn; its planning branch is historical. The #65 shutdown repair is not a diagnosis or fix of the physical report. |
+| Save/resume | #58/#69 open; [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70) is open, unmerged at `6c798411980bc16af99f3284674f976e6b30cef1`. | Pure snapshot codec is proposed by that PR, not on main. #72 storage, #73 session/UI, #74 certification remain blocked by their listed prerequisites. No playable resume exists here. |
+| Next slices | #59/#60 and #75–#81 remain open; run/carryover/reward choices await their contracts. | Authored three-encounter run stays separate from [#87](https://github.com/luminari-gurus/tactics-guru-v2/issues/87), a newly requested standalone 20×20 procedural `/map` prototype. Neither is implemented or part of first-battle acceptance. |
+| Delivery | QA records existing Pages main/branch previews. [PR #12](https://github.com/luminari-gurus/tactics-guru-v2/pull/12) remains open and unmerged. | Pages served-build captures are historical evidence, not a fresh live-host probe. SSH installer is not installed/approved by its package tests. #83/#84 review and #85 separately authorized activation retain production/rollback gates. Analytics stays optional/default off. |
+
+The October 6 legacy audit and revision notes below remain historical evidence at legacy SHA `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. This task did not re-audit that private repository or refresh the old host probe. Missing `ORIGINAL/` and `phaser4-discovery/evidence.md` references are provenance, not available local files.
 
 ## 0. Executive summary and historical context
 
@@ -17,7 +35,7 @@ The old implementation has grown beyond its TDD: resource-backed content validat
 
 Godot Resources, Nodes, TileMapLayer assumptions, autoloads, GDScript, `.tscn` tests and Web export are retired **in the new runtime** at `luminari-gurus/tactics-guru-v2`. The original `luminari-gurus/tactics-guru` repository/history and running Godot build remain untouched. Selected assets, content facts, algorithms and behavioral tests are references, not a line-for-line source port. Implementation is tracked by Epic #1; this design is input to its issues and does not authorize a production cutover.[52]
 
-The restart was motivated by deployed load time and mobile usability (§1). Three parts of this design answer that directly: a critical path of script, board tiles and unit sprites only (§7.3); assets that go through the build's hashed asset graph and stay inside the release limits (§9); and a canvas whose resolution is bounded on purpose (§5.5). None of these is a measured result yet. Budgets come from issue #2 (D2).
+The restart was motivated by deployed load time and mobile usability (§1). The original design proposed a short critical path (§7.3), hashed media (§9) and bounded canvas resolution (§5.5). Main instead loads all catalog images, including portraits, from unhashed public paths and uses CSS-pixel RESIZE; these delivery/rendering differences remain explicit in §§5/7/9 and the T register. Measurements now exist in the proof/battle/audio/performance QA notes; D2 records unchanged numeric budgets. Historical engineering proposals below remain design input where not adopted; they are not evidence of shipping behavior. Current D/T dispositions in §12 and the snapshot govern status.
 
 ## 1. Product goals and scope
 
@@ -46,7 +64,7 @@ Brian confirmed **a lean playable loop first, selectively bringing back proven f
 
 One authored forest board: Forest Ruins, 12×12, heights 0 to 2 (§4.3). Three fixed heroes against the legacy trio of two Goblin Grunts and one Goblin Archer; the encounter choice is D4. Cardinal weighted movement, occupancy and Jump; initiative; one move and one action per turn, in either order; Basic Attack and one signature per hero; greedy legal AI; win/loss, restart, turn queue, log, inspection and touch-safe preview/confirm/cancel. A small set of existing art and SFX, mute, and a nonblocking loading/error screen. No save or resume in the first tranche: issue #11 lists it as a follow-up.[52]
 
-Signatures: Guarded Strike, High Shot and Magic Missile provide defensive melee, elevation-sensitive ranged attacks and reliable rolled force damage. Their semantics are in §6.2. Brian revised Guarded Strike to a fixed Combat Expertise-inspired −2/+2 tradeoff (#49) and replaced Ember Burst with 3.5E Magic Missile on 2026-10-09. The abilities current main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
+Signatures: Guarded Strike, High Shot and Magic Missile provide defensive melee, elevation-sensitive ranged attacks and reliable rolled force damage. Their semantics are in §6.2. Brian revised Guarded Strike to a fixed Combat Expertise-inspired −2/+2 tradeoff (#49) and replaced Ember Burst with 3.5E Magic Missile on 2026-10-09. The abilities the pinned legacy main unlocks with levels are later content, not MVP acceptance: Second Wind, Mark Target and Arc Bolt at level 2; Taunt, Pinning Shot and Frost Snare at level 3.[3][12]
 
 ### Explicitly outside combat MVP
 
@@ -58,9 +76,13 @@ A later separately approved short-run slice may add three encounters, party HP c
 
 ### Definition of done
 
-Start/play/win/lose/restart without developer tools; movement/target previews match actual resolution; no illegal AI actions or soft locks; three signatures have distinct useful situations; every reachable cell and every legal target can be selected (D8); fully played repeated battles, not only forced-outcome fixtures; no console errors during a full battle; agreed mobile devices and orientations pass; measured loading and frame budgets are met (D2); production cutover is separately approved. Numeric budgets are set after measurement, not asserted here.
+#1’s implementation closure does not satisfy outstanding #57/#64/#66 hardware/restart gates. The following describes acceptance, not a claim that all rows passed.
+
+Start/play/win/lose/restart without developer tools; movement/target previews match actual resolution; no illegal AI actions or soft locks; three signatures have distinct useful situations; every reachable cell and every legal target can be selected (D8); fully played repeated battles, not only forced-outcome fixtures; no console errors during a full battle; agreed mobile devices and orientations pass; measured loading and frame budgets are met (D2); production cutover is separately approved. Numeric budgets are established as recorded under D2; physical acceptance remains separate.
 
 ## 2. Architecture and dependency boundaries
+
+The domain → session → Phaser/DOM boundary is implemented. The detailed mode/presenter/failure-containment sketches below remain the original engineering design where they differ from merged code; §2.2 and §12 state the actual session phases/start policy. These sketches do not add acceptance requirements to closed milestones or authorize a framework rewrite.
 
 ```text
 Validated content catalog + seed
@@ -102,7 +124,9 @@ Failures are handled by class, not ad hoc:
 
 Containment needs a mechanism. Phaser's frame callback requests the next frame only after the step returns, so an exception thrown inside the step — from a tween, timer, input or update callback — stops the loop for good while it still reports itself as running (`src/dom/RequestAnimationFrame.js`).[93] Run every such callback through one guard that catches and records, and have the global error handler restart a stopped loop (`loop.sleep()` then `loop.wake()` revives it) or go to `fatal`.
 
-### 2.2 Session interaction modes
+### 2.2 Original session interaction proposal
+
+Current `BattleSession` phases are `player`, `enemy`, `presenting`, `ended`, `error`, `disposed`; pending intent plus HUD/dialog state handles review/targeting. The scene starts automatically and initial enemies may act before player controls become usable. No `ready`/Begin gate exists. Every accepted command commits before presentation; generation/token and scene disposal guards protect restart. The richer mode/presenter model below is the original proposal, not an API implemented on main.
 
 The session owns one explicit UI mode. Input handlers switch on it; nothing infers the mode from which sprites are visible.
 
@@ -139,7 +163,9 @@ Enforce the import rule mechanically, not by review:
 - Compare IDs with `<` and `>`, never `localeCompare`: locale-aware comparison can differ between devices.
 - Position has one source of truth: a unit's cell. Occupancy is derived from the cells of the living units, not stored on tiles, so tile and unit records cannot drift apart as they can in the legacy state (`tile.occupant_id` beside `unit.cell`).[69]
 
-## 3. Proposed module/file layout
+## 3. Original proposed module/file layout and current paths
+
+Main implements domain/content/app/Phaser/UI boundaries, but not every proposed module below. Geometry lives in `src/geometry`, content definitions in typed `src/content` modules and `content/maps/forest-ruins.json`; HUD styles are in `src/style.css`. `vite.config.ts`, `tsconfig.domain.json` and `vitest.config.ts` exist. Playwright specs remain in `tests/*.spec.ts`, scoped away from unit tests. Main has `public/battle/`, `public/proof/` and `public/audio/battle/`; there is no `scripts/check-dist.mjs`, tracked deployment workflow or storage/run/item module. The tree below is retained as the original layout proposal, not an implementation inventory.
 
 ```text
 package.json                 # exists: one npm project, exact pins, tracked lockfile
@@ -183,15 +209,17 @@ deploy/  .github/workflows/  # release mechanism from PR #12; not designed here
 
 Paths not marked "exists" are proposals for `luminari-gurus/tactics-guru-v2`. They start from the paths the tracker's issues suggest and add what those leave out: selectors, diagnostics, the boot scene, the asset folder, the other content files and fixtures.[52] Notes:
 
-- Nothing the game loads may live under `public/`. Vite copies that folder verbatim, without hashing and with its subfolders; the release mechanism rejects nested folders and would cache an unhashed file under `/assets/` for a year (§9).
+- For the proposed flat SSH package, nothing fetched may rely on nested `public/` paths; current Pages assets do, so compatibility must be reviewed before selecting that path. The original recommendation was: nothing the game loads may live under `public/`. Vite copies that folder verbatim, without hashing and with its subfolders; the release mechanism rejects nested folders and would cache an unhashed file under `/assets/` for a year (§9).
 - There is no `manifest.json` at the output root: the publisher reserves that name and the server answers 404 for it.[53] The asset manifest is a TypeScript module.
 - Source subfolders under `src/assets/` are fine. Checked: Vite emits imported files flat, as `dist/assets/<name>-<hash>.<ext>`.
-- No `docs/` or `openspec/` tree on `main` until separately authorized. The new repository tracks requirements as issues and carries no OpenSpec tree.[52]
+- `docs/` and task-specific `openspec/changes/` are already tracked on main. No legacy OpenSpec import or main spec migration is part of #82.
 - `run.ts`, `inventory.ts`, `equipment.ts` and `items.json` appear only if the optional short-run slice is approved.
 
 Use named constants for dice bounds, critical multiplier, elevation step, tile dimensions, UI hit targets and rule limits. Split a service only when its responsibility warrants it; do not rebuild every Godot class in TypeScript.
 
 ## 4. Data contracts and content validation
+
+The sketches below are original design input. Current contracts live in `src/content/types.ts` and `src/domain/types.ts`; map/spawn and stat adaptations are recorded in [first-battle content](first-battle-content.md). The weighted legacy AI-profile table is reference context; main #9 uses pure expected-damage scoring and stable ties, not that full weight system. Do not infer unused types/modules or original constants are implemented.
 
 ### 4.1 Immutable definitions
 
@@ -335,6 +363,8 @@ Use `ConsumableDef | EquipmentDef`, typed categories, stack policy, usable conte
 
 ### 5.1 Projection and anchors
 
+Current rendering constants are 80×40/step 24/base 12 in `src/geometry/iso.ts`. Formula/legacy ratios below are original design context; they do not override those named merged constants.
+
 The logical square grid is independent of the screen projection. World units are the legacy's logical pixels.[60][61]
 
 | Quantity | Value | Baseline source |
@@ -373,7 +403,9 @@ If the proof-of-fit shows the translucency rule is not readable on a phone, the 
 
 Raised cells need sides. The legacy view swaps in slope and corner images for raised cells that have a lower neighbour (`BattleView.gd:2972-3001`); rules still treat the edge as a step. §7.1 names the images this map uses.
 
-### 5.3 Covered cells (D8)
+### 5.3 Historical covered-cell proposal (D8)
+
+The legacy overlap calculation below uses 64×32/step 16 and legacy art. Current geometry is 80×40/step 24 with generated terrain and visible-face picking plus HUD/keyboard targets. #6/#10 implement those paths; this task does not claim the legacy five-cell coincidence calculation proves a current defect or certify all physical selections. See D8/T4/T7 and #64.
 
 The ruin block at (4..6, 3..5) covers the tiles of walkable cells (3,2), (4,2), (5,2), (3,3) and (3,4): each lies exactly under the top face of the ruin cell at (x + 1, y + 1). A unit standing on one of them appears to stand on the ruin, which nothing in the slice can climb.
 
@@ -402,6 +434,8 @@ Unit tests cover: every cell on the real map round-trips through project and pic
 
 ### 5.5 Camera, canvas size and device pixel ratio
 
+Implemented: CSS-pixel `RESIZE`, fitted scale capped at 1.5 and 1–4× fit zoom; no bounded-DPR policy implemented. The bounded-resolution text below is the original T2 proposal, not a completed requirement (see §12).
+
 - Fitting the 768-unit board to a 390-pixel-wide phone gives a zoom of about 0.51 and diamonds of about 32×16 CSS pixels, far below a 44-pixel target (plan §4.2). The default zoom per orientation, the zoom range and the snap radius are therefore outputs of #2. The legacy range is 0.75 to 3.0 with steps of 0.15 (`BattleView.gd:238-240`), in viewport units.
 - Phaser's ScaleManager never reads `devicePixelRatio`. In `RESIZE` mode, which the scaffold uses, the canvas backing store equals the parent's size in CSS pixels: cheap to fill, but upscaled by the browser on a high-density screen.[44][51]
 - For a sharper canvas with a bound (T2): scale mode `NONE`, game size = CSS size × r, `scale.zoom = 1/r`, and `scale.resize()` on every container resize, with r = min(devicePixelRatio, cap). `resize()` keeps the CSS size at game size × zoom.[44] Checked in headless Chromium at a device scale factor of 3 with a cap of 2: the backing store was 780×1688 for a 390×844 CSS canvas, pointer coordinates arrived in backing-store pixels, and a `ResizeObserver` calling `scale.resize()` followed a rotation to 844×390. The camera keeps its scroll position across a resize, not its centre, so re-centre it afterwards. Fill cost grows with r²: a 390×844 phone is 0.33 megapixels at r = 1, 1.3 at r = 2 and 3.0 at r = 3.
@@ -414,6 +448,8 @@ Unit tests cover: every cell on the real map round-trips through project and pic
 - Phaser renders every frame even when nothing moves. If device measurements show heat or battery cost during idle turns, limit the loop (`fps.limit`, `setFPSLimit`) or sleep it while the board is static.
 
 ### 5.6 Renderer creation and failure handling
+
+Main requests `Phaser.AUTO`, not explicit WebGL. Content validation/load/cache errors are controlled by `contentLoading.ts` and the shell error UI; the explicit-WebGL/context/step-wrapper policies below remain original proposals rather than certified runtime capabilities.
 
 - Request WebGL explicitly. `Phaser.AUTO` falls back to the deprecated Canvas renderer with no warning and nothing visible to the player; `Phaser.WEBGL` throws `Cannot create WebGL context, aborting.` during boot when WebGL is missing.[70] Check for WebGL before creating the game and wrap creation, so the player sees a DOM message instead of a blank page. Checked locally: explicit WebGL boots in the headless Chromium that the smoke tests use. Confirm it on the CI runner when #2 makes the switch; with `AUTO`, a runner without WebGL would have passed unnoticed.
 - Context loss. The renderer emits `Phaser.Renderer.Events.LOSE_WEBGL` and `RESTORE_WEBGL`.[80] On loss, show an overlay and stop accepting board input; the domain state is unaffected. On restore, redraw from the state. If no restore arrives within a few seconds, offer a reload. Checked: forcing a loss and a restore through the `WEBGL_lose_context` extension raises both events and rendering continues, so this is testable in the browser suite; the real behaviour on phones is a #2 item.
@@ -609,7 +645,9 @@ Reuse only what the slice uses. Do not transfer Godot `.import`/`.uid` metadata 
 - Commit the optimized outputs; the originals stay in the private repository. Record the conversion commands beside the manifest. Converters are run by hand and are not build dependencies.
 - The build's `check-dist` step (§9.2) reports total `dist/` bytes and the largest file, and fails above the agreed budget (D2).
 
-### 7.3 Loading phases and failure policy
+### 7.3 Original loading phases and implemented failure checks
+
+Current content loading validates catalog input, loads all catalog images through `runtimePath`, bounds requests at 10 seconds and checks texture presence/dimensions before readiness (`contentLoading.ts`). These include portraits; the older deferred-portrait/After Begin phase table below was not adopted. Optional cue failures are nonfatal in `BattleAudio`. Hash/cache/old-session behavior still needs selected-path acceptance in #84/#85.
 
 | Phase | Contents | If it fails |
 |---|---|---|
@@ -633,6 +671,8 @@ Two cases need more than the loader:
 This minimal loading and failure surface is needed first by #2 (no WebGL) and #3 (bad content), so it arrives with #2; #10 extends it into the diagnostics panel.
 
 ### 7.4 Audio
+
+**Implemented #62:** eight generated short MP3 cues, explicit Enable sound/mute/retry, one active voice and bounded four-cue batches from accepted domain events. `BattleAudio` owns bounded recovery; battle startup disables Phaser’s automatic focus/visibility resume hooks. No Begin gate, music, two-voice requirement or legacy release/impact sound scheme shipped. See [audio QA](qa/issue-62-battle-audio.md) and T9/T11. The legacy routing and original pipeline proposal below are reference context, not the current audio adapter.
 
 Domain events name what happened; the audio adapter maps them to cues. There are no sound calls in the domain.
 
@@ -663,16 +703,16 @@ The following table records legacy sound candidates. Ember Burst cues are histor
 
 ## 8. Saves and optional services
 
-**Not in the first tranche.** Issue #11 lists saves and resume as a follow-up.[52] Until then a battle is lost when the browser discards the tab, which phones do to background tabs under memory pressure. Say so in the deferred list. The seed and command log (§4.2) keep a later resume cheap.
+**Not implemented on main.** #58 is the save/resume epic; #69 / open unmerged PR #70 proposes the pure bounded snapshot codec. After merge, #72 supplies guarded storage/backup recovery, #73 autosave/Continue UI, and #74 physical lifecycle certification. #57 is the feature release gate. Do not duplicate PR #70’s codec or claim its benchmark is a hardware guarantee. Until then a battle is lost when the browser discards the tab, which phones do to background tabs under memory pressure. Say so in the deferred list. The seed and command log (§4.2) keep a later resume cheap.
 
 Preferences such as mute may use `localStorage` from the start, under the same rules as below: a namespaced key, every access wrapped, and a visible but nonfatal result when storage is unavailable.
 
 When the save slice arrives:
 
 - Use a new namespaced key, e.g. `tactics_guru.phaser4.save.v1`. Never read or write the legacy keys `tactics_guru.active_run_state`, `tactics_guru.active_battle_state` and `tactics_guru.leaderboard_records`.[13][14][88]
-- The envelope carries format, rules, content and RNG versions and either a domain snapshot at a command boundary or the seed and command log with a snapshot digest. Validate type, size, finite safe integers, known IDs and state invariants.
+- The envelope carries format, rules, content and RNG versions and either a domain snapshot at a command boundary or the seed and command log with a snapshot digest in the original proposal. PR #70 selects snapshots; the merged/accepted contract must be used by #72, not a second serializer. Validate type, size, finite safe integers, known IDs and state invariants.
 - Corrupt or future versions offer recover/reset/export choices without automatic deletion. Keep a last-known-good backup; catch quota and security exceptions. A checksum detects accidental corruption, not cheating.
-- Resume requires next-command and RNG equivalence tests. Do not serialize animation phase, Phaser objects, DOM, resource references or unbounded logs. Migrations are pure functions with fixtures and backup-first behavior.
+- Resume requires next-command and RNG equivalence tests. Do not serialize animation phase, Phaser objects, DOM, resource references or unbounded logs. No speculative migration system is selected; future compatibility handling requires scoped fixtures and backup preservation.
 - Two limits to state plainly. `localStorage` is per origin, so the namespaced key protects old data only if the new build is ever served from the legacy origin. Safari deletes script-writable storage after seven days of browser use without interaction with the site, so resume on iPhone is best-effort.[75]
 - Legacy Godot save import is separate optional scope; its 64-bit RNG values need a precision policy, not JavaScript number coercion.[13][27]
 
@@ -682,9 +722,11 @@ No server is required. The existing global leaderboard is a deferred payload con
 
 One Vite application builds static `dist/` HTML, script and assets. No Godot export stage, WASM or PCK is retained.[22]
 
-### 9.1 Release mechanism constraints
+### 9.1 Existing Pages evidence and proposed SSH constraints
 
-From PR #12, which is open and unmerged; re-check when it lands.[53]
+Existing QA uses Pages main and branch previews, including `https://tactics-guru-v2.pages.dev` and the #65 branch URL; [frame evidence](qa/issue-65-frame-budgets.md) pins served commit/resource identity. This task did not probe live headers, protection or current served bytes. Main has no tracked deployment workflow/installer. PR #12 remains open/unmerged and explicitly not installed: reviewed package `de518a77f6d0c389ece720530a29683db0852b25`, current head `60e9581a96e5dd9314735ca659a11dd5a9992eef`; the [pinned runbook](https://github.com/luminari-gurus/tactics-guru-v2/blob/de518a77f6d0c389ece720530a29683db0852b25/deploy/ssh-install/README.md) requires exact-package review and authentic operator preflight/install/verify/activate/recovery under separate approvals. Package tests and a green PR do not prove live installation or an automatic main release.
+
+#83/#84 own host/domain/path/protection/ownership decisions and executable rollback/acceptance planning. #85 requires accepted #84/#57 and explicit authorization of the reviewed target/build/operations. No merge/install/upload/Access/production/analytics action is authorized by these docs. The historical SSH limits below are conditional on selecting/reviewing that path, not a claim about Pages.[53]
 
 - One ZIP of at most 20 MiB per release; at most 64 MiB expanded, 16 MiB per file and 512 files.
 - Allowed extensions, case-sensitive: `.html .js .css .json .png .jpg .jpeg .webp .svg .ico .woff .woff2 .mp3 .ogg .wav`. Not shippable, among others: `.map`, `.wasm`, `.m4a`, `.avif`, `.txt`, `.webmanifest`, `.ttf`, `.otf`.
@@ -694,7 +736,7 @@ From PR #12, which is open and unmerged; re-check when it lands.[53]
 
 ### 9.2 Build configuration
 
-A proposal for #3. The settings were tried on 2026-10-06 in a throwaway copy of the scaffold.
+Original #3 proposal, tried 2026-10-06 in a throwaway scaffold copy. Current `vite.config.ts` only embeds commit/dirty build identity: separate engine chunk, no-inline setting, `appType: mpa` and publisher-equivalent dist checker are not implemented. Content definitions/metadata are bundled; battle/proof images and cues use unhashed `public/battle/`, `public/proof/` and `public/audio/battle/` paths. The JS/CSS bundle is hashed. #84/#85 must resolve selected-path packaging/cache/old-session checks; historical experiments below do not prove current configuration.
 
 | Setting | Why | Checked result |
 |---|---|---|
@@ -712,7 +754,7 @@ Content JSON is imported statically, so it is bundled and hashed with the script
 
 - A session that started before a release gets a 404 for any file it requests afterwards whose name changed in that release; unchanged files, such as the engine chunk, are still served. Deferred assets fail soft (§7.3); a failed critical request offers a reload.
 - Check `content-encoding` on the deployed script at the edge: 1.38 MB uncompressed against about 0.35 MB compressed.
-- Build identity for diagnostics: a build-time constant, or `/_deployment.json` on the deployed host. That file does not exist in dev or preview, so the fallback is `dev`.
+- Implemented build identity is `__BUILD_INFO__` (Git commit + dirty flag) embedded by Vite and reported in diagnostics, including local/deployed captures. `/_deployment.json` belongs to the proposed SSH publisher, not the Pages/main runtime.
 - No third-party requests. If a content security policy is added later, note that Phaser loads images through XHR and blob URLs by default (`loader.imageLoadType`).[79]
 
 ### 9.4 Not carried over
@@ -725,24 +767,11 @@ Content JSON is imported statically, so it is bundled and hashed with the script
 
 ### 10.1 Scripts and CI wiring
 
-Existing at `df693f0`: `dev`, `preview`, `typecheck` (`tsc --noEmit`), `build` (type-check, then `vite build`) and `test` (`playwright test` against the production build). The last three were run on 2026-10-06 and passed.[51]
+Configured on main: `npm ci`, `npm run dev`, `npm run preview`, `npm run test:unit` (`vitest run`), `npm run validate:content` (content + authored-content suites), `npm run typecheck` (app and domain configurations), `npm run build` (both typechecks then Vite) and `npm test` (Playwright). See [package.json](../package.json).
 
-The workflow proposed in PR #12 runs `npm ci`, `npm run build` and `npm test`.[53] Until that PR is merged `main` has no workflow at all, so nothing is gated automatically yet. Once it is, a new script gates nothing unless one of those three reaches it. Proposed wiring, which needs no workflow change:
+Vitest is scoped to `tests/unit/**/*.test.ts` in Node; Playwright keeps `testDir: ./tests` with `testMatch: **/*.spec.ts`, one worker and desktop/Pixel 7 portrait/landscape Chromium projects. Moving tests to `tests/e2e` is unnecessary for current scoping. No configured WebKit project, `test:e2e` alias or tracked main CI workflow exists. PR #12’s workflow is proposed, not an installed gate. Local Playwright serves existing `dist/`, so build first. An installed compatible Chromium may be selected with `PLAYWRIGHT_CHROMIUM_EXECUTABLE`.
 
-```json
-"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.domain.json",
-"build": "npm run typecheck && vite build && node scripts/check-dist.mjs",
-"test:unit": "vitest run",
-"validate:content": "vitest run tests/unit/content.test.ts",
-"test:e2e": "playwright test",
-"test": "npm run test:unit && npm run test:e2e"
-```
-
-- `vitest run` runs once and exits; never start a watcher in CI.
-- Runner scoping is required, not optional. Checked with Vitest 5.0.3 and Playwright 1.63.0 installed side by side: with no configuration Vitest's default pattern picks up `tests/e2e/*.spec.ts`, and the run fails with Playwright's "did not expect test() to be called here" error. Restrict Vitest to `tests/unit/**/*.test.ts`, point Playwright's `testDir` at `tests/e2e`, and move `tests/boot.spec.ts` there, all in the PR that adds Vitest. The plan ties that to #4, which names the unit script; #3 comes first in the tracker's order and its acceptance already asks for unit fixtures, so whichever of the two lands first carries the runner and the scoping.[52]
-- Vitest 5.0.3 accepts Vite 8 and requires Node `^22.12.0 || ^24.0.0 || >=26.0.0`, which is narrower than the scaffold's `>=22.12.0`: Node 23 and 25 are excluded.[76]
-- `npm test` serves whatever `dist/` already holds: the Playwright configuration only starts the preview server.[51] CI builds first, but a local run can test a stale build. Have the web-server command build before it serves.
-- These scripts remain proposals until a PR adds them.[52]
+Existing QA notes record actual prior checks and limits, not new test runs by this documentation task. Emulated touch/WebKit cannot substitute for physical iPhone Safari/Chrome, Android Chrome or desktop acceptance in #64/#66. New behavior work runs the issue’s focused and configured checks; this reconciliation uses link/source/consistency, strict OpenSpec and whitespace checks only.
 
 ### 10.2 Unit tests (Vitest, node environment)
 
@@ -785,35 +814,27 @@ Physical iPhone Safari, iPhone Chrome, Android Chrome and agreed desktop browser
 
 ## 11. Incremental roadmap
 
-The tracker's order stands: proof-of-fit first; then content, pure state/RNG, grid, combat, signatures, AI; rendering after content and grid; UI integration after its dependencies; device and performance acceptance last.[52] The plan (§7.1) maps phases to paths and gates. What each issue takes from this design:
+The original battle order is complete; implementation milestones and remaining acceptance are separate. The plan §7.1 and this table use the same live dependency snapshot; issue bodies define the detailed contract.
 
-| Issue | Sections here |
-|---|---|
-| #2 Proof-of-fit | §2.3, §5.2–§5.7 (D8, T1, T2, T4, T7), §7.3, §9.2 |
-| #3 Content and asset catalog | §3, §4.1, §4.3, §4.4, §7.1–§7.2, §9.2 (D4, T11); §10.1 if it adds the first unit test |
-| #4 State, commands, RNG | §2.4, §4.2, §6.4 (T3), §10.1 |
-| #5 Grid and movement | §6.2 movement rows |
-| #6 Board and picking | §5.1–§5.5 (D8, T4) |
-| #7 Turn flow, attacks, outcomes | §6.1–§6.3, §6.6 (D7) |
-| #8 Signatures | §4.1, §6.2 (D5, D6, D11) |
-| #9 Enemy turns | §6.5 (T8) |
-| #10 Wiring, HUD, input | §2.1, §2.2, §5.7–§5.9, §7.4, §10.4 (T5, T6, T9, T10) |
-| #11 Device validation | §10.3, §10.5; the deferred list in §8 |
-| After the epic | §8 saves; the optional short-run slice |
+| Phase / status | Tracker | Existing paths / concrete follow-up | Acceptance gate |
+| --- | --- | --- | --- |
+| P0: scope selected | #1 closed | Existing two planning docs; approved decisions in §2 | Core product choices retained; no parity or production approval inferred. |
+| P1: proof delivered | #2, #14–#20 closed | `FitScene`, geometry/input/proof/audio diagnostics, `tests/*.spec.ts` | [Proof fit evidence](qa/issue-20-fit-gate.md) retains reported hardware success and unavailable detail. It does not certify the full battle. |
+| P2: content/state/movement delivered | #3/#4/#5 closed | `src/content`, `src/domain/{types,grid,rng}.ts`, `tests/unit` | Runtime/build content checks and pure compiler boundary exist. |
+| P3: rules/signatures delivered | #7/#8/#49 closed | `src/domain/{turns,targeting,combat}.ts`, `src/content/abilities.ts` | Approved d20/movement/Guarded/Magic Missile contracts and deterministic fixtures. |
+| P4: AI/board/play loop delivered | #9/#6/#10 closed | `src/domain/ai.ts`, `BattleSession`, `BattleScene`, `BoardRenderer`, HUD/dialogs | Real-control automated win/loss/replay/restart and transformed picking; no physical acceptance by proxy. |
+| P5: automated evidence delivered; physical gate open | #11/#62/#65/#68 closed; #57/#64/#66 open | Existing battle/audio/performance QA; cached renderer retained | Supported physical matrix and Safari restart disposition remain required. |
+| P6a: delivery review / approved activation pending | #83 → #84 → #85; PR #12 open | Existing Pages evidence and reviewed SSH alternative | #84 resolves owner target/path; #85 requires accepted #84/#57 and explicit target/build/operation approval. SSH adds separate exact-package/preflight/install/activation/recovery gates only if selected. |
+| P6b: local save/resume pending | #58, #69 / PR #70, #72–#74 | #72 guarded storage uses #69 codec only after merge; #73 command-boundary autosave/Continue uses #72 + #69 merge; #74 certifies #72/#73 + #57 | Preserve backup/corrupt bytes, next state/RNG equivalence, explicit reset/export and physical lifecycle evidence. Release waits for #57. |
+| P7: authored short run and rewards pending | #59/#60, #75–#81 | #75 run/carryover/RNG contract → #76 three encounters and #77 catalog; #78 commands needs #77 + #75; #79 controls/save needs #78 + #73 + #75 | Owner-reviewed choices before dependent implementation; existing heroes/enemies, no broad economy or parity. |
+| P7 integration/certification pending | #80/#81 | #80 requires #75/#76/#78/#73 + #57 acceptance; coordinate reward/save interface with #79 without a reciprocal implementation prerequisite. #81 waits for #80/#79/#58 acceptance/#57 | Exactly three actual-control battles, deterministic carryover/rewards/resume and full supported device evidence. |
+| Independent exploration prototype requested | #87 open | Standalone 20×20 procedural `/map`; generator/rot.js comparison belongs to #87 | Seed reproducibility/connectivity, responsive direct navigation/refresh and battle-route regression. No battle/RNG/save/run coupling, party movement, rewards or persistence; no new dependency selected here. |
 
-Where the order leaves ownership unclear:
-
-- #2 needs the map's geometry and a few images before #3's catalog and manifest exist. It carries them as a fixture of its own, and #3 replaces that fixture.
-- The second TypeScript project and the minimal loading and failure surface arrive with #2 (§2.3, §7.3).
-- #3 defines the units with Basic Attack, and the archer's Shortbow Shot, which is a plain attack. The three signatures and the Guarded status enter the catalog with #8, so validation must accept a hero with one ability until then.
-- #4 delivers the state, command and event types, the generator, the state validator and fixtures. `createBattle` with initiative, and the turn flow, are #7's.
-- Where this design asks more of an issue than its text does, the issue text governs until it is amended. The plan (§8, item 6) lists the additions that have not been posted.
-
-Every slice is reviewed from a clean TDD worktree based on current `origin/main`, with focused/full test evidence. No closing issue/PR language until acceptance is complete. Task branches never start from `docs`.
+Future behavior work uses current `origin/main`, meaningful focused regressions and configured checks; documentation-only #82 uses source/link/consistency/OpenSpec/whitespace verification. No production cutover or hardware claim follows from a closed implementation issue.
 
 ## 12. Risks, assumptions and open decisions
 
-Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keeps the full risk table; the design-level risks are:
+Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keeps the full risk table. The following mitigations are original design recommendations where not implemented; §12’s D/T dispositions, current snapshot and §§5/9 explicitly state those gaps:
 
 | Risk | Where it bites | Mitigation |
 |---|---|---|
@@ -825,45 +846,48 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | Rule lifecycle lost in translation | rules inside a scene controller | §2.1, §6.1 |
 | Asset failures go unnoticed | decode failures emit no load error; preview server masks 404s | cache checks, `appType: 'mpa'` (§7.3, §9.2) |
 | Build rejected or mis-cached by the release mechanism | nesting, extensions, reserved names, year-long caching | §9.1, §9.2 |
-| iPhone audio silent | codec support, unlock, silent switch | a universally decoded format, unlock on Begin, device test (§7.2, §7.4) |
+| iPhone audio silent | codec support, unlock, silent switch | MP3 and explicit Enable sound/retry; physical test #64 (§7.4) |
 | Battle lost on tab discard | no saves in the first tranche | accept and state it (§8) |
 | Renderer and API drift | Phaser 4's renderer is new | pinned version, standard APIs, context-loss handling (§5.6) |
 | Board freezes after an uncaught error | Phaser's frame loop does not restart after an exception in the step | one guard around step callbacks; restart or `fatal` (§2.1) |
 | A release fails after merge | the publisher's limits run only when publishing from `main` | the same checks at build time (§9.2) |
-| Enemies act before the player is ready | an enemy holds the first turn in about half of all seeds | Begin gate (§2.2, T10) |
+| Initial enemy presentation/lifecycle | enemies may act before player readiness | Current automatic start and v3 startup measurements; old Begin gate was not adopted (T10), physical checks #64 |
 | Toolchain novelty | TypeScript 7 and Vitest 5 are young major versions | exact pins; tool upgrades as their own PRs |
 
 4.2.1 fixes resize, ESM, stencil and delayed tweens; pin it and avoid custom rendering internals. Phaser 4 removes the old pipelines and unifies FX/masks into filters; Canvas is deprecated. Do not silently target Phaser 3 or promise unsupported-device performance.[38][39][72]
 
-**Resolved by Brian:** one replayable tactical battle; deployed loading/mobile problems as the restart motivation; isometric presentation and basic rules retained; iPhone Safari, iPhone Chrome, Android Chrome and desktop in both orientations; fresh runtime without legacy import; the new repository. **Open:** the decisions below; D7 (the restart seed) was resolved on 2026-10-09: a restart takes a new seed. The plan's register (§2) is authoritative; in short:
+**Resolved by Brian:** battle-first loop, loading/mobile motivation, isometric/basic tactics, required browser/orientation matrix, fresh runtime/new repository, Guarded Strike/Magic Missile and new-seed restart. Open choices and implemented engineering dispositions follow; old proposals in earlier sections are not automatic scope additions. The plan §2 carries the same register.
 
-| # | Decision | Blocks |
-|---|---|---|
-| D1 | Minimum browser versions and the physical device list | #2, #11 |
-| D2 | Numeric loading and frame budgets | #2, then #11 |
-| D4 | Encounter: the legacy trio or the current seeded roster | #3 |
-| D5 | Resolved: Guarded on miss; Ember Burst replaced by Magic Missile | Resolved for #8 |
-| D6 | Resolved: Guarded Strike trades −2 accuracy for +2 AC | #8 |
-| D8 | Selecting cells covered by raised terrain | #2, #6 |
-| D9 | Production host and cutover target | after #11 |
-| D10 | Analytics | after #11 |
-| D11 | Guarded Strike −2/+2 and Magic Missile 1d4+1 approved; starting caster level 1, range 1–5 tiles and 3-tile spread recorded | Tuning #10 |
+| # | Decision / current disposition | Evidence / remaining gate |
+| --- | --- | --- |
+| D1 | Required browser/orientation matrix retained; minimum versions and complete physical device details still open. | #64/#66; reported iPhone success is not the full matrix. |
+| D2 | Numeric loading/frame budgets established for measured acceptance. | #65: L1 cold ≤2500 ms, L2 warm ≤750 ms, L3 compressed code ≤400000 bytes, L4 assets ≤1500000 bytes; F1 idle p50 ≤16.7/p95 ≤20 ms, F2 pan/zoom/move p95 ≤33.4 ms. #64 still verifies hardware. |
+| D4 | Implemented Fighter/Ranger/Mage and two Goblin Grunts plus one Goblin Archer on Forest Ruins; no Shaman roster adopted. | #29/#3 and `src/content/forestRuins.ts`, `src/content/catalog.ts`. |
+| D5 | Resolved: Guarded on resolved hit/miss; Magic Missile replaced Ember Burst. | #8, [signature contract](signature-abilities.md). |
+| D6 | Resolved: Guarded Strike −2 attack / +2 AC; Basic Attack retains normal accuracy. | #49 / PR #50; no legacy −4 penalty. |
+| D7 | Resolved by dubstylee 2026-10-09: restart uses a new seed. | #10; BattleScene starts at seed 1 and increments per scene creation. No same-seed restart promise. |
+| D8 | Visible-face geometric picking, transformed selection and keyboard cell targeting implemented. | #6/#10, `src/geometry/picking.ts`, `src/phaser/BattleScene.ts`; the broader historical hidden-cell selection proposal is not established by this source review; no new acceptance or retirement decision is made here. Physical coverage stays in #64. |
+| D9 | Production host/domain/release path and cutover still require owner choice and authorization. | #83/#84/#85; Pages evidence does not select SSH PR #12 or approve its installation. |
+| D10 | Analytics optional/default off; no collection selected by this task. | Separate owner decision after readiness. |
+| D11 | Approved signatures retained: Guarded Strike −2/+2; Magic Missile 1d4+1 per missile, starting caster level 1, range 1–5 and 3-tile target spread. | #8/#49, signature contract; any later balance change requires its own scope. |
 
-**Design questions raised by this revision.** They are not yet in the plan's register; add them when confirmed.
+D3 was absent from the historical register; numbering is retained without inventing a decision. D7 is now shown explicitly rather than only in the prose.
 
-| # | Question | Recommendation | Decide in |
-|---|---|---|---|
-| T1 | Depth model: units above terrain (baseline) or interleaved with terrain plus translucent occluders | interleaved, if #2 shows it stays readable | #2, with D8 |
-| T2 | Canvas resolution: CSS-pixel `RESIZE` or a bounded device-pixel scale | bounded scale, cap from measurement | #2 |
-| T3 | Generator | sfc32 as specified in §6.4 | #4 |
-| T4 | Unit sprites as pick targets | test in #2; adopt if body taps miss | #6 |
-| T5 | Commit model on desktop | two-step for every pointer | #10 |
-| T6 | End the turn automatically when move and action are both spent; ask before End turn discards an unused move or action | keep the baseline: manual, no prompt | #10 |
-| T7 | Keyboard-only play | decide scope; target stepping plus a cell cursor if required | #2 with D8; built in #10 |
-| T8 | AI damage measure | previewed expectation always | #9 |
-| T9 | Sound voices, and whether release cues ship | cues on the playback timeline, two voices | #10, with #3 for the files |
-| T10 | How a battle begins | board visible and pannable at once, with a Begin button; no separate title screen | #10 |
-| T11 | Container for the short sound cues | mono WAV for cues, MP3 for music; the plan currently says MP3 for both | #3 |
+### T1–T11 engineering dispositions
+
+| # | Historical design question | Current disposition / evidence |
+| --- | --- | --- |
+| T1 | Depth model and occluders | Implemented interleaved column/surface/occupant layers and fading nearby canopies (#6, BoardRenderer); physical readability remains #64. |
+| T2 | Canvas resolution/DPR | Implemented `Phaser.AUTO` + CSS-pixel `RESIZE`, fitted board scale ≤1.5 and zoom 1–4× fit; no bounded-DPR or explicit-WebGL implementation claimed (`start.ts`, `iso.ts`, `BoardInput.ts`). |
+| T3 | Generator | sfc32 with explicit four-word/cursor state and deterministic die rejection sampling implemented (#4, `src/domain/rng.ts`). |
+| T4 | Unit sprites as pick targets | Current picker uses visible tile faces; sprites/canopies pass input through (#6). Sprite-body targets remain unadopted. |
+| T5 | Desktop commit model | Move/attack use review/confirm/cancel; Wait commits directly (#10, HUD/session). |
+| T6 | Turn ending / unused-action prompt | Explicit Wait / End turn; no automatic turn ending after move+action, no unused-action prompt (#7/#10). |
+| T7 | Keyboard-only play | DOM focus and canvas arrow cell cursor, Enter/Space selection, Escape cancel implemented (#10); physical/accessibility acceptance is not inferred from code. |
+| T8 | AI damage measure | Pure attack preview, integer damage scoring and stable explicit ties implemented (#9, `src/domain/ai.ts`); previews consume no RNG. |
+| T9 | Sound voices and release cues | #62 selected eight generated cues with one active voice and up to four queued per batch, explicit opt-in/mute/retry. The old two-voice/release-impact scheme was not adopted. |
+| T10 | Battle begins | Current scene automatically runs initial enemies to player readiness; no separate Begin button (#10). Sound unlock uses Enable sound (#62). |
+| T11 | Cue container | Eight small MP3 cues implemented (#62); no mono-WAV cue or music requirement adopted. |
 
 ## 13. Transition mapping from the original TDD
 
@@ -887,11 +911,24 @@ Section numbers are those of the legacy `docs/tech_design.md`.[1]
 
 ### OpenSpec alignment, not mutation
 
-The new repository carries no OpenSpec tree; its requirements are the tracker's issues.[52] The original repository's `openspec/specs/combat-core/spec.md`, `overworld-run/spec.md`, `mobile-web-ux/spec.md` and `meta-progression/spec.md` remain reconciliation inputs for implemented and deferred behavior. If documentation on `main` is later authorized, establish only the accepted Phaser requirements there. Do not edit, mass-delete or archive the original Godot requirements as part of this work; existing unarchived changes include already-implemented work.[30]
+Both planning documents and task-specific OpenSpec changes are already on main; no new initialization/document migration or gameplay spec import is needed. #82 is a documentation-only change using the schema’s supported `skip_specs` marker. Legacy `combat-core`, `overworld-run`, `mobile-web-ux`, `meta-progression` base/delta specs remain historical reconciliation inputs at the pinned SHA; they are not edited, archived or deleted. The unavailable discovery companion and `ORIGINAL/` mirror are not newly verified local artifacts.
 
-The list of legacy change, delta and task paths was saved in `phaser4-discovery/evidence.md`, which is not stored with this copy; `ls ORIGINAL/openspec/changes` regenerates it. The plan supplies feature decisions and the PR-sized mapping.
+### Accepted / deferred / retired ledger
 
-## Revision notes (2026-10-06)
+| Disposition | Scope | Current evidence / boundary |
+| --- | --- | --- |
+| Accepted battle slice, implemented | One replayable isometric Forest Ruins battle, fixed three heroes/minimal goblins, height/d20, signatures, legal AI, previews, replay/restart and optional sound | #1–#11/#49/#62; implementation closure is distinct from #57/#64/#66 readiness. |
+| Accepted follow-up planning, delivery pending | Safe local resume, authored three-encounter run, minimal owned rewards/items | #58–#60 and their children; unresolved contract/balance choices stay open. |
+| Separately requested prototype, not battle expansion | 20×20 seeded procedural `/map` research/prototype | #87; independent from #59 and first-battle acceptance. Larger exploration/campaign remains deferred. |
+| Deferred | Recruitment/classes, XP/meta progression, shops/economy, broad biomes/status systems, editor/custom-map exchange, rotation, accounts/leaderboards, analytics and legacy import | Historical legacy audit in the restart plan is reference material; no automatic port, new retirement or parity promise. Analytics remains default off. |
+| Retired from the new runtime only | Godot Nodes/Resources/autoloads/GDScript/export/PCK/WASM plumbing and legacy same-seed restart | TS domain/session/Phaser/DOM replaces these; original repository/history/deployment/storage remain untouched. |
+| Superseded/not adopted | Ember Burst, historical Guarded Strike −4 penalty, #68 baked prototype, proposed Begin/two-voice scheme | Approved Magic Missile/−2 tradeoff and merged implementation apply. Experiments and old proposals remain historical evidence. |
+
+## Revision notes (2026-10-12)
+
+Approved #82 reconciles current status, tools, D/T registers, roadmap, delivery and scope against main `30331e6` and the live tracker. Historical October 6 experiments/legacy provenance remain dated; original layout/build/Begin/audio proposals are distinguished from the merged runtime. Physical #57/#64/#66, unmerged #70 and explicit owner/operator/production gates remain open. #87 is independent exploration scope. No application, dependency, deployment or legacy-repository change.
+
+## Historical revision notes (2026-10-06)
 
 Corrections to the earlier draft:
 
