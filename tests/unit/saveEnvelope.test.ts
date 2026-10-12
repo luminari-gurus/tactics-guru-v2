@@ -48,7 +48,7 @@ describe('accepted snapshot boundaries', () => {
       // Select the original session's command independently; its existing queue is the oracle.
       if (session.phase === 'player') expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
       const step = session.phase === 'player' ? session.confirm() : session.nextEnemy(); assert(step);
-      expect(command).toEqual(session.replay.commands.at(-1));
+      expect(command).toEqual(session.replay!.commands.at(-1));
       expect(dispatch(state, command, battleCatalog)).toEqual({ ok: true, state: step.after, events: step.events });
       expect(session.phase).toBe('presenting');
       restored = decodeBattleSave(encoded(session.state, battleCatalog), battleCatalog); assert(restored.ok);

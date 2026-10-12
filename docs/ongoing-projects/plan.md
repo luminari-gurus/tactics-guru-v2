@@ -1,6 +1,16 @@
 # Issue #73 - battle autosave and resume implementation plan
 
-Updated 2026-10-12 (Asia/Jerusalem). **Planning only; implementation has not started.**
+Updated 2026-10-12 (Asia/Jerusalem). **Implementation authorized and in progress.**
+
+## Live handoff
+
+Working in the existing clean planning worktree below; the original checkout's unrelated edits remain untouched. Refreshed origin: main remains `3f37920`, branch starts at `f4c0993`, and there is no existing PR for this branch. OpenSpec apply is ready (spec-driven, initially 0/12).
+
+Ablation: retain the existing codec, state validator, AI policy, two-slot adapter and native modal owner. One accepted-state hook and one app coordinator cover all entry points; no new serializer, tombstone, retry loop or simulation is needed. Outcome, non-goals, files and proof remain as specified below. The user authorized autonomous resolution of discovered blockers and publication of a review-ready PR; no additional planning approval is pending.
+
+Current work: OpenSpec 6/12 complete. Hydration, nullable replay/continuation diagnostics, accepted-boundary callback and persistence coordinator are implemented. Focused session/codec tests passed (40); session/coordinator tests passed (57), including every invalidation and fresh-save failure point. Both typechecks and production build passed. Scene startup/Continue, native recovery/export/removal, visible save status and all restart gates are connected. Existing browser tests now explicitly confirm destructive restart; sound comparison runs explicitly isolate their two fresh histories. Three desktop HUD/touch/modal checks passed and two restart/keyboard checks passed. A paused-clock helper initially waited for Phaser before resuming RAF; corrected to let its caller resume first. Next: new reload/recovery browser matrix, rerun that case, then all required suites and review publication. No PR or implementation commit yet.
+
+Local tooling: Node is on PATH. OpenSpec CLI is `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`; invoke with Node. Dependencies installed from the lockfile using `node C:/Users/apexw/AppData/Local/Temp/tactics-guru-issue-66-tools/package/bin/npm-cli.js ci --no-audit --no-fund`. npm is absent from PATH; use an ignored local wrapper for nested configured commands. No dependency version changes.
 
 - Issue: [#73 - Integrate command-boundary autosave and battle resume controls](https://github.com/luminari-gurus/tactics-guru-v2/issues/73), under [#58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/73#issuecomment-6128412106).

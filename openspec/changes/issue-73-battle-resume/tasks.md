@@ -1,18 +1,18 @@
 # Tasks
 
-Planning only. Implementation of [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues/73) starts after approval of [the plan](../../../docs/ongoing-projects/plan.md). All checkboxes describe future work and remain unchecked in this planning commit.
+Implementation of [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues/73) was authorized on 2026-10-12. [The active handoff](../../../docs/ongoing-projects/plan.md) records progress and evidence. Checkboxes are completed only after their specified proof.
 
 ## 1. Validated session hydration and honest diagnostics
 
-- [ ] 1.1 Add the fallible validated snapshot factory in `BattleSession.ts`; verify malformed input rejection, owned/frozen state, derived phase and empty transients with the existing save fixtures.
-- [ ] 1.2 Preserve deterministic continuation through hydrated sessions; compare actual next command/events/state/RNG with uninterrupted seed 1-5 sessions at accepted boundaries, including seed 2/command 29, terminal and command-limit cases.
-- [ ] 1.3 Distinguish full fresh replay from resumed continuation diagnostics and update consumers/helpers; retain existing fresh-session replay checks and document the missing pre-save history in `docs/battle-save-format.md`.
+- [x] 1.1 Add the fallible validated snapshot factory in `BattleSession.ts`; verify malformed input rejection, owned/frozen state, derived phase and empty transients with the existing save fixtures.
+- [x] 1.2 Preserve deterministic continuation through hydrated sessions; compare actual next command/events/state/RNG with uninterrupted seed 1-5 sessions at accepted boundaries, including seed 2/command 29, terminal and command-limit cases.
+- [x] 1.3 Distinguish full fresh replay from resumed continuation diagnostics and update consumers/helpers; retain existing fresh-session replay checks and document the missing pre-save history in `docs/battle-save-format.md`.
 
 ## 2. Command-boundary persistence and recovery coordination
 
-- [ ] 2.1 Add one optional accepted-state callback and a focused injectable app coordinator using the existing storage adapter; verify one save attempt before presentation for each accepted player/enemy command, no writes for previews/rejection/acknowledgements, and containment of storage/observer failures.
-- [ ] 2.2 Implement read-only startup/candidate selection, recovery status and explicit per-slot removal; verify missing/valid/invalid/unavailable combinations, raw-text retention, changed-value refusal and untouched unrelated keys in `tests/unit/battlePersistence.test.ts`.
-- [ ] 2.3 Implement the shared replacement gate with backup-first removal and final absence verification; fault-inject every boundary to prove no new session/seed on failure and no old recoverable save after success, including failed fresh saves, cancelled/duplicate requests and uint32 seed wrap. Document fallback and single-writer limits in `docs/battle-storage.md`.
+- [x] 2.1 Add one optional accepted-state callback and a focused injectable app coordinator using the existing storage adapter; verify one save attempt before presentation for each accepted player/enemy command, no writes for previews/rejection/acknowledgements, and containment of storage/observer failures.
+- [x] 2.2 Implement read-only startup/candidate selection, recovery status and explicit per-slot removal; verify missing/valid/invalid/unavailable combinations, raw-text retention, changed-value refusal and untouched unrelated keys in `tests/unit/battlePersistence.test.ts`.
+- [x] 2.3 Implement the shared replacement gate with backup-first removal and final absence verification; fault-inject every boundary to prove no new session/seed on failure and no old recoverable save after success, including failed fresh saves, cancelled/duplicate requests and uint32 seed wrap. Document fallback and single-writer limits in `docs/battle-storage.md`.
 
 ## 3. Live scene and accessible controls
 
@@ -28,5 +28,5 @@ Planning only. Implementation of [#73](https://github.com/luminari-gurus/tactics
 
 ## Workflow follow-up
 
-- Open or update the implementation PR only after the plan is approved and implementation is verified. Use `Closes #73` only when its acceptance is met; parent #58 stays open.
-- Merge, deployment, physical certification and OpenSpec archival are outside this planning request.
+- The plan is approved. Open the implementation PR after implementation is verified. Use `Closes #73` only when its acceptance is met; parent #58 stays open.
+- Merge, deployment, physical certification and OpenSpec archival are outside this implementation request.

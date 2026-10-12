@@ -1,5 +1,5 @@
 import type { ContentCatalog, MapId } from '../content/types';
-import { previewCommand } from '../domain/battle';
+import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
 import { previewAttack, previewMagicMissile } from '../domain/combat';
 import { planEnemyTurn } from '../domain/ai';
@@ -7,6 +7,7 @@ import { createBattle, dispatch } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay } from '../domain/types';
 
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
+export type AcceptedState = (state: BattleState) => void;
 export interface Presentation { readonly before: BattleState; readonly after: BattleState; readonly events: readonly BattleEvent[]; readonly token: number }
 export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAttack> | ReturnType<typeof previewMagicMissile> | ReturnType<typeof previewCommand>;
 function freeze<T>(value: T): T {
@@ -26,17 +27,26 @@ export class BattleSession {
   private generation = 0;
   phase: SessionPhase;
   error: string | null = null;
-  constructor(readonly catalog: ContentCatalog, mapId: MapId, seed: number) {
-    const created = createBattle(mapId, seed, catalog);
+  readonly resumed: boolean;
+  constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState) {
+    this.resumed = typeof mapId !== 'string';
+    const created = typeof mapId === 'string' ? createBattle(mapId, seed, catalog) : readBattleState(mapId, catalog);
     if (!created.ok) throw new Error(`Could not create battle: ${created.reason}`);
     this.current = this.initial = freeze(created.state);
     this.phase = this.decisionPhase();
+  }
+  static fromSnapshot(catalog: ContentCatalog, input: unknown, accepted?: AcceptedState):
+    { ok: true; session: BattleSession } | { ok: false; reason: 'invalidState' } {
+    const read = readBattleState(input, catalog);
+    if (!read.ok) return { ok: false, reason: 'invalidState' };
+    return { ok: true, session: new BattleSession(catalog, read.state, read.state.seed, accepted) };
   }
   get state() { return this.current; }
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): Replay { return freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands]}); }
+  get replay(): Replay | null { return this.resumed ? null : freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands]}); }
+  get continuation() { return this.resumed ? freeze({snapshot:this.initial, commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
     if (command.type === 'move') return previewMove(this.current, command, this.catalog);
@@ -75,6 +85,8 @@ export class BattleSession {
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);
     this.phase = 'presenting';
+    // Observers cannot undo an accepted command or prevent its presentation.
+    try { this.accepted?.(this.current); } catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
   }
   finishPresentation(token: number) {

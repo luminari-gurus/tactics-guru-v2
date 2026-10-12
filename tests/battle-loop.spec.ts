@@ -1,3 +1,4 @@
+import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 
@@ -18,7 +19,7 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
 });
 
-import { playerDecision, session, playCommand } from './helpers/battlePolicy';
+import { playerDecision, session, readSession, playCommand } from './helpers/battlePolicy';
 import { battleCatalog as catalog } from '../src/content/catalog';
 import { replayBattle } from '../src/domain/turns';
 import type { Command } from '../src/domain/types';
@@ -28,7 +29,7 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     test.setTimeout(180000);const errors:string[]=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    if(seed===2){await page.getByRole('button',{name:'Restart battle',exact:true}).click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);}
+    if(seed===2){await page.getByRole('button',{name:'Restart battle',exact:true}).click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(2);}
     for(let i=0;i<200;i++){
       await expect.poll(async()=> (await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
       const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
@@ -45,7 +46,14 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const replayPath=test.info().outputPath('replay.json');
     writeFileSync(replayPath,JSON.stringify(final,null,2));
     await test.info().attach('replay',{path:replayPath,contentType:'application/json'});
-    await page.locator('#dialog-restart').click();
+    // Reload the legally completed battle and rebuild its outcome without historical cues.
+    await page.reload();await page.locator('#save-continue').click();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
+    const continued=await readSession(page);expect(continued.state).toEqual(final.state);
+    expect(continued.replay).toBeNull();expect(continued.events).toEqual([]);
+    expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
+    await expect(page.getByRole('dialog')).toContainText(outcome==='playerWin'?'Victory':'Defeat');
+    await page.locator('#dialog-restart').click();await confirmRestart(page);
     await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await expect(page.locator('#fit-status')).toHaveText('Battle ready');
@@ -78,14 +86,14 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   await expect(page.getByRole('button',{name:'Basic attack',exact:true})).toBeDisabled();
   expect((await session(page)).replay.commands).toHaveLength(initial.replay.commands.length+1);
   await expect(page.getByRole('button',{name:'Restart battle',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});
+  await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});await confirmRestart(page,true);
   await page.clock.resume();
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const fresh=await session(page);expect(fresh.state.seed).toBe(2);expect(fresh.replay.commands.every(c=>fresh.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
   await page.getByRole('button',{name:'Review action'}).click();
-  await page.locator('#dialog-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
+  await page.locator('#dialog-restart').click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('canvas')).toHaveCount(1);
 });
@@ -141,6 +149,7 @@ test('real touch previews a board move, modal backdrop captures it, and suspend 
 test('keyboard-only movement, attack confirmation and Wait use the shared decision flow',async({page})=>{
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.locator('#fit-restart').focus();await page.keyboard.press('Enter');
+  await page.locator('#save-confirm-reset').focus();await page.keyboard.press('Enter');
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const enact=async(command:Command)=>{
@@ -178,8 +187,8 @@ test('restart during initial enemy animation discards the old run and its callba
   // An enemy end-turn commit advances initiative before its presentation completes.
   const first=await session(page),command=first.replay.commands.at(-1);
   expect(command).toBeDefined();expect(first.state.units.find(u=>u.id===command!.unitId)!.side).toBe('enemy');
-  await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
-  await page.locator('#fit-restart').click();await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
+  await page.locator('#fit-restart').click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
+  await page.locator('#fit-restart').click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(3);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const fresh=await session(page);expect(fresh.replay.initial.seed).toBe(3);
   const replay=replayBattle(fresh.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(fresh.state);
@@ -220,7 +229,7 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   expect((await session(page)).state.commandCount).toBe(before.state.commandCount+1);
   const replay=replayBattle((await session(page)).replay,catalog);expect(replay.ok).toBe(true);
   if(replay.ok)expect(replay.state).toEqual((await session(page)).state);
-  await page.getByRole('button',{name:'Restart battle',exact:true}).click();
+  await page.getByRole('button',{name:'Restart battle',exact:true}).click();await confirmRestart(page);
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect((await page.evaluate(()=>window.fitDiagnostics())).interactions).toEqual([]);

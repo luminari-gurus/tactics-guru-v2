@@ -1,3 +1,4 @@
+import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from '@playwright/test';
 import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
@@ -67,7 +68,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
     expect(after.commandCount).toBeGreaterThan(beforeCount);
   }
   expect(activeLabels.size).toBeGreaterThan(1);
-  await page.getByRole('button', { name: 'Restart battle' }).click();
+  await page.getByRole('button', { name: 'Restart battle' }).click();await confirmRestart(page);
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const restarted = await settledReport(page);
@@ -104,7 +105,7 @@ test('authored camera keeps zoom bounds and refits on real orientation changes',
   for (const viewport of [{ width: 412, height: 839 }, { width: 915, height: 412 }]) {
     await page.setViewportSize(viewport);
     await expect.poll(async () => (await report(page)).viewport).toEqual(viewport);
-    await page.getByRole('button', { name: 'Restart battle' }).click();
+    await page.getByRole('button', { name: 'Restart battle' }).click();await confirmRestart(page);
     await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const fitted = await settledReport(page);
@@ -181,7 +182,7 @@ test('default authored board renders canonical units, highlights and stable rest
     await page.screenshot({ path: test.info().outputPath(`authored-${orientation}.png`) });
   }
   for (let run = 0; run < 4; run++) {
-    await page.getByRole('button', { name: 'Restart battle' }).click();
+    await page.getByRole('button', { name: 'Restart battle' }).click();await confirmRestart(page);
     await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const value = await report(page);
@@ -260,7 +261,7 @@ test('authored visible picking survives resize, pan, zoom, DPR and drag completi
     await page.setViewportSize(viewport);
     await expect.poll(async () => (await report(page)).viewport).toEqual(viewport);
     for (const dpr of [1, 3]) {
-      await page.getByRole('button', { name: 'Restart battle' }).click();
+      await page.getByRole('button', { name: 'Restart battle' }).click();await confirmRestart(page);
       await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
       await session.send('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: dpr, mobile: false });

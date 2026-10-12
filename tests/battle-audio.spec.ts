@@ -1,3 +1,4 @@
+import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from '@playwright/test';
 import { session, playCommand, playerDecision } from './helpers/battlePolicy';
 import { battleCatalog as catalog } from '../src/content/catalog';
@@ -41,12 +42,12 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   expect((await session(page)).state).toEqual(before.state);
   for(let run=2;run<=6;run++){
     if(run===4)await page.locator('#battle-sound').click();
-    await page.locator('#fit-restart').click();await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));
+    await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));
     await ready(page);expect((await audio(page)).enabled).toBe(run<4);
     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
     await expect(page.locator('#battle-sound')).toHaveCount(1);
   }
-  await page.reload();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
+  await page.reload();await page.locator('#save-continue').click();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
 });
 
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
@@ -72,7 +73,7 @@ test('mute, hidden and context interruptions discard active feedback while comma
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));});
   await ready(page);await page.locator('#battle-sound').click();expect((await audio(page)).enabled).toBe(false);
   await enable(page);
-  await page.locator('#fit-restart').click();await ready(page); // Seed 2 begins with a player.
+  await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page); // Seed 2 begins with a player.
   await page.clock.pauseAt(start+120000);
   let enemy:Awaited<ReturnType<typeof session>>|undefined;
   for(let i=0;i<12;i++) {
@@ -141,7 +142,7 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   const started=(await audio(page)).started;
   await page.evaluate(()=>{window.__resumeFailure=false;});await page.locator('#battle-sound-retry').click();
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started});
-  await page.locator('#fit-restart').click();await expect(page.locator('#game')).toHaveAttribute('data-run','2');await ready(page);
+  await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run','2');await ready(page);
   const afterRestart=await audio(page);
   await page.evaluate(()=>window.__releaseResume?.());await page.waitForTimeout(100);
   expect(await audio(page)).toEqual(afterRestart);
@@ -169,7 +170,7 @@ for(const early of [true,false]) test(`HTML5 per-element permission survives ${e
   if(early)await page.route('**/audio/battle/**',async route=>{await held;await route.continue();});
   await page.goto('/');await ready(page);
   if(early){await page.locator('#battle-sound').click();release();}
-  else {await enable(page);await page.locator('#fit-restart').click();await ready(page);}
+  else {await enable(page);await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);}
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,load:'ready',status:'blocked',started:0});
   await expect(page.locator('#battle-sound-retry')).toBeVisible();
   const primed=early?0:8;
@@ -202,7 +203,7 @@ for(const mode of ['missing','corrupt','stalled','decode-stalled'] as const) tes
   await page.goto('/');await ready(page);
   if(mode==='stalled' || mode==='decode-stalled'){
     // Restart while optional work is pending, five times; old callbacks must stay inert.
-    for(let run=2;run<=6;run++) {await page.locator('#fit-restart').click();await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));}
+    for(let run=2;run<=6;run++) {await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));}
     await ready(page);
   }
   await expect.poll(()=>audio(page),{timeout:LOAD_TIMEOUT_MS+3000}).toMatchObject({load:'unavailable',started:0});
@@ -222,7 +223,7 @@ test('HTML5 fallback loads and plays future cues after a gesture',async({page})=
   await page.goto('/');await ready(page);await enable(page);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
   await expect.poll(()=>audio(page)).toMatchObject({started:1,completed:1,active:null});
-  await page.locator('#fit-restart').click();await ready(page);expect((await audio(page)).enabled).toBe(true);
+  await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);expect((await audio(page)).enabled).toBe(true);
   await expect.poll(()=>audio(page)).toMatchObject({load:'ready',status:'blocked'});
   await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready'});
   // Blur in the same event after the real Confirm handler starts the cue, before it can finish.
@@ -254,7 +255,7 @@ test('late decode from a destroyed scene cannot alter replacement controls or pl
     };
   });
   await page.goto('/');await ready(page);expect((await audio(page)).load).toBe('loading');
-  await page.locator('#fit-restart').click();
+  await page.locator('#fit-restart').click();await confirmRestart(page);
   // Restart is queued by Phaser; do not accept the outgoing scene's player phase.
   await expect.poll(async()=>(await session(page)).state.seed).toBe(2);await ready(page);
   await expect.poll(()=>audio(page)).toMatchObject({load:'ready',enabled:false,started:0});
@@ -269,9 +270,10 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`s
   test.setTimeout(360000);const found=errors(page);let silent:Awaited<ReturnType<typeof session>>|undefined;
   const heard=new Set<BattleCue>();
   for(const enabled of [false,true]) {
+    if(enabled)await page.evaluate(()=>{localStorage.removeItem('tactics-guru:phaser:battle:primary:v1');localStorage.removeItem('tactics-guru:phaser:battle:backup:v1');});
     await page.goto('/');await ready(page);
     if(enabled)await enable(page);
-    if(seed===2){await page.locator('#fit-restart').click();await expect.poll(async()=>(await session(page)).state.seed).toBe(2);}
+    if(seed===2){await page.locator('#fit-restart').click();await confirmRestart(page);await expect.poll(async()=>(await session(page)).state.seed).toBe(2);}
     for(let i=0;i<200;i++){
       await expect.poll(async()=>(await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
       (await audio(page)).recent.forEach(c=>heard.add(c));

@@ -21,7 +21,7 @@ export function saveFixtures(): SaveFixture[] {
   const fixtures: SaveFixture[] = [];
   for (const seed of [1, 2]) {
     const session = new BattleSession(battleCatalog, 'map:forest_ruins', seed);
-    const capture = (name: string) => fixtures.push({ name, catalog: battleCatalog, state: session.state, replay: session.replay });
+    const capture = (name: string) => fixtures.push({ name, catalog: battleCatalog, state: session.state, replay: session.replay! });
     capture(`start-${seed}`);
     const captured = new Set<string>();
     for (let i = 0; session.phase !== 'ended' && i < 300; i++) {
