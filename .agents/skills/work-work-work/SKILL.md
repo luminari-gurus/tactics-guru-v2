@@ -1,13 +1,13 @@
 ---
 name: work-work-work
-description: Refresh backlog readiness, select the best ready-for-work GitHub issue, assign the caller, publish a branch, prepare an OpenSpec plan, wait for approval, then implement and open a PR. Use when the user invokes /work-work-work or asks to pick up the next ready backlog issue.
+description: Refresh backlog readiness, select the best ready-for-work GitHub issue, assign the caller, publish a branch, prepare a proportional plan, wait for approval, then implement and open a PR. Use when the user invokes /work-work-work or asks to pick up the next ready backlog issue.
 ---
 
 # Work work work
 
 Invoking this workflow authorizes evidence-backed backlog readiness labeling,
 issue assignment, branch publication, and PR creation. Implementation requires
-explicit approval of the concrete OpenSpec plan. Creating this skill or
+explicit approval of the concrete implementation plan. Creating this skill or
 discussing it does not invoke the workflow.
 
 ## Select and claim
@@ -70,7 +70,25 @@ force-push. Confirm the remote branch and record the issue, caller, base and bra
 in the plan. If assignment or publishing fails, report the actual partial state
 and stop before implementation; do not claim publication succeeded.
 
-## Prepare the OpenSpec plan
+## Choose the planning scope
+
+Inspect the real code and acceptance criteria before choosing the planning path.
+Use a brief plan in chat when the change is small, localized and well understood,
+its acceptance criteria can be verified directly, and OpenSpec artifacts would
+add bulk without resolving meaningful design or requirements questions. Examples
+include a focused bug fix, copy adjustment or straightforward configuration edit.
+Judge by scope and uncertainty, not a fixed file or line count. Use OpenSpec for
+broader behavior changes, cross-cutting work, significant design decisions, or
+when the user or repository instructions explicitly require it.
+
+For the small-change path, do not initialize OpenSpec or create spec, proposal,
+design or task files solely for this issue. Present the issue and selection
+rationale, published branch link, reason OpenSpec is unnecessary, affected files,
+implementation steps and verification covering every acceptance criterion.
+Ask the caller to approve this concrete plan and **end the turn awaiting
+approval**. Do not edit application code or implement tests before approval.
+
+## Prepare the OpenSpec plan (when needed)
 
 Use existing OpenSpec instructions/configuration and installed skills if present.
 Otherwise check `openspec --version` and CLI help; if the CLI is missing, arrange
@@ -102,30 +120,33 @@ Revise requested plan changes and obtain approval of the revised plan.
 
 ## Implement after approval
 
-On continuation, recover the same issue, branch and OpenSpec change from the
-conversation and artifacts. Verify explicit caller approval of this plan; do not
-select another issue or create another branch. Read OpenSpec apply instructions
-and follow its tasks, checking them off only as completed. Record the approval
-in the task-specific plan, then implement autonomously within approved scope.
-For material scope changes, update the plan and obtain approval before that work.
+On continuation, recover the same issue, branch and approved plan from the
+conversation and any artifacts. Verify explicit caller approval of this plan;
+do not select another issue or create another branch. For OpenSpec work, read
+OpenSpec apply instructions and follow its tasks, checking them off only as
+completed, and record approval in the task-specific plan. For small changes,
+follow the approved chat plan without adding planning files. Implement
+autonomously within approved scope. For material scope changes, reassess whether
+OpenSpec is needed, update the plan and obtain approval before that work.
 
 Follow the issue's delivery guardrails and repository checks. For this repository,
 inspect the current package scripts and run relevant focused tests, full configured
 unit/browser tests, strict type checking, production build and `git diff --check`
 as required by the issue. Record actual results and unverified acceptance criteria;
 never claim emulated browser checks prove physical-device acceptance. Compare
-the final implementation against every acceptance criterion and OpenSpec task.
+the final implementation against every acceptance criterion and approved plan,
+including OpenSpec tasks when present.
 
 ## Open the PR
 
 Commit only this issue's changes, push the branch, and create a PR against the
 repository default branch with `gh pr create`, honoring any repository template.
 Use a body file for multiline descriptions. Include the problem/result, issue
-link, OpenSpec change and approval, validation commands/results, and remaining
+link, planning path and approval (link the OpenSpec change when present), validation commands/results, and remaining
 limitations. Add `Closes #<number>` only if all acceptance criteria are verified.
 If blocked or incomplete, open a draft PR with `Refs #<number>` and explain the
 remaining work instead of claiming completion. Do not merge the PR, close the
-issue manually, or archive OpenSpec before merge.
+issue manually, or archive an OpenSpec change before merge.
 
 Check for an existing PR for this branch before creation and reuse it on retries.
 Attach the PR to the task with the host's artifact tool when available. Return
