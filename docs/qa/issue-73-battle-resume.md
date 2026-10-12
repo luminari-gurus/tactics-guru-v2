@@ -1,5 +1,7 @@
 # Issue #73: battle autosave and resume evidence
 
+This is the original implementation evidence. The [PR #95 review repair record](issue-92-public-asset-base.md) covers the later rebase onto merged map routing, public asset-base correction and integrated verification.
+
 2026-10-12, Asia/Jerusalem. Implementation verified on `branch/issue-73-battle-resume`, based on main `3f3792025f29716c977cbdebff9d1c94b750ec3c`. Runtime implementation: `05f2d84937ee22ca1e47c690a2f7e141614a942e`. Final test additions: `f92da65440b39a8b45cca7e51b61b2342563836f`. Later handoff/evidence commits do not change runtime behavior.
 
 ## Acceptance mapping

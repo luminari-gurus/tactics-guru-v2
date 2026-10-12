@@ -2,11 +2,13 @@
 
 ## Context
 
+Integration update (2026-10-13): PR #95 is rebased onto main `a8e115a`, which includes PR #93's route extraction. Battle startup references below use its new `src/app/startBattleApp.ts` location; the guarded restart contract is unchanged. #92 is implemented as a separate OpenSpec change in the review repair. The following baseline description records the original planning context.
+
 See [proposal](proposal.md) for motivation and scope. Inspected base: `main` at `3f3792025f29716c977cbdebff9d1c94b750ec3c`; issue [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues/73); branch `branch/issue-73-battle-resume`; owner `moshehbenavraham`.
 
 `BattleSession.resolve` commits a frozen state before returning a `Presentation`; only `confirm` and `nextEnemy` reach it. `BattleScene.present` currently starts cues/animation after that return. `BattleSession` only constructs seed-created battles, and its replay getter assumes seed-origin history. The accepted snapshot codec preserves enemy continuation through state flags (including seed 2/command 29); it intentionally stores no historical commands.
 
-`createBattleStorage` exposes guarded `load`, `save` and `removeSlot`. It inspects both slots, preserves exact invalid text, and refuses ordinary writes if either slot is invalid/unreadable. Removal is conditional on an inspected value but is not a two-slot transaction. `src/main.ts` and `src/phaser/start.ts` currently invoke raw scene restart, bypassing any persistence coordination. The scene seed starts at 1 and advances modulo uint32 per new battle. These are the concrete seams to change.
+`createBattleStorage` exposes guarded `load`, `save` and `removeSlot`. It inspects both slots, preserves exact invalid text, and refuses ordinary writes if either slot is invalid/unreadable. Removal is conditional on an inspected value but is not a two-slot transaction. `src/app/startBattleApp.ts` and `src/phaser/start.ts` currently invoke raw scene restart, bypassing any persistence coordination. The scene seed starts at 1 and advances modulo uint32 per new battle. These are the concrete seams to change.
 
 ## Goals / Non-Goals
 
@@ -51,7 +53,7 @@ Under the accepted single-writer, individually atomic-call model, gate the visib
 
 If interruption occurs before both removals finish, a reload can offer the old battle because replacement never committed; that is an incomplete reset, not a successful New battle. If it occurs after both removals, reload sees no old battle. This is the chosen fallback for failed invalidation. Concurrent tab writers and browser eviction remain outside the adapter guarantee; document one active battle tab rather than claiming compare-and-swap or durable transactions.
 
-Routing must change at all three layers: `main.ts` must not unconditionally mark the app loading before a potentially refused battle restart; `start.ts` must delegate battle restart to the coordinator/scene request while proof keeps its existing restart; `BattleDialogs` callbacks must use that same request. Preserve the current single Phaser game/canvas and sound preference across successful scene restart. A failed reset must leave usable controls and focus, not strand an ended battle behind a dismissed outcome dialog.
+Routing must change at all three layers: `app/startBattleApp.ts` must not unconditionally mark the app loading before a potentially refused battle restart; `start.ts` must delegate battle restart to the coordinator/scene request while proof keeps its existing restart; `BattleDialogs` callbacks must use that same request. Preserve the current single Phaser game/canvas and sound preference across successful scene restart. A failed reset must leave usable controls and focus, not strand an ended battle behind a dismissed outcome dialog.
 
 ### 5. Native controls share existing input boundaries
 

@@ -18,7 +18,7 @@ Implementation of [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues
 
 - [x] 3.1 Integrate startup/Continue and committed-state rendering in `BattleScene.ts`; verify actual-control ongoing/ended continuation, no initial throwaway session or hidden enemy pump, and no historical animation/audio in focused browser tests.
 - [x] 3.2 Add native Continue/New battle/recovery/export/reset UI and visible nonfatal status using current dialog/HUD conventions; verify keyboard/touch/mouse, focus restoration, 44 CSS pixel targets, short landscape, lossless export and no click-through. Document the player flow and origin-scoped limits.
-- [x] 3.3 Route toolbar, confirmation-dialog and outcome restart through the same coordinator in `main.ts`, `start.ts` and scene wiring; verify failed reset leaves a usable current session, successful repeated restart retains one canvas and sound preference, and old callbacks/listeners cannot dispatch or save. Keep proof/content-smoke behavior passing.
+- [x] 3.3 Route toolbar, confirmation-dialog and outcome restart through the same coordinator in `app/startBattleApp.ts`, `start.ts` and scene wiring; verify failed reset leaves a usable current session, successful repeated restart retains one canvas and sound preference, and old callbacks/listeners cannot dispatch or save. Keep proof/content-smoke behavior passing.
 
 ## 4. Integration verification and delivery evidence
 
