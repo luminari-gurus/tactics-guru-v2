@@ -27,6 +27,19 @@ npm run preview
 
 `dist/` is generated static output, not committed. Vite currently warns about the single Phaser bundle size; production load-time optimization requires later measurement and is not claimed by this scaffold.
 
+### Application base paths
+
+Public images, portraits and audio follow Vite's base. Canonical catalog paths and save identities stay unchanged. For a prefixed development server use `npm run dev -- --base=/prototype/`. For a built preview:
+
+```sh
+npm run build -- --base=/prototype/
+npm run preview -- --base=/prototype/
+```
+
+Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` or `/prototype/map` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
+
+After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/prototype/ npm test -- tests/public-asset-base.spec.ts`; add `PLAYWRIGHT_SERVER_MODE=dev` to check development instead. Use `/` for root checks. These are shell environment assignments (in PowerShell, set `$env:PLAYWRIGHT_BASE_PATH='/prototype/'` and `$env:PLAYWRIGHT_SERVER_MODE='dev'` before `npm test`). Clear both variables and rebuild at root before running the complete default suite. See [review repair evidence](docs/qa/issue-92-public-asset-base.md).
+
 ## Browser smoke tests
 
 ```sh

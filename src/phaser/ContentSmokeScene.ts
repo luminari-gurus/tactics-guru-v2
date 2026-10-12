@@ -4,6 +4,7 @@ import type { ContentCatalog } from '../content/types';
 import { FIRST_MAP_TERRAIN_IDS, TERRAIN_TEXTURE_SPEC } from '../content/constants';
 import { boardBounds, fitBoard, projectTile, tileFaces, TILE_HEIGHT, TILE_WIDTH } from '../geometry/iso';
 import { contentLoadPlan, CONTENT_LOAD_TIMEOUT_MS, loadContentAssets } from './contentLoading';
+import { publicAssetUrl } from '../ui/publicAssetUrl';
 
 /** Ten adjacent ground surfaces only: no authored-board renderer, picking, or canopy. */
 export class ContentSmokeScene extends Phaser.Scene {
@@ -17,7 +18,7 @@ export class ContentSmokeScene extends Phaser.Scene {
     this.status('loading');
     let input: unknown = battleCatalog;
     if (new URLSearchParams(location.search).has('contentFixture')) {
-      const response = await fetch('/battle/content-fixture.json', { signal: AbortSignal.timeout(CONTENT_LOAD_TIMEOUT_MS) });
+      const response = await fetch(publicAssetUrl('/battle/content-fixture.json'), { signal: AbortSignal.timeout(CONTENT_LOAD_TIMEOUT_MS) });
       if (!response.ok) throw new Error('Invalid content: fixture could not load');
       input = await response.json();
     }

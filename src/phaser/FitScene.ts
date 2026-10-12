@@ -5,6 +5,7 @@ import { AUDIO_LOAD_TIMEOUT_MS, PROOF_AUDIO, PROOF_IMAGES, PROOF_FIXTURES, type 
 import { bindBoardInput } from './BoardInput';
 import { ProofBoardRenderer } from './ProofBoardRenderer';
 import { PROOF_AUDIO_KEYS, ProofAudio } from './ProofAudio';
+import { publicAssetUrl } from '../ui/publicAssetUrl';
 
 export const FIT_SCENE_KEY = 'fit';
 
@@ -35,7 +36,7 @@ export class FitScene extends Phaser.Scene {
     };
     this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed));
-    for (const asset of PROOF_IMAGES) if (!this.textures.exists(asset.key)) this.load.image(asset.key, asset.url);
+    for (const asset of PROOF_IMAGES) if (!this.textures.exists(asset.key)) this.load.image(asset.key, publicAssetUrl(asset.url));
   }
 
   create(): void {
@@ -52,7 +53,7 @@ export class FitScene extends Phaser.Scene {
     const pendingAudio = PROOF_AUDIO.filter(asset => !this.cache.audio.exists(asset.key));
     if (pendingAudio.length === 0) audioLoaded();
     else {
-      for (const asset of pendingAudio) this.load.audio(asset.key, asset.url, undefined, { responseType: 'arraybuffer', timeout: AUDIO_LOAD_TIMEOUT_MS });
+      for (const asset of pendingAudio) this.load.audio(asset.key, publicAssetUrl(asset.url), undefined, { responseType: 'arraybuffer', timeout: AUDIO_LOAD_TIMEOUT_MS });
       this.load.once(Phaser.Loader.Events.COMPLETE, audioLoaded);
       this.load.start();
     }
@@ -154,7 +155,7 @@ export class FitScene extends Phaser.Scene {
     };
     portrait.addEventListener('error', portraitFailed);
     portrait.addEventListener('load', markUsable);
-    portrait.src = PROOF_IMAGES.find(asset => asset.key === 'fighter-portrait')!.url;
+    portrait.src = publicAssetUrl(PROOF_IMAGES.find(asset => asset.key === 'fighter-portrait')!.url);
     portrait.hidden = false;
     const panel = document.querySelector<HTMLElement>('#fit-panel')!;
     const layoutBoard = (): void => {

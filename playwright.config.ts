@@ -1,17 +1,22 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Focused asset-base checks can exercise the same consumers in dev and built preview.
+const basePath = process.env.PLAYWRIGHT_BASE_PATH ?? '/';
+const serverMode = process.env.PLAYWRIGHT_SERVER_MODE === 'dev' ? 'dev' : 'preview';
+const baseURL = `http://127.0.0.1:4173${basePath}`;
+
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
   // Phaser renderers share the host GPU; serialize to avoid headless boot contention.
   workers: 1,
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL,
     launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE },
   },
   webServer: {
-    command: 'npm run preview -- --port 4173 --strictPort',
-    url: 'http://127.0.0.1:4173',
+    command: `npm run ${serverMode} -- --base=${basePath} --port 4173 --strictPort`,
+    url: baseURL,
     reuseExistingServer: false,
   },
   projects: [
