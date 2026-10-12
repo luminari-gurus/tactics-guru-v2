@@ -1,16 +1,16 @@
 # Issue #72: guarded battle storage and backup recovery
 
-Status: planning complete; implementation not started. Prepared 2026-10-12 (Asia/Jerusalem).
+Status: implementation authorized and in progress on 2026-10-12 (Asia/Jerusalem). The user requested OpenSpec implementation with ablation and a review-ready PR. See the maintained [session handoff](../plan.md).
 
 - [Issue #72](https://github.com/luminari-gurus/tactics-guru-v2/issues/72), under [safe-resume epic #58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58).
 - Assigned to `moshehbenavraham`; [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/72#issuecomment-6123387699).
 - Branch: [`branch/issue-72-battle-storage`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-72-battle-storage), created from the pinned base after planning and natively linked in #72's Development section.
-- Base: current merged `origin/main`, `d167ac97e56b4b192c9212d6eb596fdbb42fe743`.
+- Planning base: `d167ac97e56b4b192c9212d6eb596fdbb42fe743`. Before implementation, merged current `origin/main` at `5d83514` (documentation-only #82/#90) without conflicts or history rewriting.
 - Prerequisite: [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69) completed through [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70), merge `ea58370ceb442b22d7f247bc463c2cdddec12456`; verified as an ancestor of the base.
 - OpenSpec: [proposal](../../../openspec/changes/issue-72-battle-storage/proposal.md), [design](../../../openspec/changes/issue-72-battle-storage/design.md), [requirements](../../../openspec/changes/issue-72-battle-storage/specs/battle-storage/spec.md), [tasks](../../../openspec/changes/issue-72-battle-storage/tasks.md).
 - Local physical capability: `CAN_TEST_MOBILE=android`, read from the original checkout. Required physical platforms for this adapter-only child: none. Device/browser access beyond that platform declaration is unverified.
 
-## Backlog review and selection
+## Backlog review and selection (historical planning snapshot)
 
 Read all 22 open repository issues with pagination, including bodies, labels, assignees, all available comments, native dependency relationships and linked branches. Inspected the single open PR (#12), remote branches and current merged main. Native dependency edges were empty; the dependencies below come from issue bodies, not invented GitHub relationships. Private project-only drafts could not be enumerated because the credential lacks `read:project`; the completeness claim is limited to this repository's open issues.
 
