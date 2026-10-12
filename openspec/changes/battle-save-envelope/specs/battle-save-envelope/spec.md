@@ -46,6 +46,14 @@ Round-tripping an accepted player or enemy command boundary SHALL preserve state
 - **WHEN** empty, mid-battle, maximum-bound, victory and defeat fixtures are round-tripped
 - **THEN** each retains its valid outcome, state and continuation semantics, including rejection of further actions when the battle has ended or exhausted its command limit
 
+#### Scenario: Enemy attack with unused movement
+- **WHEN** an accepted enemy attack is captured during presentation with `hasActed: true` and `hasMoved: false`
+- **THEN** remaining-turn reconstruction yields only Wait, preserving the uninterrupted session's next accepted command, events, state and turn ownership without serializing its transient queue
+
+#### Scenario: Remaining enemy plan after an accepted prefix
+- **WHEN** a nonterminal enemy move or attack from the current policy has committed and command capacity remains
+- **THEN** replanning the accepted state yields the unexecuted plan suffix, and decoded-boundary continuation agrees with the original session's queued decisions
+
 ### Requirement: Decode failures preserve caller data
 Encoding and decoding SHALL be pure and non-mutating. Failures MUST leave original serialized text, caller state and catalog available to the caller without deletion, replacement or persistent side effects.
 

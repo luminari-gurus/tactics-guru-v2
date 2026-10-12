@@ -34,9 +34,12 @@ function commands(state: BattleState, catalog: ContentCatalog) {
   const result = planEnemyTurn(state, 3, catalog); assert(result.ok, JSON.stringify(result)); return result.commands;
 }
 function checkLegal(state: BattleState, catalog: ContentCatalog, list: readonly Command[]) {
-  for (const command of list) {
+  for (const [index, command] of list.entries()) {
     const result = dispatch(state, command, catalog); assert(result.ok, JSON.stringify(result)); state = result.state;
     if (state.outcome !== 'ongoing') break;
+    if (index + 1 < list.length && state.commandCount < RULE_BOUNDS.commandCount.max) {
+      expect(commands(state, catalog)).toEqual(list.slice(index + 1));
+    }
   }
   return state;
 }
@@ -200,12 +203,11 @@ describe('movement and Wait fallback', () => {
     expect(commands(s, wall)).toEqual([wait]);
     checkLegal(s, wall, [wait]);
   });
-  it('never spends move/action twice and preserves the input snapshot and RNG', () => {
+  it('Waits after acting even with unused movement, without mutating the snapshot or RNG', () => {
     const { state, catalog } = setup(true);
     const before = JSON.stringify(state);
     expect(commands(changeUnit(state, 3, { hasMoved: true }), catalog)).toEqual([attack(1, true), wait]);
-    expect(commands(changeUnit(state, 3, { hasActed: true }), catalog)).toEqual([
-      { type: 'move', unitId: 3, to: { x: 1, y: 1 } }, wait]);
+    expect(commands(changeUnit(state, 3, { hasActed: true }), catalog)).toEqual([wait]);
     expect(commands(changeUnit(state, 3, { hasActed: true, hasMoved: true }), catalog)).toEqual([wait]);
     expect(JSON.stringify(state)).toBe(before);
   });

@@ -30,6 +30,36 @@ const wrap = (payload: unknown) => {
 };
 
 describe('accepted snapshot boundaries', () => {
+  it.each([1, 2, 3, 4, 5])('matches the uninterrupted queued continuation at every boundary: seed %i', seed => {
+    const session = new BattleSession(battleCatalog, 'map:forest_ruins', seed);
+    let restored = decodeBattleSave(encoded(session.state, battleCatalog), battleCatalog); assert(restored.ok);
+    let postAttackBoundary = false;
+    for (let i = 0; session.phase !== 'ended' && i < 300; i++) {
+      const state = restored.state;
+      const actor = state.units.find(u => u.id === state.initiative[state.activeIndex])!;
+      const plan = actor.side === 'enemy' ? planEnemyTurn(state, actor.id, battleCatalog) : null;
+      if (plan) assert(plan.ok);
+      const command = plan?.ok ? plan.commands[0] : playerDecision(state);
+      if (seed === 2 && state.commandCount === 29) {
+        postAttackBoundary = true;
+        expect(actor).toMatchObject({ id: 5, cell: { x: 3, y: 4 }, hasActed: true, hasMoved: false });
+        expect(command).toEqual({ type: 'endTurn', unitId: 5 });
+      }
+      // Select the original session's command independently; its existing queue is the oracle.
+      if (session.phase === 'player') expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+      const step = session.phase === 'player' ? session.confirm() : session.nextEnemy(); assert(step);
+      expect(command).toEqual(session.replay.commands.at(-1));
+      expect(dispatch(state, command, battleCatalog)).toEqual({ ok: true, state: step.after, events: step.events });
+      expect(session.phase).toBe('presenting');
+      restored = decodeBattleSave(encoded(session.state, battleCatalog), battleCatalog); assert(restored.ok);
+      expect(restored.state).toEqual(step.after);
+      expect(nextUint32(restored.state.rng)).toEqual(nextUint32(step.after.rng));
+      session.finishPresentation(step.token);
+    }
+    expect(session.phase).toBe('ended');
+    if (seed === 2) expect(postAttackBoundary).toBe(true);
+  });
+
   for (const name of ['start-1', 'start-2', 'player-presenting', 'enemy-presenting', 'guarded-presenting', 'playerWin', 'playerLoss', 'maximum-commands']) {
     it(`preserves state, next command/events, RNG and enemy decisions: ${name}`, () => {
       const fixture = fixtures.find(f => f.name === name)!;

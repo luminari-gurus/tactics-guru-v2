@@ -45,7 +45,7 @@ function damageScore(preview: AttackPreview): number {
 const attackOrder = (a: AttackCandidate, b: AttackCandidate) => b.score - a.score || a.cost - b.cost ||
   a.targetId - b.targetId || lexical(a.command.abilityId, b.command.abilityId) || cellOrder(a, b);
 
-/** At most one move, one ordinary attack, and Wait. Hypothetical moves use the same resolver as real moves. */
+/** Ordered optional move, optional ordinary attack, then Wait; also reconstructs an accepted plan's remainder. */
 export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCatalog): EnemyPlan {
   const checked = readEnemyState(input, catalog); if (!checked.ok) return checked;
   const state = checked.state;
@@ -53,6 +53,8 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   const intent = previewCommand(state, wait, catalog); if (!intent.ok) return intent;
   const actor = state.units.find(u => u.id === unitId)!;
   if (actor.side !== 'enemy') return { ok: false, reason: 'notEnemyUnit' };
+  // An attack commits the last decision before Wait, even when movement was unused.
+  if (actor.hasActed) return { ok: true, commands: [wait] };
   const positions: Position[] = [{ cell: actor.cell, cost: 0, state }];
   if (!actor.hasMoved) {
     const reachable = previewMovement(state, unitId, catalog); if (!reachable.ok) return reachable;
@@ -67,7 +69,7 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   const abilities = Object.values(catalog.abilities).filter(a => a.kind === 'attack' && a.owners.includes(actor.defId))
     .sort((a, b) => lexical(a.id, b.id));
   const attacks: AttackCandidate[] = [];
-  if (!actor.hasActed) for (const position of positions) for (const target of targets) for (const ability of abilities) {
+  for (const position of positions) for (const target of targets) for (const ability of abilities) {
     const command = { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } } as const;
     const preview = previewAttack(position.state, command, catalog);
     if (preview.ok) attacks.push({ ...position, command, score: damageScore(preview), targetId: target.id });

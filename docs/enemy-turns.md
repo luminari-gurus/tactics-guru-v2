@@ -8,6 +8,8 @@ Attack ordering is higher expected damage, lower movement cost, lower target ID,
 
 This greedy policy can wait at obstacles requiring a temporary move away from the target. It has no difficulty profiles, signature evaluator, hazard strategy or multi-turn lookahead. Domain execution uses no browser globals, timers or external entropy.
 
+Plans order optional movement, optional attack, then Wait. After state/actor validation, `hasActed: true` returns only Wait, even if `hasMoved: false`: an attack has already committed the final decision before Wait. After an accepted move, replanning from the new origin selects the same attack or Wait as the original plan suffix. Thus accepted nonterminal snapshots can reconstruct the existing session queue without storing it. This policy does not remove the domain's legal move-after-attack command; it preserves the enemy session's existing choices. Ended or command-exhausted snapshots still reject through shared validation.
+
 ## Execution and #10 hand-off
 
 `runEnemyTurn(snapshot, unitId, catalog)` plans once, dispatches sequentially and attempts at most one move, one attack and one Wait. An attack ending the battle stops execution before Wait. Success returns `state`, accepted `commands` and ordered `events`. Rejection returns `ok: false`, a typed `reason`, the last valid `state`, and the accepted prefix of commands/events; malformed snapshots return `state: undefined`. The rejected command itself changes nothing, and there are no retries or automatic turn advances. A move accepted before an attack rejection stays explicitly represented in the result.
