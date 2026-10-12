@@ -1,5 +1,7 @@
 # Tactics Guru v2
 
+The standalone [overworld map prototype](docs/qa/issue-87-overworld-map.md) opens at `/map` (under the configured base path when applicable). Enter a seed from 0 to 4294967295 and press Generate to reproduce a layout, or New seed for another 20×20 map. Walkable and blocked cells have a legend. This inspection prototype uses no battle state or persistence; the normal entry path still opens the battle.
+
 Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Design plans are maintained outside this repository.
 
 The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.

@@ -1,0 +1,63 @@
+{
+  "package": "rot-js@2.2.1",
+  "sizes": {
+    "rot": {
+      "raw": 16534,
+      "gzip": 4735,
+      "sha256": "cdf1c9f5545f578d6e7deb91326d66e929cc338de60f4be9df8212decddcb5d5"
+    },
+    "local/generate": {
+      "raw": 3635,
+      "gzip": 1527,
+      "sha256": "fb8b93b705f0b487f63c6180f9c5a8795c3e04ca67fd47063a3b794f77bfaf47"
+    }
+  },
+  "results": {
+    "local": {
+      "seeds": 260,
+      "valid": 260,
+      "failed": [],
+      "clockChanged": 0,
+      "fallback": 0,
+      "minFloor": 65,
+      "maxFloor": 171,
+      "distinctSequential": 256
+    },
+    "digger": {
+      "seeds": 260,
+      "valid": 260,
+      "failed": [],
+      "clockChanged": 260,
+      "fallback": 0,
+      "minFloor": 86,
+      "maxFloor": 147,
+      "distinctSequential": 256
+    },
+    "rogue": {
+      "seeds": 260,
+      "valid": 258,
+      "failed": [
+        0,
+        148
+      ],
+      "clockChanged": 0,
+      "fallback": 0,
+      "minFloor": 124,
+      "maxFloor": 155,
+      "distinctSequential": 256
+    }
+  },
+  "selectiveClosure": {
+    "files": 7,
+    "bytes": 44440,
+    "paths": [
+      "lib/map/digger.js",
+      "lib/map/dungeon.js",
+      "lib/map/map.js",
+      "lib/constants.js",
+      "lib/map/features.js",
+      "lib/rng.js",
+      "lib/map/rogue.js"
+    ]
+  }
+}
