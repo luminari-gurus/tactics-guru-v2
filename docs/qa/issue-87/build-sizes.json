@@ -1,0 +1,506 @@
+{
+  "baseline": {
+    "index.html": {
+      "raw": 3107,
+      "gzip": 1105
+    },
+    "battle/source/mage_portrait.png": {
+      "raw": 3341167,
+      "gzip": 3322116
+    },
+    "battle/source/ranger_sprite.png": {
+      "raw": 9093,
+      "gzip": 9116
+    },
+    "battle/source/goblin_archer_sprite.png": {
+      "raw": 10218,
+      "gzip": 10241
+    },
+    "battle/source/goblin_grunt_sprite.png": {
+      "raw": 9301,
+      "gzip": 9324
+    },
+    "battle/source/mage_sprite.png": {
+      "raw": 9565,
+      "gzip": 9588
+    },
+    "battle/source/ranger_portrait.png": {
+      "raw": 3217805,
+      "gzip": 3198972
+    },
+    "battle/source/goblin_grunt_portrait.png": {
+      "raw": 3315031,
+      "gzip": 3296122
+    },
+    "battle/source/goblin_archer_portrait.png": {
+      "raw": 3246286,
+      "gzip": 3227463
+    },
+    "battle/portraits/fighter.png": {
+      "raw": 20759,
+      "gzip": 20760
+    },
+    "battle/portraits/mage.png": {
+      "raw": 20670,
+      "gzip": 20675
+    },
+    "battle/portraits/ranger.png": {
+      "raw": 19887,
+      "gzip": 19865
+    },
+    "battle/portraits/goblin_archer.png": {
+      "raw": 20415,
+      "gzip": 20421
+    },
+    "battle/portraits/goblin_grunt.png": {
+      "raw": 20552,
+      "gzip": 20541
+    },
+    "battle/terrain/forest.png": {
+      "raw": 139184,
+      "gzip": 139218
+    },
+    "battle/terrain/grass_path.png": {
+      "raw": 139394,
+      "gzip": 139095
+    },
+    "battle/terrain/grass.png": {
+      "raw": 140320,
+      "gzip": 140306
+    },
+    "battle/terrain/stone.png": {
+      "raw": 142882,
+      "gzip": 141948
+    },
+    "battle/terrain/water.png": {
+      "raw": 118205,
+      "gzip": 118101
+    },
+    "proof/fighter.png": {
+      "raw": 8843,
+      "gzip": 8866
+    },
+    "proof/unlock-tone.ogg": {
+      "raw": 3768,
+      "gzip": 3083
+    },
+    "proof/fighter-portrait.png": {
+      "raw": 3285110,
+      "gzip": 3267077
+    },
+    "proof/fighter-portrait-96.webp": {
+      "raw": 4568,
+      "gzip": 4591
+    },
+    "proof/grass-material-v1-348.png": {
+      "raw": 260162,
+      "gzip": 260260
+    },
+    "proof/unlock-tone.mp3": {
+      "raw": 1462,
+      "gzip": 1401
+    },
+    "proof/tree-grass-v1-480.webp": {
+      "raw": 54200,
+      "gzip": 54223
+    },
+    "proof/tree-grass-v1.png": {
+      "raw": 1117492,
+      "gzip": 1081940
+    },
+    "proof/grass-material-v1.png": {
+      "raw": 2980361,
+      "gzip": 2945190
+    },
+    "textures/terrain/mud-top-down-v1.png": {
+      "raw": 2904905,
+      "gzip": 2837083
+    },
+    "textures/terrain/stone-top-down-v1.png": {
+      "raw": 3643289,
+      "gzip": 3538448
+    },
+    "textures/terrain/forest-top-down-v1.png": {
+      "raw": 3534917,
+      "gzip": 3463991
+    },
+    "textures/terrain/water-top-down-v1.png": {
+      "raw": 2209240,
+      "gzip": 2134350
+    },
+    "textures/terrain/cliff-top-down-v1.png": {
+      "raw": 3786663,
+      "gzip": 3652247
+    },
+    "textures/terrain/grass-top-down-v1.png": {
+      "raw": 3184845,
+      "gzip": 3135830
+    },
+    "textures/terrain/grass_path-top-down-v1.png": {
+      "raw": 3133231,
+      "gzip": 3083876
+    },
+    "textures/terrain/lava-top-down-v1.png": {
+      "raw": 3557231,
+      "gzip": 3483580
+    },
+    "textures/terrain/ash-top-down-v1.png": {
+      "raw": 4187512,
+      "gzip": 4006141
+    },
+    "textures/terrain/sand-top-down-v1.png": {
+      "raw": 2786755,
+      "gzip": 2701603
+    },
+    "textures/terrain/runtime/mud-top-down-v1.png": {
+      "raw": 130199,
+      "gzip": 129232
+    },
+    "textures/terrain/runtime/stone-top-down-v1.png": {
+      "raw": 144308,
+      "gzip": 143584
+    },
+    "textures/terrain/runtime/forest-top-down-v1.png": {
+      "raw": 140495,
+      "gzip": 140558
+    },
+    "textures/terrain/runtime/water-top-down-v1.png": {
+      "raw": 119204,
+      "gzip": 119121
+    },
+    "textures/terrain/runtime/cliff-top-down-v1.png": {
+      "raw": 141652,
+      "gzip": 140166
+    },
+    "textures/terrain/runtime/grass-top-down-v1.png": {
+      "raw": 141658,
+      "gzip": 141667
+    },
+    "textures/terrain/runtime/grass_path-top-down-v1.png": {
+      "raw": 140735,
+      "gzip": 140426
+    },
+    "textures/terrain/runtime/lava-top-down-v1.png": {
+      "raw": 142572,
+      "gzip": 142455
+    },
+    "textures/terrain/runtime/ash-top-down-v1.png": {
+      "raw": 137926,
+      "gzip": 136220
+    },
+    "textures/terrain/runtime/sand-top-down-v1.png": {
+      "raw": 95984,
+      "gzip": 95986
+    },
+    "audio/battle/miss.mp3": {
+      "raw": 1063,
+      "gzip": 893
+    },
+    "audio/battle/critical.mp3": {
+      "raw": 1376,
+      "gzip": 1265
+    },
+    "audio/battle/magic.mp3": {
+      "raw": 1481,
+      "gzip": 1381
+    },
+    "audio/battle/hit.mp3": {
+      "raw": 958,
+      "gzip": 788
+    },
+    "audio/battle/victory.mp3": {
+      "raw": 2212,
+      "gzip": 1953
+    },
+    "audio/battle/move.mp3": {
+      "raw": 958,
+      "gzip": 769
+    },
+    "audio/battle/loss.mp3": {
+      "raw": 2212,
+      "gzip": 1861
+    },
+    "audio/battle/unit-defeat.mp3": {
+      "raw": 1481,
+      "gzip": 1268
+    },
+    "assets/browser-CGyDMSVn.js": {
+      "raw": 3264,
+      "gzip": 1372
+    },
+    "assets/index-D2fzDm50.css": {
+      "raw": 3256,
+      "gzip": 1224
+    },
+    "assets/index-DRNCDWtF.js": {
+      "raw": 4517,
+      "gzip": 1932
+    },
+    "assets/start-CFaFkw50.js": {
+      "raw": 1488027,
+      "gzip": 384632
+    }
+  },
+  "implementation": {
+    "index.html": {
+      "raw": 3040,
+      "gzip": 1081
+    },
+    "battle/source/mage_portrait.png": {
+      "raw": 3341167,
+      "gzip": 3322116
+    },
+    "battle/source/ranger_sprite.png": {
+      "raw": 9093,
+      "gzip": 9116
+    },
+    "battle/source/goblin_archer_sprite.png": {
+      "raw": 10218,
+      "gzip": 10241
+    },
+    "battle/source/goblin_grunt_sprite.png": {
+      "raw": 9301,
+      "gzip": 9324
+    },
+    "battle/source/mage_sprite.png": {
+      "raw": 9565,
+      "gzip": 9588
+    },
+    "battle/source/ranger_portrait.png": {
+      "raw": 3217805,
+      "gzip": 3198972
+    },
+    "battle/source/goblin_grunt_portrait.png": {
+      "raw": 3315031,
+      "gzip": 3296122
+    },
+    "battle/source/goblin_archer_portrait.png": {
+      "raw": 3246286,
+      "gzip": 3227463
+    },
+    "battle/portraits/fighter.png": {
+      "raw": 20759,
+      "gzip": 20760
+    },
+    "battle/portraits/mage.png": {
+      "raw": 20670,
+      "gzip": 20675
+    },
+    "battle/portraits/ranger.png": {
+      "raw": 19887,
+      "gzip": 19865
+    },
+    "battle/portraits/goblin_archer.png": {
+      "raw": 20415,
+      "gzip": 20421
+    },
+    "battle/portraits/goblin_grunt.png": {
+      "raw": 20552,
+      "gzip": 20541
+    },
+    "battle/terrain/forest.png": {
+      "raw": 139184,
+      "gzip": 139218
+    },
+    "battle/terrain/grass_path.png": {
+      "raw": 139394,
+      "gzip": 139095
+    },
+    "battle/terrain/grass.png": {
+      "raw": 140320,
+      "gzip": 140306
+    },
+    "battle/terrain/stone.png": {
+      "raw": 142882,
+      "gzip": 141948
+    },
+    "battle/terrain/water.png": {
+      "raw": 118205,
+      "gzip": 118101
+    },
+    "proof/fighter.png": {
+      "raw": 8843,
+      "gzip": 8866
+    },
+    "proof/unlock-tone.ogg": {
+      "raw": 3768,
+      "gzip": 3083
+    },
+    "proof/fighter-portrait.png": {
+      "raw": 3285110,
+      "gzip": 3267077
+    },
+    "proof/fighter-portrait-96.webp": {
+      "raw": 4568,
+      "gzip": 4591
+    },
+    "proof/grass-material-v1-348.png": {
+      "raw": 260162,
+      "gzip": 260260
+    },
+    "proof/unlock-tone.mp3": {
+      "raw": 1462,
+      "gzip": 1401
+    },
+    "proof/tree-grass-v1-480.webp": {
+      "raw": 54200,
+      "gzip": 54223
+    },
+    "proof/tree-grass-v1.png": {
+      "raw": 1117492,
+      "gzip": 1081940
+    },
+    "proof/grass-material-v1.png": {
+      "raw": 2980361,
+      "gzip": 2945190
+    },
+    "textures/terrain/mud-top-down-v1.png": {
+      "raw": 2904905,
+      "gzip": 2837083
+    },
+    "textures/terrain/stone-top-down-v1.png": {
+      "raw": 3643289,
+      "gzip": 3538448
+    },
+    "textures/terrain/forest-top-down-v1.png": {
+      "raw": 3534917,
+      "gzip": 3463991
+    },
+    "textures/terrain/water-top-down-v1.png": {
+      "raw": 2209240,
+      "gzip": 2134350
+    },
+    "textures/terrain/cliff-top-down-v1.png": {
+      "raw": 3786663,
+      "gzip": 3652247
+    },
+    "textures/terrain/grass-top-down-v1.png": {
+      "raw": 3184845,
+      "gzip": 3135830
+    },
+    "textures/terrain/grass_path-top-down-v1.png": {
+      "raw": 3133231,
+      "gzip": 3083876
+    },
+    "textures/terrain/lava-top-down-v1.png": {
+      "raw": 3557231,
+      "gzip": 3483580
+    },
+    "textures/terrain/ash-top-down-v1.png": {
+      "raw": 4187512,
+      "gzip": 4006141
+    },
+    "textures/terrain/sand-top-down-v1.png": {
+      "raw": 2786755,
+      "gzip": 2701603
+    },
+    "textures/terrain/runtime/mud-top-down-v1.png": {
+      "raw": 130199,
+      "gzip": 129232
+    },
+    "textures/terrain/runtime/stone-top-down-v1.png": {
+      "raw": 144308,
+      "gzip": 143584
+    },
+    "textures/terrain/runtime/forest-top-down-v1.png": {
+      "raw": 140495,
+      "gzip": 140558
+    },
+    "textures/terrain/runtime/water-top-down-v1.png": {
+      "raw": 119204,
+      "gzip": 119121
+    },
+    "textures/terrain/runtime/cliff-top-down-v1.png": {
+      "raw": 141652,
+      "gzip": 140166
+    },
+    "textures/terrain/runtime/grass-top-down-v1.png": {
+      "raw": 141658,
+      "gzip": 141667
+    },
+    "textures/terrain/runtime/grass_path-top-down-v1.png": {
+      "raw": 140735,
+      "gzip": 140426
+    },
+    "textures/terrain/runtime/lava-top-down-v1.png": {
+      "raw": 142572,
+      "gzip": 142455
+    },
+    "textures/terrain/runtime/ash-top-down-v1.png": {
+      "raw": 137926,
+      "gzip": 136220
+    },
+    "textures/terrain/runtime/sand-top-down-v1.png": {
+      "raw": 95984,
+      "gzip": 95986
+    },
+    "audio/battle/miss.mp3": {
+      "raw": 1063,
+      "gzip": 893
+    },
+    "audio/battle/critical.mp3": {
+      "raw": 1376,
+      "gzip": 1265
+    },
+    "audio/battle/magic.mp3": {
+      "raw": 1481,
+      "gzip": 1381
+    },
+    "audio/battle/hit.mp3": {
+      "raw": 958,
+      "gzip": 788
+    },
+    "audio/battle/victory.mp3": {
+      "raw": 2212,
+      "gzip": 1953
+    },
+    "audio/battle/move.mp3": {
+      "raw": 958,
+      "gzip": 769
+    },
+    "audio/battle/loss.mp3": {
+      "raw": 2212,
+      "gzip": 1861
+    },
+    "audio/battle/unit-defeat.mp3": {
+      "raw": 1481,
+      "gzip": 1268
+    },
+    "assets/browser-CGyDMSVn.js": {
+      "raw": 3264,
+      "gzip": 1372
+    },
+    "assets/preload-helper-DjzSQ1t3.js": {
+      "raw": 1383,
+      "gzip": 751
+    },
+    "assets/startBattleApp-D2fzDm50.css": {
+      "raw": 3256,
+      "gzip": 1224
+    },
+    "assets/view-DhyIpuHq.js": {
+      "raw": 3457,
+      "gzip": 1739
+    },
+    "assets/view-B7ToxOtF.css": {
+      "raw": 1936,
+      "gzip": 826
+    },
+    "assets/rng-CkITdvgm.js": {
+      "raw": 1651,
+      "gzip": 789
+    },
+    "assets/start-HjUNqyD3.js": {
+      "raw": 1486502,
+      "gzip": 384126
+    },
+    "assets/index-Cze7SRBa.js": {
+      "raw": 1347,
+      "gzip": 720
+    },
+    "assets/startBattleApp-BrZ2xVNa.js": {
+      "raw": 2555,
+      "gzip": 1077
+    }
+  }
+}
