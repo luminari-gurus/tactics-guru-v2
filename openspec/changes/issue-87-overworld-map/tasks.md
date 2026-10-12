@@ -25,3 +25,7 @@
 ## Workflow follow-up
 
 - Merge and archive require later workflow steps; do not merge, close the issue manually or archive before merge.
+
+## PR review hardening
+
+- [x] Add an entry-level route-import error boundary for the failure reported in [review](https://github.com/luminari-gurus/tactics-guru-v2/pull/93#discussion_r4249483161), as explicitly requested by the user. Controlled-abort browser checks cover both route chunks, readable reload guidance, isolation, no unhandled page error and successful reload recovery across all configured profiles.

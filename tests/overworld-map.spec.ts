@@ -1,5 +1,36 @@
 import { expect, test } from '@playwright/test';
 
+for (const { path, chunk, otherChunk } of [
+  { path: '/map', chunk: 'view-', otherChunk: 'startBattleApp-' },
+  { path: '/', chunk: 'startBattleApp-', otherChunk: 'view-' },
+]) {
+  test(`failed route import at ${path} shows a reload instruction`, async ({ page }) => {
+    const errors: string[] = [];
+    const scripts: string[] = [];
+    let aborted = false;
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('request', request => {
+      if (request.resourceType() === 'script') scripts.push(request.url());
+    });
+    await page.route(`**/assets/${chunk}*.js`, route => {
+      aborted = true;
+      return route.abort();
+    });
+    await page.goto(path);
+    await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+    expect(aborted).toBe(true);
+    await expect(page.locator('#fit-restart')).toBeDisabled();
+    await expect(page.locator('canvas, #map-grid')).toHaveCount(0);
+    expect(scripts.some(url => url.includes(`/assets/${otherChunk}`))).toBe(false);
+    expect(errors).toEqual([]);
+    await page.unrouteAll();
+    await page.reload();
+    if (path === '/map') await expect(page.locator('#map-grid span')).toHaveCount(400);
+    else await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+    expect(errors).toEqual([]);
+  });
+}
+
 test('map direct entry, refresh, seeds and responsive inspection', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));

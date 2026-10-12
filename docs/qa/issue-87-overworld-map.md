@@ -70,3 +70,9 @@ Reproduction commands: `npm run test:unit`, `npm run validate:content`, `npm run
 Visual review: [desktop](issue-87/desktop.png), [portrait](issue-87/mobile-portrait.png), [landscape](issue-87/mobile-landscape.png). Full-page captures retain the scrollable layout; short landscape allows vertical scrolling to keep all cells legible.
 
 Delivery: [PR #93](https://github.com/luminari-gurus/tactics-guru-v2/pull/93), runtime implementation `136cdd0551e9140a308990d36b3f7801f5b6b788`. Later evidence/task updates are documentation only. All workflow tasks and #87 acceptance criteria are verified within the documented prototype scope. PR is ready for review; the baseline non-root battle asset defect remains isolated in #92. No merge, manual issue closure or OpenSpec archive occurred.
+
+## Review fix: route import failure
+
+The user requested the resilience fix from [review discussion](https://github.com/luminari-gurus/tactics-guru-v2/pull/93#discussion_r4249483161). `src/main.ts` now catches selected route bootstrap failures and displays an accessible alert with a reload instruction in the existing shell. Failed map loads do not import battle startup. Controlled-abort browser tests cover both selected chunks, disabled restart, absent map/canvas, no unhandled page error, route isolation and successful reload after removing the abort.
+
+Verification after this fix: focused browser 15/15; full configured browser 240/240 (12.9 minutes); unit 325/325; content 77/77; both strict typechecks and production build passed; strict OpenSpec and whitespace checks passed. Existing Phaser bundle-size warning remains. Earlier hosted acceptance identifies the pre-fix runtime commit; deployment verification of this fix is separate from these local checks.
