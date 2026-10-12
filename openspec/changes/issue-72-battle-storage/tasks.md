@@ -1,6 +1,6 @@
 # Tasks
 
-Implementation authorized on 2026-10-12 and in progress. Use [design](design.md) and the [acceptance mapping](../../../docs/ongoing-projects/issue-72-battle-storage/plan.md) for #72 on `branch/issue-72-battle-storage`.
+Implementation authorized and completed on 2026-10-12. All required local checks passed; see [QA](../../../docs/qa/issue-72-battle-storage.md), [design](design.md) and the [acceptance mapping](../../../docs/ongoing-projects/issue-72-battle-storage/plan.md) for #72 on `branch/issue-72-battle-storage`.
 
 ## 1. Guarded inspection and recovery
 
@@ -19,8 +19,8 @@ Implementation authorized on 2026-10-12 and in progress. Use [design](design.md)
 
 ## 4. Integration verification and delivery evidence
 
-- [ ] 4.1 Run focused adapter/codec/domain tests, all configured unit and content checks, both typechecks, production build and the configured browser suite; record commands, exact revision, failures and remaining limits in `docs/qa/issue-72-battle-storage.md`, without treating emulation as physical persistence acceptance.
-- [ ] 4.2 Link the completed adapter guide from `docs/battle-save-format.md`, reconcile this plan with actual delivery, and verify all #72 acceptance criteria, strict OpenSpec validation, relative document links and `git diff --check`; keep #73/#74 and parent gates explicitly open.
+- [x] 4.1 Run focused adapter/codec/domain tests, all configured unit and content checks, both typechecks, production build and the configured browser suite; record commands, exact revision, failures and remaining limits in `docs/qa/issue-72-battle-storage.md`, without treating emulation as physical persistence acceptance.
+- [x] 4.2 Link the completed adapter guide from `docs/battle-save-format.md`, reconcile this plan with actual delivery, and verify all #72 acceptance criteria, strict OpenSpec validation, relative document links and `git diff --check`; keep #73/#74 and parent gates explicitly open.
 
 ## Workflow follow-up
 

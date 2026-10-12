@@ -1,6 +1,6 @@
 # Issue #72: guarded battle storage and backup recovery
 
-Status: implementation authorized and in progress on 2026-10-12 (Asia/Jerusalem). The user requested OpenSpec implementation with ablation and a review-ready PR. See the maintained [session handoff](../plan.md).
+Status: implementation and required local verification complete on 2026-10-12 (Asia/Jerusalem); PR publication follows. The user authorized OpenSpec implementation with ablation and a review-ready PR. See the maintained [session handoff](../plan.md).
 
 - [Issue #72](https://github.com/luminari-gurus/tactics-guru-v2/issues/72), under [safe-resume epic #58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58).
 - Assigned to `moshehbenavraham`; [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/72#issuecomment-6123387699).
@@ -84,9 +84,9 @@ During implementation, run focused `npm run test:unit -- tests/unit/battleStorag
 
 Check strict OpenSpec validation for `issue-72-battle-storage`, relative document links, and `git diff --check`. No new test-only application route, live storage UI or browser harness is needed for this adapter scope: injected storage fixtures prove the ordering/failure contract; configured browser tests protect existing play. Real-browser live persistence/lifecycle acceptance remains #73/#74 and is not implied by the adapter tests.
 
-For this planning-only publication, validate OpenSpec structure, every new relative document link, changed-file scope and whitespace. Application tests/builds are not run merely for Markdown changes; this document's implementation checks are future work.
+Historical planning publication `d602d82`: strict OpenSpec validation and all 14 relative links passed; six planning files were published with implementation tasks unchecked. No application checks were run for that Markdown-only commit.
 
-Planning verification: strict OpenSpec validation passed; all four planning artifacts are complete, with eight implementation tasks unchecked. All 14 relative document links resolve. The publication contains only this plan and five OpenSpec planning/metadata files. No application tests, runtime implementation or physical-device checks were performed for this planning commit.
+Implementation complete: commit `df1159f` contains the adapter, 56 focused adapter tests and API documentation. All eight OpenSpec tasks are complete. Passed: 85 focused adapter/codec/domain checks, 372 unit tests, 77 content checks, both typechecks, production build and all 225 configured browser cases (zero failures/skips/flaky results). Strict OpenSpec, relative links and whitespace checks pass. The [QA report](../../qa/issue-72-battle-storage.md) and [source-bound validation record](../../qa/issue-72/validation.json) map acceptance to evidence and limits. Ablation retained the single adapter/two-key design and existing codec/fixtures; no framework, archive, migration, extra route or dependency was added.
 
 ## Risks and boundaries
 
