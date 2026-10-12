@@ -84,3 +84,5 @@ Actual checks:
 - Source comparison: package/compiler/runner/Vite configs; domain RNG/AI/content constants and approved signature contract; BattleSession/BattleScene, geometry/picking, content loader/public asset metadata and BattleAudio/cue definitions; retained #62/#65/#68 QA evidence. No new unit/browser tests, typecheck, build, device test or deployment capture were run for this documentation-only change.
 
 Limitations: private legacy sources, missing `ORIGINAL/`/discovery companion and historical external documentation/SRD links retain their provenance and are not claimed freshly verified. Live Pages headers/protection/served bytes and SSH installation remain unprobed. These do not block the documentation acceptance, which explicitly preserves those gaps; #57/#64/#66/#70 and product/operator/production gates remain unresolved as stated.
+
+Delivery: [PR #90](https://github.com/luminari-gurus/tactics-guru-v2/pull/90) opened against main and attached to this task. Implementation commit `6ead7bd`; only the two documents and approved task-specific OpenSpec records are in the branch diff. All ten tasks complete; PR is unmerged and OpenSpec remains unarchived.

@@ -19,7 +19,7 @@ Caller approved [proposal.md](proposal.md) and [design.md](design.md) on 2026-10
 
 - [x] 3.1 Check relative Markdown targets/internal headings and referenced source numbers in both docs and planning artifacts; verify accessible GitHub evidence links read-only and record private/unavailable reference limitations without claiming a fresh legacy audit (AC6).
 - [x] 3.2 Cross-review both documents against all six acceptance mappings; verify no contradictory current-state/roadmap/register claims, run `openspec validate issue-82-doc-reconciliation --strict` and `git diff --check`, and audit changed paths for the documentation-only boundary (AC6).
-- [ ] 3.3 Record actual verification/remaining limitations in task-specific records; commit only the two requested docs and this change, push and create/reuse a PR against main, attach it to this task and use `Closes #82` only if all six documentation criteria are verified.
+- [x] 3.3 Record actual verification/remaining limitations in task-specific records; commit only the two requested docs and this change, push and create/reuse a PR against main, attach it to this task and use `Closes #82` only if all six documentation criteria are verified.
 
 ## Workflow follow-up
 
