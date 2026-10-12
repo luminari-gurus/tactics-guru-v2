@@ -1,16 +1,18 @@
 # Issue #73 - battle autosave and resume implementation plan
 
-Updated 2026-10-13 (Asia/Jerusalem). **PR #95 review repair: implementation and local verification complete; publication in progress.**
+Updated 2026-10-13 (Asia/Jerusalem). **PR #95 review repair complete and published; ready to merge under the requested local-check policy.**
 
 ## Current review repair
 
 The user authorized all valid PR #95 review repairs and Git decisions. The review contains one actionable finding (#92 public asset bases) and an integration conflict with merged PR #93. The five original PR commits were rebased onto main `a8e115aa07aea4831419ae19b4b1db88c368fbe0`; range-diff shows only the guarded restart edit moving from `src/main.ts` into the extracted `src/app/startBattleApp.ts`. Main's route loader and import-error handling remain intact.
 
-Worktree: `C:/Users/apexw/.codex/worktrees/repair-pr-95/Tactics-Guru`, local branch `branch/repair-pr-95`, publication target `branch/issue-73-battle-resume`. The primary checkout and other worktrees retain their unrelated edits/history. The expected old remote PR head is `e3827cc531d5f5d39c66f9d9732618718cc692e1`; publication must use its exact lease and then verify head equality, zero ahead/behind and clean status.
+Worktree: `C:/Users/apexw/.codex/worktrees/repair-pr-95/Tactics-Guru`, local branch `branch/repair-pr-95`, tracking publication target `origin/branch/issue-73-battle-resume`. The primary checkout and other worktrees retain their unrelated edits/history. Publication used the exact old-head lease `e3827cc531d5f5d39c66f9d9732618718cc692e1`; head equality, zero ahead/behind and clean status were verified. Final documentation closure uses an ordinary fast-forward push and the same parity checks.
 
 Ablation outcome: restore root/prefix asset loading and prove integrated restart/resume. One small presentation helper replaces direct public paths at the existing image, portrait, audio and fixture consumers. No catalog, provenance, save identity, domain, media bytes, dependency or hosting changes. #92 is a separate [OpenSpec change](../../openspec/changes/issue-92-public-asset-base/tasks.md) and commit within this authorized review repair; the earlier decision to defer it is superseded. No release tag, squash, stacking change or merge is warranted.
 
 Runtime/test commit: `4ca9ca5`. All three prefixed entry scenes failed before the repair, reproducing the review. Unit 428/428, content 77/77, both typechecks, root/prefix builds and strict OpenSpec pass. The full configured root production suite passed 309/309, with zero failed/flaky/skipped cases; another 117 focused cases passed across prefixed preview, prefixed development and root development. Browser work is finished. See [current QA evidence](../qa/issue-92-public-asset-base.md). Original #73 evidence below remains historical; physical #74/#64/#66 and release #57/#58 gates remain open.
+
+The [review response](https://github.com/luminari-gurus/tactics-guru-v2/pull/95#issuecomment-6133332093) and updated PR description were read back. The connector's writes returned 403, so publication used the existing Git credential after independently verifying account `moshehbenavraham`; no credential was written to disk or logs. GitHub reports open, non-draft and mergeable. There are no inline threads. OpenSpec #73 is 12/12 and #92 is 3/3 complete. Remote checks are not a gate under the user's instruction. No source work or local check remains; next action is review/merge, with fresh head/base verification. No merge, release tag, production operation or OpenSpec archive was performed.
 
 ## Historical implementation handoff (2026-10-12)
 

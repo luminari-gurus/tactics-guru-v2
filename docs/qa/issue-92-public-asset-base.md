@@ -31,4 +31,6 @@ The focused checks cover direct entry and refresh of battle/proof/content-smoke,
 
 ## Limits
 
+Publication: the branch was force-pushed with an exact lease on original head `e3827cc531d5f5d39c66f9d9732618718cc692e1`, retaining the original commits and separate asset fix. Local/remote equality, `0 0` ahead/behind and clean status were verified. PR metadata and the [review response](https://github.com/luminari-gurus/tactics-guru-v2/pull/95#issuecomment-6133332093) were read back; GitHub reports open, non-draft and mergeable. Documentation commits after `4ca9ca5` do not change runtime or tests; the root build's dirty flag reflects those documentation edits only. No review finding or inline thread remains unaddressed.
+
 No physical Android/iOS certification, audible listening claim or hosted-prefix validation. No existing hosted prefix was supplied and no deployment target was created. Phaser's existing chunk-size warning, development renderer `setMask` warning and the environment's color-variable warning remain; the renderer code is unchanged by this repair. Remote CI is not a gate for this request; `.github` contains no Actions workflows to reproduce. OpenSpec remains unarchived while the PR is unmerged. #57/#58/#74 remain open.

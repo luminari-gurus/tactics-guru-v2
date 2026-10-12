@@ -7,4 +7,4 @@
 ## 2. Integrated review acceptance
 
 - [x] 2.1 Verify rebased route and guarded restart integration with full unit/content/browser suites, both typechecks, production build, strict OpenSpec and whitespace checks; record actual results and limits in QA and the active handoff.
-- [ ] 2.2 Revalidate review scope and remote heads, publish with an exact lease, update PR description and review response, then verify mergeability, remote parity and clean worktree.
+- [x] 2.2 Revalidate review scope and remote heads, publish with an exact lease, update PR description and review response, then verify mergeability, remote parity and clean worktree.
