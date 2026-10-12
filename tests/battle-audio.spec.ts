@@ -254,7 +254,9 @@ test('late decode from a destroyed scene cannot alter replacement controls or pl
     };
   });
   await page.goto('/');await ready(page);expect((await audio(page)).load).toBe('loading');
-  await page.locator('#fit-restart').click();await ready(page);
+  await page.locator('#fit-restart').click();
+  // Restart is queued by Phaser; do not accept the outgoing scene's player phase.
+  await expect.poll(async()=>(await session(page)).state.seed).toBe(2);await ready(page);
   await expect.poll(()=>audio(page)).toMatchObject({load:'ready',enabled:false,started:0});
   const before=await audio(page);
   await page.evaluate(()=>(window as unknown as {__releaseDecodes:()=>void}).__releaseDecodes());

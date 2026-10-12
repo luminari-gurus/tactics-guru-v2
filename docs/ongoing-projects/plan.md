@@ -1,4 +1,18 @@
-# Battle audio merged; next-session handoff
+# Active work: battle-save envelope (#69)
+
+## Review repair handoff — 2026-10-12
+
+The user authorized addressing all review details on [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70), using ablation and OpenSpec, including Git management and publication. Continue on `work/issue-69-save-envelope` in `C:/Users/apexw/.codex/worktrees/save-envelope-plan/Tactics-Guru`. Its seven commits were rebased without conflicts onto main `30331e6`; range-diff confirmed every original patch was preserved. The original checkout holds unrelated Safari/environment/workflow edits; preserve them.
+
+Source of truth: [implementation plan](battle-save-envelope/plan.md), [OpenSpec tasks](../../openspec/changes/battle-save-envelope/tasks.md). The sole finding was valid and is repaired in `2d23526`: seed 2/command 29 now preserves the queued Wait. Decoded snapshots match uninterrupted commands/events/state across five full battles (258 commands), whose complete original traces remain unchanged. Validation: 94 focused tests, 316 unit tests, 77 content checks, both typechecks, build and strict OpenSpec pass. Browser evidence covers all 225 configured cases: the full run had 224 passes and one existing restart synchronization race; test-only `d651b10` waits for the replacement seed before its settled player phase and passed nine repetitions across all three profiles. The full suite was not rerun after that isolated test repair. All 12 OpenSpec tasks are complete; see [QA](../qa/issue-69-save-envelope.md) and [retained review evidence](../qa/issue-69/review-repair.json). Outcome: correct state-only continuation without new payload fields. Files: existing planner/tests, format/enemy docs and current OpenSpec/plans/QA. Non-goals: storage, live hydration, UI, deployment, migration or parent #58 closure. Parent #58 remains open, with storage/session/lifecycle children #72–#74.
+
+Ablation: reuse the existing planner and state flags, validators, canonical hashing and battle policy. No queue serialization, second resume planner, new dependency or general test infrastructure is needed. Git delivery uses an exact lease against pre-rebase head `6c798411980bc16af99f3284674f976e6b30cef1`, followed by remote parity and review-reply readback. Preserve useful implementation/test/evidence commits; no stacked branch, release tag, merge or manual deployment is needed. The existing Cloudflare integration may create its normal branch preview on push. The child is ready for merge after this verified publication; leave #58 and OpenSpec archive decisions for their appropriate integration steps.
+
+Local tools: `node` is available; npm CLI is `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`. OpenSpec 1.14.1 CLI is `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`. Invoke both with `node`; the existing ignored `tmp/tool-bin/npm.cmd` enables npm's nested commands. Browser tests use installed Edge through `PLAYWRIGHT_CHROMIUM_EXECUTABLE`. Remote CI is not a completion gate; run configured checks locally.
+
+## Historical audio/performance handoff
+
+The notes below are the prior session's record, not the current task. Main now includes PR #67 at `e955e9d`; its integration instructions below have been superseded.
 
 ## Current status — 2026-10-11
 

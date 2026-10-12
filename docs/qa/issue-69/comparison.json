@@ -1,0 +1,920 @@
+{
+  "sourceCommit": "bc53bba1afe6f3ec24ec416f22eb0fa78dd508e6",
+  "sourceTree": "eb792f8a229d0a227a471fbcb4b0f30d24b4d087",
+  "dirtyPaths": "",
+  "runtime": "v24.19.0",
+  "platform": "win32",
+  "release": "10.0.26300",
+  "arch": "x64",
+  "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+  "repetitions": 5,
+  "warmups": 1,
+  "unit": "milliseconds",
+  "conditions": "Serial Node host run, catalog identity prewarmed by fixture construction; no browser or mobile certification. Encode validates payload shape; replay semantic reconstruction is measured in decode.",
+  "results": [
+    {
+      "name": "start-1",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 1,
+      "commandCount": 0,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:a615698b4655c3719cde7b6b29c792f88315b669308b152c2671d7aadbbacbf0",
+      "replayDigest": "sha256:d2f12a2ce637e99f9a08b89587841fb14c6657cae5131093c9512be4228398f3",
+      "snapshot": [
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.3146999999999025,
+          "parseMs": 0.016999999999825377,
+          "validateMs": 0.0625,
+          "integrityMs": 0.15020000000004075,
+          "reconstructMs": 0.002399999999852298,
+          "decodeMs": 0.23209999999971842
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.22919999999976426,
+          "parseMs": 0.013100000000122236,
+          "validateMs": 0.05490000000008877,
+          "integrityMs": 0.10259999999971114,
+          "reconstructMs": 0.0003999999998995918,
+          "decodeMs": 0.17099999999982174
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.4230999999999767,
+          "parseMs": 0.01290000000017244,
+          "validateMs": 0.059099999999943975,
+          "integrityMs": 0.08739999999988868,
+          "reconstructMs": 0.0005000000001018634,
+          "decodeMs": 0.15990000000010696
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.14919999999983702,
+          "parseMs": 0.00709999999980937,
+          "validateMs": 0.03760000000011132,
+          "integrityMs": 0.06890000000021246,
+          "reconstructMs": 0.0003000000001520675,
+          "decodeMs": 0.11390000000028522
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.17819999999983338,
+          "parseMs": 0.01989999999977954,
+          "validateMs": 0.05859999999984211,
+          "integrityMs": 0.11259999999992942,
+          "reconstructMs": 0.00040000000035433914,
+          "decodeMs": 0.1914999999999054
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 1262,
+          "utf8Bytes": 1262,
+          "encodeMs": 0.13140000000021246,
+          "parseMs": 0.007899999999608553,
+          "validateMs": 0.0387999999998101,
+          "integrityMs": 0.07330000000001746,
+          "reconstructMs": 0.12579999999979918,
+          "decodeMs": 0.2457999999992353
+        },
+        {
+          "codeUnits": 1262,
+          "utf8Bytes": 1262,
+          "encodeMs": 0.12639999999964857,
+          "parseMs": 0.008100000000013097,
+          "validateMs": 0.03330000000005384,
+          "integrityMs": 0.0684000000001106,
+          "reconstructMs": 0.14459999999962747,
+          "decodeMs": 0.254399999999805
+        },
+        {
+          "codeUnits": 1262,
+          "utf8Bytes": 1262,
+          "encodeMs": 0.1313000000000102,
+          "parseMs": 0.00889999999981228,
+          "validateMs": 0.04330000000027212,
+          "integrityMs": 0.06770000000005894,
+          "reconstructMs": 0.11320000000023356,
+          "decodeMs": 0.2331000000003769
+        },
+        {
+          "codeUnits": 1262,
+          "utf8Bytes": 1262,
+          "encodeMs": 0.12359999999989668,
+          "parseMs": 0.006300000000010186,
+          "validateMs": 0.04629999999997381,
+          "integrityMs": 0.06910000000016225,
+          "reconstructMs": 0.11249999999972715,
+          "decodeMs": 0.2341999999998734
+        },
+        {
+          "codeUnits": 1262,
+          "utf8Bytes": 1262,
+          "encodeMs": 0.12770000000000437,
+          "parseMs": 0.0079000000000633,
+          "validateMs": 0.033800000000155705,
+          "integrityMs": 0.06640000000015789,
+          "reconstructMs": 0.11179999999967549,
+          "decodeMs": 0.2199000000000524
+        }
+      ]
+    },
+    {
+      "name": "playerLoss",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 1,
+      "commandCount": 85,
+      "outcome": "playerLoss",
+      "stateDigest": "sha256:184b75a8a7ef25cf066c840883b1c2fececd6286ff01d0045a784696299fdbc9",
+      "replayDigest": "sha256:9ddded36d4d688149bbe80988c985095e53ed916091030d45bdece220ec8a959",
+      "snapshot": [
+        {
+          "codeUnits": 1122,
+          "utf8Bytes": 1122,
+          "encodeMs": 0.11040000000002692,
+          "parseMs": 0.0065999999997075065,
+          "validateMs": 0.029099999999743886,
+          "integrityMs": 0.06400000000030559,
+          "reconstructMs": 0.001900000000205182,
+          "decodeMs": 0.10159999999996217
+        },
+        {
+          "codeUnits": 1122,
+          "utf8Bytes": 1122,
+          "encodeMs": 0.11770000000024083,
+          "parseMs": 0.005699999999706051,
+          "validateMs": 0.028400000000146974,
+          "integrityMs": 0.06149999999979627,
+          "reconstructMs": 0.0014999999998508429,
+          "decodeMs": 0.09709999999950014
+        },
+        {
+          "codeUnits": 1122,
+          "utf8Bytes": 1122,
+          "encodeMs": 0.10330000000021755,
+          "parseMs": 0.005400000000008731,
+          "validateMs": 0.028700000000299042,
+          "integrityMs": 0.06570000000010623,
+          "reconstructMs": 0.0003000000001520675,
+          "decodeMs": 0.10010000000056607
+        },
+        {
+          "codeUnits": 1122,
+          "utf8Bytes": 1122,
+          "encodeMs": 0.10820000000012442,
+          "parseMs": 0.005199999999604188,
+          "validateMs": 0.027699999999640568,
+          "integrityMs": 0.060500000000047294,
+          "reconstructMs": 0.00020000000040454324,
+          "decodeMs": 0.09359999999969659
+        },
+        {
+          "codeUnits": 1122,
+          "utf8Bytes": 1122,
+          "encodeMs": 0.10179999999991196,
+          "parseMs": 0.004799999999704596,
+          "validateMs": 0.026400000000194268,
+          "integrityMs": 0.06199999999989814,
+          "reconstructMs": 0.0003000000001520675,
+          "decodeMs": 0.09349999999994907
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 5954,
+          "utf8Bytes": 5954,
+          "encodeMs": 0.5983000000001084,
+          "parseMs": 0.030099999999947613,
+          "validateMs": 0.12039999999979045,
+          "integrityMs": 0.27660000000014406,
+          "reconstructMs": 8.023699999999735,
+          "decodeMs": 8.450799999999617
+        },
+        {
+          "codeUnits": 5954,
+          "utf8Bytes": 5954,
+          "encodeMs": 0.5630999999998494,
+          "parseMs": 0.031199999999898864,
+          "validateMs": 0.13020000000005894,
+          "integrityMs": 0.29379999999991924,
+          "reconstructMs": 8.185699999999997,
+          "decodeMs": 8.640899999999874
+        },
+        {
+          "codeUnits": 5954,
+          "utf8Bytes": 5954,
+          "encodeMs": 0.5806000000002314,
+          "parseMs": 0.037000000000261934,
+          "validateMs": 0.14449999999987995,
+          "integrityMs": 0.296100000000024,
+          "reconstructMs": 8.032999999999902,
+          "decodeMs": 8.510600000000068
+        },
+        {
+          "codeUnits": 5954,
+          "utf8Bytes": 5954,
+          "encodeMs": 0.603099999999813,
+          "parseMs": 0.036599999999907595,
+          "validateMs": 0.14699999999993452,
+          "integrityMs": 0.308100000000195,
+          "reconstructMs": 7.153399999999692,
+          "decodeMs": 7.645099999999729
+        },
+        {
+          "codeUnits": 5954,
+          "utf8Bytes": 5954,
+          "encodeMs": 0.6738000000000284,
+          "parseMs": 0.029100000000198634,
+          "validateMs": 0.1091999999998734,
+          "integrityMs": 0.2555999999999585,
+          "reconstructMs": 6.605800000000272,
+          "decodeMs": 6.999700000000303
+        }
+      ]
+    },
+    {
+      "name": "start-2",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 2,
+      "commandCount": 0,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:2db44ff8a84fc107ed8ca6587f1c005acaff7808f12c2ce4f42c852bc66dc24a",
+      "replayDigest": "sha256:091131a5fe4413b48f2ea6f85fa1d623c546ac8b2c6a8a0c3459c1738c7351fa",
+      "snapshot": [
+        {
+          "codeUnits": 1113,
+          "utf8Bytes": 1113,
+          "encodeMs": 0.0907999999999447,
+          "parseMs": 0.004899999999906868,
+          "validateMs": 0.020300000000133878,
+          "integrityMs": 0.05499999999983629,
+          "reconstructMs": 0.00020000000040454324,
+          "decodeMs": 0.08040000000028158
+        },
+        {
+          "codeUnits": 1113,
+          "utf8Bytes": 1113,
+          "encodeMs": 0.08490000000028886,
+          "parseMs": 0.0041999999998552084,
+          "validateMs": 0.018800000000283035,
+          "integrityMs": 0.05330000000003565,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.07650000000012369
+        },
+        {
+          "codeUnits": 1113,
+          "utf8Bytes": 1113,
+          "encodeMs": 0.08570000000008804,
+          "parseMs": 0.00400000000036016,
+          "validateMs": 0.01929999999993015,
+          "integrityMs": 0.06570000000010623,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.08920000000034634
+        },
+        {
+          "codeUnits": 1113,
+          "utf8Bytes": 1113,
+          "encodeMs": 0.09149999999999636,
+          "parseMs": 0.003899999999703141,
+          "validateMs": 0.018500000000130967,
+          "integrityMs": 0.052000000000134605,
+          "reconstructMs": 0.0003000000001520675,
+          "decodeMs": 0.07470000000012078
+        },
+        {
+          "codeUnits": 1113,
+          "utf8Bytes": 1113,
+          "encodeMs": 0.08109999999987849,
+          "parseMs": 0.004100000000107684,
+          "validateMs": 0.017699999999877036,
+          "integrityMs": 0.04989999999997963,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.07189999999991414
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 1263,
+          "utf8Bytes": 1263,
+          "encodeMs": 0.10579999999981737,
+          "parseMs": 0.004799999999704596,
+          "validateMs": 0.02109999999993306,
+          "integrityMs": 0.06749999999965439,
+          "reconstructMs": 0.08280000000013388,
+          "decodeMs": 0.17619999999942593
+        },
+        {
+          "codeUnits": 1263,
+          "utf8Bytes": 1263,
+          "encodeMs": 0.27700000000004366,
+          "parseMs": 0.005700000000160799,
+          "validateMs": 0.027399999999943248,
+          "integrityMs": 0.07130000000006476,
+          "reconstructMs": 0.08320000000003347,
+          "decodeMs": 0.18760000000020227
+        },
+        {
+          "codeUnits": 1263,
+          "utf8Bytes": 1263,
+          "encodeMs": 0.104200000000219,
+          "parseMs": 0.004600000000209548,
+          "validateMs": 0.020799999999780994,
+          "integrityMs": 0.06669999999985521,
+          "reconstructMs": 0.07960000000002765,
+          "decodeMs": 0.1716999999998734
+        },
+        {
+          "codeUnits": 1263,
+          "utf8Bytes": 1263,
+          "encodeMs": 0.10190000000011423,
+          "parseMs": 0.005000000000109139,
+          "validateMs": 0.021200000000135333,
+          "integrityMs": 0.06440000000020518,
+          "reconstructMs": 0.07889999999997599,
+          "decodeMs": 0.16950000000042564
+        },
+        {
+          "codeUnits": 1263,
+          "utf8Bytes": 1263,
+          "encodeMs": 0.10100000000011278,
+          "parseMs": 0.004500000000007276,
+          "validateMs": 0.020799999999780994,
+          "integrityMs": 0.06539999999995416,
+          "reconstructMs": 0.07770000000027721,
+          "decodeMs": 0.16840000000001965
+        }
+      ]
+    },
+    {
+      "name": "enemy-presenting",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 2,
+      "commandCount": 1,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:7f16316fd05ef1a502ea5de9489f640aa6250950efcc90ccb9dad750891c4dbe",
+      "replayDigest": "sha256:3f76595bf37eca83e2cd21c9f03882bb2454034076a74ed1ca60ab8acaeb7ec6",
+      "snapshot": [
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.08469999999988431,
+          "parseMs": 0.003800000000410364,
+          "validateMs": 0.017899999999826832,
+          "integrityMs": 0.0522000000000844,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0741000000002714
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.09140000000024884,
+          "parseMs": 0.0037999999999556167,
+          "validateMs": 0.017999999999574356,
+          "integrityMs": 0.05009999999992942,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.07209999999940919
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.08049999999957436,
+          "parseMs": 0.003699999999753345,
+          "validateMs": 0.017299999999977445,
+          "integrityMs": 0.050499999999829015,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0716999999995096
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.09569999999985157,
+          "parseMs": 0.004099999999652937,
+          "validateMs": 0.0181999999999789,
+          "integrityMs": 0.07150000000001455,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.09399999999959618
+        },
+        {
+          "codeUnits": 1112,
+          "utf8Bytes": 1112,
+          "encodeMs": 0.08939999999984138,
+          "parseMs": 0.004200000000309956,
+          "validateMs": 0.01960000000008222,
+          "integrityMs": 0.06259999999974752,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0866000000000895
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 1308,
+          "utf8Bytes": 1308,
+          "encodeMs": 0.09609999999975116,
+          "parseMs": 0.005200000000058935,
+          "validateMs": 0.0239000000001397,
+          "integrityMs": 0.05739999999968859,
+          "reconstructMs": 0.19000000000005457,
+          "decodeMs": 0.2764999999999418
+        },
+        {
+          "codeUnits": 1308,
+          "utf8Bytes": 1308,
+          "encodeMs": 0.09819999999990614,
+          "parseMs": 0.005099999999856664,
+          "validateMs": 0.0215000000002874,
+          "integrityMs": 0.057000000000243745,
+          "reconstructMs": 0.18100000000004002,
+          "decodeMs": 0.2646000000004278
+        },
+        {
+          "codeUnits": 1308,
+          "utf8Bytes": 1308,
+          "encodeMs": 0.09259999999994761,
+          "parseMs": 0.005099999999856664,
+          "validateMs": 0.027800000000297587,
+          "integrityMs": 0.05780000000004293,
+          "reconstructMs": 0.1790000000000873,
+          "decodeMs": 0.2697000000002845
+        },
+        {
+          "codeUnits": 1308,
+          "utf8Bytes": 1308,
+          "encodeMs": 0.09229999999979555,
+          "parseMs": 0.004899999999906868,
+          "validateMs": 0.021999999999934516,
+          "integrityMs": 0.05580000000009022,
+          "reconstructMs": 0.18229999999994106,
+          "decodeMs": 0.26499999999987267
+        },
+        {
+          "codeUnits": 1308,
+          "utf8Bytes": 1308,
+          "encodeMs": 0.09399999999959618,
+          "parseMs": 0.004699999999957072,
+          "validateMs": 0.02250000000003638,
+          "integrityMs": 0.05660000000034415,
+          "reconstructMs": 0.18049999999993815,
+          "decodeMs": 0.26430000000027576
+        }
+      ]
+    },
+    {
+      "name": "player-presenting",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 2,
+      "commandCount": 5,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:0b332c7f93f0ed5ae1f2396cbaa40edd5e355b59f77c6945ab0801affb52e4f1",
+      "replayDigest": "sha256:776aa0d080504d44555a6d47e3a2de08227360c645bec5e4b6ab97c23c01bfe7",
+      "snapshot": [
+        {
+          "codeUnits": 1111,
+          "utf8Bytes": 1111,
+          "encodeMs": 0.09749999999985448,
+          "parseMs": 0.0061000000000603904,
+          "validateMs": 0.02109999999993306,
+          "integrityMs": 0.06439999999975043,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.09179999999969368
+        },
+        {
+          "codeUnits": 1111,
+          "utf8Bytes": 1111,
+          "encodeMs": 0.11679999999978463,
+          "parseMs": 0.004400000000259752,
+          "validateMs": 0.01970000000028449,
+          "integrityMs": 0.06520000000000437,
+          "reconstructMs": 0.00010000000020227162,
+          "decodeMs": 0.08940000000075088
+        },
+        {
+          "codeUnits": 1111,
+          "utf8Bytes": 1111,
+          "encodeMs": 0.09560000000010405,
+          "parseMs": 0.004099999999652937,
+          "validateMs": 0.018399999999928696,
+          "integrityMs": 0.06970000000001164,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.09239999999954307
+        },
+        {
+          "codeUnits": 1111,
+          "utf8Bytes": 1111,
+          "encodeMs": 0.09479999999985012,
+          "parseMs": 0.0039000000001578883,
+          "validateMs": 0.018000000000029104,
+          "integrityMs": 0.061199999999644206,
+          "reconstructMs": 0.00010000000020227162,
+          "decodeMs": 0.08320000000003347
+        },
+        {
+          "codeUnits": 1111,
+          "utf8Bytes": 1111,
+          "encodeMs": 0.09020000000009532,
+          "parseMs": 0.0037999999999556167,
+          "validateMs": 0.018100000000231375,
+          "integrityMs": 0.061599999999998545,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.08370000000013533
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 1501,
+          "utf8Bytes": 1501,
+          "encodeMs": 0.14369999999962602,
+          "parseMs": 0.007999999999810825,
+          "validateMs": 0.03040000000009968,
+          "integrityMs": 0.08100000000013097,
+          "reconstructMs": 0.6053999999999178,
+          "decodeMs": 0.7247999999999593
+        },
+        {
+          "codeUnits": 1501,
+          "utf8Bytes": 1501,
+          "encodeMs": 0.15059999999994034,
+          "parseMs": 0.0079000000000633,
+          "validateMs": 0.02970000000004802,
+          "integrityMs": 0.08480000000008658,
+          "reconstructMs": 0.5329000000001543,
+          "decodeMs": 0.6553000000003522
+        },
+        {
+          "codeUnits": 1501,
+          "utf8Bytes": 1501,
+          "encodeMs": 0.13859999999976935,
+          "parseMs": 0.006900000000314321,
+          "validateMs": 0.030700000000251748,
+          "integrityMs": 0.2923000000000684,
+          "reconstructMs": 0.5411999999996624,
+          "decodeMs": 0.8711000000002969
+        },
+        {
+          "codeUnits": 1501,
+          "utf8Bytes": 1501,
+          "encodeMs": 0.14109999999982392,
+          "parseMs": 0.007299999999759166,
+          "validateMs": 0.029199999999946158,
+          "integrityMs": 0.0818000000003849,
+          "reconstructMs": 0.530500000000302,
+          "decodeMs": 0.6488000000003922
+        },
+        {
+          "codeUnits": 1501,
+          "utf8Bytes": 1501,
+          "encodeMs": 0.13279999999986103,
+          "parseMs": 0.007500000000163709,
+          "validateMs": 0.02860000000009677,
+          "integrityMs": 0.08199999999987995,
+          "reconstructMs": 0.6014000000000124,
+          "decodeMs": 0.7195000000001528
+        }
+      ]
+    },
+    {
+      "name": "guarded-presenting",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 2,
+      "commandCount": 23,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:54a52dd8aab4177949beabd13c0ab6c709920000120a2785d83eb7395a5e9c46",
+      "replayDigest": "sha256:242cf2479b94473415eca717ec4f5bec57e0fd6074e7bd43cc7908bc788f9d70",
+      "snapshot": [
+        {
+          "codeUnits": 1120,
+          "utf8Bytes": 1120,
+          "encodeMs": 0.09699999999975262,
+          "parseMs": 0.0052999999998064595,
+          "validateMs": 0.021499999999832653,
+          "integrityMs": 0.05830000000014479,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0852999999997337
+        },
+        {
+          "codeUnits": 1120,
+          "utf8Bytes": 1120,
+          "encodeMs": 0.09349999999994907,
+          "parseMs": 0.0048000000001593435,
+          "validateMs": 0.01999999999998181,
+          "integrityMs": 0.056199999999989814,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.08120000000008076
+        },
+        {
+          "codeUnits": 1120,
+          "utf8Bytes": 1120,
+          "encodeMs": 0.08890000000019427,
+          "parseMs": 0.004299999999602733,
+          "validateMs": 0.02080000000023574,
+          "integrityMs": 0.05760000000009313,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0828999999998814
+        },
+        {
+          "codeUnits": 1120,
+          "utf8Bytes": 1120,
+          "encodeMs": 0.08899999999994179,
+          "parseMs": 0.004500000000007276,
+          "validateMs": 0.018700000000080763,
+          "integrityMs": 0.05499999999983629,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.07839999999987413
+        },
+        {
+          "codeUnits": 1120,
+          "utf8Bytes": 1120,
+          "encodeMs": 0.0864000000001397,
+          "parseMs": 0.004100000000107684,
+          "validateMs": 0.019900000000234286,
+          "integrityMs": 0.05540000000019063,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.0796000000004824
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 2448,
+          "utf8Bytes": 2448,
+          "encodeMs": 0.22420000000010987,
+          "parseMs": 0.012700000000222644,
+          "validateMs": 0.04790000000002692,
+          "integrityMs": 0.13059999999995853,
+          "reconstructMs": 1.9052000000001499,
+          "decodeMs": 2.096400000000358
+        },
+        {
+          "codeUnits": 2448,
+          "utf8Bytes": 2448,
+          "encodeMs": 0.22119999999995343,
+          "parseMs": 0.012400000000070577,
+          "validateMs": 0.047000000000025466,
+          "integrityMs": 0.1574999999997999,
+          "reconstructMs": 2.088000000000193,
+          "decodeMs": 2.3049000000000888
+        },
+        {
+          "codeUnits": 2448,
+          "utf8Bytes": 2448,
+          "encodeMs": 0.21679999999969368,
+          "parseMs": 0.012799999999970169,
+          "validateMs": 0.04779999999982465,
+          "integrityMs": 0.12460000000010041,
+          "reconstructMs": 1.970600000000104,
+          "decodeMs": 2.1557999999999993
+        },
+        {
+          "codeUnits": 2448,
+          "utf8Bytes": 2448,
+          "encodeMs": 0.223700000000008,
+          "parseMs": 0.01389999999992142,
+          "validateMs": 0.05089999999972861,
+          "integrityMs": 0.13650000000006912,
+          "reconstructMs": 2.120600000000195,
+          "decodeMs": 2.321899999999914
+        },
+        {
+          "codeUnits": 2448,
+          "utf8Bytes": 2448,
+          "encodeMs": 0.23129999999991924,
+          "parseMs": 0.012699999999767897,
+          "validateMs": 0.051300000000082946,
+          "integrityMs": 0.14210000000002765,
+          "reconstructMs": 2.1867999999999483,
+          "decodeMs": 2.392899999999827
+        }
+      ]
+    },
+    {
+      "name": "playerWin",
+      "catalog": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "seed": 2,
+      "commandCount": 38,
+      "outcome": "playerWin",
+      "stateDigest": "sha256:6707c831db1d1d46934f06a38a71377230a0c419c772d0e0f341a00f8d8d3a8e",
+      "replayDigest": "sha256:2839018817bb37a2be9c1b1bc4cfd1253d37ab206f11cf7f155e94bdb7784323",
+      "snapshot": [
+        {
+          "codeUnits": 1123,
+          "utf8Bytes": 1123,
+          "encodeMs": 0.1133999999997286,
+          "parseMs": 0.006499999999959982,
+          "validateMs": 0.0227999999997337,
+          "integrityMs": 0.06309999999984939,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.09259999999949287
+        },
+        {
+          "codeUnits": 1123,
+          "utf8Bytes": 1123,
+          "encodeMs": 0.10069999999996071,
+          "parseMs": 0.005099999999856664,
+          "validateMs": 0.021600000000034925,
+          "integrityMs": 0.07970000000022992,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.1066000000000713
+        },
+        {
+          "codeUnits": 1123,
+          "utf8Bytes": 1123,
+          "encodeMs": 0.4884999999999309,
+          "parseMs": 0.019900000000234286,
+          "validateMs": 0.06359999999995125,
+          "integrityMs": 0.5722999999998137,
+          "reconstructMs": 0.0009999999997489795,
+          "decodeMs": 0.6567999999997483
+        },
+        {
+          "codeUnits": 1123,
+          "utf8Bytes": 1123,
+          "encodeMs": 0.4832000000001244,
+          "parseMs": 0.011700000000018917,
+          "validateMs": 0.03960000000006403,
+          "integrityMs": 0.06809999999995853,
+          "reconstructMs": 0.000600000000304135,
+          "decodeMs": 0.12000000000034561
+        },
+        {
+          "codeUnits": 1123,
+          "utf8Bytes": 1123,
+          "encodeMs": 0.11000000000012733,
+          "parseMs": 0.006400000000212458,
+          "validateMs": 0.026000000000294676,
+          "integrityMs": 0.4393000000000029,
+          "reconstructMs": 0.001299999999901047,
+          "decodeMs": 0.4730000000004111
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 3356,
+          "utf8Bytes": 3356,
+          "encodeMs": 0.433100000000195,
+          "parseMs": 0.03279999999995198,
+          "validateMs": 0.13779999999997017,
+          "integrityMs": 0.2039999999997235,
+          "reconstructMs": 4.372499999999945,
+          "decodeMs": 4.747099999999591
+        },
+        {
+          "codeUnits": 3356,
+          "utf8Bytes": 3356,
+          "encodeMs": 0.5716999999999643,
+          "parseMs": 0.01860000000033324,
+          "validateMs": 0.0702000000001135,
+          "integrityMs": 0.15380000000004657,
+          "reconstructMs": 3.3600000000001273,
+          "decodeMs": 3.6026000000006206
+        },
+        {
+          "codeUnits": 3356,
+          "utf8Bytes": 3356,
+          "encodeMs": 0.27359999999998763,
+          "parseMs": 0.01960000000008222,
+          "validateMs": 0.07609999999976935,
+          "integrityMs": 0.14469999999982974,
+          "reconstructMs": 3.279099999999744,
+          "decodeMs": 3.519499999999425
+        },
+        {
+          "codeUnits": 3356,
+          "utf8Bytes": 3356,
+          "encodeMs": 0.27779999999984284,
+          "parseMs": 0.016200000000026193,
+          "validateMs": 0.06590000000005602,
+          "integrityMs": 0.14720000000033906,
+          "reconstructMs": 3.047299999999723,
+          "decodeMs": 3.276600000000144
+        },
+        {
+          "codeUnits": 3356,
+          "utf8Bytes": 3356,
+          "encodeMs": 0.25779999999986103,
+          "parseMs": 0.015499999999974534,
+          "validateMs": 0.06280000000015207,
+          "integrityMs": 0.14069999999992433,
+          "reconstructMs": 3.739799999999832,
+          "decodeMs": 3.958799999999883
+        }
+      ]
+    },
+    {
+      "name": "maximum-commands",
+      "catalog": "sha256:16a12ce5b5bdb05979ca7fb60e423201e6d4a709f7b36fe93147aa7420c9d26a",
+      "seed": 7,
+      "commandCount": 10000,
+      "outcome": "ongoing",
+      "stateDigest": "sha256:5eb1d97fa2317aaa371d38ce480fddd9e1fefaa745883a174e81a2388b4a91f2",
+      "replayDigest": "sha256:1bea21cd93b79403086a273213437d3ea112195ff6d401774cb1e7fdad3b3556",
+      "snapshot": [
+        {
+          "codeUnits": 1130,
+          "utf8Bytes": 1130,
+          "encodeMs": 0.08179999999993015,
+          "parseMs": 0.0048000000001593435,
+          "validateMs": 0.021000000000185537,
+          "integrityMs": 0.04399999999986903,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.07000000000016371
+        },
+        {
+          "codeUnits": 1130,
+          "utf8Bytes": 1130,
+          "encodeMs": 0.07600000000002183,
+          "parseMs": 0.0041999999998552084,
+          "validateMs": 0.01900000000023283,
+          "integrityMs": 0.04330000000027212,
+          "reconstructMs": 0.00020000000040454324,
+          "decodeMs": 0.0667000000007647
+        },
+        {
+          "codeUnits": 1130,
+          "utf8Bytes": 1130,
+          "encodeMs": 0.07470000000012078,
+          "parseMs": 0.0039000000001578883,
+          "validateMs": 0.018700000000080763,
+          "integrityMs": 0.04250000000001819,
+          "reconstructMs": 0.00009999999974752427,
+          "decodeMs": 0.06520000000000437
+        },
+        {
+          "codeUnits": 1130,
+          "utf8Bytes": 1130,
+          "encodeMs": 0.07189999999991414,
+          "parseMs": 0.0035000000002582965,
+          "validateMs": 0.018000000000029104,
+          "integrityMs": 0.042599999999765714,
+          "reconstructMs": 0.0001999999999497959,
+          "decodeMs": 0.06430000000000291
+        },
+        {
+          "codeUnits": 1130,
+          "utf8Bytes": 1130,
+          "encodeMs": 0.07150000000001455,
+          "parseMs": 0.003499999999803549,
+          "validateMs": 0.01859999999987849,
+          "integrityMs": 0.041899999999714055,
+          "reconstructMs": 0.00010000000020227162,
+          "decodeMs": 0.06409999999959837
+        }
+      ],
+      "replay": [
+        {
+          "codeUnits": 301272,
+          "utf8Bytes": 301272,
+          "encodeMs": 28.538300000000163,
+          "parseMs": 1.3268000000002758,
+          "validateMs": 5.100600000000213,
+          "integrityMs": 17.739300000000185,
+          "reconstructMs": 678.8888999999999,
+          "decodeMs": 703.0556000000006
+        },
+        {
+          "codeUnits": 301272,
+          "utf8Bytes": 301272,
+          "encodeMs": 28.070700000000215,
+          "parseMs": 1.0419000000001688,
+          "validateMs": 4.341200000000754,
+          "integrityMs": 17.707499999999527,
+          "reconstructMs": 754.9264999999996,
+          "decodeMs": 778.0171
+        },
+        {
+          "codeUnits": 301272,
+          "utf8Bytes": 301272,
+          "encodeMs": 34.33299999999963,
+          "parseMs": 1.0213000000003376,
+          "validateMs": 5.138699999999517,
+          "integrityMs": 17.537000000000262,
+          "reconstructMs": 656.4346999999998,
+          "decodeMs": 680.1316999999999
+        },
+        {
+          "codeUnits": 301272,
+          "utf8Bytes": 301272,
+          "encodeMs": 29.187400000000707,
+          "parseMs": 2.1184999999995853,
+          "validateMs": 5.456000000000131,
+          "integrityMs": 21.19000000000051,
+          "reconstructMs": 714.8580000000002,
+          "decodeMs": 743.6225000000004
+        },
+        {
+          "codeUnits": 301272,
+          "utf8Bytes": 301272,
+          "encodeMs": 29.187799999999697,
+          "parseMs": 1.0189000000000306,
+          "validateMs": 4.408300000000054,
+          "integrityMs": 17.03939999999966,
+          "reconstructMs": 672.6320000000005,
+          "decodeMs": 695.0986000000003
+        }
+      ]
+    }
+  ]
+}

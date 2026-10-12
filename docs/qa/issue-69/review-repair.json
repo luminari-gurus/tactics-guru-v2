@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-12",
+  "pr": "https://github.com/luminari-gurus/tactics-guru-v2/pull/70",
+  "finding": "https://github.com/luminari-gurus/tactics-guru-v2/pull/70#discussion_r4246425650",
+  "reviewedHead": "6c798411980bc16af99f3284674f976e6b30cef1",
+  "rebasedMain": "30331e6c2fd18d2051aab32b6159839f3c994e1b",
+  "runtimeAndTestCommit": "2d23526e39b9aee81af4c64eeca22cdd437610da",
+  "browserTestRepairCommit": "d651b105bc08b764dbb9e42bf71b53c684ca9b99",
+  "red": {
+    "command": "node node_modules/vitest/vitest.mjs run tests/unit/saveEnvelope.test.ts -t 'uninterrupted queued continuation' --no-color",
+    "exitCode": 1,
+    "passed": 4,
+    "failed": 1,
+    "skipped": 16,
+    "seed": 2,
+    "capturedCommandCount": 29,
+    "expected": {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    "actual": {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 2,
+        "y": 6
+      }
+    }
+  },
+  "localChecks": {
+    "focused": 94,
+    "unit": 316,
+    "content": 77,
+    "applicationTypecheck": "passed",
+    "domainTypecheck": "passed",
+    "productionBuild": "passed"
+  },
+  "browser": {
+    "executable": "Microsoft Edge 155.0.4283.45",
+    "workers": 1,
+    "retries": 0,
+    "command": "npm test -- --reporter=line,json",
+    "stats": {
+      "startTime": "2026-10-12T10:05:58.333Z",
+      "duration": 749654.735,
+      "expected": 224,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "profiles": {
+      "desktop": 75,
+      "mobile-portrait": 75,
+      "mobile-landscape": 75
+    },
+    "failures": [
+      {
+        "key": "battle-audio.spec.ts:late decode from a destroyed scene cannot alter replacement controls or playback:desktop",
+        "error": "Error: expect(received).toEqual(expected) // deep equality\n\n- Expected  - 3\n+ Received  + 3\n\n@@ -1,14 +1,14 @@\n  Object {\n    \"active\": null,\n    \"completed\": 0,\n    \"context\": \"running\",\n-   \"dropped\": 1,\n+   \"dropped\": 2,\n    \"enabled\": false,\n    \"error\": null,\n-   \"generation\": 1,\n-   \"lastToken\": 1,\n+   \"generation\": 3,\n+   \"lastToken\": 3,\n    \"load\": \"ready\",\n    \"ownedSounds\": 0,\n    \"recent\": Array [],\n    \"started\": 0,\n    \"status\": \"muted\","
+      }
+    ],
+    "recheckCommand": "npm test -- tests/battle-audio.spec.ts --grep \"late decode from a destroyed scene\" --repeat-each=3 --reporter=line,json",
+    "recheckStats": {
+      "startTime": "2026-10-12T10:19:53.367Z",
+      "duration": 28252.36,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "recheckProfiles": {
+      "desktop": 3,
+      "mobile-portrait": 3,
+      "mobile-landscape": 3
+    },
+    "combinedCoverage": {
+      "configuredCases": 225,
+      "passedCases": 225,
+      "missing": [],
+      "fullSuiteRerunAfterTestRepair": false
+    },
+    "diagnosis": "ready() could observe the outgoing seed before Phaser processed restart; replacement enemy turns legitimately advanced muted-audio counters. Wait for seed 2 and then its settled player phase; keep the full equality assertion and timeouts."
+  },
+  "unchangedUninterruptedTraces": {
+    "fields": [
+      "replay",
+      "events",
+      "state"
+    ],
+    "hash": "canonical domain SHA-256",
+    "acceptedCommands": 258,
+    "before": [
+      {
+        "seed": 1,
+        "commands": 85,
+        "outcome": "playerLoss",
+        "traceHash": "sha256:5d0753a9497197acceba9186c9b87b5415436fffd1af7a12666917280d0305c6"
+      },
+      {
+        "seed": 2,
+        "commands": 38,
+        "outcome": "playerWin",
+        "traceHash": "sha256:64af543a9bc2af79b48226c08455a9f5c9e00d7d7ff7de0413bed25223432889"
+      },
+      {
+        "seed": 3,
+        "commands": 34,
+        "outcome": "playerWin",
+        "traceHash": "sha256:1aad6e58438796841456b5705016a79eb99085c895e432718a71965aaa614478"
+      },
+      {
+        "seed": 4,
+        "commands": 61,
+        "outcome": "playerWin",
+        "traceHash": "sha256:33c22a08a517ed7ebc4bcd2ba611130ea67117b51381e427db2500e924ec1f20"
+      },
+      {
+        "seed": 5,
+        "commands": 40,
+        "outcome": "playerWin",
+        "traceHash": "sha256:1f26293cce2934555a6060630a0f43e691b951bbf8694cd464c261e221d271b1"
+      }
+    ],
+    "after": [
+      {
+        "seed": 1,
+        "commands": 85,
+        "outcome": "playerLoss",
+        "traceHash": "sha256:5d0753a9497197acceba9186c9b87b5415436fffd1af7a12666917280d0305c6"
+      },
+      {
+        "seed": 2,
+        "commands": 38,
+        "outcome": "playerWin",
+        "traceHash": "sha256:64af543a9bc2af79b48226c08455a9f5c9e00d7d7ff7de0413bed25223432889"
+      },
+      {
+        "seed": 3,
+        "commands": 34,
+        "outcome": "playerWin",
+        "traceHash": "sha256:1aad6e58438796841456b5705016a79eb99085c895e432718a71965aaa614478"
+      },
+      {
+        "seed": 4,
+        "commands": 61,
+        "outcome": "playerWin",
+        "traceHash": "sha256:33c22a08a517ed7ebc4bcd2ba611130ea67117b51381e427db2500e924ec1f20"
+      },
+      {
+        "seed": 5,
+        "commands": 40,
+        "outcome": "playerWin",
+        "traceHash": "sha256:1f26293cce2934555a6060630a0f43e691b951bbf8694cd464c261e221d271b1"
+      }
+    ]
+  },
+  "rawLocalEvidence": [
+    {
+      "path": "tmp/pr70-repair-red.txt",
+      "sha256": "c1342332178710fd1de0ecdf1e2acb457747fdae9851f448da1faaeaaaa34449"
+    },
+    {
+      "path": "tmp/pr70-repair-focused.txt",
+      "sha256": "98eb7b2141db737c270a7c358084e1dec152382044ab134ae7c7a787910de810"
+    },
+    {
+      "path": "tmp/pr70-repair-unit.txt",
+      "sha256": "4aeb80505fc0c93557d8345064e24f0d7e469af68054276ee53aef58b0e2106b"
+    },
+    {
+      "path": "tmp/pr70-repair-content.txt",
+      "sha256": "9bc63b71e9d35b5dc1d8d1cf6e30ccf8c94f4e58733f08fc6b038c074e26309e"
+    },
+    {
+      "path": "tmp/pr70-repair-build.txt",
+      "sha256": "fd094ee590e83b20024a7ee027604bbb018b6faf94714f1ff7066528ce4d854a"
+    },
+    {
+      "path": "tmp/pr70-repair-browser.json",
+      "sha256": "822fcdd30c1ad390727bc2f5b96685184b0dc3469863d302fcfd50a7353e4649"
+    },
+    {
+      "path": "tmp/pr70-repair-browser.txt",
+      "sha256": "c809909bb73277fb52a711057f25ca2ffd50940360b87ea1f5a00347ca0f2dc9"
+    },
+    {
+      "path": "tmp/pr70-repair-audio-recheck.json",
+      "sha256": "79d6ee7758f88ce4e08dd4573328336759a3a56636b0eb3a87812ab1959379a6"
+    },
+    {
+      "path": "tmp/pr70-repair-audio-recheck.txt",
+      "sha256": "61de3cb9a1e57d809fad6f90882ad4a41ad233499e074f152261e56f1bfe63fe"
+    },
+    {
+      "path": "tmp/pr70-repair-audio-failure.md",
+      "sha256": "4431b6195b3a06e38348609689da0d32f43f88fb65188ca778d64f155f85a2fa"
+    }
+  ],
+  "visualSpotChecks": [
+    {
+      "path": "tmp/pr70-repair-screenshots/authored-landscape.png",
+      "sha256": "475c3d992b1ec8c803ae25da0d1396a00b71c878b36194ecb466d8fa3621f0e5",
+      "result": "Inspected: board and unit art render; HUD remains separate from the playfield"
+    },
+    {
+      "path": "tmp/pr70-repair-screenshots/authored-portrait.png",
+      "sha256": "076c5a2b6498714209e4045f2ecc63e747c854f113f1e92497b1b2cfaf242a46",
+      "result": "Inspected: board and unit art render; HUD remains separate from the playfield"
+    }
+  ],
+  "limits": [
+    "No live storage or session hydration implementation/test",
+    "No physical-device certification",
+    "Remote CI was not a gate",
+    "No merge, release tag or manual deployment"
+  ]
+}
