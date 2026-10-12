@@ -1,0 +1,355 @@
+{
+  "date": "2026-10-12",
+  "pr": "https://github.com/luminari-gurus/tactics-guru-v2/pull/70",
+  "mergeCommit": "ea58370ceb442b22d7f247bc463c2cdddec12456",
+  "base": "9d6aeb727d53531b7f17494af2de8add58147026",
+  "head": "fabc13e8ee11cda646c66bd304f7f13de4583990",
+  "testedAndMergedTree": "01ae3c3b55b6e8f1b75da383de59585c9ac7f0ef",
+  "strategy": "merge commit; preserve ten PR commits; conflict-free; no rebase, squash, stack or tag",
+  "checks": {
+    "unit": 316,
+    "content": 77,
+    "typechecks": 2,
+    "build": "passed",
+    "openspec": "battle-save-envelope --strict passed",
+    "whitespace": "passed"
+  },
+  "commands": [
+    "npm run test:unit -- --no-color",
+    "npm run validate:content -- --no-color",
+    "npm run build",
+    "node <OpenSpec 1.14.1>/bin/openspec.js validate battle-save-envelope --strict",
+    "npm test -- tests/battle-audio.spec.ts tests/battle-board.spec.ts tests/battle-loop.spec.ts --grep \"selection labels retain|late decode from a destroyed scene|complete legal authored battle|restart during initial enemy animation|keyboard selection, confirmation lock|sound control uses real gestures|default authored board renders canonical\" --reporter=line,json",
+    "git diff --cached --check"
+  ],
+  "browser": {
+    "executable": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+    "workers": 1,
+    "retries": 0,
+    "stats": {
+      "startTime": "2026-10-12T10:34:36.734Z",
+      "duration": 159014.059,
+      "expected": 24,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "tests": [
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 3403
+          }
+        ]
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2172
+          }
+        ]
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 3439
+          }
+        ]
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2247
+          }
+        ]
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 3462
+          }
+        ]
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2173
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 6211
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "default authored board renders canonical units, highlights and stable restarts",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 4507
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 5810
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "default authored board renders canonical units, highlights and stable restarts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 5327
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 6297
+          }
+        ]
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "title": "default authored board renders canonical units, highlights and stable restarts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 5374
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 20952
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 10651
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2307
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "restart during initial enemy animation discards the old run and its callbacks",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 557
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 21274
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 10856
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2327
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "restart during initial enemy animation discards the old run and its callbacks",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 600
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 21394
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 10653
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 2346
+          }
+        ]
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "title": "restart during initial enemy animation discards the old run and its callbacks",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "durationMs": 692
+          }
+        ]
+      }
+    ]
+  },
+  "localLogs": [
+    {
+      "path": "tmp/pr70-merge-unit.txt",
+      "sha256": "b12556ebc2a8db82693146a62886aeb4d44df8ea3546e5facfe46ca812aad147"
+    },
+    {
+      "path": "tmp/pr70-merge-content.txt",
+      "sha256": "7ed4787a443fa92fd159686fe8e9cbab3573831be28265674ab6402851a29cac"
+    },
+    {
+      "path": "tmp/pr70-merge-build.txt",
+      "sha256": "0ed16e999b1459dd9feb2c2961801ff642a7e00c0e08136f4691830d14b0b8b6"
+    },
+    {
+      "path": "tmp/pr70-merge-browser.txt",
+      "sha256": "0a16d62619305e9fbffd6215e9b308163718b9dff903286bcadb1dc4bd055c50"
+    }
+  ],
+  "localBrowserReport": {
+    "path": "tmp/pr70-merge-browser.json",
+    "sha256": "7cd1fc179f050905322345862c6691f2dfc3b4db230464155ec998bba30bbec8"
+  },
+  "limits": [
+    "Only 24 focused browser cases were rerun; historical full-suite and repaired-case evidence remains separately recorded.",
+    "No physical-device, live storage/resume or deployment verification.",
+    "No next-phase work was started."
+  ]
+}

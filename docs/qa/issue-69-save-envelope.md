@@ -1,5 +1,13 @@
 # Issue #69: bounded battle-save contract evidence
 
+## Merge verification — 2026-10-12
+
+PR #70 merged as `ea58370ceb442b22d7f247bc463c2cdddec12456`; issue #69 is completed. Its parents are main `9d6aeb727d53531b7f17494af2de8add58147026` and reviewed head `fabc13e8ee11cda646c66bd304f7f13de4583990`. The published tree `01ae3c3b55b6e8f1b75da383de59585c9ac7f0ef` exactly matches the tested local merge. Main was two documentation-only commits ahead, so integration required no conflict resolution or runtime/test edits.
+
+Fresh checks: **316 unit tests, 77 content tests, both typechecks, production build, strict OpenSpec, whitespace checks and 24 focused browser cases passed**. Browser testing used installed Edge, the existing three desktop/portrait/landscape profiles, one worker and unchanged timeouts. It covered the two repaired camera/audio synchronization cases, sound controls, canonical rendering/restarts, complete legal win/loss battles, gesture replacement and restart during initial enemy animation. Portrait/landscape screenshots were inspected for rendered art and playfield/HUD separation. Existing chunk-size and color-environment warnings remain.
+
+[Retained merge evidence](issue-69/merge-validation.json) records commands, exact source/tree, report statistics and local log hashes. This is a focused merge validation, not a new full 225-case run, physical-device certification or live persistence proof. The earlier failures/rechecks below remain part of the record. All ten PR commits and the source branch are preserved; no release tag or manual deployment was made. The [current handoff](../ongoing-projects/plan.md) identifies existing #72 as the next storage-adapter phase, with #58/#73/#74 and first-battle release gates remaining open. No next-phase work was started.
+
 ## PR #70 review repair — 2026-10-12
 
 The single [review finding](https://github.com/luminari-gurus/tactics-guru-v2/pull/70#discussion_r4246425650) was reproduced after rebasing onto main `30331e6`: seed 2/command 29 captures archer 5 at `(3,4)`, acted but not moved. The original queue dispatches `endTurn` and activates unit 6; the old reconstruction selects a move to `(2,6)` and leaves unit 5 active. A new permanent regression failed on precisely this difference before the runtime repair (four other authored seeds passed).
@@ -119,6 +127,6 @@ node --experimental-strip-types scripts/measure-save-envelope.ts docs/qa/issue-6
 
 The existing Vite loader resolves source TypeScript without adding a dependency. Each candidate uses the same outer shape, canonical serialization and SHA-256 digest, one discarded warmup and five serial samples per fixture. Snapshot validation includes its owned-state reconstruction; the separate snapshot reconstruction timing measures only returning that state. Replay reconstruction includes `replayBattle`'s repeated structural validation and command execution. Encode validates shape; semantic replay cost is in decode. Fixture generation and catalog-hash warmup are outside timings. Each output records exact source/tree, dirty paths, runtime/OS/CPU, catalog and state/log hashes, sizes and every timing sample.
 
-## Publication
+## Original publication — 2026-10-11
 
 [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70) is open and non-draft against main. The connector lacked PR-creation permission (HTTP 403); the same authorized PR was created with the repository's existing GitHub credential, then read back through the connector and attached to the chat. No merge, tag or deployment was performed. Original checkout edits remain untouched. The implementation worktree is the review branch; all subsequent edits after the tested source are tests/documentation only.

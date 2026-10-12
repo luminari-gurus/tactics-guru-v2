@@ -1,6 +1,10 @@
 # Battle-save envelope implementation plan
 
-## Scope and status
+## Merged — 2026-10-12
+
+PR #70 is merged into main as `ea58370ceb442b22d7f247bc463c2cdddec12456`; GitHub closed #69 as completed. All 12 OpenSpec tasks and this child are complete. Fresh combined-tree verification passed 316 unit tests, 77 content checks, both typechecks, build, strict OpenSpec and 24 focused browser cases. See the [merge evidence](../../qa/issue-69/merge-validation.json) and [next-session handoff](../plan.md). Parent #58 remains open; existing #72 is the next storage-adapter phase and has not been started. The source branch and review history are retained; no release tag or manual deployment was made.
+
+## Prior review handoff — historical
 
 PR #70 review repair complete (2026-10-12): rebased the seven feature commits without conflicts from `e955e9d` onto main `30331e6`; range-diff preserves all seven patches. Remote pre-rebase head is `6c79841`. The single review finding reproduced at seed 2/command 29, then repair `2d23526` made the existing planner preserve the live move/attack/Wait queue through `hasActed`. Five full authored battles (258 commands) compare decoded continuation against the original session's queue, with unchanged uninterrupted trace hashes. No saved queue, second planner, storage or hydration is needed. All 12 OpenSpec tasks are complete. Focused 94, unit 316, content 77, both typechecks, build and strict OpenSpec pass. All 225 configured browser cases have passing evidence: full run 224 passes/one existing audio-test restart race, followed by nine passing repetitions after test-only repair `d651b10`; no full-suite rerun after that repair. See [QA](../../qa/issue-69-save-envelope.md) and [retained review evidence](../../qa/issue-69/review-repair.json). Publication uses an exact lease and preserves useful implementation/test/evidence commits; this is neither a stacked PR nor a release requiring tags. No merge or manual deployment is performed.
 
