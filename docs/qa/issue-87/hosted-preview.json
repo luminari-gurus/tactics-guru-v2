@@ -1,26 +1,47 @@
 {
-  "testedCommit": "136cdd0551e9140a308990d36b3f7801f5b6b788",
-  "checkRuns": [
-    {
-      "name": "Cloudflare Pages",
-      "conclusion": "failure",
-      "details_url": "https://dash.cloudflare.com/?to=/0712aa979b5d276531a4972116f61f04/pages/view/tactics-guru-v2/1e72a9db-7c69-4797-986f-380a89528708",
-      "started_at": "2026-10-12T13:16:30Z",
-      "completed_at": "2026-10-12T13:16:30Z",
-      "output": {
-        "title": "Deploying",
-        "summary": "<table><tr><td><strong>Latest commit:</strong> </td><td>\n<code>136cdd0</code>\n</td></tr>\n<tr><td><strong>Status:</strong></td><td>\ud83d\udeab&nbsp; Deploy failed.</td></tr>\n</table>\n\n[View logs](https://dash.cloudflare.com/?to=/0712aa979b5d276531a4972116f61f04/pages/view/tactics-guru-v2/1e72a9db-7c69-4797-986f-380a89528708)\n",
-        "text": null,
-        "annotations_count": 0,
-        "annotations_url": "https://api.github.com/repos/luminari-gurus/tactics-guru-v2/check-runs/114829083064/annotations"
+  "earlierFailedDeployment": {
+    "testedCommit": "136cdd0551e9140a308990d36b3f7801f5b6b788",
+    "checkRuns": [
+      {
+        "name": "Cloudflare Pages",
+        "conclusion": "failure",
+        "details_url": "https://dash.cloudflare.com/?to=/0712aa979b5d276531a4972116f61f04/pages/view/tactics-guru-v2/1e72a9db-7c69-4797-986f-380a89528708",
+        "started_at": "2026-10-12T13:16:30Z",
+        "completed_at": "2026-10-12T13:16:30Z",
+        "output": {
+          "title": "Deploying",
+          "summary": "<table><tr><td><strong>Latest commit:</strong> </td><td>\n<code>136cdd0</code>\n</td></tr>\n<tr><td><strong>Status:</strong></td><td>\ud83d\udeab&nbsp; Deploy failed.</td></tr>\n</table>\n\n[View logs](https://dash.cloudflare.com/?to=/0712aa979b5d276531a4972116f61f04/pages/view/tactics-guru-v2/1e72a9db-7c69-4797-986f-380a89528708)\n",
+          "text": null,
+          "annotations_count": 0,
+          "annotations_url": "https://api.github.com/repos/luminari-gurus/tactics-guru-v2/check-runs/114829083064/annotations"
+        }
       }
-    }
-  ],
-  "browserResult": {
-    "url": "https://work-issue-87-overworld-map.tactics-guru-v2.pages.dev/map",
-    "result": "timeout waiting for #map-grid span",
-    "httpStatus": 200,
-    "servedCommitVerified": false
+    ],
+    "browserResult": {
+      "url": "https://work-issue-87-overworld-map.tactics-guru-v2.pages.dev/map",
+      "result": "timeout waiting for #map-grid span",
+      "httpStatus": 200,
+      "servedCommitVerified": false
+    },
+    "logAccess": "Cloudflare dashboard redirects to sign-in; no diagnostic available"
   },
-  "logAccess": "Cloudflare dashboard redirects to sign-in; no diagnostic available"
+  "latestVerification": {
+    "testedCommit": "96482ed1bc1899d7e6e5fa8ad402fb2417e565e7",
+    "deploymentId": "ccec0cfb-f343-44c7-95e7-2ca86075bb1f",
+    "checkConclusion": "SUCCESS",
+    "url": "https://work-issue-87-overworld-map.tactics-guru-v2.pages.dev/map",
+    "directRoutes": [
+      "/map",
+      "/map/"
+    ],
+    "refreshPassed": true,
+    "cells": 400,
+    "generatorVersion": "rooms-v1",
+    "seed1Walkable": 91,
+    "seed42Walkable": 136,
+    "differentSeedChangesLayout": true,
+    "seed1ReproductionPassed": true,
+    "servedCommitVerified": true,
+    "logAccessRequired": false
+  }
 }
