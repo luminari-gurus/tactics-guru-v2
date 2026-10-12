@@ -48,7 +48,7 @@ No persisted data or URL contract changes. Ship through a reviewed PR against ma
 
 Modify existing generator/view/style and map unit/browser tests; add issue QA and update README. No package change expected. Unit matrix covers every type, independent validity/connectivity, repeatability, 90% diversity, baseline Rooms signatures, type metadata/error handling, bounded forced fallback, clock independence and battle RNG sentinel. Browser checks cover switching/reproducing all types, valid/invalid seed controls, New seed selection retention, entropy failure, keyboard/mobile layout, direct entry/refresh, non-root base behavior and map/battle route/storage isolation. Record representative screenshots and raw/gzip map chunk delta against base.
 
-Run focused map unit/browser checks while developing, then `npm run test:unit`, `npm run validate:content`, `npm run typecheck`, `npm run build`, full configured `npm test`, `openspec validate issue-97-map-algorithms --strict` and `git diff --check`. Report actual results and unverified criteria. Approval of this implementation plan remains pending.
+Run focused map unit/browser checks while developing, then `npm run test:unit`, `npm run validate:content`, `npm run typecheck`, `npm run build`, full configured `npm test`, `openspec validate issue-97-map-algorithms --strict` and `git diff --check`. Report actual results and unverified criteria. User approved this implementation plan on 2026-10-12.
 
 ## Scope review
 

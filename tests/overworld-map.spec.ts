@@ -65,7 +65,7 @@ test('map direct entry, refresh, seeds and responsive inspection', async ({ page
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const dimensions = await grid.locator('span').first().boundingBox();
   expect(dimensions!.width).toBeGreaterThan(12);
-  for (const control of ['#map-seed', '#map-new-seed', '#map-controls button[type="submit"]']) {
+  for (const control of ['#map-type', '#map-seed', '#map-new-seed', '#map-controls button[type="submit"]']) {
     await page.locator(control).scrollIntoViewIfNeeded();
     const rect = await page.locator(control).boundingBox();
     expect(rect!.width).toBeGreaterThanOrEqual(44);
@@ -93,6 +93,7 @@ test('map never initializes battle, audio, diagnostics or storage', async ({ pag
   page.on('request', request => { if (request.resourceType() === 'script') scripts.push(request.url()); });
   await page.goto('/map/?scene=proof');
   await expect(page.locator('#map-grid')).toBeVisible();
+  for (const type of ['random-walker', 'cellular', 'rooms']) await page.getByLabel('Map type', { exact: true }).selectOption(type);
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
   expect(await page.evaluate(() => (window as unknown as { mapStorageCalls: string[] }).mapStorageCalls)).toEqual([]);
   expect(await page.evaluate(() => ({ primary: localStorage.getItem('tg:phaser:battle:primary'), legacy: localStorage.getItem('godot-save') }))).toEqual({ primary: 'preserve-phaser', legacy: 'preserve-legacy' });
@@ -111,9 +112,64 @@ test('new seed still works when browser entropy fails or returns the current see
     crypto.getRandomValues = (() => { throw Error('unavailable'); }) as typeof crypto.getRandomValues;
   });
   await page.goto('/map');
+  await page.getByLabel('Map type', { exact: true }).selectOption('cellular');
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
+  await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('cellular');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '2');
   await page.evaluate(() => { crypto.getRandomValues = ((values: Uint32Array) => { values[0] = 2; return values; }) as typeof crypto.getRandomValues; });
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '3');
+});
+
+
+test('map types apply the displayed seed and retain committed choices', async ({ page }, testInfo) => {
+  await page.goto('/map');
+  const grid = page.locator('#map-grid');
+  const type = page.getByLabel('Map type', { exact: true });
+  const seed = page.getByLabel('Seed', { exact: true });
+  const signature = () => grid.locator('span').evaluateAll(cells => cells.map(c => c.className).join(','));
+  await expect(type).toHaveValue('rooms');
+  await type.focus();
+  await expect(type).toBeFocused();
+  await type.press('c');
+  await type.press('Tab');
+  await expect(type).toHaveValue('cellular');
+  await expect(grid).toHaveAttribute('data-type', 'cellular');
+  const layouts = new Set<string>();
+  for (const [id, version] of [['rooms', 'rooms-v1'], ['random-walker', 'random-walker-v1'], ['cellular', 'cellular-v1']]) {
+    await seed.fill('12345');
+    await type.selectOption(id);
+    await page.getByRole('button', { name: 'Generate', exact: true }).click();
+    await expect(grid).toHaveAttribute('data-type', id);
+    await expect(grid).toHaveAttribute('data-version', version);
+    await expect(grid).toHaveAttribute('data-seed', '12345');
+    await expect(page.locator('#map-status')).toContainText(version);
+    const original = await signature();
+    layouts.add(original);
+    await page.screenshot({ path: testInfo.outputPath(`${id}.png`), fullPage: true });
+    await page.getByRole('button', { name: 'New seed', exact: true }).click();
+    await expect(type).toHaveValue(id);
+    await expect(grid).not.toHaveAttribute('data-seed', '12345');
+    await seed.fill('12345');
+    await page.getByRole('button', { name: 'Generate', exact: true }).click();
+    expect(await signature()).toBe(original);
+    for (const invalid of ['', '-1', '1.5', '4294967296', 'abc']) {
+      await seed.fill(invalid);
+      await type.selectOption(id === 'rooms' ? 'cellular' : 'rooms');
+      await expect(type).toHaveValue(id);
+      await expect(grid).toHaveAttribute('data-type', id);
+      await expect(grid).toHaveAttribute('data-seed', '12345');
+      await expect(seed).toHaveAttribute('aria-invalid', 'true');
+      await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+      expect(await signature()).toBe(original);
+    }
+    // A valid edit is applied by the type change itself, without Generate.
+    await seed.fill('424242');
+    await type.selectOption(id === 'rooms' ? 'cellular' : 'rooms');
+    await expect(grid).toHaveAttribute('data-seed', '424242');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  expect(layouts.size).toBe(3);
+  await page.reload();
+  await expect(type).toHaveValue('rooms');
 });

@@ -7,8 +7,9 @@
 .map-page header p { color: #b6c7bb; margin: 0; }
 .map-page .map-eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
 .map-page #map-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
-.map-page label { display: grid; gap: 6px; font-size: 13px; }
-.map-page input, .map-page button { font: inherit; min-height: 44px; min-width: 44px; border: 1px solid #72897c; border-radius: 6px; padding: 10px 12px; color: inherit; }
+.map-page label, .map-page .map-field { display: grid; gap: 6px; font-size: 13px; }
+.map-page input, .map-page select, .map-page button { font: inherit; min-height: 44px; min-width: 44px; border: 1px solid #72897c; border-radius: 6px; padding: 10px 12px; color: inherit; }
+.map-page select { background: #192b30; max-width: 100%; }
 .map-page input { width: 150px; background: #192b30; }
 .map-page button { background: #294539; cursor: pointer; touch-action: manipulation; }
 .map-page button:hover { background: #365a49; }
