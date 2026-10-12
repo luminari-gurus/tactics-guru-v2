@@ -24,7 +24,7 @@ Implementation of [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues
 
 - [x] 4.1 Add controlled-clock reload tests during legally reached player/enemy presentation, paired uninterrupted continuation, backup recovery, legal victory/defeat and repeated restart; pass across configured desktop/portrait/landscape projects without forcing state as completion evidence.
 - [x] 4.2 Run focused checks followed by full unit/content/browser suites, both typechecks, production build, strict OpenSpec and whitespace checks; record exact revision/browser/results and limitations in `docs/qa/issue-73-battle-resume.md` and keep the active handoff current.
-- [ ] 4.3 Map all five issue acceptance criteria to evidence, recheck branch/base and unrelated PR overlap, then publish the implementation commits and review handoff; keep #57/#58/#74 gates explicit and claim no physical-device or deployed-build validation that was not performed.
+- [x] 4.3 Map all five issue acceptance criteria to evidence, recheck branch/base and unrelated PR overlap, then publish the implementation commits and review handoff; keep #57/#58/#74 gates explicit and claim no physical-device or deployed-build validation that was not performed.
 
 ## Workflow follow-up
 
