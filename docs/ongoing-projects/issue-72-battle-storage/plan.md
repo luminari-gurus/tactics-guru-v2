@@ -1,6 +1,6 @@
 # Issue #72: guarded battle storage and backup recovery
 
-Status: implementation and required local verification complete on 2026-10-12 (Asia/Jerusalem). [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) is open and ready for review against main. The user authorized OpenSpec implementation with ablation and a review-ready PR. See the maintained [session handoff](../plan.md).
+Status: complete and merged on 2026-10-12 (Asia/Jerusalem). [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) merged into main as `3e7bf08600c59a09a0f9c37f3c81c7c07b3a6954`; #72 closed automatically as completed. The user authorized this merge and next-session preparation. The historical implementation plan below is retained; see the maintained [session handoff](../plan.md) for #73, which has not started, and the [merge record](../../qa/issue-72/merge-validation.json).
 
 - [Issue #72](https://github.com/luminari-gurus/tactics-guru-v2/issues/72), under [safe-resume epic #58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58).
 - Assigned to `moshehbenavraham`; [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/72#issuecomment-6123387699).

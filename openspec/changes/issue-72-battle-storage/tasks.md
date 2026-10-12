@@ -22,7 +22,6 @@ Implementation authorized and completed on 2026-10-12. All required local checks
 - [x] 4.1 Run focused adapter/codec/domain tests, all configured unit and content checks, both typechecks, production build and the configured browser suite; record commands, exact revision, failures and remaining limits in `docs/qa/issue-72-battle-storage.md`, without treating emulation as physical persistence acceptance.
 - [x] 4.2 Link the completed adapter guide from `docs/battle-save-format.md`, reconcile this plan with actual delivery, and verify all #72 acceptance criteria, strict OpenSpec validation, relative document links and `git diff --check`; keep #73/#74 and parent gates explicitly open.
 
-## Workflow follow-up
+## Delivery closeout
 
-- Commit and publish implementation separately after the concrete plan is approved; prepare the issue-linked PR with actual evidence and remaining limitations.
-- Do not merge, deploy, close parents or archive this change as part of planning publication.
+Planning and implementation were separately authorized and published. With subsequent explicit merge authorization, PR #91 merged into main on 2026-10-12 as `3e7bf08600c59a09a0f9c37f3c81c7c07b3a6954`, completing #72. Fresh checks and retained browser evidence are recorded in the [QA report](../../../docs/qa/issue-72-battle-storage.md). No deployment, parent closure or OpenSpec archive was performed. The [next-session handoff](../../../docs/ongoing-projects/plan.md) prepares existing #73 without starting it.

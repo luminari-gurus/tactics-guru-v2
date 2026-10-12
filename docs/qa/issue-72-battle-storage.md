@@ -1,6 +1,12 @@
 # Issue #72: guarded battle storage verification
 
-Status: implementation and required local verification complete; [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) is ready for review. Date: 2026-10-12. Branch: `branch/issue-72-battle-storage`. Implementation uses the [approved plan](../ongoing-projects/issue-72-battle-storage/plan.md), [API contract](../battle-storage.md) and OpenSpec `issue-72-battle-storage`.
+Status: [PR #91](https://github.com/luminari-gurus/tactics-guru-v2/pull/91) merged into main as `3e7bf08600c59a09a0f9c37f3c81c7c07b3a6954`; #72 completed. Date: 2026-10-12. Implementation branch: `branch/issue-72-battle-storage`. Implementation uses the [approved plan](../ongoing-projects/issue-72-battle-storage/plan.md), [API contract](../battle-storage.md) and OpenSpec `issue-72-battle-storage`.
+
+## Merge verification — 2026-10-12
+
+The conflict-free merge preserves all five PR commits and exactly matches reviewed head `6124ecb55e6ccbb584832602feefbd078bdcbfba` (tree `543bbd98e219c7543b083c19baa9d3845bd0513e`). Fresh unit checks 372/372, content checks 77/77, both typechecks, production build, strict OpenSpec and whitespace checks passed. With npm absent from PATH, equivalent installed Vitest/TypeScript/Vite CLI entrypoints ran directly through Node; an ignored node_modules junction reused the implementation worktree's dependencies. No dependency/configuration change was made. The existing chunk-size warning remains.
+
+The retained 225-case browser run below was verified to contain 225 unique first-attempt passing cases; all five source blob identities match the merged head, and all differences since its tested commit are documentation/evidence. Browsers were not rerun in this merge session. The exact-head [adversarial review](https://github.com/luminari-gurus/tactics-guru-v2/pull/91#issuecomment-6127561576) reported no substantiated findings. See the [merge record](issue-72/merge-validation.json) and [next-session handoff](../ongoing-projects/plan.md). No live persistence, physical certification or deployed-main check was performed.
 
 ## Scope and source
 

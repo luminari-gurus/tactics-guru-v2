@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-12",
+  "pr": "https://github.com/luminari-gurus/tactics-guru-v2/pull/91",
+  "mergeCommit": "3e7bf08600c59a09a0f9c37f3c81c7c07b3a6954",
+  "base": "5d8351468463a9766665f3dce1da35f074e3476f",
+  "head": "6124ecb55e6ccbb584832602feefbd078bdcbfba",
+  "testedAndMergedTree": "543bbd98e219c7543b083c19baa9d3845bd0513e",
+  "strategy": "merge commit; preserve five PR commits; no conflicts, rebase, squash, stacking change or tag",
+  "checks": {
+    "unit": 372,
+    "content": 77,
+    "typechecks": 2,
+    "build": "passed; existing large-chunk warning",
+    "openspec": "issue-72-battle-storage --strict passed",
+    "whitespace": "passed"
+  },
+  "commands": [
+    "node node_modules/vitest/vitest.mjs run",
+    "node node_modules/vitest/vitest.mjs run tests/unit/content.test.ts tests/unit/authoredContent.test.ts",
+    "node node_modules/typescript/bin/tsc --noEmit",
+    "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.domain.json",
+    "node node_modules/vite/bin/vite.js build",
+    "node <installed-openspec>/bin/openspec.js validate issue-72-battle-storage --strict",
+    "git diff --check origin/main...HEAD"
+  ],
+  "browserEvidence": {
+    "rerunThisSession": false,
+    "record": "docs/qa/issue-72/validation.json",
+    "sourceCommit": "df1159f0de928dee2421c73d46f07b24749d882a",
+    "matchingRecordedSourceBlobs": 5,
+    "uniqueCases": 225,
+    "firstAttemptPassed": 225,
+    "differencesFromSourceCommit": "documentation and evidence only"
+  },
+  "review": "https://github.com/luminari-gurus/tactics-guru-v2/pull/91#issuecomment-6127561576",
+  "limits": [
+    "No browser rerun or physical certification in this merge session",
+    "No live autosave, hydration or resume controls; existing issue 73 owns integration",
+    "No manual deployment or deployed-main validation",
+    "Storage remains origin-scoped and best-effort under the documented single-writer assumptions"
+  ]
+}
