@@ -24,11 +24,11 @@ Issue [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69), a chil
 
 - [x] 4.1 Reproduce the seed-2/command-29 divergence after rebasing onto current main; extend existing tests to compare decoded presentation boundaries with the uninterrupted session's actual queued commands/events/state (AC4).
 - [x] 4.2 Make the existing planner preserve move/attack/Wait suffixes after accepted actions, prove fresh-turn and live-session behavior is preserved, and document the exact reconstruction rule without adding a queue payload or hydration path (AC4/AC6).
-- [ ] 4.3 Run focused and configured local unit/content/type/build/browser checks, strict OpenSpec and whitespace validation; update QA and handoff with the review result and Git management decisions (AC7).
+- [x] 4.3 Run focused and configured local unit/content/type/build/browser checks, strict OpenSpec and whitespace validation; update QA and handoff with the review result and Git management decisions (AC7).
 
 ## Workflow follow-up
 
 - Keep issue #69, its parent #58, branch and plan links current. The 2026-10-11 implementation request authorizes completing this child and publishing a review-ready PR.
 - After validation, open the child-scoped PR. Do not close #58 or merge/archive this implementation as part of the review handoff.
 
-Review handoff: [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70), original nine tasks complete; the 2026-10-12 request authorizes the three review-repair tasks above. Leave this change available for review; archive after the appropriate integration decision.
+Review handoff: [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70), all 12 tasks complete. The sole review finding is repaired; the local browser gate's separate test-only restart synchronization fix passed nine repetitions. See the [QA report](../../../docs/qa/issue-69-save-envelope.md) for original failures, combined coverage and Git delivery. Leave this change available for review; archive after the appropriate integration decision.

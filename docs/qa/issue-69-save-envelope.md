@@ -1,5 +1,43 @@
 # Issue #69: bounded battle-save contract evidence
 
+## PR #70 review repair — 2026-10-12
+
+The single [review finding](https://github.com/luminari-gurus/tactics-guru-v2/pull/70#discussion_r4246425650) was reproduced after rebasing onto main `30331e6`: seed 2/command 29 captures archer 5 at `(3,4)`, acted but not moved. The original queue dispatches `endTurn` and activates unit 6; the old reconstruction selects a move to `(2,6)` and leaves unit 5 active. A new permanent regression failed on precisely this difference before the runtime repair (four other authored seeds passed).
+
+Repair `2d23526e39b9aee81af4c64eeca22cdd437610da` keeps the existing policy's ordered optional move, optional attack, then Wait. A validated actor with `hasActed: true` returns only Wait. Existing AI fixtures also verify that replanning accepted prefixes reproduces their remaining commands. The new save tests compare independently selected decoded commands to the uninterrupted `BattleSession` queue, then compare dispatch events/state and RNG at each presentation boundary through completion for seeds 1–5 (258 accepted commands). Full original-versus-fixed replay/event/final-state hashes match for all five seeds. The snapshot format, state/command/rules/RNG identities, fresh-turn choices and live session queue behavior remain unchanged; no schema/version bump is needed for this reconstruction bug fix.
+
+Fresh local validation: 94 focused tests, 316 configured unit tests, 77 content checks, both TypeScript checks, production build and strict OpenSpec pass. The full browser run on installed Edge 155.0.4283.45 used the repository's desktop, Pixel 7 portrait and 915×412 landscape profiles, one worker, no retries and default timeouts: **224 passed, one failed** in 12.5 minutes. The desktop late-decode test accepted the outgoing scene's player phase after clicking Restart, then compared audio counters while the replacement seed was legitimately running enemy commands (`lastToken` 1→3, `generation` 1→3, `dropped` 1→2). This is test synchronization, not stale decoding: runtime teardown already checks `live` after asynchronous decoding, and the replacement scene was still presenting in the retained failure DOM.
+
+Separate test-only repair `d651b105bc08b764dbb9e42bf71b53c684ca9b99` waits for replacement seed 2 before its settled player phase. It preserves the full audio snapshot equality assertion and timeouts. The repaired case passed **9/9** repetitions (three per profile) in 28.3 seconds. Combined reports cover **225 unique configured cases, no missing cases**; the full suite was **not** rerun after this isolated test correction. Runtime/build/config inputs are unchanged from `2d23526`, so the other 224 passing results remain applicable. The [retained review evidence](issue-69/review-repair.json) contains both report summaries, the original failure, per-profile coverage, pre/post battle hashes and SHA-256 identities for raw local logs. Representative authored portrait/landscape screenshots were inspected; unit/terrain art rendered with the HUD separate from the playfield. Existing Vite chunk-size and color-environment warnings are informational.
+
+Commands (npm resolved through the existing ignored `tmp/tool-bin` wrapper):
+
+```text
+node node_modules/vitest/vitest.mjs run tests/unit/saveEnvelope.test.ts tests/unit/turns.test.ts tests/unit/battleSession.test.ts tests/unit/rng.test.ts tests/unit/ai.test.ts tests/unit/domainBoundary.test.ts --no-color
+# 94 passed
+npm run test:unit -- --no-color
+# 316 passed
+npm run validate:content -- --no-color
+# 77 passed
+npm run build
+# Both configured typechecks and Vite production build passed
+npm test -- --reporter=line,json
+# 224 passed, 1 restart synchronization failure
+npm test -- tests/battle-audio.spec.ts --grep "late decode from a destroyed scene" --repeat-each=3 --reporter=line,json
+# 9 passed after test-only correction
+node <openspec-1.14.1>/bin/openspec.js validate battle-save-envelope --strict
+git diff --check
+# Both passed; relative documentation links also verified
+```
+
+Both browser commands used `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`. Raw reports are `tmp/pr70-repair-browser.json` and `tmp/pr70-repair-audio-recheck.json`. The original failed DOM and reviewed screenshots are preserved under the ignored `tmp/pr70-repair-*` paths named in the evidence file. No application change was needed for this local gate repair.
+
+Git: the branch was nine commits behind main. All seven feature patches were rebased without conflicts and retained unchanged according to `git range-diff e955e9d..6c79841 30331e6..d3fdc33`. Preserve implementation, test and measurement history; no stacked dependency or release tag is needed. Only the PR branch will be updated, with an exact lease against `6c798411980bc16af99f3284674f976e6b30cef1`; no merge or manual deployment is part of this repair. The existing Cloudflare integration may publish a branch preview automatically. Original checkout edits remain untouched. Parent #58 remains open; physical devices and live storage/hydration remain outside this evidence.
+
+## Original implementation evidence — 2026-10-11
+
+The sections below retain the original implementation and browser-race evidence. The review repair above supersedes the earlier continuation-proof claim and validation counts.
+
 ## Scope and provenance
 
 Implementation started 2026-10-11 from planning head `cc4859d`, based on merged main `e955e9d9f182a76f057ea69057c7a1ac6c0bd682`. This report covers a pure unused-by-UI contract, not browser persistence or physical-device acceptance. Parent #58 remains open.
