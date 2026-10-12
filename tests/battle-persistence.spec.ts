@@ -42,6 +42,8 @@ test('startup is read-only, keyboard Continue rebuilds no historical presentatio
   const viewport=page.viewportSize()!;
   for(const box of boxes){expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);expect(box.left).toBeGreaterThanOrEqual(0);expect(box.right).toBeLessThanOrEqual(viewport.width);expect(box.bottom).toBeLessThanOrEqual(viewport.height);}
   await page.mouse.click(3,viewport.height-3);expect((await readSession(page)).state).toEqual(before.state);
+  // Let the browser's native touch highlight fade for the retained image.
+  await page.waitForTimeout(350);
   await page.screenshot({path:test.info().outputPath('recovery.png')});
   await touch(page,'#save-close');await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('#battle-recovery')).toBeFocused();expect((await readSession(page)).state).toEqual(before.state);
@@ -163,9 +165,10 @@ test('successful reset with failed fresh save cannot recover an old battle on re
   await page.reload();await ready(page);expect((await readSession(page)).state.seed).toBe(1);await expect(page.getByRole('dialog')).not.toBeVisible();
 });
 
-for(const invalid of ['{broken',JSON.stringify({kind:'future',format:99})])test(`invalid startup requires explicit reset: ${invalid.slice(0,12)}`,async({page})=>{
+for(const invalid of ['{broken',JSON.stringify({kind:'tactics-guru:battle-snapshot',format:99,payload:{},digest:'sha256:'+'0'.repeat(64)})])test(`invalid startup requires explicit reset: ${invalid.slice(0,12)}`,async({page})=>{
   await page.goto('/?scene=proof');await page.evaluate(({keys,invalid})=>localStorage.setItem(keys.primary,invalid),{keys,invalid});
   await page.goto('/');await expect(page.getByRole('dialog')).toContainText('needs recovery');await expect(page.locator('#save-continue')).toHaveCount(0);
+  if(invalid.includes('"format":99'))await expect(page.getByRole('dialog')).toContainText('incompatible');
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-cancel-reset').click();
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
   expect((await readSession(page)).state.seed).toBe(1);expect((await stored(page)).primary).not.toBe(invalid);

@@ -53,7 +53,19 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     expect(continued.replay).toBeNull();expect(continued.events).toEqual([]);
     expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
     await expect(page.getByRole('dialog')).toContainText(outcome==='playerWin'?'Victory':'Defeat');
-    await page.locator('#dialog-restart').click();await confirmRestart(page);
+    // An outcome reset can fail after removing backup; the ended session must stay usable.
+    await page.evaluate(()=>{
+      const remove=Storage.prototype.removeItem;
+      Storage.prototype.removeItem=function(key){if(key==='tactics-guru:phaser:battle:primary:v1')throw new DOMException('Denied','SecurityError');return remove.call(this,key);};
+      Object.assign(window,{restoreBattleRemoval:()=>{Storage.prototype.removeItem=remove;}});
+    });
+    await page.locator('#dialog-restart').click();await page.locator('#save-confirm-reset').click();
+    await expect(page.getByRole('dialog')).toContainText('Reset incomplete');
+    expect((await readSession(page)).state).toEqual(final.state);
+    await page.locator('#save-close').click();await expect(page.locator('#fit-restart')).toBeEnabled();
+    await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+    await page.evaluate(()=>(window as unknown as {restoreBattleRemoval:()=>void}).restoreBattleRemoval());
+    await page.locator('#fit-restart').click();await confirmRestart(page);
     await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await expect(page.locator('#fit-status')).toHaveText('Battle ready');
