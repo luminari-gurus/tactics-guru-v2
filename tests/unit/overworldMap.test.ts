@@ -1,6 +1,7 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { generateMap, validMapCells, type MapCell } from '../../src/map/generate';
+import { generateMap, validMapCells, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
 import * as rng from '../../src/domain/rng';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog } from '../../src/content/catalog';
@@ -45,28 +46,29 @@ describe('independent seeded map', () => {
   it.each([-1, 0x100000000, 1.5, NaN, Infinity])('rejects invalid numeric seed %s', seed => {
     expect(() => generateMap(seed)).toThrow(RangeError);
   });
-  it('has no clock dependency or effect on an existing battle and its next RNG draw', () => {
+  it.each(MAP_TYPES)('has no clock dependency or effect on an existing battle and its next RNG draw ($id)', ({ id }) => {
     const battle = new BattleSession(battleCatalog, 'map:forest_ruins', 42);
     const before = structuredClone(battle.state);
-    const expected = generateMap(12345);
+    const expected = generateMap(12345, id);
     const clock = vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock accessed'); });
     const entropy = vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('entropy accessed'); });
     try {
-      expect(generateMap(12345)).toEqual(expected);
+      expect(generateMap(12345, id)).toEqual(expected);
       expect(battle.state).toEqual(before);
       expect(rng.nextUint32(battle.state.rng)).toEqual(rng.nextUint32(before.rng));
     } finally { clock.mockRestore(); entropy.mockRestore(); }
     const source = readFileSync('src/map/generate.ts', 'utf8');
     expect(source).not.toMatch(/\b(?:window|document|localStorage|sessionStorage|BattleSession|Math\.random|Date\.now)\b/);
   });
-  it('caps unusable candidates and returns the same validated fallback', () => {
-    const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: 0, rng: state }));
+  it.each(MAP_TYPES)('caps unusable candidates and returns the same validated fallback ($id)', ({ id }) => {
+    const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
     try {
-      const map = generateMap(1);
+      const map = generateMap(1, id);
+      expect(map.type).toBe(id);
       expect(map.fallback).toBe(true);
       inspect(map.cells);
-      expect(draw.mock.calls.length).toBeLessThanOrEqual(120);
-      expect(generateMap(1)).toEqual(map);
+      expect(draw.mock.calls.length).toBeLessThanOrEqual(id === 'rooms' ? 120 : id === 'cellular' ? 1400 : 30000);
+      expect(generateMap(1, id)).toEqual(map);
     } finally { draw.mockRestore(); }
   });
   it('rejects malformed, empty, border-crossing and disconnected candidates', () => {
@@ -82,5 +84,35 @@ describe('independent seeded map', () => {
     for (let y = 2; y < 10; y++) for (let x = 2; x < 10; x++) isolated[y * 20 + x] = 1;
     isolated[357] = 1;
     expect(validMapCells(isolated)).toBe(false);
+  });
+});
+
+
+describe('map type contract', () => {
+  it('preserves the pre-change Rooms matrix fingerprint', () => {
+    const signature = createHash('sha256').update(seeds.map(seed => generateMap(seed, 'rooms').cells.join('')).join('\n')).digest('hex');
+    expect(signature).toBe('d7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0');
+  });
+  it.each(MAP_TYPES)('$id is valid, deterministic and diverse', ({ id, version }) => {
+    const layouts = new Set<string>();
+    for (const seed of seeds) {
+      const map = generateMap(seed, id);
+      inspect(map.cells);
+      expect(map).toMatchObject({ seed, type: id, version, width: 20, height: 20 });
+      expect(generateMap(seed, id)).toEqual(map);
+      if (seed < 256) layouts.add(map.cells.join(''));
+    }
+    expect(layouts.size).toBeGreaterThanOrEqual(Math.ceil(256 * 0.9));
+  });
+  it('rejects unknown types and invalid seeds for all types', () => {
+    expect(() => generateMap(1, 'unknown' as MapType)).toThrow(RangeError);
+    for (const { id } of MAP_TYPES) for (const seed of [-1, 0x100000000, 1.5, NaN, Infinity]) {
+      expect(() => generateMap(seed, id)).toThrow(RangeError);
+    }
+  });
+  it('the three algorithms have different layouts at representative seeds', () => {
+    for (const seed of [1, 12345, 424242]) {
+      expect(new Set(MAP_TYPES.map(({ id }) => generateMap(seed, id).cells.join(''))).size).toBe(3);
+    }
   });
 });
