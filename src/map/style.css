@@ -29,3 +29,7 @@
 .map-page [data-biome="forest"] .map-wall { background: radial-gradient(ellipse at 50% 35%, #28583d 0 35%, transparent 38%), #173c2e; }
 .map-page [data-biome="desert"] .map-floor { background: #e5c581; }
 .map-page [data-biome="desert"] .map-wall { background: linear-gradient(135deg, transparent 40%, #916b46 42% 52%, transparent 54%), #6b4c38; }
+
+.map-page [data-art="legacy-8bit"].map-floor,
+.map-page [data-art="legacy-8bit"].map-wall { background-size: 100% 100%; background-repeat: no-repeat; image-rendering: pixelated; }
+.map-page [data-art="legacy-8bit"].map-wall { box-shadow: inset 0 0 0 1px #101b20; }

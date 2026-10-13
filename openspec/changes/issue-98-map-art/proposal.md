@@ -24,4 +24,4 @@ None. Existing main specs cover battle behavior; this change does not alter thos
 
 ## Impact
 
-Issue #98; caller `dubstylee`; base `main` at `63c232183c1bee3f3cf68d2f919febc286f47abd`; branch `work/issue-98-map-art`. Affects `src/map/view.ts`, `src/map/style.css`, a small map-only art module, three files in `public/map-art/legacy-8bit/`, existing map tests, `docs/overworld-map.md`, inventory/export records and task-specific QA evidence. No dependencies, new artwork, battle rendering changes, renderer framework, persistence or URL settings. Implementation awaits approval of these concrete artifacts.
+Issue #98; caller `dubstylee`; base `main` at `63c232183c1bee3f3cf68d2f919febc286f47abd`; branch `work/issue-98-map-art`. Affects `src/map/view.ts`, `src/map/style.css`, a small map-only art module, three files in `public/map-art/legacy-8bit/`, existing map tests, `docs/overworld-map.md`, inventory/export records and task-specific QA evidence. No dependencies, new artwork, battle rendering changes, renderer framework, persistence or URL settings. Caller approved this concrete plan in chat on 2026-10-13; implementation is authorized.

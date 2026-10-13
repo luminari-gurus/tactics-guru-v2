@@ -1,0 +1,36 @@
+[
+  {
+    "kind": "network",
+    "resources": [
+      {
+        "url": "http://127.0.0.1:4174/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4174/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 0,
+        "decoded": 0,
+        "transferred": 0
+      }
+    ]
+  },
+  {
+    "kind": "decode",
+    "resources": [
+      {
+        "url": "http://127.0.0.1:4174/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 13,
+        "decoded": 13,
+        "transferred": 313
+      },
+      {
+        "url": "http://127.0.0.1:4174/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      }
+    ]
+  }
+]

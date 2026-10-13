@@ -1,0 +1,1754 @@
+{
+  "stats": {
+    "startTime": "2026-10-13T13:59:13.494Z",
+    "duration": 955892.965,
+    "expected": 336,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "canonical assets, near/far fixtures and restart remain stable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "failed canonical asset load gives a controlled visible error",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "canonical assets, near/far fixtures and restart remain stable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "failed canonical asset load gives a controlled visible error",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "canonical assets, near/far fixtures and restart remain stable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "failed canonical asset load gives a controlled visible error",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "the test tone plays only from its button and reports played each time",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a missing tone file leaves the board usable and the audio control unavailable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "restart during playback resets the audio control for the new run without errors",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "the test tone plays only from its button and reports played each time",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a missing tone file leaves the board usable and the audio control unavailable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "restart during playback resets the audio control for the new run without errors",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "the test tone plays only from its button and reports played each time",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a missing tone file leaves the board usable and the audio control unavailable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "restart during playback resets the audio control for the new run without errors",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock reject remains bounded and retryable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock pending remains bounded and retryable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives early enable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives enabled restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "unrelated asynchronous failures still reach the fatal application handler",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "missing optional media leaves legal controls usable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "corrupt optional media leaves legal controls usable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "stalled optional media leaves legal controls usable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "decode-stalled optional media leaves legal controls usable",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 fallback loads and plays future cues after a gesture",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "unsupported audio has a useful nonfatal status",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock reject remains bounded and retryable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock pending remains bounded and retryable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives early enable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives enabled restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "unrelated asynchronous failures still reach the fatal application handler",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "missing optional media leaves legal controls usable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "corrupt optional media leaves legal controls usable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "stalled optional media leaves legal controls usable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "decode-stalled optional media leaves legal controls usable",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 fallback loads and plays future cues after a gesture",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "unsupported audio has a useful nonfatal status",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock reject remains bounded and retryable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "gesture unlock pending remains bounded and retryable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives early enable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 per-element permission survives enabled restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "unrelated asynchronous failures still reach the fatal application handler",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "missing optional media leaves legal controls usable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "corrupt optional media leaves legal controls usable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "stalled optional media leaves legal controls usable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "decode-stalled optional media leaves legal controls usable",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 fallback loads and plays future cues after a gesture",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "unsupported audio has a useful nonfatal status",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "default authored board renders canonical units, highlights and stable restarts",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled missing canonical sprite error",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled corrupt canonical sprite error",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "legal player movement updates elevation, reachability and canopy occlusion",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "touch pinch and cancelled pointer cannot select or move a unit",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "default authored board renders canonical units, highlights and stable restarts",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled missing canonical sprite error",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled corrupt canonical sprite error",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "legal player movement updates elevation, reachability and canopy occlusion",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "touch pinch and cancelled pointer cannot select or move a unit",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "default authored board renders canonical units, highlights and stable restarts",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled missing canonical sprite error",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "default battle reports a controlled corrupt canonical sprite error",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "legal player movement updates elevation, reachability and canopy occlusion",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "touch pinch and cancelled pointer cannot select or move a unit",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "player HUD and preview cancellation preserve state and modal capture",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "restart during initial enemy animation discards the old run and its callbacks",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "player HUD and preview cancellation preserve state and modal capture",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "restart during initial enemy animation discards the old run and its callbacks",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "player HUD and preview cancellation preserve state and modal capture",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "restart during initial enemy animation discards the old run and its callbacks",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {broken",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {broken",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {broken",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "shows the complete elevated board in both orientations and after restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "shows the complete elevated board in both orientations and after restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "shows the complete elevated board in both orientations and after restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "boots a Phaser scene and fits the viewport after resize",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "boots a Phaser scene and fits the viewport after resize",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "boots a Phaser scene and fits the viewport after resize",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: success",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: malformed",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: unknown",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: missing",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: corrupt",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: stalled",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: success",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: malformed",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: unknown",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: missing",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: corrupt",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: stalled",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: success",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: malformed",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: unknown",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: missing",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: corrupt",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content smoke: stalled",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "proof controls survive repeated restart and expose distinct ready markers",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "shows loading before boot and a controlled error if the engine module cannot load",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "shell initially displays loading while the engine is delayed",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "proof controls survive repeated restart and expose distinct ready markers",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "shows loading before boot and a controlled error if the engine module cannot load",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "shell initially displays loading while the engine is delayed",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "proof controls survive repeated restart and expose distinct ready markers",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "shows loading before boot and a controlled error if the engine module cannot load",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "shell initially displays loading while the engine is delayed",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "square grass material projects all corners exactly onto the shared tile geometry",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "square grass material projects all corners exactly onto the shared tile geometry",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "square grass material projects all corners exactly onto the shared tile geometry",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "picks visible cells through art after transforms, resize and restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "touch tap selects, pinch and its trailing pointer do not",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "selection survives a live device pixel ratio change",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "picks visible cells through art after transforms, resize and restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "touch tap selects, pinch and its trailing pointer do not",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "selection survives a live device pixel ratio change",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "picks visible cells through art after transforms, resize and restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "touch tap selects, pinch and its trailing pointer do not",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "selection survives a live device pixel ratio change",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 390x844",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 844x390",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 360x640",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 915x412",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 1280x720",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 390x844",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 844x390",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 360x640",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 915x412",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 1280x720",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 390x844",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 844x390",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 360x640",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 915x412",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "controls stay at least 44 px and reachable at 1280x720",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "a pointer held down across hide and show cannot pan or select on resume",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "window blur and focus are counted and never start or repeat audio",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "a pointer held down across hide and show cannot pan or select on resume",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "window blur and focus are counted and never start or repeat audio",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "a pointer held down across hide and show cannot pan or select on resume",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "window blur and focus are counted and never start or repeat audio",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "opacity slider previews 0\u2013100, preserves its choice across fixtures and restart",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "opacity slider previews 0\u2013100, preserves its choice across fixtures and restart",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "opacity slider previews 0\u2013100, preserves its choice across fixtures and restart",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at /map shows a reload instruction",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at / shows a reload instruction",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "map direct entry, refresh, seeds and responsive inspection",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "map never initializes battle, audio, diagnostics or storage",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "new seed still works when browser entropy fails or returns the current seed",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "map types apply the displayed seed and retain committed choices",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "biome combinations preserve topology and render matching Simple legends",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "biome and type changes apply edited seeds and roll back invalid selections",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art styles preserve map data across all combinations and match legends",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art network failure uses partial Simple fallback and matching legend",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art decode failure uses partial Simple fallback and matching legend",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art late loads preserve newer selections and seed validation",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "art uses configured base, bounded transfers and no battle requests",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at /map shows a reload instruction",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at / shows a reload instruction",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "map direct entry, refresh, seeds and responsive inspection",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "map never initializes battle, audio, diagnostics or storage",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "new seed still works when browser entropy fails or returns the current seed",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "map types apply the displayed seed and retain committed choices",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "biome combinations preserve topology and render matching Simple legends",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "biome and type changes apply edited seeds and roll back invalid selections",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art styles preserve map data across all combinations and match legends",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art network failure uses partial Simple fallback and matching legend",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art decode failure uses partial Simple fallback and matching legend",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art late loads preserve newer selections and seed validation",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "art uses configured base, bounded transfers and no battle requests",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at /map shows a reload instruction",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "failed route import at / shows a reload instruction",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "map direct entry, refresh, seeds and responsive inspection",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "map never initializes battle, audio, diagnostics or storage",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "new seed still works when browser entropy fails or returns the current seed",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "map types apply the displayed seed and retain committed choices",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "biome combinations preserve topology and render matching Simple legends",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "biome and type changes apply edited seeds and roll back invalid selections",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art styles preserve map data across all combinations and match legends",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art network failure uses partial Simple fallback and matching legend",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art decode failure uses partial Simple fallback and matching legend",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art late loads preserve newer selections and seed validation",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "art uses configured base, bounded transfers and no battle requests",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle direct entry and refresh resolve public assets",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "proof direct entry and refresh resolve public assets",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content-smoke direct entry and refresh resolve public assets",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "Web Audio battle audio loads at the base and plays a committed move",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 battle audio loads at the base and plays a committed move",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content fixture uses the base and still validates input",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "extracted map route still loads directly and on refresh at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content image missing stays controlled at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio missing stays nonfatal at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content image corrupt stays controlled at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio corrupt stays nonfatal at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "content image stalled stays controlled at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio stalled stays nonfatal at the base",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "battle direct entry and refresh resolve public assets",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "proof direct entry and refresh resolve public assets",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content-smoke direct entry and refresh resolve public assets",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "Web Audio battle audio loads at the base and plays a committed move",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 battle audio loads at the base and plays a committed move",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content fixture uses the base and still validates input",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "extracted map route still loads directly and on refresh at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content image missing stays controlled at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio missing stays nonfatal at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content image corrupt stays controlled at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio corrupt stays nonfatal at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "content image stalled stays controlled at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio stalled stays nonfatal at the base",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "battle direct entry and refresh resolve public assets",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "proof direct entry and refresh resolve public assets",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content-smoke direct entry and refresh resolve public assets",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "Web Audio battle audio loads at the base and plays a committed move",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "HTML5 battle audio loads at the base and plays a committed move",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content fixture uses the base and still validates input",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "extracted map route still loads directly and on refresh at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content image missing stays controlled at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio missing stays nonfatal at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content image corrupt stays controlled at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio corrupt stays nonfatal at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "content image stalled stays controlled at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "battle audio stalled stays nonfatal at the base",
+      "project": "mobile-landscape",
+      "status": "expected"
+    },
+    {
+      "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+      "project": "desktop",
+      "status": "expected"
+    },
+    {
+      "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+      "project": "mobile-portrait",
+      "status": "expected"
+    },
+    {
+      "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+      "project": "mobile-landscape",
+      "status": "expected"
+    }
+  ],
+  "transfers": [
+    [
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ],
+    [
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ],
+    [
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4173/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ]
+  ]
+}

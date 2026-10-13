@@ -1,6 +1,6 @@
 # Overworld map contract
 
-Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type and Biome controls; it does not initialize a battle, audio or storage.
+Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls; it does not initialize a battle, audio or storage.
 
 ## Layout and biome
 
@@ -24,7 +24,11 @@ Status and grid metadata identify seed, map type, algorithm version, biome ID/ve
 
 ## Art integration and fallback
 
-Simple is the only current art style and always covers all six terrain IDs. Imported styles belong to #98, which adds its own dropdown and verified inventory. That renderer must consume this retained terrain layer, preserve cells/terrain/seed/selections, and never draw generation RNG. Missing coverage or failed assets must render the matching Simple treatment with visible fallback feedback and matching legend. No legacy artwork is imported by #99, and no complete-coverage or new-artwork prerequisite exists. All three biomes can therefore be inspected now.
+Simple is the default and always covers all six terrain IDs. Legacy 8-bit (`legacy-8bit`) uses three unchanged 48×48 procedural legacy PNGs. Grass plains represents grassland grass and forest clearings; mountain/rock represents blocked grassland, and pines represents blocked forest. Both desert treatments use Simple with visible missing-coverage feedback. HTTP/decode failures use Simple for the affected treatment; the legend always matches the actual presentation. Blocked imported cells have a dark outline for small-size readability.
+
+Art changes only rerender retained terrain and consume no generation/battle RNG. A pending valid seed edit stays in the input without changing the generated map. Invalid seed input rejects art changes and keeps the committed choices with validation feedback. Generate/New seed retain the art selection. Late image completion reads current selections and preserves pending seed edits and validation.
+
+Images load lazily only when needed for Legacy 8-bit, under the configured base path, with no map artwork requests on the battle route. The three PNGs total 1,118 bytes before HTTP overhead. [Pinned inventory, hashes and coverage](art/issue-98/README.md) and [export manifest](art/issue-98/inventory.json) preserve source records and the known absence of an explicit license/creator entry; no CC0 license is asserted. Current and ASCII are legacy code-drawn presentations, and legacy isometric battle tile families are outside this bounded import. See [issue 98 QA](qa/issue-98-map-art.md) for measured transfer/bundle sizes and checks.
 
 ## Legacy references
 
