@@ -36,7 +36,7 @@ Both builds identify starting HEAD and a dirty worktree due only to acceptance d
 
 The GitHub connector could not create the PR (`403 Resource not accessible by integration`). Publication used the repository's existing Git credential after verifying account `moshehbenavraham` and exact remote head; the PR title/body, target and non-draft state were read back. The publishing session verifies final head/remote parity after this handoff commit.
 
-No implementation work remains. Review the six-criterion QA disposition and evidence; merge remains a separate action. #96 stays open until the review PR is merged. No merge, tag, deployment, manual issue closure or OpenSpec archive was performed.
+No implementation work remains. Review the six-criterion QA disposition and evidence; merge remains a separate action. #96 stays open until the review PR is merged. No merge, tag, manual deployment, manual issue closure or OpenSpec archive was performed. GitHub reported that the existing Cloudflare integration automatically started a PR build after publication; its outcome is outside this local acceptance record.
 
 ## Commands and local tools
 
