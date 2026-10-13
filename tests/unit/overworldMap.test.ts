@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { generateMap, validMapCells, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
+import { applyBiome, BIOMES, type Biome } from '../../src/map/biomes';
 import * as rng from '../../src/domain/rng';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog } from '../../src/content/catalog';
@@ -114,5 +115,57 @@ describe('map type contract', () => {
     for (const seed of [1, 12345, 424242]) {
       expect(new Set(MAP_TYPES.map(({ id }) => generateMap(seed, id).cells.join(''))).size).toBe(3);
     }
+  });
+});
+
+
+describe('topology-preserving biome treatment', () => {
+  it.each(BIOMES)('$id reproduces every map type without mutating frozen layout', ({ id, version }) => {
+    for (const { id: type } of MAP_TYPES) for (const seed of seeds) {
+      const layout = generateMap(seed, type);
+      const before = structuredClone(layout);
+      Object.freeze(layout.cells);
+      Object.freeze(layout);
+      const map = applyBiome(layout, id);
+      expect(map).toMatchObject({ ...before, biome: id, biomeVersion: version });
+      expect(map.terrain).toHaveLength(400);
+      expect(map.terrain.every((terrain, i) => terrain === `${id}-${layout.cells[i] ? 'open' : 'blocked'}`)).toBe(true);
+      inspect(map.cells);
+      expect(layout).toEqual(before);
+      expect(applyBiome(layout, id)).toEqual(map);
+      applyBiome(layout, id === 'forest' ? 'desert' : 'forest');
+      expect(applyBiome(layout, id)).toEqual(map);
+    }
+  });
+  it('defaults to grassland and rejects unknown biomes', () => {
+    expect(applyBiome(generateMap(1)).biome).toBe('grassland');
+    expect(() => applyBiome(generateMap(1), 'snow' as Biome)).toThrow(RangeError);
+  });
+  it.each(MAP_TYPES)('retains bounded fallback for every biome ($id)', ({ id }) => {
+    const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
+    try {
+      const layout = generateMap(1, id);
+      expect(layout.fallback).toBe(true);
+      for (const { id: biome } of BIOMES) {
+        const map = applyBiome(layout, biome);
+        expect(map.fallback).toBe(true);
+        expect(map.cells).toEqual(layout.cells);
+        inspect(map.cells);
+      }
+    } finally { draw.mockRestore(); }
+  });
+  it('has no entropy/clock dependency and preserves battle RNG and layout', () => {
+    const battle = new BattleSession(battleCatalog, 'map:forest_ruins', 42);
+    const before = structuredClone(battle.state);
+    const layouts = MAP_TYPES.map(({ id }) => generateMap(12345, id));
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock accessed'); });
+    const entropy = vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('entropy accessed'); });
+    const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(() => { throw Error('RNG accessed'); });
+    try {
+      for (const layout of layouts) for (const { id } of BIOMES) expect(applyBiome(layout, id).cells).toEqual(layout.cells);
+      expect(battle.state).toEqual(before);
+      expect(draw).not.toHaveBeenCalled();
+    } finally { clock.mockRestore(); entropy.mockRestore(); draw.mockRestore(); }
+    expect(rng.nextUint32(battle.state.rng)).toEqual(rng.nextUint32(before.rng));
   });
 });

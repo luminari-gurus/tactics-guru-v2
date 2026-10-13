@@ -93,7 +93,10 @@ test('map never initializes battle, audio, diagnostics or storage', async ({ pag
   page.on('request', request => { if (request.resourceType() === 'script') scripts.push(request.url()); });
   await page.goto('/map/?scene=proof');
   await expect(page.locator('#map-grid')).toBeVisible();
-  for (const type of ['random-walker', 'cellular', 'rooms']) await page.getByLabel('Map type', { exact: true }).selectOption(type);
+  for (const type of ['random-walker', 'cellular', 'rooms']) {
+    await page.getByLabel('Map type', { exact: true }).selectOption(type);
+    for (const biome of ['forest', 'desert', 'grassland']) await page.getByLabel('Biome', { exact: true }).selectOption(biome);
+  }
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
   expect(await page.evaluate(() => (window as unknown as { mapStorageCalls: string[] }).mapStorageCalls)).toEqual([]);
   expect(await page.evaluate(() => ({ primary: localStorage.getItem('tg:phaser:battle:primary'), legacy: localStorage.getItem('godot-save') }))).toEqual({ primary: 'preserve-phaser', legacy: 'preserve-legacy' });
@@ -113,7 +116,9 @@ test('new seed still works when browser entropy fails or returns the current see
   });
   await page.goto('/map');
   await page.getByLabel('Map type', { exact: true }).selectOption('cellular');
+  await page.getByLabel('Biome', { exact: true }).selectOption('desert');
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
+  await expect(page.getByLabel('Biome', { exact: true })).toHaveValue('desert');
   await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('cellular');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '2');
   await page.evaluate(() => { crypto.getRandomValues = ((values: Uint32Array) => { values[0] = 2; return values; }) as typeof crypto.getRandomValues; });
@@ -172,4 +177,122 @@ test('map types apply the displayed seed and retain committed choices', async ({
   expect(layouts.size).toBe(3);
   await page.reload();
   await expect(type).toHaveValue('rooms');
+});
+
+
+test('biome combinations preserve topology and render matching Simple legends', async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('map');
+  await page.reload();
+  const grid = page.locator('#map-grid');
+  const type = page.getByLabel('Map type', { exact: true });
+  const biome = page.getByLabel('Biome', { exact: true });
+  const seed = page.getByLabel('Seed', { exact: true });
+  await expect(type).toHaveValue('rooms');
+  await expect(biome).toHaveValue('grassland');
+  const topology = () => grid.locator('span').evaluateAll(cells => cells.map(cell => cell.className).join(','));
+  const terrain = () => grid.locator('span').evaluateAll(cells => cells.map(cell => (cell as HTMLElement).dataset.terrain).join(','));
+  const palette = new Set<string>();
+  for (const mapType of ['rooms', 'random-walker', 'cellular']) {
+    await seed.fill('12345');
+    await type.selectOption(mapType);
+    const original = await topology();
+    const treatments = new Set<string>();
+    for (const [id, label, open, blocked] of [
+      ['grassland', 'Grassland', 'Grass', 'Rock'],
+      ['forest', 'Forest', 'Clearing', 'Dense pines'],
+      ['desert', 'Desert', 'Sand', 'Rock'],
+    ]) {
+      await biome.selectOption(id);
+      await expect(grid.locator('span')).toHaveCount(400);
+      expect(await topology()).toBe(original);
+      await expect(grid).toHaveAttribute('data-type', mapType);
+      await expect(grid).toHaveAttribute('data-seed', '12345');
+      await expect(grid).toHaveAttribute('data-biome', id);
+      await expect(grid).toHaveAttribute('data-biome-version', `${id}-v1`);
+      await expect(page.locator('#map-status')).toContainText(`${label} (${id})`);
+      await expect(page.locator('#map-status')).toContainText(`${id}-v1`);
+      await expect(page.locator('#map-open-label')).toHaveText(`Walkable · ${open}`);
+      await expect(page.locator('#map-blocked-label')).toHaveText(`Blocked · ${blocked}`);
+      const treatment = await terrain();
+      treatments.add(treatment);
+      expect(await grid.locator('span').evaluateAll((cells, selected) => cells.every(cell =>
+        (cell as HTMLElement).dataset.terrain === `${selected}-${cell.className === 'map-floor' ? 'open' : 'blocked'}`), id)).toBe(true);
+      const colors = await page.evaluate(() => {
+        const style = (selector: string) => { const s = getComputedStyle(document.querySelector(selector)!); return [s.backgroundColor, s.backgroundImage]; };
+        return { floor: style('#map-grid .map-floor'), wall: style('#map-grid .map-wall'), open: style('figcaption .map-floor'), blocked: style('figcaption .map-wall') };
+      });
+      expect(colors.floor).toEqual(colors.open);
+      expect(colors.wall).toEqual(colors.blocked);
+      expect(colors.floor[0]).not.toEqual(colors.wall[0]);
+      palette.add(JSON.stringify([colors.floor, colors.wall]));
+      await page.getByRole('button', { name: 'Generate', exact: true }).click();
+      expect(await terrain()).toBe(treatment);
+      await page.getByRole('button', { name: 'New seed', exact: true }).click();
+      await expect(type).toHaveValue(mapType);
+      await expect(biome).toHaveValue(id);
+      await expect(grid).not.toHaveAttribute('data-seed', '12345');
+      await seed.fill('12345');
+      await page.getByRole('button', { name: 'Generate', exact: true }).click();
+      expect(await terrain()).toBe(treatment);
+      for (const control of [type, biome]) {
+        const rect = await control.boundingBox();
+        expect(rect!.width).toBeGreaterThanOrEqual(44);
+        expect(rect!.height).toBeGreaterThanOrEqual(44);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.screenshot({ path: testInfo.outputPath(`${mapType}-${id}.png`), fullPage: true });
+    }
+    expect(treatments.size).toBe(3);
+  }
+  expect(palette.size).toBe(3);
+  expect(errors).toEqual([]);
+});
+
+test('biome and type changes apply edited seeds and roll back invalid selections', async ({ page }) => {
+  await page.goto('map');
+  const type = page.getByLabel('Map type', { exact: true });
+  const biome = page.getByLabel('Biome', { exact: true });
+  const seed = page.getByLabel('Seed', { exact: true });
+  const grid = page.locator('#map-grid');
+  await seed.fill('424242');
+  await biome.selectOption('forest');
+  await expect(grid).toHaveAttribute('data-seed', '424242');
+  await seed.fill('4294967295');
+  await type.selectOption('cellular');
+  await expect(grid).toHaveAttribute('data-seed', '4294967295');
+  await expect(biome).toHaveValue('forest');
+  const original = await grid.innerHTML();
+  for (const invalid of ['', '-1', '1.5', '4294967296', 'abc']) {
+    await seed.fill(invalid);
+    for (const [control, choice] of [[biome, 'desert'], [type, 'rooms']] as const) {
+      await control.selectOption(choice);
+      await expect(type).toHaveValue('cellular');
+      await expect(biome).toHaveValue('forest');
+      await expect(seed).toHaveAttribute('aria-invalid', 'true');
+      await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+      expect(await grid.innerHTML()).toBe(original);
+      await expect(grid).toHaveAttribute('data-seed', '4294967295');
+    }
+    await page.getByRole('button', { name: 'Generate', exact: true }).click();
+    expect(await grid.innerHTML()).toBe(original);
+  }
+  await seed.fill('424242');
+  await biome.focus();
+  await expect(biome).toBeFocused();
+  await biome.press('d');
+  await biome.press('Tab');
+  await expect(biome).toHaveValue('desert');
+  await expect(grid).toHaveAttribute('data-biome', 'desert');
+  await expect(grid).toHaveAttribute('data-seed', '424242');
+  await biome.selectOption('forest');
+  const forest = await grid.innerHTML();
+  await biome.selectOption('grassland');
+  await biome.selectOption('forest');
+  expect(await grid.innerHTML()).toBe(forest);
+  await page.reload();
+  await expect(type).toHaveValue('rooms');
+  await expect(biome).toHaveValue('grassland');
+  await expect(grid).toHaveAttribute('data-seed', '1');
 });

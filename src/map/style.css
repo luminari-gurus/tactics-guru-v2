@@ -24,3 +24,8 @@
 .map-page figcaption { display: flex; gap: 24px; padding-top: 16px; font-size: 13px; }
 .map-page figcaption span { display: flex; align-items: center; gap: 8px; }
 .map-page figcaption i { display: inline-block; width: 16px; height: 16px; border: 1px solid #72897c; }
+
+.map-page [data-biome="forest"] .map-floor { background: #8dbb81; }
+.map-page [data-biome="forest"] .map-wall { background: radial-gradient(ellipse at 50% 35%, #28583d 0 35%, transparent 38%), #173c2e; }
+.map-page [data-biome="desert"] .map-floor { background: #e5c581; }
+.map-page [data-biome="desert"] .map-wall { background: linear-gradient(135deg, transparent 40%, #916b46 42% 52%, transparent 54%), #6b4c38; }
