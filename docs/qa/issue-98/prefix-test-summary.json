@@ -1,0 +1,72 @@
+{
+  "stats": {
+    "startTime": "2026-10-13T14:01:19.525Z",
+    "duration": 11645.527,
+    "expected": 18,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "transfers": [
+    [
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ],
+    [
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ],
+    [
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/00_terrain_grass_plains.png",
+        "encoded": 277,
+        "decoded": 277,
+        "transferred": 577
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+        "encoded": 406,
+        "decoded": 406,
+        "transferred": 706
+      },
+      {
+        "url": "http://127.0.0.1:4174/issue98/map-art/legacy-8bit/01_terrain_forest.png",
+        "encoded": 435,
+        "decoded": 435,
+        "transferred": 735
+      }
+    ]
+  ]
+}

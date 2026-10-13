@@ -1,0 +1,17 @@
+[
+  {
+    "path": "public/map-art/legacy-8bit/00_terrain_grass_plains.png",
+    "bytes": 277,
+    "sha256": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f"
+  },
+  {
+    "path": "public/map-art/legacy-8bit/01_terrain_forest.png",
+    "bytes": 435,
+    "sha256": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013"
+  },
+  {
+    "path": "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+    "bytes": 406,
+    "sha256": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e"
+  }
+]

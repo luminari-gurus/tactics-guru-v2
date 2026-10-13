@@ -1,0 +1,33 @@
+{
+  "baseCommit": "63c232183c1bee3f3cf68d2f919febc286f47abd",
+  "compression": "Python gzip.compress default; comparable bytes, not served encoding",
+  "base": [
+    {
+      "file": "startBattleApp-D_AYwrQx.css",
+      "bytes": 3436,
+      "gzip": 1268
+    },
+    {
+      "file": "view-Bm3IJx23.css",
+      "bytes": 2375,
+      "gzip": 965
+    },
+    {
+      "file": "view-4MFH0oPZ.js",
+      "bytes": 7051,
+      "gzip": 2884
+    }
+  ],
+  "implementation": [
+    {
+      "file": "view-BBW_du9E.css",
+      "bytes": 2617,
+      "gzip": 1032
+    },
+    {
+      "file": "view-vKf--o8e.js",
+      "bytes": 8836,
+      "gzip": 3488
+    }
+  ]
+}

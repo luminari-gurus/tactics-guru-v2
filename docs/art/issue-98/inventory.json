@@ -585,7 +585,8 @@
         48
       ],
       "preservedSource": "docs/art/issue-98/sources/00_terrain_grass_plains.png",
-      "proposedRuntime": "public/map-art/legacy-8bit/00_terrain_grass_plains.png"
+      "proposedRuntime": "public/map-art/legacy-8bit/00_terrain_grass_plains.png",
+      "runtimeExport": "public/map-art/legacy-8bit/00_terrain_grass_plains.png"
     },
     {
       "path": "art/overworld/8bit/generated/individual_48/01_terrain_forest.png",
@@ -603,7 +604,8 @@
         48
       ],
       "preservedSource": "docs/art/issue-98/sources/01_terrain_forest.png",
-      "proposedRuntime": "public/map-art/legacy-8bit/01_terrain_forest.png"
+      "proposedRuntime": "public/map-art/legacy-8bit/01_terrain_forest.png",
+      "runtimeExport": "public/map-art/legacy-8bit/01_terrain_forest.png"
     },
     {
       "path": "art/overworld/8bit/generated/individual_48/02_terrain_road_path.png",
@@ -653,7 +655,8 @@
         48
       ],
       "preservedSource": "docs/art/issue-98/sources/04_terrain_mountain_blocked.png",
-      "proposedRuntime": "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png"
+      "proposedRuntime": "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+      "runtimeExport": "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png"
     },
     {
       "path": "art/overworld/8bit/generated/individual_48/05_terrain_fog_unrevealed_overlay.png",

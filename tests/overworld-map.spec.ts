@@ -95,7 +95,11 @@ test('map never initializes battle, audio, diagnostics or storage', async ({ pag
   await expect(page.locator('#map-grid')).toBeVisible();
   for (const type of ['random-walker', 'cellular', 'rooms']) {
     await page.getByLabel('Map type', { exact: true }).selectOption(type);
-    for (const biome of ['forest', 'desert', 'grassland']) await page.getByLabel('Biome', { exact: true }).selectOption(biome);
+    for (const biome of ['forest', 'desert', 'grassland']) {
+      await page.getByLabel('Biome', { exact: true }).selectOption(biome);
+      await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
+      await page.getByLabel('Art style', { exact: true }).selectOption('simple');
+    }
   }
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
   expect(await page.evaluate(() => (window as unknown as { mapStorageCalls: string[] }).mapStorageCalls)).toEqual([]);
@@ -295,4 +299,167 @@ test('biome and type changes apply edited seeds and roll back invalid selections
   await expect(type).toHaveValue('rooms');
   await expect(biome).toHaveValue('grassland');
   await expect(grid).toHaveAttribute('data-seed', '1');
+});
+
+// These paths are relative so the same checks run against a configured base prefix.
+test('art styles preserve map data across all combinations and match legends', async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('map');
+  await page.reload();
+  const grid = page.locator('#map-grid');
+  const art = page.getByLabel('Art style', { exact: true });
+  await expect(art).toHaveValue('simple');
+  const signature = () => grid.evaluate(element => ({
+    cells: [...element.children].map(cell => [cell.className, (cell as HTMLElement).dataset.terrain]),
+    metadata: ['seed', 'version', 'type', 'biome', 'biomeVersion', 'fallback'].map(key => (element as HTMLElement).dataset[key]),
+  }));
+  for (const type of ['rooms', 'random-walker', 'cellular']) {
+    await page.getByLabel('Map type', { exact: true }).selectOption(type);
+    for (const biome of ['grassland', 'forest', 'desert']) {
+      await page.getByLabel('Biome', { exact: true }).selectOption(biome);
+      const original = await signature();
+      for (const style of ['simple', 'legacy-8bit']) {
+        await art.selectOption(style);
+        await expect(grid).toHaveAttribute('data-art', style);
+        if (style === 'legacy-8bit' && biome !== 'desert') await expect(grid).toHaveAttribute('data-art-fallback', 'false');
+        if (style === 'legacy-8bit' && biome === 'desert') {
+          await expect(page.locator('#map-status')).toContainText('No legacy desert artwork; using Simple');
+          await expect(grid.locator('[data-art="simple"]')).toHaveCount(400);
+        }
+        expect(await signature()).toEqual(original);
+        const legends = await page.evaluate(() => {
+          const read = (selector: string) => { const s = getComputedStyle(document.querySelector(selector)!); return [s.backgroundImage, s.backgroundColor, s.boxShadow]; };
+          return { floor: read('#map-grid .map-floor'), wall: read('#map-grid .map-wall'), open: read('figcaption .map-floor'), blocked: read('figcaption .map-wall') };
+        });
+        expect(legends.floor).toEqual(legends.open);
+        expect(legends.wall).toEqual(legends.blocked);
+        expect(legends.floor).not.toEqual(legends.wall);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        const rect = await art.boundingBox();
+        expect(rect!.width).toBeGreaterThanOrEqual(44);
+        expect(rect!.height).toBeGreaterThanOrEqual(44);
+        await page.screenshot({ path: testInfo.outputPath(`art-${type}-${biome}-${style}.png`), fullPage: true });
+      }
+    }
+  }
+  expect(errors).toEqual([]);
+});
+
+test('art controls retain pending seeds, reject invalid edits and retain selections', async ({ page }) => {
+  await page.goto('map');
+  const art = page.getByLabel('Art style', { exact: true });
+  const seed = page.getByLabel('Seed', { exact: true });
+  const grid = page.locator('#map-grid');
+  await seed.fill('12345');
+  await art.focus();
+  await art.press('l');
+  await art.press('Tab');
+  await expect(art).toHaveValue('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art-fallback', 'false');
+  await expect(seed).toHaveValue('12345');
+  await expect(grid).toHaveAttribute('data-seed', '1');
+  // Any art path that draws browser entropy would now throw.
+  await page.evaluate(() => { crypto.getRandomValues = (() => { throw Error('Art must not draw RNG'); }) as typeof crypto.getRandomValues; });
+  await art.selectOption('simple');
+  await art.selectOption('legacy-8bit');
+  await expect(seed).toHaveValue('12345');
+  await page.getByRole('button', { name: 'Generate', exact: true }).click();
+  await expect(grid).toHaveAttribute('data-seed', '12345');
+  await expect(art).toHaveValue('legacy-8bit');
+  for (const invalid of ['', 'abc', '-1', '1.5', '4294967296']) {
+    await seed.fill(invalid);
+    const before = await grid.innerHTML();
+    await art.selectOption('simple');
+    await expect(art).toHaveValue('legacy-8bit');
+    await expect(seed).toHaveValue(invalid);
+    await expect(seed).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+    expect(await grid.innerHTML()).toBe(before);
+  }
+  await page.getByRole('button', { name: 'New seed', exact: true }).click();
+  await expect(grid).toHaveAttribute('data-seed', '12346');
+  await expect(art).toHaveValue('legacy-8bit');
+  await page.reload();
+  await expect(art).toHaveValue('simple');
+});
+
+for (const failure of ['network', 'decode']) {
+  test(`art ${failure} failure uses partial Simple fallback and matching legend`, async ({ page }) => {
+    await page.route('**/map-art/**/04_terrain_mountain_blocked.png', route => failure === 'network'
+      ? route.abort() : route.fulfill({ status: 200, contentType: 'image/png', body: 'invalid image' }));
+    await page.goto('map');
+    await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
+    await expect(page.locator('#map-status')).toContainText('Artwork unavailable; using Simple for affected terrain');
+    await expect(page.locator('#map-grid .map-floor').first()).toHaveAttribute('data-art', 'legacy-8bit');
+    await expect(page.locator('#map-grid .map-wall').first()).toHaveAttribute('data-art', 'simple');
+    await expect(page.locator('figcaption .map-wall')).toHaveAttribute('data-art', 'simple');
+    await expect(page.locator('figcaption .map-floor')).toHaveAttribute('data-art', 'legacy-8bit');
+    await page.getByLabel('Biome', { exact: true }).selectOption('forest');
+    await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+    await page.getByLabel('Art style', { exact: true }).selectOption('simple');
+    await expect(page.locator('#map-status')).not.toContainText('Artwork unavailable');
+  });
+}
+
+test('art late loads preserve newer selections and seed validation', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLImageElement.prototype.decode;
+    Object.assign(window, { artDecodes: 0 });
+    HTMLImageElement.prototype.decode = async function () {
+      try { return await original.call(this); } finally {
+        (window as unknown as { artDecodes: number }).artDecodes++;
+      }
+    };
+  });
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/map-art/**', async route => { await held; await route.continue(); });
+  await page.goto('map');
+  const art = page.getByLabel('Art style', { exact: true });
+  await art.selectOption('legacy-8bit');
+  await expect(page.locator('#map-status')).toContainText('Loading artwork');
+  await art.selectOption('simple');
+  await page.getByLabel('Seed', { exact: true }).fill('abc');
+  await page.getByRole('button', { name: 'Generate', exact: true }).click();
+  release();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { artDecodes: number }).artDecodes)).toBe(2);
+  await expect(art).toHaveValue('simple');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art', 'simple');
+  await expect(page.locator('#map-grid [data-art="simple"]')).toHaveCount(400);
+  await expect(page.getByLabel('Seed', { exact: true })).toHaveValue('abc');
+  await expect(page.locator('#map-seed')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+});
+
+test('art uses configured base, bounded transfers and no battle requests', async ({ page }, testInfo) => {
+  const requests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/map-art/')) requests.push(request.url()); });
+  await page.goto('map');
+  expect(requests).toEqual([]);
+  await page.getByLabel('Biome', { exact: true }).selectOption('desert');
+  await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
+  expect(requests).toEqual([]);
+  await page.getByLabel('Biome', { exact: true }).selectOption('grassland');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+  await page.getByLabel('Biome', { exact: true }).selectOption('forest');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+  const entries = await page.evaluate(() => performance.getEntriesByType('resource')
+    .filter(entry => entry.name.includes('/map-art/')).map(entry => {
+      const resource = entry as PerformanceResourceTiming;
+      return { url: resource.name, encoded: resource.encodedBodySize, decoded: resource.decodedBodySize, transferred: resource.transferSize };
+    }));
+  expect(new Set(requests).size).toBe(3);
+  expect(entries.reduce((n, entry) => n + entry.encoded, 0)).toBe(1118);
+  const base = new URL(testInfo.project.use.baseURL as string);
+  expect(requests.every(url => new URL(url).pathname.startsWith(`${base.pathname}map-art/legacy-8bit/`))).toBe(true);
+  await testInfo.attach('art-transfers', { body: JSON.stringify(entries, null, 2), contentType: 'application/json' });
+  await page.reload();
+  await expect(page.getByLabel('Art style', { exact: true })).toHaveValue('simple');
+  await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+  requests.length = 0;
+  await page.goto('./');
+  await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+  expect(requests).toEqual([]);
 });
