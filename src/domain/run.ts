@@ -96,6 +96,9 @@ export function readRunState(input: unknown, definition: RunDefinition, catalog:
   const party = readParty(input.party, catalog);
   if (!party) return invalid;
   const alive = party.some(h => h.hp > 0), index = input.encounterIndex;
+  // Run HP is encounter-entry HP; current first-battle damage belongs to its snapshot.
+  if (input.phase === 'battle' && index === 0 &&
+    party.some(hero => hero.hp !== catalog.heroes[hero.heroId].stats.maxHp)) return invalid;
   const base = { format: RUN_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: RNG_VERSION, content: input.versions.content },
     id: input.id, seed: input.seed, encounters: [...definition.encounters] as [EncounterId, EncounterId, EncounterId],
     encounterIndex: index, revision: input.revision, party } as const;

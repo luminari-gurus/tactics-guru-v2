@@ -27,6 +27,8 @@ Both final victory and defeat screens will contain **Start new run**. It resets 
 
 Readers reject extra keys, symbols, accessors, sparse/extended arrays, duplicate/out-of-order/unknown heroes, unsafe numbers, unknown/future versions and inconsistent phases. Accepted data is copied. Run state does not include initiative, actions, Guarded, positions, animation/preview data or mutable battle RNG. Zero HP encodes defeat without a redundant flag. Current run format intentionally has no inventory fields; their future format requires explicit ownership validation.
 
+At the initial battle entry (index 0, revision 0), every hero must have catalog-max HP. Damaged or defeated initial entry parties are rejected, including when restored from JSON. Later encounter entries retain survivor HP. Current damage during encounter 1 belongs to the separate active battle snapshot, not the run entry party.
+
 The catalog/definition are trusted validated inputs, not arbitrary uploaded objects. `describeRunBattle` and `runBoundaryId` are previews of an already validated RunState. Adapters must call `readRunState` before using saved/unknown data.
 
 ## Atomic transition table
@@ -113,3 +115,9 @@ Checks on 2026-10-13:
 | `git diff --check` | Passed |
 
 The initial focused test caught incorrect expected seed vectors in the new fixture; those expectations were corrected against an independent Python calculation, then the focused and full suites passed. Browser regression and contract fixtures are supporting automation, not physical-device or playable-run certification. The caller reported iPhone Chrome/Safari verification in chat; this issue does not change #57/#64/#66 acceptance records. All five #75 contract acceptance criteria are covered above; downstream playable run, inventory and save integration remain with their named owners.
+
+### Initial entry HP validation correction
+
+The reader now rejects damaged or defeated heroes at battle/index 0/revision 0. Six regression cases (damaged and defeated for each initial hero) failed before the fix and passed afterward. Two additional fixtures retain damaged survivors and defeated-hero exclusion at later encounter entries. Rejected reads/transitions preserve frozen input; current first-battle damage remains owned by the separate battle snapshot.
+
+Follow-up validation: focused run/domain-boundary suite 70 passed; full unit suite 508 passed; content checks 77 passed; both TypeScript checks and production build passed; strict validation of this change and all 17 OpenSpec items passed; `git diff --check` passed. The full configured browser suite passed 336 checks in 33.8 minutes using `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/playwright-browsers/chromium-1228/chrome-linux64/chrome npm test`. Browser coverage remains desktop and emulated Pixel 7 portrait/landscape, not physical-device certification.

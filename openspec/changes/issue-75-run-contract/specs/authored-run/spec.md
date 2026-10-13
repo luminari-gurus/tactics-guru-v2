@@ -13,6 +13,10 @@ The run SHALL have a versioned JSON-compatible identity, seed, three ordered enc
 - **WHEN** a run contains duplicate heroes, out-of-range HP, a fourth encounter or an invalid phase/index combination
 - **THEN** it is rejected without mutation or entropy consumption
 
+#### Scenario: Invalid initial entry HP
+- **WHEN** a restored battle/index 0/revision 0 run contains a damaged or defeated hero
+- **THEN** it is rejected because the initial entry party must have catalog-max HP; active-battle damage is owned by the separate battle snapshot
+
 ### Requirement: Party carryover
 Surviving heroes SHALL retain remaining HP between encounters without automatic healing. Heroes at zero HP SHALL remain defeated and excluded from subsequent participation. Initiative, action flags and battle-local statuses SHALL NOT be run-owned fields.
 

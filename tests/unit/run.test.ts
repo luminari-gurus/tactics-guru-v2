@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HERO_IDS } from '../../src/content/constants';
 import { createRun, deriveRunSeed, describeRunBattle, readRunState, runBoundaryId, transitionRun,
   type RunCommand, type RunDefinition, type RunResult, type RunState } from '../../src/domain/run';
 import { nextUint32, seedRng } from '../../src/domain/rng';
@@ -42,6 +43,25 @@ describe('run identity and validation', () => {
     expect(restored).toEqual(state);
     expect(restored.party).not.toBe(state.party);
     expect(restored.versions).not.toBe(state.versions);
+  });
+  it.each(HERO_IDS.flatMap(heroId => [
+    { heroId, condition: 'damaged', hp: catalog.heroes[heroId].stats.maxHp - 1 },
+    { heroId, condition: 'defeated', hp: 0 },
+  ]))('rejects a $condition $heroId at initial battle entry', ({ heroId, hp }) => {
+    const saved = JSON.parse(JSON.stringify(fresh())) as RunState;
+    const party = saved.party.map(hero => hero.heroId === heroId ? { ...hero, hp } : hero);
+    const state = freeze({ ...saved, party });
+    const before = JSON.stringify(state);
+    expect(readRunState(state, definition, catalog)).toEqual({ ok: false, reason: 'invalidRun' });
+    expect(transitionRun(state, complete(state, party.map(hero => hero.hp)), definition, catalog))
+      .toEqual({ ok: false, reason: 'invalidRun' });
+    expect(JSON.stringify(state)).toBe(before);
+  });
+  it.each([1, 2])('accepts damaged survivor entry HP at later encounter %s', index => {
+    const state = trace()[index * 2];
+    expect(state.party.some(hero => hero.hp === 0)).toBe(true);
+    expect(state.party.some(hero => hero.hp > 0 && hero.hp < catalog.heroes[hero.heroId].stats.maxHp)).toBe(true);
+    expect(accepted(readRunState(JSON.parse(JSON.stringify(state)), definition, catalog))).toEqual(state);
   });
   it.each([-1, 2 ** 32, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER])('rejects seed %s', seed => {
     expect(createRun('attempt', seed, definition, catalog).ok).toBe(false);
