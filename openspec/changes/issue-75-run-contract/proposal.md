@@ -25,4 +25,4 @@ Planned files: `src/domain/run.ts`, `tests/unit/run.test.ts`, `docs/run-contract
 
 Caller: `dubstylee`. Branch: `work/issue-75-run-contract`. Base: `main` at `79f7d983ff3a12ca38e93efdc72f3f317dfb789c`. Issue is assigned and readiness label verified. #57 acceptance remains a downstream feature-delivery gate; this contract may proceed independently. Caller-reported iPhone verification is not a replacement for recorded #57 acceptance evidence.
 
-Implementation approval: pending review of this plan; product decisions alone do not authorize implementation.
+Implementation approval: the caller explicitly replied “Approved” to the published issue-75-run-contract plan in this conversation on 2026-10-13. Implementation follows that specific plan.
