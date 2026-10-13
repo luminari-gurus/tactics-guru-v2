@@ -15,7 +15,7 @@
 ## 3. Regression and delivery
 
 - [x] 3.1 Run full unit/content/browser suites, both typechecks, production build, strict OpenSpec validation and git diff --check; record commands, actual results and any unavailable checks in docs/run-contract.md. Verify existing single-battle behavior and distinguish regression evidence from physical/run integration acceptance.
-- [ ] 3.2 Review the diff against all five #75 criteria and approved scope; commit only issue changes, push and open/attach a PR with validation and remaining downstream limitations. Use Closes #75 only when its contract acceptance is fully verified; otherwise use a draft with Refs #75.
+- [x] 3.2 Review the diff against all five #75 criteria and approved scope; commit only issue changes, push and open/attach a PR with validation and remaining downstream limitations. Use Closes #75 only when its contract acceptance is fully verified; otherwise use a draft with Refs #75. Delivered in PR #107.
 
 ## Workflow follow-up
 
