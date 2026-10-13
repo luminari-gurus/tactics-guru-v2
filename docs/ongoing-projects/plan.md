@@ -1,32 +1,64 @@
-# Battle autosave and resume merged; certification handoff
+# Issue 96 — combined map acceptance and closeout plan
 
-Updated 2026-10-13 (Asia/Jerusalem). [PR #95](https://github.com/luminari-gurus/tactics-guru-v2/pull/95) is merged into `main` as `38cb3d9defdef6bac0233dfee290d78ebc391d6f`. GitHub automatically closed [#73](https://github.com/luminari-gurus/tactics-guru-v2/issues/73) and [#92](https://github.com/luminari-gurus/tactics-guru-v2/issues/92) as completed. Battle autosave/resume and the public-asset base repair are complete. No implementation task remains in those two changes.
+Updated 2026-10-13 (Asia/Jerusalem). Status: planning only; acceptance execution and implementation have not started.
 
-## Merge and verification
+- Issue: [#96 — Map type, biome and art style selection](https://github.com/luminari-gurus/tactics-guru-v2/issues/96).
+- Assignee: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/96#issuecomment-6152871668).
+- Task branch: [branch/issue-96-map-acceptance](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-96-map-acceptance), published and natively linked in #96's Development section.
+- Base: `main` at `79f7d983ff3a12ca38e93efdc72f3f317dfb789c`.
+- Workspace: `C:/Users/apexw/.codex/worktrees/issue-96-map-plan/Tactics-Guru`.
+- OpenSpec: [proposal](../../openspec/changes/issue-96-map-acceptance/proposal.md), [design](../../openspec/changes/issue-96-map-acceptance/design.md), [future tasks](../../openspec/changes/issue-96-map-acceptance/tasks.md). Specifications are deliberately skipped because no behavior change is proposed; the child contracts remain authoritative.
 
-The repository's actual default/base branch is `main`. It had advanced seven commits to `d15caca0f66ed2e956cbf7194bd67a634c2a224f`, including map algorithms and biomes from PRs #100/#101. The merge with reviewed head `03bb3c41c4bbe44a5f8be821c9680b8c6b1b708c` was conflict-free. Its two-parent commit preserves all eight PR commits and the newer main history. No rebase, squash, extra stack or release tag was warranted. The source branch remains available for evidence links.
+## Why this item
 
-The GitHub connector returned an integration-permission error. The tested merge was published with existing repository Git credentials by a normal fast-forward push; GitHub's merged state and both completed issues were read back. No application source was changed during closeout.
+The [complete repository backlog review](issue-96-map-acceptance/backlog-review.md) covers 18 open issues, the one open PR, prerequisites, assignments and active branches. #75 has stronger downstream value but is already assigned to `dubstylee` and has an active planning branch. Its run/reward dependents remain blocked; physical iOS items are ineligible locally; release planning still needs owner decisions. #96 is the remaining unclaimed, concrete acceptance task. No new feature or child issue is needed.
 
-Fresh checks on the combined merge passed: 446 unit tests, 77 content checks, both TypeScript configurations, root and `/prototype/` production builds, both relevant strict OpenSpec validations, 120 root integration browser cases and 39 prefixed cases. Each browser case passed on its first attempt, with no failures, skips or flaky results. Screenshots were inspected across desktop and emulated Pixel 7 portrait/landscape. See [merge validation and limits](../qa/pr-95-merge.md). The complete current 318-case browser suite was not rerun; the prior complete 309-case run remains historical evidence for the repaired PR head.
+#97/#99/#98 are completed through merged PRs #100/#101/#104. The shared product contract is approved, and the source already implements all three controls. Promoted #96 to `ready for work`, assigned the caller, and left the kickoff comment. The epic remains open: closed children do not by themselves prove every parent criterion.
 
-References: [battle save format](../battle-save-format.md), [storage and replacement contract](../battle-storage.md), [persistence acceptance](../qa/issue-73-battle-resume.md), [asset-base repair evidence](../qa/issue-92-public-asset-base.md), [completed #73 tasks](../../openspec/changes/issue-73-battle-resume/tasks.md), [completed #92 tasks](../../openspec/changes/issue-92-public-asset-base/tasks.md), and [preserved implementation/review plan](https://github.com/luminari-gurus/tactics-guru-v2/blob/03bb3c41c4bbe44a5f8be821c9680b8c6b1b708c/docs/ongoing-projects/plan.md). Completed OpenSpec records remain at their existing paths.
+Available physical mobile capability: Android, from the caller checkout's `CAN_TEST_MOBILE=android`. Required for #96: desktop/mobile usability and keyboard checks, with no mandated physical-iOS matrix. Existing configured Pixel 7 profiles provide emulation only. #64/#74/#81 physical certification is separate. Private project-only drafts could not be read because `read:project` is unavailable.
 
-## Next session: existing readiness gates, then #74 certification
+## Existing implementation and evidence
 
-[#74: persistence lifecycle certification](https://github.com/luminari-gurus/tactics-guru-v2/issues/74) is the remaining child of [#58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58). Its #72/#73 implementation prerequisites are now satisfied; [#57](https://github.com/luminari-gurus/tactics-guru-v2/issues/57) acceptance remains a blocker. Do not mark #74 or the parent ready/completed on the strength of this merge.
+[Map contract](../overworld-map.md) defines layout → biome → art, defaults Rooms/Grassland/Simple, 20×20 topology, reproducibility metadata and fallback. `src/map/generate.ts`, `biomes.ts`, `art.ts` and `view.ts` implement those boundaries. The approved exception is explicit: type/biome changes apply the displayed valid seed; art changes rerender retained data and leave a pending valid seed edit unapplied. Invalid input preserves the previous map and selections.
 
-1. Refresh main, active PRs and #57/#64/#66/#74 before scheduling work. Continue the existing first-battle certification under [#64](https://github.com/luminari-gurus/tactics-guru-v2/issues/64) and retain the unresolved physical Safari restart report under [#66](https://github.com/luminari-gurus/tactics-guru-v2/issues/66). Reuse their existing evidence and plans; no replacement implementation or new ticket is needed merely because #95 merged.
-2. Confirm actual device/tester access and pin the candidate URL, served commit, browser/OS versions, orientation, cache and network conditions. Local configuration declares Android capability, but no physical device was used here and physical iOS remains unavailable locally. Android/desktop evidence can contribute to #64; the full iPhone matrix and Safari restart requirement remain explicit. The root checkout's Android-certification draft is uncommitted, historical and unapproved; recheck it before any use and do not create its proposed child automatically.
-3. Once #57's prerequisite is accepted, execute #74 against the selected served build. Cover accepted player/enemy boundaries, background/discard/reload during presentation, Continue, ended saves, New battle and outcome restart; compare state, next command/RNG/enemy decisions with uninterrupted fixtures. Exercise corrupt/future data, backup recovery, exact export/reset and unavailable storage while retaining original bytes and failures.
-4. Reuse `BattleSession`, `BattlePersistence`, the existing codec/two-slot adapter, `tests/helpers/saveFixtures.ts`, `tests/helpers/battlePolicy.ts` and the persistence/loop browser tests. Keep physical lifecycle evidence separate from emulation. Confirm the agreed measurement budgets before measuring encode/write/restore and cold/warm resume; preserve current budgets and document unavailable checks.
+[Algorithm QA](../qa/issue-97-map-algorithms.md), [biome QA](../qa/issue-99-map-biomes.md) and [art QA](../qa/issue-98-map-art.md) already document generation matrices, combined controls, 18 combinations, keyboard use, asset failures and root/prefix navigation. The art report records 336 configured browser passes on its implementation working tree. These are inherited records, not tests run in this planning session.
 
-#58 and #57 stay open. The #73 dependency is also satisfied for #79/#80, while their other prerequisites and separate run/reward work remain outside this handoff. No next-phase branch, assignment, proposal, implementation, physical certification or manual deployment was started.
+## Acceptance mapping
 
-## Local resume point
+1. **All three accessible controls:** use `tests/overworld-map.spec.ts` to verify associated labels, native keyboard selection, visible focus, 44px controls and no horizontal overflow on desktop and emulated portrait/landscape. Inspect the combined page and retained visuals.
+2. **Seed and selection transactions:** reuse type/biome/art tests for Generate, New seed, valid pending edits, invalid input rollback and retained selections. Preserve the approved art-only rerender exception.
+3. **Reproducible data and isolated RNG:** reuse `tests/unit/overworldMap.test.ts` for the seed matrix, preserved Rooms fingerprint, bounds/connectivity/fallback and biome/RNG isolation; use browser signatures to verify art leaves cells, terrain and version metadata unchanged.
+4. **Baseline choices and metadata:** verify seed 1/Rooms/Grassland/Simple defaults and refresh behavior, all supported options, visible seed/type/version/biome/version/fallback information, and the documented absence of URL/save state.
+5. **All combinations and fallback:** inspect 3 types × 3 biomes × 2 art styles; use existing matching-legend checks and desert, network, decode and stale-load scenarios. Preserve the inventoried three PNGs and their documented provenance limits.
+6. **Navigation and regression evidence:** pin the built revision and `data-commit`, run root map checks and configured-prefix entry/refresh plus relative-route biome/art checks, verify battle startup/isolation, and record applicable checks with actual counts and limitations.
 
-Use `C:/Users/apexw/.codex/worktrees/merge-pr-95/Tactics-Guru`, branch `branch/merge-pr-95` tracking `origin/main`, or a fresh worktree from merged main. Closeout publication verifies exact remote equality, zero ahead/behind and a clean merge worktree; the local `main` ref is fast-forwarded as well.
+## Execution after plan approval
 
-The original checkout stays on `work/issue-66-safari-restart` with its unrelated workflow, environment, AGENTS and Android-draft changes preserved. Its older `docs/ongoing-projects/plan.md` is not the current merged handoff. No source branch was deleted and no release tag was created. No deployed-main or hosted-prefix validation is claimed.
+1. Refresh main and issue state, pin the actual revision, and compare runtime/test/config/lockfile blobs with child evidence. Start `docs/qa/issue-96-map-acceptance.md` with six acceptance sections and separate inherited/fresh/unverified results.
+2. Run the existing map unit suite and root map browser suite. Inspect representative original screenshots and the complete combination sheets; record browser/version, profile, URL, source/build identity, command and outcome.
+3. Build with `--base=/prototype/`; use the existing `PLAYWRIGHT_BASE_PATH=/prototype/` configuration and relative-route biome/art cases for prefix checks. Some older map tests use absolute `/map`, so do not label those as prefix evidence. Confirm direct `/prototype/map` entry/refresh separately with actual controls.
+4. If an acceptance requirement lacks coverage, extend its existing test only. If a reproducible contract violation is found, retain a failing regression and make the smallest in-scope correction. A documentation-only result is acceptable; do not add code merely to make a larger PR.
+5. Finalize the epic report and update the tasks/plan. Publish a normal PR after acceptance work is authorized; use `Closes #96` only with evidence for all criteria, otherwise `Refs #96` and explicit blockers. Do not manually close the epic in this planning task.
 
-Stop here. Next-session execution requires a new instruction.
+## Files and verification
+
+Expected deliverable: `docs/qa/issue-96-map-acceptance.md`, plus narrowly needed evidence under `docs/qa/issue-96/` and updates to this plan/OpenSpec tasks. Reuse existing child assets rather than duplicating them. Conditional files: existing map tests, `docs/overworld-map.md` for proven documentation discrepancies, and map source only for a reproduced violation of the approved contract. No package/config change is planned.
+
+Commands for the execution phase:
+
+- `npm run test:unit -- tests/unit/overworldMap.test.ts`
+- `npm run build` (runs both application/domain typechecks)
+- `npm test -- tests/overworld-map.spec.ts`
+- `npm run build -- --base=/prototype/`, then prefix-configured `npm test -- tests/overworld-map.spec.ts --grep 'biome|art '`, followed by restoring the root build before root regression checks
+- `npm run test:unit`, `npm run validate:content`, and full configured `npm test` if source/tests change or inherited broad evidence cannot be bound to the tested source
+- `openspec validate issue-96-map-acceptance --strict` and `git diff --check`
+
+Use the existing installed Chromium executable override if required on this host. Record actual passes, failures, skips, retries and unperformed checks. Reuse exact-source broad historical evidence only when its source binding is established; do not silently convert it into a fresh run. After required checks pass, repeat or broaden only for new changes or unresolved concerns.
+
+## Boundaries and risks
+
+No new generator, biome, art set, RNG semantics, save system, campaign/run integration, dependency upgrade, deployment or infrastructure operation. Broader behavior changes require a revised plan. Main can advance: refresh and bind every conclusion to the actual tested revision. Emulated mobile/local preview evidence does not establish physical-device or hosted production behavior. No physical iOS acceptance is claimed.
+
+The prior persistence handoff is preserved at [main's previous plan](https://github.com/luminari-gurus/tactics-guru-v2/blob/79f7d983ff3a12ca38e93efdc72f3f317dfb789c/docs/ongoing-projects/plan.md); #57/#58/#74 remain open and are not superseded by map closeout. The original dirty checkout and Android draft remain untouched.
+
+Planning validation: strict OpenSpec validation passed; proposal/design/tasks are complete, specification deltas are intentionally skipped, and all seven execution tasks remain unchecked. Nine relative document links resolved. Game tests and acceptance execution were not run for this planning-only publication. The plan and related planning files are committed/pushed together; the publishing session separately verifies the exact commit and remote parity.
