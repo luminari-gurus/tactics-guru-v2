@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-13",
+  "timezone": "Asia/Jerusalem",
+  "mergeCommit": "38cb3d9defdef6bac0233dfee290d78ebc391d6f",
+  "mergeTree": "961591d1f4be1847e078d5d17d5beb4d16f3b2a9",
+  "mainParent": "d15caca0f66ed2e956cbf7194bd67a634c2a224f",
+  "prParent": "03bb3c41c4bbe44a5f8be821c9680b8c6b1b708c",
+  "browser": "Microsoft Edge 155.0.4283.45",
+  "workers": 1,
+  "unitPassed": 446,
+  "contentSubsetPassed": 77,
+  "typecheck": [
+    "tsconfig.json",
+    "tsconfig.domain.json"
+  ],
+  "builds": [
+    "/",
+    "/prototype/"
+  ],
+  "strictOpenSpec": [
+    "issue-73-battle-resume",
+    "issue-92-public-asset-base"
+  ],
+  "completeConfiguredBrowserCaseCount": 318,
+  "completeBrowserSuiteRerun": false,
+  "physicalDevicesTested": false,
+  "hostedPrefixTested": false,
+  "deployedMainTested": false,
+  "runs": [
+    {
+      "name": "root-browser",
+      "path": "tmp/merge-pr-95/root-browser.json",
+      "sha256": "2d26c43a8f9dfac5fca69241515ca61af90ffbe92dc6a8d1b2e28af6a83d36f2",
+      "stats": {
+        "startTime": "2026-10-13T12:27:30.127Z",
+        "duration": 329161.383,
+        "expected": 120,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "countsByFile": {
+        "battle-loop.spec.ts": 27,
+        "battle-persistence.spec.ts": 30,
+        "overworld-map.spec.ts": 24,
+        "public-asset-base.spec.ts": 39
+      },
+      "countsByProject": {
+        "desktop": 40,
+        "mobile-portrait": 40,
+        "mobile-landscape": 40
+      },
+      "uniqueCases": 120,
+      "allPassedFirstAttempt": true
+    },
+    {
+      "name": "prefix-browser",
+      "path": "tmp/merge-pr-95/prefix-browser.json",
+      "sha256": "a9094157a4864fa19773e549d404cd165470fdfed3f843d92483341b7f2044c7",
+      "stats": {
+        "startTime": "2026-10-13T12:33:40.766Z",
+        "duration": 85433.94200000001,
+        "expected": 39,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "countsByFile": {
+        "public-asset-base.spec.ts": 39
+      },
+      "countsByProject": {
+        "desktop": 13,
+        "mobile-portrait": 13,
+        "mobile-landscape": 13
+      },
+      "uniqueCases": 39,
+      "allPassedFirstAttempt": true
+    }
+  ]
+}
