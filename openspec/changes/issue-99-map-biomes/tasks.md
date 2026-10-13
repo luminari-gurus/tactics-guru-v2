@@ -16,7 +16,9 @@ Approval: user explicitly approved this published plan in the task conversation 
 
 ## 3. Integrated validation and delivery
 - [x] 3.1 Run focused checks, complete unit/content/browser suites, both typechecks, root production build, prefix build/preview map checks, strict OpenSpec and git diff --check. Record actual commands/results, screenshots and any limitations in docs/qa/issue-99-map-biomes.md against every acceptance criterion (AC6).
-- [ ] 3.2 Review issue scope and all artifacts/tasks against final changes, commit only this issue, push and create/attach PR with approval and validation evidence. Use Closes only when all criteria are verified; otherwise draft with Refs and remaining work.
+- [x] 3.2 Review issue scope and all artifacts/tasks against final changes, commit only this issue, push and create/attach PR with approval and validation evidence. Use Closes only when all criteria are verified; otherwise draft with Refs and remaining work.
 
 ## Workflow follow-up
 - Do not merge or archive before merge. No release or production operation is authorized.
+
+Delivery: [PR #101](https://github.com/luminari-gurus/tactics-guru-v2/pull/101), implementation commit `ae399d8`. All eight tasks completed; no merge or archive performed.
