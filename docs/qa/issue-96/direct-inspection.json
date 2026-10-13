@@ -1,0 +1,166 @@
+{
+  "root": {
+    "url": "http://127.0.0.1:4173/map",
+    "commit": "9670a64ba508463ddd3d3e3335e273463fa7014a",
+    "focus": [
+      {
+        "focus": true,
+        "height": 44,
+        "id": "map-type",
+        "offset": "3px",
+        "outline": "rgb(240, 204, 123) solid 3px",
+        "width": 135
+      },
+      {
+        "focus": true,
+        "height": 44,
+        "id": "map-biome",
+        "offset": "3px",
+        "outline": "rgb(240, 204, 123) solid 3px",
+        "width": 102
+      },
+      {
+        "focus": true,
+        "height": 44,
+        "id": "map-art",
+        "offset": "3px",
+        "outline": "rgb(240, 204, 123) solid 3px",
+        "width": 116.5
+      }
+    ],
+    "defaults": [
+      {
+        "id": "map-seed",
+        "value": "1"
+      },
+      {
+        "id": "map-type",
+        "value": "rooms"
+      },
+      {
+        "id": "map-biome",
+        "value": "grassland"
+      },
+      {
+        "id": "map-art",
+        "value": "simple"
+      }
+    ],
+    "status": "Seed 1 · Rooms · rooms-v1 · Grassland (grassland) · grassland-v1 · Simple · 91 walkable cells",
+    "keyboardResult": {
+      "art": "legacy-8bit",
+      "artFallback": "false",
+      "biome": "forest",
+      "biomeVersion": "forest-v1",
+      "commit": "9670a64ba508463ddd3d3e3335e273463fa7014a",
+      "fallback": "false",
+      "seed": "1",
+      "type": "cellular",
+      "version": "cellular-v1"
+    },
+    "afterReload": [
+      {
+        "id": "map-seed",
+        "value": "1"
+      },
+      {
+        "id": "map-type",
+        "value": "rooms"
+      },
+      {
+        "id": "map-biome",
+        "value": "grassland"
+      },
+      {
+        "id": "map-art",
+        "value": "simple"
+      }
+    ]
+  },
+  "prefix": {
+    "url": "http://127.0.0.1:4174/prototype/map",
+    "commit": "9670a64ba508463ddd3d3e3335e273463fa7014a",
+    "selected": {
+      "cells": 400,
+      "images": [
+        "url(\"/prototype/map-art/legacy-8bit/01_terrain_forest.png\")",
+        "url(\"/prototype/map-art/legacy-8bit/00_terrain_grass_plains.png\")"
+      ],
+      "metadata": {
+        "art": "legacy-8bit",
+        "artFallback": "false",
+        "biome": "forest",
+        "biomeVersion": "forest-v1",
+        "commit": "9670a64ba508463ddd3d3e3335e273463fa7014a",
+        "fallback": "false",
+        "seed": "424242",
+        "type": "random-walker",
+        "version": "random-walker-v1"
+      }
+    },
+    "afterReload": [
+      {
+        "id": "map-seed",
+        "value": "1"
+      },
+      {
+        "id": "map-type",
+        "value": "rooms"
+      },
+      {
+        "id": "map-biome",
+        "value": "grassland"
+      },
+      {
+        "id": "map-art",
+        "value": "simple"
+      }
+    ],
+    "mobile": {
+      "controls": [
+        {
+          "height": 44,
+          "id": "map-seed",
+          "text": "1",
+          "width": 150
+        },
+        {
+          "height": 44,
+          "id": "map-type",
+          "text": "rooms",
+          "width": 135
+        },
+        {
+          "height": 44,
+          "id": "map-biome",
+          "text": "desert",
+          "width": 102
+        },
+        {
+          "height": 44,
+          "id": "map-art",
+          "text": "legacy-8bit",
+          "width": 116.5
+        },
+        {
+          "height": 44,
+          "id": "",
+          "text": "Generate",
+          "width": 90.2578125
+        },
+        {
+          "height": 44,
+          "id": "map-new-seed",
+          "text": "New seed",
+          "width": 95.2265625
+        }
+      ],
+      "scrollWidth": 393,
+      "status": "Seed 1 · Rooms · rooms-v1 · Desert (desert) · desert-v1 · Legacy 8-bit · 91 walkable cells · No legacy desert artwork; using Simple",
+      "viewport": {
+        "height": 727,
+        "width": 393
+      }
+    }
+  }
+}
