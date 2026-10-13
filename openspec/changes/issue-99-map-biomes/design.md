@@ -29,4 +29,4 @@ Complete paginated scan: 23 open issues, two open PRs. #99 promoted and read bac
 Small cells may obscure motifs → inspect actual mobile screenshots and retain light/dark semantics. Sibling #98 can conflict in view/CSS → publish explicit six-treatment contract and recheck main before implementation. Biomes contain no random variation → deterministic minimal first release; later variation requires version changes. PR #95 asset-base fix is unmerged → keep prefix map checks scoped and report existing battle prefix failures without taking over #92.
 
 ## Migration Plan
-Additive map-only feature with grassland default, no saved state migration. Rollback reverts this issue's changes. No deployment authorized. Approval is pending; all implementation tasks remain unchecked.
+Additive map-only feature with grassland default, no saved state migration. Rollback reverts this issue's changes. No deployment authorized. Explicit user approval received in the task conversation on 2026-10-12.

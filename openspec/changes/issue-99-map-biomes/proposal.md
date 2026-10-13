@@ -18,4 +18,4 @@ None. Existing main specs contain no overworld capability; retained in-flight ma
 ## Impact
 Affected: new `src/map/biomes.ts`, `src/map/view.ts`, `src/map/style.css`, `tests/unit/overworldMap.test.ts`, `tests/overworld-map.spec.ts`, `docs/overworld-map.md` and README discoverability. No dependencies, battle changes or asset imports.
 
-Caller: `dubstylee`. Base: `main` at `be7094aa105fb2b21c90610f411e16c4ef15ae25`. Branch: `work/issue-99-map-biomes`. Implementation approval: pending.
+Caller: `dubstylee`. Base: `main` at `be7094aa105fb2b21c90610f411e16c4ef15ae25`. Branch: `work/issue-99-map-biomes`. Implementation approval: explicitly received in the task conversation on 2026-10-12.
