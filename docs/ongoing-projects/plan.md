@@ -1,6 +1,6 @@
 # Issue 96 — combined map acceptance
 
-Updated 2026-10-14 (Asia/Jerusalem). Status: acceptance and documentation checks passed; PR publication in progress.
+Updated 2026-10-14 (Asia/Jerusalem). Status: complete and ready for review in [PR #105](https://github.com/luminari-gurus/tactics-guru-v2/pull/105).
 
 ## Goal and working state
 
@@ -30,21 +30,23 @@ The plan is already minimal: keep the existing layout → biome → art pipeline
 
 Both builds identify starting HEAD and a dirty worktree due only to acceptance documentation/evidence. Source/tests/config remain unchanged. Root `dist` remains intact; prefix output lives under ignored `tmp/issue-96/prefix-dist`.
 
-## Remaining publication steps
+## Review handoff
 
-1. Documentation validation is complete: 33 relative links resolved, strict OpenSpec passed with 7/7 tasks, and whitespace checks passed.
-2. Commit/push the documentation and evidence normally, then open a non-draft PR against main with `Closes #96`. Read back the PR and verify exact head/remote parity and a clean dedicated worktree.
-3. Add the PR link here for review handoff. No manual issue closure, merge, tag, deployment or OpenSpec archive.
+[PR #105 — Verify combined map selection acceptance for #96](https://github.com/luminari-gurus/tactics-guru-v2/pull/105) is open, non-draft and targets main with `Closes #96`. Evidence commit: `6c633687e537207a8a4080abb32b2f058b066782`; this final handoff update changes documentation only. The original planning commit is preserved. All seven OpenSpec tasks are complete; strict validation, 33 relative links and whitespace checks passed.
+
+The GitHub connector could not create the PR (`403 Resource not accessible by integration`). Publication used the repository's existing Git credential after verifying account `moshehbenavraham` and exact remote head; the PR title/body, target and non-draft state were read back. The publishing session verifies final head/remote parity after this handoff commit.
+
+No implementation work remains. Review the six-criterion QA disposition and evidence; merge remains a separate action. #96 stays open until the review PR is merged. No merge, tag, deployment, manual issue closure or OpenSpec archive was performed.
 
 ## Commands and local tools
 
-Node is available on PATH; npm is not. Ignored `tmp/issue-96/bin/npm.cmd` invokes the existing npm CLI with bundled Node. Prepend that directory to PATH before repository npm commands. This leaves package/config files unchanged. Installed Edge override: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`.
+Node is available on PATH; npm is not. This run used an ignored `tmp/issue-96/bin/npm.cmd` to invoke the existing npm CLI with bundled Node. A future local rerun should provide npm on PATH (or recreate that local wrapper) before repository commands. This leaves package/config files unchanged. Installed Edge override: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`.
 
 - Unit: `npm run test:unit -- --reporter=json --outputFile=tmp/issue-96/unit.json`; content: `npm run validate:content`.
 - Root: `npm run build`; `PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/issue-96/root-browser.json npm test -- --reporter=list,json --output=tmp/issue-96/root-results` (set env vars with PowerShell syntax on Windows).
 - Prefix: `npm run build -- --base=/prototype/ --outDir=tmp/issue-96/prefix-dist`; `PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/issue-96/prefix-browser.json npm test -- --config=tmp/issue-96-prefix.config.ts tests/overworld-map.spec.ts --grep 'biome|art ' --reporter=list,json`.
-- The ignored prefix adapter imports repository config, preserves projects/worker count, uses `testDir: '../tests'`, baseURL `http://127.0.0.1:4174/prototype/`, and preview command `npm run preview -- --base=/prototype/ --outDir=tmp/issue-96/prefix-dist --port=4174 --strictPort` with repository cwd and matching readiness URL. No server is left running from manual inspection.
-- Ignored `tmp/issue-96/summarize.mjs` reduces raw results, assembles existing screenshots into contact sheets and records screenshot hashes; it does not execute browser actions or add a test harness.
+- The temporary prefix adapter (reproduced in the QA report) imports repository config, preserves projects/worker count, uses `testDir: '../tests'`, baseURL `http://127.0.0.1:4174/prototype/`, and preview command `npm run preview -- --base=/prototype/ --outDir=tmp/issue-96/prefix-dist --port=4174 --strictPort` with repository cwd and matching readiness URL. No server is left running from manual inspection.
+- Raw reports, logs and screenshots are retained locally under ignored `tmp/issue-96/`. Temporary formatting/publication helpers are removed after verification; they introduce no runtime/test framework. The QA report includes the prefix adapter needed for reproduction.
 - OpenSpec CLI: `node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js instructions apply --change issue-96-map-acceptance --json`; use the same entrypoint for `validate issue-96-map-acceptance --strict`.
 
 ## Limits and prior context
