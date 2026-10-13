@@ -26,5 +26,5 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
     } },
     scene,
   });
-  return () => { scene.scene.restart(); };
+  return () => { if(scene instanceof BattleScene)scene.requestRestart();else scene.scene.restart(); };
 }

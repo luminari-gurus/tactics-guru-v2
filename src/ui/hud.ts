@@ -4,6 +4,7 @@ import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
 import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
+import { publicAssetUrl } from './publicAssetUrl';
 
 export type Action = 'move' | 'basic' | 'signature';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -66,7 +67,7 @@ export class BattleHud {
     for(const unit of session.state.units.filter(u=>u.side==='player')) {
       if(unit.side!=='player') continue;
       const hero=session.catalog.heroes[unit.defId], b=document.createElement('button'), img=document.createElement('img'), text=document.createElement('span');
-      img.src=session.catalog.assets[hero.portraitAssetId].runtimePath;img.alt=`${displayName(unit.defId)} portrait`;img.width=32;img.height=32;
+      img.src=publicAssetUrl(session.catalog.assets[hero.portraitAssetId].runtimePath);img.alt=`${displayName(unit.defId)} portrait`;img.width=32;img.height=32;
       b.append(img,text); b.addEventListener('click',()=>{this.root.querySelector('#battle-preview')!.textContent=`${this.unitLabel(session.state.units.find(u=>u.id===unit.id)!)} · inspection only`;},{signal});
       this.root.querySelector('#battle-party')!.append(b);this.party.set(unit.id,b);
     }

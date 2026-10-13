@@ -1,0 +1,3601 @@
+{
+  "runtimeCommit": "05f2d84937ee22ca1e47c690a2f7e141614a942e",
+  "finalTestCommit": "f92da65440b39a8b45cca7e51b61b2342563836f",
+  "baseCommit": "3f3792025f29716c977cbdebff9d1c94b750ec3c",
+  "environment": {
+    "node": "v24.19.0",
+    "platform": "win32",
+    "browser": "Microsoft Edge 155.0.4283.45",
+    "mobile": "Playwright Pixel 7 emulation; no physical devices"
+  },
+  "checks": {
+    "unit": {
+      "passed": 419,
+      "files": 29
+    },
+    "content": {
+      "passed": 77
+    },
+    "typechecks": 2,
+    "build": "passed",
+    "openspec": "strict passed"
+  },
+  "runs": [
+    {
+      "sourceCommit": "05f2d84937ee22ca1e47c690a2f7e141614a942e",
+      "command": "npm test -- --reporter=line,json",
+      "stats": {
+        "startTime": "2026-10-12T17:49:07.795Z",
+        "duration": 838200.091,
+        "expected": 255,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "projects": [
+        "desktop",
+        "mobile-portrait",
+        "mobile-landscape"
+      ],
+      "cases": [
+        {
+          "project": "desktop",
+          "file": "assets.spec.ts",
+          "title": "canonical assets, near/far fixtures and restart remain stable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1006
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "assets.spec.ts",
+          "title": "failed canonical asset load gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 299
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "assets.spec.ts",
+          "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 335
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "assets.spec.ts",
+          "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 313
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "assets.spec.ts",
+          "title": "canonical assets, near/far fixtures and restart remain stable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1195
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "assets.spec.ts",
+          "title": "failed canonical asset load gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 294
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "assets.spec.ts",
+          "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 320
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "assets.spec.ts",
+          "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 423
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "assets.spec.ts",
+          "title": "canonical assets, near/far fixtures and restart remain stable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1352
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "assets.spec.ts",
+          "title": "failed canonical asset load gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 462
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "assets.spec.ts",
+          "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 475
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "assets.spec.ts",
+          "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 443
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "the test tone plays only from its button and reports played each time",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1314
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 684
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "a missing tone file leaves the board usable and the audio control unavailable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 489
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "restart during playback resets the audio control for the new run without errors",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2110
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3052
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 15499
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "audio.spec.ts",
+          "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 739
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "the test tone plays only from its button and reports played each time",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1213
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 696
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "a missing tone file leaves the board usable and the audio control unavailable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 511
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "restart during playback resets the audio control for the new run without errors",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2232
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3087
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 15625
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "audio.spec.ts",
+          "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 745
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "the test tone plays only from its button and reports played each time",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1314
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "a context that will not resume is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 742
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "a missing tone file leaves the board usable and the audio control unavailable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 519
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "restart during playback resets the audio control for the new run without errors",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2257
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "a resume() that never settles is reported as blocked with retry, then plays once it can",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3051
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "a stalled tone request never holds the board; the control reports unavailable after the load timeout",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 15579
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "audio.spec.ts",
+          "title": "the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 731
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2779
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4192
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock reject remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1135
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock pending remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4019
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3357
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6261
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives early enable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2637
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives enabled restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2736
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "unrelated asynchronous failures still reach the fatal application handler",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1088
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "missing optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1263
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "corrupt optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1247
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7627
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "decode-stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 8729
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 fallback loads and plays future cues after a gesture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2810
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "unsupported audio has a useful nonfatal status",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1066
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2207
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 40009
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21325
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2836
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3983
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock reject remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1136
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock pending remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4044
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3406
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6257
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives early enable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2692
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives enabled restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2700
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "unrelated asynchronous failures still reach the fatal application handler",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1109
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "missing optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1313
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "corrupt optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1326
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7587
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "decode-stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 8633
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 fallback loads and plays future cues after a gesture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2779
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "unsupported audio has a useful nonfatal status",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1074
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2169
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 40768
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21014
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2808
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4164
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock reject remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1136
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "gesture unlock pending remains bounded and retryable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4035
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery reject after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3413
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "automatic recovery pending after successful unlock stays nonfatal and bounded",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6362
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives early enable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2568
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 per-element permission survives enabled restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2594
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "unrelated asynchronous failures still reach the fatal application handler",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1088
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "missing optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1234
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "corrupt optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1260
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7521
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "decode-stalled optional media leaves legal controls usable",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 8591
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "HTML5 fallback loads and plays future cues after a gesture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2915
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "unsupported audio has a useful nonfatal status",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1112
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "late decode from a destroyed scene cannot alter replacement controls or playback",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2218
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 1: sound on/off legal battles match with committed cues and playerLoss",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 40864
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-audio.spec.ts",
+          "title": "seed 2: sound on/off legal battles match with committed cues and playerWin",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21105
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6269
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4261
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4814
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled missing canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 324
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled corrupt canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 333
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1102
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2345
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "legal player movement updates elevation, reachability and canopy occlusion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1511
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-board.spec.ts",
+          "title": "touch pinch and cancelled pointer cannot select or move a unit",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 819
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5742
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4631
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5109
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled missing canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 312
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled corrupt canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 295
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1134
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2460
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "legal player movement updates elevation, reachability and canopy occlusion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1551
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-board.spec.ts",
+          "title": "touch pinch and cancelled pointer cannot select or move a unit",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 816
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5848
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3974
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4854
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled missing canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 348
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "default battle reports a controlled corrupt canonical sprite error",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 336
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "picks authored elevated tops and visible side faces through unit and canopy art",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1635
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "authored visible picking survives resize, pan, zoom, DPR and drag completion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2830
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "legal player movement updates elevation, reachability and canopy occlusion",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1608
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-board.spec.ts",
+          "title": "touch pinch and cancelled pointer cannot select or move a unit",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 924
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1184
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21250
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10879
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2410
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1272
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1310
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2353
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "restart during initial enemy animation discards the old run and its callbacks",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 606
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2287
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1141
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21524
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10685
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2364
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1412
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1303
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2394
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "restart during initial enemy animation discards the old run and its callbacks",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 571
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2304
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1150
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21889
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 11091
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2389
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "battle HUD targets fit portrait and short landscape with a bounded readable log",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1498
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1329
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2522
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "restart during initial enemy animation discards the old run and its callbacks",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 535
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "battle diagnostics record real selection, gestures and movement and reset on restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2357
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2724
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5080
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5154
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2975
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2195
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2410
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2089
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3051
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 809
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"fut",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1338
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2797
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5105
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5351
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3022
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1760
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2624
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2174
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3080
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 849
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"fut",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1366
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2791
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5074
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5358
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3064
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1755
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2555
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2199
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3035
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1364
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"fut",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 867
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "board.spec.ts",
+          "title": "shows the complete elevated board in both orientations and after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 464
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "board.spec.ts",
+          "title": "shows the complete elevated board in both orientations and after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 829
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "board.spec.ts",
+          "title": "shows the complete elevated board in both orientations and after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 898
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "boot.spec.ts",
+          "title": "boots a Phaser scene and fits the viewport after resize",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 432
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "boot.spec.ts",
+          "title": "boots a Phaser scene and fits the viewport after resize",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 416
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "boot.spec.ts",
+          "title": "boots a Phaser scene and fits the viewport after resize",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 414
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: success",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 398
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: malformed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 363
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: unknown",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 372
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: missing",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 345
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: corrupt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 384
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: stalled",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10332
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: success",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 741
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: malformed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 423
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: unknown",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 438
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: missing",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 478
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: corrupt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 427
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: stalled",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10900
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: success",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 730
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: malformed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 436
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: unknown",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 412
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: missing",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 453
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: corrupt",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 518
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "content-loading.spec.ts",
+          "title": "content smoke: stalled",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10888
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "engine-fit.spec.ts",
+          "title": "proof controls survive repeated restart and expose distinct ready markers",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 796
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "engine-fit.spec.ts",
+          "title": "shows loading before boot and a controlled error if the engine module cannot load",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 209
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "engine-fit.spec.ts",
+          "title": "shell initially displays loading while the engine is delayed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 385
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "engine-fit.spec.ts",
+          "title": "proof controls survive repeated restart and expose distinct ready markers",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 992
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "engine-fit.spec.ts",
+          "title": "shows loading before boot and a controlled error if the engine module cannot load",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 255
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "engine-fit.spec.ts",
+          "title": "shell initially displays loading while the engine is delayed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 431
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "engine-fit.spec.ts",
+          "title": "proof controls survive repeated restart and expose distinct ready markers",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 905
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "engine-fit.spec.ts",
+          "title": "shows loading before boot and a controlled error if the engine module cannot load",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 222
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "engine-fit.spec.ts",
+          "title": "shell initially displays loading while the engine is delayed",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 407
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "grass-surface.spec.ts",
+          "title": "square grass material projects all corners exactly onto the shared tile geometry",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 321
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "grass-surface.spec.ts",
+          "title": "square grass material projects all corners exactly onto the shared tile geometry",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 565
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "grass-surface.spec.ts",
+          "title": "square grass material projects all corners exactly onto the shared tile geometry",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 490
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "input.spec.ts",
+          "title": "picks visible cells through art after transforms, resize and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1011
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "input.spec.ts",
+          "title": "touch tap selects, pinch and its trailing pointer do not",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 540
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "input.spec.ts",
+          "title": "selection survives a live device pixel ratio change",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 456
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "input.spec.ts",
+          "title": "picks visible cells through art after transforms, resize and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1045
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "input.spec.ts",
+          "title": "touch tap selects, pinch and its trailing pointer do not",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 575
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "input.spec.ts",
+          "title": "selection survives a live device pixel ratio change",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 549
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "input.spec.ts",
+          "title": "picks visible cells through art after transforms, resize and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 995
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "input.spec.ts",
+          "title": "touch tap selects, pinch and its trailing pointer do not",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 534
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "input.spec.ts",
+          "title": "selection survives a live device pixel ratio change",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 478
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 390x844",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 560
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 844x390",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 561
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 360x640",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 568
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 915x412",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 553
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 1280x720",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 556
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "layout.spec.ts",
+          "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 491
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 390x844",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 635
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 844x390",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 633
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 360x640",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 650
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 915x412",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 658
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 1280x720",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 723
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "layout.spec.ts",
+          "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 470
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 390x844",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 651
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 844x390",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 640
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 360x640",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 610
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 915x412",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 647
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "controls stay at least 44 px and reachable at 1280x720",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 735
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "layout.spec.ts",
+          "title": "page gestures are suppressed in CSS and the canvas has no context menu",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 472
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "lifecycle.spec.ts",
+          "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 564
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "lifecycle.spec.ts",
+          "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6083
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "lifecycle.spec.ts",
+          "title": "a pointer held down across hide and show cannot pan or select on resume",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 570
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "lifecycle.spec.ts",
+          "title": "window blur and focus are counted and never start or repeat audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1318
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "lifecycle.spec.ts",
+          "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 628
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "lifecycle.spec.ts",
+          "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6216
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "lifecycle.spec.ts",
+          "title": "a pointer held down across hide and show cannot pan or select on resume",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 632
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "lifecycle.spec.ts",
+          "title": "window blur and focus are counted and never start or repeat audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1385
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "lifecycle.spec.ts",
+          "title": "hidden and visible while idle count once each, keep rendering and never start audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 578
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "lifecycle.spec.ts",
+          "title": "a move in flight freezes while hidden and completes exactly once after resume, also after restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6244
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "lifecycle.spec.ts",
+          "title": "a pointer held down across hide and show cannot pan or select on resume",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 604
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "lifecycle.spec.ts",
+          "title": "window blur and focus are counted and never start or repeat audio",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1371
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "move.spec.ts",
+          "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10074
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "move.spec.ts",
+          "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10241
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "move.spec.ts",
+          "title": "actual move controls reject repeated input, complete, and cancel on repeated restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 10295
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "opacity.spec.ts",
+          "title": "opacity slider previews 0–100, preserves its choice across fixtures and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 630
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "opacity.spec.ts",
+          "title": "opacity slider previews 0–100, preserves its choice across fixtures and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 650
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "opacity.spec.ts",
+          "title": "opacity slider previews 0–100, preserves its choice across fixtures and restart",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 644
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "terrain-materials.spec.ts",
+          "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 445
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "terrain-materials.spec.ts",
+          "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 656
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "terrain-materials.spec.ts",
+          "title": "every terrain source decodes as an opaque square and maps to a rendered tile",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 645
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sourceCommit": "f92da65440b39a8b45cca7e51b61b2342563836f",
+      "command": "npm test -- tests/battle-loop.spec.ts tests/battle-persistence.spec.ts --grep 'complete legal authored|invalid startup|startup is read-only' --reporter=line,json",
+      "stats": {
+        "startTime": "2026-10-12T18:03:27.697Z",
+        "duration": 120774.955,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "projects": [
+        "desktop",
+        "mobile-portrait",
+        "mobile-landscape"
+      ],
+      "cases": [
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 22277
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 11076
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21955
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 11293
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 21937
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 11185
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3209
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 873
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1367
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3300
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 876
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1382
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3184
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1355
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1382
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "buildFiles": [
+    {
+      "path": "dist/index.html",
+      "sha256": "806dcab5390d56e259d9d014c18ba6014e6943576b1ea0e393cd181a832d3486"
+    },
+    {
+      "path": "dist/assets/browser-CutFmQLF.js",
+      "sha256": "fb38e560de6d0ae85821b840940ee6bc00168d47ce5eb2b0e734a9daa1985b32"
+    },
+    {
+      "path": "dist/assets/index-D_AYwrQx.css",
+      "sha256": "5acddf244bb5db291e3ee23eab517b733e31f622b93705cf95240214e06ab8c2"
+    },
+    {
+      "path": "dist/assets/index-leXu4xjm.js",
+      "sha256": "e54f87f11fc7bea5e4cf9ecd45f083e271a2d06d0793be5205abdb8f1fa3839b"
+    },
+    {
+      "path": "dist/assets/start-CvEUzw2S.js",
+      "sha256": "be94c77de1f694b62d6cf2c0ac3635fd806cf9a42708a0ec3b08526af93ac293"
+    }
+  ],
+  "limitations": [
+    "Full suite ran on runtime/test commit 05f2d84; final test-only expansions were checked in all three profiles by the affected-case run.",
+    "No physical-device, hosted deployment, merge or release validation."
+  ]
+}

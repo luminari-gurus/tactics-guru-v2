@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import type { ContentCatalog } from '../content/types';
 import { validateContent } from '../content/validate';
+import { publicAssetUrl } from '../ui/publicAssetUrl';
 
 export const CONTENT_LOAD_TIMEOUT_MS = 10000;
 
@@ -41,6 +42,6 @@ export function loadContentAssets(scene: Phaser.Scene, catalog: ContentCatalog, 
   scene.load.on('loaderror', onError);
   scene.load.once('complete', onComplete);
   const pending = Object.values(catalog.assets).filter(asset => !scene.textures.exists(asset.id));
-  for (const asset of pending) scene.load.image(asset.id, asset.runtimePath, { responseType: 'blob', timeout: CONTENT_LOAD_TIMEOUT_MS });
+  for (const asset of pending) scene.load.image(asset.id, publicAssetUrl(asset.runtimePath), { responseType: 'blob', timeout: CONTENT_LOAD_TIMEOUT_MS });
   if (pending.length) scene.load.start(); else onComplete();
 }

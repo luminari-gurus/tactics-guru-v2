@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import type { ContentCatalog } from '../content/types';
 import type { BattleEvent } from '../domain/types';
 import { battleCues, BATTLE_CUES, type BattleCue } from '../audio/battleCues';
+import { publicAssetUrl } from '../ui/publicAssetUrl';
 
 export const REQUEST_TIMEOUT_MS = 5000;
 export const LOAD_TIMEOUT_MS = 6500;
@@ -189,7 +190,7 @@ export class BattleAudio {
         this.requests.set(request,setTimeout(()=>this.loadFailed('Audio request timed out.'),REQUEST_TIMEOUT_MS));
         let bytes: ArrayBuffer;
         try {
-          const response=await fetch(cue.url,{signal:request.signal});
+          const response=await fetch(publicAssetUrl(cue.url),{signal:request.signal});
           if(!response.ok) throw Error('Missing audio');
           bytes=await response.arrayBuffer();
         } finally {clearTimeout(this.requests.get(request));this.requests.delete(request);}

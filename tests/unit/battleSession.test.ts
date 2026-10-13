@@ -3,6 +3,9 @@ import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import { previewMovement } from '../../src/domain/grid';
 import { replayBattle } from '../../src/domain/turns';
+import { assert } from 'vitest';
+import { saveFixtures } from '../helpers/saveFixtures';
+import { nextUint32 } from '../../src/domain/rng';
 
 const make = (seed = 1) => new BattleSession(catalog, 'map:forest_ruins', seed);
 const finishEnemies = (s: BattleSession) => {
@@ -39,10 +42,10 @@ describe('battle session', () => {
   it('confirmation is exactly once and obsolete/disposed completion cannot unlock a session', () => {
     const s = make(); finishEnemies(s);
     expect(s.prepare({type:'endTurn',unitId:s.active.id}).ok).toBe(true);
-    const n = s.replay.commands.length;
+    const n = s.replay!.commands.length;
     const step = s.confirm()!;
     expect(s.phase).toBe('presenting');
-    expect(s.confirm()).toBeNull(); expect(s.replay.commands).toHaveLength(n+1);
+    expect(s.confirm()).toBeNull(); expect(s.replay!.commands).toHaveLength(n+1);
     s.finishPresentation(step.token+1); expect(s.phase).toBe('presenting');
     s.dispose(); s.finishPresentation(step.token); expect(s.phase).toBe('disposed');
     expect(s.nextEnemy()).toBeNull();
@@ -50,7 +53,7 @@ describe('battle session', () => {
   it('records a fresh initial boundary independently of previous sessions', () => {
     const old = make(); finishEnemies(old); old.dispose();
     const fresh = make(2);
-    expect(fresh.state.seed).toBe(2); expect(fresh.replay.commands).toEqual([]);
+    expect(fresh.state.seed).toBe(2); expect(fresh.replay!.commands).toEqual([]);
     expect(fresh.pending).toBeNull(); expect(fresh.events).toEqual([]);
   });
 });
@@ -64,7 +67,7 @@ it.each([1,2,42])('plays and replays legal authored battle seed %i using basic a
   }
   expect(s.phase).toBe('ended');
   expect(s.state.outcome).toBe(seed===1?'playerLoss':'playerWin');
-  if(seed===2) expect(s.replay.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:guarded_strike','ability:high_shot','ability:magic_missile']));
+  if(seed===2) expect(s.replay!.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:guarded_strike','ability:high_shot','ability:magic_missile']));
   const replay=replayBattle(s.replay,catalog);expect(replay.ok).toBe(true);
   if(replay.ok){expect(replay.state).toEqual(s.state);expect(replay.events).toEqual(s.events);}
 });
@@ -95,4 +98,63 @@ it('revalidates confirmation without recording a rejected intent or advancing RN
   const dispatch=vi.spyOn(turns,'dispatch').mockReturnValue({ok:false,reason:'commandLimit'});
   try {expect(s.confirm()).toBeNull();expect(s.error).toBe('commandLimit');expect(s.state).toEqual(before);expect(s.replay).toEqual(record);expect(s.phase).toBe('player');}
   finally {dispatch.mockRestore();}
+});
+
+describe('validated continuation',()=>{
+  it('rejects malformed and incompatible snapshots without exposing a partial session',()=>{
+    for(const input of [null,{}, {...make().state,seed:-1}, {...make().state,versions:{}}])
+      expect(BattleSession.fromSnapshot(catalog,input)).toEqual({ok:false,reason:'invalidState'});
+  });
+  it('owns frozen state and starts with no historical presentation or fake replay',()=>{
+    const input=structuredClone(make().state), restored=BattleSession.fromSnapshot(catalog,input);assert(restored.ok);
+    const s=restored.session;
+    expect(s.state).toEqual(input);expect(s.state).not.toBe(input);
+    (input.units[0] as {hp:number}).hp=0;expect(s.state.units[0].hp).not.toBe(0);
+    expect(()=>{(s.state.units[0] as {hp:number}).hp=0;}).toThrow();
+    expect(s.phase).toBe('enemy');expect(s.pending).toBeNull();expect(s.events).toEqual([]);expect(s.replay).toBeNull();
+    expect(s.continuation).toEqual({snapshot:s.state,commands:[],events:[]});
+    s.finishPresentation(1);expect(s.phase).toBe('enemy');
+  });
+  it.each([1,2,3,4,5])('matches the actual uninterrupted queue at every accepted boundary for seed %i',seed=>{
+    const original=make(seed);let checkedAttackWait=false;
+    for(let i=0;original.phase!=='ended' && i<300;i++){
+      const result=BattleSession.fromSnapshot(catalog,original.state);assert(result.ok);const resumed=result.session;
+      if(seed===2 && original.state.commandCount===29)checkedAttackWait=true;
+      for(const s of [original,resumed])if(s.phase==='player')expect(s.prepare(playerDecision(s.state)).ok).toBe(true);
+      const a=original.phase==='player'?original.confirm():original.nextEnemy();
+      const b=resumed.phase==='player'?resumed.confirm():resumed.nextEnemy();assert(a);assert(b);
+      expect(b.after).toEqual(a.after);expect(b.events).toEqual(a.events);
+      expect(resumed.continuation!.commands).toEqual([original.replay!.commands.at(-1)]);
+      expect(resumed.continuation!.events).toEqual(a.events);
+      expect(nextUint32(b.after.rng)).toEqual(nextUint32(a.after.rng));
+      const mid=BattleSession.fromSnapshot(catalog,original.state);assert(mid.ok);
+      expect(mid.session.state).toEqual(a.after);expect(mid.session.events).toEqual([]);
+      expect(mid.session.phase).not.toBe('presenting');
+      original.finishPresentation(a.token);
+    }
+    expect(original.phase).toBe('ended');if(seed===2)expect(checkedAttackWait).toBe(true);
+  });
+  it('preserves fixture outcomes, Guarded and the command limit without extra commands',()=>{
+    for(const f of saveFixtures()){
+      const result=BattleSession.fromSnapshot(f.catalog,f.state);assert(result.ok);const s=result.session;
+      expect(s.state).toEqual(f.state);expect(s.events).toEqual([]);expect(s.pending).toBeNull();
+      if(f.state.outcome!=='ongoing'){expect(s.phase).toBe('ended');expect(s.nextEnemy()).toBeNull();expect(s.confirm()).toBeNull();}
+      if(f.name==='maximum-commands'){
+        if(s.phase==='enemy')expect(s.nextEnemy()).toBeNull();
+        else {expect(s.prepare({type:'endTurn',unitId:s.active.id}).ok).toBe(false);expect(s.confirm()).toBeNull();}
+        expect(s.state).toEqual(f.state);expect(s.continuation!.commands).toEqual([]);
+      }
+    }
+  },15000);
+});
+
+it('observes each accepted boundary before presentation exactly once and contains observer failure',()=>{
+  const observed:unknown[]=[];
+  const s=new BattleSession(catalog,'map:forest_ruins',1,state=>{expect(s.phase).toBe('presenting');observed.push(state);throw Error('observer failed');});
+  const step=s.nextEnemy();assert(step);expect(observed).toEqual([step.after]);
+  s.finishPresentation(step.token);s.finishPresentation(step.token);expect(observed).toHaveLength(1);
+  finishEnemies(s);const count=observed.length;
+  s.prepare({type:'move',unitId:s.active.id,to:{x:-1,y:-1}});s.cancel();s.confirm();expect(observed).toHaveLength(count);
+  s.prepare({type:'endTurn',unitId:s.active.id});const player=s.confirm();assert(player);
+  expect(observed).toHaveLength(count+1);expect(observed.at(-1)).toBe(s.state);
 });

@@ -2,11 +2,13 @@ import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
 import { BattleSession, type Presentation } from '../app/BattleSession';
+import { BattlePersistence } from '../app/BattlePersistence';
 import { previewMove, previewMovement } from '../domain/grid';
 import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import type { Point } from '../geometry/iso';
 import { BattleHud, actionCommand, previewText, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
+import { BattleSaveControls } from '../ui/persistence';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
@@ -14,17 +16,30 @@ import { BattleAudio } from './BattleAudio';
 
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
 export class BattleScene extends Phaser.Scene {
-  private seed = 1;
+  private persistence: BattlePersistence | null = null;
+  private restartAction: (()=>void) | null = null;
   private soundEnabled = false;
   constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void) {super('battle');}
+  requestRestart(){this.restartAction?.();}
   create():void {
     this.status('loading');measurements.begin(performance.now());
     let catalog:ContentCatalog;
     try{catalog=contentLoadPlan(battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
-    loadContentAssets(this,catalog,()=>{try{this.begin(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
+    loadContentAssets(this,catalog,()=>{try{this.prepareBattle(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
   }
-  private begin(catalog:ContentCatalog):void {
-    const session=new BattleSession(catalog,FIRST_BATTLE_MAP_ID,this.seed);this.seed=(this.seed+1)>>>0;
+  private prepareBattle(catalog:ContentCatalog):void {
+    this.persistence??=new BattlePersistence(catalog,FIRST_BATTLE_MAP_ID);
+    let modalTransition=()=>{};
+    const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
+    const saves=new BattleSaveControls(this.persistence,dialogs,session=>this.begin(catalog,session,dialogs,fn=>{modalTransition=fn;}),()=>{
+      this.status('loading');this.scene.restart();
+    });
+    this.restartAction=()=>{if(!dialogs.open)saves.requestNew();};
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.restartAction=null;saves.dispose();dialogs.dispose();});
+    saves.start();
+    if(!this.persistence.session)this.status('ready');
+  }
+  private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false;
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
@@ -39,8 +54,8 @@ export class BattleScene extends Phaser.Scene {
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[]);
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;
-      game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,events:session.events,pending:session.pending,phase:session.phase});
-      if(ready && session.phase==='ended' && !outcomeShown){outcomeShown=true;dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
+      game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
+      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
     };
     const describe=(command: import('../domain/types').Command)=>{
       const text=previewText(session.prepare(command));
@@ -58,14 +73,12 @@ export class BattleScene extends Phaser.Scene {
       refresh();
       if(changed)measurements.interaction('selection',inputMs);
     };
-    const board=new BoardRenderer(this,catalog,FIRST_BATTLE_MAP_ID,select);
+    const board=new BoardRenderer(this,catalog,session.state.mapId,select);
     const removeInput=bindBoardInput(canvas,{
       select:(point:Point)=>board.select(point),
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
     },()=>({width:this.scale.width,height:this.scale.height}),()=>ready && !initialFit && !dialogs.open);
-    const restart=()=>document.querySelector<HTMLButtonElement>('#fit-restart')!.click();
-    const dialogs=new BattleDialogs(()=>removeInput.reset(),restart);
     const present=async(step:Presentation|null)=>{
       if(!step){refresh();return;}
       clear();selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
@@ -79,7 +92,8 @@ export class BattleScene extends Phaser.Scene {
       if(initialFit && session.phase==='player'){initialFit=false;fit();board.resetView();measurements.controlsUsable(performance.now());}
       pump();
     };
-    const pump=()=>{if(live && ready && session.phase==='enemy')void present(session.nextEnemy());};
+    const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
+    setModalTransition(()=>{removeInput.reset();queueMicrotask(()=>{if(live){refresh();pump();}});});
     const review=()=>{if(session.phase!=='player' || !session.pending || dialogs.open)return;const preview=session.preview(session.pending);dialogs.show('Confirm action',previewText(preview),()=>void present(session.confirm()),()=>{session.cancel();message='Cancelled';refresh();});};
     const hud=new BattleHud(session,{
       action:a=>{session.cancel();action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
@@ -95,11 +109,11 @@ export class BattleScene extends Phaser.Scene {
       if(event.key==='Escape'){clear();refresh();event.preventDefault();return;}
       if(['Enter',' '].includes(event.key)){event.preventDefault();select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
-      if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[FIRST_BATTLE_MAP_ID];
+      if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[session.state.mapId];
       cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};selected=cursor;session.cancel();refresh();
     };
     canvas.addEventListener('keydown',key);
-    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();}};
+    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();}else pump();};
     document.addEventListener('visibilitychange',visibility);
     const panel=document.querySelector<HTMLElement>('#fit-panel')!;
     const fit=()=>board.fit(this.scale.width,this.scale.height,panel.getBoundingClientRect().bottom);
@@ -116,7 +130,7 @@ export class BattleScene extends Phaser.Scene {
     };
     this.game.events.on(Phaser.Core.Events.POST_RENDER,onRender);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();dialogs.dispose();hud.dispose();removeInput();observer.disconnect();
+      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();hud.dispose();removeInput();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;
