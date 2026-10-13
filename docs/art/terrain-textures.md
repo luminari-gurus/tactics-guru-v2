@@ -15,3 +15,5 @@ For future variants, use the relevant PNG as a material/style reference and requ
 The original generated grass proof image is retained under `public/proof/` for the existing projection regression check. Runtime terrain now uses the new catalog.
 
 Asset sizes and SHA-256 hashes are in `terrain-manifest-v1.json`. Visual review: `terrain-contact-v1.png` and `terrain-board-v1.png`.
+
+Unit sprites and portraits have a separate [unit-art guide](unit-art-guide.md), [annotated reference sheet](unit-art-reference.png), and reusable [sprite](unit-sprite-brief.md) / [portrait](unit-portrait-brief.md) briefs. Use that guide for unit identity, anchoring and small-size readability; terrain material prompts do not define unit artwork.
