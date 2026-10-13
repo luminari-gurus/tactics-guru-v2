@@ -1,0 +1,1459 @@
+{
+  "repository": "luminari-gurus/tactics-guru",
+  "revision": "e9433f6b608ae6b2d95418615cce9cf17dadcf74",
+  "styleId": "legacy-8bit",
+  "styleLabel": "Legacy 8-bit",
+  "files": [
+    {
+      "path": "art/overworld/8bit/README.md",
+      "gitBlob": "1b8e542d53553281123caf73e7c7bcd3f510c218",
+      "bytes": 2342,
+      "sha256": "f277d72438eee247cc00898067c754188ad88865efe2bad5cfa1ce51d19b57dc",
+      "selected": false
+    },
+    {
+      "path": "art/overworld/8bit/generated/HANDOFF.md",
+      "gitBlob": "862cbb4fe454c97ddf8c96196009bc01634d7eb8",
+      "bytes": 5516,
+      "sha256": "870892edb7ac4426735ea089e4940a01389c32a1dac8376ec43d529475cf978a",
+      "selected": false
+    },
+    {
+      "path": "art/overworld/8bit/generated/generate_overworld_8bit_assets.py",
+      "gitBlob": "b02ab21edd3af255b9f61d8008e3d2027e75f8ab",
+      "bytes": 15035,
+      "sha256": "b13cbd0dd43682bc3c1ec2119e331ca119073d3b2a2e83b468aebfda6b193d9b",
+      "selected": false
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/00_terrain_grass_plains.png",
+      "gitBlob": "31918d022cd48c4188beb8f3cb8f9b2374cb08a0",
+      "bytes": 197,
+      "sha256": "7bc1f6a6c5b9012c6b2fc7fb383208a1b507e39da3cb6153a9624fc1561714b0",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/01_terrain_forest.png",
+      "gitBlob": "9872d1f3433bd8dda6ffe76501bab28cdd60680b",
+      "bytes": 325,
+      "sha256": "bc5b32cfd5c1ab6e320dff0a2b3e7dfdd4cac11f95a70cd42d4d6309ea447ea6",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/02_terrain_road_path.png",
+      "gitBlob": "508b7001d0ec5c1719a9df393d342b90f661dd10",
+      "bytes": 204,
+      "sha256": "11f38487f2f309ef72e9f7a955a255cb4c85955e26dbbe3414e3e044c5ad6a72",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/03_terrain_water.png",
+      "gitBlob": "25180f800c9445f46fb6b8de57ca326a0ffb41ee",
+      "bytes": 171,
+      "sha256": "f2e82ed9f7abff02d8795e5aa8a87ab2f2d7640f8e81776e79ed9e8af140ae5e",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/04_terrain_mountain_blocked.png",
+      "gitBlob": "5e334f3e13a18c51b82513ba5136fa0654e4745b",
+      "bytes": 289,
+      "sha256": "fd70842d100177ef51c7f881e3d2d38a39a73fff38abbaff4ec5bbedf2f910b1",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/05_terrain_fog_unrevealed_overlay.png",
+      "gitBlob": "35804c74468693de63462b814ab22f86ff24ac13",
+      "bytes": 132,
+      "sha256": "7df6c106a13abf6ec9d6f8b89abc3872c0d8f1f53cff608d7a70852099bfdd35",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/06_terrain_revealed_empty.png",
+      "gitBlob": "72d5ae47d67f0971c3b66d40749185501a4c775b",
+      "bytes": 158,
+      "sha256": "a9da2e35474ec8e04b5c16c45d8e3cebfc36214603c960b92d5fe09efc512b31",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/07_poi_start_trailhead.png",
+      "gitBlob": "105bb4ef41cefbbbfe18788561bedc7d0ed04f21",
+      "bytes": 146,
+      "sha256": "f37174f8ca298c24402eadeb2ed73947a397d19cecd2d0e80aebd93880aa4500",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        11,
+        8,
+        28,
+        28
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/08_poi_regular_combat.png",
+      "gitBlob": "23ccf480533ccfaff32578066b4ffaf16875d35e",
+      "bytes": 306,
+      "sha256": "e688b43c70af5599dd7f01c10ebcdcb10683d825bd4b533f94fc575dbaff67bc",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        4,
+        4,
+        30,
+        30
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/09_poi_elite_combat.png",
+      "gitBlob": "9e6ac27f0ba77bfce66427a1551cd4ef85bf3e49",
+      "bytes": 285,
+      "sha256": "c838d40e4ded255e40914aa3f7930956ca53db6d1515ea9143208a78abcc6b84",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        4,
+        3,
+        30,
+        30
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/10_poi_boss.png",
+      "gitBlob": "681e7184815cd832122fb5d90f44cd334c88ef3e",
+      "bytes": 278,
+      "sha256": "e03677ff833bcb04959421809d968a6bd4750e2201da7203492c824fa8773abd",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        2,
+        3,
+        31,
+        31
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/11_poi_shop.png",
+      "gitBlob": "c1b3a980108f6d1c33cadfc6f65db133300245bf",
+      "bytes": 156,
+      "sha256": "9d0a353fc7450028240495880156fa7f57b5af02728e18f20ae776de893f8356",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        7,
+        8,
+        26,
+        26
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/12_poi_camp.png",
+      "gitBlob": "3761b3ca18a4650ce98f22d6dedf6f86abc14ad5",
+      "bytes": 194,
+      "sha256": "d0b12268fd4e14964e04c583ad1371b141ded8f9df1c6489f926e4d871f9e637",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        7,
+        8,
+        26,
+        29
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/13_poi_treasure_cache.png",
+      "gitBlob": "eb5c3d34fa2df4b06f5bd2d1c1bda1d2c3e8fccf",
+      "bytes": 155,
+      "sha256": "764be165e044b052943ff0c582edb2be282d728eed731692b07ffbc0db63073f",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        7,
+        12,
+        26,
+        26
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/14_poi_resource_supply_cache.png",
+      "gitBlob": "99f0d3f887c38c0a3cc4147a9cd7a9865ebb8b4c",
+      "bytes": 139,
+      "sha256": "1ac9fd5d6d8c05c51d6cb9b66d401221a470f356fabb2ea0c15488b2f98b83aa",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        9,
+        10,
+        24,
+        27
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/15_poi_event_unknown.png",
+      "gitBlob": "b492e5fb15e6f2ccd27f5f30d187ca971e0cd149",
+      "bytes": 248,
+      "sha256": "193a57c2b31a8fac591881e7ccb13b7acf4b11c62ff3459e2f8b43e588c59d05",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        4,
+        4,
+        30,
+        30
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/16_player_party_marker.png",
+      "gitBlob": "86bf08dd12413904ae37885c8efca838431e3df2",
+      "bytes": 166,
+      "sha256": "a89327c74903c6880bf7e1591d8d01a6580fd14d34e2e06d4afac5056686fb28",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        10,
+        8,
+        25,
+        28
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/17_terrain_road_straight_horizontal.png",
+      "gitBlob": "115ec424733e5f20678d82477501fe7011ebaddd",
+      "bytes": 195,
+      "sha256": "85872d79b4a1859c0c7952f8ab4273bd0c43e7ca99d18ff0f58dce71a9fad6ee",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/18_terrain_road_straight_vertical.png",
+      "gitBlob": "e47ec6afeb7822809a63f555027b03fdefe5c256",
+      "bytes": 179,
+      "sha256": "b1556ee7d32ee7de48118a3c3d755a71f48914ed7bc0c3aee986a848c8444ca3",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/19_terrain_road_corner_ne.png",
+      "gitBlob": "9cb8c44de7d961f58cfd138a502995a8e4e490ab",
+      "bytes": 213,
+      "sha256": "08ebda70df2f4e38c95152d555c36ed0489ffbb1cc13ded742833f83c2246c4e",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/20_terrain_road_corner_se.png",
+      "gitBlob": "8f5e6e512af6f9c72fd6925129757e0c73385e08",
+      "bytes": 196,
+      "sha256": "eeaae63f132d7c9221bf2a48aee1904cdbd6eba8181d4f14755fb9c7bcdbe258",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/21_terrain_road_corner_sw.png",
+      "gitBlob": "a6017dfe624af41c55dab9b8b9471337876d1f53",
+      "bytes": 206,
+      "sha256": "0a2a4f132e2d76b0b6fbc024777de206aeacf61c295191faacf5c5164369be45",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/22_terrain_road_corner_nw.png",
+      "gitBlob": "73ad0b17ac7b2f19676644a7e1c66428e6b535ff",
+      "bytes": 219,
+      "sha256": "2e22dafc26e8e334189a7a5e77342290c27cc38df115ae4eb6c6aad41b1d8ae1",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/23_terrain_road_end_n.png",
+      "gitBlob": "2425d1970c526e3d7a367545b170236f9d7dd2de",
+      "bytes": 199,
+      "sha256": "3095c39e7fa3a9dca3341ed66cb47f0e1e2cbbeaee2cdba939de5526249bfa63",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/24_terrain_road_end_e.png",
+      "gitBlob": "321fa8cab61941b83254baa88aabac4b1ce49df3",
+      "bytes": 196,
+      "sha256": "aa1fe73f21bdcb6872153acbbda823f77671155c9979e5917bf64c401b8f9d06",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/25_terrain_road_end_s.png",
+      "gitBlob": "5edcfef259a152e3b854a7b6598ab33ed76a4d15",
+      "bytes": 191,
+      "sha256": "b8f84cbece016feaf6a5f752ec0df6a6b46245691d5efc68f579bab96cf57098",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/26_terrain_road_end_w.png",
+      "gitBlob": "726050d54705affb010549e838de1bee40c0c247",
+      "bytes": 204,
+      "sha256": "ff883b6d2ae0d74c3230cc186ce324818fa2051699cb90bd516c166320318dd4",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/27_terrain_road_t_n.png",
+      "gitBlob": "f27a02c1bd97c4d0cf517f1fedca2c9c389522bf",
+      "bytes": 222,
+      "sha256": "68599f1c2775edc3a80735fd6a1e71372d99ee8188cd2db92755ce02a0d8de86",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/28_terrain_road_t_e.png",
+      "gitBlob": "548146e37721ca0964d02266181fd0324944f660",
+      "bytes": 194,
+      "sha256": "a89f82c97481a5ab550c3a1c6b39d81403ae138a6dec14d6e475fcae892b63b3",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/29_terrain_road_t_s.png",
+      "gitBlob": "6f0f8a15dfdc668246e622780b3ebaa4818339ef",
+      "bytes": 208,
+      "sha256": "84326247522b8f0d01b3ca9b34b7387e0571a0e7ba0878206b81dbb930fe22bd",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/30_terrain_road_t_w.png",
+      "gitBlob": "59cb49c14b9f8e0887c7605a7d3b9663dd27f467",
+      "bytes": 203,
+      "sha256": "116aad51876f85ca70f1d5fe24c804fca850a784ca85d564143d3c2d2bfdfe45",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/31_terrain_border_dark_bevel.png",
+      "gitBlob": "9e56d8b0f4a81a20b0f6d47060d63746d54c4706",
+      "bytes": 167,
+      "sha256": "5997d96c3c549842fb4172b9a0b84ea028f7224f2c0a044071922ba29002ddf8",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/32_terrain_border_mossy_broken.png",
+      "gitBlob": "79348cd519029286ba71776b67e69dabbbde9e04",
+      "bytes": 225,
+      "sha256": "e74b3544dca70fceda02d8978571d95f097fdbfb5b976ecc586c60dedf05f2b2",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_32/33_terrain_road_shoulder_endcap.png",
+      "gitBlob": "04b483b06fcc667a1711ad7065147cc4d2c392e0",
+      "bytes": 203,
+      "sha256": "39fcaff6a063b53d2408a0507d8bcd9ea71502084cc998381fc14b0ae73bbf95",
+      "selected": false,
+      "width": 32,
+      "height": 32,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/00_terrain_grass_plains.png",
+      "gitBlob": "8350b9977e837f8d1ac0970acaac370131773549",
+      "bytes": 277,
+      "sha256": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f",
+      "selected": true,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "preservedSource": "docs/art/issue-98/sources/00_terrain_grass_plains.png",
+      "proposedRuntime": "public/map-art/legacy-8bit/00_terrain_grass_plains.png"
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/01_terrain_forest.png",
+      "gitBlob": "4278c601b4e3f825082932627c77647934891ee7",
+      "bytes": 435,
+      "sha256": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013",
+      "selected": true,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "preservedSource": "docs/art/issue-98/sources/01_terrain_forest.png",
+      "proposedRuntime": "public/map-art/legacy-8bit/01_terrain_forest.png"
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/02_terrain_road_path.png",
+      "gitBlob": "3c2b65ff82e53b928c9b26aeaf5ef57787c1c779",
+      "bytes": 249,
+      "sha256": "fac0b9e7028f34c9d51d3c5c899e04592222ce8280c2edbdbd44e805bd0150d3",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/03_terrain_water.png",
+      "gitBlob": "9d38684e6cc11bb8bac0aa08d8139c3490a78b9e",
+      "bytes": 189,
+      "sha256": "f2e689d49469a54bfcc1a89e84e3eb550f014d5eb68ebe69debf03158631647d",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/04_terrain_mountain_blocked.png",
+      "gitBlob": "205c7ec4d06f63c44d232e768beffb11881c14c5",
+      "bytes": 406,
+      "sha256": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e",
+      "selected": true,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "preservedSource": "docs/art/issue-98/sources/04_terrain_mountain_blocked.png",
+      "proposedRuntime": "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png"
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/05_terrain_fog_unrevealed_overlay.png",
+      "gitBlob": "46615e25ba155db1c689d5405e889a2173a5f106",
+      "bytes": 170,
+      "sha256": "f7ed382fbfdff3bdd1fbf2548067fb9c1c1c93f4a5229daa8827512643ce456c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/06_terrain_revealed_empty.png",
+      "gitBlob": "3f14323f34b49420467796fc4a381e326b12ac54",
+      "bytes": 184,
+      "sha256": "afdc72acedd4aad9c713ce0fecd62c10da2593a241d7a6240f41743e0b3572ca",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/07_poi_start_trailhead.png",
+      "gitBlob": "f6a1b3ced75184aeb976e32b6359fb80719f9c01",
+      "bytes": 185,
+      "sha256": "b64b3bd91d11a77d686f70e2f182882d9e2a71a678275c9cc4fdfe9cb4850292",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        16,
+        12,
+        42,
+        42
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/08_poi_regular_combat.png",
+      "gitBlob": "ad1cb26d17efadc06c1a885661d4c514145b45d1",
+      "bytes": 386,
+      "sha256": "daa3ec4eb0939f9343511c48587de1e014340969dbc5b0d1eab340ead01714dc",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        5,
+        6,
+        44,
+        44
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/09_poi_elite_combat.png",
+      "gitBlob": "675560a9a39ddd359f1f30483ecadf21bb92702c",
+      "bytes": 360,
+      "sha256": "e124209252d0e5bd88d412895af3a0cb7550f50b85842398ff0bfc42e0835a1c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        5,
+        4,
+        44,
+        44
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/10_poi_boss.png",
+      "gitBlob": "9e9c0584a51a7cfe356d0b2bfbc985a8fe3aacd6",
+      "bytes": 348,
+      "sha256": "1d15206328c59b1cad8c015b9d145cb5897f649e99933ec7483a517460ae7a50",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        3,
+        4,
+        46,
+        46
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/11_poi_shop.png",
+      "gitBlob": "bb319e3113d2c827080f987f365bfc7f6fe6e0ad",
+      "bytes": 183,
+      "sha256": "33061f1f2e782b46c8bd41a5509e4d9a77d7b5d982becaa058325b8efa61be1d",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        10,
+        12,
+        38,
+        38
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/12_poi_camp.png",
+      "gitBlob": "cd8447cd16c69d6820919496906ad4cc53da2284",
+      "bytes": 245,
+      "sha256": "853d81b55c1a8bfcbbf2806d62a832d4ceb036bcb72ed0f66d1966d234b25923",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        10,
+        12,
+        39,
+        43
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/13_poi_treasure_cache.png",
+      "gitBlob": "22fa97ea9996247cbeba2cda6ad232b182a3808b",
+      "bytes": 179,
+      "sha256": "c5fb5be6ce7c404cc5a590b15163fb0531424a82857a6abd35d92322cdb5e177",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        10,
+        17,
+        38,
+        39
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/14_poi_resource_supply_cache.png",
+      "gitBlob": "cf1843629ddf08957e56cb4041ae0743a0b782fc",
+      "bytes": 165,
+      "sha256": "29e6423792c66d15c64802c87f0bba307a131ad612c58e6567a7f1f033c0185c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        13,
+        15,
+        35,
+        40
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/15_poi_event_unknown.png",
+      "gitBlob": "b3c90f24e7d5201770770e9cb1e9590169e4a1d9",
+      "bytes": 301,
+      "sha256": "0e283abd0ad021142da3078c534eca5dc3201962ead72cdee4fa5bfa53918976",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        5,
+        6,
+        44,
+        44
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/16_player_party_marker.png",
+      "gitBlob": "72155730726ac122b1c67890aacc4763eee262d0",
+      "bytes": 218,
+      "sha256": "9e1f9a520d4c14ec88c03f7300feddde2fffa4d30d870d3a28248bc50bd095f1",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        15,
+        12,
+        40,
+        41
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/17_terrain_road_straight_horizontal.png",
+      "gitBlob": "51f1973626aa6096590f2dd098e61dad1970d5fd",
+      "bytes": 242,
+      "sha256": "f4b8b5a6829aef4ecd9c6dc9ea3cd2d0172484473bccc11bf8e655d4b2ff1da8",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/18_terrain_road_straight_vertical.png",
+      "gitBlob": "63565d91e4ac0c4a46166ecf7f253cba20700c7b",
+      "bytes": 225,
+      "sha256": "6ac55e9efbb5795bc2471bb703e0cd05633ffd1e1586a7c8d93f8a1ff2d3e78c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/19_terrain_road_corner_ne.png",
+      "gitBlob": "3aa545ee15199644f4ec21086e5a26c7a027f7e4",
+      "bytes": 259,
+      "sha256": "0ac5f0f7b5d50626a2a90e9f8817fc083d51c8a5968d942bf80abde63223518b",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/20_terrain_road_corner_se.png",
+      "gitBlob": "7ef1e748c19a069bf6f62e5b27435cfc8396b2f1",
+      "bytes": 240,
+      "sha256": "2fca0d98181617c8ba75c0fb55384fb3dada10af04b2d075e8eb9d54eb70d210",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/21_terrain_road_corner_sw.png",
+      "gitBlob": "127d5307294f729dbe3ae726a75cd82e3de2f681",
+      "bytes": 249,
+      "sha256": "33a2d45b0bc1d4b5bc84c0a3104dc8510ad4f9e7130adc6c14cea64e582ce807",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/22_terrain_road_corner_nw.png",
+      "gitBlob": "bfacbf04d4d9f0d712b169637f8a39d7e50ff4f7",
+      "bytes": 263,
+      "sha256": "c7e2faa46dfdae3a02830fec4a82f5cf11602301c7b76c3de76bac0e3153c0ec",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/23_terrain_road_end_n.png",
+      "gitBlob": "2786e1589b8b3625b05478bab59e533ba9047052",
+      "bytes": 250,
+      "sha256": "d3da2e2ef68f3a8eae27f53be20c36147104e6ccd38e3a2960fd110eaafea14e",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/24_terrain_road_end_e.png",
+      "gitBlob": "e68070e1143e11153e7dbf035f992f6dd4a956ed",
+      "bytes": 242,
+      "sha256": "2a41061c491e8d9739457d5bf5b04b1312839e198963274c841285db6cbdf28f",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/25_terrain_road_end_s.png",
+      "gitBlob": "abcd372930716b9758cd6ac42f259a452edbf265",
+      "bytes": 238,
+      "sha256": "11d7f77ffff87e64e0e4123dddc51539919a3b0c858922bd1fae9113ddd185e2",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/26_terrain_road_end_w.png",
+      "gitBlob": "deec5ff72b2f040f532cc51a49a82db39859fdfb",
+      "bytes": 248,
+      "sha256": "6c98665822cfa44d9398c198fb6f2232eb56ee837613c208d1fe87c18e5a745c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/27_terrain_road_t_n.png",
+      "gitBlob": "68969160a7b99a7bb891a539b04ab2528dd1cfe3",
+      "bytes": 268,
+      "sha256": "5edc005ff002d154d456a94326b746571802c84d660fc2ebc5ca5ee4ba27e836",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/28_terrain_road_t_e.png",
+      "gitBlob": "f6e151d9408aae24fffbf559e84500fb97c605cc",
+      "bytes": 235,
+      "sha256": "1374634690811fc0b5347c08075f09725d3f71c1d4a3af3f34f0933b819dc986",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/29_terrain_road_t_s.png",
+      "gitBlob": "3bf9098f52313e63a21db1c5a5a2a93a251921d2",
+      "bytes": 252,
+      "sha256": "04e56f6879dcca370c5f7684b7fa1c77fc15d8456d9a52644c1d33f2a2037811",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/30_terrain_road_t_w.png",
+      "gitBlob": "15f5ac4dc5c42c5f35fc4796550fb063b87880ee",
+      "bytes": 247,
+      "sha256": "a57d5cc4c5faca2a103e2d5740d694fd0f3365ce59085a64b6dc0ec4d125a735",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/31_terrain_border_dark_bevel.png",
+      "gitBlob": "c74087c1bfe12f3a1e46f3d4b618c03e820dbacb",
+      "bytes": 196,
+      "sha256": "3be2ce55bbc7256b70d5584ee9d890e2899be6b5637ce8f97e08a78d69e59c46",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/32_terrain_border_mossy_broken.png",
+      "gitBlob": "e4bbf394d88892b9e6b4e29a9f9db0392ca27c59",
+      "bytes": 270,
+      "sha256": "fc814520e2f794866dd9897aaf5aba053f506c354e0017fbb86085e7f93ce484",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/individual_48/33_terrain_road_shoulder_endcap.png",
+      "gitBlob": "420cd06a0ab78e57affc06e1696ac26954a897b9",
+      "bytes": 249,
+      "sha256": "ec2513fc640e69332093433014bbebd1ed345d60b7efde5f0fcc24b70c4a206c",
+      "selected": false,
+      "width": 48,
+      "height": 48,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        48,
+        48
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/overworld_8bit_tiles_icons_32px_sheet.png",
+      "gitBlob": "079dde05c317422de5f1f24405dae85ecbb34bdd",
+      "bytes": 3353,
+      "sha256": "f7ffcef38b2c24a71b1cd9fc64af71fb90c923d7375b5be132d514afc81d899a",
+      "selected": false,
+      "width": 160,
+      "height": 224,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        160,
+        224
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/overworld_8bit_tiles_icons_48px_sheet.png",
+      "gitBlob": "3d047b740908f8326ed71f1678e10d6c63d53e78",
+      "bytes": 4915,
+      "sha256": "45621d0848b0de180ad1efb07b0c3408d2c06e9bd00eb8f198b293c9dbe3ce3c",
+      "selected": false,
+      "width": 240,
+      "height": 336,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        240,
+        336
+      ]
+    },
+    {
+      "path": "art/overworld/8bit/generated/sprite_manifest.txt",
+      "gitBlob": "20a345ad79335a77d80a86370ac9c958c967928c",
+      "bytes": 1308,
+      "sha256": "1f6c9c1b52597797bd5542a824cb127a2eb5d6d0135576627924685cb299a44f",
+      "selected": false
+    },
+    {
+      "path": "docs/asset_licenses.md",
+      "gitBlob": "2d7129986f8c69352cb421185911a952250ac6d3",
+      "bytes": 5926,
+      "sha256": "b2815ff4b809da760e876a4fbabcefef4181f1cdcf52102a63c697008b85dbfe",
+      "selected": false
+    },
+    {
+      "path": "scripts/run/OverworldScene.gd",
+      "gitBlob": "e07956368446c5287a844b7cb7abae5154a07325",
+      "bytes": 168384,
+      "sha256": "ed6fe24c3c5e4107a31d78545f6b9c718de10c209bbc8a0fa7ad41cd41094ae9",
+      "selected": false
+    },
+    {
+      "path": "scripts/tests/test_m12_overworld_visual_style.gd",
+      "gitBlob": "eb96a2170fc249e35a826cadfb4e0ee10774b9b0",
+      "bytes": 17417,
+      "sha256": "3c8ef0f9b7fa71801d747502158fc6a6c22aa3c6b8511b4d1f89ef90c42bf13b",
+      "selected": false
+    }
+  ],
+  "exportChecks": [
+    {
+      "file": "00_terrain_grass_plains.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "01_terrain_forest.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "02_terrain_road_path.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "03_terrain_water.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "04_terrain_mountain_blocked.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "05_terrain_fog_unrevealed_overlay.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "06_terrain_revealed_empty.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "07_poi_start_trailhead.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "08_poi_regular_combat.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "09_poi_elite_combat.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "10_poi_boss.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "11_poi_shop.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "12_poi_camp.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "13_poi_treasure_cache.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "14_poi_resource_supply_cache.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "15_poi_event_unknown.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "16_player_party_marker.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "17_terrain_road_straight_horizontal.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "18_terrain_road_straight_vertical.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "19_terrain_road_corner_ne.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "20_terrain_road_corner_se.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "21_terrain_road_corner_sw.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "22_terrain_road_corner_nw.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "23_terrain_road_end_n.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "24_terrain_road_end_e.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "25_terrain_road_end_s.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "26_terrain_road_end_w.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "27_terrain_road_t_n.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "28_terrain_road_t_e.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "29_terrain_road_t_s.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "30_terrain_road_t_w.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "31_terrain_border_dark_bevel.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "32_terrain_border_mossy_broken.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    },
+    {
+      "file": "33_terrain_road_shoulder_endcap.png",
+      "atlasMatches": true,
+      "generator32Matches": true
+    }
+  ],
+  "otherTerrainPaths": [
+    "art/tiles/ash_corner_down_N.png",
+    "art/tiles/ash_corner_left_N.png",
+    "art/tiles/ash_corner_right_N.png",
+    "art/tiles/ash_corner_up_N.png",
+    "art/tiles/ash_slope_down_left_N.png",
+    "art/tiles/ash_slope_down_right_N.png",
+    "art/tiles/ash_slope_up_left_N.png",
+    "art/tiles/ash_slope_up_right_N.png",
+    "art/tiles/ash_smooth_N.png",
+    "art/tiles/brush_corner_down_N.png",
+    "art/tiles/brush_corner_left_N.png",
+    "art/tiles/brush_corner_right_N.png",
+    "art/tiles/brush_corner_up_N.png",
+    "art/tiles/brush_slope_down_left_N.png",
+    "art/tiles/brush_slope_down_right_N.png",
+    "art/tiles/brush_slope_up_left_N.png",
+    "art/tiles/brush_slope_up_right_N.png",
+    "art/tiles/brush_smooth_N.png",
+    "art/tiles/castle_center_N.png",
+    "art/tiles/cliff_corner_down_N.png",
+    "art/tiles/cliff_corner_left_N.png",
+    "art/tiles/cliff_corner_right_N.png",
+    "art/tiles/cliff_corner_up_N.png",
+    "art/tiles/cliff_slope_down_left_N.png",
+    "art/tiles/cliff_slope_down_right_N.png",
+    "art/tiles/cliff_slope_up_left_N.png",
+    "art/tiles/cliff_slope_up_right_N.png",
+    "art/tiles/cliff_smooth_N.png",
+    "art/tiles/dirt_low_N.png",
+    "art/tiles/forest_corner_down_N.png",
+    "art/tiles/forest_corner_left_N.png",
+    "art/tiles/forest_corner_right_N.png",
+    "art/tiles/forest_corner_up_N.png",
+    "art/tiles/forest_dense_detailed_N.png",
+    "art/tiles/forest_slope_down_left_N.png",
+    "art/tiles/forest_slope_down_right_N.png",
+    "art/tiles/forest_slope_up_left_N.png",
+    "art/tiles/forest_slope_up_right_N.png",
+    "art/tiles/forest_smooth_N.png",
+    "art/tiles/grass_center_N.png",
+    "art/tiles/grass_corner_down_N.png",
+    "art/tiles/grass_corner_left_N.png",
+    "art/tiles/grass_corner_right_N.png",
+    "art/tiles/grass_corner_up_N.png",
+    "art/tiles/grass_detailed_N.png",
+    "art/tiles/grass_path_detailed_N.png",
+    "art/tiles/grass_slope_down_left_N.png",
+    "art/tiles/grass_slope_down_right_N.png",
+    "art/tiles/grass_slope_up_left_N.png",
+    "art/tiles/grass_slope_up_right_N.png",
+    "art/tiles/grass_smooth_N.png",
+    "art/tiles/lava_corner_down_N.png",
+    "art/tiles/lava_corner_left_N.png",
+    "art/tiles/lava_corner_right_N.png",
+    "art/tiles/lava_corner_up_N.png",
+    "art/tiles/lava_slope_down_left_N.png",
+    "art/tiles/lava_slope_down_right_N.png",
+    "art/tiles/lava_slope_up_left_N.png",
+    "art/tiles/lava_slope_up_right_N.png",
+    "art/tiles/lava_smooth_N.png",
+    "art/tiles/mud_corner_down_N.png",
+    "art/tiles/mud_corner_left_N.png",
+    "art/tiles/mud_corner_right_N.png",
+    "art/tiles/mud_corner_up_N.png",
+    "art/tiles/mud_slope_down_left_N.png",
+    "art/tiles/mud_slope_down_right_N.png",
+    "art/tiles/mud_slope_up_left_N.png",
+    "art/tiles/mud_slope_up_right_N.png",
+    "art/tiles/mud_smooth_N.png",
+    "art/tiles/rocks_dirt_N.png",
+    "art/tiles/sand_corner_down_N.png",
+    "art/tiles/sand_corner_left_N.png",
+    "art/tiles/sand_corner_right_N.png",
+    "art/tiles/sand_corner_up_N.png",
+    "art/tiles/sand_slope_down_left_N.png",
+    "art/tiles/sand_slope_down_right_N.png",
+    "art/tiles/sand_slope_up_left_N.png",
+    "art/tiles/sand_slope_up_right_N.png",
+    "art/tiles/sand_smooth_N.png",
+    "art/tiles/stone_corner_down_N.png",
+    "art/tiles/stone_corner_left_N.png",
+    "art/tiles/stone_corner_right_N.png",
+    "art/tiles/stone_corner_up_N.png",
+    "art/tiles/stone_detailed_N.png",
+    "art/tiles/stone_slope_down_left_N.png",
+    "art/tiles/stone_slope_down_right_N.png",
+    "art/tiles/stone_slope_up_left_N.png",
+    "art/tiles/stone_slope_up_right_N.png",
+    "art/tiles/stone_smooth_N.png",
+    "art/tiles/tree_cluster_detailed_N.png",
+    "art/tiles/tree_multiple_N.png",
+    "art/tiles/tree_single_detailed_N.png",
+    "art/tiles/water_center_N.png",
+    "art/tiles/water_corner_down_N.png",
+    "art/tiles/water_corner_left_N.png",
+    "art/tiles/water_corner_right_N.png",
+    "art/tiles/water_corner_up_N.png",
+    "art/tiles/water_slope_down_left_N.png",
+    "art/tiles/water_slope_down_right_N.png",
+    "art/tiles/water_slope_up_left_N.png",
+    "art/tiles/water_slope_up_right_N.png",
+    "art/tiles/water_smooth_N.png"
+  ]
+}
