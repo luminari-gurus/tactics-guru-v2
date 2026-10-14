@@ -1,9 +1,11 @@
 // Focused documentation-prototype checks; does not run or certify gameplay.
 import { chromium } from 'playwright';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
-const output=fileURLToPath(new URL('./previews/',import.meta.url));
+const output=resolve(process.env.DESIGN_OUTPUT_DIR ?? fileURLToPath(new URL('./previews/',import.meta.url)))+'/';
+mkdirSync(output,{recursive:true});
 const base=process.env.DESIGN_BASE_URL ?? new URL('./mockups.html',import.meta.url).href;
 const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{})});
 const states=['idle','selected','preview','invalid','review','move-spent','action-spent','enemy','presenting','victory','defeat','inspection'];
@@ -44,6 +46,27 @@ try{
   await page.keyboard.press('Escape');assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false);assert.equal(await page.locator('#board-count').textContent(),count,'dismissal capture');assert.equal(await page.locator('#actor-name').textContent(),actor);assert.equal(await page.locator('#target').inputValue(),'');assert.ok(await page.locator('#review').isDisabled());assert.ok(await page.evaluate(()=>document.activeElement===document.getElementById('restart')),'disabled invoker fallback');
   await page.locator('#inspect').click();assert.match(await page.locator('#dialog-title').textContent(),/Inspection only/);assert.equal(await page.locator('#actor-name').textContent(),actor);await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.id),'inspect');
   await page.locator('#sound').click();assert.equal(await page.locator('#sound').getAttribute('aria-pressed'),'true');assert.equal(await page.locator('#board-count').textContent(),count);
+  // A held activation must not flow from action confirmation through destructive reset.
+  await open(page,example);await page.locator('#move').click();await page.locator('#target').selectOption('valid');await page.locator('#review').click();
+  await page.getByRole('button',{name:'Confirm',exact:true}).focus();await page.keyboard.down('Enter');
+  await page.waitForTimeout(600);await page.keyboard.down('Enter');await page.waitForTimeout(50);await page.keyboard.down('Enter');await page.keyboard.up('Enter');
+  assert.match(await page.locator('#phase').textContent(),/locked/);assert.equal(await page.locator('#move-budget').textContent(),'Move spent');assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false);assert.equal(await page.locator('#board-count').textContent(),'0');
+  await page.locator('#restart').focus();await page.keyboard.down('Enter');await page.keyboard.down('Enter');await page.keyboard.up('Enter');
+  assert.equal(await page.locator('#dialog-title').textContent(),'Start a new battle?');assert.match(await page.locator('#phase').textContent(),/locked/);
+  await page.keyboard.down('Space');await page.keyboard.down('Space');assert.match(await page.locator('#phase').textContent(),/locked/);await page.keyboard.up('Space');assert.equal(await page.locator('#phase').textContent(),'Your turn');
+  // Nonmodal Escape and the visible Cancel share focus restoration, including spent movement.
+  for(const fixture of ['idle','move-spent'])for(const gesture of ['Escape','Cancel']){
+   await open(page,example,fixture);await page.locator(fixture==='idle'?'#move':'#basic').click();await page.locator('#target').selectOption('valid');await page.locator('#target').focus();await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'review');
+   if(gesture==='Escape')await page.keyboard.press('Escape');else await page.locator('#cancel').click();
+   assert.equal(await page.evaluate(()=>document.activeElement.id),fixture==='idle'?'move':'wait');assert.equal(await page.locator('#target').inputValue(),'');assert.ok(await page.locator('#review').isDisabled());assert.equal(await page.locator('#board-count').textContent(),'0');
+  }
+  // Only Guarded Strike grants Guarded; header and inspection must agree.
+  for(const action of ['basic','signature']){
+   await open(page,'fighter');await page.locator(`#${action}`).click();await page.locator('#target').selectOption('valid');await page.locator('#review').click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
+   const guarded=action==='signature',status=guarded?'Guarded · +2 AC':'No status effects',ac=guarded?'16':'14';
+   assert.equal(await page.locator('#action-budget').textContent(),'Action spent');assert.equal(await page.locator('#status').textContent(),status);assert.equal(await page.locator('#stats').textContent(),`AC ${ac} · Accuracy +4`);
+   await page.locator('#inspect').click();await page.getByRole('button',{name:'Inspect Fighter',exact:true}).click();assert.ok((await page.locator('#dialog-copy').textContent()).includes(status));assert.equal(await page.locator('#dialog-copy dd').first().textContent(),ac);
+  }
   // Each prepare path has Review, Confirm and a persistent presentation lock.
   for(const action of ['move','basic','signature']){await open(page,example);await page.locator(`#${action}`).click();await page.locator('#target').selectOption('invalid');assert.ok(await page.locator('#review').isDisabled());await page.locator('#target').selectOption('valid');await page.locator('#review').click();await page.getByRole('button',{name:'Confirm',exact:true}).click();assert.match(await page.locator('#phase').textContent(),/locked/);assert.ok(await page.locator('#wait').isDisabled());assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false);}
   await open(page,example);await page.locator('#wait').click();assert.match(await page.locator('#phase').textContent(),/locked/);assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false,'Wait has no review dialog');
@@ -57,7 +80,7 @@ try{
   await open(page,example);await page.evaluate(()=>{for(const [side,value] of Object.entries({top:24,right:24,bottom:34,left:24}))document.documentElement.style.setProperty(`--test-safe-${side}`,`${value}px`);});
   const safe=await measure(page);assert.ok(safe.board.x>=24&&safe.board.y>=24);assert.ok(safe.controls.x+safe.controls.width<=width-24+.5&&safe.controls.y+safe.controls.height<=height-34+.5);assert.equal(safe.horizontalOverflow,false);
   results.layouts.at(-1).enlarged=enlarged;results.layouts.at(-1).syntheticSafeArea=safe;
-  results.interactions.push(`${name}: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress`);
+  results.interactions.push(`${name}: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress`);
   await context.close();
  }
  const luminance=hex=>{const a=hex.match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;};

@@ -34,6 +34,8 @@ See [proposal.md](proposal.md) for motivation and [the implementation plan](../.
 
 ## Risks / Trade-offs
 
+PR #112 review repair keeps the finite display prototype: Guarded is its own display flag, set only by Fighter signature confirmation or the explicitly authored Fighter action-spent fixture. Basic attack spends the action without granting Guarded. Share post-cancel focus restoration between the visible Cancel button and nonmodal Escape. Retain Restart fallback with repeated Enter/Space button activation suppressed; carry this requirement into the runtime handoff. Extend `verify.mjs` with these exact regressions and keep existing layout/interaction checks.
+
 - Rich unit details can consume the board area. Use inspection/disclosure and measure the expanded states, not only the ideal idle screenshot.
 - A prototype can display impossible states. Check examples against the existing catalog/session fields; label illustrative fixtures, and retain real command semantics.
 - Top-only geometry can make a polished rail/dock impossible to integrate through CSS alone. Document the needed viewport rectangle adaptation and focused camera tests in the handoff; do not hide this cost.

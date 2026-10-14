@@ -75,14 +75,14 @@ const states={idle:'Idle',selected:'Action selected / choose target',preview:'Va
 const query=new URLSearchParams(location.search);
 let hero=Object.hasOwn(heroes,query.get('hero'))?query.get('hero'):'fighter';
 let state=Object.hasOwn(states,query.get('state'))?query.get('state'):'idle';
-let action=null,choice='',phase='player',moved=false,acted=false,boardCount=0,prior=null,onDismiss=()=>{},sound=false;
+let action=null,choice='',phase='player',moved=false,acted=false,guarded=false,boardCount=0,prior=null,onDismiss=()=>{},sound=false;
 if(query.has('export'))document.body.classList.add('export');
 $('hero-fixture').value=hero;
 for(const [value,label] of Object.entries(states))$('state-fixture').add(new Option(label,value));
 const actionLabel=()=>action==='move'?'Move':action==='basic'?'Basic attack':heroes[hero].signature;
 function forecast(){if(action==='move')return 'Move 2 steps · cost 2 · uses movement';if(action==='signature')return heroes[hero].forecast;const h=heroes[hero];return `Hit ${({fighter:65,ranger:70,mage:60})[hero]}% · attack +${h.accuracy} vs AC 12 · damage ${2+h.power} (${2*(2+h.power)} critical) · uses action`;}
 function render(){
- const h=heroes[hero],enemy=phase==='enemy',locked=phase!=='player',guarded=acted&&hero==='fighter';
+ const h=heroes[hero],enemy=phase==='enemy',locked=phase!=='player';
  $('phase').textContent=({player:'Your turn',enemy:'Enemy turn',presenting:'Resolving action · locked',victory:'Victory · battle complete',defeat:'Defeat · battle complete'})[phase];
  $('board-phase').textContent=$('phase').textContent;
  $('actor-name').textContent=enemy?'Goblin archer':h.name;
@@ -118,17 +118,17 @@ function modal(title,content,choices,dismiss=()=>{}){
  for(const [label,callback,primary] of choices){const b=document.createElement('button');b.textContent=label;if(primary)b.className='primary';b.onclick=()=>closeDialog(callback);$('dialog-choices').append(b);}
  if(!$('dialog').open)$('dialog').showModal();$('dialog-choices').querySelector('button')?.focus();
 }
-function cancel(){action=null;choice='';render();}
-function review(){if($('review').disabled)return;modal('Confirm action',`<p><strong>${heroes[hero].name} · ${actionLabel()}</strong><br>${action==='move'?'Destination (3, 2)':'Target: Goblin grunt · 9/9 HP'}</p><p>${forecast()}</p><p class="modal-note">Confirm accepts one command. Cancel spends nothing.</p>`,[['Confirm',()=>{phase='presenting';if(action==='move')moved=true;else acted=true;action=null;choice='';render();},true],['Cancel',cancel],['Restart battle',restart]],cancel);}
+function cancel(){action=null;choice='';render();$('move').disabled?$('wait').focus():$('move').focus();}
+function review(){if($('review').disabled)return;modal('Confirm action',`<p><strong>${heroes[hero].name} · ${actionLabel()}</strong><br>${action==='move'?'Destination (3, 2)':'Target: Goblin grunt · 9/9 HP'}</p><p>${forecast()}</p><p class="modal-note">Confirm accepts one command. Cancel spends nothing.</p>`,[['Confirm',()=>{phase='presenting';if(action==='move')moved=true;else acted=true;if(action==='signature'&&hero==='fighter')guarded=true;action=null;choice='';render();},true],['Cancel',cancel],['Restart battle',restart]],cancel);}
 function restart(){modal('Start a new battle?','<p>The game will discard the current battle and both saved slots. Export recovery data first if needed.</p><p class="modal-note">Design demo only: this example has no saved data.</p>',[['Start new battle',()=>loadFixture('idle'),true],['Cancel',()=>{}]]);}
 function inspect(id=hero==='ranger'?'mage':'ranger'){
- const h=heroes[id],guarded=acted&&id===hero&&hero==='fighter';modal(`Inspection only — ${h.name}`,`<img class="portrait" src="../../../public/battle/portraits/${id}.png" alt="${h.name} portrait"><p><strong>${phase==='defeat'?0:h.hp}/${h.max} HP</strong><br>${phase==='defeat'?'Defeated':guarded?'Guarded · +2 AC':'No status effects'}</p><p>Acting unit remains ${$('actor-name').textContent}. Inspection never changes the turn.</p><div class="party-list">${Object.entries(heroes).map(([key,h])=>`<button data-inspect="${key}">Inspect ${h.name}</button>`).join('')}</div><dl><dt>Armor class</dt><dd>${h.ac+(guarded?2:0)}</dd><dt>Accuracy</dt><dd>+${h.accuracy}</dd><dt>Power</dt><dd>${h.power}</dd><dt>Movement allowance</dt><dd>4 tiles</dd><dt>Jump</dt><dd>1</dd><dt>Dexterity / Will</dt><dd>${h.dex} / ${h.will}</dd></dl>`,[['Close inspection',()=>{}]]);
+ const h=heroes[id],isGuarded=guarded&&id===hero;modal(`Inspection only — ${h.name}`,`<img class="portrait" src="../../../public/battle/portraits/${id}.png" alt="${h.name} portrait"><p><strong>${phase==='defeat'?0:h.hp}/${h.max} HP</strong><br>${phase==='defeat'?'Defeated':isGuarded?'Guarded · +2 AC':'No status effects'}</p><p>Acting unit remains ${$('actor-name').textContent}. Inspection never changes the turn.</p><div class="party-list">${Object.entries(heroes).map(([key,h])=>`<button data-inspect="${key}">Inspect ${h.name}</button>`).join('')}</div><dl><dt>Armor class</dt><dd>${h.ac+(isGuarded?2:0)}</dd><dt>Accuracy</dt><dd>+${h.accuracy}</dd><dt>Power</dt><dd>${h.power}</dd><dt>Movement allowance</dt><dd>4 tiles</dd><dt>Jump</dt><dd>1</dd><dt>Dexterity / Will</dt><dd>${h.dex} / ${h.will}</dd></dl>`,[['Close inspection',()=>{}]]);
  $('dialog-copy').querySelectorAll('[data-inspect]').forEach(b=>b.onclick=()=>inspect(b.dataset.inspect));
 }
-function loadFixture(value){if($('dialog').open)$('dialog').close();state=value;phase=['enemy','presenting','victory','defeat'].includes(value)?value:'player';action=['selected','preview','invalid','review'].includes(value)?'signature':null;choice=['preview','review'].includes(value)?'valid':value==='invalid'?'invalid':'';moved=value==='move-spent';acted=value==='action-spent';$('state-fixture').value=value;render();if(value==='review'){$('review').focus();review();}if(value==='inspection'){$('inspect').focus();inspect();}if(value==='victory'||value==='defeat'){ $('restart').focus();modal(value==='victory'?'Victory':'Defeat','<p>Battle complete. Restart for a fresh battle.</p>',[['Restart battle',restart]]);}}
+function loadFixture(value){if($('dialog').open)$('dialog').close();state=value;phase=['enemy','presenting','victory','defeat'].includes(value)?value:'player';action=['selected','preview','invalid','review'].includes(value)?'signature':null;choice=['preview','review'].includes(value)?'valid':value==='invalid'?'invalid':'';moved=value==='move-spent';acted=value==='action-spent';guarded=acted&&hero==='fighter';$('state-fixture').value=value;render();if(value==='review'){$('review').focus();review();}if(value==='inspection'){$('inspect').focus();inspect();}if(value==='victory'||value==='defeat'){ $('restart').focus();modal(value==='victory'?'Victory':'Defeat','<p>Battle complete. Restart for a fresh battle.</p>',[['Restart battle',restart]]);}}
 document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{action=b.dataset.action;choice='';render();$('target').focus();});
 $('target').onchange=()=>{choice=$('target').value;render();};
-$('cancel').onclick=()=>{cancel();$('move').disabled?$('wait').focus():$('move').focus();};
+$('cancel').onclick=cancel;
 $('review').onclick=review;
 $('wait').onclick=()=>{phase='presenting';action=null;choice='';render();};
 $('board').onclick=()=>{boardCount++;if(action)choice='valid';render();};
@@ -141,6 +141,7 @@ $('hero-fixture').onchange=()=>{hero=$('hero-fixture').value;loadFixture(state);
 $('export-view').onclick=()=>{location.href=`?hero=${hero}&state=${state}&export=1`;};
 $('dialog').addEventListener('cancel',e=>{e.preventDefault();const callback=onDismiss;closeDialog(callback);});
 $('dialog').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=[...$('dialog').querySelectorAll('button:not(:disabled)')],first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')&&e.target.closest('button'))e.preventDefault();},{capture:true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('dialog').open&&phase==='player'){cancel();e.preventDefault();}});
 loadFixture(state);
 </script>
