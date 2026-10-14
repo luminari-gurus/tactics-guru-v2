@@ -5,6 +5,9 @@ import { decodeBattleSave } from '../src/domain/saveEnvelope';
 import { battleCatalog as catalog } from '../src/content/catalog';
 import { confirmRestart, playCommand, playerDecision, readSession } from './helpers/battlePolicy';
 
+// Playwright disables BFCache by default; persistence coverage must include cached documents.
+test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);
 async function seedTwo(page:Page) {
@@ -172,4 +175,78 @@ for(const invalid of ['{broken',JSON.stringify({kind:'tactics-guru:battle-snapsh
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-cancel-reset').click();
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
   expect((await readSession(page)).state.seed).toBe(1);expect((await stored(page)).primary).not.toBe(invalid);
+});
+
+test.describe('browser history with BFCache enabled',()=>{
+  test.beforeEach(async({page})=>{
+    await page.addInitScript(()=>window.addEventListener('pageshow',event=>{
+      if(event.persisted)sessionStorage.setItem('test:bfcache-return',location.href);
+    }));
+  });
+
+  for(const cached of ['battle','recovery dialog'])test(`cached ${cached} cannot overwrite either slot of its replacement`,async({page,baseURL})=>{
+    const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+    const first=new URL('./?history=first',baseURL).href,map=new URL('map',baseURL).href;
+    await page.goto(first);await ready(page);
+    expect((await readSession(page)).state.seed).toBe(1);
+    if(cached==='recovery dialog'){await page.reload();await expect(page.locator('#save-continue')).toBeVisible();}
+    await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);await page.goto(baseURL!);
+    await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
+    const replacement=await readSession(page),saved=await stored(page);
+    expect(replacement.state.seed).toBe(2);
+    await page.goBack({waitUntil:'commit'});await expect(page).toHaveURL(map);
+    await page.goBack({waitUntil:'commit'});
+    await expect(page.locator('#save-continue')).toBeVisible();
+    expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
+    expect(await stored(page)).toEqual(saved);
+    expect(await page.locator('#game').getAttribute('data-session')).toBeNull();
+    await page.screenshot({path:test.info().outputPath('cached-return-recovery.png')});
+    await page.locator('#save-continue').click();await ready(page);
+    expect((await readSession(page)).state).toEqual(replacement.state);
+    expect(await stored(page)).toEqual(saved);
+    await page.locator('#battle-next').click();await ready(page);
+    const after=await stored(page);
+    for(const text of [after.primary,after.backup]){
+      const decoded=decodeBattleSave(text!,catalog);expect(decoded.ok).toBe(true);
+      if(decoded.ok)expect(decoded.state.seed).toBe(2);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  for(const departure of ['player','presentation'])test(`cached return after restart at ${departure} preserves the accepted boundary`,async({page,baseURL})=>{
+    const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+    const first=new URL('./?history=first',baseURL).href,map=new URL('map',baseURL).href;
+    await page.goto(first);await ready(page);
+    await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
+    // Observe the last accepted boundary before the application's pagehide shutdown.
+    await page.evaluate(keys=>window.addEventListener('pagehide',()=>{
+      sessionStorage.setItem('test:departure',JSON.stringify({
+        primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),
+      }));
+    },{capture:true,once:true}),keys);
+    if(departure==='presentation'){
+      await page.evaluate(map=>{
+        document.querySelector<HTMLButtonElement>('#battle-next')!.click();
+        sessionStorage.setItem('test:departure-phase',document.querySelector<HTMLElement>('#game')!.dataset.phase!);
+        location.assign(map);
+      },map);
+      await expect(page).toHaveURL(map);
+      expect(await page.evaluate(()=>sessionStorage.getItem('test:departure-phase'))).toBe('presenting');
+    }else await page.goto(map);
+    await expect(page.locator('#map-grid span')).toHaveCount(400);
+    const saved=JSON.parse((await page.evaluate(()=>sessionStorage.getItem('test:departure')))!);
+    expect(await stored(page)).toEqual(saved);
+    await page.goBack({waitUntil:'commit'});
+    await expect(page.locator('#save-continue')).toBeVisible();
+    expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
+    expect(await stored(page)).toEqual(saved);
+    await page.locator('#save-continue').click();await ready(page);
+    const continued=await readSession(page),decoded=decodeBattleSave(saved.primary,catalog);
+    expect(decoded.ok).toBe(true);
+    if(decoded.ok)expect(continued.continuation!.snapshot).toEqual(decoded.state);
+    expect(continued.state.seed).toBe(2);
+    if(departure==='player'){expect(await stored(page)).toEqual(saved);expect(continued.events).toEqual([]);}
+    await page.screenshot({path:test.info().outputPath(`continued-${departure}.png`)});
+    expect(errors).toEqual([]);
+  });
 });
