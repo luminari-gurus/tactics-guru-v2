@@ -24,5 +24,5 @@ Implementation authorized on 2026-10-14; see [plan.md](../../../docs/ongoing-pro
 
 ## Workflow follow-up
 
-- [PR #110](https://github.com/luminari-gurus/tactics-guru-v2/pull/110) is ready for review and closes #106 on merge; all acceptance criteria have recorded evidence. #108 remains separate.
-- Merge and OpenSpec archive remain later workflow steps; no merge, manual deployment or production cutover is authorized by the planning request.
+- [PR #110](https://github.com/luminari-gurus/tactics-guru-v2/pull/110) merged on 2026-10-14 as `82c0eb457cad1fd51eb944e925ef6b96cb92b2bb` after the user authorized integration. All acceptance criteria have recorded evidence; no implementation tasks remain. See the [QA closeout](../../../docs/qa/issue-106-ability-animations.md#review-and-merge-closeout--2026-10-14).
+- This completed OpenSpec record remains in place. #108 is the separate next-session recommendation; no work on it, manual deployment or production cutover began during this closeout.
