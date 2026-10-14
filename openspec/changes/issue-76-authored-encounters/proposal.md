@@ -4,7 +4,7 @@
 
 Issue [#76](https://github.com/luminari-gurus/tactics-guru-v2/issues/76) needs three authored encounters after the accepted #75 run contract. Main currently has one authored map; a validated roster will supply #80 integration without changing the current single battle.
 
-Caller: `dubstylee`. Branch: `work/issue-76-authored-encounters`. Base: `origin/main` at `7a9b22b73f5187fff5a27701a2879e94368a148a` (merged PR #107). Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-76-authored-encounters`. Base: `origin/main` at `7a9b22b73f5187fff5a27701a2879e94368a148a` (merged PR #107). Implementation approval: caller explicitly approved this published plan on 2026-10-14 ("Approved").
 
 ## What Changes
 
@@ -26,7 +26,7 @@ None. Existing board/control requirements remain regression constraints.
 
 ## Impact
 
-Expected files: `src/content/encounters.ts`, two new authored map modules, `tests/unit/authoredEncounters.test.ts`, `tests/authored-encounters.spec.ts`, a minimal `tests/fixtures/encounters/` browser entry, and `docs/authored-encounters.md`. Reuse `src/content/validate.ts`, `src/domain/run.ts`, `src/domain/turns.ts`, `src/phaser/BoardRenderer.ts` and `BoardInput.ts`; change these only for a demonstrated requirement within scope.
+Expected files: `src/content/encounters.ts`, two new authored map modules, `tests/unit/authoredEncounters.test.ts`, `tests/authored-encounters.spec.ts`, a minimal `tests/fixtures/encounters/` browser entry, and `docs/authored-encounters.md`. Validation wiring also affects `package.json`, `playwright.config.ts`, `playwright.encounters.config.ts` and `tsconfig.json`. Reuse `src/content/validate.ts`, `src/domain/run.ts`, `src/domain/turns.ts`, `src/phaser/BoardRenderer.ts` and `BoardInput.ts`; change these only for a demonstrated requirement within scope.
 
 No run progression UI, reward/item logic, production carryover constructor/replay changes, persistence changes, new art, balance/stat/ability changes, dependency updates or deployment. #57 still gates feature release; #81 owns full-run balance and physical certification.
 

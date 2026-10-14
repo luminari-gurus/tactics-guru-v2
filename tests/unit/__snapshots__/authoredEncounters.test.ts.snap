@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`resolves the ordered run and reuses immutable single-battle definitions and assets > fixed authored maps 1`] = `
+[
+  "sha256:fa658f03c5e08becc896bac7ff24b6ea8535b2b416eaa98e4a2f0b306efd964b",
+  "sha256:15aefd548f329327020abbf1501aefe146bc7226547fc556ad2f871ea4a43136",
+  "sha256:749eeaf90e79e43f6141410b171498e8d28c61295ec223a3e6cfde573addd431",
+]
+`;
+
+exports[`resolves the ordered run and reuses immutable single-battle definitions and assets > unchanged single-battle identity 1`] = `"sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"`;

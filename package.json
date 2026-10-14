@@ -9,12 +9,13 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.domain.json",
-    "build": "npm run typecheck && vite build",
+    "build": "npm run validate:content && npm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "playwright test",
     "test:unit": "vitest run",
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
-    "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts"
+    "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts",
+    "posttest": "playwright test -c playwright.encounters.config.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"

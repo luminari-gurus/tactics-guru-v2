@@ -23,6 +23,7 @@
     "playwright.config.ts",
     "vitest.config.ts",
     "vite.config.ts",
-    "scripts"
+    "scripts",
+    "playwright.encounters.config.ts"
   ]
 }
