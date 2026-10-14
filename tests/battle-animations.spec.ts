@@ -105,6 +105,9 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   expect(accepted.continuation!.commands).toEqual([fixture.command]);
   const expected=dispatch(fixture.before,fixture.command,catalog);expect(expected.ok).toBe(true);
   if(expected.ok)expect(accepted.state).toEqual(expected.state);
+  // Exercise board input during the lock. Fresh keys on the usable Restart
+  // fallback intentionally open/confirm reset; held-key capture has its own regression.
+  await expect(page.locator('#fit-restart')).toBeFocused();await page.locator('canvas').focus();
   await page.keyboard.press('Enter');await page.keyboard.press('Space');
   await expect(page.locator('#battle-next')).toBeDisabled();await expect(page.locator('[data-action="signature"]')).toBeDisabled();
   await page.clock.runFor(112);const travel=await report(page);aligned(travel,fixture);

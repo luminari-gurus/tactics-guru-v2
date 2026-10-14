@@ -10,6 +10,10 @@ export class BattleDialogs {
     this.element.id='battle-dialog';this.element.setAttribute('aria-labelledby','battle-dialog-title');
     this.element.innerHTML='<h2 id="battle-dialog-title"></h2><p id="battle-dialog-message"></p><div class="fit-controls"></div>';
     document.body.append(this.element); const signal=this.abort.signal;
+    // A held confirmation key must not activate the next focused button (e.g. reset).
+    document.addEventListener('keydown',event=>{
+      if(event.repeat && (event.key==='Enter' || event.key===' ') && event.target instanceof Element && event.target.closest('button'))event.preventDefault();
+    },{capture:true,signal});
     this.element.addEventListener('click',event=>{
       const button=(event.target as Element).closest('button');
       const choice=this.choices.find(c=>c.id===button?.id);
@@ -49,8 +53,11 @@ export class BattleDialogs {
     callback?.();
     // The callback can disable the invoker or open a replacement modal.
     if(this.open)return;
-    if(prior?.isConnected && !prior.closest('dialog') && !(prior instanceof HTMLButtonElement && prior.disabled))prior.focus();
-    else document.querySelector<HTMLElement>('#fit-restart')?.focus();
+    if(prior?.isConnected && prior!==document.body && prior!==document.documentElement && !prior.closest('dialog') && !prior.matches(':disabled')) {
+      prior.focus();
+      if(document.activeElement===prior)return;
+    }
+    document.querySelector<HTMLElement>('#fit-restart')?.focus();
   }
   dispose(){this.abort.abort();this.element.close();this.element.remove();this.choices=[];this.cancel=null;}
 }

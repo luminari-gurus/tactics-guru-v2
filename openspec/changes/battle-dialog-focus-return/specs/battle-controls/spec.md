@@ -20,3 +20,11 @@ Dialogs SHALL capture focus and prevent board click-through. Keyboard players SH
 #### Scenario: Dialog action opens a replacement dialog
 - **WHEN** a dialog action immediately opens another modal
 - **THEN** focus stays inside that replacement modal instead of returning to the underlying battle controls
+
+#### Scenario: Held confirmation key
+- **WHEN** Enter or Space remains held while a button activation changes focus
+- **THEN** repeated keydowns do not activate the newly focused button or reset either saved slot; a fresh activation after key release remains usable
+
+#### Scenario: Startup dialog has no usable invoker
+- **WHEN** keyboard Continue closes a startup dialog whose original invoker is BODY, the document element, or cannot acquire focus
+- **THEN** focus moves to the enabled Restart control after the callback, while a replacement modal retains its own focus
