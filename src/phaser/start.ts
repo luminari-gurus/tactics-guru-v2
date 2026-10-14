@@ -7,7 +7,7 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
   const sceneName = new URLSearchParams(location.search).get('scene');
   const scene = sceneName === 'content-smoke' ? new ContentSmokeScene(status, error)
     : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error);
-  new Phaser.Game({
+  const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     backgroundColor: '#172033',
@@ -26,5 +26,17 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
     } },
     scene,
   });
+  if (scene instanceof BattleScene) {
+    window.addEventListener('pagehide', () => {
+      status('loading');
+      // Stop synchronously: queued scene operations may not run before BFCache freezes us.
+      // Existing shutdown disposes the session, pending presentation and recovery controls.
+      game.scene.stop(scene);
+    }, { once: true });
+    window.addEventListener('pageshow', event => {
+      // Another history entry may have replaced the save. Re-enter read-only startup.
+      if (event.persisted) location.reload();
+    });
+  }
   return () => { if(scene instanceof BattleScene)scene.requestRestart();else scene.scene.restart(); };
 }

@@ -1,0 +1,571 @@
+{
+  "date": "2026-10-14",
+  "timezone": "Asia/Jerusalem",
+  "reviewedHead": "46465d4f398ed9c87ea5223a8ef928fcdcfc3e11",
+  "base": "7a9b22b73f5187fff5a27701a2879e94368a148a",
+  "buildCommit": "8cd986d0e5a481b189eaa6abd2cdc6562bc897af",
+  "buildDirty": true,
+  "buildDirtyScope": "Only src/phaser/start.ts changes the production build; current main also adds its merged run domain/tests. Test and documentation edits are captured by input objects below.",
+  "gitInputObjects": {
+    "src": "e82de445017b502fbdd9ab61719314df00e10479",
+    "tests": "0b2d8580bf794c7d33fb92a3652e03759430eba2",
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "package.json": "98e64fd8855e3530d791b97ec1934cc8c8310ce8",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+    "playwright.config.ts": "46fc780b74fed4d634216e45b3eb30a2c86cb614",
+    "vite.config.ts": "59a5900815bc4a3cabc5accd93dbce3ae76914ca",
+    "tsconfig.json": "2933c83050bfa4a7a21494e6d9f7b21a6622be53",
+    "tsconfig.domain.json": "231561e38f4baf69afd169d885edd1f6e31fa62a",
+    "vitest.config.ts": "b96a6e80f73900884b38327b3479d495f3864935"
+  },
+  "node": "v24.19.0",
+  "browser": "Microsoft Edge 155.0.4283.45",
+  "workers": 1,
+  "retries": 0,
+  "unit": {
+    "total": 508,
+    "passed": 508,
+    "failed": 0,
+    "pending": 0
+  },
+  "content": {
+    "passed": 77
+  },
+  "checks": {
+    "typecheck": "both configurations passed",
+    "rootBuild": "passed",
+    "prefixBuild": "passed",
+    "buildWarning": "existing large bundle warning"
+  },
+  "focused": {
+    "stats": {
+      "startTime": "2026-10-14T08:46:30.463Z",
+      "duration": 49771.701,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "total": 12,
+    "attempts": 12,
+    "byFile": {
+      "battle-persistence.spec.ts": 12
+    },
+    "byProfile": {
+      "desktop": 4,
+      "mobile-portrait": 4,
+      "mobile-landscape": 4
+    },
+    "historyCases": [
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "root": {
+    "stats": {
+      "startTime": "2026-10-14T08:48:23.983Z",
+      "duration": 1141570.971,
+      "expected": 348,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "total": 348,
+    "attempts": 348,
+    "byFile": {
+      "assets.spec.ts": 12,
+      "audio.spec.ts": 21,
+      "battle-audio.spec.ts": 54,
+      "battle-board.spec.ts": 27,
+      "battle-loop.spec.ts": 27,
+      "battle-persistence.spec.ts": 42,
+      "board.spec.ts": 3,
+      "boot.spec.ts": 3,
+      "content-loading.spec.ts": 18,
+      "engine-fit.spec.ts": 9,
+      "grass-surface.spec.ts": 3,
+      "input.spec.ts": 9,
+      "layout.spec.ts": 18,
+      "lifecycle.spec.ts": 12,
+      "move.spec.ts": 3,
+      "opacity.spec.ts": 3,
+      "overworld-map.spec.ts": 42,
+      "public-asset-base.spec.ts": 39,
+      "terrain-materials.spec.ts": 3
+    },
+    "byProfile": {
+      "desktop": 116,
+      "mobile-portrait": 116,
+      "mobile-landscape": 116
+    },
+    "historyCases": [
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "prefix": {
+    "stats": {
+      "startTime": "2026-10-14T09:07:33.602Z",
+      "duration": 59799.034999999996,
+      "expected": 36,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "total": 36,
+    "attempts": 36,
+    "byFile": {
+      "battle-persistence.spec.ts": 12,
+      "overworld-map.spec.ts": 24
+    },
+    "byProfile": {
+      "desktop": 12,
+      "mobile-portrait": 12,
+      "mobile-landscape": 12
+    },
+    "historyCases": [
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached battle cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached recovery dialog cannot overwrite either slot of its replacement",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at player preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "title": "cached return after restart at presentation preserves the accepted boundary",
+        "profile": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "visualInspection": [
+    "recovery-desktop.png",
+    "recovery-landscape.png",
+    "continued-portrait.png"
+  ],
+  "limitations": [
+    "Local Edge and mobile emulation only",
+    "No physical Android/iOS certification or production hosting validation",
+    "No concurrent-tab ownership or durable retention guarantee",
+    "Remote CI not a gate"
+  ]
+}

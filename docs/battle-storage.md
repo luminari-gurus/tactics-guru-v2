@@ -55,6 +55,12 @@ Toolbar restart, action-dialog restart, outcome restart and New battle share one
 
 If removal or final inspection fails, the current battle and seed remain; the UI reports incomplete reset, retains inspected raw copies for export (including partially deleted slots), and offers review/retry/cancel. Partial deletion is not rolled back and is never described as a transaction. After successful invalidation, a failed first fresh save can leave only the new battle or no save; the old battle cannot reappear under the single-writer, individually atomic storage-call assumptions. Storage denial can therefore block replacement while an existing battle continues. Use one active battle tab. This is origin-scoped best-effort retention, with physical lifecycle acceptance still owned by #74.
 
+## Browser history
+
+Leaving a battle document (`pagehide`) synchronously shuts down its scene, disposing the live session, presentation callbacks, audio and recovery controls. A return from the back/forward cache reloads the same URL through startup. Current saved slots are inspected again and Continue or recovery requires a fresh choice before play resumes. This prevents an old history entry from autosaving over a replacement battle created later in the same tab, including after scene restarts or when a recovery dialog was cached.
+
+The reload does not itself write or remove existing slots. With both slots absent, the normal fresh-start rule applies. A successful Continue uses the current saved boundary; accepted enemy commands may subsequently autosave as usual. Normal hide/show without navigation keeps the live session. A cached return incurs a reload and can recover only saved progress; the existing warning for failed saves remains significant. This does not add concurrent-tab ownership or physical-device certification.
+
 ## Delivery boundary
 
 Storage is synchronous, origin-scoped and best-effort. Browser policy/private mode, quota, eviction and other tabs can invalidate assumptions. This adapter does not provide cross-tab transactions, permanent retention or power-loss durability. #73 owns live hydration, accepted-command autosave, player-facing warning/recovery/export controls and safe restart invalidation. #74 owns browser lifecycle and physical-device certification. #58/#57 remain open.

@@ -1,0 +1,61 @@
+{
+  "browser": "155.0.4283.45",
+  "initial": {
+    "session": {
+      "seed": 1,
+      "commandCount": 2
+    },
+    "primary": {
+      "seed": 1,
+      "commandCount": 2
+    },
+    "backup": {
+      "seed": 1,
+      "commandCount": 1
+    }
+  },
+  "replacement": {
+    "session": {
+      "seed": 2,
+      "commandCount": 4
+    },
+    "primary": {
+      "seed": 2,
+      "commandCount": 4
+    },
+    "backup": {
+      "seed": 2,
+      "commandCount": 3
+    }
+  },
+  "restored": {
+    "session": {
+      "seed": 1,
+      "commandCount": 2
+    },
+    "primary": {
+      "seed": 2,
+      "commandCount": 4
+    },
+    "backup": {
+      "seed": 2,
+      "commandCount": 3
+    }
+  },
+  "persistedReturn": "http://127.0.0.1:4174/?history=first",
+  "afterWait": {
+    "session": {
+      "seed": 1,
+      "commandCount": 7
+    },
+    "primary": {
+      "seed": 1,
+      "commandCount": 7
+    },
+    "backup": {
+      "seed": 1,
+      "commandCount": 6
+    }
+  },
+  "errors": []
+}

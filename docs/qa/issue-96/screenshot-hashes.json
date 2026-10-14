@@ -1,0 +1,272 @@
+[
+  {
+    "profile": "desktop",
+    "name": "art-rooms-grassland-simple.png",
+    "sha256": "7da4bfe25aa92b2d7df10180404120e65a50f48d4d53e47f0a0ae797539225d0"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-rooms-grassland-legacy-8bit.png",
+    "sha256": "83f95f21c5c3c230e7827aad4d41b4c89cb15b58252e53dfe9d97bd9e42248f5"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-rooms-forest-simple.png",
+    "sha256": "3907101c9d4e3f0857d01eca389f7272cda95884429c35e0d103aeb3875ef48e"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-rooms-forest-legacy-8bit.png",
+    "sha256": "f0359055dc7bb174823410dcdb6c97f1c9800a1624e2022c7dffc0fde6353dcc"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-rooms-desert-simple.png",
+    "sha256": "541f0596cc7d4e9858c7e83764f2efc1b26efab169aebf65330bac5b21e3e558"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-rooms-desert-legacy-8bit.png",
+    "sha256": "cae5403fb033bb7f07f36474bd3fa6f6c01bd13422486ff51a30e608d0ebaead"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-grassland-simple.png",
+    "sha256": "4c57351924d2ed4eeacb452ec7c8f2d1f3557e7d82ba6433af978bf7e04af84f"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-grassland-legacy-8bit.png",
+    "sha256": "1fb4209a2fc2aecd5278ac9937b8ba1fc02447ae39125aa5e04b22d4660c3917"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-forest-simple.png",
+    "sha256": "edb0c891e885b00db63467bcf8ca10c800b25cc77b603f8cf528a4db310b38be"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-forest-legacy-8bit.png",
+    "sha256": "3f12fa247494529c9dbc599d00a356dc32edba36d12f9a39907b388bbab16382"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-desert-simple.png",
+    "sha256": "a54897eae760d21e34b583fb965318b89f04ee412efdef3cbb132cc7b1205670"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-random-walker-desert-legacy-8bit.png",
+    "sha256": "27b91bc56c6be82f3e5551f7f6c29b05b17646999a81e6a313145b854641c228"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-grassland-simple.png",
+    "sha256": "8389b4c66c1bf16aa22c071f3cb9b3f32937c961c2733f8bc622ba93d0436df8"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-grassland-legacy-8bit.png",
+    "sha256": "7da78062584a841ca72461d9270525edde175c3d4058d62e21d2acfac5159797"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-forest-simple.png",
+    "sha256": "3cb77d10aaab4f0d0d3df299dc8fb18b60ac32a0f6c575675d37e6dcfe2ca2e6"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-forest-legacy-8bit.png",
+    "sha256": "2017c1537cc7c0b4c11e436bd8a73771439d259423199014c2398c2932e74993"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-desert-simple.png",
+    "sha256": "b962421b15e4fe014c2763214de5315fb01ba39c8187c3da65a37377c95dae85"
+  },
+  {
+    "profile": "desktop",
+    "name": "art-cellular-desert-legacy-8bit.png",
+    "sha256": "3d6d5b4e08a536f4c7af205108f70859631c2fcf5b588c3a39a5bf99ad8278da"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-grassland-simple.png",
+    "sha256": "646c6de11a94c30e066330a3e6a46927b6459d214bb71501b291e6da201e95e0"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-grassland-legacy-8bit.png",
+    "sha256": "994167665874f303081dbfa7fcbbaa7d8433fe09582fcc9cf83570f8d14feadd"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-forest-simple.png",
+    "sha256": "2a5d4a8a9c4b21e511be6de31e807d358f90e30b56acfc34d6f1621001c219ce"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-forest-legacy-8bit.png",
+    "sha256": "505880443ab852b5cdad2de14c514b960279a141ee5d668310fd46ee3982b553"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-desert-simple.png",
+    "sha256": "5383d2ba8b29f6ec92690d549a73d31253d731494a2e4050bae370e4df142fe7"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-rooms-desert-legacy-8bit.png",
+    "sha256": "2394845440798c0cd51fc7578ed10f4d1c3419bb071078e8556b596d29f636b5"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-grassland-simple.png",
+    "sha256": "ec309616761bd707a85e4c9b7a9190f9a87f1b0494d6e4a92eded88879821c2b"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-grassland-legacy-8bit.png",
+    "sha256": "15d2368098879bfb029ccb970cf2cee088aaa441bfa8b7979367d5a62a5ada6f"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-forest-simple.png",
+    "sha256": "c4e0b10e42f14b823e40bdd72503f06ba49844d002221c968ab5d05ef37729c8"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-forest-legacy-8bit.png",
+    "sha256": "0edb5d426910376fc8a56f2c6da79a0ac32db4f3435926a08b720150da5f96e3"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-desert-simple.png",
+    "sha256": "f7251f665b74afa4bb02da98d70e2520597d7289e0a94cf80c12ed2f9312c337"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-random-walker-desert-legacy-8bit.png",
+    "sha256": "c705aae625deb9911de010be7ad3d3b2768fab7b3b801f9fa503d8f9b4db3079"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-grassland-simple.png",
+    "sha256": "465d7458ede50072fc02bd1430d53d7496ecaa96ba575936c8603a3170e0f6fe"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-grassland-legacy-8bit.png",
+    "sha256": "d31c21c902a0edfdda6a0f4aba3f344c3273508862a41ddbb0d5de37d7261886"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-forest-simple.png",
+    "sha256": "fc378652ec7d73bfacea1b0115a4f2c2e06f58a46acad9478994643394932e29"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-forest-legacy-8bit.png",
+    "sha256": "1be5943fea62a7f516a24829e10a82189fc2d299ce7170143816007064ac032e"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-desert-simple.png",
+    "sha256": "764dd2331b88378bdd052d516db2902762b87449e6d61c76753dff65404f9b48"
+  },
+  {
+    "profile": "mobile-portrait",
+    "name": "art-cellular-desert-legacy-8bit.png",
+    "sha256": "daa8b45d8ea85847afdd606807efa7cb051d9dddbeb216e8a2c34164bdc58345"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-grassland-simple.png",
+    "sha256": "90b9ffc4696f6b2d9fd589aabcc35405e44d33eb3853fd55183d5c2940293c2d"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-grassland-legacy-8bit.png",
+    "sha256": "6e8554b71fb94a9b7b1e9ac49cdd7f9c092fb76bc7fdb2e938422fc673bc45b8"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-forest-simple.png",
+    "sha256": "f5e140047b39576e2fa74c87dd16157969899ebb7114cd98ea2f410e8f0c5289"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-forest-legacy-8bit.png",
+    "sha256": "812c42b716c4ff16ab6243b3b8cb3d1e2115698e145a150f92a589e76ab7d644"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-desert-simple.png",
+    "sha256": "1910a6e3eeb4a054a6467529569c2a9142c896ec2c3a978ca7544e7e6df3a4ea"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-rooms-desert-legacy-8bit.png",
+    "sha256": "eacc39192e216e09dbf5a30e03569267a0405d2d56993489f63956199a89e430"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-grassland-simple.png",
+    "sha256": "fd40f12a6c670e0201d203f4f81c96fd796383a6b4888841f0d252158cee6c4f"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-grassland-legacy-8bit.png",
+    "sha256": "bc047a5824d15da7e7c389ad52eaabbfcfcf32198486c088cfef4d76bbf7c6a6"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-forest-simple.png",
+    "sha256": "48e5c8f78151cddbf5745103e2ca746ace7d0f9c68ae5c96c7d6a6ce30cbc2f2"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-forest-legacy-8bit.png",
+    "sha256": "c5bf587c9bc8d36cd95aa46e17794d7b19818e9aee0c7fb994b607c838078222"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-desert-simple.png",
+    "sha256": "ce18152e7872435702327037d56871fc57490958f44c4efd3de892d3247e1245"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-random-walker-desert-legacy-8bit.png",
+    "sha256": "89f8aa43fd0700469e959d72b0b7aa0ed69013ef8fa82633f4a96bba46520aea"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-grassland-simple.png",
+    "sha256": "12d59920526141acb09569e8502644b42a1c57f162f004373f994950cef6405e"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-grassland-legacy-8bit.png",
+    "sha256": "1900379c8457e721207ea0ea3ef9d090c2ed67e4c9ac36ccf97d82e4fb039918"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-forest-simple.png",
+    "sha256": "0aaf2599ae7b85c0317eaf2ad05f9a7ba0074fe991650a3c5cf3c779a486603f"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-forest-legacy-8bit.png",
+    "sha256": "4dff537a9d8f1d4a4f4b6e701538839cc49eca50739e0de7efb6e22c7a750858"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-desert-simple.png",
+    "sha256": "d9ee3c3eae6661b93b1238419531acb3fd7585acc296c192de111445413ad23a"
+  },
+  {
+    "profile": "mobile-landscape",
+    "name": "art-cellular-desert-legacy-8bit.png",
+    "sha256": "04088a5dd97554eed52cbc932d2e8564504224a7b6476e9ce0085e099ad1fb21"
+  }
+]
