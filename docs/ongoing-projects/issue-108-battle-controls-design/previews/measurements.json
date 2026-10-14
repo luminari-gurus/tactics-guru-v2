@@ -594,11 +594,11 @@
     }
   ],
   "interactions": [
-    "desktop: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
-    "portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
-    "landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
-    "small-portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
-    "small-landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress"
+    "desktop: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "small-portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "small-landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, nonmodal Escape/Cancel with movement ready/spent, held Enter/reset and fresh Space activation, Basic attack versus Guarded Strike header/inspection, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress"
   ],
   "contrast": [
     {

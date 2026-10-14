@@ -25,7 +25,7 @@ Planning is complete when these tasks are concrete and validated; none is marked
 
 - [x] 4.1 Reproduce held Enter resetting the prototype, Basic attack falsely granting Guarded, and nonmodal Escape losing focus in the existing prototype walkthrough.
 - [x] 4.2 Prevent repeated button activation, separate display-only Guarded from acted, share Cancel/Escape focus restoration, and update the runtime handoff.
-- [ ] 4.3 Pass all prototype fixtures and interaction/layout checks, strict OpenSpec, links and whitespace; publish the fixes and resolve verified review threads with remote parity.
+- [x] 4.3 Pass all prototype fixtures and interaction/layout checks, strict OpenSpec, links and whitespace; publish the fixes and resolve verified review threads with remote parity.
 
 ## Workflow follow-up
 
