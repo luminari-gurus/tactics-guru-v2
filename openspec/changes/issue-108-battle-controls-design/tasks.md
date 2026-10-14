@@ -19,7 +19,7 @@ Planning is complete when these tasks are concrete and validated; none is marked
 
 - [x] 3.1 Record the selected design and review disposition with one evidence link for every issue acceptance criterion; verify all three layouts and all representative states are accessible from the review entrypoint, without treating an unreviewed proposal as accepted.
 - [x] 3.2 Write the bounded runtime handoff, including files/selectors, any viewport rectangle/input changes, preservation of autosave/history/audio behavior and reuse of existing regression suites; create or reuse a linked implementation issue only if needed, and verify its relationship and scope against #108.
-- [ ] 3.3 Validate the complete design package with strict OpenSpec validation, link/whitespace checks and a documented browser walkthrough; update the plan with actual evidence and remaining limitations, then commit/push design artifacts without live HUD changes.
+- [x] 3.3 Validate the complete design package with strict OpenSpec validation, link/whitespace checks and a documented browser walkthrough; update the plan with actual evidence and remaining limitations, then commit/push design artifacts without live HUD changes.
 
 ## Workflow follow-up
 

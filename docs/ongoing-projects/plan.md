@@ -1,6 +1,6 @@
 # Issue #108 — battle controls design implementation plan
 
-Updated 2026-10-14 (Asia/Jerusalem). **Design package verified; publication in progress**, authorized by the user's explicit request to continue this plan. This is approval to execute the design scope, not artistic acceptance or authorization to ship the HUD.
+Updated 2026-10-14 (Asia/Jerusalem). **Design package published for review**, authorized by the user's explicit request to continue this plan. This is approval to execute the design scope, not artistic acceptance or authorization to ship the HUD.
 
 - Issue: [#108 — Design desktop and mobile battle control sections](https://github.com/luminari-gurus/tactics-guru-v2/issues/108).
 - Assignee: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/108#issuecomment-6170822095).
@@ -69,7 +69,7 @@ Ablation keeps one prototype, existing art, existing command semantics and exist
 
 ## Current handoff — design publication
 
-The [chosen design and runtime handoff](issue-108-battle-controls-design/design.md) and [interactive prototype](issue-108-battle-controls-design/mockups.html) are ready for human design review. OpenSpec is 9/10 complete; only final publication/readback remains. The user explicitly authorized execution in this session. Human artistic acceptance is still pending.
+The [chosen design and runtime handoff](issue-108-battle-controls-design/design.md) and [interactive prototype](issue-108-battle-controls-design/mockups.html) are ready for human design review. OpenSpec is 10/10 complete. [PR #112](https://github.com/luminari-gurus/tactics-guru-v2/pull/112) is open and non-draft; published design commit `7d50285b4770b6fa030ff49fcfdd0ff65f49e0aa` was verified at exact local/remote parity. The user explicitly authorized execution in this session. Human artistic acceptance is still pending.
 
 - Refreshed `origin/main` remains `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`. The requested branch started at clean/synchronized planning commit `886ac0807e39cde327e9f093ff2e81e2cf58708b`. No rebase, merge or release tag is warranted.
 - Selected a right rail for desktop/short landscape and a bounded portrait bottom dock, using existing art. At large text the actor and action sections scroll independently. The actual drawable board retains 30% viewport height normally and 55% in short landscape. The prototype is display-only; it contains no command engine, saves or audio playback.
@@ -79,4 +79,4 @@ The [chosen design and runtime handoff](issue-108-battle-controls-design/design.
 - A separate real focus defect was reproduced on baseline: Move → target → Review → Escape leaves focus on BODY after Review becomes disabled. Per the user's autonomous-repair instruction, publish a separate focused OpenSpec/code/test PR for this defect after the design PR. Keep runtime redesign in #111; do not fold the focus repair into #108.
 - Requested Game Studio routing, UI, playtest, Phaser and foundations skills guided the package. Sprite/image generation is inapplicable: this scope explicitly reuses existing art and needs interactive native controls.
 
-Next actions: commit/push this design package, open the focused review PR, verify remote parity and PR metadata, mark final publication complete, then repair and validate the separate focus defect. Preserve unrelated primary-checkout edits. Leave both works ready for review; do not merge, deploy, tag a release or start #111.
+Next action: repair and validate the separate focus defect in its own OpenSpec change and PR. Preserve unrelated primary-checkout edits. Leave both works ready for review; do not merge, deploy, tag a release or start #111.
