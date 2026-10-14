@@ -20,9 +20,9 @@ Implementation authorized on 2026-10-14; see [plan.md](../../../docs/ongoing-pro
 ## 4. Integrated verification and handoff
 
 - [x] 4.1 Run focused animation/lifecycle tests, full unit and content checks, both TypeScript configurations, production build and full configured browser suite; record actual counts/failures/retries and any unperformed checks. Run the relevant built `/prototype/` animation/persistence checks, restore the root build and run strict OpenSpec plus whitespace validation.
-- [ ] 4.2 Map every #106 acceptance criterion to fresh evidence in the QA document, update this plan/handoff and task completion honestly, and verify that the final diff adds no combat/content/save-format/audio changes or unrelated work. Publish the implementation and review PR only after the approved scope is complete; report remaining acceptance gaps explicitly.
+- [x] 4.2 Map every #106 acceptance criterion to fresh evidence in the QA document, update this plan/handoff and task completion honestly, and verify that the final diff adds no combat/content/save-format/audio changes or unrelated work. Publish the implementation and review PR only after the approved scope is complete; report remaining acceptance gaps explicitly.
 
 ## Workflow follow-up
 
-- Link the eventual implementation PR to #106 and keep #108 separate. Use a closing reference only when all #106 acceptance criteria are verified.
+- [PR #110](https://github.com/luminari-gurus/tactics-guru-v2/pull/110) is ready for review and closes #106 on merge; all acceptance criteria have recorded evidence. #108 remains separate.
 - Merge and OpenSpec archive remain later workflow steps; no merge, manual deployment or production cutover is authorized by the planning request.
