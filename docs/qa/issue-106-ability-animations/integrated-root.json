@@ -1,0 +1,149 @@
+{
+  "label": "Integrated root signature controls and rejected previews",
+  "runtimeCommit": "00687ed1446ab308330735c213ea325ca7528323",
+  "rendererBundleSha256": "1f878c8879f33bd379a909dae76cec3b3bf1bcb9fef38b307562f6e703578145",
+  "rawReportSha256": "1f5d76af9c72e474a40fa8a6359b2b4f619fa8827de60edbcde2c0ea9dd4861d",
+  "stats": {
+    "startTime": "2026-10-14T12:17:18.502Z",
+    "duration": 15944.839,
+    "expected": 9,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "workers": 1,
+  "projects": [
+    {
+      "name": "desktop",
+      "retries": 0
+    },
+    {
+      "name": "mobile-portrait",
+      "retries": 0
+    },
+    {
+      "name": "mobile-landscape",
+      "retries": 0
+    }
+  ],
+  "errors": [],
+  "cases": [
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1509
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1129
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1112
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1629
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1306
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1327
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1621
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1246
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1209
+        }
+      ]
+    }
+  ]
+}

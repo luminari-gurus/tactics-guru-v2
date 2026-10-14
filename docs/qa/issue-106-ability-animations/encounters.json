@@ -1,0 +1,266 @@
+{
+  "label": "Integrated authored encounter browser hook",
+  "runtimeCommit": "00687ed1446ab308330735c213ea325ca7528323",
+  "serving": "Vite development source",
+  "rawReportSha256": "4309b6e8a5737f82fa8ed9ad806d540188ac3d1c18efb5a4d5ecfee1f2e5ff6c",
+  "stats": {
+    "startTime": "2026-10-14T12:21:18.954Z",
+    "duration": 25343.878,
+    "expected": 18,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "workers": 1,
+  "projects": [
+    {
+      "name": "desktop",
+      "retries": 0
+    },
+    {
+      "name": "mobile-portrait",
+      "retries": 0
+    },
+    {
+      "name": "mobile-landscape",
+      "retries": 0
+    }
+  ],
+  "errors": [],
+  "cases": [
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:forest_ruins: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1855
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:woodland_crossing: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1321
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:ruined_approach: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1398
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "unknown encounter fails before board construction",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 546
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset missing produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 549
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset decode produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 610
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:forest_ruins: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1896
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:woodland_crossing: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2111
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:ruined_approach: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2031
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "unknown encounter fails before board construction",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 560
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset missing produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 545
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset decode produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 582
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:forest_ruins: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1875
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:woodland_crossing: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1936
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "encounter:ruined_approach: render, resize and transformed picking",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1961
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "unknown encounter fails before board construction",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 521
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset missing produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 544
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "authored-encounters.spec.ts",
+      "title": "required asset decode produces controlled error",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 593
+        }
+      ]
+    }
+  ]
+}

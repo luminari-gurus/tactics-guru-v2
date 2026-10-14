@@ -5,8 +5,46 @@ import { previewAttack, previewMagicMissile } from '../../src/domain/combat';
 import { createBattle, dispatch, endTurn, replayBattle } from '../../src/domain/turns';
 import { validateContent } from '../../src/content/validate';
 import { rollDie, seedRng } from '../../src/domain/rng';
+import { abilityPresentation } from '../../src/phaser/abilityPresentation';
 
 const shot = { type: 'useAbility', unitId: 2, abilityId: 'ability:high_shot', target: { unitId: 4 } } as const;
+function freeze<T>(value:T):T {
+  if(value && typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;
+}
+
+it('maps frozen accepted signature events to affected units without changing state or the next RNG draw',()=>{
+  for(const natural of [1,12,20]){
+    const {catalog,state}=guardSetup(natural);
+    const before=freeze(state),result=dispatch(before,guardedStrike,catalog);assert(result.ok);
+    freeze(result);const copy=structuredClone({before,result}),next=rollDie(result.state.rng,20);
+    const view=abilityPresentation(result.events);
+    expect(view.signature).toEqual({kind:'guarded_strike',actorId:1,targetId:4,missed:natural===1,guarded:true});
+    expect(view.feedback).toEqual([
+      {unitId:4,kind:'result',text:natural===1?'Miss':natural===20?'Critical · −10':'Hit · −5'},
+      ...(natural===20?[{unitId:4,kind:'defeat',text:'Defeated'}]:[]),
+      {unitId:1,kind:'guard',text:'Guarded'},
+    ]);
+    expect({before,result}).toEqual(copy);expect(rollDie(result.state.rng,20)).toEqual(next);
+  }
+  const {catalog,state}=setup(3,2);
+  let seed=0;while(rollDie(seedRng(seed),20).value!==20)seed++;
+  const critical=dispatch(freeze({...state,rng:seedRng(seed)}),shot,catalog);assert(critical.ok);freeze(critical);
+  const view=abilityPresentation(critical.events);
+  expect(view.signature).toMatchObject({kind:'high_shot',actorId:2,targetId:4,missed:false});
+  expect(view.feedback).toEqual([{unitId:4,kind:'result',text:'Critical · −12'},{unitId:4,kind:'defeat',text:'Defeated'}]);
+  for(let seed=0;seed<12;seed++){
+    const {catalog,state}=missileSetup();
+    const result=dispatch(freeze({...state,rng:seedRng(seed)}),missile,catalog);assert(result.ok);freeze(result);
+    const copy=structuredClone(result),view=abilityPresentation(result.events);
+    const damage=result.events.find(e=>e.type==='damaged')!;
+    expect(view.signature).toEqual({kind:'magic_missile',actorId:3,targetId:4,missed:false,guarded:false});
+    expect(view.feedback).toEqual([{unitId:4,kind:'result',text:`−${damage.damage}`}]);
+    expect(result).toEqual(copy);expect(result.events.some(e=>e.type==='attackRolled')).toBe(false);
+  }
+  expect(abilityPresentation([])).toEqual({signature:null,feedback:[]});
+  const basic=dispatch(guardSetup(12).state,{...guardedStrike,abilityId:'ability:basic_attack'},guardSetup(12).catalog);
+  assert(basic.ok);expect(abilityPresentation(basic.events).signature).toBeNull();
+});
 function setup(distance = 3, rise = 0) {
   const catalog = { ...battleCatalog, maps: { 'map:forest_ruins': { ...battleCatalog.maps['map:forest_ruins'],
     cells: battleCatalog.maps['map:forest_ruins'].cells.map(c => ({ ...c, terrainId: 'grass' as const,

@@ -1,0 +1,411 @@
+{
+  "viewport": {
+    "width": 915,
+    "height": 412
+  },
+  "fixture": {
+    "command": {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    "before": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          2744299216,
+          2772463645,
+          391717936,
+          19
+        ],
+        "cursor": 6
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 1,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 9
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 8,
+            "y": 4
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 2,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 4
+    },
+    "after": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          2769473573,
+          3525461424,
+          3470133796,
+          20
+        ],
+        "cursor": 7
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 1,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 9
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 8,
+            "y": 4
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 3
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 2,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 5
+    },
+    "events": [
+      {
+        "type": "abilityUsed",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "attackRolled",
+        "unitId": 2,
+        "targetId": 6,
+        "natural": 5,
+        "bonus": 7,
+        "total": 12,
+        "armorClass": 12,
+        "result": "hit"
+      },
+      {
+        "type": "damaged",
+        "unitId": 6,
+        "damage": 6,
+        "hp": 3
+      }
+    ],
+    "token": 5
+  },
+  "travel": {
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "transform": {
+      "scale": 0.3736016631267048,
+      "x": 457.53142415057914,
+      "y": 224.0593960852741
+    },
+    "effect": {
+      "kind": "high_shot",
+      "actorId": 2,
+      "targetId": 6,
+      "progress": 0.17142857142857143,
+      "from": {
+        "x": -240,
+        "y": 148
+      },
+      "to": {
+        "x": -40,
+        "y": 192
+      },
+      "feedback": [
+        {
+          "unitId": 6,
+          "text": "Hit · −6",
+          "x": -40,
+          "y": 141.01795560752632,
+          "visible": false
+        }
+      ]
+    },
+    "units": [
+      {
+        "id": 2,
+        "unitId": "ranger",
+        "side": "player",
+        "tile": {
+          "x": 2,
+          "y": 8,
+          "elevation": 1
+        },
+        "assetId": "asset:ranger_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 386.5,
+        "position": {
+          "x": -240,
+          "y": 176
+        },
+        "anchorError": 5.3947966093944364E-06
+      },
+      {
+        "id": 6,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 416.5,
+        "position": {
+          "x": -40,
+          "y": 220
+        },
+        "anchorError": 5.800974397943705E-06
+      }
+    ],
+    "objectCount": 617
+  },
+  "impact": {
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "transform": {
+      "scale": 0.388108677116139,
+      "x": 482.5520594376982,
+      "y": 205.10102567892835
+    },
+    "effect": {
+      "kind": "high_shot",
+      "actorId": 2,
+      "targetId": 6,
+      "progress": 0.4857142857142857,
+      "from": {
+        "x": -240,
+        "y": 148
+      },
+      "to": {
+        "x": -40,
+        "y": 192
+      },
+      "feedback": [
+        {
+          "unitId": 6,
+          "text": "Hit · −6",
+          "x": -40,
+          "y": 141.95175299175185,
+          "visible": true
+        }
+      ]
+    },
+    "units": [
+      {
+        "id": 2,
+        "unitId": "ranger",
+        "side": "player",
+        "tile": {
+          "x": 2,
+          "y": 8,
+          "elevation": 1
+        },
+        "assetId": "asset:ranger_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 386.5,
+        "position": {
+          "x": -240,
+          "y": 176
+        },
+        "anchorError": 1.4080832538827324E-05
+      },
+      {
+        "id": 6,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 416.5,
+        "position": {
+          "x": -40,
+          "y": 220
+        },
+        "anchorError": 1.322524857364527E-05
+      }
+    ],
+    "objectCount": 617
+  }
+}

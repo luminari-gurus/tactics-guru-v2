@@ -1,0 +1,413 @@
+{
+  "viewport": {
+    "width": 412,
+    "height": 839
+  },
+  "fixture": {
+    "command": {
+      "type": "useAbility",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          4
+        ]
+      }
+    },
+    "before": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          2769473573,
+          3525461424,
+          3470133796,
+          20
+        ],
+        "cursor": 7
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 3,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 6,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 3
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 5,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 11
+    },
+    "after": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          3528152210,
+          1166433092,
+          3150901418,
+          21
+        ],
+        "cursor": 8
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 3,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": true,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 6,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 6
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 3
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 5,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 12
+    },
+    "events": [
+      {
+        "type": "abilityUsed",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            4
+          ]
+        }
+      },
+      {
+        "type": "missileRolled",
+        "unitId": 3,
+        "targetId": 4,
+        "missile": 1,
+        "natural": 2,
+        "damage": 3
+      },
+      {
+        "type": "damaged",
+        "unitId": 4,
+        "damage": 3,
+        "hp": 6
+      }
+    ],
+    "token": 12
+  },
+  "travel": {
+    "viewport": {
+      "width": 412,
+      "height": 839
+    },
+    "transform": {
+      "scale": 0.42071078587514776,
+      "x": 206,
+      "y": 628.3535430149046
+    },
+    "effect": {
+      "kind": "magic_missile",
+      "actorId": 3,
+      "targetId": 4,
+      "progress": 0.17142857142857143,
+      "from": {
+        "x": -200,
+        "y": 112
+      },
+      "to": {
+        "x": 0,
+        "y": 212
+      },
+      "feedback": [
+        {
+          "unitId": 4,
+          "text": "−3",
+          "x": 0,
+          "y": 163.8153219582463,
+          "visible": false
+        }
+      ]
+    },
+    "units": [
+      {
+        "id": 3,
+        "unitId": "mage",
+        "side": "player",
+        "tile": {
+          "x": 1,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:mage_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 272.5,
+        "position": {
+          "x": -200,
+          "y": 140
+        },
+        "anchorError": 2.8241533614354454E-05
+      },
+      {
+        "id": 4,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 6,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 452.5,
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "anchorError": 4.291534423828125E-06
+      }
+    ],
+    "objectCount": 617
+  },
+  "impact": {
+    "viewport": {
+      "width": 412,
+      "height": 839
+    },
+    "transform": {
+      "scale": 0.4370470548443968,
+      "x": 231,
+      "y": 608.9018022453305
+    },
+    "effect": {
+      "kind": "magic_missile",
+      "actorId": 3,
+      "targetId": 4,
+      "progress": 0.4857142857142857,
+      "from": {
+        "x": -200,
+        "y": 112
+      },
+      "to": {
+        "x": 0,
+        "y": 212
+      },
+      "feedback": [
+        {
+          "unitId": 4,
+          "text": "−3",
+          "x": 0,
+          "y": 164.64455730823695,
+          "visible": true
+        }
+      ]
+    },
+    "units": [
+      {
+        "id": 3,
+        "unitId": "mage",
+        "side": "player",
+        "tile": {
+          "x": 1,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:mage_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 272.5,
+        "position": {
+          "x": -200,
+          "y": 140
+        },
+        "anchorError": 6.2400113717567446E-06
+      },
+      {
+        "id": 4,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 6,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 452.5,
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "anchorError": 9.5367431640625E-07
+      }
+    ],
+    "objectCount": 617
+  }
+}
