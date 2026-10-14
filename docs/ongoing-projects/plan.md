@@ -1,6 +1,6 @@
 # PR #105 — map acceptance and cached battle repair
 
-Updated 2026-10-14 (Asia/Jerusalem). [PR #105](https://github.com/luminari-gurus/tactics-guru-v2/pull/105) remains open against `main`. The user authorized validating and fully fixing every review finding, Git repair/publication and local verification using ablation and OpenSpec. Merge remains a separate action.
+Updated 2026-10-14 (Asia/Jerusalem). [PR #105](https://github.com/luminari-gurus/tactics-guru-v2/pull/105) is ready to merge against `main`: the sole actionable review finding is fixed, locally verified and answered. All four repair OpenSpec tasks are complete. Merge remains a separate action.
 
 ## Current work
 
@@ -17,7 +17,9 @@ The battle bootstrap now synchronously invokes existing scene shutdown on pagehi
 
 ## Validation and publication
 
-The focused BFCache regression passes 12/12 across all three profiles. All 508 unit tests and 77 content checks, both TypeScript checks and root/prefix builds pass. The full root browser suite passes 348/348; prefix map/history checks pass 36/36. Both final runs have zero failures, skips, flakes or retries. Strict OpenSpec, relative links and whitespace pass. [Review repair evidence](../qa/pr-105-review-repair.md) and [source-bound results](../qa/pr-105/validation.json) record commands, counts, screenshots and limits. Raw logs and screenshots live under ignored `tmp/review-105/`. The initial regression fails on the rebased unmodified runtime; the retained reproducer confirms actual save loss. Git publication and the review response are next.
+The focused BFCache regression passes 12/12 across all three profiles. All 508 unit tests and 77 content checks, both TypeScript checks and root/prefix builds pass. The full root browser suite passes 348/348; prefix map/history checks pass 36/36. Both final runs have zero failures, skips, flakes or retries. Strict OpenSpec, relative links and whitespace pass. [Review repair evidence](../qa/pr-105-review-repair.md) and [source-bound results](../qa/pr-105/validation.json) record commands, counts, screenshots and limits. Raw logs and screenshots live under ignored `tmp/review-105/`. The initial regression fails on the rebased unmodified runtime; the retained reproducer confirms actual save loss.
+
+Repair commit `2b1ac4db4345c8f57e6223840b343a8b49d85c7b` was published using an exact lease against the reviewed remote head. The title/body now describe the final scope, and the [P1 response](https://github.com/luminari-gurus/tactics-guru-v2/pull/105#issuecomment-6164933576) was read back exactly. No inline review threads exist. GitHub confirms the PR is open, non-draft and mergeable; automatic CI status is not a gate. Repository credentials for verified account `moshehbenavraham` completed the authorized metadata/comment writes after connector integration 403 errors. Final closeout changes only documentation/tracking; verify current remote parity after its push. No further implementation work remains.
 
 ## Historical map acceptance and limits
 
@@ -25,4 +27,4 @@ The [original six-criterion acceptance report](../qa/issue-96-map-acceptance.md)
 
 Physical Android/iOS lifecycle certification, production hosting and #57/#58/#64/#74 acceptance remain separate. No merge, release tag, manual deployment, manual issue closure or OpenSpec archive is part of this repair. The existing Cloudflare integration may automatically build a published PR; remote CI is not a completion gate.
 
-The primary checkout's unrelated instruction/environment edits and Android-certification draft, and the original planning worktree, remain untouched. Local test tooling uses the existing npm CLI through ignored `tmp/review-105/bin/npm.cmd`; packages, lockfile and configuration are unchanged. Edge override: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`. OpenSpec CLI: `node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` with `OPENSPEC_TELEMETRY=0`.
+The primary checkout's unrelated instruction/environment edits and Android-certification draft, and the original planning worktree, remain untouched. Local checks used the existing npm CLI through an ignored temporary wrapper; packages, lockfile and configuration are unchanged. Recreate npm on PATH when rerunning checks. Edge override: `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`. OpenSpec CLI: `node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` with `OPENSPEC_TELEMETRY=0`.

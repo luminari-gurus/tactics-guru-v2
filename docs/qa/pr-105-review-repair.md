@@ -43,6 +43,12 @@ Run `npm test -- --config=tmp/review-105-prefix.config.ts tests/overworld-map.sp
 
 Representative screenshots were visually inspected: [desktop recovery](pr-105/recovery-desktop.png), [landscape recovery](pr-105/recovery-landscape.png), [portrait continued battle](pr-105/continued-portrait.png). Recovery controls and focus remain readable and within the viewport; continued battle controls and playfield render correctly.
 
+## Publication
+
+Repair commit `2b1ac4db4345c8f57e6223840b343a8b49d85c7b` was pushed to `branch/issue-96-map-acceptance` with an exact lease against reviewed head `46465d4`. The published commit's source/test/config objects match the validation record. All four original patches are preserved by rebase onto current main; the original planning checkout retains its prior history. No squash, extra stacked branch or release tag is warranted.
+
+The PR title/body describe both map acceptance and the lifecycle fix. The [P1 reply](https://github.com/luminari-gurus/tactics-guru-v2/pull/105#issuecomment-6164933576) was posted and read back exactly. There are no inline threads to resolve; the automated Cloudflare status requires no code action. GitHub confirms open, non-draft and mergeable. Metadata/comment writes used the verified repository credential after connector integration 403 errors. Final closeout commits modify documentation/tracking only and preserve every tested input object.
+
 ## Scope and historical evidence
 
 The [original #96 map acceptance](issue-96-map-acceptance.md) remains a record of its original source and checks. It is not rewritten to imply that it tested this later repair. Physical Android/iOS testing, production hosting, concurrent-tab serialization and durable retention are not established here. The original art-license gap, desert fallback and physical certification work remain unchanged.

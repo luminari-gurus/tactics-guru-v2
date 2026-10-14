@@ -8,7 +8,7 @@
 ## 2. Integrated proof and publication
 
 - [x] 2.1 Run all unit/content/type checks, root and prefixed builds, the full configured root browser suite and relevant prefix checks; record actual counts, skips, retries, screenshots and source identity, and validate OpenSpec, links and whitespace.
-- [ ] 2.2 Update the ongoing handoff and PR description, publish the rebased repair with an exact lease, reply to every actionable review finding, and verify current main ancestry, remote parity, clean worktree and mergeable PR state.
+- [x] 2.2 Update the ongoing handoff and PR description, publish the rebased repair with an exact lease, reply to every actionable review finding, and verify current main ancestry, remote parity, clean worktree and mergeable PR state.
 
 ## Workflow follow-up
 
