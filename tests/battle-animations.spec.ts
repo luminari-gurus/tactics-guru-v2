@@ -48,6 +48,7 @@ async function boot(page:Page,fixture:Boundary) {
     }
   },{keys,text:encoded.text});
   await page.clock.install();await page.goto('./');await page.locator('#save-continue').click();await ready(page);
+  expect(new URL(page.url()).pathname).toBe(process.env.PLAYWRIGHT_BASE_PATH ?? '/');
   expect((await readSession(page)).state).toEqual(fixture.before);
 }
 async function press(page:Page,selector:string,keyboard=false) {
@@ -88,6 +89,11 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   const fixture=boundary(kind),keyboard=kind==='magic_missile';await boot(page,fixture);
   const baseline=(await report(page)).objectCount,savedBefore=await stored(page);
+  // A signature aimed at its own actor must remain a rejected preview, with no cue or save.
+  await press(page,'[data-action="signature"]',keyboard);await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  await expect(page.locator('#battle-preview')).toContainText('Unavailable');await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
+  await press(page,'#battle-cancel',keyboard);
   await review(page,fixture,keyboard);await page.keyboard.press('Escape');
   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
   // Transform before the effect through real board gestures.
@@ -112,7 +118,9 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   expect(impact.effect.feedback.filter((f:any)=>f.visible).map((f:any)=>({unitId:f.unitId,text:f.text})))
     .toEqual(abilityPresentation(fixture.events).feedback.map(f=>({unitId:f.unitId,text:f.text})));
   await page.screenshot({path:info.outputPath(`${kind}-impact.png`)});
-  writeFileSync(info.outputPath('animation.json'),JSON.stringify({viewport:page.viewportSize(),fixture,travel,impact},null,2));
+  const capture=(r:any)=>({viewport:r.viewport,transform:r.transform,effect:r.effect,
+    units:r.units.filter((u:any)=>u.id===r.effect.actorId || u.id===r.effect.targetId),objectCount:r.objectCount});
+  writeFileSync(info.outputPath('animation.json'),JSON.stringify({viewport:page.viewportSize(),fixture,travel:capture(travel),impact:capture(impact)},null,2));
   expect((await readSession(page)).state).toEqual(accepted.state);expect(await stored(page)).toEqual(saved);
   await page.clock.runFor(500);await ready(page);
   expect((await report(page)).effect).toBeNull();expect((await report(page)).objectCount).toBe(baseline);

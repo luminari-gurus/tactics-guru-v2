@@ -10,11 +10,11 @@ Implementation authorized on 2026-10-14; see [plan.md](../../../docs/ongoing-pro
 ## 2. Completion and lifecycle
 
 - [x] 2.1 Unify completion/cancellation cleanup for temporary objects and tween callbacks; verify normal completion, repeated cancellation, visibility loss/return, restart-dialog cancellation and confirmed restart during each signature without stuck input, duplicate commands, changed RNG or leftover effects.
-- [ ] 2.2 Retain session-token/live guards and current-save startup on shutdown/history return; verify ability-specific reload/departure cases plus the existing real BFCache regressions preserve accepted state and exact save bytes before Continue, with no stale callback, historical effect or page error. Record the tested lifecycle cases in the QA document.
+- [x] 2.2 Retain session-token/live guards and current-save startup on shutdown/history return; verify ability-specific reload/departure cases plus the existing real BFCache regressions preserve accepted state and exact save bytes before Continue, with no stale callback, historical effect or page error. Record the tested lifecycle cases in the QA document.
 
 ## 3. Responsive visual acceptance
 
-- [ ] 3.1 Verify pan/zoom, elevation and resize during effects across desktop and emulated mobile portrait/landscape; inspect travel/impact screenshots for all signatures, readable hit/miss/damage/guard/defeat feedback and cleanup after repeated use. Record source commit, browser/project/viewport, case, image paths and observed limitations in the QA document.
+- [x] 3.1 Verify pan/zoom, elevation and resize during effects across desktop and emulated mobile portrait/landscape; inspect travel/impact screenshots for all signatures, readable hit/miss/damage/guard/defeat feedback and cleanup after repeated use. Record source commit, browser/project/viewport, case, image paths and observed limitations in the QA document.
 - [ ] 3.2 Verify keyboard/touch/mouse action selection, confirmation locking, rejected/cancelled previews and repeated use with the existing battle helpers; compare full legal battle replay/events and next RNG against domain results, and retain movement/basic/enemy regression behavior.
 
 ## 4. Integrated verification and handoff

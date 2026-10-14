@@ -29,6 +29,8 @@ Attach temporary Graphics/Text objects to the existing board root. Calculate act
 
 Start with roughly 280–420 ms total per signature, with a short travel/strike followed by readable outcome feedback; tune within a bounded duration using captured frames. Keep a single progress tween per presentation and derive stages from its progress rather than chaining timers/promises. No dynamic textures, particles or downloads are required. This preserves the current lightweight rendering approach and avoids asset provenance/loading work.
 
+Implementation decision (2026-10-14): captured fit-scale frames required minimum-size feedback and more reading time. Use 560 ms total (252 ms travel/strike, 308 ms outcome), at least 14 CSS px label text, a minimum size for shape details and scale-aware separation of defeat/result labels. Anchors remain board-local. See the QA report for the retained images.
+
 Use a deliberate temporary overlay depth above units/canopies, keeping endpoints anchored to them. Place miss/damage/defeat feedback at the target and guard at the actor, with separate offsets or stages to prevent overlap. Leave existing HUD/log state authoritative and immediately committed; temporary visuals do not delay combat or persistence.
 
 ### 3. One idempotent finish path
