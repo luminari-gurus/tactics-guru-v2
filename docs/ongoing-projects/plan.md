@@ -8,6 +8,8 @@ Published implementation: `d01e0bb8d848332807178bcc9cf3a3a6cb8c0497`; evidence c
 
 Moving-base checkpoint: main `220d40f` (PR #109, authored encounters) merged without conflicts as `00687ed`. Its three new modules are consumed by separate encounter fixtures; all 10 production HTML/JS/CSS files match the tested build byte-for-byte with identical metadata. This retains the 399-case evidence without claiming it was rerun after integration. The normal combined root/prefix builds and added encounter hook were separately verified. Per-case reports, bundle hashes and build comparison are retained under `docs/qa/issue-106-ability-animations/`; raw local runner output remains in ignored `tmp/issue-106-*` files.
 
+Local cleanup limit: automatic approval review blocked removal of ignored temporary comparison bundles, contact sheets and helper scripts without a detailed reason. They remain under this worktree's `tmp/`, outside the PR, alongside retained raw validation output and the npm wrapper. No source, publication or acceptance work is blocked.
+
 Ablation: retain the existing session/save/lifecycle and one animation tween. Add only an event-to-feedback helper, board-local vector effects, focused tests and evidence. New generated sprites, a general animation framework and new dependencies are unnecessary. Outcome, non-goals, files and proof remain as specified below. Publish each independently reviewable chunk when ready, as requested; merge, tags and manual deployment are not needed for this feature.
 
 - Issue: [Add battle animations for Guarded Strike, High Shot, and Magic Missile #106](https://github.com/luminari-gurus/tactics-guru-v2/issues/106).
