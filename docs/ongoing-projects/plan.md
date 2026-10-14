@@ -1,13 +1,13 @@
 # Issue #108 — battle controls design implementation plan
 
-Updated 2026-10-14 (Asia/Jerusalem). **Planning only; design execution has not started.**
+Updated 2026-10-14 (Asia/Jerusalem). **Design package verified; publication in progress**, authorized by the user's explicit request to continue this plan. This is approval to execute the design scope, not artistic acceptance or authorization to ship the HUD.
 
 - Issue: [#108 — Design desktop and mobile battle control sections](https://github.com/luminari-gurus/tactics-guru-v2/issues/108).
 - Assignee: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/108#issuecomment-6170822095).
 - Published branch: [work/issue-108-battle-controls-design](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-108-battle-controls-design), natively linked in #108's Development section.
 - Base: current fetched `origin/main` at `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`.
 - Worktree: `C:/Users/apexw/.codex/worktrees/issue-108-controls-plan/Tactics-Guru`.
-- OpenSpec: [proposal](../../openspec/changes/issue-108-battle-controls-design/proposal.md), [design approach](../../openspec/changes/issue-108-battle-controls-design/design.md), [10 unchecked tasks](../../openspec/changes/issue-108-battle-controls-design/tasks.md). `skip_specs: true` is intentional for this design/documentation deliverable; existing [battle-controls requirements](../../openspec/specs/battle-controls/spec.md) remain the baseline.
+- OpenSpec: [proposal](../../openspec/changes/issue-108-battle-controls-design/proposal.md), [design approach](../../openspec/changes/issue-108-battle-controls-design/design.md), [design tasks](../../openspec/changes/issue-108-battle-controls-design/tasks.md). `skip_specs: true` is intentional for this design/documentation deliverable; existing [battle-controls requirements](../../openspec/specs/battle-controls/spec.md) remain the baseline.
 - Previous work: [completed PR #110 merge and next-session handoff](https://github.com/luminari-gurus/tactics-guru-v2/blob/d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5/docs/ongoing-projects/plan.md) preserves the prior plan and verification record.
 
 ## Selection and prerequisites
@@ -67,6 +67,16 @@ The main integration risk is the current top-only board-reservation API. The des
 
 Ablation keeps one prototype, existing art, existing command semantics and existing regression paths. It removes a speculative UI framework, new assets, duplicated behavior specs and live HUD changes from this design issue. Every retained deliverable supports a specific acceptance criterion.
 
-## Current handoff
+## Current handoff — design publication
 
-The plan is ready for review. Strict OpenSpec validation passed with specs intentionally skipped; all 19 local document links resolve, all eight acceptance criteria are mapped, and all ten design tasks remain unchecked. Assignment, kickoff comment and native branch linkage are verified. The kickoff comment records the final pushed planning revision and publication checks. No game tests were run for this documentation-only plan; no mockups, design acceptance, runtime edits or physical testing are claimed. Before later execution, record explicit approval of this concrete plan and refresh the issue/branch baseline.
+The [chosen design and runtime handoff](issue-108-battle-controls-design/design.md) and [interactive prototype](issue-108-battle-controls-design/mockups.html) are ready for human design review. OpenSpec is 9/10 complete; only final publication/readback remains. The user explicitly authorized execution in this session. Human artistic acceptance is still pending.
+
+- Refreshed `origin/main` remains `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`. The requested branch started at clean/synchronized planning commit `886ac0807e39cde327e9f093ff2e81e2cf58708b`. No rebase, merge or release tag is warranted.
+- Selected a right rail for desktop/short landscape and a bounded portrait bottom dock, using existing art. At large text the actor and action sections scroll independently. The actual drawable board retains 30% viewport height normally and 55% in short landscape. The prototype is display-only; it contains no command engine, saves or audio playback.
+- [Raw evidence](issue-108-battle-controls-design/previews/measurements.json): 180 fixture cases (3 heroes × 12 states × 5 viewports), interaction walkthroughs at every size, 44px targets, 200% text, synthetic safe areas, measured contrast, no horizontal overflow, no page/console errors and modal pointer/tap/drag capture. Exported screenshots and exact reproduction command are linked in the design. Browser: installed Edge 155.0.4283.45 via repository Playwright. These checks do not certify physical devices or runtime integration.
+- Strict OpenSpec validation and whitespace checks passed; local Markdown links resolve. No application source/config/dependencies changed and no full game suite/build is claimed for this documentation package. A local `node_modules` junction reuses existing dependencies; scratch tooling stays ignored.
+- [Runtime implementation #111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111) was created and read back. Its body links #108/design and explicitly requires design acceptance; it is not ready for work. It specifies one available board rectangle replacing the top-only `panelBottom` boundary, existing selector/command contracts, lifecycle preservation and existing regression suites. The connector could not create issues (integration permission 403); publication used the repository's existing Git credential without exposing it.
+- A separate real focus defect was reproduced on baseline: Move → target → Review → Escape leaves focus on BODY after Review becomes disabled. Per the user's autonomous-repair instruction, publish a separate focused OpenSpec/code/test PR for this defect after the design PR. Keep runtime redesign in #111; do not fold the focus repair into #108.
+- Requested Game Studio routing, UI, playtest, Phaser and foundations skills guided the package. Sprite/image generation is inapplicable: this scope explicitly reuses existing art and needs interactive native controls.
+
+Next actions: commit/push this design package, open the focused review PR, verify remote parity and PR metadata, mark final publication complete, then repair and validate the separate focus defect. Preserve unrelated primary-checkout edits. Leave both works ready for review; do not merge, deploy, tag a release or start #111.

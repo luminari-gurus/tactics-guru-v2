@@ -1,0 +1,654 @@
+{
+  "browser": "155.0.4283.45",
+  "fixtureCases": 180,
+  "layouts": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "board": {
+        "x": 12,
+        "y": 12,
+        "width": 892,
+        "height": 696
+      },
+      "imageRegion": {
+        "x": 13,
+        "y": 99.703125,
+        "width": 890,
+        "height": 569.5
+      },
+      "controls": {
+        "x": 916,
+        "y": 12,
+        "width": 352,
+        "height": 696
+      },
+      "actor": {
+        "x": 917,
+        "y": 13,
+        "width": 350,
+        "height": 182.6875
+      },
+      "scroll": {
+        "x": 917,
+        "y": 195.6875,
+        "width": 350,
+        "height": 511.3125
+      },
+      "horizontalOverflow": false,
+      "smallTargets": [],
+      "missingImages": [],
+      "enlarged": {
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "board": {
+          "x": 12,
+          "y": 12,
+          "width": 892,
+          "height": 696
+        },
+        "imageRegion": {
+          "x": 13,
+          "y": 149.453125,
+          "width": 890,
+          "height": 502.953125
+        },
+        "controls": {
+          "x": 916,
+          "y": 12,
+          "width": 352,
+          "height": 696
+        },
+        "actor": {
+          "x": 917,
+          "y": 13,
+          "width": 350,
+          "height": 312.296875
+        },
+        "scroll": {
+          "x": 917,
+          "y": 325.296875,
+          "width": 350,
+          "height": 381.703125
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      },
+      "syntheticSafeArea": {
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "board": {
+          "x": 24,
+          "y": 24,
+          "width": 868,
+          "height": 662
+        },
+        "imageRegion": {
+          "x": 25,
+          "y": 111.703125,
+          "width": 866,
+          "height": 535.5
+        },
+        "controls": {
+          "x": 904,
+          "y": 24,
+          "width": 352,
+          "height": 662
+        },
+        "actor": {
+          "x": 905,
+          "y": 25,
+          "width": 350,
+          "height": 182.6875
+        },
+        "scroll": {
+          "x": 905,
+          "y": 207.6875,
+          "width": 350,
+          "height": 477.3125
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      }
+    },
+    {
+      "name": "portrait",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "board": {
+        "x": 8,
+        "y": 8,
+        "width": 396,
+        "height": 387.5625
+      },
+      "imageRegion": {
+        "x": 9,
+        "y": 73.65625,
+        "width": 394,
+        "height": 290.234375
+      },
+      "controls": {
+        "x": 8,
+        "y": 403.5625,
+        "width": 396,
+        "height": 503.4375
+      },
+      "actor": {
+        "x": 9,
+        "y": 404.5625,
+        "width": 394,
+        "height": 167.6875
+      },
+      "scroll": {
+        "x": 9,
+        "y": 572.25,
+        "width": 394,
+        "height": 333.75
+      },
+      "horizontalOverflow": false,
+      "smallTargets": [],
+      "missingImages": [],
+      "enlarged": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "board": {
+          "x": 8,
+          "y": 8,
+          "width": 396,
+          "height": 387.5625
+        },
+        "imageRegion": {
+          "x": 9,
+          "y": 82.3125,
+          "width": 394,
+          "height": 274.5
+        },
+        "controls": {
+          "x": 8,
+          "y": 403.5625,
+          "width": 396,
+          "height": 503.4375
+        },
+        "actor": {
+          "x": 9,
+          "y": 404.5625,
+          "width": 394,
+          "height": 225.640625
+        },
+        "scroll": {
+          "x": 9,
+          "y": 630.203125,
+          "width": 394,
+          "height": 275.796875
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      },
+      "syntheticSafeArea": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "board": {
+          "x": 24,
+          "y": 24,
+          "width": 364,
+          "height": 369.09375
+        },
+        "imageRegion": {
+          "x": 25,
+          "y": 87.640625,
+          "width": 362,
+          "height": 274.5
+        },
+        "controls": {
+          "x": 24,
+          "y": 401.09375,
+          "width": 364,
+          "height": 479.90625
+        },
+        "actor": {
+          "x": 25,
+          "y": 402.09375,
+          "width": 362,
+          "height": 167.6875
+        },
+        "scroll": {
+          "x": 25,
+          "y": 569.78125,
+          "width": 362,
+          "height": 310.21875
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      }
+    },
+    {
+      "name": "landscape",
+      "viewport": {
+        "width": 915,
+        "height": 412
+      },
+      "board": {
+        "x": 8,
+        "y": 8,
+        "width": 611,
+        "height": 396
+      },
+      "imageRegion": {
+        "x": 9,
+        "y": 70.734375,
+        "width": 609,
+        "height": 302.46875
+      },
+      "controls": {
+        "x": 627,
+        "y": 8,
+        "width": 280,
+        "height": 396
+      },
+      "actor": {
+        "x": 628,
+        "y": 9,
+        "width": 278,
+        "height": 153.96875
+      },
+      "scroll": {
+        "x": 628,
+        "y": 162.96875,
+        "width": 278,
+        "height": 240.03125
+      },
+      "horizontalOverflow": false,
+      "smallTargets": [],
+      "missingImages": [],
+      "enlarged": {
+        "viewport": {
+          "width": 915,
+          "height": 412
+        },
+        "board": {
+          "x": 8,
+          "y": 8,
+          "width": 611,
+          "height": 396
+        },
+        "imageRegion": {
+          "x": 9,
+          "y": 99.125,
+          "width": 609,
+          "height": 226.59375
+        },
+        "controls": {
+          "x": 627,
+          "y": 8,
+          "width": 280,
+          "height": 396
+        },
+        "actor": {
+          "x": 628,
+          "y": 9,
+          "width": 278,
+          "height": 177.296875
+        },
+        "scroll": {
+          "x": 628,
+          "y": 186.296875,
+          "width": 278,
+          "height": 216.703125
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      },
+      "syntheticSafeArea": {
+        "viewport": {
+          "width": 915,
+          "height": 412
+        },
+        "board": {
+          "x": 24,
+          "y": 24,
+          "width": 579,
+          "height": 354
+        },
+        "imageRegion": {
+          "x": 25,
+          "y": 86.734375,
+          "width": 577,
+          "height": 260.46875
+        },
+        "controls": {
+          "x": 611,
+          "y": 24,
+          "width": 280,
+          "height": 354
+        },
+        "actor": {
+          "x": 612,
+          "y": 25,
+          "width": 278,
+          "height": 153.96875
+        },
+        "scroll": {
+          "x": 612,
+          "y": 178.96875,
+          "width": 278,
+          "height": 198.03125
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      }
+    },
+    {
+      "name": "small-portrait",
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "board": {
+        "x": 8,
+        "y": 8,
+        "width": 304,
+        "height": 234.890625
+      },
+      "imageRegion": {
+        "x": 9,
+        "y": 9,
+        "width": 302,
+        "height": 202.21875
+      },
+      "controls": {
+        "x": 8,
+        "y": 250.890625,
+        "width": 304,
+        "height": 309.109375
+      },
+      "actor": {
+        "x": 9,
+        "y": 251.890625,
+        "width": 302,
+        "height": 138.1875
+      },
+      "scroll": {
+        "x": 9,
+        "y": 390.078125,
+        "width": 302,
+        "height": 168.921875
+      },
+      "horizontalOverflow": false,
+      "smallTargets": [],
+      "missingImages": [],
+      "enlarged": {
+        "viewport": {
+          "width": 320,
+          "height": 568
+        },
+        "board": {
+          "x": 8,
+          "y": 8,
+          "width": 304,
+          "height": 234.890625
+        },
+        "imageRegion": {
+          "x": 9,
+          "y": 9,
+          "width": 302,
+          "height": 177
+        },
+        "controls": {
+          "x": 8,
+          "y": 250.890625,
+          "width": 304,
+          "height": 309.109375
+        },
+        "actor": {
+          "x": 9,
+          "y": 251.890625,
+          "width": 302,
+          "height": 138.1875
+        },
+        "scroll": {
+          "x": 9,
+          "y": 390.078125,
+          "width": 302,
+          "height": 168.921875
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      },
+      "syntheticSafeArea": {
+        "viewport": {
+          "width": 320,
+          "height": 568
+        },
+        "board": {
+          "x": 24,
+          "y": 24,
+          "width": 272,
+          "height": 216.40625
+        },
+        "imageRegion": {
+          "x": 25,
+          "y": 25,
+          "width": 270,
+          "height": 183.734375
+        },
+        "controls": {
+          "x": 24,
+          "y": 248.40625,
+          "width": 272,
+          "height": 285.59375
+        },
+        "actor": {
+          "x": 25,
+          "y": 249.40625,
+          "width": 270,
+          "height": 127.609375
+        },
+        "scroll": {
+          "x": 25,
+          "y": 377.015625,
+          "width": 270,
+          "height": 155.984375
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      }
+    },
+    {
+      "name": "small-landscape",
+      "viewport": {
+        "width": 568,
+        "height": 320
+      },
+      "board": {
+        "x": 8,
+        "y": 8,
+        "width": 300,
+        "height": 304
+      },
+      "imageRegion": {
+        "x": 9,
+        "y": 68.046875,
+        "width": 298,
+        "height": 213.15625
+      },
+      "controls": {
+        "x": 316,
+        "y": 8,
+        "width": 244,
+        "height": 304
+      },
+      "actor": {
+        "x": 317,
+        "y": 9,
+        "width": 242,
+        "height": 135.890625
+      },
+      "scroll": {
+        "x": 317,
+        "y": 144.890625,
+        "width": 242,
+        "height": 166.109375
+      },
+      "horizontalOverflow": false,
+      "smallTargets": [],
+      "missingImages": [],
+      "enlarged": {
+        "viewport": {
+          "width": 568,
+          "height": 320
+        },
+        "board": {
+          "x": 8,
+          "y": 8,
+          "width": 300,
+          "height": 304
+        },
+        "imageRegion": {
+          "x": 9,
+          "y": 93.140625,
+          "width": 298,
+          "height": 176
+        },
+        "controls": {
+          "x": 316,
+          "y": 8,
+          "width": 244,
+          "height": 304
+        },
+        "actor": {
+          "x": 317,
+          "y": 9,
+          "width": 242,
+          "height": 135.890625
+        },
+        "scroll": {
+          "x": 317,
+          "y": 144.890625,
+          "width": 242,
+          "height": 166.109375
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      },
+      "syntheticSafeArea": {
+        "viewport": {
+          "width": 568,
+          "height": 320
+        },
+        "board": {
+          "x": 24,
+          "y": 24,
+          "width": 268,
+          "height": 262
+        },
+        "imageRegion": {
+          "x": 25,
+          "y": 80.578125,
+          "width": 266,
+          "height": 176
+        },
+        "controls": {
+          "x": 300,
+          "y": 24,
+          "width": 244,
+          "height": 262
+        },
+        "actor": {
+          "x": 301,
+          "y": 25,
+          "width": 242,
+          "height": 117
+        },
+        "scroll": {
+          "x": 301,
+          "y": 142,
+          "width": 242,
+          "height": 143
+        },
+        "horizontalOverflow": false,
+        "smallTargets": [],
+        "missingImages": []
+      }
+    }
+  ],
+  "interactions": [
+    "desktop: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "small-portrait: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress",
+    "small-landscape: keyboard loop, touch/pointer and drag capture, cancellation/focus return, inspection, sound, three confirmations, immediate Wait, board activation, restart, 200% text, safe-area stress"
+  ],
+  "contrast": [
+    {
+      "foreground": "f5efdf",
+      "background": "182335",
+      "ratio": 13.75,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "c3cbd6",
+      "background": "26364b",
+      "ratio": 7.5,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "f0cf83",
+      "background": "334155",
+      "ratio": 6.88,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "182335",
+      "background": "f0cf83",
+      "ratio": 10.49,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "8d9bad",
+      "background": "26364b",
+      "ratio": 4.34,
+      "minimum": 3
+    },
+    {
+      "foreground": "a9ddb8",
+      "background": "182335",
+      "ratio": 10.31,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "ffc1ae",
+      "background": "182335",
+      "ratio": 10.14,
+      "minimum": 4.5
+    },
+    {
+      "foreground": "c3cbd6",
+      "background": "25374b",
+      "ratio": 7.43,
+      "minimum": 4.5
+    }
+  ],
+  "errors": []
+}
