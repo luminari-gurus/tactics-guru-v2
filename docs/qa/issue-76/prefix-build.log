@@ -1,0 +1,47 @@
+
+> tactics-guru-v2@0.0.0 build
+> npm run validate:content && npm run typecheck && vite build --base=/prototype/ --outDir=/tmp/issue76-prefix-dist
+
+
+> tactics-guru-v2@0.0.0 validate:content
+> vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-76-encounters/tactics-guru-v2
+
+
+ Test Files  3 passed (3)
+      Tests  129 passed (129)
+   Start at  06:09:40
+   Duration  4.31s (tests 96%, transform 3%, import 1%)
+
+
+> tactics-guru-v2@0.0.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.domain.json
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 59 modules transformed.
+
+(!) outDir /tmp/issue76-prefix-dist is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../../tmp/issue76-prefix-dist/index.html                              3.13 kB │ gzip:   1.09 kB
+../../../../../../tmp/issue76-prefix-dist/assets/view-BBW_du9E.css                2.61 kB │ gzip:   1.03 kB
+../../../../../../tmp/issue76-prefix-dist/assets/startBattleApp-D_AYwrQx.css      3.43 kB │ gzip:   1.26 kB
+../../../../../../tmp/issue76-prefix-dist/assets/preload-helper-BklznAHM.js       1.39 kB │ gzip:   0.75 kB
+../../../../../../tmp/issue76-prefix-dist/assets/index-RkN4NbJ0.js                1.53 kB │ gzip:   0.81 kB
+../../../../../../tmp/issue76-prefix-dist/assets/rng-CkITdvgm.js                  1.65 kB │ gzip:   0.80 kB
+../../../../../../tmp/issue76-prefix-dist/assets/startBattleApp-CDXOuJDR.js       2.55 kB │ gzip:   1.07 kB
+../../../../../../tmp/issue76-prefix-dist/assets/browser-BHgpSQ2A.js              3.26 kB │ gzip:   1.37 kB
+../../../../../../tmp/issue76-prefix-dist/assets/view-Bcbuf9AG.js                 8.84 kB │ gzip:   3.51 kB
+../../../../../../tmp/issue76-prefix-dist/assets/start-CzmiT8ip.js            1,498.23 kB │ gzip: 393.57 kB
+
+✓ built in 287ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
