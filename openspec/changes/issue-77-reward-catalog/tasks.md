@@ -15,7 +15,9 @@
 ## 3. Integration and delivery
 
 - [x] 3.1 Run focused tests, configured full unit/content/browser suites, both typechecks, production build, strict OpenSpec validation and git diff --check; retain actual results and distinguish automated regression support from downstream UI/full-run/physical acceptance.
-- [ ] 3.2 Compare implementation and documentation against all five #77 acceptance criteria and approved scope; verify task-specific diff, commit/push and create or reuse the PR, attaching it to this task. Use Closes only if every criterion is verified; otherwise use a draft with Refs and explicit gaps.
+- [x] 3.2 Compare implementation and documentation against all five #77 acceptance criteria and approved scope; verify task-specific diff, commit/push and create or reuse the PR, attaching it to this task. Use Closes only if every criterion is verified; otherwise use a draft with Refs and explicit gaps.
+
+Delivery: [PR #114](https://github.com/luminari-gurus/tactics-guru-v2/pull/114), implementation commit `f7b2542`. Acceptance mapping and actual validation results are retained in [run-items.md](../../../docs/run-items.md). The PR is attached to this task; no merge, archive or deployment performed.
 
 ## Workflow follow-up
 
