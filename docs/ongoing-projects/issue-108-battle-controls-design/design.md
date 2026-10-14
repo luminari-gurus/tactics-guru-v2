@@ -83,7 +83,7 @@ Passed 180 cases (3 heroes × 12 states × 5 viewports), plus reviewer-toolbar n
 
 Repairs during verification: cancellation now restores focus **after** its state-changing callback, falling back to Restart when Review is disabled; bounded actor scrolling prevents enlarged text from consuming the action area; drawable-board minima prevent oversized captions consuming the battlefield. Enemy states explicitly label the disabled player action owner; defeat shows zero HP; inspection of a Guarded fighter retains effective AC/status.
 
-The same cancellation focus defect was separately reproduced on the unmodified live baseline: Move → target → Review → Escape left `document.activeElement` as BODY with Review disabled. It is being repaired in a separate focused PR; no game source is changed by this design package.
+The same cancellation focus defect was separately reproduced on the unmodified live baseline: Move → target → Review → Escape left `document.activeElement` as BODY with Review disabled. It is repaired in separate [PR #113](https://github.com/luminari-gurus/tactics-guru-v2/pull/113); no game source is changed by this design package.
 
 ## Acceptance map
 
