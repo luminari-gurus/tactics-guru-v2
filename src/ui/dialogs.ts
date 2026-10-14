@@ -44,10 +44,13 @@ export class BattleDialogs {
   }
   dismiss(){if(this.cancel)this.close(this.cancel);}
   close(callback:(()=>void)|null=null){
+    const prior=this.prior;
     this.choices=[];this.cancel=null;this.element.close();this.transition();
-    if(this.prior?.isConnected && !this.prior.closest('dialog') && !(this.prior instanceof HTMLButtonElement && this.prior.disabled))this.prior.focus();
-    else document.querySelector<HTMLElement>('#fit-restart')?.focus();
     callback?.();
+    // The callback can disable the invoker or open a replacement modal.
+    if(this.open)return;
+    if(prior?.isConnected && !prior.closest('dialog') && !(prior instanceof HTMLButtonElement && prior.disabled))prior.focus();
+    else document.querySelector<HTMLElement>('#fit-restart')?.focus();
   }
   dispose(){this.abort.abort();this.element.close();this.element.remove();this.choices=[];this.cancel=null;}
 }

@@ -172,7 +172,10 @@ for(const invalid of ['{broken',JSON.stringify({kind:'tactics-guru:battle-snapsh
   await page.goto('/?scene=proof');await page.evaluate(({keys,invalid})=>localStorage.setItem(keys.primary,invalid),{keys,invalid});
   await page.goto('/');await expect(page.getByRole('dialog')).toContainText('needs recovery');await expect(page.locator('#save-continue')).toHaveCount(0);
   if(invalid.includes('"format":99'))await expect(page.getByRole('dialog')).toContainText('incompatible');
-  expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-cancel-reset').click();
+  expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();
+  await expect(page.locator('#save-confirm-reset')).toBeFocused();
+  await page.locator('#save-cancel-reset').click();
+  await expect(page.locator('#save-new')).toBeFocused();
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
   expect((await readSession(page)).state.seed).toBe(1);expect((await stored(page)).primary).not.toBe(invalid);
 });

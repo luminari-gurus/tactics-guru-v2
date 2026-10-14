@@ -1,0 +1,41 @@
+
+[WebServer] (node:38676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:43896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/1] [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+  1) [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  locator('#fit-restart')
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" locator('#fit-restart') with timeout 5000ms
+      - waiting for locator('#fit-restart')
+        14 × locator resolved to <button type="button" id="fit-restart">Restart battle</button>
+           - unexpected value "inactive"
+
+
+      18 |   const initial = JSON.parse(before!);
+      19 |   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
+    > 20 |   await expect(page.locator('#fit-restart')).toBeFocused();
+         |                                              ^
+      21 |   // The Cancel button has the same callback as Escape; neither may leave focus
+      22 |   // on the Review button that cancellation just disabled.
+      23 |   await page.locator('#battle-target').selectOption({index:1});
+        at C:\Users\apexw\.codex\worktrees\battle-dialog-focus\Tactics-Guru\tests\battle-loop.spec.ts:20:46
+
+    Error Context: test-results\battle-loop-player-HUD-and-0acf4-rve-state-and-modal-capture-desktop\error-context.md
+
+
+  1 failed
+    [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture 

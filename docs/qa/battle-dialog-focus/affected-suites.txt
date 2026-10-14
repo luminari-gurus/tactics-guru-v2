@@ -1,0 +1,100 @@
+
+[WebServer] (node:16492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 69 tests using 1 worker
+
+(node:26248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/69] [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[2/69] [desktop] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+[3/69] [desktop] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+[4/69] [desktop] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+[5/69] [desktop] › tests\battle-loop.spec.ts:127:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+[6/69] [desktop] › tests\battle-loop.spec.ts:142:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+[7/69] [desktop] › tests\battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+[8/69] [desktop] › tests\battle-loop.spec.ts:209:1 › restart during initial enemy animation discards the old run and its callbacks
+[9/69] [desktop] › tests\battle-loop.spec.ts:226:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+(node:31796) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[10/69] [desktop] › tests\battle-persistence.spec.ts:27:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+[11/69] [desktop] › tests\battle-persistence.spec.ts:55:47 › reload during legal player presentation matches an uninterrupted browser
+[12/69] [desktop] › tests\battle-persistence.spec.ts:55:47 › reload during legal enemy presentation matches an uninterrupted browser
+[13/69] [desktop] › tests\battle-persistence.spec.ts:95:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+[14/69] [desktop] › tests\battle-persistence.spec.ts:116:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+[15/69] [desktop] › tests\battle-persistence.spec.ts:134:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+[16/69] [desktop] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[17/69] [desktop] › tests\battle-persistence.spec.ts:161:1 › successful reset with failed fresh save cannot recover an old battle on reload
+[18/69] [desktop] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[19/69] [desktop] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+[20/69] [desktop] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement
+[21/69] [desktop] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement
+[22/69] [desktop] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary
+[23/69] [desktop] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary
+(node:42172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[24/69] [mobile-portrait] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[25/69] [mobile-portrait] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+[26/69] [mobile-portrait] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+[27/69] [mobile-portrait] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+[28/69] [mobile-portrait] › tests\battle-loop.spec.ts:127:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+[29/69] [mobile-portrait] › tests\battle-loop.spec.ts:142:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+[30/69] [mobile-portrait] › tests\battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+[31/69] [mobile-portrait] › tests\battle-loop.spec.ts:209:1 › restart during initial enemy animation discards the old run and its callbacks
+[32/69] [mobile-portrait] › tests\battle-loop.spec.ts:226:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+
+(node:43772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[33/69] [mobile-portrait] › tests\battle-persistence.spec.ts:27:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+[34/69] [mobile-portrait] › tests\battle-persistence.spec.ts:55:47 › reload during legal player presentation matches an uninterrupted browser
+[35/69] [mobile-portrait] › tests\battle-persistence.spec.ts:55:47 › reload during legal enemy presentation matches an uninterrupted browser
+[36/69] [mobile-portrait] › tests\battle-persistence.spec.ts:95:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+[37/69] [mobile-portrait] › tests\battle-persistence.spec.ts:116:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+[38/69] [mobile-portrait] › tests\battle-persistence.spec.ts:134:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+[39/69] [mobile-portrait] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[40/69] [mobile-portrait] › tests\battle-persistence.spec.ts:161:1 › successful reset with failed fresh save cannot recover an old battle on reload
+[41/69] [mobile-portrait] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[42/69] [mobile-portrait] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+[43/69] [mobile-portrait] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement
+[44/69] [mobile-portrait] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement
+[45/69] [mobile-portrait] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary
+[46/69] [mobile-portrait] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary
+(node:12700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[47/69] [mobile-landscape] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[48/69] [mobile-landscape] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+[49/69] [mobile-landscape] › tests\battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+[50/69] [mobile-landscape] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+[51/69] [mobile-landscape] › tests\battle-loop.spec.ts:127:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+[52/69] [mobile-landscape] › tests\battle-loop.spec.ts:142:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+[53/69] [mobile-landscape] › tests\battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+[54/69] [mobile-landscape] › tests\battle-loop.spec.ts:209:1 › restart during initial enemy animation discards the old run and its callbacks
+[55/69] [mobile-landscape] › tests\battle-loop.spec.ts:226:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+(node:29972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[56/69] [mobile-landscape] › tests\battle-persistence.spec.ts:27:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+[57/69] [mobile-landscape] › tests\battle-persistence.spec.ts:55:47 › reload during legal player presentation matches an uninterrupted browser
+[58/69] [mobile-landscape] › tests\battle-persistence.spec.ts:55:47 › reload during legal enemy presentation matches an uninterrupted browser
+[59/69] [mobile-landscape] › tests\battle-persistence.spec.ts:95:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+[60/69] [mobile-landscape] › tests\battle-persistence.spec.ts:116:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+[61/69] [mobile-landscape] › tests\battle-persistence.spec.ts:134:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+[62/69] [mobile-landscape] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[63/69] [mobile-landscape] › tests\battle-persistence.spec.ts:161:1 › successful reset with failed fresh save cannot recover an old battle on reload
+[64/69] [mobile-landscape] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[65/69] [mobile-landscape] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+[66/69] [mobile-landscape] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement
+[67/69] [mobile-landscape] › tests\battle-persistence.spec.ts:190:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement
+[68/69] [mobile-landscape] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary
+[69/69] [mobile-landscape] › tests\battle-persistence.spec.ts:219:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary
+  69 passed (5.0m)
