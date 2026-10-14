@@ -2,6 +2,8 @@
 
 Date: 2026-10-14 (Asia/Jerusalem). Base: `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`. Branch: `branch/fix-battle-dialog-focus`. Found during [design PR #112](https://github.com/luminari-gurus/tactics-guru-v2/pull/112); independent of the #108 mockups and #111 runtime redesign.
 
+[PR #113](https://github.com/luminari-gurus/tactics-guru-v2/pull/113) is open for review against main. Implementation commit: `630d32f`; later publication/evidence edits do not change the tested runtime or tests. Retained console logs normalize trailing whitespace only.
+
 ## Reproduction and repair
 
 Move → choose a reachable destination → Review action → Escape cancelled the intent correctly but left focus on BODY. `BattleDialogs.close` focused Review before the callback disabled it. The added existing-browser-test assertion failed on baseline: [original failure](battle-dialog-focus/baseline-failure.txt).

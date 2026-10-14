@@ -15,7 +15,7 @@ dist/assets/view-BaRTJime.js                 8.83 kB │ gzip:   3.51 kB
 dist/assets/start-CNGYVmxH.js            1,502.12 kB │ gzip: 394.96 kB
 
 ✓ built in 1.46s
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting

@@ -9,7 +9,7 @@ Running 1 test using 1 worker
 (Use `node --trace-warnings ...` to show where the warning was created)
 
 [1/1] [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
-  1) [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture 
+  1) [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
 
     Error: expect(locator).toBeFocused() failed
 
@@ -38,4 +38,4 @@ Running 1 test using 1 worker
 
 
   1 failed
-    [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture 
+    [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture

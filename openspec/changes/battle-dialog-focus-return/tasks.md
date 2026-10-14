@@ -7,7 +7,7 @@
 
 ## 2. Verify and publish
 
-- [ ] 2.1 Run unit/content checks, both typechecks, production build, affected browser suites and strict OpenSpec/whitespace checks; record actual results, then commit/push a focused independent PR and verify remote parity.
+- [x] 2.1 Run unit/content checks, both typechecks, production build, affected browser suites and strict OpenSpec/whitespace checks; record actual results, then commit/push a focused independent PR and verify remote parity.
 
 ## Workflow follow-up
 
