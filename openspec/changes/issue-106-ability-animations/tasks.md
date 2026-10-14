@@ -15,11 +15,11 @@ Implementation authorized on 2026-10-14; see [plan.md](../../../docs/ongoing-pro
 ## 3. Responsive visual acceptance
 
 - [x] 3.1 Verify pan/zoom, elevation and resize during effects across desktop and emulated mobile portrait/landscape; inspect travel/impact screenshots for all signatures, readable hit/miss/damage/guard/defeat feedback and cleanup after repeated use. Record source commit, browser/project/viewport, case, image paths and observed limitations in the QA document.
-- [ ] 3.2 Verify keyboard/touch/mouse action selection, confirmation locking, rejected/cancelled previews and repeated use with the existing battle helpers; compare full legal battle replay/events and next RNG against domain results, and retain movement/basic/enemy regression behavior.
+- [x] 3.2 Verify keyboard/touch/mouse action selection, confirmation locking, rejected/cancelled previews and repeated use with the existing battle helpers; compare full legal battle replay/events and next RNG against domain results, and retain movement/basic/enemy regression behavior.
 
 ## 4. Integrated verification and handoff
 
-- [ ] 4.1 Run focused animation/lifecycle tests, full unit and content checks, both TypeScript configurations, production build and full configured browser suite; record actual counts/failures/retries and any unperformed checks. Run the relevant built `/prototype/` animation/persistence checks, restore the root build and run strict OpenSpec plus whitespace validation.
+- [x] 4.1 Run focused animation/lifecycle tests, full unit and content checks, both TypeScript configurations, production build and full configured browser suite; record actual counts/failures/retries and any unperformed checks. Run the relevant built `/prototype/` animation/persistence checks, restore the root build and run strict OpenSpec plus whitespace validation.
 - [ ] 4.2 Map every #106 acceptance criterion to fresh evidence in the QA document, update this plan/handoff and task completion honestly, and verify that the final diff adds no combat/content/save-format/audio changes or unrelated work. Publish the implementation and review PR only after the approved scope is complete; report remaining acceptance gaps explicitly.
 
 ## Workflow follow-up

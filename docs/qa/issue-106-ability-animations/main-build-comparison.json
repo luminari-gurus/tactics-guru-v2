@@ -1,0 +1,34 @@
+{
+  "testedRuntimeSource": "d01e0bb8d848332807178bcc9cf3a3a6cb8c0497",
+  "integratedMain": "220d40f",
+  "fixedBuildMetadata": {
+    "commit": "60e15629c2d333d9c41f2ae314447673504bda0e",
+    "dirty": true
+  },
+  "method": "Production rebuild with identical metadata and default root base; compare every emitted HTML/JS/CSS file byte-for-byte. Public assets are unchanged by the merge.",
+  "before": {
+    "assets/browser-p1-3vV5x.js": "73dc0db4a21cf21c0774eeedaa40f0288adddba56802dd2108599dcc1853f5ac",
+    "assets/index-CLRL-6u-.js": "995fda2e31e2f8d5531e10394cfc4f71a7811f4851c05517519dd1676ea7cd67",
+    "assets/preload-helper-DjzSQ1t3.js": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f",
+    "assets/rng-CkITdvgm.js": "4b4b79c05916dda331edea9e52c41392b35015d7248e02b953e6ce0060c23dff",
+    "assets/start-CEV7_Hem.js": "32748eb558f56da9933b7fb2263f7d3b55de580bbd452ae55db7dd28594b03b0",
+    "assets/startBattleApp-BDsYSlvi.js": "32c3bf93da477e6df4aee35b05e31b2871a870df334a231985cd65cc0645850f",
+    "assets/startBattleApp-D_AYwrQx.css": "5acddf244bb5db291e3ee23eab517b733e31f622b93705cf95240214e06ab8c2",
+    "assets/view-0SVaPpIu.js": "c38fc24b7f05355095ddb6b90171df62ae7915f0d48ab9677297efa1086be1d5",
+    "assets/view-BBW_du9E.css": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57",
+    "index.html": "56b3335a2f0cf82db39087848f0211db93acf76184a5528dbbf33f81c1f7916d"
+  },
+  "after": {
+    "assets/browser-p1-3vV5x.js": "73dc0db4a21cf21c0774eeedaa40f0288adddba56802dd2108599dcc1853f5ac",
+    "assets/index-CLRL-6u-.js": "995fda2e31e2f8d5531e10394cfc4f71a7811f4851c05517519dd1676ea7cd67",
+    "assets/preload-helper-DjzSQ1t3.js": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f",
+    "assets/rng-CkITdvgm.js": "4b4b79c05916dda331edea9e52c41392b35015d7248e02b953e6ce0060c23dff",
+    "assets/start-CEV7_Hem.js": "32748eb558f56da9933b7fb2263f7d3b55de580bbd452ae55db7dd28594b03b0",
+    "assets/startBattleApp-BDsYSlvi.js": "32c3bf93da477e6df4aee35b05e31b2871a870df334a231985cd65cc0645850f",
+    "assets/startBattleApp-D_AYwrQx.css": "5acddf244bb5db291e3ee23eab517b733e31f622b93705cf95240214e06ab8c2",
+    "assets/view-0SVaPpIu.js": "c38fc24b7f05355095ddb6b90171df62ae7915f0d48ab9677297efa1086be1d5",
+    "assets/view-BBW_du9E.css": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57",
+    "index.html": "56b3335a2f0cf82db39087848f0211db93acf76184a5528dbbf33f81c1f7916d"
+  },
+  "mismatches": []
+}

@@ -1,0 +1,1241 @@
+{
+  "label": "Built /prototype/ animation and persistence checks",
+  "runtimeCommit": "00687ed1446ab308330735c213ea325ca7528323",
+  "rendererBundleSha256": "51d34f3d9e2bed008b334bde6d49e699c856ac7857a4418fd33f765687c2998a",
+  "rawReportSha256": "774100302d7dc9488e2f582882d6ed07c3b3382ed2649270dec96ca22551d42f",
+  "stats": {
+    "startTime": "2026-10-14T12:18:06.801Z",
+    "duration": 190974.33800000002,
+    "expected": 93,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "workers": 1,
+  "projects": [
+    {
+      "name": "desktop",
+      "retries": 0
+    },
+    {
+      "name": "mobile-portrait",
+      "retries": 0
+    },
+    {
+      "name": "mobile-landscape",
+      "retries": 0
+    }
+  ],
+  "errors": [],
+  "cases": [
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1406
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1020
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 970
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 895
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1112
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: critical feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1078
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: defeat feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 956
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1785
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1739
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1713
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 933
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 800
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 890
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "elevated target remains anchored through rotation during impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1353
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1523
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1217
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1211
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1048
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1237
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: critical feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1179
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: defeat feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1072
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1881
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1745
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1780
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 905
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 884
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 916
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "elevated target remains anchored through rotation during impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1398
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1647
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1393
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1275
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1060
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: miss feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1180
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: critical feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1063
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: defeat feedback matches resolved events",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1011
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1855
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1757
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: repeated cancellation, modal refresh, resize and restart during travel and impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1713
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "guarded_strike: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 886
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "high_shot: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 889
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: reload resumes accepted save without historical effects",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 977
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "elevated target remains anchored through rotation during impact",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1499
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > guarded_strike: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 988
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > high_shot: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 918
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > magic_missile: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 972
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > guarded_strike: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 916
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > high_shot: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 927
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > magic_missile: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 954
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > guarded_strike: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 994
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > high_shot: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 951
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-animations.spec.ts",
+      "title": "ability departure through real browser history > magic_missile: cached return preserves exact accepted slots until Continue",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 994
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 4045
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5589
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5254
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3630
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2270
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2620
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2204
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2911
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {broken",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 877
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1323
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 4015
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5768
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5122
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3641
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2261
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2686
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2156
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3086
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {broken",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 875
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1418
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 4057
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal player presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5681
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "reload during legal enemy presentation matches an uninterrupted browser",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5146
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3545
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1779
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2547
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "changed saved data refuses an old confirmation and requires fresh review",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2172
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3101
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {broken",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 1369
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 928
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached battle cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2489
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached recovery dialog cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2759
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at player preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2371
+        }
+      ]
+    },
+    {
+      "project": "desktop",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at presentation preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2302
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached battle cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2653
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached recovery dialog cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2775
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at player preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2489
+        }
+      ]
+    },
+    {
+      "project": "mobile-portrait",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at presentation preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2498
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached battle cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2821
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached recovery dialog cannot overwrite either slot of its replacement",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2787
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at player preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2387
+        }
+      ]
+    },
+    {
+      "project": "mobile-landscape",
+      "file": "battle-persistence.spec.ts",
+      "title": "browser history with BFCache enabled > cached return after restart at presentation preserves the accepted boundary",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2376
+        }
+      ]
+    }
+  ]
+}
