@@ -4,7 +4,7 @@
 
 [Issue #78](https://github.com/luminari-gurus/tactics-guru-v2/issues/78) needs executable ownership and reward commands now that #75/PR #107 and #77/PR #114 are merged. The current reward acknowledgment advances the run without granting inventory; the item package must make grant and advancement atomic before #79 controls and #80 integration consume it.
 
-Caller: `dubstylee`. Branch: `work/issue-78-owned-item-commands`. Base: `origin/main` at `73fed0be21358276c9ae70164a952c259ab4086a`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-78-owned-item-commands`. Base: `origin/main` at `73fed0be21358276c9ae70164a952c259ab4086a`. Caller explicitly approved the published plan at `4d59b01` on 2026-10-14 with “Approved”.
 
 Readiness refresh on 2026-10-14 covered all 16 open issues (paginated API includes three PR records), dependency relationships, relevant comments, three open PRs and remote branches. #75 is closed with merged PR #107 (`7a9b22b`); #77 is closed with merged PR #114 (`73fed0b`). #78 had no assignee, dependency relation or active branch/PR; its body prerequisites are both complete. Added and read back the exact `ready for work` label, refreshed candidates, assigned and verified `dubstylee`, and confirmed remote branch publication. #78 directly supplies #79 and #80, then their work supplies #81. #64/#66 retain physical-device acceptance; #74/#80/#81 retain #57 gates, #79 awaits #78, #111 awaits accepted #108 design (open PR #112), #84 retains owner target/path decisions, and #85 retains acceptance/activation gates. Parent epics stay unchanged; no other readiness promotion was supported.
 

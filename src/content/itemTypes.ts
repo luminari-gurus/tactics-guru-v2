@@ -28,7 +28,7 @@ export const ITEM_BOUNDS = {
   equipmentInstances: { min: 0, max: 6 },
 } as const;
 
-/** Contracts for #78 commands and #79/#80 save integration, not command implementations. */
+/** Owned data consumed by pure domain/items commands and future #79/#80 save integration. */
 export interface OwnedConsumable { readonly itemId: ItemId; readonly quantity: number }
 export interface OwnedEquipment { readonly instanceId: string; readonly itemId: ItemId }
 export interface EquipmentAssignment { readonly heroId: HeroId; readonly slot: EquipmentSlot; readonly instanceId: string }

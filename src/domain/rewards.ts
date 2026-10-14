@@ -14,7 +14,7 @@ export interface RewardOffer {
   readonly catalogIdentity: string;
   readonly options: readonly [RewardOption, RewardOption];
 }
-/** #78 must atomically grant this choice and acknowledge the matching run boundary. */
+/** domain/items extends this intent with itemRevision and atomically grants/acknowledges. */
 export interface RewardClaimIntent {
   readonly type: 'claimReward';
   readonly runId: string;
