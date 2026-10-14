@@ -1,6 +1,10 @@
 # Issue #106 — signature ability animations
 
-Updated 2026-10-14 (Asia/Jerusalem). **Planning only; implementation has not started.**
+Updated 2026-10-14 (Asia/Jerusalem). **Implementation authorized and in progress.** The user requested this branch, OpenSpec implementation, autonomous repairs, tests, commits, pushes and focused review PRs. This supersedes the planning-only approval boundary below.
+
+Current checkpoint: implementation and 51 focused browser cases pass (39 animation/lifecycle plus 12 elevation/BFCache), with 509 unit and 77 content tests, typechecks and production build green. See the [QA report](../qa/issue-106-ability-animations.md). OpenSpec tasks 1.1, 1.2 and 2.1 are complete; broader regression verification and final handoff remain. Working in the existing branch worktree; the primary checkout's unrelated edits are preserved. The desktop app cannot attach this worktree because it belongs to the planning chat; repository work continues at its explicit path.
+
+Ablation: retain the existing session/save/lifecycle and one animation tween. Add only an event-to-feedback helper, board-local vector effects, focused tests and evidence. New generated sprites, a general animation framework and new dependencies are unnecessary. Outcome, non-goals, files and proof remain as specified below. Publish each independently reviewable chunk when ready, as requested; merge, tags and manual deployment are not needed for this feature.
 
 - Issue: [Add battle animations for Guarded Strike, High Shot, and Magic Missile #106](https://github.com/luminari-gurus/tactics-guru-v2/issues/106).
 - Assignee: `moshehbenavraham`; [claim comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/106#issuecomment-6165482833).
@@ -35,7 +39,7 @@ Keep combat rules, action economy, HP, RNG, command identity, autosave boundarie
 - Primary: `src/phaser/BoardRenderer.ts` for event-driven rendering, label placement, bounded temporary objects and cleanup.
 - Conditional: `src/phaser/abilityPresentation.ts` plus focused unit tests for a small pure event mapping; `src/phaser/BattleScene.ts` only for demonstrated integration needs. Reuse existing diagnostics instead of adding an independent framework.
 - Tests: a focused `tests/battle-animations.spec.ts`, existing `tests/helpers/battlePolicy.ts`, `tests/battle-loop.spec.ts` and `tests/battle-persistence.spec.ts` where shared behavior requires extensions. Existing domain/session suites remain regression oracles.
-- Evidence/handoff: `docs/qa/issue-106-ability-animations.md`, this plan and the OpenSpec task status. No runtime/test file has been edited in this planning commit.
+- Evidence/handoff: `docs/qa/issue-106-ability-animations.md`, retained screenshots/JSON, this plan and the OpenSpec task status.
 
 ## Acceptance and verification
 
@@ -69,6 +73,6 @@ Environment notation above is conceptual: in PowerShell use `$env:PLAYWRIGHT_BAS
 
 Longer animations can expose cancellation races and increase battle duration; keep bounded phases and meaningful timeouts. Refresh/resize can render committed snapshots while transient effects exist; keep effects independently anchored and test those transitions. Shutdown may destroy objects before cleanup; finish must be safe and idempotent. Visual quality needs inspected intermediate frames, not just passing DOM assertions. See the design for these decisions and mitigations.
 
-Planning validation passed: strict OpenSpec validation, all 10 relative document links and whitespace checks. All four planning artifacts are present; all eight implementation tasks remain unchecked. The branch is natively linked in #106's Development section. Application tests are intentionally not run for this documentation-only change. Implementation is unapproved. No PR, merge, manual deployment or production activation is part of this request; existing hosting automation may build branch pushes.
+The implementation is authorized, and the branch remains natively linked in #106's Development section. Publish the first tested implementation chunk as a draft PR while integrated verification continues. Existing hosting automation may build branch pushes. No merge, manual deployment or production activation is required.
 
-After approval, continue this same issue/branch and OpenSpec change, record the approval, then implement the checklist. Do not reselect work or reopen completed #105 scope.
+Next: run the full configured browser suite (including unchanged persistence BFCache regressions and extended full-battle no-effect-leak assertions), then a `/prototype/` build with animation/persistence tests. Restore the root build, reconcile all acceptance evidence/tasks, verify strict OpenSpec and whitespace, push the final handoff and mark the PR ready. No combat/content/save/audio work or #108 redesign belongs in this change.

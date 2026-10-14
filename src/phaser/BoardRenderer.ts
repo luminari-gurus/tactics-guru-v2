@@ -5,6 +5,7 @@ import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresent
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
+import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
@@ -30,6 +31,10 @@ export class BoardRenderer {
   private reachable: readonly CellPosition[] = [];
   private selected: Tile | null = null;
   private selectionEvents = 0;
+  private animatedSnapshot: BattleState | undefined;
+  private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
+    from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
+  private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
 
   constructor(private readonly scene: Phaser.Scene, private readonly catalog: ContentCatalog, private readonly mapId: MapId,
     private readonly onSelect: (cell: CellPosition | null) => void) {
@@ -123,6 +128,8 @@ export class BoardRenderer {
   }
 
   present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = []): void {
+    // Modal/layout refreshes must not remove a defeated target before impact.
+    snapshot = this.animatedSnapshot ?? snapshot;
     this.snapshot = snapshot;
     this.reachable = reachable;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
@@ -161,28 +168,102 @@ export class BoardRenderer {
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
     this.present(before, [], null);
+    this.animatedSnapshot = before;
     const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
-    const visualEvents = events.filter(e=>['attackRolled','damaged','guarded','defeated','missileRolled'].includes(e.type));
+    const {signature, feedback} = abilityPresentation(events);
     const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
-    const duration=move ? Math.max(1,move.path.length-1)*STEP_MS : visualEvents.length ? COMBAT_MS : TURN_MS;
+    const duration=move ? Math.max(1,move.path.length-1)*STEP_MS : signature ? 560 : feedback.length ? COMBAT_MS : TURN_MS;
     const marker={progress:0};
     const labels:Phaser.GameObjects.Text[]=[];
-    for(const event of visualEvents) {
-      const id='unitId' in event ? event.unitId : undefined;
-      const unit=before.units.find(u=>u.id===id); if(!unit) continue;
-      const tile=this.byCell.get(cellKey(unit.cell))!;const p=projectTile(tile);
-      const label=event.type==='damaged'?`−${event.damage}`:event.type==='attackRolled'?event.result:event.type==='guarded'?'Guarded':event.type==='defeated'?'Defeated':'';
-      if(label){const text=this.scene.add.text(p.x,p.y-65,label,{fontSize:'16px',color:'#ffffff',backgroundColor:'#172033'}).setOrigin(0.5).setDepth(10000);this.root.add(text);labels.push(text);}
+    const anchor=(id:number)=>projectTile(this.byCell.get(cellKey(before.units.find(u=>u.id===id)!.cell))!);
+    for(const item of feedback) {
+      const p=anchor(item.unitId);
+      const y=p.y+(item.kind==='guard'?16:item.kind==='defeat'?-88:-64);
+      const text=this.scene.add.text(p.x,y,item.text,{fontFamily:'sans-serif',fontSize:'18px',fontStyle:'bold',
+        color:item.kind==='guard'?'#a9f3e6':'#ffffff',backgroundColor:'#172033',padding:{x:4,y:2}})
+        .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature);
+      this.root.add(text);labels.push(text);
+      this.effectLabels.push({text,anchor:p,kind:item.kind});
     }
+    const graphics=signature ? this.scene.add.graphics().setDepth(10000) : null;
+    if(graphics && signature){
+      this.root.add(graphics);
+      const a=anchor(signature.actorId),b=anchor(signature.targetId);
+      this.effect={kind:signature.kind,actorId:signature.actorId,targetId:signature.targetId,progress:0,
+        from:{x:a.x,y:a.y-28},to:{x:b.x,y:b.y-28},
+        feedback:feedback.map((item,i)=>({unitId:item.unitId,text:item.text,x:labels[i].x,y:labels[i].y,visible:false}))};
+    }
+    // New objects need sorting immediately, not only after a later HUD refresh.
+    this.root.sort('depth');
+    this.layoutFeedback();
+    this.publish();
     let complete!:()=>void;const done=new Promise<void>(resolve=>{complete=resolve;});let finished=false;
+    let tween:Phaser.Tweens.Tween | undefined;
     const finish=()=>{
-      if(finished)return;finished=true;labels.forEach(l=>l.destroy());
+      if(finished)return;finished=true;tween?.stop();
+      labels.forEach(l=>{if(l.scene)l.destroy();});if(graphics?.scene)graphics.destroy();
+      this.effectLabels=[];this.animatedSnapshot=undefined;this.effect=null;
       // Scene shutdown destroys the display list before canceling this presentation.
       // Resolve cancellation without touching images whose scene/texture binding is gone.
       if(this.root.scene)this.present(after,[],null);
       complete();
     };
-    const tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
+    tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
+      if(finished)return;
+      if(!this.root.scene){finish();return;}
+      if(graphics && signature && this.effect){
+        const {from:a,to:b}=this.effect,p=marker.progress;
+        const travel=Math.min(1,p/0.45),impact=Math.max(0,(p-0.45)/0.55);
+        const angle=Math.atan2(b.y-a.y,b.x-a.x),dx=Math.cos(angle),dy=Math.sin(angle);
+        const size=Math.max(1,0.65/this.view.scale);
+        graphics.clear();
+        if(signature.kind==='guarded_strike'){
+          // A blade sweeps toward the defender; its white edge reads without color.
+          if(p<0.6){
+            const x=a.x+(b.x-a.x)*travel,y=a.y+(b.y-a.y)*travel;
+            graphics.lineStyle(7*size,0xffd36a,1-impact).beginPath()
+              .arc(x,y,23*size,angle-1.3+travel,angle+0.8+travel).strokePath();
+            graphics.lineStyle(2*size,0xffffff,1-impact).lineBetween(a.x,a.y,x,y);
+          }
+          if(signature.guarded){
+            const x=a.x-22*size,y=a.y+4;
+            const shield=[[-12,-13],[12,-13],[10,3],[0,14],[-10,3]].map(([dx,dy])=>new Phaser.Math.Vector2(x+dx*size,y+dy*size));
+            graphics.fillStyle(0x163d3b,0.9).fillPoints(shield,true);
+            graphics.lineStyle(3*size,0x86ead6).strokePoints(shield,true);
+            graphics.lineStyle(2*size,0xffffff).lineBetween(x,y-8*size,x,y+7*size);
+          }
+        }else if(p<0.45){
+          const x=a.x+(b.x-a.x)*travel,y=a.y+(b.y-a.y)*travel;
+          if(signature.kind==='high_shot'){
+            graphics.lineStyle(3*size,0xffe3a0).lineBetween(x-dx*28*size,y-dy*28*size,x,y);
+            graphics.fillStyle(0xffffff).fillTriangle(x+dx*5*size,y+dy*5*size,x-(dx*7+dy*5)*size,y-(dy*7-dx*5)*size,x-(dx*7-dy*5)*size,y-(dy*7+dx*5)*size);
+            graphics.lineStyle(2*size,0xffe3a0).lineBetween(x-(dx*25+dy*5)*size,y-(dy*25-dx*5)*size,x-dx*18*size,y-dy*18*size);
+          }else{
+            graphics.lineStyle(7*size,0x9c85ff,0.35).lineBetween(x-dx*32*size,y-dy*32*size,x,y);
+            graphics.fillStyle(0x9c85ff,0.3).fillCircle(x,y,12*size);
+            graphics.fillStyle(0xb9adff).fillCircle(x,y,7*size);
+            graphics.fillStyle(0xffffff).fillCircle(x+2*size,y-2*size,3*size);
+          }
+        }
+        if(p>=0.45 && !signature.missed){
+          const radius=(8+impact*19)*size;
+          graphics.lineStyle(3*size,signature.kind==='magic_missile'?0xc4b9ff:0xffe3a0,1-impact).strokeCircle(b.x,b.y,radius);
+          for(let i=0;i<4;i++){
+            const theta=i*Math.PI/2+Math.PI/4;
+            graphics.lineStyle(2*size,0xffffff,1-impact).lineBetween(b.x+Math.cos(theta)*radius,b.y+Math.sin(theta)*radius,
+              b.x+Math.cos(theta)*(radius+8*size),b.y+Math.sin(theta)*(radius+8*size));
+          }
+        }
+        labels.forEach((label,i)=>{
+          const visible=feedback[i].kind==='guard' || p>=0.45;
+          label.setVisible(visible);this.effect!.feedback[i].visible=visible;
+        });
+        this.effect.progress=p;
+        // Update only the transient fields; geometry diagnostics need no per-frame recomputation.
+        const game=document.querySelector<HTMLElement>('#game')!;
+        const report=JSON.parse(game.dataset.battleReport!);report.effect=this.effect;
+        game.dataset.battleReport=JSON.stringify(report);
+      }
       if(!move)return;
       const progress=marker.progress*(move.path.length-1),i=Math.min(Math.floor(progress),move.path.length-2);
       if(i<0)return;
@@ -201,7 +282,7 @@ export class BoardRenderer {
       }
       this.root.sort('depth');
     },onComplete:finish});
-    return {done,cancel:()=>{tween.stop();finish();}};
+    return {done,cancel:finish};
   }
 
   fit(width: number, height: number, panelBottom: number): void {
@@ -229,7 +310,22 @@ export class BoardRenderer {
   private applyView(view: View): void {
     this.view = constrainView(view, this.bounds, this.viewport, this.panelBottom, this.fitScale);
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
+    this.layoutFeedback();
     this.publish();
+  }
+
+  private layoutFeedback():void {
+    // Keep labels legible when the whole board is fitted into short mobile viewports.
+    // Coordinates remain board-local, including the extra separation for defeat.
+    const scale=Math.max(1,14/(18*this.view.scale));
+    this.effectLabels.forEach(({text,anchor,kind},i)=>{
+      text.setScale(scale);
+      const height=text.height*scale;
+      const y=kind==='guard'?anchor.y+height/2+6/this.view.scale
+        :anchor.y-54-height/2-(kind==='defeat'?height+3/this.view.scale:0);
+      text.setPosition(anchor.x,y);
+      if(this.effect){this.effect.feedback[i].x=text.x;this.effect.feedback[i].y=text.y;}
+    });
   }
 
   pan(dx: number, dy: number): boolean {
@@ -280,6 +376,7 @@ export class BoardRenderer {
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
       reachable: this.reachable, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
+      effect: this.effect,
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),
       canopies: this.canopies.map(({ tile, graphics }) => ({ tile, depth: graphics.depth, alpha: graphics.alpha })),

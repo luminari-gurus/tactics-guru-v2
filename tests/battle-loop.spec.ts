@@ -30,8 +30,12 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     if(seed===2){await page.getByRole('button',{name:'Restart battle',exact:true}).click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(2);}
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const boardObjects=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).objectCount;
     for(let i=0;i<200;i++){
       await expect.poll(async()=> (await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
+      const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+      expect(board.effect).toBeNull();expect(board.objectCount).toBe(boardObjects);
       const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
       await playCommand(page,playerDecision(s.state));
     }

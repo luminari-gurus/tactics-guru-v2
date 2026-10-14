@@ -25,4 +25,4 @@ None. Existing `battle-session` resolution/replay/restart and `battle-controls` 
 
 Primary implementation is in `src/phaser/BoardRenderer.ts`, with a small presentation-only event descriptor helper if useful for isolated tests, and minimal `BattleScene.ts` integration only where lifecycle correctness requires it. Tests extend the existing battle policy, session/replay, input and persistence coverage. No content/rules/RNG/save-format changes, new dependencies, asset generation, audio expansion or control redesign are planned; #108 remains separate.
 
-Planning base: `main` at `6292b1c808fc7d18aab2a70da7cfe8bbdef87837`. Task branch: `branch/issue-106-ability-animations`. Assignee: `moshehbenavraham`. See [implementation plan](../../../docs/ongoing-projects/plan.md). Implementation has not been approved or started.
+Planning base: `main` at `6292b1c808fc7d18aab2a70da7cfe8bbdef87837`. Task branch: `branch/issue-106-ability-animations`. Assignee: `moshehbenavraham`. See [implementation plan](../../../docs/ongoing-projects/plan.md). Implementation and incremental PR publication were authorized on 2026-10-14.

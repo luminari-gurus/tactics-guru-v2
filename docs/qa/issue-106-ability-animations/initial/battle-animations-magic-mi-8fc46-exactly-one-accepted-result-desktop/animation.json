@@ -1,0 +1,4177 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "fixture": {
+    "command": {
+      "type": "useAbility",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          4
+        ]
+      }
+    },
+    "before": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          2769473573,
+          3525461424,
+          3470133796,
+          20
+        ],
+        "cursor": 7
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 3,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 6,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 3
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 5,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 11
+    },
+    "after": {
+      "format": 1,
+      "versions": {
+        "rules": 1,
+        "rng": 1,
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+      },
+      "seed": 2,
+      "rng": {
+        "words": [
+          3528152210,
+          1166433092,
+          3150901418,
+          21
+        ],
+        "cursor": 8
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 3,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": true,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 6,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 6
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 2
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 3
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 5,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 12
+    },
+    "events": [
+      {
+        "type": "abilityUsed",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            4
+          ]
+        }
+      },
+      {
+        "type": "missileRolled",
+        "unitId": 3,
+        "targetId": 4,
+        "missile": 1,
+        "natural": 2,
+        "damage": 3
+      },
+      {
+        "type": "damaged",
+        "unitId": 4,
+        "damage": 3,
+        "hp": 6
+      }
+    ],
+    "token": 12
+  },
+  "travel": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "transform": {
+      "scale": 0.3885348793274136,
+      "x": 640,
+      "y": 532.0632544429202
+    },
+    "tiles": [
+      {
+        "x": 0,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 0
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 36
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 72
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 108
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 144
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 180
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 216
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 252
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 288
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 324
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 360
+      },
+      {
+        "x": 11,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 396
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 39
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 75
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 111
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 147
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 183
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 219
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 255
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 291
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 327
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 363
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 399
+      },
+      {
+        "x": 11,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 435
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 78
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 114
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 150
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 186
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 222
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 258
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 294
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 330
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 366
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 402
+      },
+      {
+        "x": 10,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 438
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 474
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 117
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 153
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 189
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 225
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 261
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 297
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 333
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 369
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 405
+      },
+      {
+        "x": 9,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 441
+      },
+      {
+        "x": 10,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 477
+      },
+      {
+        "x": 11,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 513
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 156
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 192
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 228
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 264
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 300
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 336
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 372
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 408
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 444
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 480
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 516
+      },
+      {
+        "x": 11,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 552
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 195
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 231
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 267
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 303
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 339
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 375
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 411
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 447
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 483
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 519
+      },
+      {
+        "x": 10,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 555
+      },
+      {
+        "x": 11,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 591
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 234
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 270
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 306
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 342
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 378
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 414
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 450
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 486
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 522
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 558
+      },
+      {
+        "x": 10,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 594
+      },
+      {
+        "x": 11,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 630
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 273
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 309
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 345
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 381
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 417
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 453
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 489
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 525
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 561
+      },
+      {
+        "x": 9,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 597
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 633
+      },
+      {
+        "x": 11,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 669
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 312
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 348
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "elevation": 1,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 384
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "elevation": 1,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 420
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 456
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 492
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 528
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 564
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 600
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 636
+      },
+      {
+        "x": 10,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 672
+      },
+      {
+        "x": 11,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 708
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 351
+      },
+      {
+        "x": 1,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 387
+      },
+      {
+        "x": 2,
+        "y": 9,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 423
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 459
+      },
+      {
+        "x": 4,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 495
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 531
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 567
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 603
+      },
+      {
+        "x": 8,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 639
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 675
+      },
+      {
+        "x": 10,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 711
+      },
+      {
+        "x": 11,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 747
+      },
+      {
+        "x": 0,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 390
+      },
+      {
+        "x": 1,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 426
+      },
+      {
+        "x": 2,
+        "y": 10,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 462
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 498
+      },
+      {
+        "x": 4,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 534
+      },
+      {
+        "x": 5,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 570
+      },
+      {
+        "x": 6,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 606
+      },
+      {
+        "x": 7,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 642
+      },
+      {
+        "x": 8,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 678
+      },
+      {
+        "x": 9,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 714
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 750
+      },
+      {
+        "x": 11,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 786
+      },
+      {
+        "x": 0,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 429
+      },
+      {
+        "x": 1,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 465
+      },
+      {
+        "x": 2,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 501
+      },
+      {
+        "x": 3,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 537
+      },
+      {
+        "x": 4,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 573
+      },
+      {
+        "x": 5,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 609
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 645
+      },
+      {
+        "x": 7,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 681
+      },
+      {
+        "x": 8,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 717
+      },
+      {
+        "x": 9,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 753
+      },
+      {
+        "x": 10,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 789
+      },
+      {
+        "x": 11,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 825
+      }
+    ],
+    "units": [
+      {
+        "id": 1,
+        "unitId": "fighter",
+        "side": "player",
+        "tile": {
+          "x": 3,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:fighter_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 344.5,
+        "position": {
+          "x": -120,
+          "y": 180
+        },
+        "anchorError": 0.000021790532086184693
+      },
+      {
+        "id": 2,
+        "unitId": "ranger",
+        "side": "player",
+        "tile": {
+          "x": 2,
+          "y": 8,
+          "elevation": 1
+        },
+        "assetId": "asset:ranger_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 386.5,
+        "position": {
+          "x": -240,
+          "y": 176
+        },
+        "anchorError": 0.00001795594251991532
+      },
+      {
+        "id": 3,
+        "unitId": "mage",
+        "side": "player",
+        "tile": {
+          "x": 1,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:mage_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 272.5,
+        "position": {
+          "x": -200,
+          "y": 140
+        },
+        "anchorError": 0.00001580276399590416
+      },
+      {
+        "id": 4,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 6,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 452.5,
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "anchorError": 0.000017642974853515625
+      },
+      {
+        "id": 5,
+        "unitId": "goblin_archer",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 2,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_archer_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 260.5,
+        "position": {
+          "x": 120,
+          "y": 140
+        },
+        "anchorError": 0.00002645613779991033
+      },
+      {
+        "id": 6,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 416.5,
+        "position": {
+          "x": -40,
+          "y": 220
+        },
+        "anchorError": 0.000017171517827080005
+      }
+    ],
+    "activeId": 3,
+    "commandCount": 11,
+    "reachable": [],
+    "selected": null,
+    "selectionEvents": 0,
+    "objectCount": 617,
+    "effect": {
+      "kind": "magic_missile",
+      "actorId": 3,
+      "targetId": 4,
+      "progress": 0.17142857142857143,
+      "from": {
+        "x": -200,
+        "y": 112
+      },
+      "to": {
+        "x": 0,
+        "y": 212
+      },
+      "feedback": [
+        {
+          "unitId": 4,
+          "text": "−3",
+          "x": 0,
+          "y": 161.97813264670057,
+          "visible": false
+        }
+      ]
+    },
+    "depthOrder": [
+      0,
+      1,
+      2,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      155.5,
+      155.5,
+      156,
+      157,
+      158,
+      158.5,
+      158.5,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      194.5,
+      194.5,
+      195,
+      196,
+      197,
+      197.5,
+      197.5,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      233.5,
+      233.5,
+      234,
+      235,
+      236,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      260.25,
+      260.5,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      272.25,
+      272.5,
+      273,
+      274,
+      275,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303,
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      344.25,
+      344.5,
+      345,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      352,
+      353,
+      360,
+      361,
+      362,
+      363,
+      364,
+      365,
+      366,
+      367,
+      368,
+      369,
+      370,
+      371,
+      372,
+      373,
+      374,
+      375,
+      376,
+      377,
+      378,
+      379,
+      380,
+      381,
+      382,
+      383,
+      384,
+      385,
+      386,
+      386.25,
+      386.5,
+      387,
+      388,
+      389,
+      390,
+      391,
+      392,
+      396,
+      397,
+      398,
+      399,
+      400,
+      401,
+      402,
+      403,
+      404,
+      405,
+      406,
+      407,
+      408,
+      409,
+      410,
+      411,
+      412,
+      413,
+      414,
+      415,
+      416,
+      416.25,
+      416.5,
+      417,
+      418,
+      419,
+      420,
+      421,
+      422,
+      423,
+      424,
+      425,
+      426,
+      427,
+      428,
+      429,
+      430,
+      431,
+      435,
+      436,
+      437,
+      438,
+      439,
+      440,
+      441,
+      442,
+      443,
+      444,
+      445,
+      446,
+      447,
+      448,
+      449,
+      450,
+      451,
+      452,
+      452.25,
+      452.5,
+      453,
+      454,
+      455,
+      456,
+      457,
+      458,
+      459,
+      460,
+      461,
+      462,
+      463,
+      464,
+      465,
+      466,
+      467,
+      474,
+      475,
+      476,
+      477,
+      478,
+      479,
+      480,
+      481,
+      482,
+      483,
+      484,
+      485,
+      486,
+      487,
+      488,
+      489,
+      490,
+      491,
+      492,
+      493,
+      494,
+      495,
+      496,
+      497,
+      498,
+      499,
+      500,
+      501,
+      502,
+      503,
+      513,
+      514,
+      515,
+      516,
+      517,
+      518,
+      519,
+      520,
+      521,
+      522,
+      523,
+      524,
+      525,
+      526,
+      527,
+      528,
+      529,
+      530,
+      531,
+      532,
+      533,
+      534,
+      535,
+      536,
+      537,
+      538,
+      539,
+      552,
+      553,
+      554,
+      554.5,
+      554.5,
+      555,
+      556,
+      557,
+      558,
+      559,
+      560,
+      561,
+      562,
+      563,
+      564,
+      565,
+      566,
+      567,
+      568,
+      569,
+      570,
+      571,
+      572,
+      573,
+      574,
+      575,
+      591,
+      592,
+      593,
+      593.5,
+      593.5,
+      594,
+      595,
+      596,
+      596.5,
+      596.5,
+      597,
+      598,
+      599,
+      599.5,
+      599.5,
+      600,
+      601,
+      602,
+      603,
+      604,
+      605,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      630,
+      631,
+      632,
+      632.5,
+      632.5,
+      633,
+      634,
+      635,
+      635.5,
+      635.5,
+      636,
+      637,
+      638,
+      638.5,
+      638.5,
+      639,
+      640,
+      641,
+      642,
+      643,
+      644,
+      645,
+      646,
+      647,
+      669,
+      670,
+      671,
+      672,
+      673,
+      674,
+      674.5,
+      674.5,
+      675,
+      676,
+      677,
+      678,
+      679,
+      680,
+      681,
+      682,
+      683,
+      708,
+      709,
+      710,
+      711,
+      712,
+      713,
+      714,
+      715,
+      716,
+      717,
+      718,
+      719,
+      747,
+      748,
+      749,
+      750,
+      751,
+      752,
+      753,
+      754,
+      755,
+      786,
+      787,
+      788,
+      789,
+      790,
+      791,
+      825,
+      826,
+      827,
+      10000,
+      10001
+    ],
+    "surfaceCornerError": 0.00004021436642034769,
+    "canopies": [
+      {
+        "tile": {
+          "x": 1,
+          "y": 3,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 153
+        },
+        "depth": 155.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 0,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 156
+        },
+        "depth": 158.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 1,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 192
+        },
+        "depth": 194.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 0,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 195
+        },
+        "depth": 197.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 1,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 231
+        },
+        "depth": 233.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 552
+        },
+        "depth": 554.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 591
+        },
+        "depth": 593.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 6,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 594
+        },
+        "depth": 596.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 9,
+          "y": 7,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 597
+        },
+        "depth": 599.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 6,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 630
+        },
+        "depth": 632.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 7,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 633
+        },
+        "depth": 635.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 9,
+          "y": 8,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 636
+        },
+        "depth": 638.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 8,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 672
+        },
+        "depth": 674.5,
+        "alpha": 1
+      }
+    ],
+    "bounds": {
+      "left": 453.5032579228415,
+      "right": 826.4967420771585,
+      "top": 513.607847674868,
+      "bottom": 715.4517174854594
+    }
+  },
+  "impact": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "transform": {
+      "scale": 0.4293974492906887,
+      "x": 665,
+      "y": 505.92178965473585
+    },
+    "tiles": [
+      {
+        "x": 0,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 0
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 36
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 72
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 108
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 144
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 180
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 216
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 252
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 288
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 324
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 360
+      },
+      {
+        "x": 11,
+        "y": 0,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 396
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 39
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 75
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 111
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 147
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 183
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 219
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 255
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 291
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 327
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 363
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 399
+      },
+      {
+        "x": 11,
+        "y": 1,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 435
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 78
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 114
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 150
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 186
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 222
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 258
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 294
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 330
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 366
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 402
+      },
+      {
+        "x": 10,
+        "y": 2,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 438
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 474
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 117
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 153
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 189
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 225
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 261
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 297
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 333
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 369
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 405
+      },
+      {
+        "x": 9,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 441
+      },
+      {
+        "x": 10,
+        "y": 3,
+        "elevation": 1,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 477
+      },
+      {
+        "x": 11,
+        "y": 3,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 513
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 156
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 192
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 228
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 264
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 300
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 336
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 372
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 408
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 444
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 480
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 516
+      },
+      {
+        "x": 11,
+        "y": 4,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 552
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 195
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 231
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 267
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 303
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 339
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 375
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "elevation": 2,
+        "terrain": "stone",
+        "surfaceAssetId": "asset:terrain_stone",
+        "depth": 411
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 447
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 483
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 519
+      },
+      {
+        "x": 10,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 555
+      },
+      {
+        "x": 11,
+        "y": 5,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 591
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 234
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 270
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 306
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 342
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 378
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 414
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 450
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 486
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 522
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 558
+      },
+      {
+        "x": 10,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 594
+      },
+      {
+        "x": 11,
+        "y": 6,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 630
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 273
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 309
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 345
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 381
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 417
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 453
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 489
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 525
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 561
+      },
+      {
+        "x": 9,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 597
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 633
+      },
+      {
+        "x": 11,
+        "y": 7,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 669
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 312
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 348
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "elevation": 1,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 384
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "elevation": 1,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 420
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 456
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass_path",
+        "surfaceAssetId": "asset:terrain_grass_path",
+        "depth": 492
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 528
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 564
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 600
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 636
+      },
+      {
+        "x": 10,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "forest",
+        "surfaceAssetId": "asset:terrain_forest",
+        "depth": 672
+      },
+      {
+        "x": 11,
+        "y": 8,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 708
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 351
+      },
+      {
+        "x": 1,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 387
+      },
+      {
+        "x": 2,
+        "y": 9,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 423
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 459
+      },
+      {
+        "x": 4,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 495
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 531
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 567
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "water",
+        "surfaceAssetId": "asset:terrain_water",
+        "depth": 603
+      },
+      {
+        "x": 8,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 639
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 675
+      },
+      {
+        "x": 10,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 711
+      },
+      {
+        "x": 11,
+        "y": 9,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 747
+      },
+      {
+        "x": 0,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 390
+      },
+      {
+        "x": 1,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 426
+      },
+      {
+        "x": 2,
+        "y": 10,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 462
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "elevation": 1,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 498
+      },
+      {
+        "x": 4,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 534
+      },
+      {
+        "x": 5,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 570
+      },
+      {
+        "x": 6,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 606
+      },
+      {
+        "x": 7,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 642
+      },
+      {
+        "x": 8,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 678
+      },
+      {
+        "x": 9,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 714
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 750
+      },
+      {
+        "x": 11,
+        "y": 10,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 786
+      },
+      {
+        "x": 0,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 429
+      },
+      {
+        "x": 1,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 465
+      },
+      {
+        "x": 2,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 501
+      },
+      {
+        "x": 3,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 537
+      },
+      {
+        "x": 4,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 573
+      },
+      {
+        "x": 5,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 609
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 645
+      },
+      {
+        "x": 7,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 681
+      },
+      {
+        "x": 8,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 717
+      },
+      {
+        "x": 9,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 753
+      },
+      {
+        "x": 10,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 789
+      },
+      {
+        "x": 11,
+        "y": 11,
+        "elevation": 0,
+        "terrain": "grass",
+        "surfaceAssetId": "asset:terrain_grass",
+        "depth": 825
+      }
+    ],
+    "units": [
+      {
+        "id": 1,
+        "unitId": "fighter",
+        "side": "player",
+        "tile": {
+          "x": 3,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:fighter_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 344.5,
+        "position": {
+          "x": -120,
+          "y": 180
+        },
+        "anchorError": 0.00001693275537926169
+      },
+      {
+        "id": 2,
+        "unitId": "ranger",
+        "side": "player",
+        "tile": {
+          "x": 2,
+          "y": 8,
+          "elevation": 1
+        },
+        "assetId": "asset:ranger_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 386.5,
+        "position": {
+          "x": -240,
+          "y": 176
+        },
+        "anchorError": 0.000030157829858478352
+      },
+      {
+        "id": 3,
+        "unitId": "mage",
+        "side": "player",
+        "tile": {
+          "x": 1,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:mage_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 272.5,
+        "position": {
+          "x": -200,
+          "y": 140
+        },
+        "anchorError": 0.00002756184771846471
+      },
+      {
+        "id": 4,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 6,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 452.5,
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "anchorError": 0.0000019073486328125
+      },
+      {
+        "id": 5,
+        "unitId": "goblin_archer",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 2,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_archer_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 260.5,
+        "position": {
+          "x": 120,
+          "y": 140
+        },
+        "anchorError": 0.000019896169705414832
+      },
+      {
+        "id": 6,
+        "unitId": "goblin_grunt",
+        "side": "enemy",
+        "tile": {
+          "x": 5,
+          "y": 6,
+          "elevation": 0
+        },
+        "assetId": "asset:goblin_grunt_sprite",
+        "origin": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "depth": 416.5,
+        "position": {
+          "x": -40,
+          "y": 220
+        },
+        "anchorError": 0.000006415187858139854
+      }
+    ],
+    "activeId": 3,
+    "commandCount": 11,
+    "reachable": [],
+    "selected": null,
+    "selectionEvents": 0,
+    "objectCount": 617,
+    "effect": {
+      "kind": "magic_missile",
+      "actorId": 3,
+      "targetId": 4,
+      "progress": 0.4857142857142857,
+      "from": {
+        "x": -200,
+        "y": 112
+      },
+      "to": {
+        "x": 0,
+        "y": 212
+      },
+      "feedback": [
+        {
+          "unitId": 4,
+          "text": "−3",
+          "x": 0,
+          "y": 164.26411556763824,
+          "visible": true
+        }
+      ]
+    },
+    "depthOrder": [
+      0,
+      1,
+      2,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      155.5,
+      155.5,
+      156,
+      157,
+      158,
+      158.5,
+      158.5,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      194.5,
+      194.5,
+      195,
+      196,
+      197,
+      197.5,
+      197.5,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      233.5,
+      233.5,
+      234,
+      235,
+      236,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      260.25,
+      260.5,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      272.25,
+      272.5,
+      273,
+      274,
+      275,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303,
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      344.25,
+      344.5,
+      345,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      352,
+      353,
+      360,
+      361,
+      362,
+      363,
+      364,
+      365,
+      366,
+      367,
+      368,
+      369,
+      370,
+      371,
+      372,
+      373,
+      374,
+      375,
+      376,
+      377,
+      378,
+      379,
+      380,
+      381,
+      382,
+      383,
+      384,
+      385,
+      386,
+      386.25,
+      386.5,
+      387,
+      388,
+      389,
+      390,
+      391,
+      392,
+      396,
+      397,
+      398,
+      399,
+      400,
+      401,
+      402,
+      403,
+      404,
+      405,
+      406,
+      407,
+      408,
+      409,
+      410,
+      411,
+      412,
+      413,
+      414,
+      415,
+      416,
+      416.25,
+      416.5,
+      417,
+      418,
+      419,
+      420,
+      421,
+      422,
+      423,
+      424,
+      425,
+      426,
+      427,
+      428,
+      429,
+      430,
+      431,
+      435,
+      436,
+      437,
+      438,
+      439,
+      440,
+      441,
+      442,
+      443,
+      444,
+      445,
+      446,
+      447,
+      448,
+      449,
+      450,
+      451,
+      452,
+      452.25,
+      452.5,
+      453,
+      454,
+      455,
+      456,
+      457,
+      458,
+      459,
+      460,
+      461,
+      462,
+      463,
+      464,
+      465,
+      466,
+      467,
+      474,
+      475,
+      476,
+      477,
+      478,
+      479,
+      480,
+      481,
+      482,
+      483,
+      484,
+      485,
+      486,
+      487,
+      488,
+      489,
+      490,
+      491,
+      492,
+      493,
+      494,
+      495,
+      496,
+      497,
+      498,
+      499,
+      500,
+      501,
+      502,
+      503,
+      513,
+      514,
+      515,
+      516,
+      517,
+      518,
+      519,
+      520,
+      521,
+      522,
+      523,
+      524,
+      525,
+      526,
+      527,
+      528,
+      529,
+      530,
+      531,
+      532,
+      533,
+      534,
+      535,
+      536,
+      537,
+      538,
+      539,
+      552,
+      553,
+      554,
+      554.5,
+      554.5,
+      555,
+      556,
+      557,
+      558,
+      559,
+      560,
+      561,
+      562,
+      563,
+      564,
+      565,
+      566,
+      567,
+      568,
+      569,
+      570,
+      571,
+      572,
+      573,
+      574,
+      575,
+      591,
+      592,
+      593,
+      593.5,
+      593.5,
+      594,
+      595,
+      596,
+      596.5,
+      596.5,
+      597,
+      598,
+      599,
+      599.5,
+      599.5,
+      600,
+      601,
+      602,
+      603,
+      604,
+      605,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      630,
+      631,
+      632,
+      632.5,
+      632.5,
+      633,
+      634,
+      635,
+      635.5,
+      635.5,
+      636,
+      637,
+      638,
+      638.5,
+      638.5,
+      639,
+      640,
+      641,
+      642,
+      643,
+      644,
+      645,
+      646,
+      647,
+      669,
+      670,
+      671,
+      672,
+      673,
+      674,
+      674.5,
+      674.5,
+      675,
+      676,
+      677,
+      678,
+      679,
+      680,
+      681,
+      682,
+      683,
+      708,
+      709,
+      710,
+      711,
+      712,
+      713,
+      714,
+      715,
+      716,
+      717,
+      718,
+      719,
+      747,
+      748,
+      749,
+      750,
+      751,
+      752,
+      753,
+      754,
+      755,
+      786,
+      787,
+      788,
+      789,
+      790,
+      791,
+      825,
+      826,
+      827,
+      10000,
+      10001
+    ],
+    "surfaceCornerError": 0.00003371747880871523,
+    "canopies": [
+      {
+        "tile": {
+          "x": 1,
+          "y": 3,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 153
+        },
+        "depth": 155.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 0,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 156
+        },
+        "depth": 158.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 1,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 192
+        },
+        "depth": 194.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 0,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 195
+        },
+        "depth": 197.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 1,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 231
+        },
+        "depth": 233.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 4,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 552
+        },
+        "depth": 554.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 5,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 591
+        },
+        "depth": 593.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 6,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 594
+        },
+        "depth": 596.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 9,
+          "y": 7,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 597
+        },
+        "depth": 599.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 11,
+          "y": 6,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 630
+        },
+        "depth": 632.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 7,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 633
+        },
+        "depth": 635.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 9,
+          "y": 8,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 636
+        },
+        "depth": 638.5,
+        "alpha": 1
+      },
+      {
+        "tile": {
+          "x": 10,
+          "y": 8,
+          "elevation": 0,
+          "terrain": "forest",
+          "surfaceAssetId": "asset:terrain_forest",
+          "depth": 672
+        },
+        "depth": 674.5,
+        "alpha": 1
+      }
+    ],
+    "bounds": {
+      "left": 458.88922434046947,
+      "right": 871.1107756595305,
+      "top": 485.52541081342815,
+      "bottom": 708.5973857199409
+    }
+  }
+}
