@@ -1,0 +1,380 @@
+
+> tactics-guru-v2@0.0.0 test
+> playwright test --list
+
+Listing tests:
+  [desktop] › assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable
+  [desktop] › assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error
+  [desktop] › assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error
+  [desktop] › assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error
+  [desktop] › audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time
+  [desktop] › audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can
+  [desktop] › audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable
+  [desktop] › audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors
+  [desktop] › audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can
+  [desktop] › audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout
+  [desktop] › audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt
+  [desktop] › battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+  [desktop] › battle-audio.spec.ts:53:1 › mute, hidden and context interruptions discard active feedback while commands finish
+  [desktop] › battle-audio.spec.ts:93:50 › gesture unlock reject remains bounded and retryable
+  [desktop] › battle-audio.spec.ts:93:50 › gesture unlock pending remains bounded and retryable
+  [desktop] › battle-audio.spec.ts:109:50 › automatic recovery reject after successful unlock stays nonfatal and bounded
+  [desktop] › battle-audio.spec.ts:109:50 › automatic recovery pending after successful unlock stays nonfatal and bounded
+  [desktop] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives early enable
+  [desktop] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives enabled restart
+  [desktop] › battle-audio.spec.ts:187:1 › unrelated asynchronous failures still reach the fatal application handler
+  [desktop] › battle-audio.spec.ts:199:78 › missing optional media leaves legal controls usable
+  [desktop] › battle-audio.spec.ts:199:78 › corrupt optional media leaves legal controls usable
+  [desktop] › battle-audio.spec.ts:199:78 › stalled optional media leaves legal controls usable
+  [desktop] › battle-audio.spec.ts:199:78 › decode-stalled optional media leaves legal controls usable
+  [desktop] › battle-audio.spec.ts:216:1 › HTML5 fallback loads and plays future cues after a gesture
+  [desktop] › battle-audio.spec.ts:240:1 › unsupported audio has a useful nonfatal status
+  [desktop] › battle-audio.spec.ts:246:1 › late decode from a destroyed scene cannot alter replacement controls or playback
+  [desktop] › battle-audio.spec.ts:268:74 › seed 1: sound on/off legal battles match with committed cues and playerLoss
+  [desktop] › battle-audio.spec.ts:268:74 › seed 2: sound on/off legal battles match with committed cues and playerWin
+  [desktop] › battle-board.spec.ts:18:1 › selection labels retain the zoomed and panned camera without gameplay commands
+  [desktop] › battle-board.spec.ts:101:1 › authored camera keeps zoom bounds and refits on real orientation changes
+  [desktop] › battle-board.spec.ts:151:1 › default authored board renders canonical units, highlights and stable restarts
+  [desktop] › battle-board.spec.ts:209:3 › default battle reports a controlled missing canonical sprite error
+  [desktop] › battle-board.spec.ts:209:3 › default battle reports a controlled corrupt canonical sprite error
+  [desktop] › battle-board.spec.ts:223:1 › picks authored elevated tops and visible side faces through unit and canopy art
+  [desktop] › battle-board.spec.ts:254:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion
+  [desktop] › battle-board.spec.ts:292:1 › legal player movement updates elevation, reachability and canopy occlusion
+  [desktop] › battle-board.spec.ts:325:1 › touch pinch and cancelled pointer cannot select or move a unit
+  [desktop] › battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+  [desktop] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+  [desktop] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+  [desktop] › battle-loop.spec.ts:76:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+  [desktop] › battle-loop.spec.ts:113:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+  [desktop] › battle-loop.spec.ts:128:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+  [desktop] › battle-loop.spec.ts:161:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+  [desktop] › battle-loop.spec.ts:195:1 › restart during initial enemy animation discards the old run and its callbacks
+  [desktop] › battle-loop.spec.ts:212:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+  [desktop] › battle-persistence.spec.ts:24:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+  [desktop] › battle-persistence.spec.ts:52:47 › reload during legal player presentation matches an uninterrupted browser
+  [desktop] › battle-persistence.spec.ts:52:47 › reload during legal enemy presentation matches an uninterrupted browser
+  [desktop] › battle-persistence.spec.ts:92:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+  [desktop] › battle-persistence.spec.ts:113:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+  [desktop] › battle-persistence.spec.ts:131:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+  [desktop] › battle-persistence.spec.ts:149:1 › changed saved data refuses an old confirmation and requires fresh review
+  [desktop] › battle-persistence.spec.ts:158:1 › successful reset with failed fresh save cannot recover an old battle on reload
+  [desktop] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {broken
+  [desktop] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {"kind":"tac
+  [desktop] › board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart
+  [desktop] › boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: success
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: malformed
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: unknown
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: missing
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: corrupt
+  [desktop] › content-loading.spec.ts:5:3 › content smoke: stalled
+  [desktop] › engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers
+  [desktop] › engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load
+  [desktop] › engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed
+  [desktop] › grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry
+  [desktop] › input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart
+  [desktop] › input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not
+  [desktop] › input.spec.ts:57:1 › selection survives a live device pixel ratio change
+  [desktop] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844
+  [desktop] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390
+  [desktop] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640
+  [desktop] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412
+  [desktop] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720
+  [desktop] › layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu
+  [desktop] › lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio
+  [desktop] › lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart
+  [desktop] › lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume
+  [desktop] › lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio
+  [desktop] › move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart
+  [desktop] › opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart
+  [desktop] › overworld-map.spec.ts:7:3 › failed route import at /map shows a reload instruction
+  [desktop] › overworld-map.spec.ts:7:3 › failed route import at / shows a reload instruction
+  [desktop] › overworld-map.spec.ts:34:1 › map direct entry, refresh, seeds and responsive inspection
+  [desktop] › overworld-map.spec.ts:78:1 › map never initializes battle, audio, diagnostics or storage
+  [desktop] › overworld-map.spec.ts:117:1 › new seed still works when browser entropy fails or returns the current seed
+  [desktop] › overworld-map.spec.ts:134:1 › map types apply the displayed seed and retain committed choices
+  [desktop] › overworld-map.spec.ts:187:1 › biome combinations preserve topology and render matching Simple legends
+  [desktop] › overworld-map.spec.ts:257:1 › biome and type changes apply edited seeds and roll back invalid selections
+  [desktop] › overworld-map.spec.ts:305:1 › art styles preserve map data across all combinations and match legends
+  [desktop] › overworld-map.spec.ts:349:1 › art controls retain pending seeds, reject invalid edits and retain selections
+  [desktop] › overworld-map.spec.ts:388:3 › art network failure uses partial Simple fallback and matching legend
+  [desktop] › overworld-map.spec.ts:388:3 › art decode failure uses partial Simple fallback and matching legend
+  [desktop] › overworld-map.spec.ts:405:1 › art late loads preserve newer selections and seed validation
+  [desktop] › overworld-map.spec.ts:435:1 › art uses configured base, bounded transfers and no battle requests
+  [desktop] › public-asset-base.spec.ts:9:3 › battle direct entry and refresh resolve public assets
+  [desktop] › public-asset-base.spec.ts:9:3 › proof direct entry and refresh resolve public assets
+  [desktop] › public-asset-base.spec.ts:9:3 › content-smoke direct entry and refresh resolve public assets
+  [desktop] › public-asset-base.spec.ts:61:47 › Web Audio battle audio loads at the base and plays a committed move
+  [desktop] › public-asset-base.spec.ts:61:47 › HTML5 battle audio loads at the base and plays a committed move
+  [desktop] › public-asset-base.spec.ts:79:1 › content fixture uses the base and still validates input
+  [desktop] › public-asset-base.spec.ts:87:1 › extracted map route still loads directly and on refresh at the base
+  [desktop] › public-asset-base.spec.ts:96:3 › content image missing stays controlled at the base
+  [desktop] › public-asset-base.spec.ts:107:3 › battle audio missing stays nonfatal at the base
+  [desktop] › public-asset-base.spec.ts:96:3 › content image corrupt stays controlled at the base
+  [desktop] › public-asset-base.spec.ts:107:3 › battle audio corrupt stays nonfatal at the base
+  [desktop] › public-asset-base.spec.ts:96:3 › content image stalled stays controlled at the base
+  [desktop] › public-asset-base.spec.ts:107:3 › battle audio stalled stays nonfatal at the base
+  [desktop] › terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile
+  [mobile-portrait] › assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable
+  [mobile-portrait] › assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error
+  [mobile-portrait] › assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error
+  [mobile-portrait] › assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error
+  [mobile-portrait] › audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time
+  [mobile-portrait] › audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can
+  [mobile-portrait] › audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable
+  [mobile-portrait] › audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors
+  [mobile-portrait] › audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can
+  [mobile-portrait] › audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout
+  [mobile-portrait] › audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt
+  [mobile-portrait] › battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+  [mobile-portrait] › battle-audio.spec.ts:53:1 › mute, hidden and context interruptions discard active feedback while commands finish
+  [mobile-portrait] › battle-audio.spec.ts:93:50 › gesture unlock reject remains bounded and retryable
+  [mobile-portrait] › battle-audio.spec.ts:93:50 › gesture unlock pending remains bounded and retryable
+  [mobile-portrait] › battle-audio.spec.ts:109:50 › automatic recovery reject after successful unlock stays nonfatal and bounded
+  [mobile-portrait] › battle-audio.spec.ts:109:50 › automatic recovery pending after successful unlock stays nonfatal and bounded
+  [mobile-portrait] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives early enable
+  [mobile-portrait] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives enabled restart
+  [mobile-portrait] › battle-audio.spec.ts:187:1 › unrelated asynchronous failures still reach the fatal application handler
+  [mobile-portrait] › battle-audio.spec.ts:199:78 › missing optional media leaves legal controls usable
+  [mobile-portrait] › battle-audio.spec.ts:199:78 › corrupt optional media leaves legal controls usable
+  [mobile-portrait] › battle-audio.spec.ts:199:78 › stalled optional media leaves legal controls usable
+  [mobile-portrait] › battle-audio.spec.ts:199:78 › decode-stalled optional media leaves legal controls usable
+  [mobile-portrait] › battle-audio.spec.ts:216:1 › HTML5 fallback loads and plays future cues after a gesture
+  [mobile-portrait] › battle-audio.spec.ts:240:1 › unsupported audio has a useful nonfatal status
+  [mobile-portrait] › battle-audio.spec.ts:246:1 › late decode from a destroyed scene cannot alter replacement controls or playback
+  [mobile-portrait] › battle-audio.spec.ts:268:74 › seed 1: sound on/off legal battles match with committed cues and playerLoss
+  [mobile-portrait] › battle-audio.spec.ts:268:74 › seed 2: sound on/off legal battles match with committed cues and playerWin
+  [mobile-portrait] › battle-board.spec.ts:18:1 › selection labels retain the zoomed and panned camera without gameplay commands
+  [mobile-portrait] › battle-board.spec.ts:101:1 › authored camera keeps zoom bounds and refits on real orientation changes
+  [mobile-portrait] › battle-board.spec.ts:151:1 › default authored board renders canonical units, highlights and stable restarts
+  [mobile-portrait] › battle-board.spec.ts:209:3 › default battle reports a controlled missing canonical sprite error
+  [mobile-portrait] › battle-board.spec.ts:209:3 › default battle reports a controlled corrupt canonical sprite error
+  [mobile-portrait] › battle-board.spec.ts:223:1 › picks authored elevated tops and visible side faces through unit and canopy art
+  [mobile-portrait] › battle-board.spec.ts:254:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion
+  [mobile-portrait] › battle-board.spec.ts:292:1 › legal player movement updates elevation, reachability and canopy occlusion
+  [mobile-portrait] › battle-board.spec.ts:325:1 › touch pinch and cancelled pointer cannot select or move a unit
+  [mobile-portrait] › battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+  [mobile-portrait] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+  [mobile-portrait] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+  [mobile-portrait] › battle-loop.spec.ts:76:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+  [mobile-portrait] › battle-loop.spec.ts:113:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+  [mobile-portrait] › battle-loop.spec.ts:128:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+  [mobile-portrait] › battle-loop.spec.ts:161:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+  [mobile-portrait] › battle-loop.spec.ts:195:1 › restart during initial enemy animation discards the old run and its callbacks
+  [mobile-portrait] › battle-loop.spec.ts:212:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+  [mobile-portrait] › battle-persistence.spec.ts:24:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+  [mobile-portrait] › battle-persistence.spec.ts:52:47 › reload during legal player presentation matches an uninterrupted browser
+  [mobile-portrait] › battle-persistence.spec.ts:52:47 › reload during legal enemy presentation matches an uninterrupted browser
+  [mobile-portrait] › battle-persistence.spec.ts:92:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+  [mobile-portrait] › battle-persistence.spec.ts:113:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+  [mobile-portrait] › battle-persistence.spec.ts:131:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+  [mobile-portrait] › battle-persistence.spec.ts:149:1 › changed saved data refuses an old confirmation and requires fresh review
+  [mobile-portrait] › battle-persistence.spec.ts:158:1 › successful reset with failed fresh save cannot recover an old battle on reload
+  [mobile-portrait] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {broken
+  [mobile-portrait] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {"kind":"tac
+  [mobile-portrait] › board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart
+  [mobile-portrait] › boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: success
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: malformed
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: unknown
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: missing
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: corrupt
+  [mobile-portrait] › content-loading.spec.ts:5:3 › content smoke: stalled
+  [mobile-portrait] › engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers
+  [mobile-portrait] › engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load
+  [mobile-portrait] › engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed
+  [mobile-portrait] › grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry
+  [mobile-portrait] › input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart
+  [mobile-portrait] › input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not
+  [mobile-portrait] › input.spec.ts:57:1 › selection survives a live device pixel ratio change
+  [mobile-portrait] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844
+  [mobile-portrait] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390
+  [mobile-portrait] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640
+  [mobile-portrait] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412
+  [mobile-portrait] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720
+  [mobile-portrait] › layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu
+  [mobile-portrait] › lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio
+  [mobile-portrait] › lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart
+  [mobile-portrait] › lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume
+  [mobile-portrait] › lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio
+  [mobile-portrait] › move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart
+  [mobile-portrait] › opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart
+  [mobile-portrait] › overworld-map.spec.ts:7:3 › failed route import at /map shows a reload instruction
+  [mobile-portrait] › overworld-map.spec.ts:7:3 › failed route import at / shows a reload instruction
+  [mobile-portrait] › overworld-map.spec.ts:34:1 › map direct entry, refresh, seeds and responsive inspection
+  [mobile-portrait] › overworld-map.spec.ts:78:1 › map never initializes battle, audio, diagnostics or storage
+  [mobile-portrait] › overworld-map.spec.ts:117:1 › new seed still works when browser entropy fails or returns the current seed
+  [mobile-portrait] › overworld-map.spec.ts:134:1 › map types apply the displayed seed and retain committed choices
+  [mobile-portrait] › overworld-map.spec.ts:187:1 › biome combinations preserve topology and render matching Simple legends
+  [mobile-portrait] › overworld-map.spec.ts:257:1 › biome and type changes apply edited seeds and roll back invalid selections
+  [mobile-portrait] › overworld-map.spec.ts:305:1 › art styles preserve map data across all combinations and match legends
+  [mobile-portrait] › overworld-map.spec.ts:349:1 › art controls retain pending seeds, reject invalid edits and retain selections
+  [mobile-portrait] › overworld-map.spec.ts:388:3 › art network failure uses partial Simple fallback and matching legend
+  [mobile-portrait] › overworld-map.spec.ts:388:3 › art decode failure uses partial Simple fallback and matching legend
+  [mobile-portrait] › overworld-map.spec.ts:405:1 › art late loads preserve newer selections and seed validation
+  [mobile-portrait] › overworld-map.spec.ts:435:1 › art uses configured base, bounded transfers and no battle requests
+  [mobile-portrait] › public-asset-base.spec.ts:9:3 › battle direct entry and refresh resolve public assets
+  [mobile-portrait] › public-asset-base.spec.ts:9:3 › proof direct entry and refresh resolve public assets
+  [mobile-portrait] › public-asset-base.spec.ts:9:3 › content-smoke direct entry and refresh resolve public assets
+  [mobile-portrait] › public-asset-base.spec.ts:61:47 › Web Audio battle audio loads at the base and plays a committed move
+  [mobile-portrait] › public-asset-base.spec.ts:61:47 › HTML5 battle audio loads at the base and plays a committed move
+  [mobile-portrait] › public-asset-base.spec.ts:79:1 › content fixture uses the base and still validates input
+  [mobile-portrait] › public-asset-base.spec.ts:87:1 › extracted map route still loads directly and on refresh at the base
+  [mobile-portrait] › public-asset-base.spec.ts:96:3 › content image missing stays controlled at the base
+  [mobile-portrait] › public-asset-base.spec.ts:107:3 › battle audio missing stays nonfatal at the base
+  [mobile-portrait] › public-asset-base.spec.ts:96:3 › content image corrupt stays controlled at the base
+  [mobile-portrait] › public-asset-base.spec.ts:107:3 › battle audio corrupt stays nonfatal at the base
+  [mobile-portrait] › public-asset-base.spec.ts:96:3 › content image stalled stays controlled at the base
+  [mobile-portrait] › public-asset-base.spec.ts:107:3 › battle audio stalled stays nonfatal at the base
+  [mobile-portrait] › terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile
+  [mobile-landscape] › assets.spec.ts:3:1 › canonical assets, near/far fixtures and restart remain stable
+  [mobile-landscape] › assets.spec.ts:34:1 › failed canonical asset load gives a controlled visible error
+  [mobile-landscape] › assets.spec.ts:45:1 › a proof image that downloads but cannot be decoded gives a controlled visible error
+  [mobile-landscape] › assets.spec.ts:56:1 › a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error
+  [mobile-landscape] › audio.spec.ts:18:1 › the test tone plays only from its button and reports played each time
+  [mobile-landscape] › audio.spec.ts:48:1 › a context that will not resume is reported as blocked with retry, then plays once it can
+  [mobile-landscape] › audio.spec.ts:80:1 › a missing tone file leaves the board usable and the audio control unavailable
+  [mobile-landscape] › audio.spec.ts:101:1 › restart during playback resets the audio control for the new run without errors
+  [mobile-landscape] › audio.spec.ts:122:1 › a resume() that never settles is reported as blocked with retry, then plays once it can
+  [mobile-landscape] › audio.spec.ts:154:1 › a stalled tone request never holds the board; the control reports unavailable after the load timeout
+  [mobile-landscape] › audio.spec.ts:183:1 › the control follows the audio context: a body gesture unlock reads Ready and a suspension reads Locked, with no attempt
+  [mobile-landscape] › battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+  [mobile-landscape] › battle-audio.spec.ts:53:1 › mute, hidden and context interruptions discard active feedback while commands finish
+  [mobile-landscape] › battle-audio.spec.ts:93:50 › gesture unlock reject remains bounded and retryable
+  [mobile-landscape] › battle-audio.spec.ts:93:50 › gesture unlock pending remains bounded and retryable
+  [mobile-landscape] › battle-audio.spec.ts:109:50 › automatic recovery reject after successful unlock stays nonfatal and bounded
+  [mobile-landscape] › battle-audio.spec.ts:109:50 › automatic recovery pending after successful unlock stays nonfatal and bounded
+  [mobile-landscape] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives early enable
+  [mobile-landscape] › battle-audio.spec.ts:152:34 › HTML5 per-element permission survives enabled restart
+  [mobile-landscape] › battle-audio.spec.ts:187:1 › unrelated asynchronous failures still reach the fatal application handler
+  [mobile-landscape] › battle-audio.spec.ts:199:78 › missing optional media leaves legal controls usable
+  [mobile-landscape] › battle-audio.spec.ts:199:78 › corrupt optional media leaves legal controls usable
+  [mobile-landscape] › battle-audio.spec.ts:199:78 › stalled optional media leaves legal controls usable
+  [mobile-landscape] › battle-audio.spec.ts:199:78 › decode-stalled optional media leaves legal controls usable
+  [mobile-landscape] › battle-audio.spec.ts:216:1 › HTML5 fallback loads and plays future cues after a gesture
+  [mobile-landscape] › battle-audio.spec.ts:240:1 › unsupported audio has a useful nonfatal status
+  [mobile-landscape] › battle-audio.spec.ts:246:1 › late decode from a destroyed scene cannot alter replacement controls or playback
+  [mobile-landscape] › battle-audio.spec.ts:268:74 › seed 1: sound on/off legal battles match with committed cues and playerLoss
+  [mobile-landscape] › battle-audio.spec.ts:268:74 › seed 2: sound on/off legal battles match with committed cues and playerWin
+  [mobile-landscape] › battle-board.spec.ts:18:1 › selection labels retain the zoomed and panned camera without gameplay commands
+  [mobile-landscape] › battle-board.spec.ts:101:1 › authored camera keeps zoom bounds and refits on real orientation changes
+  [mobile-landscape] › battle-board.spec.ts:151:1 › default authored board renders canonical units, highlights and stable restarts
+  [mobile-landscape] › battle-board.spec.ts:209:3 › default battle reports a controlled missing canonical sprite error
+  [mobile-landscape] › battle-board.spec.ts:209:3 › default battle reports a controlled corrupt canonical sprite error
+  [mobile-landscape] › battle-board.spec.ts:223:1 › picks authored elevated tops and visible side faces through unit and canopy art
+  [mobile-landscape] › battle-board.spec.ts:254:1 › authored visible picking survives resize, pan, zoom, DPR and drag completion
+  [mobile-landscape] › battle-board.spec.ts:292:1 › legal player movement updates elevation, reachability and canopy occlusion
+  [mobile-landscape] › battle-board.spec.ts:325:1 › touch pinch and cancelled pointer cannot select or move a unit
+  [mobile-landscape] › battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+  [mobile-landscape] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays
+  [mobile-landscape] › battle-loop.spec.ts:28:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays
+  [mobile-landscape] › battle-loop.spec.ts:76:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+  [mobile-landscape] › battle-loop.spec.ts:113:1 › battle HUD targets fit portrait and short landscape with a bounded readable log
+  [mobile-landscape] › battle-loop.spec.ts:128:1 › real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once
+  [mobile-landscape] › battle-loop.spec.ts:161:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow
+  [mobile-landscape] › battle-loop.spec.ts:195:1 › restart during initial enemy animation discards the old run and its callbacks
+  [mobile-landscape] › battle-loop.spec.ts:212:1 › battle diagnostics record real selection, gestures and movement and reset on restart
+  [mobile-landscape] › battle-persistence.spec.ts:24:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+  [mobile-landscape] › battle-persistence.spec.ts:52:47 › reload during legal player presentation matches an uninterrupted browser
+  [mobile-landscape] › battle-persistence.spec.ts:52:47 › reload during legal enemy presentation matches an uninterrupted browser
+  [mobile-landscape] › battle-persistence.spec.ts:92:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+  [mobile-landscape] › battle-persistence.spec.ts:113:1 › unknown storage blocks startup until retry; writes remain nonfatal during play
+  [mobile-landscape] › battle-persistence.spec.ts:131:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+  [mobile-landscape] › battle-persistence.spec.ts:149:1 › changed saved data refuses an old confirmation and requires fresh review
+  [mobile-landscape] › battle-persistence.spec.ts:158:1 › successful reset with failed fresh save cannot recover an old battle on reload
+  [mobile-landscape] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {broken
+  [mobile-landscape] › battle-persistence.spec.ts:168:141 › invalid startup requires explicit reset: {"kind":"tac
+  [mobile-landscape] › board.spec.ts:3:1 › shows the complete elevated board in both orientations and after restart
+  [mobile-landscape] › boot.spec.ts:3:1 › boots a Phaser scene and fits the viewport after resize
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: success
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: malformed
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: unknown
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: missing
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: corrupt
+  [mobile-landscape] › content-loading.spec.ts:5:3 › content smoke: stalled
+  [mobile-landscape] › engine-fit.spec.ts:3:1 › proof controls survive repeated restart and expose distinct ready markers
+  [mobile-landscape] › engine-fit.spec.ts:47:1 › shows loading before boot and a controlled error if the engine module cannot load
+  [mobile-landscape] › engine-fit.spec.ts:54:1 › shell initially displays loading while the engine is delayed
+  [mobile-landscape] › grass-surface.spec.ts:3:1 › square grass material projects all corners exactly onto the shared tile geometry
+  [mobile-landscape] › input.spec.ts:5:1 › picks visible cells through art after transforms, resize and restart
+  [mobile-landscape] › input.spec.ts:37:1 › touch tap selects, pinch and its trailing pointer do not
+  [mobile-landscape] › input.spec.ts:57:1 › selection survives a live device pixel ratio change
+  [mobile-landscape] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 390x844
+  [mobile-landscape] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 844x390
+  [mobile-landscape] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 360x640
+  [mobile-landscape] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 915x412
+  [mobile-landscape] › layout.spec.ts:30:3 › controls stay at least 44 px and reachable at 1280x720
+  [mobile-landscape] › layout.spec.ts:82:1 › page gestures are suppressed in CSS and the canvas has no context menu
+  [mobile-landscape] › lifecycle.spec.ts:25:1 › hidden and visible while idle count once each, keep rendering and never start audio
+  [mobile-landscape] › lifecycle.spec.ts:45:1 › a move in flight freezes while hidden and completes exactly once after resume, also after restart
+  [mobile-landscape] › lifecycle.spec.ts:96:1 › a pointer held down across hide and show cannot pan or select on resume
+  [mobile-landscape] › lifecycle.spec.ts:123:1 › window blur and focus are counted and never start or repeat audio
+  [mobile-landscape] › move.spec.ts:5:1 › actual move controls reject repeated input, complete, and cancel on repeated restart
+  [mobile-landscape] › opacity.spec.ts:3:1 › opacity slider previews 0–100, preserves its choice across fixtures and restart
+  [mobile-landscape] › overworld-map.spec.ts:7:3 › failed route import at /map shows a reload instruction
+  [mobile-landscape] › overworld-map.spec.ts:7:3 › failed route import at / shows a reload instruction
+  [mobile-landscape] › overworld-map.spec.ts:34:1 › map direct entry, refresh, seeds and responsive inspection
+  [mobile-landscape] › overworld-map.spec.ts:78:1 › map never initializes battle, audio, diagnostics or storage
+  [mobile-landscape] › overworld-map.spec.ts:117:1 › new seed still works when browser entropy fails or returns the current seed
+  [mobile-landscape] › overworld-map.spec.ts:134:1 › map types apply the displayed seed and retain committed choices
+  [mobile-landscape] › overworld-map.spec.ts:187:1 › biome combinations preserve topology and render matching Simple legends
+  [mobile-landscape] › overworld-map.spec.ts:257:1 › biome and type changes apply edited seeds and roll back invalid selections
+  [mobile-landscape] › overworld-map.spec.ts:305:1 › art styles preserve map data across all combinations and match legends
+  [mobile-landscape] › overworld-map.spec.ts:349:1 › art controls retain pending seeds, reject invalid edits and retain selections
+  [mobile-landscape] › overworld-map.spec.ts:388:3 › art network failure uses partial Simple fallback and matching legend
+  [mobile-landscape] › overworld-map.spec.ts:388:3 › art decode failure uses partial Simple fallback and matching legend
+  [mobile-landscape] › overworld-map.spec.ts:405:1 › art late loads preserve newer selections and seed validation
+  [mobile-landscape] › overworld-map.spec.ts:435:1 › art uses configured base, bounded transfers and no battle requests
+  [mobile-landscape] › public-asset-base.spec.ts:9:3 › battle direct entry and refresh resolve public assets
+  [mobile-landscape] › public-asset-base.spec.ts:9:3 › proof direct entry and refresh resolve public assets
+  [mobile-landscape] › public-asset-base.spec.ts:9:3 › content-smoke direct entry and refresh resolve public assets
+  [mobile-landscape] › public-asset-base.spec.ts:61:47 › Web Audio battle audio loads at the base and plays a committed move
+  [mobile-landscape] › public-asset-base.spec.ts:61:47 › HTML5 battle audio loads at the base and plays a committed move
+  [mobile-landscape] › public-asset-base.spec.ts:79:1 › content fixture uses the base and still validates input
+  [mobile-landscape] › public-asset-base.spec.ts:87:1 › extracted map route still loads directly and on refresh at the base
+  [mobile-landscape] › public-asset-base.spec.ts:96:3 › content image missing stays controlled at the base
+  [mobile-landscape] › public-asset-base.spec.ts:107:3 › battle audio missing stays nonfatal at the base
+  [mobile-landscape] › public-asset-base.spec.ts:96:3 › content image corrupt stays controlled at the base
+  [mobile-landscape] › public-asset-base.spec.ts:107:3 › battle audio corrupt stays nonfatal at the base
+  [mobile-landscape] › public-asset-base.spec.ts:96:3 › content image stalled stays controlled at the base
+  [mobile-landscape] › public-asset-base.spec.ts:107:3 › battle audio stalled stays nonfatal at the base
+  [mobile-landscape] › terrain-materials.spec.ts:4:1 › every terrain source decodes as an opaque square and maps to a rendered tile
+Total: 336 tests in 19 files
+
+> tactics-guru-v2@0.0.0 posttest
+> playwright test -c playwright.encounters.config.ts
+
+[WebServer] (node:59399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 1 worker
+
+(node:59438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.4s)
+  ✓   2 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.2s)
+  ✓   3 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.2s)
+  ✓   4 [desktop] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (244ms)
+  ✓   5 [desktop] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (256ms)
+[WebServer] 6:22:54 AM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓   6 [desktop] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (278ms)
+(node:59475) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.6s)
+  ✓   8 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓   9 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.3s)
+  ✓  10 [mobile-portrait] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (243ms)
+  ✓  11 [mobile-portrait] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (254ms)
+[WebServer] 6:23:00 AM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓  12 [mobile-portrait] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (274ms)
+(node:59506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.7s)
+  ✓  14 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓  15 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.4s)
+  ✓  16 [mobile-landscape] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (237ms)
+  ✓  17 [mobile-landscape] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (251ms)
+[WebServer] 6:23:06 AM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓  18 [mobile-landscape] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (278ms)
+
+  18 passed (17.4s)
