@@ -1,0 +1,28 @@
+# Tasks
+
+Implementation is not started. Begin only after approval of [plan.md](../../../docs/ongoing-projects/plan.md), and record that approval there. All boxes describe future work.
+
+## 1. Event mapping and signature effects
+
+- [ ] 1.1 Map accepted signature events to actor/target/outcome presentation data without changing domain events; verify focused frozen-input fixtures for hit, miss, critical, defeat, guard-on-miss and automatic-hit Magic Missile, including unchanged state/RNG.
+- [ ] 1.2 Implement board-local slash/guard, arrow and magic projectile/impact effects in the existing animation handle; verify all three through normal controls with controlled intermediate frames, correct target labels and final snapshots. Document chosen visual phases/timing in `docs/qa/issue-106-ability-animations.md` with initial screenshots.
+
+## 2. Completion and lifecycle
+
+- [ ] 2.1 Unify completion/cancellation cleanup for temporary objects and tween callbacks; verify normal completion, repeated cancellation, visibility loss/return, restart-dialog cancellation and confirmed restart during each signature without stuck input, duplicate commands, changed RNG or leftover effects.
+- [ ] 2.2 Retain session-token/live guards and current-save startup on shutdown/history return; verify ability-specific reload/departure cases plus the existing real BFCache regressions preserve accepted state and exact save bytes before Continue, with no stale callback, historical effect or page error. Record the tested lifecycle cases in the QA document.
+
+## 3. Responsive visual acceptance
+
+- [ ] 3.1 Verify pan/zoom, elevation and resize during effects across desktop and emulated mobile portrait/landscape; inspect travel/impact screenshots for all signatures, readable hit/miss/damage/guard/defeat feedback and cleanup after repeated use. Record source commit, browser/project/viewport, case, image paths and observed limitations in the QA document.
+- [ ] 3.2 Verify keyboard/touch/mouse action selection, confirmation locking, rejected/cancelled previews and repeated use with the existing battle helpers; compare full legal battle replay/events and next RNG against domain results, and retain movement/basic/enemy regression behavior.
+
+## 4. Integrated verification and handoff
+
+- [ ] 4.1 Run focused animation/lifecycle tests, full unit and content checks, both TypeScript configurations, production build and full configured browser suite; record actual counts/failures/retries and any unperformed checks. Run the relevant built `/prototype/` animation/persistence checks, restore the root build and run strict OpenSpec plus whitespace validation.
+- [ ] 4.2 Map every #106 acceptance criterion to fresh evidence in the QA document, update this plan/handoff and task completion honestly, and verify that the final diff adds no combat/content/save-format/audio changes or unrelated work. Publish the implementation and review PR only after the approved scope is complete; report remaining acceptance gaps explicitly.
+
+## Workflow follow-up
+
+- Link the eventual implementation PR to #106 and keep #108 separate. Use a closing reference only when all #106 acceptance criteria are verified.
+- Merge and OpenSpec archive remain later workflow steps; no merge, manual deployment or production cutover is authorized by the planning request.
