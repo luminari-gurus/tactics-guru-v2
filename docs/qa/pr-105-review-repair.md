@@ -54,3 +54,11 @@ The PR title/body describe both map acceptance and the lifecycle fix. The [P1 re
 The [original #96 map acceptance](issue-96-map-acceptance.md) remains a record of its original source and checks. It is not rewritten to imply that it tested this later repair. Physical Android/iOS testing, production hosting, concurrent-tab serialization and durable retention are not established here. The original art-license gap, desert fallback and physical certification work remain unchanged.
 
 No merge, release tag, manual deployment, issue closure or OpenSpec archive is performed. GitHub/Cloudflare CI is not a gate for this locally verified repair. The unrelated primary checkout and original planning worktree remain preserved.
+
+## Subsequent merge — 2026-10-14
+
+The repair-stage statements above remain historical. PR #105 subsequently merged into refreshed `main` (`7a9b22b`) as `483f6e3c33226aa80f404f7fdcc27dbc2969cc51`, preserving all six PR commits and closing #96 automatically. There were no conflicts or further history rewrites; merge tree `08ceeba4ac358e66305f812d003c0bddb6048d14` exactly matches head `bf8bf74`.
+
+Fresh merge checks passed: 508 unit tests, 77 content checks, both typechecks, root/prefix builds and 36 root plus 36 prefixed biome/art/history cases (12 real BFCache cases per path). No failures, skips, flakes or retries. Desktop/landscape recovery and portrait continuation screenshots were inspected. Both OpenSpec changes validate strictly, and document links/whitespace pass. The pre-existing build/color warnings remain. The prior full 348-case root suite and 36-case prefix report were independently checked against raw results and all ten input Git objects, not rerun as full suites. [Merge validation](pr-105/merge-validation.json) records the exact inputs and results.
+
+The [next-session handoff](../ongoing-projects/plan.md) recommends existing #106 without starting it. #74 receives this merged automated lifecycle evidence but remains subject to its physical-device and #57 gates. No tag, manual deployment, production acceptance, unrelated issue closure or OpenSpec archive was performed.

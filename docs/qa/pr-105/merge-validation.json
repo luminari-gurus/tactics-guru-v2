@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-14",
+  "timezone": "Asia/Jerusalem",
+  "base": "7a9b22b73f5187fff5a27701a2879e94368a148a",
+  "head": "bf8bf741897fea98a41c1e7e81d1835afb0dcdcf",
+  "tree": "08ceeba4ac358e66305f812d003c0bddb6048d14",
+  "gitInputObjects": {
+    "src": "e82de445017b502fbdd9ab61719314df00e10479",
+    "tests": "0b2d8580bf794c7d33fb92a3652e03759430eba2",
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "package.json": "98e64fd8855e3530d791b97ec1934cc8c8310ce8",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+    "playwright.config.ts": "46fc780b74fed4d634216e45b3eb30a2c86cb614",
+    "vite.config.ts": "59a5900815bc4a3cabc5accd93dbce3ae76914ca",
+    "tsconfig.json": "2933c83050bfa4a7a21494e6d9f7b21a6622be53",
+    "tsconfig.domain.json": "231561e38f4baf69afd169d885edd1f6e31fa62a",
+    "vitest.config.ts": "b96a6e80f73900884b38327b3479d495f3864935"
+  },
+  "retainedEvidence": {
+    "source": "docs/qa/pr-105/validation.json",
+    "rawReportsLocation": "C:/Users/apexw/.codex/worktrees/repair-pr-105/Tactics-Guru/tmp/review-105",
+    "root": {
+      "stats": {
+        "startTime": "2026-10-14T08:48:23.983Z",
+        "duration": 1141570.971,
+        "expected": 348,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "total": 348,
+      "attempts": 348,
+      "byProfile": {
+        "desktop": 116,
+        "mobile-portrait": 116,
+        "mobile-landscape": 116
+      },
+      "errors": []
+    },
+    "prefix": {
+      "stats": {
+        "startTime": "2026-10-14T09:07:33.602Z",
+        "duration": 59799.034999999996,
+        "expected": 36,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "total": 36,
+      "attempts": 36,
+      "byProfile": {
+        "desktop": 12,
+        "mobile-portrait": 12,
+        "mobile-landscape": 12
+      },
+      "errors": []
+    }
+  },
+  "limits": [
+    "Fresh browser runs are 72 focused cases, not a full-suite rerun.",
+    "348/348 retained full root cases and 36/36 retained prefix cases were independently checked against raw reports and all 10 source/test/asset/config Git objects.",
+    "No physical-device certification, production-host acceptance, release tag or manual deployment.",
+    "Raw fresh reports and screenshots remain in the merge checkout under ignored tmp/merge-105/."
+  ],
+  "buildCommit": "7a9b22b73f5187fff5a27701a2879e94368a148a",
+  "buildDirty": true,
+  "buildDirtyScope": "Staged merge tree exactly equals PR head; no implementation modifications.",
+  "node": "v24.19.0",
+  "browser": "Microsoft Edge 155.0.4283.45",
+  "workers": 1,
+  "retries": 0,
+  "fresh": {
+    "unit": {
+      "passed": 508,
+      "failed": 0,
+      "pending": 0
+    },
+    "content": {
+      "passed": 77
+    },
+    "typecheck": "Both configurations passed",
+    "rootBuild": "passed",
+    "prefixBuild": "passed",
+    "rootBrowser": {
+      "stats": {
+        "startTime": "2026-10-14T09:31:08.931Z",
+        "duration": 59493.835,
+        "expected": 36,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "total": 36,
+      "attempts": 36,
+      "byProfile": {
+        "desktop": 12,
+        "mobile-portrait": 12,
+        "mobile-landscape": 12
+      },
+      "errors": []
+    },
+    "prefixBrowser": {
+      "stats": {
+        "startTime": "2026-10-14T09:32:09.09Z",
+        "duration": 59496.441000000006,
+        "expected": 36,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "total": 36,
+      "attempts": 36,
+      "byProfile": {
+        "desktop": 12,
+        "mobile-portrait": 12,
+        "mobile-landscape": 12
+      },
+      "errors": []
+    },
+    "openSpec": [
+      "issue-96-map-acceptance: strict passed",
+      "pr-105-bfcache-recovery: strict passed"
+    ],
+    "rawReportSHA256": {
+      "unit.json": "5aaebe9b43df0f899fb8c289c32b1888152b85c1fcdc4bd36927e302ab7be67e",
+      "root-browser.json": "4e41f8321108241e79b91ce0ef047bf4cc206c733db8c4427de79b66d2c5c7e3",
+      "prefix-browser.json": "cac83e2125fb61de5f4ac9850f32b76c1a1b2e5f4bd204e5ed7ffe6b896ea733"
+    },
+    "relativeDocumentLinks": {
+      "files": 3,
+      "links": 34,
+      "broken": 0
+    },
+    "whitespace": "git diff --check and git diff --cached --check passed"
+  },
+  "browserSelection": "tests/battle-persistence.spec.ts tests/overworld-map.spec.ts --grep \"browser history|biome|art \" --retries=0; 12 actual BFCache cases and 24 biome/art cases per base path.",
+  "visualInspection": [
+    "Fresh desktop and landscape recovery screenshots: visible readable controls and focus",
+    "Fresh portrait continued battle screenshot: controls and playfield rendered"
+  ],
+  "warnings": [
+    "Existing Vite large-chunk warning",
+    "Existing NO_COLOR/FORCE_COLOR environment warning"
+  ],
+  "mergeCommit": "483f6e3c33226aa80f404f7fdcc27dbc2969cc51"
+}
