@@ -1,23 +1,23 @@
 # Tasks
 
-Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10d18271b2e410e3c2532e27231cd3a8d6. Implementation approval pending: record explicit approval before starting these tasks.
+Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10d18271b2e410e3c2532e27231cd3a8d6. Implementation explicitly approved by the caller in the task conversation on 2026-10-15.
 
 ## 1. Carried-party battle construction and replay
 
-- [ ] 1.1 Add pure canonical run battle construction using validated authored encounter mapping, derived seed, surviving HP and once-projected equipment; verify all survivor subsets, fresh battle-local fields, immutable base catalog and invalid entry rejection in focused unit tests.
-- [ ] 1.2 Add fresh run-boundary BattleSession creation and strict run-specific accepted-command replay without relaxing replayBattle; verify event/state equality, tampered HP/roster/equipment/initiative rejection, restored continuation next-command/RNG equality and existing single-battle replay tests. Document APIs and invariants in docs/run-contract.md.
+- [x] 1.1 Add pure canonical run battle construction using validated authored encounter mapping, derived seed, surviving HP and once-projected equipment; verify all survivor subsets, fresh battle-local fields, immutable base catalog and invalid entry rejection in focused unit tests.
+- [x] 1.2 Add fresh run-boundary BattleSession creation and strict run-specific accepted-command replay without relaxing replayBattle; verify event/state equality, tampered HP/roster/equipment/initiative rejection, restored continuation next-command/RNG equality and existing single-battle replay tests. Document APIs and invariants in docs/run-contract.md.
 
 ## 2. Authoritative run lifecycle and persistence
 
-- [ ] 2.1 Extend RunItemSession to own encounter start, current BattleSession accepted state and validated atomic outcome/offer commits; verify first/second reward, third victory, party wipe, current-session authority, duplicate/stale callback rejection and unchanged failed transitions with controller tests. Update #79 handoff documentation.
-- [ ] 2.2 Add fresh identity/seed/full-party/empty-ownership reset and hydrate/startup behavior using the existing run codec/storage; verify every accepted player/enemy and run/item boundary saves, ended active snapshots reconcile once, and restored next command/RNG matches uninterrupted execution.
-- [ ] 2.3 Integrate reviewed Continue/export/retry/removal and safe replacement without silently overwriting bad data; test corrupt/incompatible/oversized/quota/unavailable and changed bytes, backup recovery, partial multi-slot reset retaining live state/seed and exportable original bytes, and the supported maximum payload bound. Document recovery and best-effort limits.
+- [x] 2.1 Extend RunItemSession to own encounter start, current BattleSession accepted state and validated atomic outcome/offer commits; verify first/second reward, third victory, party wipe, current-session authority, duplicate/stale callback rejection and unchanged failed transitions with controller tests. Update #79 handoff documentation.
+- [x] 2.2 Add fresh identity/seed/full-party/empty-ownership reset and hydrate/startup behavior using the existing run codec/storage; verify every accepted player/enemy and run/item boundary saves, ended active snapshots reconcile once, and restored next command/RNG matches uninterrupted execution.
+- [x] 2.3 Integrate reviewed Continue/export/retry/removal and safe replacement without silently overwriting bad data; test corrupt/incompatible/oversized/quota/unavailable and changed bytes, backup recovery, partial multi-slot reset retaining live state/seed and exportable original bytes, and the supported maximum payload bound. Document recovery and best-effort limits.
 
 ## 3. Live route, battle host and run controls
 
-- [ ] 3.1 Add discoverable /run bootstrap and return-to-single-battle navigation, explicit Start/Continue/preparation/Start encounter, existing reward/item controls and final victory/defeat Start new run; verify production-route smoke, independent save namespaces, narrow/portrait/landscape layout, native touch/keyboard/focus and modal input capture. Document routes and user flow.
+- [x] 3.1 Add discoverable /run bootstrap and return-to-single-battle navigation, explicit Start/Continue/preparation/Start encounter, existing reward/item controls and final victory/defeat Start new run; verify production-route smoke, independent save namespaces, narrow/portrait/landscape layout, native touch/keyboard/focus and modal input capture. Document routes and user flow.
 - [ ] 3.2 Introduce the narrow BattleScene/start host seam reusing existing board/HUD/presentation/audio and default single-battle persistence; verify correct authored map/party/catalog per encounter, final presentation before screen switch, sound preference across in-page transitions, no historical cues on Continue and single-battle regressions.
-- [ ] 3.3 Dispose scenes/controllers/UI bindings and guard generations during encounter change, restart, pagehide and BFCache return; verify obsolete callbacks cannot change replacement saves, one canvas/modal/input owner remains, and repeated transitions/resize preserve command locks and gesture capture.
+- [x] 3.3 Dispose scenes/controllers/UI bindings and guard generations during encounter change, restart, pagehide and BFCache return; verify obsolete callbacks cannot change replacement saves, one canvas/modal/input owner remains, and repeated transitions/resize preserve command locks and gesture capture.
 
 ## 4. Integrated legal run evidence
 

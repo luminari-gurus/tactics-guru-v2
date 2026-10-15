@@ -4,7 +4,7 @@
 
 [Issue #80](https://github.com/luminari-gurus/tactics-guru-v2/issues/80) connects the merged run, encounters, ownership and reward controls into a playable three-battle run. The owner accepted baseline #57 on 2026-10-15 using the recorded Playwright evidence, so its prerequisite no longer blocks this integration.
 
-Caller: `dubstylee`. Branch: `work/issue-80-run-progression`. Base: `origin/main` at `46284e10d18271b2e410e3c2532e27231cd3a8d6`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-80-run-progression`. Base: `origin/main` at `46284e10d18271b2e410e3c2532e27231cd3a8d6`. Implementation approved by the caller in the task conversation on 2026-10-15.
 
 ## What Changes
 

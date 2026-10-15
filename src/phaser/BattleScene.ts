@@ -14,20 +14,32 @@ import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
 import { BattleAudio } from './BattleAudio';
 
+export interface RunBattleHost {
+  catalog: ContentCatalog; session: BattleSession; dialogs: BattleDialogs;
+  sound: { enabled: boolean }; modalTransition: () => void;
+  ended: () => void; restart: () => void;
+}
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
 export class BattleScene extends Phaser.Scene {
   private persistence: BattlePersistence | null = null;
   private restartAction: (()=>void) | null = null;
   private soundEnabled = false;
-  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void) {super('battle');}
+  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void, private readonly host?: RunBattleHost) {super('battle'); this.soundEnabled=host?.sound.enabled??false;}
   requestRestart(){this.restartAction?.();}
   create():void {
     this.status('loading');measurements.begin(performance.now());
     let catalog:ContentCatalog;
-    try{catalog=contentLoadPlan(battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
+    try{catalog=contentLoadPlan(this.host?.catalog??battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
     loadContentAssets(this,catalog,()=>{try{this.prepareBattle(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
   }
   private prepareBattle(catalog:ContentCatalog):void {
+    if(this.host) {
+      const host=this.host;
+      this.restartAction=()=>{if(!host.dialogs.open)host.restart();};
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.restartAction=null;host.modalTransition=()=>{};});
+      this.begin(catalog,host.session,host.dialogs,fn=>{host.modalTransition=fn;});
+      return;
+    }
     this.persistence??=new BattlePersistence(catalog,FIRST_BATTLE_MAP_ID);
     let modalTransition=()=>{};
     const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
@@ -55,7 +67,7 @@ export class BattleScene extends Phaser.Scene {
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
-      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
+      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
     };
     const describe=(command: import('../domain/types').Command)=>{
       const text=previewText(session.prepare(command));
@@ -99,7 +111,7 @@ export class BattleScene extends Phaser.Scene {
       action:a=>{session.cancel();action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
       target:select,review,cancel:()=>{clear();refresh();},
       wait:()=>{if(session.phase==='player' && !dialogs.open){session.prepare({type:'endTurn',unitId:session.active.id});void present(session.confirm());}},
-      sound:()=>{this.soundEnabled=!this.soundEnabled;audio.setEnabled(this.soundEnabled);},
+      sound:()=>{this.soundEnabled=!this.soundEnabled;if(this.host)this.host.sound.enabled=this.soundEnabled;audio.setEnabled(this.soundEnabled);},
       retrySound:()=>audio.unlock(),
     });
     const audio=new BattleAudio(this,catalog,this.soundEnabled,snapshot=>hud.renderSound(snapshot));

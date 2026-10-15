@@ -12,6 +12,8 @@ let restart: (() => void) | undefined;
 const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
 const battle = !contentSmoke && new URLSearchParams(location.search).get('scene') !== 'proof';
 if (battle) {
+  const runLink=document.createElement('a');runLink.href=`${import.meta.env.BASE_URL}run`;runLink.textContent='Play three-encounter run';runLink.className='run-entry-link';
+  document.querySelector('#fit-panel')!.append(runLink);
   document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(element => { element.hidden = true; });
   document.querySelector<HTMLElement>('#battle-controls')!.hidden = false;
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
