@@ -1,0 +1,43 @@
+
+[WebServer] (node:42172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 1 worker
+
+(node:36224) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/18] [desktop] › tests\authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking
+[2/18] [desktop] › tests\authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking
+[3/18] [desktop] › tests\authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking
+[4/18] [desktop] › tests\authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction
+[5/18] [desktop] › tests\authored-encounters.spec.ts:65:43 › required asset missing produces controlled error
+[6/18] [desktop] › tests\authored-encounters.spec.ts:65:43 › required asset decode produces controlled error
+
+[WebServer] 6:44:04 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+(node:42676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[7/18] [mobile-portrait] › tests\authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking
+[8/18] [mobile-portrait] › tests\authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking
+[9/18] [mobile-portrait] › tests\authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking
+[10/18] [mobile-portrait] › tests\authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction
+[11/18] [mobile-portrait] › tests\authored-encounters.spec.ts:65:43 › required asset missing produces controlled error
+[12/18] [mobile-portrait] › tests\authored-encounters.spec.ts:65:43 › required asset decode produces controlled error
+
+[WebServer] 6:44:13 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+
+(node:23172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[13/18] [mobile-landscape] › tests\authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking
+[14/18] [mobile-landscape] › tests\authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking
+[15/18] [mobile-landscape] › tests\authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking
+[16/18] [mobile-landscape] › tests\authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction
+[17/18] [mobile-landscape] › tests\authored-encounters.spec.ts:65:43 › required asset missing produces controlled error
+[18/18] [mobile-landscape] › tests\authored-encounters.spec.ts:65:43 › required asset decode produces controlled error
+
+[WebServer] 6:44:22 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  18 passed (26.1s)

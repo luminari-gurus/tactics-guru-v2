@@ -34,6 +34,7 @@ test('startup is read-only, keyboard Continue rebuilds no historical presentatio
   for(let i=0;i<9;i++){await page.keyboard.press('Tab');expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);}
   await page.screenshot({path:test.info().outputPath('continue.png')});
   await page.locator('#save-continue').focus();await page.keyboard.press('Enter');await ready(page);
+  await expect(page.locator('#fit-restart')).toBeFocused();
   const after=await readSession(page);expect(after.state).toEqual(before.state);expect(after.replay).toBeNull();expect(after.events).toEqual([]);
   expect(after.continuation).toEqual({snapshot:before.state,commands:[],events:[]});
   expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({lastToken:0,started:0});
@@ -50,6 +51,31 @@ test('startup is read-only, keyboard Continue rebuilds no historical presentatio
   await page.screenshot({path:test.info().outputPath('recovery.png')});
   await touch(page,'#save-close');await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('#battle-recovery')).toBeFocused();expect((await readSession(page)).state).toEqual(before.state);
+});
+
+test('held confirmation Enter cannot flow through Restart and replace either saved slot',async({page})=>{
+  await page.goto('/');await ready(page);
+  const before=await readSession(page),old=await stored(page);
+  await chooseMove(page);await page.locator('#dialog-confirm').focus();
+  await page.keyboard.down('Enter');
+  const accepted=await stored(page);
+  expect(accepted.primary).not.toBe(old.primary);expect(accepted.backup).toBe(old.primary);
+  expect((await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+  await page.waitForTimeout(600);await page.keyboard.down('Enter');
+  await page.waitForTimeout(50);await page.keyboard.down('Enter');await page.keyboard.up('Enter');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect((await readSession(page)).state.seed).toBe(before.state.seed);
+  expect(await stored(page)).toEqual(accepted);
+  // A fresh press may open reset, but holding that press must not also confirm it.
+  await page.locator('#fit-restart').focus();await page.keyboard.down('Enter');
+  await expect(page.locator('#save-confirm-reset')).toBeFocused();
+  await page.keyboard.down('Enter');await page.keyboard.down('Enter');await page.keyboard.up('Enter');
+  await expect(page.locator('#save-confirm-reset')).toBeVisible();expect(await stored(page)).toEqual(accepted);
+  // Space retains its native keyup activation after repeated keydowns.
+  await page.keyboard.down('Space');await page.keyboard.down('Space');
+  expect(await stored(page)).toEqual(accepted);await page.keyboard.up('Space');await ready(page);
+  expect((await readSession(page)).state.seed).toBe(before.state.seed+1);
+  for(const text of Object.values(await stored(page)))expect(text).not.toBe(accepted.primary);
 });
 
 for(const side of ['player','enemy'] as const)test(`reload during legal ${side} presentation matches an uninterrupted browser`,async({page,browser})=>{
@@ -172,7 +198,10 @@ for(const invalid of ['{broken',JSON.stringify({kind:'tactics-guru:battle-snapsh
   await page.goto('/?scene=proof');await page.evaluate(({keys,invalid})=>localStorage.setItem(keys.primary,invalid),{keys,invalid});
   await page.goto('/');await expect(page.getByRole('dialog')).toContainText('needs recovery');await expect(page.locator('#save-continue')).toHaveCount(0);
   if(invalid.includes('"format":99'))await expect(page.getByRole('dialog')).toContainText('incompatible');
-  expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-cancel-reset').click();
+  expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();
+  await expect(page.locator('#save-confirm-reset')).toBeFocused();
+  await page.locator('#save-cancel-reset').click();
+  await expect(page.locator('#save-new')).toBeFocused();
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
   expect((await readSession(page)).state.seed).toBe(1);expect((await stored(page)).primary).not.toBe(invalid);
 });

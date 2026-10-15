@@ -1,0 +1,46 @@
+
+[WebServer] (node:4092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+
+(node:41744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/15] [desktop] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[2/15] [desktop] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+
+(node:39148) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[3/15] [desktop] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[4/15] [desktop] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[5/15] [desktop] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+
+(node:28632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[6/15] [mobile-portrait] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[7/15] [mobile-portrait] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+
+(node:1792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[8/15] [mobile-portrait] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[9/15] [mobile-portrait] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[10/15] [mobile-portrait] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+(node:24760) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[11/15] [mobile-landscape] › tests\battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture
+[12/15] [mobile-landscape] › tests\battle-loop.spec.ts:89:1 › keyboard selection, confirmation lock, touch and restart discard old gestures and previews
+(node:37780) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[13/15] [mobile-landscape] › tests\battle-persistence.spec.ts:152:1 › changed saved data refuses an old confirmation and requires fresh review
+[14/15] [mobile-landscape] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {broken
+[15/15] [mobile-landscape] › tests\battle-persistence.spec.ts:171:141 › invalid startup requires explicit reset: {"kind":"tac
+  15 passed (37.0s)

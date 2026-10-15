@@ -17,6 +17,15 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   const after = JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   const initial = JSON.parse(before!);
   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
+  await expect(page.locator('#fit-restart')).toBeFocused();
+  // The Cancel button has the same callback as Escape; neither may leave focus
+  // on the Review button that cancellation just disabled.
+  await page.locator('#battle-target').selectOption({index:1});
+  await page.getByRole('button',{name:'Review action'}).click();
+  await page.locator('#dialog-cancel').click();
+  await expect(page.locator('#fit-restart')).toBeFocused();
+  const cancelled=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(cancelled.state).toEqual(initial.state);expect(cancelled.replay).toEqual(initial.replay);
 });
 
 import { playerDecision, session, readSession, playCommand } from './helpers/battlePolicy';
@@ -100,6 +109,7 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   await page.locator('#dialog-confirm').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   await expect(page.getByRole('button',{name:'Basic attack',exact:true})).toBeDisabled();
+  await expect(page.locator('#fit-restart')).toBeFocused();
   expect((await session(page)).replay.commands).toHaveLength(initial.replay.commands.length+1);
   await expect(page.getByRole('button',{name:'Restart battle',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Restart battle',exact:true}).click({force:true});await confirmRestart(page,true);
