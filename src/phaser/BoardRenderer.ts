@@ -3,7 +3,7 @@ import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type Bounds, type Point, type Tile } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 
@@ -25,7 +25,7 @@ export class BoardRenderer {
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private view: View = { x: 0, y: 0, scale: 1 };
   private viewport = { width: 1, height: 1 };
-  private panelBottom = 0;
+  private region: BoardRegion = { x: 0, y: 0, width: 1, height: 1 };
   private fitScale = 1;
   private snapshot: BattleState | undefined;
   private reachable: readonly CellPosition[] = [];
@@ -285,16 +285,16 @@ export class BoardRenderer {
     return {done,cancel:finish};
   }
 
-  fit(width: number, height: number, panelBottom: number): void {
+  fit(width: number, height: number, region: BoardRegion): void {
     // Responsive panel layout can precede Phaser's fullscreen resize event.
     // Do not mix its new DOM geometry with stale viewport dimensions: the
     // following scale resize fits the settled viewport with the original zoom.
     if (width !== window.innerWidth || height !== window.innerHeight) return;
-    const layout = fitBoard(this.bounds, { width, height }, panelBottom);
+    const layout = fitBoard(this.bounds, region);
     const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
     const zoom = this.view.scale / this.fitScale;
     this.viewport = { width, height };
-    this.panelBottom = panelBottom;
+    this.region = region;
     this.fitScale = layout.scale;
     // Panel text/layout changes are not navigation: retain the camera, clamping
     // only where the new available area or zoom limits require it. Real viewport
@@ -304,11 +304,11 @@ export class BoardRenderer {
 
   /** A fresh battle is centered after its initial automatic turns settle the HUD. */
   resetView(): void {
-    this.applyView(fitBoard(this.bounds, this.viewport, this.panelBottom));
+    this.applyView(fitBoard(this.bounds, this.region));
   }
 
   private applyView(view: View): void {
-    this.view = constrainView(view, this.bounds, this.viewport, this.panelBottom, this.fitScale);
+    this.view = constrainView(view, this.bounds, this.region, this.fitScale);
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
     this.publish();

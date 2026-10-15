@@ -116,7 +116,7 @@ export class BattleScene extends Phaser.Scene {
     const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();}else pump();};
     document.addEventListener('visibilitychange',visibility);
     const panel=document.querySelector<HTMLElement>('#fit-panel')!;
-    const fit=()=>board.fit(this.scale.width,this.scale.height,panel.getBoundingClientRect().bottom);
+    const fit=()=>{const y=panel.getBoundingClientRect().bottom;board.fit(this.scale.width,this.scale.height,{x:0,y,width:this.scale.width,height:this.scale.height-y});};
     const observer=new ResizeObserver(fit);observer.observe(panel);this.scale.on(Phaser.Scale.Events.RESIZE,fit);
     refresh();fit();
     const onReady=()=>{if(!live)return;measurements.sceneReady(performance.now());ready=true;this.status('ready');refresh();if(session.phase==='player'){initialFit=false;fit();board.resetView();measurements.controlsUsable(performance.now());}pump();};

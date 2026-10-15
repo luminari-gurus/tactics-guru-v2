@@ -42,7 +42,8 @@ export class ContentSmokeScene extends Phaser.Scene {
       return { tile, image, key };
     });
     const fit = () => {
-      const layout = fitBoard(boardBounds(tiles), this.scale, document.querySelector('#fit-panel')!.getBoundingClientRect().bottom);
+      const y = document.querySelector('#fit-panel')!.getBoundingClientRect().bottom;
+      const layout = fitBoard(boardBounds(tiles), { x: 0, y, width: this.scale.width, height: this.scale.height - y });
       root.setPosition(layout.x, layout.y).setScale(layout.scale);
       const half = TERRAIN_TEXTURE_SPEC.runtimeWidth / 2;
       const corners = [{ x: -half, y: -half }, { x: half, y: -half }, { x: half, y: half }, { x: -half, y: half }];

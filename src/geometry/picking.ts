@@ -1,4 +1,4 @@
-import { orderTiles, tileFaces, type Tile, type Point, type Bounds } from './iso';
+import { orderTiles, tileFaces, type Tile, type Point, type Bounds, type BoardRegion } from './iso';
 export interface View { x: number; y: number; scale: number; }
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 4;
@@ -17,11 +17,12 @@ function contains(vertices: readonly Point[], point: Point): boolean {
 export function pickTile(tiles: readonly Tile[], point: Point): Tile | null {
   return orderTiles(tiles).reverse().find(tile => Object.values(tileFaces(tile)).some(face => contains(face, point))) ?? null;
 }
-export function constrainView(view: View, bounds: Bounds, viewport: {width:number;height:number}, panelBottom: number, fitScale: number): View {
+/** Keep every board edge reachable at the center of the same region used to fit. */
+export function constrainView(view: View, bounds: Bounds, region: BoardRegion, fitScale: number): View {
   const scale = Math.max(fitScale * MIN_ZOOM, Math.min(fitScale * MAX_ZOOM, view.scale));
   const clampAxis = (value:number, low:number, high:number):number => low > high ? (low + high) / 2 : Math.max(low, Math.min(high, value));
   return { scale,
-    x: clampAxis(view.x, viewport.width / 2 - bounds.right * scale, viewport.width / 2 - bounds.left * scale),
-    y: clampAxis(view.y, panelBottom + (viewport.height-panelBottom)/2 - bounds.bottom*scale, panelBottom + (viewport.height-panelBottom)/2 - bounds.top*scale),
+    x: clampAxis(view.x, region.x + region.width / 2 - bounds.right * scale, region.x + region.width / 2 - bounds.left * scale),
+    y: clampAxis(view.y, region.y + region.height / 2 - bounds.bottom * scale, region.y + region.height / 2 - bounds.top * scale),
   };
 }

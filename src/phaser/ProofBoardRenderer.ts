@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { BOARD_FIXTURE, BOARD_TERRAINS } from '../diagnostics/boardFixture';
 import { PROOF_IMAGES, PROOF_ART, PROOF_FIXTURES, proofDepth, type ProofFixture } from '../diagnostics/proofAssets';
 import { setProofDiagnostics, setBoardDiagnostics, type BoardDiagnostics } from '../diagnostics/browser';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, type Point, type BoardRegion, type Bounds, type Tile, TILE_WIDTH, TILE_HEIGHT } from '../geometry/iso';
 
 import { constrainView, pickTile, screenToBoard, MAX_ZOOM, type View } from '../geometry/picking';
 
@@ -19,8 +19,7 @@ export class ProofBoardRenderer {
   private readonly bounds: Bounds;
   private occludingTreeAlpha = DEFAULT_OCCLUDING_TREE_ALPHA;
   private view: View = { x: 0, y: 0, scale: 1 };
-  private viewport = { width: 1, height: 1 };
-  private panelBottom = 0;
+  private region: BoardRegion = { x: 0, y: 0, width: 1, height: 1 };
   private fitScale = 1;
   private selected: Tile | null = null;
   private readonly selection: Phaser.GameObjects.Graphics;
@@ -139,10 +138,9 @@ export class ProofBoardRenderer {
       objectCount: this.root.length + 1 + this.surfaceMasks.length + this.surfaces.length });
   }
 
-  fit(width: number, height: number, panelBottom: number): BoardDiagnostics {
-    const layout = fitBoard(this.bounds, { width, height }, panelBottom);
-    this.viewport = { width, height };
-    this.panelBottom = panelBottom;
+  fit(region: BoardRegion): BoardDiagnostics {
+    const layout = fitBoard(this.bounds, region);
+    this.region = region;
     const zoom = this.view.scale / this.fitScale;
     this.fitScale = layout.scale;
     this.applyView({ ...layout, scale: layout.scale * zoom });
@@ -159,7 +157,7 @@ export class ProofBoardRenderer {
   }
 
   private applyView(view: View): void {
-    this.view = constrainView(view, this.bounds, this.viewport, this.panelBottom, this.fitScale);
+    this.view = constrainView(view, this.bounds, this.region, this.fitScale);
     const { x, y, scale } = this.view;
     this.root.setPosition(x, y).setScale(scale);
     for (const mask of this.surfaceMasks) mask.setPosition(x, y).setScale(scale);

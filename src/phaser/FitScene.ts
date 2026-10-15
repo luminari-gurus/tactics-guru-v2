@@ -159,7 +159,8 @@ export class FitScene extends Phaser.Scene {
     portrait.hidden = false;
     const panel = document.querySelector<HTMLElement>('#fit-panel')!;
     const layoutBoard = (): void => {
-      setBoardDiagnostics(board.fit(this.scale.width, this.scale.height, panel.getBoundingClientRect().bottom));
+      const y = panel.getBoundingClientRect().bottom;
+      setBoardDiagnostics(board.fit({ x: 0, y, width: this.scale.width, height: this.scale.height - y }));
     };
     const panelObserver = new ResizeObserver(layoutBoard);
     panelObserver.observe(panel);

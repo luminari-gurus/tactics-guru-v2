@@ -17,6 +17,14 @@ describe('visible solid picking', () => {
     expect(screenToBoard({x: 140,y: 280}, {x: 100,y: 200,scale: 2})).toEqual({x:20,y:40});
   });
   it('bounds scale and keeps board inside reachable viewport', () => {
-    expect(constrainView({x:9999,y:-9999,scale:99}, {left:-40,right:40,top:-20,bottom:20}, {width:400,height:600}, 100, 1)).toEqual({x:360,y:270,scale:4});
+    expect(constrainView({x:9999,y:-9999,scale:99}, {left:-40,right:40,top:-20,bottom:20}, {x:0,y:100,width:400,height:500}, 1)).toEqual({x:360,y:270,scale:4});
+  });
+  it('clamps pan and relative zoom around the drawable center, independent of viewport edges', () => {
+    const bounds={left:-40,right:40,top:-20,bottom:20};
+    const region={x:24,y:80,width:240,height:200};
+    expect(constrainView({x:9999,y:-9999,scale:99},bounds,region,0.5)).toEqual({x:224,y:140,scale:2});
+    expect(constrainView({x:-9999,y:9999,scale:0},bounds,region,0.5)).toEqual({x:124,y:190,scale:0.5});
+    const view={x:150,y:180,scale:1};
+    expect(constrainView(view,bounds,region,0.5)).toEqual(view);
   });
 });

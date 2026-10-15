@@ -90,7 +90,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
     top:(initial.bounds.top-initial.transform.y)/initial.transform.scale,
     bottom:(initial.bounds.bottom-initial.transform.y)/initial.transform.scale,
   };
-  const expectedFit=fitBoard(localBounds,restarted.viewport,panelBottom);
+  const expectedFit=fitBoard(localBounds,{x:0,y:panelBottom,width:restarted.viewport.width,height:restarted.viewport.height-panelBottom});
   expect(restarted.transform.scale).toBeCloseTo(expectedFit.scale,5);
   expect(restarted.transform.x).toBeCloseTo(expectedFit.x,5);
   expect(restarted.transform.y).toBeCloseTo(expectedFit.y,5);
@@ -128,7 +128,7 @@ test('authored camera keeps zoom bounds and refits on real orientation changes',
       top: (fitted.bounds.top - fitted.transform.y) / fitted.transform.scale,
       bottom: (fitted.bounds.bottom - fitted.transform.y) / fitted.transform.scale,
     };
-    const nextFit = fitBoard(localBounds, nextViewport, panelBottom);
+    const nextFit = fitBoard(localBounds, {x:0,y:panelBottom,width:nextViewport.width,height:nextViewport.height-panelBottom});
     expect((await settledReport(page)).transform.scale).toBeCloseTo(nextFit.scale * MAX_ZOOM, 5);
     await page.mouse.move(nextViewport.width - 5, nextViewport.height - 5);
     for (let wheel = 0; wheel < 8; wheel++) {
