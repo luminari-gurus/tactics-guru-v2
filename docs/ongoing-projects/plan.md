@@ -1,6 +1,6 @@
 # Issue #111 — responsive battle controls implementation plan
 
-Status: **planning complete; implementation approval pending**. This work prepares the plan and branch only.
+Status: **implementation in progress**, authorized by the owner on 2026-10-15. OpenSpec: 1/10 tasks verified.
 
 - Issue: [#111 — Implement the reviewed responsive battle-control rail and portrait dock](https://github.com/luminari-gurus/tactics-guru-v2/issues/111).
 - Assignee: `moshehbenavraham`. [Acceptance and kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/111#issuecomment-6196912979).
@@ -13,7 +13,7 @@ Status: **planning complete; implementation approval pending**. This work prepar
 
 The [full backlog disposition](issue-111-responsive-battle-controls/backlog-review.md) covers all 13 open repository issues, comments/native relationships, one open PR and 58 branches before publication. #80 has direct downstream value but belongs to `dubstylee`; hardware tasks exceed our device capability; release items retain owner-decision gates. Private project-only drafts could not be enumerated without `read:project`.
 
-The owner explicitly answered **“Accept the design and plan #111”** on 2026-10-15. This accepts the [merged rail/dock design](issue-108-battle-controls-design/design.md), clears #111's design prerequisite and authorizes this claim/plan/publication. It does not approve execution of this implementation plan. #112 and #113 are merged, #108 is completed, and #111 had no assignee or active branch/PR before the claim. Its `enhancement` label is preserved and `ready for work` added.
+The owner explicitly answered **“Accept the design and plan #111”** on 2026-10-15. This accepts the [merged rail/dock design](issue-108-battle-controls-design/design.md), clears #111's design prerequisite and authorizes this claim/plan/publication. The subsequent goal request explicitly authorizes execution, autonomous repairs, tests and publication in focused PR chunks. #112 and #113 are merged, #108 is completed, and #111 had no assignee or active branch/PR before the claim. Its `enhancement` label is preserved and `ready for work` added.
 
 Physical capability: **Android**, read from the caller checkout's `CAN_TEST_MOBILE` only. Required physical platforms: **none for #111**. Browser emulation and synthetic safe areas are valid for this issue's responsive checks, not physical-device certification. #57/#58/#64/#66/#74 keep their own acceptance; the narrow #57 owner disposition for #80 is not a blanket waiver.
 
@@ -69,10 +69,20 @@ The principal risks are mismatched DOM/canvas coordinates during resize, panel u
 
 The base `battle-controls` spec has not yet absorbed the already merged #113 change. This plan preserves those runtime requirements and tests; do not archive or modify that other change as part of this planning publication.
 
-## Planning validation and handoff
+## Implementation handoff
+
+Active checkout: `C:/Users/apexw/.codex/worktrees/issue-111-responsive-controls/Tactics-Guru`, local branch `branch/issue-111-geometry`, based on planning head `9fea4faf`. The original planning checkout belongs to another chat and remains untouched. Current main is still `4e601480`; #80 remains assigned to `dubstylee`; no matching implementation PR existed at kickoff.
+
+Publication sequence: (1) shared geometry and all callers, published to the requested `work/issue-111-responsive-battle-controls` branch with a PR to main; (2) live rail/dock, state and input integration in a dependent branch/PR; (3) any distinct acceptance repairs as evidence requires. No tag or merge is warranted for review-ready feature chunks.
+
+Ablation: retain the finite caller migration and existing tests. No extra geometry compatibility API, overlay registry, framework or duplicated modal/state ownership is needed. Outcome, non-goals, files and proof remain as mapped above. Task 1.1 is complete at source commit `3a645ca0a412ab3e2de73fbb1ce4a821094ad1d3`: 651 unit, 167 content, both typechecks/build, 12 focused browser and 18 encounter cases passed. [QA record](../qa/issue-111-battle-controls.md) retains commands and limits. Next: tasks 1.2 and 2.1, measured battle shell and rail/dock integration; other tasks remain open.
+
+Tooling: bundled Node is on PATH; npm is absent. A temporary npm 11.6.2 CLI under ignored `tmp/npm` and `tmp/bin/npm.cmd` supports lockfile-preserving installation and the configured lifecycle scripts. Add `$PWD/tmp/bin` to PATH for each shell call. OpenSpec uses the entrypoint above. Use installed Edge through `PLAYWRIGHT_CHROMIUM_EXECUTABLE`.
+
+## Retained planning validation
 
 This publication contains task-specific documentation and OpenSpec planning only. The checklist has ten unchecked implementation tasks. Planning verification covers strict OpenSpec validation, local document links, all seven acceptance mappings, whitespace and scoped diff review, assignment/comment readback, native issue/branch linkage and exact local/remote commit parity. Runtime suites and device checks are reserved for the approved implementation; no new runtime pass is claimed here.
 
 Precommit validation passed: strict OpenSpec, 57 local document links, all seven acceptance mappings, ten unstarted tasks, whitespace and an eight-file planning-only scope check. Assignment, readiness label, kickoff comment and native Development branch linkage were read back successfully. The kickoff comment will retain the final commit and publication verification after push.
 
-Worktree: `C:/Users/apexw/.codex/worktrees/issue-111-controls-plan/Tactics-Guru`. The original checkout is preserved. Continue on this branch after explicit approval of this concrete plan; refresh main and issue state first. Stop after plan publication for this request.
+Worktree: `C:/Users/apexw/.codex/worktrees/issue-111-controls-plan/Tactics-Guru`. The original checkout is preserved. Planning publication is complete. Continue implementation in the active isolated checkout documented above; refresh main and remote target before every publication.

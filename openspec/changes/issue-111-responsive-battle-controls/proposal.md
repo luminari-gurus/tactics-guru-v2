@@ -27,4 +27,4 @@ Primary code: `src/ui/hud.ts`, `src/style.css`, `index.html`, `src/app/startBatt
 
 Extend existing geometry/input unit tests and battle-loop/battle-board browser tests, retaining animation, persistence, audio, proof, content, encounter and run-item suites. No dependency, save-format, balance, new-art, framework, deployment or physical-device certification changes.
 
-Plan: [docs/ongoing-projects/plan.md](../../../docs/ongoing-projects/plan.md). Branch: `work/issue-111-responsive-battle-controls`; base: `main` at `4e601480400a241a2c08cb88a41442e55a5385b7`. Assignee: `moshehbenavraham`. This publication contains planning only; implementation approval remains pending.
+Plan: [docs/ongoing-projects/plan.md](../../../docs/ongoing-projects/plan.md). Branch: `work/issue-111-responsive-battle-controls`; base: `main` at `4e601480400a241a2c08cb88a41442e55a5385b7`. Assignee: `moshehbenavraham`. The owner authorized implementation on 2026-10-15; progress and publication are tracked in the plan.

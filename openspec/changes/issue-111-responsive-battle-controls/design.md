@@ -2,7 +2,7 @@
 
 ## Context
 
-See [proposal.md](proposal.md) for motivation and [the implementation plan](../../../docs/ongoing-projects/plan.md) for the acceptance map. The accepted [#108 design](../../../docs/ongoing-projects/issue-108-battle-controls-design/design.md) is on `main` at `4e601480400a241a2c08cb88a41442e55a5385b7`, together with the #113 runtime focus repair and #79 reward/item controls. Owner acceptance on 2026-10-15 clears the design gate, not approval to execute this plan.
+See [proposal.md](proposal.md) for motivation and [the implementation plan](../../../docs/ongoing-projects/plan.md) for the acceptance map. The accepted [#108 design](../../../docs/ongoing-projects/issue-108-battle-controls-design/design.md) is on `main` at `4e601480400a241a2c08cb88a41442e55a5385b7`, together with the #113 runtime focus repair and #79 reward/item controls. Owner acceptance on 2026-10-15 cleared the design gate; the subsequent implementation request authorizes this plan.
 
 `BattleHud` currently combines actor/party text, actions, target selection and preview in `#fit-panel`; inspection overwrites preview text. `BattleScene` owns the real action state and one `BattleDialogs` instance shared with persistence. It observes panel height and passes `panelBottom` to `BoardRenderer.fit`. Geometry functions and proof/content-smoke scenes also consume that top-only convention. `BoardInput` converts CSS coordinates through the canvas rectangle and owns pointer capture; layout must retain that coordinate agreement.
 
@@ -57,4 +57,4 @@ Run configured checks, including both dev-only posttest suites for encounters an
 
 ## Migration Plan
 
-No data migration or deployment is part of this task. Implement geometry and caller adaptations coherently, integrate the HUD/focus behavior, then complete the acceptance checks before opening an implementation PR. A code rollback can restore the previous presentation without changing stored bytes. This planning branch contains no runtime edits and remains reviewable before implementation begins.
+No data migration or deployment is part of this task. Implement geometry and caller adaptations coherently, integrate the HUD/focus behavior, publishing each tested chunk for review and stacking dependent PRs, then complete integrated acceptance. A code rollback can restore the previous presentation without changing stored bytes. The plan records implementation progress, tested revisions and PR dependencies.

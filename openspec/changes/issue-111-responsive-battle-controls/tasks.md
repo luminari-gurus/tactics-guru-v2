@@ -1,10 +1,10 @@
 # Tasks
 
-Implementation approval is pending. All tasks below remain unstarted; design acceptance and publication of this plan do not complete them.
+Implementation authorized by the owner on 2026-10-15. Tasks are checked only after their implementation and required proof are complete.
 
 ## 1. Drawable board geometry
 
-- [ ] 1.1 Replace the shared top-only fit/clamp contract with one explicit drawable rectangle and adapt BoardRenderer, proof/content-smoke callers and the encounter fixture together. Verify offset rail/dock bounds, padding, fit/zoom limits and diagnostic compatibility with the existing iso/picking unit tests and focused proof/content/encounter browser checks; document the coordinate contract in the touched geometry API.
+- [x] 1.1 Replace the shared top-only fit/clamp contract with one explicit drawable rectangle and adapt BoardRenderer, proof/content-smoke callers and the encounter fixture together. Verify offset rail/dock bounds, padding, fit/zoom limits and diagnostic compatibility with the existing iso/picking unit tests and focused proof/content/encounter browser checks; document the coordinate contract in the touched geometry API.
 - [ ] 1.2 Wire the measured board region and settled resize handling into BattleScene. Preserve pan/zoom on panel changes, relative zoom on viewport changes and fresh-battle fit; verify actual drawable floors, raised art/feedback visibility and transformed picking in battle-board tests, and record representative bounds in the issue QA document.
 
 ## 2. Live responsive HUD
@@ -26,6 +26,6 @@ Implementation approval is pending. All tasks below remain unstarted; design acc
 
 ## Workflow follow-up
 
-- Obtain explicit approval of this concrete implementation plan before starting task 1.1.
+- Publish completed chunks for review as they are ready; stack dependent PRs. Leave them unmerged.
 - Keep #57/#58/#64/#66/#74, #80 and production release work separate. Physical capability is Android; no physical-device certification is claimed or required for #111.
 - Do not merge or archive this change during planning. Reconcile the already merged #113 spec delta during the later normal archive workflow without losing its scenarios.
