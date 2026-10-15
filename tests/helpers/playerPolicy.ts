@@ -35,4 +35,3 @@ export function playerDecision(state:BattleState, catalog:ContentCatalog = defau
   }
   return wait;
 }
-

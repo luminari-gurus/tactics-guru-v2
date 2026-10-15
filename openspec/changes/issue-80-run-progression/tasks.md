@@ -16,17 +16,17 @@ Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10
 ## 3. Live route, battle host and run controls
 
 - [x] 3.1 Add discoverable /run bootstrap and return-to-single-battle navigation, explicit Start/Continue/preparation/Start encounter, existing reward/item controls and final victory/defeat Start new run; verify production-route smoke, independent save namespaces, narrow/portrait/landscape layout, native touch/keyboard/focus and modal input capture. Document routes and user flow.
-- [ ] 3.2 Introduce the narrow BattleScene/start host seam reusing existing board/HUD/presentation/audio and default single-battle persistence; verify correct authored map/party/catalog per encounter, final presentation before screen switch, sound preference across in-page transitions, no historical cues on Continue and single-battle regressions.
+- [x] 3.2 Introduce the narrow BattleScene/start host seam reusing existing board/HUD/presentation/audio and default single-battle persistence; verify correct authored map/party/catalog per encounter, final presentation before screen switch, sound preference across in-page transitions, no historical cues on Continue and single-battle regressions.
 - [x] 3.3 Dispose scenes/controllers/UI bindings and guard generations during encounter change, restart, pagehide and BFCache return; verify obsolete callbacks cannot change replacement saves, one canvas/modal/input owner remains, and repeated transitions/resize preserve command locks and gesture capture.
 
 ## 4. Integrated legal run evidence
 
-- [ ] 4.1 Add deterministic legal-policy browser checks executing all three authored battles, two reward claims and preparation through actual production controls from a fresh run; verify final victory, complete replay/boundary records, HP/defeated-party/equipment correctness and no forced progression or state injection. Record exact seed and policy in docs/qa/issue-80.md.
-- [ ] 4.2 Exercise legal defeat, fresh-run restart and reload/Continue during player/enemy presentation, pending/claimed reward, preparation and final outcome through actual controls; verify no duplicate reward/encounter/command/cue and next-command/RNG equivalence across desktop and emulated mobile portrait/landscape. Retain focused WebKit evidence/limitations consistent with owner acceptance.
+- [x] 4.1 Add deterministic legal-policy browser checks executing all three authored battles, two reward claims and preparation through actual production controls from a fresh run; verify final victory, complete replay/boundary records, HP/defeated-party/equipment correctness and no forced progression or state injection. Record exact seed and policy in docs/qa/issue-80.md.
+- [x] 4.2 Exercise legal defeat, fresh-run restart and reload/Continue during player/enemy presentation, pending/claimed reward, preparation and final outcome through actual controls; verify no duplicate reward/encounter/command/cue and next-command/RNG equivalence across desktop and emulated mobile portrait/landscape. Retain focused WebKit evidence/limitations consistent with owner acceptance.
 
 ## 5. Final integration and delivery
 
-- [ ] 5.1 Run relevant focused tests, full npm run test:unit, npm run validate:content, both npm run typecheck configurations, npm run build and full npm test including encounter/run-item posttests; verify strict OpenSpec and git diff --check, record exact revisions/commands/results, build/transfer delta, failures and limitations, and map every #80 criterion to evidence in docs/qa/issue-80.md.
+- [x] 5.1 Run relevant focused tests, full npm run test:unit, npm run validate:content, both npm run typecheck configurations, npm run build and full npm test including encounter/run-item posttests; verify strict OpenSpec and git diff --check, record exact revisions/commands/results, build/transfer delta, failures and limitations, and map every #80 criterion to evidence in docs/qa/issue-80.md.
 - [ ] 5.2 Compare final changes with approved scope, commit only #80 work, push and create/attach a PR against main with issue/plan/approval and actual validation; use Closes #80 only when every criterion is verified, otherwise open a draft with Refs #80 and remaining work.
 
 ## Workflow follow-up

@@ -1,0 +1,72 @@
+
+> tactics-guru-v2@0.0.0 posttest
+> playwright test -c playwright.encounters.config.ts && playwright test -c playwright.run-items.config.ts
+
+[WebServer] (node:99949) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 1 worker
+
+(node:99988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.4s)
+  ✓   2 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.2s)
+  ✓   3 [desktop] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.2s)
+  ✓   4 [desktop] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (249ms)
+  ✓   5 [desktop] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (263ms)
+[WebServer] 2:41:09 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓   6 [desktop] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (268ms)
+(node:127) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.7s)
+  ✓   8 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓   9 [mobile-portrait] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.5s)
+  ✓  10 [mobile-portrait] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (247ms)
+  ✓  11 [mobile-portrait] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (258ms)
+[WebServer] 2:41:15 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓  12 [mobile-portrait] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (329ms)
+(node:199) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:forest_ruins: render, resize and transformed picking (1.6s)
+  ✓  14 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓  15 [mobile-landscape] › tests/authored-encounters.spec.ts:27:36 › encounter:ruined_approach: render, resize and transformed picking (1.4s)
+  ✓  16 [mobile-landscape] › tests/authored-encounters.spec.ts:60:1 › unknown encounter fails before board construction (249ms)
+  ✓  17 [mobile-landscape] › tests/authored-encounters.spec.ts:65:43 › required asset missing produces controlled error (255ms)
+[WebServer] 2:41:21 PM [vite] (client) [console.error] Failed to process file: image "asset:fighter_sprite"
+  ✓  18 [mobile-landscape] › tests/authored-encounters.spec.ts:65:43 › required asset decode produces controlled error (329ms)
+
+  18 passed (17.6s)
+[WebServer] (node:301) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 21 tests using 1 worker
+
+(node:340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (313ms)
+  ✓   2 [desktop] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (465ms)
+  ✓   3 [desktop] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (459ms)
+  ✓   4 [desktop] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (499ms)
+  ✓   5 [desktop] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (231ms)
+  ✓   6 [desktop] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (263ms)
+  ✓   7 [desktop] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (257ms)
+(node:372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [mobile-portrait] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (302ms)
+  ✓   9 [mobile-portrait] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (498ms)
+  ✓  10 [mobile-portrait] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (470ms)
+  ✓  11 [mobile-portrait] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (481ms)
+  ✓  12 [mobile-portrait] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (232ms)
+  ✓  13 [mobile-portrait] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (262ms)
+  ✓  14 [mobile-portrait] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (255ms)
+(node:404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [mobile-landscape] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (314ms)
+  ✓  16 [mobile-landscape] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (497ms)
+  ✓  17 [mobile-landscape] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (457ms)
+  ✓  18 [mobile-landscape] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (482ms)
+  ✓  19 [mobile-landscape] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (231ms)
+  ✓  20 [mobile-landscape] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (258ms)
+  ✓  21 [mobile-landscape] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (267ms)
+
+  21 passed (9.5s)
