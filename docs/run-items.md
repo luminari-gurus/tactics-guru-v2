@@ -83,7 +83,60 @@ The selected option ordinal plus reward identity supplies an equipment instance 
 | #80 | One shared save envelope owner; before-battle preparation context, carried HP/equipment battle initialization and replay reconstruction |
 | #81 | Legal full-run controls/playtest and reviewed content tuning, physical-device certification and measured budgets |
 
-These contracts implement #77's specification package. They do not claim runnable item commands, rewards UI, stored inventory, equipment projection or full-run completion.
+These contracts implement #77's specification package. The following #78 pure API implements item commands and projection; rewards UI, stored inventory and full-run completion remain downstream.
+
+## Executable item API (#78)
+
+[Issue #78](https://github.com/luminari-gurus/tactics-guru-v2/issues/78) implements [items.ts](../src/domain/items.ts), with the caller-approved [OpenSpec plan](../openspec/changes/issue-78-owned-item-commands/proposal.md) at `4d59b01`, branch `work/issue-78-owned-item-commands`, base `73fed0be21358276c9ae70164a952c259ab4086a`. Approval was explicit on 2026-10-14. The scope remains pure domain behavior; #79/#80 own the trusted live session and save/UI integration.
+
+`emptyItemOwnership()` returns new empty arrays. `readItemOwnership(unknown, runId, itemCatalog)` validates stacks, known matching definitions, assignments and bounds and returns independent canonically ordered data. Equipment IDs have the exact bounded encoding `<runId>:reward:<0|1>:option:<0|1>` (run ID: 1–64 ASCII letters/digits/hyphens). Claim derives the ID from the matching reward identity and selected option's ordinal, without RNG. Arrays cannot contain duplicate stacks/instances, hidden fields, accessors, symbols, sparse entries or extra keys. Instance/slot/hero eligibility and unique assignment constraints are checked even for defeated heroes' retained records. This is structural ownership validation, not a cryptographic history/provenance verifier. The accepted six-instance cap is retained; the current two-boundary/two-option encoding provides four distinct structural IDs and actual play grants at most two instances.
+
+`RunItems` has exactly `{run, ownership, offer, itemRevision}`. `readRunItems(unknown, definition, baseCatalog, itemCatalog)` uses the existing run and stored-offer readers and returns owned state. Reward phase requires its exact concrete offer; other phases require `offer: null`. `itemRevision` is a nonnegative safe integer, bounded at `Number.MAX_SAFE_INTEGER`; every successful item command increments it, and commands reject at the limit. It is separate from the run revision, whose exact values are already fixed by phase/index. The future run codec must persist both revisions, ownership, offer and item catalog identity. Fresh-run integration must explicitly supply empty ownership/revision zero; it cannot carry the previous aggregate into a new attempt.
+
+`applyItemCommand(unknownState, unknownCommand, trustedContext, definition, baseCatalog, itemCatalog)` returns either `{ok:true, state, events}` or `{ok:false, reason}`. All four commands carry `runId`, expected run `revision`, `encounterId`, `boundaryId` and expected `itemRevision`:
+
+| Command | Additional fields | Success |
+| --- | --- | --- |
+| `claimReward` | `offerId`, `itemId` | Grant one selected item, acknowledge boundary, clear offer, emit itemClaimed and encounterReady together |
+| `useItem` | `itemId`, `heroId` | Heal the living injured eligible hero, consume one, remove empty stack, emit itemUsed |
+| `equipItem` | `instanceId`, `heroId`, `slot` | Assign owned compatible instance, retain displaced instance as unequipped, emit itemEquipped |
+| `unequipItem` | `instanceId`, `heroId`, `slot` | Remove only the matching assignment, retain instance, emit itemUnequipped |
+
+The trusted context has exactly `{runId, encounterId, boundaryId, activeBattle}`. Its identity must match the current boundary, `activeBattle` must be false, and phase must be reward or subsequent encounter entry. #79/#80 must derive this fact from the authoritative session's current active battle, never from client command data or run phase alone. Initial entry, terminal states and active battles reject. The pure API cannot independently observe whether a live scene exists.
+
+Preflight failure returns no successor state/events and never mutates the input aggregate. It consumes no entropy and has no reference to battle actions, previews, audio or storage. Reusing an intent against the returned successor fails its revision/boundary checks, so two clicks cannot claim or consume twice. The adapter must replace its authoritative aggregate with the success result before processing the next request; re-executing against an old snapshot reproduces the same pure result, rather than changing external state. Use the aggregate claim path instead of separately calling `acknowledgeReward` and granting an item.
+
+For example, a prepared Fighter at 12/18 HP with two draughts uses one and reaches 18 HP with one draught left and itemRevision advanced once. Replaying that intent rejects; a fresh intent at full HP also rejects. A Fighter at 16 HP with one draught reaches 18 HP and the stack disappears. Defeated heroes never revive. An instance already equipped anywhere rejects another equip request, including a redundant same-hero equip; unequip requires its exact hero/slot/instance. Cross-hero transfer requires an explicit eligible unequip then equip.
+
+`projectItemCatalog(unknownState, definition, immutableBaseCatalog, itemCatalog)` validates the aggregate then copies each hero record/stats and adds the assigned generic bonus once for living heroes. Shared maps/enemies/assets stay immutable; base stats and definitions never change. Each call must use the original base catalog. Passing a previously changed projection instead fails the aggregate's base content identity check. The returned catalog works directly with existing `createBattle`, `previewAttack` and `resolveAttack`: accuracy affects attacker bonus and armor class affects target defense, without new battle draws or combat branches. Reconstruct the identical projection before future run battle snapshot/replay validation; projected content identity differs from the base. #80 still owns surviving spawns, carried HP initialization, battle-local resets and live replay/save integration. Single-battle callers continue supplying their original catalog and their save/content identity is unchanged.
+
+Executable proof is in [itemCommands.test.ts](../tests/unit/itemCommands.test.ts): strict/rejected input matrices, frozen input/canonical independent copies, context and duplicate preflight, capped healing/exhausted stacks, retained replacement/defeated ownership, actual seeded battle/combat composition and next-RNG equivalence, repeated base projection and JSON restoration, and additional validated Mage tonic/Ranger charm effects without item-ID-specific execution. Browser regression evidence covers the existing app; it cannot prove future reward controls or physical-device certification.
+
+### #78 validation — 2026-10-14
+
+Implementation follows the approved `4d59b01` plan on base `73fed0b`. Final source and fixture bytes were tested before commit; the delivery revision is recorded below after publication. No application UI, battle/save format, runtime combat or dependency changes were needed.
+
+| #78 acceptance | Executable evidence |
+| --- | --- |
+| Ownership/context/slot/stack preflight; unchanged rejection | Strict owned-data and aggregate matrices; frozen inputs, duplicate identity/assignment, malformed/capacity/context/stale checks |
+| Exactly-once deterministic claim | Atomic grant/advance events, option-derived IDs, duplicate/stale/unoffered/collision/overflow cases, equal-input replay and next battle RNG |
+| Consumable decrement and retained replacement ownership | Reward/preparation healing, HP cap, exhausted stacks, full/dead/ineligible rejection, stale second use versus valid fresh intent, equip/replace/unequip |
+| Fresh nonaccumulating derived stats | Repeated fresh battle creation, replacement/unequip, defeated assignment, JSON reconstruction, unchanged frozen base, actual attack preview/resolution using projected accuracy/armor class |
+| Generic composition fixtures | Additional Mage tonic and Ranger charm claimed and used/projected through existing effect types; no item-ID-specific execution branch |
+
+- Focused `npx vitest run tests/unit/itemCommands.test.ts tests/unit/rewards.test.ts tests/unit/run.test.ts`: 104 passed before the final exact-encoding fixture; final full unit run includes that additional case (36 item-command tests total).
+- Final `npm run test:unit`: 635 passed across 35 files.
+- `npm run validate:content`: 167 passed across five files; the same gate also passed in the final production build.
+- `npm run typecheck`: application and DOM/Node-free domain/content configurations passed.
+- Final `npm run build`: passed; the existing large-chunk warning remains. The live application's emitted asset names/sizes remain unchanged because the pure item API is not yet wired into it.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`: all 399 configured main cases ran, with 397 passing and two desktop failures. Initial sandbox execution could not bind the server and was retried outside the sandbox. A startup failure in delayed audio decode coincided with rebuilding the served preview files; an elevated-target animation case observed the old viewport immediately after resize. Original failures were retained, not removed from the record.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npx playwright test --last-failed`: both cases passed unchanged against the stable build (2/2). No test expectations or app code were changed to obtain these results. The full 399-case suite was not repeated after the targeted rerun; final coverage combines the 397 initial passes and two rerun passes.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run posttest`: all 18 authored-encounter cases passed. Run explicitly because npm does not invoke the posttest hook after a failed main command.
+- Strict OpenSpec, 15 relative document links and staged whitespace checks passed.
+
+Desktop and emulated mobile portrait/landscape regressions support this pure package. Rewards UI, run persistence/replay integration, real full-run controls and physical-device/release acceptance remain with #79/#80/#81/#57. No deployment or physical certification was performed.
+
+Delivery: [PR #115](https://github.com/luminari-gurus/tactics-guru-v2/pull/115), implementation revision `34dbb5e3631fcc7286cf9bf79c5b4711417132cf`. This revision contains the tested source/fixture bytes; the subsequent delivery commit updates documentation and the completed task checkbox only. The PR remains open for review, with no merge or OpenSpec archive performed.
 
 ## Acceptance evidence
 
