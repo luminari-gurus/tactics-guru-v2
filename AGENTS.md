@@ -2,9 +2,15 @@
 
 ## `.env` & `.env.example`
 
-These are the environment configuration files used by developers for the application, not the deployment configuration.
+These files contain developer configuration for the application, not deployment
+configuration. They may include developer-specific capabilities and secrets.
+Read only the variables needed for the task; do not print or copy unrelated values.
 
-Example:  Media gen API Keys to create assets for the game
+Examples:
+
+- Media generation API keys used to create game assets.
+- `CAN_TEST_MOBILE`, which declares access to physical mobile testing platforms;
+  see `.env.example` for supported values. Access does not imply completed testing.
 
 ## `docs/ongoing-projects`
 

@@ -16,6 +16,16 @@ discussing it does not invoke the workflow.
    repository and default branch with `gh repo view --json nameWithOwner,defaultBranchRef`.
    Resolve the caller with `gh api user --jq .login`, unless the user explicitly
    identifies a different GitHub login. Do not guess the caller from Git author settings.
+   Read only `CAN_TEST_MOBILE` from the developer's local `.env`, using the value
+   contract in `.env.example`; never print or copy unrelated environment values.
+   It describes access to physical devices, not emulation or proven test results.
+   Parse case-insensitively with surrounding whitespace/quotes removed and
+   comma-separated platform names trimmed. `none` means no mobile platforms;
+   `ios` and `android` name individual platforms; `all` means both. `none`/`all`
+   must be used alone. Treat a missing, empty, unknown or conflicting value as
+   `none` and report that limitation; the example file is not local availability.
+   When using an isolated worktree, retain the capability value from the caller's
+   checkout without copying the rest of `.env` or committing local configuration.
 2. **Refresh backlog readiness before selecting any issue.** Read the entire
    open backlog with pagination (`gh api --paginate` or a limit verified to
    include all results), including bodies, labels and assignees. Do not filter
@@ -44,6 +54,16 @@ discussing it does not invoke the workflow.
    work on the default branch. Exclude blocked issues, unresolved prerequisites,
    issues assigned to other people, and work already covered by an active
    branch/PR or this caller's ongoing task.
+   Also exclude issues whose acceptance requires a physical mobile platform
+   absent from `CAN_TEST_MOBILE`. Require every requested platform, not merely
+   one overlap: `android` excludes an iPhone Safari investigation and any task
+   requiring both iOS and Android. Work without physical-mobile acceptance stays
+   eligible. Browser/device requirements within an available platform still need
+   checking; `all` does not prove access to every model/browser. Do not claim an
+   issue on the basis that coding can start while its required device testing is
+   unavailable, and do not substitute emulation for physical acceptance. Report
+   the mismatch and consider the next candidate. This is caller eligibility,
+   not global readiness: do not remove readiness labels for a local device limit.
 4. Prefer issues that unblock the most actionable downstream work, then critical
    path/release priority, then a clearly scoped and verifiable implementation.
    Use transitive dependencies when evidenced; do not invent links. Break equal
@@ -54,6 +74,8 @@ discussing it does not invoke the workflow.
    assignments/status. Assign with `gh issue edit <number> --add-assignee <login>`
    and verify the assignment. If it was claimed by someone else, reselect.
    Preserve labels and existing assignees; do not close the issue.
+   Recheck device eligibility before assignment and record the available and
+   required platforms in the plan.
 
 ## Publish the work branch
 
