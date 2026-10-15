@@ -2,6 +2,8 @@ import type { TerrainId } from '../terrain/materials';
 export interface Tile { readonly x: number; readonly y: number; readonly elevation: number; readonly terrain?: TerrainId; }
 export interface Point { readonly x: number; readonly y: number; }
 export interface Bounds { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number; }
+/** Drawable area in canvas coordinates, before the single fit padding inset. */
+export interface BoardRegion { readonly x: number; readonly y: number; readonly width: number; readonly height: number; }
 
 export const TILE_WIDTH = 80;
 export const TILE_HEIGHT = 40;
@@ -51,15 +53,14 @@ export function boardBounds(tiles: readonly Tile[]): Bounds {
   };
 }
 
-/** Fit the entire solid board in the viewport space below the diagnostic panel. */
-export function fitBoard(bounds: Bounds, viewport: { width: number; height: number }, panelBottom: number) {
-  const top = panelBottom + BOARD_MARGIN;
-  const availableWidth = Math.max(1, viewport.width - BOARD_MARGIN * 2);
-  const availableHeight = Math.max(1, viewport.height - top - BOARD_MARGIN);
+/** Fit the complete board in the unobscured region, applying BOARD_MARGIN once. */
+export function fitBoard(bounds: Bounds, region: BoardRegion) {
+  const availableWidth = Math.max(1, region.width - BOARD_MARGIN * 2);
+  const availableHeight = Math.max(1, region.height - BOARD_MARGIN * 2);
   const scale = Math.min(MAX_BOARD_SCALE, availableWidth / (bounds.right - bounds.left), availableHeight / (bounds.bottom - bounds.top));
   return {
     scale,
-    x: viewport.width / 2 - (bounds.left + bounds.right) / 2 * scale,
-    y: top + availableHeight / 2 - (bounds.top + bounds.bottom) / 2 * scale,
+    x: region.x + region.width / 2 - (bounds.left + bounds.right) / 2 * scale,
+    y: region.y + region.height / 2 - (bounds.top + bounds.bottom) / 2 * scale,
   };
 }

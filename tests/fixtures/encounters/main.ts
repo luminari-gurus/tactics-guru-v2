@@ -27,7 +27,7 @@ class EncounterScene extends Phaser.Scene {
         const render=()=>board.present(state,reach.cells.map(c=>c.cell),selected);
         const board=new BoardRenderer(this,catalog,encounter.mapId,cell=>{selected=cell;render();});
         render();
-        const fit=()=>board.fit(this.scale.width,this.scale.height,document.querySelector('#fit-panel')!.getBoundingClientRect().bottom);
+        const fit=()=>{const y=document.querySelector('#fit-panel')!.getBoundingClientRect().bottom;board.fit(this.scale.width,this.scale.height,{x:0,y,width:this.scale.width,height:this.scale.height-y});};
         fit();
         const input=bindBoardInput(this.game.canvas,{select:p=>board.select(p),pan:(x,y)=>board.pan(x,y),zoom:(factor,p)=>board.zoom(factor,p)},()=>({width:this.scale.width,height:this.scale.height}));
         this.scale.on('resize',fit);

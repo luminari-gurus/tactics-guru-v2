@@ -1,8 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD_FIXTURE, BOARD_SIZE } from '../../src/diagnostics/boardFixture';
-import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces } from '../../src/geometry/iso';
+import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BOARD_MARGIN, MAX_BOARD_SCALE } from '../../src/geometry/iso';
 
 describe('diagnostic isometric geometry', () => {
+  it.each([
+    { x: 24, y: 90, width: 860, height: 590 },
+    { x: 24, y: 72, width: 364, height: 300 },
+    { x: 32, y: 50, width: 240, height: 190 },
+  ])('fits all faces inside an offset drawable region with one padding inset: %j', region => {
+    const bounds = boardBounds(BOARD_FIXTURE);
+    const fit = fitBoard(bounds, region);
+    expect(fit.x + bounds.left * fit.scale).toBeGreaterThanOrEqual(region.x + BOARD_MARGIN - 1e-8);
+    expect(fit.x + bounds.right * fit.scale).toBeLessThanOrEqual(region.x + region.width - BOARD_MARGIN + 1e-8);
+    expect(fit.y + bounds.top * fit.scale).toBeGreaterThanOrEqual(region.y + BOARD_MARGIN - 1e-8);
+    expect(fit.y + bounds.bottom * fit.scale).toBeLessThanOrEqual(region.y + region.height - BOARD_MARGIN + 1e-8);
+    expect(fit.scale).toBeLessThanOrEqual(MAX_BOARD_SCALE);
+    const origin = fitBoard(bounds, { ...region, x: 0, y: 0 });
+    expect(fit.x - origin.x).toBeCloseTo(region.x);
+    expect(fit.y - origin.y).toBeCloseTo(region.y);
+    expect(fit.scale).toBe(origin.scale);
+  });
+
   it('projects known origin, axes and elevation fixtures', () => {
     expect(projectTile({ x: 0, y: 0, elevation: 0 })).toEqual({ x: 0, y: 0 });
     expect(projectTile({ x: 1, y: 0, elevation: 0 })).toEqual({ x: 40, y: 20 });
@@ -49,7 +67,7 @@ describe('diagnostic isometric geometry', () => {
 
   it.each([{ width: 390, height: 844 }, { width: 844, height: 390 }, { width: 320, height: 320 }])('fits every face below the panel within $width x $height', viewport => {
     const bounds = boardBounds(BOARD_FIXTURE);
-    const layout = fitBoard(bounds, viewport, 140);
+    const layout = fitBoard(bounds, { x: 0, y: 140, width: viewport.width, height: viewport.height - 140 });
     expect(layout.x + bounds.left * layout.scale).toBeGreaterThanOrEqual(16 - 1e-8);
     expect(layout.x + bounds.right * layout.scale).toBeLessThanOrEqual(viewport.width - 16 + 1e-8);
     expect(layout.y + bounds.top * layout.scale).toBeGreaterThanOrEqual(156 - 1e-8);
