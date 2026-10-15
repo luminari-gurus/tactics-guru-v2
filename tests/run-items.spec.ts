@@ -81,7 +81,8 @@ test('keyboard cancel, held activation, native modal capture and layout', async 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const sizes = await page.locator('main button, main select').evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect()).map(r => ({ w: r.width, h: r.height })));
     expect(sizes.every(r => r.w >= 44 && r.h >= 44)).toBe(true);
-    await page.screenshot({ path: info.outputPath(`items-${viewport.width}x${viewport.height}.png`), fullPage: true });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('#items').screenshot({ path: info.outputPath(`items-${viewport.width}x${viewport.height}.png`), scale: 'css' });
     await writeFile(info.outputPath(`items-${viewport.width}x${viewport.height}.json`), JSON.stringify({
       project: info.project.name, capturedAt: new Date().toISOString(), browser: page.context().browser()!.version(), viewport, report: await report(page),
     }, null, 2));

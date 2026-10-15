@@ -12,13 +12,13 @@
 
 ## 3. Reward and party controls
 
-- [ ] 3.1 Add catalog-driven reward, consumable, target and equip/unequip controls with native review/cancel dialogs and scoped responsive CSS; verify mouse/touch/keyboard paths, eligible-target explanations, projected stats and actual success/rejection through a fixture mounting production modules.
-- [ ] 3.2 Add browser checks for rapid/stale submissions, held confirmation keys, cancellation, modal capture and usable focus return; verify no board pass-through, 44px controls, safe areas, 320x568 portrait and 915x412 landscape without horizontal overflow; record screenshots and fixture limitations.
-- [ ] 3.3 Exercise reload pending/after claim/use/equip, backup recovery and unavailable/corrupt storage via actual controls; assert identical ownership/stats/next encounter/RNG with no duplicated effects or playback, and document the #80 integration API separately from full-run acceptance.
+- [x] 3.1 Add catalog-driven reward, consumable, target and equip/unequip controls with native review/cancel dialogs and scoped responsive CSS; verify mouse/touch/keyboard paths, eligible-target explanations, projected stats and actual success/rejection through a fixture mounting production modules.
+- [x] 3.2 Add browser checks for rapid/stale submissions, held confirmation keys, cancellation, modal capture and usable focus return; verify no board pass-through, 44px controls, safe areas, 320x568 portrait and 915x412 landscape without horizontal overflow; record screenshots and fixture limitations.
+- [x] 3.3 Exercise reload pending/after claim/use/equip, backup recovery and unavailable/corrupt storage via actual controls; assert identical ownership/stats/next encounter/RNG with no duplicated effects or playback, and document the #80 integration API separately from full-run acceptance.
 
 ## 4. Integration verification and delivery
 
-- [ ] 4.1 Run focused tests then full configured unit/content/browser checks including encounter posttest, both typechecks, production build, strict OpenSpec and git diff --check; record exact commands/revision/results, payload sizes and unverified physical/full-run criteria against every #79 acceptance item.
+- [x] 4.1 Run focused tests then full configured unit/content/browser checks including encounter posttest, both typechecks, production build, strict OpenSpec and git diff --check; record exact commands/revision/results, payload sizes and unverified physical/full-run criteria against every #79 acceptance item.
 - [ ] 4.2 Commit only approved issue changes, push and open/attach a PR after checking for an existing one; verify branch/PR identity and use Refs #79 with a draft if any issue acceptance remains unmet.
 
 ## Workflow follow-up

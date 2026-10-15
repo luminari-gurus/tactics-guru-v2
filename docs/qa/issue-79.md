@@ -22,7 +22,7 @@ The browser fixture starts from explicit run boundaries and mounts production UI
 
 ## Validation
 
-In progress. Initial focused codec/storage/session checks: 12 passing tests. The authored stress snapshot with all six combatants, four instance identities, three assignments, a full consumable stack and wide numeric fields is 2,567 code units of the 32,768 bound; this is a supported shape stress fixture, not evidence of legal item provenance.
+Final focused codec/storage/session checks: 12 passing tests. The authored stress snapshot with all six combatants, four instance identities, three assignments, a full consumable stack and wide numeric fields is 2,567 code units of the 32,768 bound; this is a supported shape stress fixture, not evidence of legal item provenance.
 
 ## Acceptance mapping
 
@@ -42,7 +42,17 @@ Validation commands:
 - `npm run validate:content`: 167 passing.
 - `npm run typecheck`: both configured typechecks pass.
 - `npm run build`: content, both typechecks and production build pass; existing large-chunk warning remains. Run UI is not yet in the main entry bundle; #80 will measure integrated delivery impact.
-- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`: full 399-case main suite plus encounter and run-item posttests running; final disposition below.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test`: 399 main + 18 encounter + 21 run-item browser checks passed (438 total).
 - `openspec validate issue-79-reward-item-controls --strict` and `git diff --check`: pass.
 
 Initial focused browser run: 18/18 passed before the final additional rejection/active-reload coverage. The final full run includes the updated posttest suite. No physical-device, Safari, screen-reader, deployed upgrade or full authored-run certification is claimed.
+
+## Final evidence and revision binding
+
+Implementation commit: `064de6f5f48ea0ebb1e4b68c225d07cd9fcd00ce`. Final unit/build checks passed again at that revision. The 19-minute full browser run passed all 399 main cases, then 18 encounter and 21 run-item posttests. Its main preview reported plan commit `9ea31b8f6ac838126f88772a403fd8441daa80a7` with a dirty worktree; it was built before the implementation commit. New modules are not imported by that existing single-battle entry. No failure or skipped browser case was observed.
+
+Visual review caught blank mobile full-page screenshot output from the first capture method. The screenshot-only correction captures the item element at CSS scale. All 21 run-item cases passed again after that correction, using the committed runtime at `064de6f` plus the screenshot-test edit. No runtime changes followed that commit. The final capture JSON records browser Chrome 155.0.8059.41, actual project/viewport, build identity and complete fixture report. [Source hashes and result counts](issue-79/validation.json) bind the relevant implementation and final fixture/test inputs; these are source identities, not a claim that the earlier main preview was built from the later commit.
+
+Reviewed final images: [portrait](issue-79/items-412x915.png), [narrow portrait](issue-79/items-320x568.png), [short landscape](issue-79/items-915x412.png). They show the scrollable component, not a complete battle layout. The mobile emulation runs exercise native touch, keyboard, focus and modal behavior; they do not prove physical hardware or screen-reader acceptance.
+
+Logs (trailing whitespace normalized): [full browser run](issue-79/browser.txt), [final item rerun](issue-79/run-items.txt), [unit](issue-79/unit.txt), [content](issue-79/content.txt), [build](issue-79/build.txt). Existing Vite large-chunk and Node color-environment warnings remain. Strict OpenSpec, both typechecks, local document links and whitespace checks passed. The only remaining workflow step is PR publication; #80/#81 integration/certification remain separate scope.

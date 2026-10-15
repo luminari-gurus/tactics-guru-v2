@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 validate:content
+> vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+
+ Test Files  5 passed (5)
+      Tests  167 passed (167)
+   Start at  03:53:48
+   Duration  4.23s (tests 94%, transform 5%, import 1%)
