@@ -10,7 +10,7 @@ Updated 2026-10-15 (Asia/Jerusalem). **The geometry prerequisite is merged. Issu
 
 ## Concrete next-session work
 
-1. Refresh `main`, PR #119's head/base, review threads and working-tree state. Retarget #119 to `main` after #118; preserve the original implementation commits. Reconcile this handoff if the branch has changed. The source checkout is `C:/Users/apexw/.codex/worktrees/issue-111-responsive-controls/Tactics-Guru`; inspect it before reuse because it may belong to active work.
+1. Refresh `main`, PR #119's head/base, review threads and working-tree state. #119 now targets `main`; its handoff conflict has been reconciled without changing runtime/test source. Preserve the original implementation commits and reconcile newer work if the branch has changed. The source checkout is `C:/Users/apexw/.codex/worktrees/issue-111-responsive-controls/Tactics-Guru`; inspect it before reuse because it may belong to active work.
 2. Address [target-identity finding](https://github.com/luminari-gurus/tactics-guru-v2/pull/119#discussion_r4286775892): when a defeated unit and living unit share a cell, dropdown/target feedback, inspection, confirmation and the committed command must identify the same living target. Prefer the living occupant and derive confirmation identity from the prepared command. Add the legal seed-1 shared-cell regression described in the review.
 3. Address [feedback-overlap finding](https://github.com/luminari-gurus/tactics-guru-v2/pull/119#discussion_r4286775908): at a panned drawable edge, Guarded and the target's damage feedback must remain separately readable. Resolve intersections across visible units' feedback stacks and assert pairwise non-overlap, including the reviewed 320x568 legal Guarded Strike scenario.
 4. Verify each repair and the affected target/inspection/confirmation and board/animation paths. Run the repository's required unit/content checks, both typechecks, production build and applicable browser/posttest acceptance on the resulting branch. Record exact revisions and results; prior 420-case browser and 48-case prefix reports are retained evidence, not fresh validation of new fixes. Resolve review threads only after proving the repairs.
@@ -18,6 +18,8 @@ Updated 2026-10-15 (Asia/Jerusalem). **The geometry prerequisite is merged. Issu
 
 ## Scope and Git decisions
 
-#118 needed no conflict resolution or history rewrite: current main was already its ancestor. A merge commit preserved the stack. No release tag is warranted for this partial feature delivery. #119 should target `main`; any integration of this handoff into it is documentation-only and must preserve its runtime/test source objects and unresolved review threads.
+#118 needed no conflict resolution or history rewrite: current main was already its ancestor. A merge commit preserved the stack. No release tag is warranted for this partial feature delivery. #119 targets `main`; integrating this handoff into it changed documentation only and preserved its runtime/test source objects and both unresolved review threads.
+
+GitHub automatically closed #111 when #118 merged. Final status verification caught the premature closure; #111 was reopened and verified open because #119 and its two findings are still outstanding.
 
 The requested #118 merge session does not start either #119 repair. There is no new work item to invent: the existing PR and findings describe the remaining work. Preserve current combat/RNG, command/confirmation, save/audio, native dialog and reward/item contracts. #80 remains separately owned; physical-device, screen-reader and release/deployment acceptance remain outside this handoff.

@@ -25,4 +25,4 @@ Runtime: bundled Node 24.19.0, repository Playwright and installed Edge, one wor
 
 Evidence is retained under `C:/Users/apexw/.codex/worktrees/merge-pr118/Tactics-Guru/tmp/`: `merge-unit.log`, `merge-build.log`, `merge-browser.json`, `merge-encounters.json` and their artifact directories. This session did not rerun the full #119 browser/prefix/run-item suites, repair or merge #119, certify physical devices or screen readers, or separately execute/verify deployment. The existing hosting integration may deploy merges automatically.
 
-See the [next-session handoff](../ongoing-projects/plan.md) for the two evidenced repairs and completion criteria. No issue was closed because this geometry prerequisite alone does not complete #111.
+See the [next-session handoff](../ongoing-projects/plan.md) for the two evidenced repairs and completion criteria. GitHub automatically closed #111 immediately after #118 merged; final readback caught that premature closure, and #111 was reopened and verified open. This geometry prerequisite alone does not complete #111.
