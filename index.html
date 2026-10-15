@@ -9,6 +9,12 @@
   </head>
   <body>
     <main id="game" aria-label="Tactics Guru game canvas" data-ready="false"></main>
+    <div id="battle-shell">
+    <section id="battlefield" aria-label="Battlefield" hidden>
+      <header id="battle-heading"><p>Tactics Guru</p><h1>Forest Ruins</h1></header>
+      <div id="battle-board-region"></div>
+      <p id="battle-board-caption">Gold: active · White: selected · Teal: reachable</p>
+    </section>
     <aside id="fit-panel" aria-label="Proof scene diagnostics">
       <div class="fit-controls">
         <span id="fit-status" role="status" aria-live="polite">Loading</span>
@@ -55,6 +61,7 @@
         <pre id="fit-report">Refresh to capture current measurements.</pre>
       </details>
     </aside>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

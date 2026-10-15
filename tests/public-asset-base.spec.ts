@@ -26,7 +26,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
       for (const path of expected) await expect.poll(() => paths.has(base + path.slice(1))).toBe(true);
       if (base !== '/') for (const path of expected) expect(paths.has(path)).toBe(false);
       if (scene !== 'content-smoke') {
-        const portraits = page.locator(scene === 'proof' ? '#proof-portrait' : '#battle-party img');
+        const portraits = page.locator(scene === 'proof' ? '#proof-portrait' : '#battle-portraits img');
         expect(await portraits.count()).toBeGreaterThan(0);
         await expect.poll(() => portraits.evaluateAll(images => images.every(image => {
           const img = image as HTMLImageElement;

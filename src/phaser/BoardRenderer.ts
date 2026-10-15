@@ -261,7 +261,7 @@ export class BoardRenderer {
         this.effect.progress=p;
         // Update only the transient fields; geometry diagnostics need no per-frame recomputation.
         const game=document.querySelector<HTMLElement>('#game')!;
-        const report=JSON.parse(game.dataset.battleReport!);report.effect=this.effect;
+        const report=JSON.parse(game.dataset.battleReport!);report.effect=this.effect;report.feedbackBounds=this.feedbackBounds();
         game.dataset.battleReport=JSON.stringify(report);
       }
       if(!move)return;
@@ -299,7 +299,8 @@ export class BoardRenderer {
     // Panel text/layout changes are not navigation: retain the camera, clamping
     // only where the new available area or zoom limits require it. Real viewport
     // changes still refit the board and preserve relative zoom.
-    this.applyView(viewportChanged ? { ...layout, scale: layout.scale * zoom } : this.view);
+    const center={x:region.x+region.width/2,y:region.y+region.height/2};
+    this.applyView(viewportChanged ? {scale:layout.scale*zoom,x:center.x+(layout.x-center.x)*zoom,y:center.y+(layout.y-center.y)*zoom} : this.view);
   }
 
   /** A fresh battle is centered after its initial automatic turns settle the HUD. */
@@ -318,15 +319,49 @@ export class BoardRenderer {
     // Keep labels legible when the whole board is fitted into short mobile viewports.
     // Coordinates remain board-local, including the extra separation for defeat.
     const scale=Math.max(1,14/(18*this.view.scale));
-    this.effectLabels.forEach(({text,anchor,kind},i)=>{
+    this.effectLabels.forEach(({text,anchor,kind})=>{
       text.setScale(scale);
       const height=text.height*scale;
       const y=kind==='guard'?anchor.y+height/2+6/this.view.scale
         :anchor.y-54-height/2-(kind==='defeat'?height+3/this.view.scale:0);
       text.setPosition(anchor.x,y);
-      if(this.effect){this.effect.feedback[i].x=text.x;this.effect.feedback[i].y=text.y;}
     });
+    // Keep each unit's result/defeat stack readable inside the clipped region.
+    // Move the stack together so clamping cannot collapse two labels into one.
+    const stacks:{labels:Phaser.GameObjects.Text[];left:number;right:number;top:number;bottom:number}[]=[];
+    for(const key of new Set(this.effectLabels.map(({anchor})=>`${anchor.x},${anchor.y}`))){
+      const labels=this.effectLabels.filter(({anchor})=>`${anchor.x},${anchor.y}`===key).map(({text})=>text);
+      const left=Math.min(...labels.map(t=>t.x-t.displayWidth/2)),right=Math.max(...labels.map(t=>t.x+t.displayWidth/2));
+      const top=Math.min(...labels.map(t=>t.y-t.displayHeight/2)),bottom=Math.max(...labels.map(t=>t.y+t.displayHeight/2));
+      const {x,y,scale}=this.view,r=this.region;
+      const dx=Math.max((r.x+4-x)/scale-left,Math.min(0,(r.x+r.width-4-x)/scale-right));
+      const dy=Math.max((r.y+4-y)/scale-top,Math.min(0,(r.y+r.height-4-y)/scale-bottom));
+      labels.forEach(t=>t.setPosition(t.x+dx,t.y+dy));
+      stacks.push({labels,left:left+dx,right:right+dx,top:top+dy,bottom:bottom+dy});
+    }
+    // Clamping can put different units at the same edge. Only on collision,
+    // collect their intact stacks into one column. Reserve hidden impact labels
+    // too, so the group does not jump when damage/defeat becomes visible.
+    if(stacks.some((a,i)=>stacks.some((b,j)=>i<j && a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom))){
+      const {x,y,scale}=this.view,r=this.region,gap=3/scale;
+      stacks.sort((a,b)=>a.top-b.top);
+      const width=Math.max(...stacks.map(s=>s.right-s.left));
+      const height=stacks.reduce((sum,s)=>sum+s.bottom-s.top,0)+gap*(stacks.length-1);
+      const center=(Math.min(...stacks.map(s=>s.left))+Math.max(...stacks.map(s=>s.right)))/2;
+      const columnX=Math.max((r.x+4-x)/scale+width/2,Math.min(center,(r.x+r.width-4-x)/scale-width/2));
+      let top=Math.max((r.y+4-y)/scale,Math.min(stacks[0].top,(r.y+r.height-4-y)/scale-height));
+      for(const stack of stacks){
+        const dx=columnX-(stack.left+stack.right)/2,dy=top-stack.top;
+        stack.labels.forEach(t=>t.setPosition(t.x+dx,t.y+dy));
+        top+=stack.bottom-stack.top+gap;
+      }
+    }
+    if(this.effect)this.effectLabels.forEach(({text},i)=>{this.effect!.feedback[i].x=text.x;this.effect!.feedback[i].y=text.y;});
   }
+
+  private feedbackBounds(){return this.effectLabels.filter(({text})=>text.visible).map(({text})=>{
+    const r=text.getBounds();return {text:text.text,x:r.x,y:r.y,width:r.width,height:r.height};
+  });}
 
   pan(dx: number, dy: number): boolean {
     const before = this.view;
@@ -372,11 +407,12 @@ export class BoardRenderer {
     });
     const { x, y, scale } = this.view;
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
-      viewport: this.viewport, transform: this.view, tiles: this.board.tiles, units,
+      viewport: this.viewport, region: this.region, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
       reachable: this.reachable, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
       effect: this.effect,
+      feedbackBounds: this.feedbackBounds(),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),
       canopies: this.canopies.map(({ tile, graphics }) => ({ tile, depth: graphics.depth, alpha: graphics.alpha })),
