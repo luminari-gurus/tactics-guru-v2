@@ -2,13 +2,13 @@
 
 ## 1. Run snapshot contract
 
-- [ ] 1.1 Record explicit approval in proposal.md before implementation; add the bounded run codec and replace the placeholder contract, verifying round-trip of reward, encounter-entry, active battle and terminal snapshots with exact ownership/stats/next RNG and nonaccumulating projection.
-- [ ] 1.2 Add malformed, oversized, corrupt, incompatible identity/version, invalid ownership/offer and cross-field mismatch tests; verify rejection before hydration and document the shared payload/32,768-unit bound for #80 in docs/qa/issue-79.md.
+- [x] 1.1 Record explicit approval in proposal.md before implementation; add the bounded run codec and replace the placeholder contract, verifying round-trip of reward, encounter-entry, active battle and terminal snapshots with exact ownership/stats/next RNG and nonaccumulating projection.
+- [x] 1.2 Add malformed, oversized, corrupt, incompatible identity/version, invalid ownership/offer and cross-field mismatch tests; verify rejection before hydration and document the shared payload/32,768-unit bound for #80 in docs/qa/issue-79.md.
 
 ## 2. Guarded persistence and session
 
-- [ ] 2.1 Add run primary/backup storage and explicit recovery APIs; verify guarded access, quota/interrupted writes, compare-before-remove and exact byte preservation for invalid primary/backup, existing battle saves and legacy keys; document key/recovery semantics.
-- [ ] 2.2 Add RunItemSession dispatch/restore/save ownership using existing domain commands; verify revision-bound stale/duplicate rejection, authoritative active-battle context, post-claim next encounter, no partial mutation and unsaved status after storage failure with focused session tests.
+- [x] 2.1 Add run primary/backup storage and explicit recovery APIs; verify guarded access, quota/interrupted writes, compare-before-remove and exact byte preservation for invalid primary/backup, existing battle saves and legacy keys; document key/recovery semantics.
+- [x] 2.2 Add RunItemSession dispatch/restore/save ownership using existing domain commands; verify revision-bound stale/duplicate rejection, authoritative active-battle context, post-claim next encounter, no partial mutation and unsaved status after storage failure with focused session tests.
 
 ## 3. Reward and party controls
 

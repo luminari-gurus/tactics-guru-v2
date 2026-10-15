@@ -69,7 +69,7 @@ The module never obtains entropy; new-run seeds/identities come from an adapter.
 
 `PendingReward` provides stable identity and independent seed. #77 defines reward catalog, timing, offer count and valid targets/effects. #78 owns the concrete pending offer and owned inventory. `acknowledgeReward` grants no item and is a reference progression step: #78/#80 must validate ownership/target/effect/offer and progression together, produce both next values before committing, and leave both unchanged on failure. Never grant inventory and then independently call a potentially failing progression step. Replayed/reloaded claims must match the same saved offer/boundary identity.
 
-`RunSaveExtension<ActiveBattle>` sketches `{run, activeBattle}` for #79/#80. It is not a codec or permission to extend the current battle-save payload. Future storage must:
+`RunSnapshot` in `src/domain/runSaveEnvelope.ts` replaces the #75 placeholder with `{items: RunItems, activeBattle: BattleState|null}`. #79 owns the bounded run codec, item session and guarded run storage; see [the #79 handoff](qa/issue-79.md) for its context, identities, 32,768-code-unit bound and recovery API. The existing battle-save payload is unchanged. Run persistence must:
 
 - Version and bound the complete envelope and nested owned inventory/equipment/pending offer using the reviewed #77 contract, without serializing scene references, previews or pending presentation.
 - Include an accepted active battle snapshot only for battle phase, cross-validating map/encounter, seed, surviving heroes, rules/content/RNG and committed HP. Run party HP represents encounter-entry HP during battle; the accepted active snapshot supplies current battle HP. Completion updates run HP at the terminal boundary.
@@ -77,7 +77,7 @@ The module never obtains entropy; new-run seeds/identities come from an adapter.
 - Preserve the exact run identity, revision and pending offer so reload cannot advance/grant twice. Round-trip must preserve next command/dice and derived seeds.
 - Use explicit compatibility/version rejection and the existing guarded storage/recovery policy; preserve corrupt/incompatible original bytes and backup. Never widen format-1 battle decoding implicitly or access legacy Godot keys.
 
-No storage adapter or new save format is implemented in #75. #79/#80 coordinate one concrete extended format and ownership; #74/#58 retain persistence acceptance.
+No storage adapter or new save format was implemented in #75. #79 now supplies one concrete format for #80 to consume; #80 still owns complete battle progression and carried-party replay. #74/#58 retain persistence acceptance.
 
 ## Acceptance mapping
 
@@ -86,7 +86,7 @@ No storage adapter or new save format is implemented in #75. #79/#80 coordinate 
 | Reviewed HP/defeat/reward/wipe/outcome/seed decisions | Decision record above; full-HP, carryover, wipe-at-each-index, terminal reset fixtures |
 | Bounded JSON RunState and separate ownership | Strict reader, invalid shape/numeric/identity fixtures, owned round trips and survivor descriptor |
 | Acyclic exactly-once sequence | Complete deterministic trace, stale/duplicate/out-of-order rejection, terminal behavior and frozen-input fixtures |
-| Reward and save interfaces | Typed boundaries/descriptors/extension sketch and explicit #77–#80 handoffs above |
+| Reward and save interfaces | Typed boundaries/descriptors and the concrete #79 snapshot handoff above |
 | Deterministic fixtures and #59 mapping | Golden seed vectors, identical trace and preview/RNG isolation; matrix below |
 
 | #59 acceptance | Contract contribution and remaining owner |
