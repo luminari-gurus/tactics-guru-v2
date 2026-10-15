@@ -1,6 +1,6 @@
 # Issue #111 — responsive battle controls verification
 
-Updated 2026-10-15 (Asia/Jerusalem). All seven issue criteria are verified; final PR publication is in progress. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
+Updated 2026-10-15 (Asia/Jerusalem). All seven issue criteria are verified. [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118) and dependent [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) are open and ready for review. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
 
 ## Geometry chunk
 
@@ -56,7 +56,7 @@ Real-control hero captures from this run: [Fighter](issue-111-battle-controls/ac
 4. **Geometry/navigation:** offset-region unit checks and real board tests cover fit, clamp limits, raised tops/sides, DPR, preserved camera on HUD changes, relative zoom on viewport changes, fresh-battle reset and bounded action feedback.
 5. **Accessibility/input:** native labels, visible focus, tab order/trap/return, Move/Wait cancellation focus, text scaling, actual contrast pairs and pointer/touch/pinch/wheel boundaries pass. Resize, modal, restart and visibility changes discard stale captured gestures. Reduced-motion adds no decorative transition; static status remains available. No screen-reader conformance claim is made.
 6. **Lifecycle:** the complete persistence/audio suites retain exact save bytes, keyboard Continue, replacement-modal focus, held Enter/Space protection, current-save history startup, recovery, restart and audio teardown. All 21 run-item cases pass with the shared modal owner.
-7. **Verification/publication:** 652 unit, 167 content, both typechecks/build, 420 browser, 18 encounter and 21 run-item cases pass. Strict OpenSpec and whitespace checks pass. All 48 prefixed-path cases pass as recorded below; publication verification follows.
+7. **Verification/publication:** 652 unit, 167 content, both typechecks/build, 420 browser, 18 encounter and 21 run-item cases pass. Strict OpenSpec and whitespace checks pass. All 48 prefixed-path cases pass as recorded below; publication verification is in the continuation plan.
 
 ## Prefix verification and publication
 

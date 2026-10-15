@@ -22,7 +22,7 @@ Implementation authorized by the owner on 2026-10-15. Tasks are checked only aft
 ## 4. Integrated acceptance and handoff
 
 - [x] 4.1 Run configured unit/content/browser checks including both encounter and run-item posttests, both TypeScript configurations, production build, strict OpenSpec and whitespace checks. Refresh current main, resolve shared-file drift with #80 only as needed, and record exact tested revisions, commands, counts, failures and limitations in the QA document.
-- [ ] 4.2 Complete real-control visual and interaction acceptance at 1280x720, 412x915, 915x412, 320x568 and 568x320, including enlarged text and safe areas. Map all seven issue criteria to evidence, verify plan/spec/task consistency, and prepare the implementation PR with only justified changes; use closure wording only when every criterion is proven.
+- [x] 4.2 Complete real-control visual and interaction acceptance at 1280x720, 412x915, 915x412, 320x568 and 568x320, including enlarged text and safe areas. Map all seven issue criteria to evidence, verify plan/spec/task consistency, and prepare the implementation PR with only justified changes; use closure wording only when every criterion is proven.
 
 ## Workflow follow-up
 

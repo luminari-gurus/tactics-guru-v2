@@ -1,10 +1,10 @@
 # Issue #111 — responsive battle controls review handoff
 
-Updated 2026-10-15 (Asia/Jerusalem). **Implementation and acceptance verified; final PR publication in progress.** OpenSpec is 9/10 checked; the final task includes publishing this handoff and the dependent PR.
+Updated 2026-10-15 (Asia/Jerusalem). **Complete and ready for review.** OpenSpec is **10/10** checked; no implementation or required acceptance work remains.
 
 - Issue: [#111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111).
 - Geometry: [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118), `work/issue-111-responsive-battle-controls` → `main`, head `ba47b0a95ff315fd3f38e7d628f99ffbe5ef3307`.
-- HUD/input implementation: `branch/issue-111-responsive-hud`, stacked on the geometry branch; PR publication is the immediate next action.
+- HUD/input implementation: [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119), `branch/issue-111-responsive-hud` → `work/issue-111-responsive-battle-controls`. Both PRs are open, ready for review and unmerged.
 - Active checkout: `C:/Users/apexw/.codex/worktrees/issue-111-responsive-controls/Tactics-Guru`. Original and planning checkouts remain untouched.
 - OpenSpec: [proposal](../../openspec/changes/issue-111-responsive-battle-controls/proposal.md), [design](../../openspec/changes/issue-111-responsive-battle-controls/design.md), [delta](../../openspec/changes/issue-111-responsive-battle-controls/specs/battle-controls/spec.md), [tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
 - Detailed acceptance, screenshots and commands: [QA record](../qa/issue-111-battle-controls.md). Accepted visual reference: [#108 design](issue-108-battle-controls-design/design.md).
@@ -35,7 +35,7 @@ Ignored evidence is in the active checkout: `tmp/hud-final-full.json`, `tmp/hud-
 
 Current `main` was refreshed at `4e601480400a241a2c08cb88a41442e55a5385b7`; the parent PR still points at `ba47b0a`. No integration drift was found. The HUD branch descends from that exact parent. No history rewrite, tag, merge or manual deployment is warranted for these review-ready feature chunks.
 
-Immediate closeout: publish the HUD branch, open its PR against `work/issue-111-responsive-battle-controls`, attach/link both PRs, mark task 4.2 complete, and verify exact remote-head equality, `0 0` parity and a clean worktree. Do not merge either PR. Review #118 first, then its dependent HUD PR; after any future parent merge, refresh main and retarget/integrate the child without losing the verified source. Preserve the merged #113 spec scenarios during a later normal archive workflow; this unmerged change is not archived here.
+PR #119 was created and read back at source/evidence head `1b6b49267aa547adb9aaa2e681445a450db65267`, with exact remote equality, `0 0` parity and a clean worktree. This final handoff-only commit is followed by the same remote/parity/clean-tree checks. Both PRs are attached to the chat. Do not merge either PR in this implementation session. Next reviewer: review #118 first, then #119; after any future parent merge, refresh main and retarget/integrate the child without losing the verified source. Preserve the merged #113 spec scenarios during a later normal archive workflow; this unmerged change is not archived here.
 
 To reproduce, add the ignored `tmp/bin` directory to PATH for its temporary npm wrapper (bundled Node is already available), set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`, and run:
 
@@ -47,4 +47,4 @@ openspec validate issue-111-responsive-battle-controls --strict
 git diff --check
 ```
 
-The build includes content validation and both TypeScript configurations. The test lifecycle includes encounter and run-item posttests. OpenSpec 1.14.1 entrypoint on this machine is `node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`, with `OPENSPEC_TELEMETRY=0`. The temporary inspection server is stopped. Default-root build output will be restored after the prefix check; future preview commands use the normal project scripts.
+The build includes content validation and both TypeScript configurations. The test lifecycle includes encounter and run-item posttests. OpenSpec 1.14.1 entrypoint on this machine is `node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`, with `OPENSPEC_TELEMETRY=0`. The temporary inspection server is stopped. Default-root build output is restored after the prefix check; future preview commands use the normal project scripts.
