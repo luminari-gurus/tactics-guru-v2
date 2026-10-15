@@ -12,11 +12,24 @@ let restart: (() => void) | undefined;
 const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
 const battle = !contentSmoke && new URLSearchParams(location.search).get('scene') !== 'proof';
 if (battle) {
+  document.body.classList.add('battle-mode');
+  document.querySelector<HTMLElement>('#battlefield')!.hidden = false;
   document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(element => { element.hidden = true; });
   document.querySelector<HTMLElement>('#battle-controls')!.hidden = false;
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
   document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
   restartButton.textContent = 'Restart battle';
+  const panel = document.querySelector<HTMLElement>('#fit-panel')!;
+  const scroll = document.createElement('div');
+  scroll.id = 'battle-scroll'; scroll.tabIndex = 0;
+  scroll.setAttribute('aria-label', 'Actions, target and secondary tools; scroll for more');
+  scroll.append(...panel.childNodes);
+  scroll.prepend(scroll.querySelector('#battle-controls')!);
+  const actor = document.createElement('header');
+  actor.id = 'battle-actor'; actor.tabIndex = 0;
+  actor.setAttribute('aria-label', 'Acting unit information; scroll for details');
+  actor.hidden = true;
+  panel.append(actor, scroll);
 }
 if (contentSmoke) {
   document.querySelectorAll('#fit-panel > :not(.fit-controls), .fit-controls > :not(#fit-status)').forEach(element => { (element as HTMLElement).hidden = true; });

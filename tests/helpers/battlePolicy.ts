@@ -55,7 +55,7 @@ export async function confirmRestart(page:Page, force=false) {
 export async function playCommand(page:Page,command:Command){
   if(command.type==='endTurn') {await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();return;}
   const snapshot=(await readSession(page)).state;
-  await page.getByRole('button',{name:command.type==='move'?'Move':command.abilityId==='ability:basic_attack'?'Basic attack':/^Signature:/,exact:command.type==='move' || command.type==='useAbility' && command.abilityId==='ability:basic_attack'}).click();
+  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();
   const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
   await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
   await page.getByRole('button',{name:'Review action'}).click();

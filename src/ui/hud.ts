@@ -5,6 +5,7 @@ import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/consta
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
 import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
+import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
 export type Action = 'move' | 'basic' | 'signature';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -46,33 +47,50 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
   }
 }
 const LOG_LIMIT=40;
+export function unitFeedback(session:BattleSession, unit:UnitState) {
+  const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
+  const guard=unit.guarded?GUARDED_STRIKE_TRADEOFF:null;
+  return {def,name:displayName(unit.defId),armorClass:def.stats.armorClass+(guard?.armorClassBonus??0),
+    accuracy:def.stats.accuracy-(guard?.attackPenalty??0),
+    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC)`:'No status effects'};
+}
 export class BattleHud {
   readonly root=document.querySelector<HTMLElement>('#battle-controls')!;
   readonly target: HTMLSelectElement;
+  private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
-  private readonly party = new Map<number,HTMLButtonElement>();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition)=>void;review:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void}) {
-    this.root.innerHTML=`<div id="battle-party" aria-label="Heroes"></div><p id="battle-active"></p><div class="fit-controls battle-actions"><button id="battle-move" data-action="move">Move</button><button data-action="basic">Basic attack</button><button data-action="signature">Signature</button><button id="battle-next">Wait / End turn</button></div><label for="battle-target">Target (or select a board cell)</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="fit-controls"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div><details id="battle-log-panel"><summary>Battle log</summary><ol id="battle-log" aria-label="Battle log"></ol></details>`;
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition)=>void;review:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;log:(lines:readonly string[])=>void}) {
+    this.actorRoot.hidden=false;
+    this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
+    for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
+      const info=unitFeedback(session,unit),img=document.createElement('img');
+      img.src=publicAssetUrl(session.catalog.assets[info.def.portraitAssetId].runtimePath);img.alt=info.name+' portrait';
+      img.className='battle-portrait';img.width=60;img.height=60;img.dataset.unitType=unit.defId;img.hidden=true;
+      this.actorRoot.querySelector('#battle-portraits')!.append(img);
+    }
+    this.root.innerHTML=`<p class="battle-section-label">Choose your action</p><div class="battle-actions" aria-label="Acting unit actions">
+      <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
+      <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
+      <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
+      <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
+      <p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
+      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
-    this.root.insertAdjacentHTML('afterbegin','<div class="fit-controls"><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><span id="battle-sound-status" aria-live="polite">Sound off</span></div>');
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
     this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
+    this.root.querySelector('#battle-party')!.addEventListener('click',()=>callbacks.inspect(),{signal});
+    this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
+    this.root.querySelector('#battle-log-open')!.addEventListener('click',()=>callbacks.log(this.log),{signal});
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>b.addEventListener('click',()=>callbacks.action(b.dataset.action as Action),{signal}));
     this.target=this.root.querySelector('#battle-target')!;
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}},{signal});
     this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.review,{signal});
     this.root.querySelector('#battle-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
-    for(const unit of session.state.units.filter(u=>u.side==='player')) {
-      if(unit.side!=='player') continue;
-      const hero=session.catalog.heroes[unit.defId], b=document.createElement('button'), img=document.createElement('img'), text=document.createElement('span');
-      img.src=publicAssetUrl(session.catalog.assets[hero.portraitAssetId].runtimePath);img.alt=`${displayName(unit.defId)} portrait`;img.width=32;img.height=32;
-      b.append(img,text); b.addEventListener('click',()=>{this.root.querySelector('#battle-preview')!.textContent=`${this.unitLabel(session.state.units.find(u=>u.id===unit.id)!)} · inspection only`;},{signal});
-      this.root.querySelector('#battle-party')!.append(b);this.party.set(unit.id,b);
-    }
   }
-  private unitLabel(u:UnitState) {const def=u.side==='player'?this.session.catalog.heroes[u.defId]:this.session.catalog.enemies[u.defId];return `${displayName(u.defId)} #${u.id} · HP ${u.hp}/${def.stats.maxHp}${u.guarded?' · Guarded':''}`;}
+  private unitLabel(u:UnitState) {const {def,name,status}=unitFeedback(this.session,u);return `${name} #${u.id} · HP ${u.hp}/${def.stats.maxHp}${status==='No status effects'?'':` · ${status}`}`;}
+  focusAction(){this.root.querySelector<HTMLButtonElement>('#battle-move:not(:disabled), #battle-next:not(:disabled)')?.focus();}
   renderSound(snapshot:BattleAudioSnapshot) {
     const button=this.root.querySelector<HTMLButtonElement>('#battle-sound')!;
     button.textContent=snapshot.enabled?'Mute':'Enable sound';button.setAttribute('aria-pressed',String(snapshot.enabled));
@@ -82,13 +100,32 @@ export class BattleHud {
   }
   render(action:Action|null, selected:CellPosition|null, message:string) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
-    for(const u of s.state.units.filter(u=>u.side==='player')) { const b=this.party.get(u.id)!;b.querySelector('span')!.textContent=this.unitLabel(u);b.setAttribute('aria-current',String(u.id===actor.id)); }
-    this.root.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'} · ${this.unitLabel(actor)} · Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}${s.phase==='presenting'?' · Animating':''}`;
-    this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{b.disabled=!enabled || (b.dataset.action==='move'?actor.hasMoved:actor.hasActed);b.setAttribute('aria-pressed',String(b.dataset.action===action));if(b.dataset.action==='signature') {const a=Object.values(s.catalog.abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(actor.defId));b.textContent=a?`Signature: ${displayName(a.id)}`:'Signature';}});
+    const info=unitFeedback(s,actor);
+    this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
+    this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
+    this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${actor.hp}/${info.def.stats.maxHp}`;
+    this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==actor.defId;});
+    (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*actor.hp/info.def.stats.maxHp}%`;
+    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${info.armorClass} · Accuracy ${info.accuracy>=0?'+':''}${info.accuracy}`;
+    this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
+    this.actorRoot.querySelector('#battle-budgets')!.textContent=`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
+    const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
+    this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
+      const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
+      const signature=b.dataset.action==='signature'?Object.values(s.catalog.abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(actor.defId)):null;
+      b.disabled=!enabled || spent || (b.dataset.action==='signature' && !signature);
+      b.setAttribute('aria-pressed',String(b.dataset.action===action));
+      b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.dataset.action==='move'?'Uses movement':'Uses action';
+      if(b.dataset.action==='signature'){const label=signature?displayName(signature.id):'No signature';b.querySelector('strong')!.textContent=label;b.setAttribute('aria-label',label);}
+    });
+    this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait ends the turn immediately.`;
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
     (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || !s.pending;
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;
     this.root.querySelector('#battle-selection')!.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
+    const target=selected?s.state.units.find(u=>u.cell.x===selected.x&&u.cell.y===selected.y):undefined;
+    this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${this.unitLabel(target)}`:'';
+    const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=!target;inspect.dataset.unitId=target?String(target.id):'';
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {const reach=previewMovement(s.state,actor.id,s.catalog);if(reach.ok) for(const c of reach.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
@@ -99,7 +136,6 @@ export class BattleHud {
   append(events:readonly BattleEvent[]) {
     for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
-    this.root.querySelector('#battle-log')!.replaceChildren(...this.log.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));
   }
-  dispose(){this.abort.abort();this.root.replaceChildren();}
+  dispose(){this.abort.abort();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }

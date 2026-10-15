@@ -1,4 +1,4 @@
-export interface DialogChoice { id: string; label: string; run: () => void }
+export interface DialogChoice { id: string; label: string; run: () => void; keepOpen?: boolean }
 /** One native modal owner for battle actions, outcomes and persistence recovery. */
 export class BattleDialogs {
   readonly element=document.createElement('dialog');
@@ -8,7 +8,8 @@ export class BattleDialogs {
   private cancel:(()=>void)|null=null;
   constructor(private readonly transition:()=>void, private readonly restart:()=>void) {
     this.element.id='battle-dialog';this.element.setAttribute('aria-labelledby','battle-dialog-title');
-    this.element.innerHTML='<h2 id="battle-dialog-title"></h2><p id="battle-dialog-message"></p><div class="fit-controls"></div>';
+    this.element.setAttribute('aria-describedby','battle-dialog-message');
+    this.element.innerHTML='<h2 id="battle-dialog-title"></h2><div id="battle-dialog-message"></div><div class="fit-controls"></div>';
     document.body.append(this.element); const signal=this.abort.signal;
     // A held confirmation key must not activate the next focused button (e.g. reset).
     document.addEventListener('keydown',event=>{
@@ -17,7 +18,7 @@ export class BattleDialogs {
     this.element.addEventListener('click',event=>{
       const button=(event.target as Element).closest('button');
       const choice=this.choices.find(c=>c.id===button?.id);
-      if(choice)this.close(choice.run);
+      if(choice){if(choice.keepOpen)choice.run();else this.close(choice.run);}
     },{signal});
     this.element.addEventListener('cancel',e=>{e.preventDefault();if(this.cancel)this.close(this.cancel);},{signal});
     this.element.addEventListener('keydown',e=>{
@@ -44,7 +45,7 @@ export class BattleDialogs {
     this.element.querySelector('.fit-controls')!.replaceChildren(...choices.map(choice=>{
       const button=document.createElement('button');button.type='button';button.id=choice.id;button.textContent=choice.label;return button;
     }));
-    this.transition();if(!this.open)this.element.showModal();
+    this.transition();if(!this.open)this.element.showModal();else this.element.querySelector('button')?.focus();
   }
   dismiss(){if(this.cancel)this.close(this.cancel);}
   close(callback:(()=>void)|null=null){
