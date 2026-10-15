@@ -16,8 +16,8 @@ test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTAB
 const kinds = ['guarded_strike','high_shot','magic_missile'] as const;
 type Outcome = 'any'|'miss'|'critical'|'defeat';
 /** Reach a real accepted boundary with the existing policy/session, never invent battle state. */
-function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false) {
-  for(let seed=2;seed<80;seed++){
+function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false,firstSeed=2) {
+  for(let seed=firstSeed;seed<80;seed++){
     const session=new BattleSession(catalog,'map:forest_ruins',seed);
     for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
       const command=session.phase==='player'?playerDecision(session.state):null;
@@ -39,6 +39,25 @@ type Boundary=ReturnType<typeof boundary>;
 const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+
+function sharedCellBoundary() {
+  const session=new BattleSession(catalog,'map:forest_ruins',1);
+  for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
+    if(session.phase==='player'){
+      const target=session.state.units.find(u=>u.hp>0 && u.side==='enemy' && session.state.units.some(d=>d.hp===0 && d.cell.x===u.cell.x && d.cell.y===u.cell.y));
+      if(target){
+        const command:Command={type:'useAbility',unitId:session.active.id,abilityId:'ability:basic_attack',target:{unitId:target.id}};
+        if(session.prepare(command).ok)return {command,...session.confirm()!};
+      }
+    }
+    const command=session.phase==='player'?playerDecision(session.state):null;
+    if(command)session.prepare(command);
+    const step=command?session.confirm():session.nextEnemy();
+    if(!step)throw Error('Policy failed to make progress');
+    session.finishPresentation(step.token);
+  }
+  throw Error('No legal shared-cell boundary');
+}
 
 async function boot(page:Page,fixture:Boundary) {
   const encoded=encodeBattleSave(fixture.before,catalog);expect(encoded.ok).toBe(true);if(!encoded.ok)throw Error(encoded.reason);
@@ -85,6 +104,66 @@ function aligned(r:any,fixture:Boundary) {
     expect(r.units.find((u:any)=>u.id===id).anchorError).toBeLessThan(0.001);
   }
 }
+
+test('shared corpse cell keeps living target identity through inspection, confirmation and execution',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  const fixture=sharedCellBoundary();expect(fixture.before.commandCount).toBe(64);
+  const target=fixture.before.units.find(u=>u.id===5)!,corpse=fixture.before.units.find(u=>u.id===2)!;
+  expect(target.hp).toBe(5);expect(corpse.hp).toBe(0);expect(corpse.cell).toEqual(target.cell);
+  await boot(page,fixture);
+  await expect(page).toHaveTitle(/Tactics Guru/);await expect(page.locator('vite-error-overlay')).toHaveCount(0);
+  await page.locator('[data-action="basic"]').click();await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  const label='Goblin Archer #5 · HP 5/8',saved=await stored(page),prepared=await page.locator('#game').getAttribute('data-session');
+  expect(JSON.parse(prepared!).pending).toEqual(fixture.command);
+  await expect(page.locator('#battle-target option:checked')).toContainText(label);
+  await expect(page.locator('#battle-target-info')).toHaveText(`Target: ${label}`);
+  await page.locator('#battle-inspect-target').click();await expect(page.locator('#battle-dialog-title')).toHaveText('Inspection only — Goblin Archer #5');
+  await expect(page.locator('#battle-dialog-message')).toContainText('HP 5/8');
+  await page.locator('#inspection-close').click();expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);expect(await stored(page)).toEqual(saved);
+  // Confirmation must use the prepared command, even if the rendered panel is stale.
+  await page.locator('#battle-target-info').evaluate(el=>{el.textContent='Target: Ranger #2 · Defeated';});
+  await page.locator('#battle-review').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Target: ${label}`);
+  await expect(page.locator('#battle-dialog-message')).not.toContainText('Ranger #2');
+  await page.screenshot({path:info.outputPath('living-target-confirmation.png')});
+  await confirmFrozen(page);
+  const accepted=await readSession(page);expect(accepted.continuation!.commands).toEqual([fixture.command]);
+  expect(accepted.events).toEqual(fixture.events);expect(accepted.state).toEqual(fixture.after);expect(accepted.state.units.find(u=>u.id===corpse.id)!.hp).toBe(0);
+  await page.clock.runFor(700);await ready(page);expect(errors).toEqual([]);
+});
+
+for(const outcome of ['miss','defeat'] as const)test(`guarded strike ${outcome}: panned-edge actor and target feedback never overlap`,async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  const fixture=boundary('guarded_strike',outcome,false,1);
+  if(outcome==='defeat'){expect(fixture.before.seed).toBe(1);expect(fixture.before.commandCount).toBe(73);}
+  await page.setViewportSize({width:320,height:568});await boot(page,fixture);
+  const r=(await report(page)).region;
+  const drag=async(dx:number,dy:number)=>{
+    const x=r.x+r.width*(dx>0?.1:dx<0?.9:.5),y=r.y+r.height*(dy>0?.1:dy<0?.9:.5);
+    await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx*r.width*.8,y+dy*r.height*.8,{steps:8});await page.mouse.up();
+  };
+  // Reproduce the review: pan before the command, with no mid-animation gesture.
+  await drag(0,-1);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
+  const saved=await stored(page);
+  const check=async()=>{
+    const frame=await report(page),labels=frame.feedbackBounds;
+    expect(labels.map((b:any)=>b.text)).toEqual(abilityPresentation(fixture.events).feedback.map(f=>f.text));
+    expect(labels).toHaveLength(outcome==='defeat'?3:2);
+    for(const a of labels){
+      expect(a.x).toBeGreaterThanOrEqual(frame.region.x);expect(a.y).toBeGreaterThanOrEqual(frame.region.y);
+      expect(a.x+a.width).toBeLessThanOrEqual(frame.region.x+frame.region.width);expect(a.y+a.height).toBeLessThanOrEqual(frame.region.y+frame.region.height);
+    }
+    for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
+      const a=labels[i],b=labels[j];expect(a.x+a.width<=b.x || b.x+b.width<=a.x || a.y+a.height<=b.y || b.y+b.height<=a.y,`${a.text} overlaps ${b.text}`).toBe(true);
+    }
+    expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);
+  };
+  await check();await page.screenshot({path:info.outputPath(`guarded-${outcome}-prepan.png`)});
+  // Re-layout at the other edges, maximum zoom and an actual viewport change.
+  for(const [dx,dy] of [[0,1],[-1,0],[1,0],[0,-1]]){await drag(dx,dy);await check();}
+  await page.mouse.move(r.x+r.width/2,r.y+r.height/2);await page.mouse.wheel(0,-3000);await drag(0,-1);await check();
+  await page.setViewportSize({width:568,height:320});await page.clock.runFor(32);await check();
+  await page.clock.runFor(700);await ready(page);expect(errors).toEqual([]);
+});
 
 for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed anchors and exactly one accepted result`,async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});

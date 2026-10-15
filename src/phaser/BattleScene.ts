@@ -6,7 +6,7 @@ import { BattlePersistence } from '../app/BattlePersistence';
 import { previewMove, previewMovement } from '../domain/grid';
 import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import type { Point, BoardRegion } from '../geometry/iso';
-import { BattleHud, actionCommand, previewText, displayName, unitFeedback, type Action } from '../ui/hud';
+import { BattleHud, actionCommand, previewText, displayName, unitFeedback, unitLabel, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
 import { BoardRenderer } from './BoardRenderer';
@@ -100,7 +100,10 @@ export class BattleScene extends Phaser.Scene {
       if(session.phase!=='player' || !session.pending || dialogs.open)return;
       const command=session.pending,preview=session.preview(command);
       const name=command.type==='useAbility'?displayName(command.abilityId):command.type==='move'?'Move':'Wait';
-      const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`:document.querySelector('#battle-target-info')!.textContent;
+      const targetIds=command.type==='useAbility' ? 'unitId' in command.target ? [command.target.unitId]
+        : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
+      const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
+        :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
       dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();message='Cancelled';refresh();});
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};

@@ -54,6 +54,10 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
     accuracy:def.stats.accuracy-(guard?.attackPenalty??0),
     status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC)`:'No status effects'};
 }
+export function unitLabel(session:BattleSession, unit:UnitState) {
+  const {def,name,status}=unitFeedback(session,unit);
+  return `${name} #${unit.id} · HP ${unit.hp}/${def.stats.maxHp}${status==='No status effects'?'':` · ${status}`}`;
+}
 export class BattleHud {
   readonly root=document.querySelector<HTMLElement>('#battle-controls')!;
   readonly target: HTMLSelectElement;
@@ -89,7 +93,6 @@ export class BattleHud {
     this.root.querySelector('#battle-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
   }
-  private unitLabel(u:UnitState) {const {def,name,status}=unitFeedback(this.session,u);return `${name} #${u.id} · HP ${u.hp}/${def.stats.maxHp}${status==='No status effects'?'':` · ${status}`}`;}
   focusAction(){this.root.querySelector<HTMLButtonElement>('#battle-move:not(:disabled), #battle-next:not(:disabled)')?.focus();}
   renderSound(snapshot:BattleAudioSnapshot) {
     const button=this.root.querySelector<HTMLButtonElement>('#battle-sound')!;
@@ -123,13 +126,14 @@ export class BattleHud {
     (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || !s.pending;
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;
     this.root.querySelector('#battle-selection')!.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
-    const target=selected?s.state.units.find(u=>u.cell.x===selected.x&&u.cell.y===selected.y):undefined;
-    this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${this.unitLabel(target)}`:'';
+    const occupants=selected?s.state.units.filter(u=>u.cell.x===selected.x&&u.cell.y===selected.y):[];
+    const target=occupants.find(u=>u.hp>0)??occupants[0];
+    this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=!target;inspect.dataset.unitId=target?String(target.id):'';
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {const reach=previewMovement(s.state,actor.id,s.catalog);if(reach.ok) for(const c of reach.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
-    else if(enabled && action) for(const u of s.state.units.filter(u=>u.side!==actor.side && u.hp>0)) options.push({cell:u.cell,label:this.unitLabel(u)});
+    else if(enabled && action) for(const u of s.state.units.filter(u=>u.side!==actor.side && u.hp>0)) options.push({cell:u.cell,label:unitLabel(s,u)});
     this.target.replaceChildren(new Option('Choose target',''),...options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`)));
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }

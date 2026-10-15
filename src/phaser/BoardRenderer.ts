@@ -328,6 +328,7 @@ export class BoardRenderer {
     });
     // Keep each unit's result/defeat stack readable inside the clipped region.
     // Move the stack together so clamping cannot collapse two labels into one.
+    const stacks:{labels:Phaser.GameObjects.Text[];left:number;right:number;top:number;bottom:number}[]=[];
     for(const key of new Set(this.effectLabels.map(({anchor})=>`${anchor.x},${anchor.y}`))){
       const labels=this.effectLabels.filter(({anchor})=>`${anchor.x},${anchor.y}`===key).map(({text})=>text);
       const left=Math.min(...labels.map(t=>t.x-t.displayWidth/2)),right=Math.max(...labels.map(t=>t.x+t.displayWidth/2));
@@ -336,6 +337,24 @@ export class BoardRenderer {
       const dx=Math.max((r.x+4-x)/scale-left,Math.min(0,(r.x+r.width-4-x)/scale-right));
       const dy=Math.max((r.y+4-y)/scale-top,Math.min(0,(r.y+r.height-4-y)/scale-bottom));
       labels.forEach(t=>t.setPosition(t.x+dx,t.y+dy));
+      stacks.push({labels,left:left+dx,right:right+dx,top:top+dy,bottom:bottom+dy});
+    }
+    // Clamping can put different units at the same edge. Only on collision,
+    // collect their intact stacks into one column. Reserve hidden impact labels
+    // too, so the group does not jump when damage/defeat becomes visible.
+    if(stacks.some((a,i)=>stacks.some((b,j)=>i<j && a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom))){
+      const {x,y,scale}=this.view,r=this.region,gap=3/scale;
+      stacks.sort((a,b)=>a.top-b.top);
+      const width=Math.max(...stacks.map(s=>s.right-s.left));
+      const height=stacks.reduce((sum,s)=>sum+s.bottom-s.top,0)+gap*(stacks.length-1);
+      const center=(Math.min(...stacks.map(s=>s.left))+Math.max(...stacks.map(s=>s.right)))/2;
+      const columnX=Math.max((r.x+4-x)/scale+width/2,Math.min(center,(r.x+r.width-4-x)/scale-width/2));
+      let top=Math.max((r.y+4-y)/scale,Math.min(stacks[0].top,(r.y+r.height-4-y)/scale-height));
+      for(const stack of stacks){
+        const dx=columnX-(stack.left+stack.right)/2,dy=top-stack.top;
+        stack.labels.forEach(t=>t.setPosition(t.x+dx,t.y+dy));
+        top+=stack.bottom-stack.top+gap;
+      }
     }
     if(this.effect)this.effectLabels.forEach(({text},i)=>{this.effect!.feedback[i].x=text.x;this.effect!.feedback[i].y=text.y;});
   }
