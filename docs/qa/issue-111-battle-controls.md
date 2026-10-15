@@ -1,6 +1,31 @@
 # Issue #111 — responsive battle controls verification
 
-Updated 2026-10-15 (Asia/Jerusalem). All seven issue criteria are verified. [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118) and dependent [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) are open and ready for review. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
+Updated 2026-10-16 (Asia/Jerusalem). [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118) is merged. Both review findings in [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) are repaired and verified; it remains open and ready to merge. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
+
+## PR #119 review repairs — 2026-10-16
+
+Repair source/test commit: `617830999bd4fc7539b47188b1b41b1bcf1f7b4e`, on `453cf2d`, containing main `21f5023`. Both published P2 findings were valid and reproduced before editing runtime code.
+
+- **Target identity:** legal seed 1 at command count 64 has dead Ranger #2 and living Archer #5 at (3,8). The old panel/inspection/confirmation selected the corpse although the prepared command attacked #5. The HUD now prefers the living occupant, and confirmation reads command target IDs through the shared label formatter. The browser regression checks the dropdown, panel, inspection, unchanged pending state/save bytes, confirmation even after stale panel text is injected, and exact committed command/events/state.
+- **Feedback overlap:** legal seed 1 at command count 73, panned upward before Guarded Strike at 320×568, made `Hit · −5` intersect `Guarded`. The existing per-unit clamping now collects colliding stacks into a separated column, preserving damage/defeat order and reserving hidden labels. Browser cases assert pairwise non-overlap and containment for all actor/target labels, for miss and defeat, at the reproduced edge, other pan directions, zoom and rotation to 568×320.
+- The initial desktop probe reproduced both defects. A duplicate hit case also exposed a test assumption: the reviewed hit is lethal and emits three labels, including Defeated. The final cases explicitly cover miss (two labels) and defeat (three), avoiding duplicate fixture coverage.
+
+Fresh completed verification:
+
+- `npm run test:unit`: **652/652**, 38 files.
+- `npm run build`: **167/167** content checks, both TypeScript configurations, production build passed.
+- `playwright test tests/battle-animations.spec.ts --grep "shared corpse|panned-edge"`: **9/9**.
+- `playwright test --reporter=line,json`: **429/429**, 143 per configured profile.
+- `playwright test -c playwright.encounters.config.ts --reporter=line,json`: **18/18**.
+- `playwright test -c playwright.run-items.config.ts --reporter=line,json`: **21/21**.
+- The last three commands execute the complete `npm test`/posttest lifecycle separately so each retains its own JSON report and artifact directory. Each case passed on its first attempt; no retries or skips.
+- `openspec validate issue-111-responsive-battle-controls --strict` and `git diff --check` passed.
+
+Environment: Windows, Node 24.19.0, installed Edge 155.0.4283.45 through repository Playwright, one worker, `http://127.0.0.1:4173/`. Browser plugin not available; the existing Playwright workflow was used. Checks covered page identity, nonblank ready UI, no framework overlay, console/page-error health, rendered screenshots and the actual selection/inspection/review/confirm flow. Desktop confirmation shows living Archer #5; the small portrait impact screenshot shows Defeated, Hit and Guarded separately. Synthetic clock control freezes presentation for inspection; legal commands and saved snapshots come from the existing policy/session.
+
+Evidence is retained outside the repository at `C:/Users/apexw/.codex/visualizations/2026/10/15/01a1416d-6c5e-7b61-9411-f14b6983e626/pr119/`: `baseline-tests.log`, `fixed-tests.log`, `unit.log`, `final-build.log`, `clean-build.log`, `full.json`, `encounters.json`, `run-items.json`, corresponding logs and artifact directories. Focused screenshots include `living-target-confirmation.png` and `guarded-defeat-prepan.png` under `fixed-artifacts/`.
+
+The build's snapshot generator again changed only line endings; filtered blob identity was verified before restoring the snapshot and emitting a clean build stamped `6178309`. Final documentation commits preserve all runtime/test objects. The existing bundle-size warning remains. No fresh prefix-path run, physical-device/screen-reader acceptance or deployment certification is claimed. Earlier evidence below remains dated implementation evidence.
 
 ## Geometry chunk
 
