@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>Battle controls · Tactics Guru design #108</title>
+<style>
+:root{color-scheme:dark;--ink:#f5efdf;--muted:#c3cbd6;--gold:#f0cf83;--panel:#182335;--button:#26364b;--edge:#8d9bad;--good:#a9ddb8;--warning:#ffc1ae;font:16px/1.4 system-ui,sans-serif;color:var(--ink);background:#101827}
+*{box-sizing:border-box}body{margin:0}button,select,summary,a{touch-action:manipulation}button,select,summary{font:inherit;color:inherit;min-width:44px;min-height:44px}button,select{border:1px solid var(--edge);border-radius:5px;background:var(--button);padding:9px 12px}button,summary{cursor:pointer}button:hover:not(:disabled){background:#31445b}button:disabled{cursor:default;color:var(--muted);background:var(--panel)}:focus-visible{outline:3px solid var(--gold);outline-offset:2px}a{color:var(--gold)}h1,h2,h3,p{margin:0}h1,h2,h3{font-family:Georgia,serif;font-weight:normal}h2{font-size:1.6rem}h3{font-size:1.1rem}small,.small{font-size:.8rem;color:var(--muted)}[hidden]{display:none!important}
+.reviewer{padding:12px 20px;display:flex;align-items:end;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--edge)}.reviewer h1{font-size:1.35rem}.reviewer label{display:grid;gap:4px}.reviewer a{padding:10px}.reviewer select{max-width:100%}.export .reviewer{display:none}.stage{height:calc(100dvh - 110px);min-height:320px;display:grid;grid-template-columns:minmax(0,1fr) 352px;gap:12px;padding:max(12px,env(safe-area-inset-top),var(--test-safe-top,0px)) max(12px,env(safe-area-inset-right),var(--test-safe-right,0px)) max(12px,env(safe-area-inset-bottom),var(--test-safe-bottom,0px)) max(12px,env(safe-area-inset-left),var(--test-safe-left,0px))}.export .stage{height:100dvh;min-height:0}
+.board-area{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;background:#172033;border:1px solid #536275;border-radius:8px}.board-title{display:flex;justify-content:space-between;gap:10px;padding:16px 18px;border-bottom:1px solid #536275}.eyebrow{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}.board-title h1{font-size:1.5rem;margin-top:4px}.board-title .round{text-align:right;color:var(--muted);font-size:.8rem}.board{position:relative;min-height:0;min-width:0;display:block;width:100%;height:100%;padding:0;border:0;border-radius:0;background:#172033;overflow:hidden}.board:hover:not(:disabled){background:#172033}.board img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}.board:focus-visible{outline-offset:-4px}.board-note{padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.75rem;color:var(--muted);border-top:1px solid #536275}.board-note .capture{margin-left:auto}.board-note strong{color:var(--gold)}
+.controls{min-height:0;min-width:0;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--edge);border-radius:8px;overflow:hidden;box-shadow:0 10px 28px #0004}.actor{flex:none;padding:16px;border-bottom:1px solid var(--edge);background:linear-gradient(125deg,#25374b,#182335)}.turnline{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:.78rem;color:var(--gold)}.identity{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px;align-items:center}.identity img{width:60px;height:60px;object-fit:cover;border:1px solid var(--gold);border-radius:6px}.name-row{display:flex;justify-content:space-between;align-items:baseline;gap:5px}.hp{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.9rem}.health{height:5px;margin:5px 0 7px;background:#0b1320;border-radius:5px}.health span{display:block;height:100%;background:var(--good);border-radius:5px}.identity .small{font-size:.75rem}.budgets{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.budget{border:1px solid var(--edge);padding:3px 7px;font-size:.75rem;border-radius:3px}.spent{color:var(--warning)}.control-scroll{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:16px;scroll-padding:12px;scrollbar-gutter:stable}.section-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:10px;min-height:66px;line-height:1.2;overflow-wrap:anywhere}.actions .action-name{font-weight:650}.actions .action-hint{font-size:.75rem;color:var(--muted);margin-top:7px}.actions button[aria-pressed=true]{border:2px solid var(--gold);padding:9px;background:#334155}.actions button[aria-pressed=true] .action-hint{color:var(--gold)}.reason{font-size:.8rem;color:var(--muted);margin:10px 0 15px}.decision{border-top:1px solid #66768d;padding-top:13px}.decision label{display:block;font-size:.75rem;margin-bottom:6px;color:var(--muted)}.decision select{width:100%;font-size:.85rem;white-space:normal}.preview{padding:12px 0;font-size:.85rem;min-height:56px}.preview strong{display:block;color:var(--gold);margin-bottom:4px}.preview.invalid strong{color:var(--warning)}.commit-row{display:grid;grid-template-columns:1fr auto;gap:8px}.primary{background:var(--gold);color:#182335;border-color:var(--gold);font-weight:650}.primary:hover:not(:disabled){background:#ffe3a4}.tools{margin-top:16px;border-top:1px solid #66768d;padding-top:12px;display:flex;gap:6px;flex-wrap:wrap}.tools button{font-size:.8rem;padding:8px 10px}.status-line{font-size:.75rem;color:var(--muted);margin-top:10px}.status-line span{display:block}.design-label{margin-top:12px;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+dialog{width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:2px solid var(--gold);border-radius:8px;padding:22px;background:var(--panel);color:var(--ink)}dialog::backdrop{background:#060b14bf}dialog h2{margin-bottom:12px}dialog p{margin:8px 0 16px}dialog .choices{display:flex;gap:8px;flex-wrap:wrap}dialog .portrait{width:64px;height:64px;border-radius:5px;float:left;margin:0 14px 12px 0}dialog dl{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;clear:both;margin:16px 0}dialog dt{color:var(--muted)}dialog dd{margin:0;text-align:right}dialog .party-list{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}dialog .party-list button{flex:1}dialog ol{padding-left:22px}dialog .modal-note{font-size:.8rem;color:var(--muted)}
+@media(max-width:759px) and (min-height:501px),(orientation:portrait){.stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) min(56%,510px);gap:8px;padding:max(8px,env(safe-area-inset-top),var(--test-safe-top,0px)) max(8px,env(safe-area-inset-right),var(--test-safe-right,0px)) max(8px,env(safe-area-inset-bottom),var(--test-safe-bottom,0px)) max(8px,env(safe-area-inset-left),var(--test-safe-left,0px))}.actor{padding:12px}.identity{grid-template-columns:48px minmax(0,1fr);gap:10px}.identity img{width:48px;height:48px}.turnline{margin-bottom:6px}.budgets{margin-top:8px}.control-scroll{padding:12px}.board-title{padding:10px 12px}.board-title h1{font-size:1.15rem}.board-note{padding:7px 10px;font-size:.7rem}.board-note .capture{margin-left:0}.actions button{min-height:60px}.board-title .eyebrow{font-size:.62rem}}
+@media(orientation:landscape) and (max-height:500px){.stage{grid-template-columns:minmax(0,1fr) 280px;gap:8px;padding:max(8px,env(safe-area-inset-top),var(--test-safe-top,0px)) max(8px,env(safe-area-inset-right),var(--test-safe-right,0px)) max(8px,env(safe-area-inset-bottom),var(--test-safe-bottom,0px)) max(8px,env(safe-area-inset-left),var(--test-safe-left,0px))}.actor{padding:10px}.turnline{margin-bottom:5px}.identity{grid-template-columns:40px minmax(0,1fr);gap:8px}.identity img{width:40px;height:40px}.identity h2{font-size:1.3rem}.budgets{margin-top:6px}.control-scroll{padding:10px}.board-title{padding:8px 12px}.board-title h1{font-size:1.1rem}.board-note{padding:6px 10px}.actions button{min-height:62px}.reason{margin-bottom:10px}.tools{margin-top:12px}}
+@media(orientation:landscape) and (max-height:500px) and (max-width:640px){.stage{grid-template-columns:minmax(0,1fr) 244px}.board-title .round{display:none}.board-title .eyebrow{font-size:.6rem}.board-note .capture{display:none}.identity h2{font-size:1.15rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+.actor{max-height:45%;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.name-row{flex-wrap:wrap}.name-row h2{overflow-wrap:anywhere}
+.board-area{display:flex;flex-direction:column}.board-title{flex:0 1 auto;min-height:0;max-height:30%;overflow:auto}.board{flex:1 0 30dvh;min-height:30dvh}.board-note{flex:0 1 auto;min-height:0;max-height:24%;overflow:auto}
+@media(orientation:landscape) and (max-height:500px){.board{flex-basis:55dvh;min-height:55dvh}}
+@media(orientation:portrait) and (max-width:450px) and (max-height:700px){.board-title{display:none}.board-note .capture{display:none}}
+.actor,.control-scroll,.board-title,.board-note{scrollbar-width:thin;scrollbar-color:var(--edge) var(--panel)}
+</style>
+</head>
+<body>
+<header class="reviewer" aria-label="Design review controls">
+ <div><h1>Battle controls / study 108</h1><small>Display fixtures, not a playable battle</small></div>
+ <label>Acting hero fixture<select id="hero-fixture"><option value="fighter">Fighter</option><option value="ranger">Ranger</option><option value="mage">Mage</option></select></label>
+ <label>State fixture<select id="state-fixture"></select></label>
+ <a href="design.md">Design &amp; handoff</a><button id="export-view">Open player view</button>
+</header>
+<main class="stage">
+ <section class="board-area" aria-label="Reserved battlefield region">
+  <header class="board-title"><div><p class="eyebrow">Tactics Guru · Forest Ruins</p><h1>Hold your ground.</h1></div><p class="round">Round 3<br><span id="board-phase">Your turn</span></p></header>
+  <button class="board" id="board" aria-label="Board context. Enter selects an illustrative target; actual cell navigation is a runtime handoff." aria-describedby="board-help"><img src="previews/board-context.png" alt="Actual Forest Ruins board capture; independent from the illustrative control state"></button>
+  <footer class="board-note"><span id="board-help">Board context · <strong id="board-selection">No target selected</strong></span><span class="capture">Prototype board inputs: <output id="board-count">0</output></span></footer>
+ </section>
+ <aside class="controls" aria-label="Battle controls">
+  <header class="actor" tabindex="0" aria-label="Acting unit information; scroll for details at enlarged text">
+   <p class="turnline"><strong id="phase" role="status">Your turn</strong><span>ACTING UNIT</span></p>
+   <div class="identity"><img id="portrait" src="../../../public/battle/portraits/fighter.png" alt="Fighter portrait"><div><div class="name-row"><h2 id="actor-name">Fighter</h2><span class="hp" id="hp">14 / 18 HP</span></div><div class="health" aria-hidden="true"><span id="health-fill"></span></div><p class="small" id="stats">AC 14 · Accuracy +4</p><p class="small" id="status">No status effects</p></div></div>
+   <div class="budgets"><span class="budget" id="move-budget">Move ready</span><span class="budget" id="action-budget">Action ready</span></div>
+  </header>
+  <div class="control-scroll" tabindex="0" aria-label="Actions, target and secondary tools; scroll for more">
+   <p class="section-label" id="actions-heading">Choose your action</p>
+   <div class="actions" aria-label="Acting unit actions">
+    <button id="move" data-action="move" aria-pressed="false" aria-describedby="reason"><span class="action-name">Move</span><span class="action-hint">Uses movement</span></button>
+    <button id="basic" data-action="basic" aria-pressed="false" aria-describedby="reason"><span class="action-name">Basic attack</span><span class="action-hint">Uses action</span></button>
+    <button id="signature" data-action="signature" aria-pressed="false" aria-describedby="reason"><span class="action-name">Guarded Strike</span><span class="action-hint">Uses action</span></button>
+    <button id="wait" aria-describedby="reason"><span class="action-name">Wait / End turn</span><span class="action-hint">Ends turn immediately</span></button>
+   </div>
+   <p class="reason" id="reason">Choose an action, then a target. Wait ends the turn immediately.</p>
+   <section class="decision" aria-label="Target and action preview">
+    <label for="target">Target / destination</label><select id="target" disabled><option value="">Choose an action first</option></select>
+    <div id="preview" class="preview" aria-live="polite"><strong>No action selected</strong><span>Your next decision starts above.</span></div>
+    <div class="commit-row"><button class="primary" id="review" disabled>Review action</button><button id="cancel" disabled>Cancel</button></div>
+   </section>
+   <nav class="tools" aria-label="Secondary battle tools"><button id="inspect">Inspect party</button><button id="log">Battle log</button><button id="sound" aria-pressed="false">Enable sound</button><button id="recovery">Save recovery</button><button id="restart">Restart battle</button><button id="help">Board controls</button></nav>
+   <p class="status-line"><span id="sound-status" aria-live="polite">Sound off · display only</span><span>Save status: current battle saved · example</span></p>
+   <p class="design-label">Design study · illustrative state</p>
+  </div>
+ </aside>
+</main>
+<dialog id="dialog" aria-labelledby="dialog-title" aria-describedby="dialog-copy"><h2 id="dialog-title"></h2><div id="dialog-copy"></div><div class="choices" id="dialog-choices"></div></dialog>
+<script>
+// A finite presentation demo only. All legality, commands, saves and RNG stay in the game.
+const $=id=>document.getElementById(id);
+const heroes={
+ fighter:{name:'Fighter',hp:14,max:18,ac:14,accuracy:4,power:3,dex:0,will:1,signature:'Guarded Strike',forecast:'Hit 55% · attack +2 vs AC 12 · damage 5 (10 critical) · uses action'},
+ ranger:{name:'Ranger',hp:9,max:12,ac:12,accuracy:5,power:2,dex:2,will:0,signature:'High Shot',forecast:'Hit 70% · attack +5 vs AC 12 · damage 4 (8 critical) · uses action'},
+ mage:{name:'Mage',hp:7,max:11,ac:11,accuracy:3,power:4,dex:1,will:2,signature:'Magic Missile',forecast:'Automatic hit · 2–5 force damage · uses action'}
+};
+const states={idle:'Idle',selected:'Action selected / choose target',preview:'Valid target preview',invalid:'Invalid target',review:'Review and confirm','move-spent':'Movement spent','action-spent':'Action spent',enemy:'Enemy turn',presenting:'Presentation / input lock',victory:'Victory',defeat:'Defeat',inspection:'Inspect non-acting ally'};
+const query=new URLSearchParams(location.search);
+let hero=Object.hasOwn(heroes,query.get('hero'))?query.get('hero'):'fighter';
+let state=Object.hasOwn(states,query.get('state'))?query.get('state'):'idle';
+let action=null,choice='',phase='player',moved=false,acted=false,guarded=false,boardCount=0,prior=null,onDismiss=()=>{},sound=false;
+if(query.has('export'))document.body.classList.add('export');
+$('hero-fixture').value=hero;
+for(const [value,label] of Object.entries(states))$('state-fixture').add(new Option(label,value));
+const actionLabel=()=>action==='move'?'Move':action==='basic'?'Basic attack':heroes[hero].signature;
+function forecast(){if(action==='move')return 'Move 2 steps · cost 2 · uses movement';if(action==='signature')return heroes[hero].forecast;const h=heroes[hero];return `Hit ${({fighter:65,ranger:70,mage:60})[hero]}% · attack +${h.accuracy} vs AC 12 · damage ${2+h.power} (${2*(2+h.power)} critical) · uses action`;}
+function render(){
+ const h=heroes[hero],enemy=phase==='enemy',locked=phase!=='player';
+ $('phase').textContent=({player:'Your turn',enemy:'Enemy turn',presenting:'Resolving action · locked',victory:'Victory · battle complete',defeat:'Defeat · battle complete'})[phase];
+ $('board-phase').textContent=$('phase').textContent;
+ $('actor-name').textContent=enemy?'Goblin archer':h.name;
+ $('portrait').src=`../../../public/battle/portraits/${enemy?'goblin_archer':hero}.png`;
+ $('portrait').alt=`${enemy?'Goblin archer':h.name} portrait`;
+ $('hp').textContent=enemy?'8 / 8 HP':`${phase==='defeat'?0:h.hp} / ${h.max} HP`;
+ $('health-fill').style.width=enemy?'100%':`${phase==='defeat'?0:h.hp/h.max*100}%`;
+ $('stats').textContent=enemy?'AC 11 · Accuracy +4':`AC ${h.ac+ (guarded?2:0)} · Accuracy +${h.accuracy}`;
+ $('status').textContent=phase==='defeat'?'Defeated':guarded?'Guarded · +2 AC':'No status effects';
+ $('actions-heading').textContent=enemy?`Your ${h.name}'s actions · locked`:'Choose your action';
+ $('move-budget').textContent=`Move ${moved?'spent':'ready'}`;$('move-budget').classList.toggle('spent',moved);
+ $('action-budget').textContent=`Action ${acted?'spent':'ready'}`;$('action-budget').classList.toggle('spent',acted);
+ $('signature').querySelector('.action-name').textContent=h.signature;
+ for(const b of document.querySelectorAll('[data-action]')){const a=b.dataset.action,spent=a==='move'?moved:acted;b.disabled=locked||spent;b.setAttribute('aria-pressed',String(a===action));b.querySelector('.action-hint').textContent=locked?'Locked':spent?'Spent':a===action?'Selected':a==='move'?'Uses movement':'Uses action';}
+ $('wait').disabled=locked;$('wait').querySelector('.action-hint').textContent=locked?'Locked':'Ends turn immediately';
+ $('reason').textContent=locked?phase==='presenting'?'Command accepted. Controls unlock when presentation finishes; no timer.':phase==='enemy'?'Enemy is acting. Inspect, sound, log and restart remain available.':'Battle complete. Gameplay actions are unavailable.':acted?'Action spent: attacks are unavailable. Move or end your turn.':moved?'Movement spent: Move is unavailable. Attack or end your turn.':'Choose an action, then a target. Wait ends the turn immediately.';
+ const target=$('target');target.disabled=locked||!action;target.replaceChildren(new Option(action?'Choose target':'Choose an action first',''));
+ if(action){target.add(new Option(action==='move'?'Destination (3, 2) · cost 2':'Goblin grunt · 9/9 HP · AC 12','valid'));target.add(new Option('Distant target · out of range','invalid'));}target.value=choice;
+ const valid=choice==='valid'&&!!action&&!locked;
+ $('review').disabled=!valid;$('cancel').disabled=locked||!action;$('board').disabled=locked;
+ $('preview').classList.toggle('invalid',choice==='invalid');
+ let heading='No action selected',copy='Your next decision starts above.';
+ if(locked){heading=$('phase').textContent;copy=phase==='presenting'?'Presentation cannot create another command.':'Use secondary tools for details.';}
+ else if(action){heading=choice==='invalid'?'Unavailable: out of range':choice==='valid'?`${actionLabel()} → ${action==='move'?'(3, 2)':'Goblin grunt'}`:`${actionLabel()} selected`;copy=choice==='invalid'?'Choose a nearer target. Nothing has been spent.':choice==='valid'?forecast():'Choose a target below, or select the board. Nothing spent.';}
+ $('preview').replaceChildren(Object.assign(document.createElement('strong'),{textContent:heading}),Object.assign(document.createElement('span'),{textContent:copy}));
+ $('board-selection').textContent=choice==='valid'?(action==='move'?'Destination selected':'Target: Goblin grunt'):choice==='invalid'?'Invalid target':'No target selected';
+ $('board-count').value=boardCount;
+}
+function closeDialog(callback){const returnTo=prior;$('dialog').close();onDismiss=()=>{};callback?.();render();if(!$('dialog').open){if(returnTo?.isConnected&&!returnTo.disabled)returnTo.focus();else $('restart').focus();}}
+function modal(title,content,choices,dismiss=()=>{}){
+ if(!$('dialog').open)prior=document.activeElement;
+ $('dialog-title').textContent=title;$('dialog-copy').innerHTML=content;$('dialog-choices').replaceChildren();onDismiss=dismiss;
+ for(const [label,callback,primary] of choices){const b=document.createElement('button');b.textContent=label;if(primary)b.className='primary';b.onclick=()=>closeDialog(callback);$('dialog-choices').append(b);}
+ if(!$('dialog').open)$('dialog').showModal();$('dialog-choices').querySelector('button')?.focus();
+}
+function cancel(){action=null;choice='';render();$('move').disabled?$('wait').focus():$('move').focus();}
+function review(){if($('review').disabled)return;modal('Confirm action',`<p><strong>${heroes[hero].name} · ${actionLabel()}</strong><br>${action==='move'?'Destination (3, 2)':'Target: Goblin grunt · 9/9 HP'}</p><p>${forecast()}</p><p class="modal-note">Confirm accepts one command. Cancel spends nothing.</p>`,[['Confirm',()=>{phase='presenting';if(action==='move')moved=true;else acted=true;if(action==='signature'&&hero==='fighter')guarded=true;action=null;choice='';render();},true],['Cancel',cancel],['Restart battle',restart]],cancel);}
+function restart(){modal('Start a new battle?','<p>The game will discard the current battle and both saved slots. Export recovery data first if needed.</p><p class="modal-note">Design demo only: this example has no saved data.</p>',[['Start new battle',()=>loadFixture('idle'),true],['Cancel',()=>{}]]);}
+function inspect(id=hero==='ranger'?'mage':'ranger'){
+ const h=heroes[id],isGuarded=guarded&&id===hero;modal(`Inspection only — ${h.name}`,`<img class="portrait" src="../../../public/battle/portraits/${id}.png" alt="${h.name} portrait"><p><strong>${phase==='defeat'?0:h.hp}/${h.max} HP</strong><br>${phase==='defeat'?'Defeated':isGuarded?'Guarded · +2 AC':'No status effects'}</p><p>Acting unit remains ${$('actor-name').textContent}. Inspection never changes the turn.</p><div class="party-list">${Object.entries(heroes).map(([key,h])=>`<button data-inspect="${key}">Inspect ${h.name}</button>`).join('')}</div><dl><dt>Armor class</dt><dd>${h.ac+(isGuarded?2:0)}</dd><dt>Accuracy</dt><dd>+${h.accuracy}</dd><dt>Power</dt><dd>${h.power}</dd><dt>Movement allowance</dt><dd>4 tiles</dd><dt>Jump</dt><dd>1</dd><dt>Dexterity / Will</dt><dd>${h.dex} / ${h.will}</dd></dl>`,[['Close inspection',()=>{}]]);
+ $('dialog-copy').querySelectorAll('[data-inspect]').forEach(b=>b.onclick=()=>inspect(b.dataset.inspect));
+}
+function loadFixture(value){if($('dialog').open)$('dialog').close();state=value;phase=['enemy','presenting','victory','defeat'].includes(value)?value:'player';action=['selected','preview','invalid','review'].includes(value)?'signature':null;choice=['preview','review'].includes(value)?'valid':value==='invalid'?'invalid':'';moved=value==='move-spent';acted=value==='action-spent';guarded=acted&&hero==='fighter';$('state-fixture').value=value;render();if(value==='review'){$('review').focus();review();}if(value==='inspection'){$('inspect').focus();inspect();}if(value==='victory'||value==='defeat'){ $('restart').focus();modal(value==='victory'?'Victory':'Defeat','<p>Battle complete. Restart for a fresh battle.</p>',[['Restart battle',restart]]);}}
+document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{action=b.dataset.action;choice='';render();$('target').focus();});
+$('target').onchange=()=>{choice=$('target').value;render();};
+$('cancel').onclick=cancel;
+$('review').onclick=review;
+$('wait').onclick=()=>{phase='presenting';action=null;choice='';render();};
+$('board').onclick=()=>{boardCount++;if(action)choice='valid';render();};
+$('inspect').onclick=()=>inspect();$('restart').onclick=restart;
+$('log').onclick=()=>modal('Battle log','<p class="modal-note">Illustrative log; actual game retains the latest 40 events.</p><ol><li>Round 3: Fighter’s turn</li><li>Fighter moves to (3, 2)</li><li>Fighter uses Guarded Strike</li><li>Fighter Guarded (+2 AC)</li></ol>',[['Back to battle',()=>{}]]);
+$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'Mute':'Enable sound';$('sound').setAttribute('aria-pressed',String(sound));$('sound-status').textContent=sound?'Sound on · display only':'Sound off · display only';};
+$('recovery').onclick=()=>modal('Save recovery','<p>The existing game dialog keeps current-save inspection, export, retry and removal confirmation here.</p><p class="modal-note">This design prototype does not read or write browser saves. Runtime retains the single BattleDialogs owner and current recovery choices.</p>',[['Back to battle',()=>{}]]);
+$('help').onclick=()=>modal('Board controls','<p>Game: arrow keys move the board cursor; Enter or Space selects; Escape cancels. Drag to pan; wheel or pinch to zoom.</p><p class="modal-note">This prototype uses a static board capture. Enter or a tap selects the illustrative target and increments the input counter. Pan, zoom and tile navigation must be tested during runtime integration.</p>',[['Back to battle',()=>{}]]);
+$('hero-fixture').onchange=()=>{hero=$('hero-fixture').value;loadFixture(state);};$('state-fixture').onchange=()=>loadFixture($('state-fixture').value);
+$('export-view').onclick=()=>{location.href=`?hero=${hero}&state=${state}&export=1`;};
+$('dialog').addEventListener('cancel',e=>{e.preventDefault();const callback=onDismiss;closeDialog(callback);});
+$('dialog').addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=[...$('dialog').querySelectorAll('button:not(:disabled)')],first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')&&e.target.closest('button'))e.preventDefault();},{capture:true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('dialog').open&&phase==='player'){cancel();e.preventDefault();}});
+loadFixture(state);
+</script>
+</body>
+</html>

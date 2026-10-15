@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" role="img" aria-labelledby="title desc">
+<title id="title">Two layout options for short landscape</title><desc id="desc">A top panel reserves forty-five percent of height. The selected right rail reserves width, keeping full height beside it. Portrait stacks the same controls below the board.</desc>
+<rect width="960" height="330" fill="#101827"/>
+<g font-family="system-ui,sans-serif" fill="#f5efdf">
+<text x="24" y="34" font-size="20">A · Compact top cluster</text><text x="500" y="34" font-size="20">B · Rail / portrait dock — selected</text>
+<rect x="24" y="55" width="430" height="220" rx="6" fill="#172033" stroke="#8d9bad"/>
+<rect x="24" y="55" width="430" height="99" rx="6" fill="#26364b" stroke="#f0cf83"/>
+<text x="40" y="86" font-size="16">Actor · actions · target / preview</text><text x="40" y="115" font-size="14">Scroll for details and secondary tools</text><text x="40" y="218" font-size="18">Board: 55% of viewport height</text>
+<rect x="500" y="55" width="430" height="220" rx="6" fill="#172033" stroke="#8d9bad"/>
+<rect x="788" y="55" width="142" height="220" rx="6" fill="#26364b" stroke="#f0cf83"/>
+<text x="516" y="146" font-size="18">Full-height board</text><text x="516" y="172" font-size="14">Fit, pan and effects use</text><text x="516" y="192" font-size="14">the remaining rectangle</text>
+<text x="800" y="86" font-size="14">Acting unit</text><text x="800" y="126" font-size="14">Actions</text><text x="800" y="157" font-size="14">Target / preview</text><text x="800" y="188" font-size="14">Review / cancel</text><text x="800" y="243" font-size="14">Tools (scroll)</text>
+<text x="24" y="308" font-size="14" fill="#c3cbd6">Schematic only. Selection and exact measured viewport bounds are recorded in design.md.</text>
+</g></svg>
