@@ -1,6 +1,6 @@
 # Issue #111 — responsive battle controls verification
 
-Updated 2026-10-15 (Asia/Jerusalem). Implementation is in progress; this record does not yet establish all seven issue criteria. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
+Updated 2026-10-15 (Asia/Jerusalem). All seven issue criteria are verified; final PR publication is in progress. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
 
 ## Geometry chunk
 
@@ -20,7 +20,7 @@ Browser: installed Edge 155, selected using `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/P
 
 Source commit: `057166e2bae9d4e2249d379964bfc447179a5b72`, dependent on [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118) at `ba47b0a`. One existing HUD and native dialog owner remain. The shell supplies one measured drawable rectangle to fitting, navigation, CSS canvas clipping and the captured-pointer boundary. Feedback labels move together within that region so damage/defeat text remains distinct at small sizes. Actor and control scrolling are independent.
 
-Fresh focused evidence: **652/652** unit tests; **24/24** browser acceptance cases across desktop, emulated portrait and landscape; then **12/12** final focused cases after adding target-inspection assertions, adapting the asset-base portrait selector and resetting each screenshot layout to fit. Both focused runs had zero failures, retries or skips. Production build, 167 content checks, both typechecks and strict OpenSpec passed. Reports: `tmp/hud-unit.log`, `tmp/hud-acceptance-v2.json`, `tmp/hud-final-focus.json`, and their corresponding artifact directories. The full configured regression run remains pending below.
+Fresh focused evidence: **652/652** unit tests; **24/24** browser acceptance cases across desktop, emulated portrait and landscape; then **12/12** final focused cases after adding target-inspection assertions, adapting the asset-base portrait selector and resetting each screenshot layout to fit. Both focused runs had zero failures, retries or skips. Production build, 167 content checks, both typechecks and strict OpenSpec passed. Reports: `tmp/hud-unit.log`, `tmp/hud-acceptance-v2.json`, `tmp/hud-final-focus.json`, and their corresponding artifact directories. The complete configured run is recorded below.
 
 The first integration probe had 44 passes and four failures: a formerly visible tile was now behind the intentional canvas clip, and the single changing actor image caused repeated portrait requests. The test now selects a visible central raised tile; the HUD reuses one loaded image per unit type and shows only the current actor. A subsequent focused run exposed a DOM click event being passed as an inspection unit ID; the callback now explicitly invokes inspection without that event. These repairs are covered by the passing cases above. An initial full run was stopped early to repair an obsolete `#battle-party img` asset test selector; its partial progress is not claimed as a full pass.
 
@@ -40,8 +40,26 @@ Stable action hooks remain `[data-action=move|basic|signature]`, `#battle-move`,
 
 `#battle-log-open` opens the bounded event log inside the same modal; `#battle-log` remains the list. Sound/retry, save/recovery and restart selectors remain unchanged. Nonmodal Escape/Cancel share intent clearing and focus enabled Move or Wait. Idle, selection and invalid preview expose descriptive text; spent buttons say Spent; enemy, presentation, ended and error phases explain the gameplay lock. Wait still uses the immediate authoritative command path. No display timer releases input.
 
-## Remaining acceptance
+## Integrated verification
 
-Complete configured browser/posttest verification, the integrated lifecycle/state acceptance map and final publication remain open. Prototype evidence is a design reference only. Full battle state/lifecycle acceptance will be recorded here as each corresponding OpenSpec task is verified.
+The clean root build was stamped `7d333f1281b88120918d1663f8aebeae2f34feb7`. `npm test -- --reporter=json --output=tmp/hud-final-full-artifacts` passed **420/420** main cases, followed automatically by the configured **18/18** authored-encounter and **21/21** run-item posttests. All 420 main cases have exactly one passing attempt, no retries, failures or skips. The three projects each ran 140 cases: desktop, emulated portrait and emulated landscape. Reports/logs: `tmp/hud-final-full.json`, `tmp/hud-final-full.log`, and the main artifact directory. Expected decode errors deliberately induced by failure tests are not uncontrolled runtime errors.
+
+No runtime or test source changed during that run. The root build's 68-file SHA-256 manifest is retained at `tmp/hud-root-build-manifest.json`. The normal build ran content validation and both typechecks; its snapshot generator changed only line endings, verified and restored before a final Vite emit stamped the tree clean. Later documentation commits preserve the same source/test objects. Dev-only posttests used those same objects with documentation changes present; they are fixture evidence, not a deployed release.
+
+Real-control hero captures from this run: [Fighter](issue-111-battle-controls/actor-fighter.png), [Ranger](issue-111-battle-controls/actor-ranger.png), [Mage](issue-111-battle-controls/actor-mage.png). Both complete legal battle outcomes, replay equivalence, modal cancellation, input locking, exact primary/backup bytes under held keys, current-save history return, storage failures, audio ownership, diagnostic routes and reward/item flows passed.
+
+## Acceptance map
+
+1. **Responsive layout:** all five accepted sizes, 200% text and safe insets pass the measured drawable floors, 44px target, scroll reachability, contrast and no-overflow checks. Fitted screenshots and measurements are linked above.
+2. **Live actor/inspection/target:** all three catalog signatures, HP/max HP, budgets and effective Guarded values pass. Both party/unit navigation and the selected-target entrypoint preserve actor, pending intent, state and RNG.
+3. **Command states:** battle-loop and animation tests cover idle, selection, valid/invalid previews, review/confirm/cancel, spent resources, enemy, presenting, ended and error behavior. Legal full battles prove the reachable decision flow and deterministic results. Wait is immediate; frozen presentation tests retain authoritative locking.
+4. **Geometry/navigation:** offset-region unit checks and real board tests cover fit, clamp limits, raised tops/sides, DPR, preserved camera on HUD changes, relative zoom on viewport changes, fresh-battle reset and bounded action feedback.
+5. **Accessibility/input:** native labels, visible focus, tab order/trap/return, Move/Wait cancellation focus, text scaling, actual contrast pairs and pointer/touch/pinch/wheel boundaries pass. Resize, modal, restart and visibility changes discard stale captured gestures. Reduced-motion adds no decorative transition; static status remains available. No screen-reader conformance claim is made.
+6. **Lifecycle:** the complete persistence/audio suites retain exact save bytes, keyboard Continue, replacement-modal focus, held Enter/Space protection, current-save history startup, recovery, restart and audio teardown. All 21 run-item cases pass with the shared modal owner.
+7. **Verification/publication:** 652 unit, 167 content, both typechecks/build, 420 browser, 18 encounter and 21 run-item cases pass. Strict OpenSpec and whitespace checks pass. All 48 prefixed-path cases pass as recorded below; publication verification follows.
+
+## Prefix verification and publication
+
+A production build with `--base=/tactics-guru/` at `98f630cefc0a6324905c110dfee22cd362061588` passed **48/48** cases, one passing attempt each, no failures/retries/skips. Command: `playwright test tests/public-asset-base.spec.ts tests/battle-animations.spec.ts --grep "direct entry|at the base|content fixture|extracted map|cached return" --reporter=json`, with `PLAYWRIGHT_BASE_PATH=/tactics-guru/`. Reports: `tmp/hud-prefix.json` and `tmp/hud-prefix-artifacts/`. This covers direct/refresh asset and audio resolution, controlled failures and real cached return through Continue. Its source/test objects equal the root-run revision; later commits only update documentation/evidence. Final PR publication and remote parity are recorded in the continuation plan.
 
 No physical Android/iOS, screen-reader, deployment or release-certification claim is made. #111 requires browser responsive acceptance; other device/release issues remain separate.
