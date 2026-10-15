@@ -9,14 +9,14 @@ Implementation authorized by the owner on 2026-10-15. Tasks are checked only aft
 
 ## 2. Live responsive HUD
 
-- [ ] 2.1 Implement the accepted rail/dock shell, bounded actor/actions scrolling, safe areas, captions and secondary controls while preserving startup/error/recovery and diagnostic routes. Verify all five sizes, 200% text, 44px controls, contrast and no horizontal overflow in battle-loop/layout checks; record screenshots and measurements in docs/qa/issue-111-battle-controls.md.
-- [ ] 2.2 Derive actor/target/inspection fields and named actions from live session/catalog data; route distinct inspection through the existing dialog owner without overwriting preview. Verify all three heroes, effective Guarded status, actor/intent/RNG invariance and visible disabled reasons through battle-loop tests; document the retained selector mapping and state catalogue in the QA record.
+- [x] 2.1 Implement the accepted rail/dock shell, bounded actor/actions scrolling, safe areas, captions and secondary controls while preserving startup/error/recovery and diagnostic routes. Verify all five sizes, 200% text, 44px controls, contrast and no horizontal overflow in battle-loop/layout checks; record screenshots and measurements in docs/qa/issue-111-battle-controls.md.
+- [x] 2.2 Derive actor/target/inspection fields and named actions from live session/catalog data; route distinct inspection through the existing dialog owner without overwriting preview. Verify all three heroes, effective Guarded status, actor/intent/RNG invariance and visible disabled reasons through battle-loop tests; document the retained selector mapping and state catalogue in the QA record.
 - [ ] 2.3 Preserve selection, valid/invalid preview, review/confirm/cancel, spent/enemy/presenting/ended/error states and immediate Wait. Verify atomic cancellation/rejection, one accepted command per confirmation and authoritative animation unlock through existing battle-loop and battle-animations tests with observable runtime assertions.
 
 ## 3. Input, focus and lifecycle
 
 - [ ] 3.1 Share nonmodal Escape/Cancel handling and focus Move or Wait after refresh; retain #113 modal callback order, replacement-modal focus and held-key protection. Verify keyboard board/target parity, modal trap/return, keyboard Continue, fresh Enter/Space after release and exact primary/backup save-byte preservation in battle-loop/persistence checks; document any selector changes.
-- [ ] 3.2 Prevent UI/modal and stale captured gestures from passing to the board during scrolling, resize, restart or visibility changes. Change BoardInput only where required, add boundary cases to existing input/battle-board tests, and verify tap/drag/pinch/wheel isolation, one canvas and no duplicate command/listener behavior.
+- [x] 3.2 Prevent UI/modal and stale captured gestures from passing to the board during scrolling, resize, restart or visibility changes. Change BoardInput only where required, add boundary cases to existing input/battle-board tests, and verify tap/drag/pinch/wheel isolation, one canvas and no duplicate command/listener behavior.
 - [ ] 3.3 Preserve accepted-command autosave, current-save history return, recovery/restart access and audio ownership. Verify existing battle-persistence/battle-audio regressions and run-item modal/recovery checks; record actual results and retained limitations without changing storage formats or run-progression behavior.
 
 ## 4. Integrated acceptance and handoff
