@@ -1,0 +1,34 @@
+[WebServer] (node:83541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 21 tests using 1 worker
+
+(node:83576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (302ms)
+  ✓   2 [desktop] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (466ms)
+  ✓   3 [desktop] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (459ms)
+  ✓   4 [desktop] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (492ms)
+  ✓   5 [desktop] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (234ms)
+  ✓   6 [desktop] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (261ms)
+  ✓   7 [desktop] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (256ms)
+(node:83628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [mobile-portrait] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (302ms)
+  ✓   9 [mobile-portrait] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (495ms)
+  ✓  10 [mobile-portrait] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (458ms)
+  ✓  11 [mobile-portrait] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (489ms)
+  ✓  12 [mobile-portrait] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (229ms)
+  ✓  13 [mobile-portrait] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (261ms)
+  ✓  14 [mobile-portrait] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (266ms)
+(node:83685) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [mobile-landscape] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (306ms)
+  ✓  16 [mobile-landscape] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (501ms)
+  ✓  17 [mobile-landscape] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (454ms)
+  ✓  18 [mobile-landscape] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (496ms)
+  ✓  19 [mobile-landscape] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (230ms)
+  ✓  20 [mobile-landscape] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (260ms)
+  ✓  21 [mobile-landscape] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (252ms)
+
+  21 passed (9.6s)

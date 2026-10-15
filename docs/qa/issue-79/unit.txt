@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+
+ Test Files  38 passed (38)
+      Tests  647 passed (647)
+   Start at  04:54:08
+   Duration  4.57s (tests 84%, transform 9%, import 7%)

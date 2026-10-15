@@ -1,0 +1,11 @@
+.run-items { color: #eef3fa; background: #172033; font: 1rem/1.5 system-ui, sans-serif; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); max-width: 900px; box-sizing: border-box; overflow-wrap: anywhere; }
+.run-items section { border-top: 1px solid #8495ac; padding-block: 12px; }
+.run-items section > div { padding-block: 8px; }
+.run-items button, .run-items select, .run-item-dialog button { min-width: 44px; min-height: 44px; font: inherit; margin: 4px; padding: 8px 12px; max-width: 100%; box-sizing: border-box; white-space: normal; }
+.run-items button, .run-item-dialog button { color: #102036; background: #e4efff; border: 2px solid transparent; border-radius: 6px; cursor: pointer; }
+.run-items button:disabled { color: #c3cddd; background: #344258; cursor: default; }
+.run-items :focus-visible, .run-item-dialog :focus-visible { outline: 3px solid #ffd477; outline-offset: 2px; }
+.run-items [role=status] { border-left: 4px solid #ffd477; padding-left: 10px; }
+.run-item-dialog { color: #eef3fa; background: #172033; border: 2px solid #8495ac; border-radius: 12px; max-width: min(540px, calc(100vw - 48px)); max-height: calc(100dvh - 48px); overflow: auto; padding: 16px; overflow-wrap: anywhere; font: 1rem/1.5 system-ui, sans-serif; }
+.run-item-dialog::backdrop { background: #030916ba; }
+@media (max-width: 400px) { .run-items { padding-inline: 12px; } .run-items button, .run-items select { margin-inline: 0; display: block; width: 100%; } }

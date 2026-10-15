@@ -1,0 +1,72 @@
+{
+  "project": "mobile-portrait",
+  "capturedAt": "2026-10-15T08:55:08.025Z",
+  "browser": "155.0.8059.41",
+  "viewport": {
+    "width": 412,
+    "height": 915
+  },
+  "report": {
+    "build": {
+      "commit": "064de6f5f48ea0ebb1e4b68c225d07cd9fcd00ce",
+      "dirty": true
+    },
+    "snapshot": {
+      "items": {
+        "run": {
+          "format": 1,
+          "versions": {
+            "rules": 1,
+            "rng": 1,
+            "content": "sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a"
+          },
+          "id": "item-fixture",
+          "seed": 123,
+          "encounters": [
+            "encounter:forest_ruins",
+            "encounter:woodland_crossing",
+            "encounter:ruined_approach"
+          ],
+          "encounterIndex": 1,
+          "revision": 2,
+          "party": [
+            {
+              "heroId": "fighter",
+              "hp": 10
+            },
+            {
+              "heroId": "ranger",
+              "hp": 4
+            },
+            {
+              "heroId": "mage",
+              "hp": 0
+            }
+          ],
+          "phase": "battle",
+          "pendingReward": null
+        },
+        "ownership": {
+          "consumables": [
+            {
+              "itemId": "item:healing_draught",
+              "quantity": 1
+            }
+          ],
+          "equipment": [
+            {
+              "instanceId": "item-fixture:reward:0:option:0",
+              "itemId": "item:warding_charm"
+            }
+          ],
+          "assignments": []
+        },
+        "offer": null,
+        "itemRevision": 1
+      },
+      "activeBattle": null
+    },
+    "selected": 1,
+    "status": "Run saved on this device"
+  }
+}

@@ -45,12 +45,6 @@ export type RunResult = { readonly ok: true; readonly state: RunState; readonly 
 export interface RunBattleDescriptor {
   readonly encounterId: EncounterId; readonly seed: number; readonly boundaryId: string; readonly party: readonly RunHero[];
 }
-/** Shape for the future run codec; not accepted by the existing battle-save decoder.
- * Inventory/equipment and concrete offers are added and validated by #79/#80. */
-export interface RunSaveExtension<ActiveBattle> {
-  readonly run: RunState;
-  readonly activeBattle: ActiveBattle | null;
-}
 
 function isRunId(value: unknown): value is string { return typeof value === 'string' && /^[A-Za-z0-9-]{1,64}$/.test(value); }
 function isDefinition(value: unknown): value is RunDefinition {
