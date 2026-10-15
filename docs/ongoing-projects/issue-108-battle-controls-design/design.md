@@ -1,6 +1,6 @@
 # Battle controls — design review
 
-Status: **ready for design review; not yet accepted**. Issue [#108](https://github.com/luminari-gurus/tactics-guru-v2/issues/108). Source baseline: `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`, re-fetched 2026-10-14. The user's continuation request authorizes producing this package. Runtime integration belongs to [#111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111), gated on acceptance of this design.
+Status: **design accepted by the owner on 2026-10-15** for [#111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111), with the explicit instruction “Accept the design and plan #111”. [Acceptance receipt](https://github.com/luminari-gurus/tactics-guru-v2/issues/111#issuecomment-6196912979). Issue [#108](https://github.com/luminari-gurus/tactics-guru-v2/issues/108) is completed through merged PR #112. Original design source baseline: `d2a1a61abb636b5ab38ddce6c26207f6bcb6d4f5`, re-fetched 2026-10-14; merged baseline: `4e601480400a241a2c08cb88a41442e55a5385b7`. Runtime integration is covered by the [#111 implementation plan](../plan.md), whose execution still requires separate approval.
 
 ## Review entrypoint
 
@@ -53,7 +53,7 @@ No nonessential animation in this prototype, so reduced motion is intrinsically 
 
 ## Rendered evidence and review disposition
 
-Author review selected the rail/dock, inspected the three primary compositions, the smaller layouts, previews, confirmation and enlarged-text states, and repaired discovered prototype defects. Human design acceptance is pending in the PR. Screenshots and the clickable prototype are proposals for that review, not a claim of approval.
+Author review selected the rail/dock, inspected the three primary compositions, the smaller layouts, previews, confirmation and enlarged-text states, and repaired discovered prototype defects. The owner subsequently accepted the merged design on 2026-10-15, as recorded above. Screenshots and the clickable prototype define the accepted visual reference; their measurements remain prototype evidence, not proof of runtime implementation.
 
 - Desktop / Fighter: [idle](previews/desktop.png), [Guarded Strike preview](previews/desktop-preview.png), [confirmation](previews/desktop-review.png).
 - Portrait / Ranger: [idle](previews/portrait.png), [High Shot preview](previews/portrait-preview.png), [confirmation](previews/portrait-review.png).
@@ -98,11 +98,11 @@ The same cancellation focus defect was separately reproduced on the unmodified l
 5. At-a-glance decisions and disabled feedback: idle/spent/invalid/locked fixtures, numerical HP, status and budget text, and persistent reasons independent of hover.
 6. Accessibility: Visual language, measured contrast, target/focus/scroll/keyboard checks and enlarged-text captures.
 7. Board visibility/input capture: annotated rectangles above, measurement JSON and real pointer/tap/drag counter assertions. This verifies only the prototype.
-8. Chosen design and scoped handoff: author-review disposition and [implementation issue #111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111), created after checking for an existing matching item and read back with its explicit #108 acceptance dependency. It is intentionally not labelled ready for work.
+8. Chosen design and scoped handoff: review disposition and [implementation issue #111](https://github.com/luminari-gurus/tactics-guru-v2/issues/111), created after checking for an existing matching item and read back with its explicit #108 acceptance dependency. It was kept unready until the owner's 2026-10-15 design acceptance; readiness and assignment are now recorded in the linked acceptance receipt.
 
 ## Runtime implementation handoff
 
-Implement only after the design review is accepted. Reuse existing architecture; one native DOM HUD connected to `BattleSession`, no second simulation or framework. Open an implementation OpenSpec change against `battle-controls`; preserve all current behavioral requirements.
+The design review is accepted. Implement after approval of the concrete [#111 plan](../plan.md). Reuse existing architecture; one native DOM HUD connected to `BattleSession`, no second simulation or framework. The implementation OpenSpec change targets `battle-controls`; preserve all current behavioral requirements.
 
 1. **HUD/shell:** update `src/ui/hud.ts`, `src/style.css` and `index.html`. Keep `#battle-controls`, `#battle-party`, `#battle-active`, `[data-action=move|basic|signature]`, `#battle-move`, `#battle-next`, `#battle-target`, `#battle-selection`, `#battle-preview`, `#battle-review`, `#battle-cancel`, `#battle-log`, `#battle-sound`, `#battle-sound-retry`, `#battle-save-status`, `#battle-recovery` and `#fit-restart` where practical. Action names may present the catalog name directly while preserving the intent hook; update exact-name tests deliberately. Inspect must read live unit data without overwriting action preview/actor state. The prototype's short IDs are documentation-only and must not replace runtime selectors.
 2. **Camera/geometry:** in `BattleScene`, observe the actual drawable board region, excluding safe insets and captions. Pass one `{x,y,width,height}` rectangle to `BoardRenderer.fit`, `fitBoard` and `constrainView`, replacing `panelBottom`. Center and clamp in that rectangle; keep existing fit padding, min/max zoom and navigation-preservation behavior. Refit on actual orientation/viewport changes, not on every status-text update. Keep target/unit/effect anchors within the drawable region, including raised tiles and #106 labels. Do not implement a generalized overlay registry.
