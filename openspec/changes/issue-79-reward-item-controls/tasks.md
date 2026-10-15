@@ -19,7 +19,7 @@
 ## 4. Integration verification and delivery
 
 - [x] 4.1 Run focused tests then full configured unit/content/browser checks including encounter posttest, both typechecks, production build, strict OpenSpec and git diff --check; record exact commands/revision/results, payload sizes and unverified physical/full-run criteria against every #79 acceptance item.
-- [ ] 4.2 Commit only approved issue changes, push and open/attach a PR after checking for an existing one; verify branch/PR identity and use Refs #79 with a draft if any issue acceptance remains unmet.
+- [x] 4.2 Commit only approved issue changes, push and open/attach a PR after checking for an existing one; verify branch/PR identity and use Refs #79 with a draft if any issue acceptance remains unmet.
 
 ## Workflow follow-up
 
