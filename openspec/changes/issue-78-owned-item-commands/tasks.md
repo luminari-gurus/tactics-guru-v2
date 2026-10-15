@@ -21,7 +21,7 @@ Caller approved this plan at `4d59b01` on 2026-10-14. Issue/caller/base/branch a
 ## 4. Integrated regression and delivery
 
 - [x] 4.1 Run focused tests, full configured unit/content/browser suites including encounter posttest, both typechecks, production build, strict OpenSpec and whitespace; record exact revision/commands/results and genuine limitations, mapping every #78 acceptance criterion to executable evidence.
-- [ ] 4.2 Review the issue-only diff against the approved scope, commit/push and open/attach the PR against main; verify published head and PR URL, using Closes only if all #78 acceptance criteria are verified, otherwise a draft with Refs and explicit remaining work.
+- [x] 4.2 Review the issue-only diff against the approved scope, commit/push and open/attach the PR against main; verify published head and PR URL, using Closes only if all #78 acceptance criteria are verified, otherwise a draft with Refs and explicit remaining work.
 
 ## Workflow follow-up
 
