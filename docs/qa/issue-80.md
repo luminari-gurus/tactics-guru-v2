@@ -49,3 +49,5 @@ transfer or hardware frame-budget evidence. See [raw inventories](issue-80/build
 The initial baseline comparison failed because npm's prefix invocation selected an
 incorrect install context; a direct npm ci in the temporary baseline and a successful
 complete build replaced that invalid partial inventory.
+
+Delivery: [PR #120](https://github.com/luminari-gurus/tactics-guru-v2/pull/120). OpenSpec tasks are complete; the PR remains open for review.

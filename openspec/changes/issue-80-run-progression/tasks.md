@@ -27,7 +27,7 @@ Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10
 ## 5. Final integration and delivery
 
 - [x] 5.1 Run relevant focused tests, full npm run test:unit, npm run validate:content, both npm run typecheck configurations, npm run build and full npm test including encounter/run-item posttests; verify strict OpenSpec and git diff --check, record exact revisions/commands/results, build/transfer delta, failures and limitations, and map every #80 criterion to evidence in docs/qa/issue-80.md.
-- [ ] 5.2 Compare final changes with approved scope, commit only #80 work, push and create/attach a PR against main with issue/plan/approval and actual validation; use Closes #80 only when every criterion is verified, otherwise open a draft with Refs #80 and remaining work.
+- [x] 5.2 Compare final changes with approved scope, commit only #80 work, push and create/attach a PR against main with issue/plan/approval and actual validation; use Closes #80 only when every criterion is verified, otherwise open a draft with Refs #80 and remaining work.
 
 ## Workflow follow-up
 
