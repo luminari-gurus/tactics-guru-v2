@@ -173,3 +173,18 @@ test('review: reopened outcome recovery exports the exact retained backup after 
  expect(await snapshot(page)).toEqual(ended);
  expect(await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS)).toEqual({primary:saved.primary,backup:null});
 });
+for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissal via ${dismiss} retains connected visible keyboard focus`,async({page})=>{
+ async function checkFocus(){
+  const recovery=page.getByRole('button',{name:'Save recovery',exact:true});const before=await snapshot(page);
+  await recovery.focus();await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();
+  if(dismiss==='Escape')await page.keyboard.press('Escape');
+  else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
+  await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();await expect(recovery).toBeInViewport();
+  expect(await recovery.evaluate(node=>node.isConnected && document.activeElement===node)).toBe(true);expect(await snapshot(page)).toEqual(before);
+ }
+ await page.goto('/run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+ await checkFocus(); // The mounted preparation controls are replaced on dismissal.
+ await page.reload();await expect(page.locator('#run-continue')).toBeVisible();await checkFocus();
+ await page.locator('#run-continue').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await checkFocus(); // Battle controls stay mounted and keep their existing return behavior.
+});

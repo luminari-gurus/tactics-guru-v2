@@ -80,6 +80,12 @@ function requestNew() {
  ],()=>restart.focus());
 }
 function showRecovery() {
+ const closeRecovery=()=>{
+  if(!live || playing)return;
+  render();
+  // Boundary rendering replaces the invoker, so focus its new equivalent afterward.
+  [...screen.querySelectorAll<HTMLButtonElement>('button')].find(button=>button.textContent==='Save recovery')?.focus();
+ };
  const review=controller.inspect(),choices:DialogChoice[]=[];
  for(const [index,{slot,text}] of controller.recoveryTexts(review).entries()) {
   choices.push({id:`run-export-${slot}-${index}`,label:`Export ${slot} save`,run:()=>{
@@ -95,9 +101,9 @@ function showRecovery() {
  }
  if(startup && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
  choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(!startup)controller.save();showRecovery();}},
-  {id:'run-close-recovery',label:'Close',run:()=>{if(!playing)render();}});
+  {id:'run-close-recovery',label:'Close',run:closeRecovery});
  const message=review.ok?`primary: ${review.inspection.primary.status}. backup: ${review.inspection.backup.status}. ${controller.status}`:`Storage ${review.kind}. Your run can continue unsaved.`;
- dialogs.showChoices('Run save recovery',message,choices,()=>{if(!playing)render();});
+ dialogs.showChoices('Run save recovery',message,choices,closeRecovery);
 }
 function continueRun(review:RunLoadResult) {
  if(!controller.continue(review))return;
