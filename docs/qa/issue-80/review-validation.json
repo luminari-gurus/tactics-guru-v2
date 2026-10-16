@@ -1,0 +1,44 @@
+{
+  "sourceCommit": "f0b2e8d2a9488c5d56f8b5dd2edad637dc6e041d",
+  "reportedCommit": "5a9d5e3ffe41860936775bc1cb58daaeac31deef",
+  "red": {
+    "desktopRegressions": 3,
+    "failedBeforeApplicationChanges": 3
+  },
+  "green": {
+    "unit": 654,
+    "content": 167,
+    "focusedDesktopRegressions": 3,
+    "runFlowMatrix": 30,
+    "itemFixtureMatrix": 21,
+    "webkitReviewRegressions": 6,
+    "typecheck": "both configurations passed",
+    "productionBuild": "passed"
+  },
+  "scope": "Full affected run-flow suite on desktop/Pixel 7 portrait/landscape, unchanged standalone item fixture suite and targeted review regressions in iPhone-sized WebKit portrait/landscape. No full repository-wide browser rerun for these narrow UI fixes.",
+  "build": "Production preview used the clean f0b2e8d commit; the standalone item fixture dev server used identical source with docs-only working-tree changes. Initial WebKit discovery selected zero tests because config and CLI filters intersected; a corrected focused configuration selected and passed six cases.",
+  "sourceSha256": {
+    "src/app/startRunApp.ts": "8137fcea098aac44ff5799f89ec4dd1d8a379534ddaf507116d687609c1d5aa9",
+    "src/ui/runItems.ts": "b0a1634bf1e3d763ea188842d092b7cde88697a1bca46641b8ec83d58acc8842",
+    "tests/run-progression.spec.ts": "b2327da810af44c9c5e03dc831af84184caad29f797b908c4ce3ae934965d934",
+    "src/app/RunItemSession.ts": "0819808764f6a0c4b4f4475fe27d11a6bf2d24244519cf21ebd8b511b4d79cb9",
+    "src/persistence/runStorage.ts": "c217c052382c87a1935761ba3611c6f25c5dbe6bd60ba1ba11911e8fa212feac",
+    "package.json": "1aea488e60265ffca7c4ccf0d2b6a5c2e3912a6ba7fe4ba6a46a941efe546530",
+    "package-lock.json": "e05e63e5c84dddd65df26c9f97204cb248c5adcd07aad4612bad4047b8e8b310",
+    "playwright.config.ts": "82a4eeaf511602bb8ffb2b0d39845c9148b74150e16fbd9f2eb0166a8dcf4c7e"
+  },
+  "evidenceSha256": {
+    "review-webkit.config.ts.txt": "41933a70536baa92b9abb814634da8d40a9c2b5d44eb5a8c28e974463cba57fd",
+    "review-build.txt": "8f500b0b2997e29e9e7e54922eace40501c54053452fbd1a9a399105ff3f6462",
+    "review-red-source.json": "b5d64132132c9b2dad183db9e92ec3e32cf7c4b86a8fa88c968ac2ce9c0af12c",
+    "review-red.txt": "6791e0e43f2febca72cac481cc3b3e85a92e3b38c696af640f935e1f2a824850",
+    "review-item-matrix.txt": "adb677a2a858b3af1de667d9ef20fed6811a57bb5e306dd4f98f125d01d648b3",
+    "review-webkit-results.json": "b2f8ebc20035d65a55d0b5e8da8c441e85160c473bdd2a297a14c9115ac075ad",
+    "review-green-desktop.txt": "0119457fd5603737aab7b34c1b616c63f4b6e0cec440cc28bd64a37568f29b59",
+    "review-run-matrix.txt": "3de2d32fdd7cf3df1e943222446e4db85c475667cda0b6e3cf3fc31ed37cab3b",
+    "review-webkit-discovery.txt": "1cf78643d636fe58a35ad980c52c1dfa3985af65eb215edee5bbb2b9bc75672b",
+    "review-unit.txt": "d22c0e96ad603a16112cf47710370ebb111dd020772ffd3f137b57c62c21efae",
+    "review-webkit.txt": "f2d386f9eca9d74314e079a70b0fa5e00f662d54700d870f20a721bfd0f71f71",
+    "review-build-comparison.json": "50786655727dfc18e83b5c28a73400dcc904a51cec291f7950610407e0d22885"
+  }
+}

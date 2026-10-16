@@ -1,0 +1,21 @@
+[WebServer] (node:12066) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 6 tests using 1 worker
+
+(node:12107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat
+[2/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes
+[3/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset
+(node:12174) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[4/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat
+[5/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes
+[6/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset
+  6 passed (1.1m)

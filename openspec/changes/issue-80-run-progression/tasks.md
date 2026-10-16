@@ -33,7 +33,7 @@ Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10
 
 - [x] 6.1 Route in-flow Continue through the host's existing boundary/battle lifecycle; reproduce legal-defeat backup restoration before fixing and verify the resumed board and exact snapshot in browser tests.
 - [x] 6.2 Offer explicit unsaved play when run-key reads are unavailable with no usable save; verify getItem SecurityError separately from storage acquisition failure and preserve inaccessible bytes without writes/removals.
-- [ ] 6.3 Use retained-aware host recovery from every mounted live-run boundary; reproduce partial reset, close/reopen recovery and verify the exact deleted backup download, then run affected regression suites and publish the fixes.
+- [x] 6.3 Use retained-aware host recovery from every mounted live-run boundary; reproduce partial reset, close/reopen recovery and verify the exact deleted backup download, then run affected regression suites and publish the fixes.
 
 ## Workflow follow-up
 

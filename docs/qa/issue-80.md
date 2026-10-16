@@ -21,9 +21,9 @@ The existing run format 1 and 32,768-code-unit bound are unchanged. RunItemSessi
 | Same reload state/next command/RNG without duplicate reward/cues | Real reload before/after reward/preparation/final outcome and player/enemy presentation; uninterrupted browser comparison, snapshot continuation and no historical cues; BFCache replacement test preserves exact primary/backup bytes |
 | Integrated legal victory/defeat/restart/resume | run-progression.spec.ts enacts production controls from a fresh run; no forced HP/outcome/progression. Per-encounter replay evidence and screenshots retained with final validation |
 
-## Verification
+## Initial integration verification
 
-Tested implementation revision: `23a98521a4a2337854d8d47f26c0f78c6446aee3`, clean build identity. A final delivery commit updates evidence/task checkboxes and removes one extra blank line at the end of the shared test policy; no application behavior changes. See [validation manifest and source hashes](issue-80/validation.json).
+Tested implementation revision: `23a98521a4a2337854d8d47f26c0f78c6446aee3`, clean build identity. The initial delivery commit updates evidence/task checkboxes and removes one extra blank line at the end of the shared test policy; no application behavior changes. See [validation manifest and source hashes](issue-80/validation.json).
 
 - `npm run test:unit`: 654 passed across 39 files, including seven new run construction/controller/replay tests.
 - `npm run validate:content`: 167 passed.
@@ -51,3 +51,24 @@ incorrect install context; a direct npm ci in the temporary baseline and a succe
 complete build replaced that invalid partial inventory.
 
 Delivery: [PR #120](https://github.com/luminari-gurus/tactics-guru-v2/pull/120). OpenSpec tasks are complete; the PR remains open for review.
+
+## PR review corrections — 2026-10-16
+
+All three [review findings](https://github.com/luminari-gurus/tactics-guru-v2/pull/120#issuecomment-6205563219) were reproduced on the reported application revision `5a9d5e3ffe41860936775bc1cb58daaeac31deef` before app changes. The three new desktop browser regressions failed at the reported hidden-scene, missing-unsaved-control and missing-backup-export assertions. [Pre-fix output](issue-80/review-red.txt) and [test/source identity](issue-80/review-red-source.json) are retained.
+
+The fix at `f0b2e8d` gives the mounted item screen two explicit live-host actions: Continue uses the existing host boundary/battle lifecycle, and recovery uses the same retained-aware UI as startup and in-battle recovery. Failed Continue inspection also uses that host recovery path. The standalone item fixture retains its existing default behavior. Startup now offers Play unsaved run when inspected reads are unavailable and no usable save is selected, covering slot-read errors as well as acquisition failure. The domain, save format and storage adapter are unchanged.
+
+The new browser checks reach defeat through legal Wait actions, remove primary through actual recovery controls and verify the restored backup's exact continuation snapshot with a visible board. Separate read-level failure injection preserves both original stored byte strings with zero writes/removals while play continues unsaved. Partial-reset failure injection deletes backup before primary removal fails; closing/reopening normal recovery still downloads JSON containing the exact deleted backup text. These are controlled read/removal-failure tests, not injected battle outcomes.
+
+Focused desktop verification passed all three regressions; the full unit suite passed 654 tests. The production build includes 167 passing content checks and both passing typechecks. All 30 run-flow cases, 21 standalone item cases and six focused WebKit review regressions passed without retries or skips. See the [review validation receipt and source hashes](issue-80/review-validation.json). Initial integration evidence above remains historical; it is not presented as a full repository-wide rerun of the review-fix revision.
+
+Review verification commands:
+
+- `npm run test:unit`: 654 passed.
+- `npm run build`: 167 content checks, both typechecks and production build passed; existing large-chunk warning remains.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npx playwright test tests/run-progression.spec.ts`: 30 passed ([output](issue-80/review-run-matrix.txt)).
+- The same executable with `npx playwright test -c playwright.run-items.config.ts`: 21 passed ([output](issue-80/review-item-matrix.txt)).
+- `npx playwright test -c tmp/issue120-review-webkit.config.ts`: six passed ([output](issue-80/review-webkit.txt)). The first CLI-filter attempt selected zero tests because it intersected the existing config filter; the retained [focused config](issue-80/review-webkit.config.ts.txt) selects the intended cases. Restore both this config and the original WebKit config to their `tmp/` paths to reproduce.
+- Strict OpenSpec, relative documentation links and whitespace checks passed. The full repository-wide browser suite was not rerun for these two UI-module changes; its initial integration results above remain historical.
+
+Current all-bundle local gzip accounting is 415,172 bytes, +13,243 versus the base (49 bytes more than initial delivery), with unchanged media bytes ([review inventory](issue-80/review-build-comparison.json)). This does not assert network-transfer or hardware budgets. No domain/save-format/storage-adapter change, merge or manual deployment is included in the review fix.

@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "f0b2e8d2a9488c5d56f8b5dd2edad637dc6e041d",
+  "baseCodeGzipBytes": 401929,
+  "codeGzipBytes": 415172,
+  "codeGzipDelta": 13243,
+  "assetBytesDelta": 0,
+  "conditions": "Same locked dependencies and Node gzip defaults as initial comparison; current dist built from the clean review-fix commit. Local gzip accounting, not observed CDN/network transfer."
+}
