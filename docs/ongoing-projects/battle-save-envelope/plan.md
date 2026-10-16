@@ -2,7 +2,7 @@
 
 ## Merged — 2026-10-12
 
-PR #70 is merged into main as `ea58370ceb442b22d7f247bc463c2cdddec12456`; GitHub closed #69 as completed. All 12 OpenSpec tasks and this child are complete. Fresh combined-tree verification passed 316 unit tests, 77 content checks, both typechecks, build, strict OpenSpec and 24 focused browser cases. See the [merge evidence](../../qa/issue-69/merge-validation.json) and [next-session handoff](../plan.md). Parent #58 remains open; existing #72 is the next storage-adapter phase and has not been started. The source branch and review history are retained; no release tag or manual deployment was made.
+PR #70 is merged into main as `ea58370ceb442b22d7f247bc463c2cdddec12456`; GitHub closed #69 as completed. All 12 OpenSpec tasks and this child are complete. Fresh combined-tree verification passed 316 unit tests, 77 content checks, both typechecks, build, strict OpenSpec and 24 focused browser cases. See the [merge evidence](../../qa/issue-69/merge-validation.json) and [next-session handoff](../plan.md). Parent #58 remains open. Subsequent #72 storage and #73 autosave/Continue work is now merged (PRs #91/#95); #74 certification remains open. The source branch and review history are retained; no release tag or manual deployment was made.
 
 ## Prior review handoff — historical
 

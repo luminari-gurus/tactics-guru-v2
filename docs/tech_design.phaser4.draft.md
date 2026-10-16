@@ -1,17 +1,17 @@
 # Tactics Guru — Browser-First Tactical Game Technical Design
 
-**Document status:** maintained technical design draft in `docs/tech_design.phaser4.draft.md`, already on main through PR #13. Approved #82 reconciliation, 2026-10-12: current implementation, original proposals and remaining acceptance are distinguished below. Core product decisions remain approved; this document authorizes no production action.
-**New project repository (Brian’s decision):** https://github.com/luminari-gurus/tactics-guru-v2 (public). Main at `30331e6c2fd18d2051aab32b6159839f3c994e1b` contains the playable battle, scoped unit/browser/content checks and task-specific OpenSpec changes. #1/#2–#11 are closed implementation milestones; #57/#64/#66 still own physical readiness/restart acceptance. No scaffold or plan migration is pending.
+**Document status:** maintained technical design draft in `docs/tech_design.phaser4.draft.md`, already on main through PR #13. Status refreshed 2026-10-16 after the #82 reconciliation: current implementation, original proposals and remaining acceptance are distinguished below. Core product decisions remain approved; this document authorizes no production action.
+**New project repository (Brian’s decision):** https://github.com/luminari-gurus/tactics-guru-v2 (public). Main (revision recorded below) contains the playable battle, scoped unit/browser/content checks and task-specific OpenSpec changes. #1/#2–#11 are closed implementation milestones; #57/#64/#66 still own physical readiness/restart acceptance. No scaffold or plan migration is pending.
 **Reference baseline:** `luminari-gurus/tactics-guru` (private), `main` at `e9433f6b608ae6b2d95418615cce9cf17dadcf74`, inspected 2026-10-05 UTC and re-verified 2026-10-06. Local read-only mirror: `ORIGINAL/`. Legacy line numbers in this document refer to that SHA.
 **Stack (pinned on main):** Phaser **4.2.1**, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0 and Vitest 5.0.3; Node declared ≥22.12.0. See `package.json`; packages are unchanged by this task.
 **Approved presentation/rules:** isometric board and baseline height/movement/d20 tactics, responsive HTML/CSS HUD. Historical legacy geometry was 64×32 with elevation step 16; current pure geometry uses 80×40, step 24 and base thickness 12 (`src/geometry/iso.ts`). These are rendering constants, not a tactical-rule redesign.
-**Approved MVP:** one polished replayable tactical battle (coordinator question 1, option A). A short roguelike route is deferred, not a prerequisite.
+**Approved MVP:** one polished replayable tactical battle (coordinator question 1, option A). The authored three-encounter run is now integrated as a follow-up; it does not replace the original battle acceptance gate.
 **Companion document:** `docs/phaser4-restart-plan.md` ("the plan") holds the legacy audit, the tracker mapping, the evidence for the release constraints and the open-decision register D1–D11. This document states the design contracts. Where the two disagree, that is a defect to fix, not a choice. The tracker's issues are the authority for scope and acceptance.[52]
 **Conventions:** *baseline* means legacy behaviour at the pinned SHA; *target* means the originally intended design, whose implementation status is reconciled in the current snapshot and §12; *proposal* means a design choice not yet made in code. D1–D11 refer to the plan's register; T1–T11 are historical engineering questions with current dispositions (§12). Source numbers [1]–[77] are the plan's; [78] onward are new here.
 
-### Current state (verified 2026-10-12)
+### Current state (verified 2026-10-16)
 
-Read-only snapshot of v2 `main` at [`30331e6c2fd18d2051aab32b6159839f3c994e1b`](https://github.com/luminari-gurus/tactics-guru-v2/commit/30331e6c2fd18d2051aab32b6159839f3c994e1b); PR #86 changed workflow guidance only after the game baseline `cae524e`. Issue states and PRs were refreshed on 2026-10-12. This reconciliation changes documentation, not product choices or runtime behavior.
+GitHub main is [`b175ddb5dabed2ee8457e132e345e9a2fc2affdb`](https://github.com/luminari-gurus/tactics-guru-v2/commit/b175ddb5dabed2ee8457e132e345e9a2fc2affdb), the merged #80 integration (PR #120). Issue and PR states were refreshed on 2026-10-16. Initial local source inspection used `work/issue-79-reward-item-controls` at `3060060`; subsequent main changes below are confirmed by merged tracker records, not local execution. The documentation PR is based on the main revision above. Historical QA results retain their original revision/device limits; this documentation update ran no gameplay or physical-device tests.
 
 | Area | Merged implementation / tracker state | Evidence and remaining acceptance |
 | --- | --- | --- |
@@ -21,8 +21,10 @@ Read-only snapshot of v2 `main` at [`30331e6c2fd18d2051aab32b6159839f3c994e1b`](
 | Performance | #65 closed; [PR #67](https://github.com/luminari-gurus/tactics-guru-v2/pull/67) merged at `e955e9d`. Shared cached column/overlay textures and corrected v3 POST_RENDER sampling. | [Frame evidence](qa/issue-65-frame-budgets.md) records deployed unchanged F1/F2/L1–L4 passes, source/build identity and earlier failures. These captures do not certify hardware or the later combined audio tree. |
 | Baked experiment | #68 closed; [PR #71](https://github.com/luminari-gurus/tactics-guru-v2/pull/71) merged at `cae524e`. Prototype **not adopted**; #67 renderer retained. | [Experiment evidence](qa/issue-68-baked-tiles.md): submission reduction did not justify memory/generation/maintenance cost; prototype source and failures remain reviewable. |
 | First-battle readiness | #57 remains open; #64 physical iPhone Safari/Chrome, Android Chrome and desktop certification plus #66 intermittent Safari restart remain open. | [#64](https://github.com/luminari-gurus/tactics-guru-v2/issues/64), [#66](https://github.com/luminari-gurus/tactics-guru-v2/issues/66). #66’s prior claim was withdrawn; its planning branch is historical. The #65 shutdown repair is not a diagnosis or fix of the physical report. |
-| Save/resume | #58/#69 open; [PR #70](https://github.com/luminari-gurus/tactics-guru-v2/pull/70) is open, unmerged at `6c798411980bc16af99f3284674f976e6b30cef1`. | Pure snapshot codec is proposed by that PR, not on main. #72 storage, #73 session/UI, #74 certification remain blocked by their listed prerequisites. No playable resume exists here. |
-| Next slices | #59/#60 and #75–#81 remain open; run/carryover/reward choices await their contracts. | Authored three-encounter run stays separate from [#87](https://github.com/luminari-gurus/tactics-guru-v2/issues/87), a newly requested standalone 20×20 procedural `/map` prototype. Neither is implemented or part of first-battle acceptance. |
+| Save/resume | #69/#72/#73 complete through merged PRs #70/#91/#95; snapshot codec, guarded primary/backup storage, command-boundary autosave, Continue and recovery controls are implemented. | [Storage contract](battle-storage.md), [resume QA](qa/issue-73-battle-resume.md). #58 and physical lifecycle certification #74 remain open; implementation is not certification. |
+| Authored run and rewards | #75–#80 closed; PRs #107/#109/#114/#115/#116/#120 merged. Three encounters, HP carryover, item/reward catalog, atomic commands, ownership UI and playable run continuation are delivered. | [Run contract](run-contract.md), [encounters](authored-encounters.md), [item QA](qa/issue-79.md), [integration PR #120](https://github.com/luminari-gurus/tactics-guru-v2/pull/120). #59/#60 and full-run certification #81 remain open. |
+| Overworld prototype | #87/#96–#99 closed; PRs #93/#100/#101/#104/#105 merged. Standalone `/map` has seeded layouts, biomes and art selection. | [Map contract](overworld-map.md), [acceptance QA](qa/issue-96-map-acceptance.md). This remains independent of battle/run progression. |
+| Battle presentation and controls | #106 animation and #108 design complete (PRs #110/#112); dialog/input fixes #113 and drawable board regions #118 merged. | [Animation QA](qa/issue-106-ability-animations.md). #111 remains open with controls/inspection PR #119 open; health bars #121 are requested, not delivered. |
 | Delivery | QA records existing Pages main/branch previews. [PR #12](https://github.com/luminari-gurus/tactics-guru-v2/pull/12) remains open and unmerged. | Pages served-build captures are historical evidence, not a fresh live-host probe. SSH installer is not installed/approved by its package tests. #83/#84 review and #85 separately authorized activation retain production/rollback gates. Analytics stays optional/default off. |
 
 The October 6 legacy audit and revision notes below remain historical evidence at legacy SHA `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. This task did not re-audit that private repository or refresh the old host probe. Missing `ORIGINAL/` and `phaser4-discovery/evidence.md` references are provenance, not available local files.
@@ -96,7 +98,7 @@ Validated content catalog + seed
             ↙                ↘
  Phaser board/input/audio   HTML/CSS HUD/dialogs
                   ⋮
-     storage adapter (deferred, §8)
+     storage adapter (implemented in src/persistence, §8)
 ```
 
 Domain code imports no Phaser, DOM, browser globals or animation helpers. The session validates/dispatches player or AI commands, exposes a pure preview and coordinates presentation. Phaser Scenes load/render assets and translate pointers/camera positions into commands; they never determine legality, HP or victory. DOM controls consume selectors and send intentions through the same session. Storage only receives plain domain data.
@@ -194,7 +196,7 @@ src/
   assets/                    # imported through Vite, never placed under public/
     manifest.ts              # typed rows: key, file, origin, size, anchor
     tiles/ units/ portraits/ audio/
-  storage/                   # deferred (§8)
+  persistence/               # implemented guarded battle/run storage (§8)
 content/
   maps/forest-ruins.json
   terrain.json classes.json units.json abilities.json statuses.json
@@ -703,14 +705,14 @@ The following table records legacy sound candidates. Ember Burst cues are histor
 
 ## 8. Saves and optional services
 
-**Not implemented on main.** #58 is the save/resume epic; #69 / open unmerged PR #70 proposes the pure bounded snapshot codec. After merge, #72 supplies guarded storage/backup recovery, #73 autosave/Continue UI, and #74 physical lifecycle certification. #57 is the feature release gate. Do not duplicate PR #70’s codec or claim its benchmark is a hardware guarantee. Until then a battle is lost when the browser discards the tab, which phones do to background tabs under memory pressure. Say so in the deferred list. The seed and command log (§4.2) keep a later resume cheap.
+**Implemented on main.** #69/#72/#73 delivered the bounded snapshot codec, guarded storage/backup recovery and command-boundary autosave/Continue through merged PRs #70/#91/#95. [Battle storage](battle-storage.md) is the implemented contract. #79/#80 also delivered separate run ownership/battle snapshots and playable continuation (PRs #116/#120). #58/#74 retain physical lifecycle acceptance; storage remains best-effort and can report an unsaved state.
 
 Preferences such as mute may use `localStorage` from the start, under the same rules as below: a namespaced key, every access wrapped, and a visible but nonfatal result when storage is unavailable.
 
-When the save slice arrives:
+Implemented save boundaries (the linked storage contract gives exact keys and recovery behavior):
 
-- Use a new namespaced key, e.g. `tactics_guru.phaser4.save.v1`. Never read or write the legacy keys `tactics_guru.active_run_state`, `tactics_guru.active_battle_state` and `tactics_guru.leaderboard_records`.[13][14][88]
-- The envelope carries format, rules, content and RNG versions and either a domain snapshot at a command boundary or the seed and command log with a snapshot digest in the original proposal. PR #70 selects snapshots; the merged/accepted contract must be used by #72, not a second serializer. Validate type, size, finite safe integers, known IDs and state invariants.
+- Battle storage uses `tactics-guru:phaser:battle:primary:v1` and a separate backup key; run storage has its own namespace. Never read or write the legacy keys `tactics_guru.active_run_state`, `tactics_guru.active_battle_state` and `tactics_guru.leaderboard_records`.[13][14][88]
+- The envelope carries format, rules, content and RNG versions and either a domain snapshot at a command boundary or the seed and command log with a snapshot digest in the original proposal. Merged PR #70 selects snapshots; #72 uses that codec. Validate type, size, finite safe integers, known IDs and state invariants.
 - Corrupt or future versions offer recover/reset/export choices without automatic deletion. Keep a last-known-good backup; catch quota and security exceptions. A checksum detects accidental corruption, not cheating.
 - Resume requires next-command and RNG equivalence tests. Do not serialize animation phase, Phaser objects, DOM, resource references or unbounded logs. No speculative migration system is selected; future compatibility handling requires scoped fixtures and backup preservation.
 - Two limits to state plainly. `localStorage` is per origin, so the namespaced key protects old data only if the new build is ever served from the legacy origin. Safari deletes script-writable storage after seven days of browser use without interaction with the site, so resume on iPhone is best-effort.[75]
@@ -825,10 +827,10 @@ The original battle order is complete; implementation milestones and remaining a
 | P4: AI/board/play loop delivered | #9/#6/#10 closed | `src/domain/ai.ts`, `BattleSession`, `BattleScene`, `BoardRenderer`, HUD/dialogs | Real-control automated win/loss/replay/restart and transformed picking; no physical acceptance by proxy. |
 | P5: automated evidence delivered; physical gate open | #11/#62/#65/#68 closed; #57/#64/#66 open | Existing battle/audio/performance QA; cached renderer retained | Supported physical matrix and Safari restart disposition remain required. |
 | P6a: delivery review / approved activation pending | #83 → #84 → #85; PR #12 open | Existing Pages evidence and reviewed SSH alternative | #84 resolves owner target/path; #85 requires accepted #84/#57 and explicit target/build/operation approval. SSH adds separate exact-package/preflight/install/activation/recovery gates only if selected. |
-| P6b: local save/resume pending | #58, #69 / PR #70, #72–#74 | #72 guarded storage uses #69 codec only after merge; #73 command-boundary autosave/Continue uses #72 + #69 merge; #74 certifies #72/#73 + #57 | Preserve backup/corrupt bytes, next state/RNG equivalence, explicit reset/export and physical lifecycle evidence. Release waits for #57. |
-| P7: authored short run and rewards pending | #59/#60, #75–#81 | #75 run/carryover/RNG contract → #76 three encounters and #77 catalog; #78 commands needs #77 + #75; #79 controls/save needs #78 + #73 + #75 | Owner-reviewed choices before dependent implementation; existing heroes/enemies, no broad economy or parity. |
-| P7 integration/certification pending | #80/#81 | #80 requires #75/#76/#78/#73 + #57 acceptance; coordinate reward/save interface with #79 without a reciprocal implementation prerequisite. #81 waits for #80/#79/#58 acceptance/#57 | Exactly three actual-control battles, deterministic carryover/rewards/resume and full supported device evidence. |
-| Independent exploration prototype requested | #87 open | Standalone 20×20 procedural `/map`; generator/rot.js comparison belongs to #87 | Seed reproducibility/connectivity, responsive direct navigation/refresh and battle-route regression. No battle/RNG/save/run coupling, party movement, rewards or persistence; no new dependency selected here. |
+| P6b: local save/resume implemented; certification open | #69/#72/#73 closed; PRs #70/#91/#95 merged; #58/#74 open | Snapshot codec, guarded storage/backup, autosave, Continue and explicit recovery delivered | Physical lifecycle certification #74 and first-battle readiness #57 remain open. |
+| P7: authored content, rewards and controls delivered | #75–#79 closed; #59/#60 open | Approved run contract, three encounters, deterministic offers, atomic ownership commands and resumable item controls | Parent acceptance remains open; see #81 for full-run certification. |
+| P7: integration delivered; certification pending | #80 closed via merged PR #120; #81 open | Playable three-encounter progression and bounded run continuation integrated on main | Full supported-device/playtest certification remains #81; #57/#58 parent acceptance is not inferred from merge. |
+| Independent exploration prototype delivered | #87/#96–#99 closed | Standalone seeded 20×20 `/map`, three layout algorithms, three biomes and art selection | [Map acceptance](qa/issue-96-map-acceptance.md); no battle/run coupling or exploration campaign implied. |
 
 Future behavior work uses current `origin/main`, meaningful focused regressions and configured checks; documentation-only #82 uses source/link/consistency/OpenSpec/whitespace verification. No production cutover or hardware claim follows from a closed implementation issue.
 
@@ -904,7 +906,7 @@ Section numbers are those of the legacy `docs/tech_design.md`.[1]
 | 14–15 initial content/AI | Keep three roles and the two goblin profiles, not the expanded rosters and abilities. |
 | 16–18 UI/rendering/audio | Rebuild browser/mobile UI and event presentation; reuse selected artwork/SFX with recorded sources. |
 | 19–21 authoring/database/signals | One validated JSON map/catalog; typed commands/events instead of Godot signal/resource tooling; editor later. |
-| 22–25 debugging/tests/performance/saves | Seed and command log; Vitest/Playwright and devices; measured performance; saves deferred, with a safe namespaced design when they return. |
+| 22–25 debugging/tests/performance/saves | Seed and command log; Vitest/Playwright and devices; measured performance; bounded namespaced battle/run saves now implemented (§8). |
 | 26–27 milestones/backlog | Replaced by the tracker's issues. |
 | 28–30 risks/extensions/questions | Explicit scope ledger, optional run, product questions; no automatic parity. |
 | 31–33 operations/references/immediate step | Static browser build through the reviewed release mechanism; official Phaser 4 tagged references; proof-of-fit first, not old M1 movement work. |
@@ -918,13 +920,17 @@ Both planning documents and task-specific OpenSpec changes are already on main; 
 | Disposition | Scope | Current evidence / boundary |
 | --- | --- | --- |
 | Accepted battle slice, implemented | One replayable isometric Forest Ruins battle, fixed three heroes/minimal goblins, height/d20, signatures, legal AI, previews, replay/restart and optional sound | #1–#11/#49/#62; implementation closure is distinct from #57/#64/#66 readiness. |
-| Accepted follow-up planning, delivery pending | Safe local resume, authored three-encounter run, minimal owned rewards/items | #58–#60 and their children; unresolved contract/balance choices stay open. |
-| Separately requested prototype, not battle expansion | 20×20 seeded procedural `/map` research/prototype | #87; independent from #59 and first-battle acceptance. Larger exploration/campaign remains deferred. |
+| Accepted follow-ups, implementation delivered; acceptance open | Safe local resume, authored three-encounter run and minimal owned rewards/items | #69/#72/#73/#75–#80 closed; #58–#60/#74/#81 retain acceptance scope. |
+| Separately requested prototype, delivered | 20×20 seeded procedural `/map` with layout, biome and art selection | #87/#96–#99 closed; independent of #59 and first-battle acceptance. Larger exploration/campaign remains deferred. |
 | Deferred | Recruitment/classes, XP/meta progression, shops/economy, broad biomes/status systems, editor/custom-map exchange, rotation, accounts/leaderboards, analytics and legacy import | Historical legacy audit in the restart plan is reference material; no automatic port, new retirement or parity promise. Analytics remains default off. |
 | Retired from the new runtime only | Godot Nodes/Resources/autoloads/GDScript/export/PCK/WASM plumbing and legacy same-seed restart | TS domain/session/Phaser/DOM replaces these; original repository/history/deployment/storage remain untouched. |
 | Superseded/not adopted | Ember Burst, historical Guarded Strike −4 penalty, #68 baked prototype, proposed Begin/two-voice scheme | Approved Magic Missile/−2 tradeoff and merged implementation apply. Experiments and old proposals remain historical evidence. |
 
-## Revision notes (2026-10-12)
+## Revision notes (2026-10-16)
+
+Refreshed save/resume, authored run/rewards, overworld and control-work status against merged PRs and open acceptance issues. Main includes PR #120; initial local source inspection predates that integration. No runtime changes or fresh test/certification claims.
+
+## Historical revision notes (2026-10-12)
 
 Approved #82 reconciles current status, tools, D/T registers, roadmap, delivery and scope against main `30331e6` and the live tracker. Historical October 6 experiments/legacy provenance remain dated; original layout/build/Begin/audio proposals are distinguished from the merged runtime. Physical #57/#64/#66, unmerged #70 and explicit owner/operator/production gates remain open. #87 is independent exploration scope. No application, dependency, deployment or legacy-repository change.
 

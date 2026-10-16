@@ -1,3 +1,26 @@
+# Current project handoff — 2026-10-16
+
+Main is `b175ddb5dabed2ee8457e132e345e9a2fc2affdb` after [PR #120](https://github.com/luminari-gurus/tactics-guru-v2/pull/120) merged the playable three-encounter run. Initial local source inspection used `work/issue-79-reward-item-controls` at `3060060`; the documentation PR is based on the main revision above. Tracker status was checked on 2026-10-16; no runtime tests or physical certification were performed for this documentation refresh.
+
+## Delivered
+
+- Battle save envelope, guarded storage and autosave/Continue: #69/#72/#73, merged PRs #70/#91/#95.
+- Run contract, three authored encounters, reward/item catalog, atomic commands, resumable controls and integrated progression: #75–#80, merged PRs #107/#109/#114/#115/#116/#120.
+- Standalone `/map` with layout, biome and art selection: #87/#96–#99 complete.
+- Signature effects #106 and responsive-controls design #108 complete. PR #113 fixed dialog focus/held-key resets; PR #118 delivered drawable board regions.
+
+## Remaining work
+
+#111 remains open; [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) contains the ongoing responsive-control/inspection work. #121 requests unit health bars. Preserve existing ownership and review progress before selecting work.
+
+#57/#64/#66 retain first-battle physical readiness and Safari restart acceptance. #58/#74 retain persistence lifecycle certification. #59/#60 and full-run certification #81 remain open despite completed implementation children. #83–#85 and open PR #12 retain separate release-path and production-approval scope. Merged implementation is not evidence that these acceptance gates passed.
+
+The maintained [restart plan](../phaser4-restart-plan.md) and [technical design](../tech_design.phaser4.draft.md) summarize current delivery. Task QA and historical records keep their original source/build/device limits.
+
+## Prior #111 handoff — 2026-10-15
+
+The detailed review handoff below is retained from main. Its #80 ownership statement describes that earlier checkpoint; #80 has since merged as recorded above. Refresh PR #119 before acting on its recorded review state.
+
 # Issue #111 — PR #118 merged; PR #119 follow-up
 
 Updated 2026-10-15 (Asia/Jerusalem). **The geometry prerequisite is merged. Issue #111 remains open.** The remaining responsive HUD/input implementation already exists in PR #119; continue from that PR and its two review findings.
