@@ -56,3 +56,14 @@ Visual review caught blank mobile full-page screenshot output from the first cap
 Reviewed final images: [portrait](issue-79/items-412x915.png), [narrow portrait](issue-79/items-320x568.png), [short landscape](issue-79/items-915x412.png). They show the scrollable component, not a complete battle layout. The mobile emulation runs exercise native touch, keyboard, focus and modal behavior; they do not prove physical hardware or screen-reader acceptance.
 
 Logs (trailing whitespace normalized): [full browser run](issue-79/browser.txt), [final item rerun](issue-79/run-items.txt), [unit](issue-79/unit.txt), [content](issue-79/content.txt), [build](issue-79/build.txt). Existing Vite large-chunk and Node color-environment warnings remain. Strict OpenSpec, both typechecks, local document links and whitespace checks passed. Delivery: [PR #116](https://github.com/luminari-gurus/tactics-guru-v2/pull/116) targets main from the published issue branch. #80/#81 integration/certification remain separate scope. The PR is not merged and the OpenSpec change is not archived.
+
+## #80 live controller integration
+
+The approved #80 implementation extends RunItemSession with an owned BattleSession,
+canonical encounter start, accepted-command save and atomic terminal completion.
+Completion derives HP/outcome from that owned session and builds the reward offer
+before publishing the next snapshot. Item/reward dispatch invalidates the old session.
+The run route reuses the existing item UI and run storage keys. Snapshot hydration
+preserves the saved active battle and exposes only its continuation; it does not invent
+historical replay or cues. Reset retains reviewed raw slot texts for export across a
+partial removal failure; the live run/seed changes only after both removals succeed.

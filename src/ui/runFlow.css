@@ -1,0 +1,7 @@
+#run-screen { position:fixed; inset:0; z-index:2; overflow:auto; background:#172033; padding-bottom:env(safe-area-inset-bottom); }
+#run-screen[hidden] { display:none; }
+#run-screen .run-items { margin-inline:auto; }
+.run-actions { max-width:900px; margin:auto; padding:12px max(16px, env(safe-area-inset-right)) 32px max(16px, env(safe-area-inset-left)); display:flex; flex-wrap:wrap; gap:12px; box-sizing:border-box; }
+.run-actions button, .run-entry-link { display:inline-flex; align-items:center; justify-content:center; min-height:44px; min-width:44px; padding:10px 12px; box-sizing:border-box; color:#f6f1e7; font:inherit; touch-action:manipulation; }
+.run-entry-link:focus-visible { outline:3px solid #ffd77d; outline-offset:2px; }
+#run-progress { font-size:14px; margin:0 0 8px; }

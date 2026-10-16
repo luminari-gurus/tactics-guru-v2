@@ -1,0 +1,43 @@
+[WebServer] (node:11020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 30 tests using 1 worker
+
+(node:11061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (46.5s)
+  ✓   2 [desktop] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (14.8s)
+  ✓   3 [desktop] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.3s)
+  ✓   4 [desktop] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (4.9s)
+  ✓   5 [desktop] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.3s)
+  ✓   6 [desktop] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.3s)
+  ✓   7 [desktop] › tests/run-progression.spec.ts:119:1 › cached run return cannot overwrite either slot of a newer replacement (1.3s)
+  ✓   8 [desktop] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.1s)
+  ✓   9 [desktop] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.0s)
+  ✓  10 [desktop] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (13.9s)
+(node:11128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 [mobile-portrait] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (46.4s)
+  ✓  12 [mobile-portrait] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (14.8s)
+  ✓  13 [mobile-portrait] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.3s)
+  ✓  14 [mobile-portrait] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (4.8s)
+  ✓  15 [mobile-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.2s)
+  ✓  16 [mobile-portrait] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.3s)
+  ✓  17 [mobile-portrait] › tests/run-progression.spec.ts:119:1 › cached run return cannot overwrite either slot of a newer replacement (1.3s)
+  ✓  18 [mobile-portrait] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.1s)
+  ✓  19 [mobile-portrait] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (1.9s)
+  ✓  20 [mobile-portrait] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (13.8s)
+(node:11257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [mobile-landscape] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (46.4s)
+  ✓  22 [mobile-landscape] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (14.7s)
+  ✓  23 [mobile-landscape] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.3s)
+  ✓  24 [mobile-landscape] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (4.9s)
+  ✓  25 [mobile-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.2s)
+  ✓  26 [mobile-landscape] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.3s)
+  ✓  27 [mobile-landscape] › tests/run-progression.spec.ts:119:1 › cached run return cannot overwrite either slot of a newer replacement (1.3s)
+  ✓  28 [mobile-landscape] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.1s)
+  ✓  29 [mobile-landscape] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.0s)
+  ✓  30 [mobile-landscape] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (13.9s)
+
+  30 passed (5.1m)

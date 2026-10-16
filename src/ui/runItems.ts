@@ -15,7 +15,8 @@ const encounterLabel = (id: string) => id.split(':').at(-1)!.split('_').map(word
 const effect = (def: ItemDef) => def.effect.kind === 'restoreHp' ? `Restore ${def.effect.amount} HP` :
   `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
 /** Mount once per flow, dispose before replacement. Caller owns the sole modal instance. */
-export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs) {
+export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs,
+  host?: { continueRun: (load: RunLoadResult) => void; recover: () => void }) {
   const abort = new AbortController();
   let renderAbort = new AbortController();
   dialogs.element.classList.add('run-item-dialog');
@@ -67,6 +68,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       : `Storage ${load.kind}. Play can continue unsaved.`;
     dialogs.showChoices('Save recovery', message, choices, focus);
   };
+  // The live flow owns scene navigation and retained recovery copies.
+  const recover = (load?: RunLoadResult) => host ? host.recover() : showRecovery(load);
   const render = () => {
     renderAbort.abort(); renderAbort = new AbortController();
     const { items, activeBattle } = session.snapshot;
@@ -140,12 +143,12 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     const persistence = element('section'); persistence.setAttribute('aria-label', 'Run save');
     persistence.append(button('Continue saved run', () => {
       const load = session.inspect();
-      if (!load.ok || !load.selected) { showRecovery(load); return; }
+      if (!load.ok || !load.selected) { recover(load); return; }
       dialogs.showChoices('Continue saved run?', load.selected.slot === 'backup' ? 'Recover backup. Some progress may be lost.' : 'Restore the saved run boundary.', [
-        { id: 'continue-run', label: 'Continue', run: () => { session.continue(load); focus(); } },
+        { id: 'continue-run', label: 'Continue', run: () => { if (host) host.continueRun(load); else session.continue(load); focus(); } },
         { id: 'continue-cancel', label: 'Cancel', run: focus },
       ], focus);
-    }), button('Save recovery', () => showRecovery()));
+    }), button('Save recovery', () => recover()));
     root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory, persistence);
   };
   session.onChange = render;

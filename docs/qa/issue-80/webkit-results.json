@@ -1,0 +1,311 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.11.0_1/bin/node",
+      "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "tmp/issue80-webkit.config.ts"
+    ],
+    "configFile": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tmp/issue80-webkit.config.ts",
+    "rootDir": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tmp/issue80-webkit-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iphone-webkit-portrait",
+        "name": "iphone-webkit-portrait",
+        "testDir": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tmp/issue80-webkit-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "iphone-webkit-landscape",
+        "name": "iphone-webkit-landscape",
+        "testDir": "/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "issue80-webkit-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-portrait",
+              "projectName": "iphone-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 54720,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:41:32.745Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-eabaf4276a6ed5553b57",
+          "file": "run-progression.spec.ts",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-portrait",
+              "projectName": "iphone-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1583,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:42:27.680Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-4ac2e8e9fea3ccd57fd7",
+          "file": "run-progression.spec.ts",
+          "line": 66,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-portrait",
+              "projectName": "iphone-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1569,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:42:29.266Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b040c43b6c19c8677877",
+          "file": "run-progression.spec.ts",
+          "line": 104,
+          "column": 1
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-landscape",
+              "projectName": "iphone-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 54241,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:42:31.138Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c1e1077e77b376f574b8",
+          "file": "run-progression.spec.ts",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-landscape",
+              "projectName": "iphone-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1619,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:43:25.531Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2254ff1f8623f5f7085f",
+          "file": "run-progression.spec.ts",
+          "line": 66,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "iphone-webkit-landscape",
+              "projectName": "iphone-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1592,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T18:43:27.154Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3959923bae109f44c4c8",
+          "file": "run-progression.spec.ts",
+          "line": 104,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-15T18:41:32.155Z",
+    "duration": 116676.03000000001,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

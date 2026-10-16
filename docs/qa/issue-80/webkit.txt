@@ -1,0 +1,21 @@
+[WebServer] (node:471) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 6 tests using 1 worker
+
+(node:512) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart
+[2/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues
+[3/6] [iphone-webkit-portrait] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout
+(node:542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[4/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart
+[5/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues
+[6/6] [iphone-webkit-landscape] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout
+  6 passed (1.9m)

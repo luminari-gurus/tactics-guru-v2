@@ -1,3 +1,5 @@
+import { createRunBattle } from '../domain/runBattle';
+import type { RunSaveContext } from '../domain/runSaveEnvelope';
 import type { ContentCatalog, MapId } from '../content/types';
 import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
@@ -28,12 +30,16 @@ export class BattleSession {
   phase: SessionPhase;
   error: string | null = null;
   readonly resumed: boolean;
-  constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState) {
-    this.resumed = typeof mapId !== 'string';
+  constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState, fresh = false) {
+    this.resumed = typeof mapId !== 'string' && !fresh;
     const created = typeof mapId === 'string' ? createBattle(mapId, seed, catalog) : readBattleState(mapId, catalog);
     if (!created.ok) throw new Error(`Could not create battle: ${created.reason}`);
     this.current = this.initial = freeze(created.state);
     this.phase = this.decisionPhase();
+  }
+  static fromRun(entry: unknown, context: RunSaveContext, accepted?: AcceptedState) {
+    const created = createRunBattle(entry, context);
+    return created.ok ? { ok: true as const, session: new BattleSession(created.catalog, created.state, created.state.seed, accepted, true) } : created;
   }
   static fromSnapshot(catalog: ContentCatalog, input: unknown, accepted?: AcceptedState):
     { ok: true; session: BattleSession } | { ok: false; reason: 'invalidState' } {
