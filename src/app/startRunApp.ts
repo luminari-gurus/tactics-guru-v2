@@ -111,7 +111,7 @@ function render() {
  if(playing){const label=persistence.querySelector('span');if(label)label.textContent=controller.status;return;}
  unmount();panel.hidden=true;screen.hidden=false;container.style.visibility='hidden';
  screen.replaceChildren(items,actions);actions.replaceChildren();
- mounted=mountRunItems(items,controller,dialogs);
+ mounted=mountRunItems(items,controller,dialogs,{continueRun,recover:showRecovery});
  const itemRender=controller.onChange!;
  controller.onChange=()=>{itemRender();evidence();renderActions();};
  if(startup) {
@@ -124,7 +124,7 @@ function render() {
     startup=false;controller.save();render();
    } else requestNew();
   },'run-start'));
-  if(!review.ok)actions.append(button('Play unsaved run',()=>{startup=false;controller.save();render();},'run-unsaved'));
+  if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.save();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
   items.replaceChildren(title);actions.append(nav.cloneNode(true));controller.onChange=()=>{evidence();};

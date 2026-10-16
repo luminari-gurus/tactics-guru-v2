@@ -1,5 +1,5 @@
 import {expect,test,type Page} from '@playwright/test';
-import {writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync} from 'node:fs';
 import {readSession,playCommand} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
@@ -126,4 +126,50 @@ test('cached run return cannot overwrite either slot of a newer replacement',asy
  const before=await stored();await replacement.close();await page.goBack({waitUntil:'commit'});
  await expect(page.locator('#run-continue')).toBeVisible();expect(await stored()).toEqual(before);
  await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(fresh);
+});
+
+test('review: in-flow Continue resumes an ongoing backup battle after legal defeat',async({page})=>{
+ test.setTimeout(90000);await start(page);await fight(page,true);
+ await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ const backup=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.backup);
+ const expected=JSON.parse(backup!).payload.activeBattle;expect(expected.outcome).toBe('ongoing');
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await page.getByRole('dialog').getByRole('button',{name:'Remove primary save',exact:true}).click();
+ await page.getByRole('dialog').getByRole('button',{name:'Remove reviewed save',exact:true}).click();
+ if(await page.getByRole('dialog').isVisible())await page.getByRole('dialog').getByRole('button',{name:/^(Close|Cancel)$/}).click();
+ await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
+ await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+ await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
+ await page.clock.runFor(32);
+ await expect(page.locator('#run-screen')).toBeHidden();await expect(page.locator('#game')).toHaveCSS('visibility','visible');
+ expect((await readSession(page)).continuation?.snapshot).toEqual(expected);expect(await page.locator('canvas').count()).toBe(1);
+ await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+});
+test('review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes',async({page})=>{
+ await page.goto('/run');await page.evaluate(keys=>{localStorage.setItem(keys.primary,'preserve primary');localStorage.setItem(keys.backup,'preserve backup');},RUN_STORAGE_KEYS);
+ await page.addInitScript(keys=>{
+  const read=Storage.prototype.getItem,write=Storage.prototype.setItem,remove=Storage.prototype.removeItem,calls:string[]=[];
+  const owns=(key:string)=>Object.values(keys).some(value=>value===key);
+  Storage.prototype.getItem=function(key){if(owns(key))throw new DOMException('Read denied','SecurityError');return read.call(this,key);};
+  Storage.prototype.setItem=function(key,value){if(owns(key))calls.push('write:'+key);return write.call(this,key,value);};
+  Storage.prototype.removeItem=function(key){if(owns(key))calls.push('remove:'+key);return remove.call(this,key);};
+  Object.assign(window,{reviewReadEvidence:()=>({primary:read.call(localStorage,keys.primary),backup:read.call(localStorage,keys.backup),calls})});
+ },RUN_STORAGE_KEYS);
+ await page.reload();await expect(page.locator('#run-continue')).toHaveCount(0);
+ await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: unavailable. backup: unavailable');await page.getByRole('button',{name:'Close',exact:true}).click();
+ await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
+ expect(await page.evaluate(()=>(window as unknown as {reviewReadEvidence:()=>unknown}).reviewReadEvidence())).toEqual({primary:'preserve primary',backup:'preserve backup',calls:[]});
+});
+test('review: reopened outcome recovery exports the exact retained backup after partial reset',async({page})=>{
+ test.setTimeout(90000);await start(page);await fight(page,true);const ended=await snapshot(page);
+ const saved=await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);expect(saved.backup).not.toBeNull();
+ await page.evaluate(primary=>{const remove=Storage.prototype.removeItem;Storage.prototype.removeItem=function(key){if(key===primary)throw new DOMException('Removal denied','SecurityError');return remove.call(this,key);};},RUN_STORAGE_KEYS.primary);
+ await page.locator('#run-new').click();await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Close',exact:true}).click();await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup save',exact:true}).click();const download=await downloadPromise;
+ expect(JSON.parse(readFileSync((await download.path())!,'utf8'))).toEqual({slot:'backup',text:saved.backup});
+ expect(await snapshot(page)).toEqual(ended);
+ expect(await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS)).toEqual({primary:saved.primary,backup:null});
 });

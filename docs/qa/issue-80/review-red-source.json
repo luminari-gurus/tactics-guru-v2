@@ -1,0 +1,6 @@
+{
+  "applicationCommit": "5a9d5e3ffe41860936775bc1cb58daaeac31deef",
+  "applicationChangedBeforeRed": false,
+  "testSha256": "b2327da810af44c9c5e03dc831af84184caad29f797b908c4ce3ae934965d934",
+  "result": "All three feedback regressions failed on the reported paths before application changes."
+}

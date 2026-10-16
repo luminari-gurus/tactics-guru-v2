@@ -29,6 +29,12 @@ Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10
 - [x] 5.1 Run relevant focused tests, full npm run test:unit, npm run validate:content, both npm run typecheck configurations, npm run build and full npm test including encounter/run-item posttests; verify strict OpenSpec and git diff --check, record exact revisions/commands/results, build/transfer delta, failures and limitations, and map every #80 criterion to evidence in docs/qa/issue-80.md.
 - [x] 5.2 Compare final changes with approved scope, commit only #80 work, push and create/attach a PR against main with issue/plan/approval and actual validation; use Closes #80 only when every criterion is verified, otherwise open a draft with Refs #80 and remaining work.
 
+## 6. PR review corrections
+
+- [x] 6.1 Route in-flow Continue through the host's existing boundary/battle lifecycle; reproduce legal-defeat backup restoration before fixing and verify the resumed board and exact snapshot in browser tests.
+- [x] 6.2 Offer explicit unsaved play when run-key reads are unavailable with no usable save; verify getItem SecurityError separately from storage acquisition failure and preserve inaccessible bytes without writes/removals.
+- [ ] 6.3 Use retained-aware host recovery from every mounted live-run boundary; reproduce partial reset, close/reopen recovery and verify the exact deleted backup download, then run affected regression suites and publish the fixes.
+
 ## Workflow follow-up
 
 - Do not merge, deploy, close parent epics or archive this change before merge.

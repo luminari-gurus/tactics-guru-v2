@@ -1,0 +1,92 @@
+[WebServer] (node:6039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:6081) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (19.4s)
+(node:6137) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [desktop] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (30.0s)
+(node:6196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [desktop] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (18.9s)
+
+
+  1) [desktop] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('#run-screen')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('#run-screen') with timeout 5000ms
+      - waiting for locator('#run-screen')
+        14 × locator resolved to <section id="run-screen" aria-label="Authored run">…</section>
+           - unexpected value "visible"
+
+
+      142 |  await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
+      143 |  await page.clock.runFor(32);
+    > 144 |  await expect(page.locator('#run-screen')).toBeHidden();await expect(page.locator('#game')).toHaveCSS('visibility','visible');
+          |                                            ^
+      145 |  expect((await readSession(page)).continuation?.snapshot).toEqual(expected);expect(await page.locator('canvas').count()).toBe(1);
+      146 |  await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+      147 | });
+        at /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:144:44
+
+    Error Context: test-results/run-progression-review-in--ccbd7-p-battle-after-legal-defeat-desktop/error-context.md
+
+  2) [desktop] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('#run-unsaved')
+
+
+      158 |  await page.reload();await expect(page.locator('#run-continue')).toHaveCount(0);
+      159 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: unavailable. backup: unavailable');await page.getByRole('button',{name:'Close',exact:true}).click();
+    > 160 |  await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+          |                                     ^
+      161 |  await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
+      162 |  expect(await page.evaluate(()=>(window as unknown as {reviewReadEvidence:()=>unknown}).reviewReadEvidence())).toEqual({primary:'preserve primary',backup:'preserve backup',calls:[]});
+      163 | });
+        at /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:160:37
+
+    Error Context: test-results/run-progression-review-rea-0ad6e-changing-inaccessible-bytes-desktop/error-context.md
+
+  3) [desktop] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Export backup save', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Export backup save', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Export backup save', exact: true })
+
+
+      168 |  await page.locator('#run-new').click();await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+      169 |  await page.getByRole('button',{name:'Close',exact:true}).click();await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+    > 170 |  await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+          |                                                                                ^
+      171 |  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup save',exact:true}).click();const download=await downloadPromise;
+      172 |  expect(JSON.parse(readFileSync((await download.path())!,'utf8'))).toEqual({slot:'backup',text:saved.backup});
+      173 |  expect(await snapshot(page)).toEqual(ended);
+        at /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:170:80
+
+    Error Context: test-results/run-progression-review-reo-5956c--backup-after-partial-reset-desktop/error-context.md
+
+  3 failed
+    [desktop] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat
+    [desktop] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes
+    [desktop] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset
