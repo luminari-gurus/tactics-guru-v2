@@ -35,7 +35,7 @@ Issue #80; caller dubstylee; branch work/issue-80-run-progression; base 46284e10
 - [x] 6.2 Offer explicit unsaved play when run-key reads are unavailable with no usable save; verify getItem SecurityError separately from storage acquisition failure and preserve inaccessible bytes without writes/removals.
 - [x] 6.3 Use retained-aware host recovery from every mounted live-run boundary; reproduce partial reset, close/reopen recovery and verify the exact deleted backup download, then run affected regression suites and publish the fixes.
 
-- [ ] 6.4 Restore recovery return focus after boundary rerender for both Escape and Close; verify connected visible focus on startup/preparation and unchanged battle-mode behavior in Chromium and WebKit, and publish the correction.
+- [x] 6.4 Restore recovery return focus after boundary rerender for both Escape and Close; verify connected visible focus on startup/preparation and unchanged battle-mode behavior in Chromium and WebKit, and publish the correction.
 
 ## Workflow follow-up
 

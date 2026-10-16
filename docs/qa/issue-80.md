@@ -71,4 +71,18 @@ Review verification commands:
 - `npx playwright test -c tmp/issue120-review-webkit.config.ts`: six passed ([output](issue-80/review-webkit.txt)). The first CLI-filter attempt selected zero tests because it intersected the existing config filter; the retained [focused config](issue-80/review-webkit.config.ts.txt) selects the intended cases. Restore both this config and the original WebKit config to their `tmp/` paths to reproduce.
 - Strict OpenSpec, relative documentation links and whitespace checks passed. The full repository-wide browser suite was not rerun for these two UI-module changes; its initial integration results above remain historical.
 
-Current all-bundle local gzip accounting is 415,172 bytes, +13,243 versus the base (49 bytes more than initial delivery), with unchanged media bytes ([review inventory](issue-80/review-build-comparison.json)). This does not assert network-transfer or hardware budgets. No domain/save-format/storage-adapter change, merge or manual deployment is included in the review fix.
+For `f0b2e8d`, all-bundle local gzip accounting is 415,172 bytes, +13,243 versus the base (49 bytes more than initial delivery), with unchanged media bytes ([review inventory](issue-80/review-build-comparison.json)). This does not assert network-transfer or hardware budgets. No domain/save-format/storage-adapter change, merge or manual deployment is included in the review fix.
+
+## Recovery dismissal focus follow-up — 2026-10-16
+
+The [new review finding](https://github.com/luminari-gurus/tactics-guru-v2/pull/120#issuecomment-6214466687) was reproduced on `85ed3d6`: both Escape and explicit Close failed the focused-control assertion after preparation recovery was dismissed ([pre-fix output](issue-80/focus-red.txt)).
+
+Fix `a8bc639` uses one recovery-close callback for both paths. On boundary screens it renders first and focuses the newly created Save recovery control. In battle mode it does not rerender; existing native modal return focus stays on the mounted recovery button. The shared BattleDialogs and item component are unchanged by this follow-up.
+
+The two keyboard tests verify connected, visible, focused and in-viewport recovery controls after both Escape and Close, at preparation, startup and battle. Run snapshots remain unchanged. Verification on the clean fix revision:
+
+- `npm run test:unit`: 654 passed.
+- `npm run build`: 167 content checks, both typechecks and build passed; existing bundle warning remains.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npx playwright test tests/run-progression.spec.ts --grep 'review:|run startup preserves|44px controls'`: all 21 affected checks passed across desktop and mobile portrait/landscape, including previous review regressions ([output](issue-80/focus-matrix.txt)).
+- `npx playwright test -c tmp/issue120-focus-webkit.config.ts`: all four focus cases passed in iPhone-sized WebKit portrait/landscape ([output](issue-80/focus-webkit.txt), [config](issue-80/focus-webkit.config.ts.txt)). Restore the existing base WebKit config and focus config to their `tmp/` paths to reproduce.
+- Strict OpenSpec, document links and whitespace checks passed. No full repository-wide browser rerun is claimed for this one callback correction. See [source-bound validation](issue-80/focus-validation.json).
