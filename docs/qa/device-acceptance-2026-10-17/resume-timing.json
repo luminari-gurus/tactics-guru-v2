@@ -1,0 +1,1941 @@
+{
+  "method": "host emulation; no network throttling; three fresh contexts per profile then two same-context saved reloads; prompt navigation timing separate from automated Continue click-to-player; OS discard simulated by real reload",
+  "measuredAt": "2026-10-17T14:19:01.792Z",
+  "rows": [
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm",
+      "startupPromptMs": 107.40000009536743,
+      "continueToPlayerMs": 49.39999997615814,
+      "navigationToPlayerMs": 157.20000004768372,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm-repeat",
+      "startupPromptMs": 98,
+      "continueToPlayerMs": 47.60000002384186,
+      "navigationToPlayerMs": 145.80000007152557,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "cold-resume",
+      "startupPromptMs": 205.5,
+      "continueToPlayerMs": 88.69999992847443,
+      "navigationToPlayerMs": 294.5,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm",
+      "startupPromptMs": 106.89999997615814,
+      "continueToPlayerMs": 33.89999997615814,
+      "navigationToPlayerMs": 141.09999990463257,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm-repeat",
+      "startupPromptMs": 97.60000002384186,
+      "continueToPlayerMs": 31.600000023841858,
+      "navigationToPlayerMs": 130.20000004768372,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "cold-resume",
+      "startupPromptMs": 203.89999997615814,
+      "continueToPlayerMs": 83.5,
+      "navigationToPlayerMs": 287.60000002384186,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm",
+      "startupPromptMs": 107.29999995231628,
+      "continueToPlayerMs": 33.60000002384186,
+      "navigationToPlayerMs": 141.19999992847443,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm-repeat",
+      "startupPromptMs": 98.10000002384186,
+      "continueToPlayerMs": 33,
+      "navigationToPlayerMs": 131.29999995231628,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "desktop",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "cold-resume",
+      "startupPromptMs": 204.5,
+      "continueToPlayerMs": 88.5,
+      "navigationToPlayerMs": 293.2999999523163,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm",
+      "startupPromptMs": 133.60000002384186,
+      "continueToPlayerMs": 43.89999997615814,
+      "navigationToPlayerMs": 177.79999995231628,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm-repeat",
+      "startupPromptMs": 123,
+      "continueToPlayerMs": 63.300000071525574,
+      "navigationToPlayerMs": 186.60000002384186,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "cold-resume",
+      "startupPromptMs": 204.29999995231628,
+      "continueToPlayerMs": 85.30000007152557,
+      "navigationToPlayerMs": 290,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm",
+      "startupPromptMs": 131,
+      "continueToPlayerMs": 45.700000047683716,
+      "navigationToPlayerMs": 177,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm-repeat",
+      "startupPromptMs": 122,
+      "continueToPlayerMs": 64.39999997615814,
+      "navigationToPlayerMs": 186.59999990463257,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "cold-resume",
+      "startupPromptMs": 207.89999997615814,
+      "continueToPlayerMs": 86.5,
+      "navigationToPlayerMs": 294.7000000476837,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm",
+      "startupPromptMs": 132.20000004768372,
+      "continueToPlayerMs": 45.10000002384186,
+      "navigationToPlayerMs": 177.70000004768372,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.09999990463256836
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm-repeat",
+      "startupPromptMs": 122.5,
+      "continueToPlayerMs": 63.300000071525574,
+      "navigationToPlayerMs": 186.10000002384186,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.09999990463256836
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-portrait",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "cold-resume",
+      "startupPromptMs": 200.40000009536743,
+      "continueToPlayerMs": 85.30000007152557,
+      "navigationToPlayerMs": 285.90000009536743,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm",
+      "startupPromptMs": 133.10000002384186,
+      "continueToPlayerMs": 42.60000002384186,
+      "navigationToPlayerMs": 176,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.09999990463256836
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "warm-repeat",
+      "startupPromptMs": 121.5,
+      "continueToPlayerMs": 43.699999928474426,
+      "navigationToPlayerMs": 165.39999997615814,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.09999990463256836
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 1,
+      "cache": "cold-resume",
+      "startupPromptMs": 201.70000004768372,
+      "continueToPlayerMs": 78.60000002384186,
+      "navigationToPlayerMs": 280.5,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm",
+      "startupPromptMs": 134.10000002384186,
+      "continueToPlayerMs": 42.700000047683716,
+      "navigationToPlayerMs": 177,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "warm-repeat",
+      "startupPromptMs": 121.89999997615814,
+      "continueToPlayerMs": 43,
+      "navigationToPlayerMs": 165.20000004768372,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0.10000002384185791
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 2,
+      "cache": "cold-resume",
+      "startupPromptMs": 205.40000009536743,
+      "continueToPlayerMs": 75.29999995231628,
+      "navigationToPlayerMs": 281,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm",
+      "startupPromptMs": 133.20000004768372,
+      "continueToPlayerMs": 43.10000002384186,
+      "navigationToPlayerMs": 176.60000002384186,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "warm-repeat",
+      "startupPromptMs": 122.5,
+      "continueToPlayerMs": 42.700000047683716,
+      "navigationToPlayerMs": 165.5,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "chromium",
+      "profile": "android-landscape",
+      "browserVersion": "155.0.8059.80",
+      "repetition": 3,
+      "cache": "cold-resume",
+      "startupPromptMs": 201,
+      "continueToPlayerMs": 80,
+      "navigationToPlayerMs": 281.2000000476837,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "warm",
+      "startupPromptMs": 108,
+      "continueToPlayerMs": 67,
+      "navigationToPlayerMs": 175,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 1
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "warm-repeat",
+      "startupPromptMs": 82,
+      "continueToPlayerMs": 57,
+      "navigationToPlayerMs": 139,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 1
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "cold-resume",
+      "startupPromptMs": 213,
+      "continueToPlayerMs": 102,
+      "navigationToPlayerMs": 315,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "warm",
+      "startupPromptMs": 132,
+      "continueToPlayerMs": 76,
+      "navigationToPlayerMs": 208,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "warm-repeat",
+      "startupPromptMs": 82,
+      "continueToPlayerMs": 58,
+      "navigationToPlayerMs": 140,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "cold-resume",
+      "startupPromptMs": 218,
+      "continueToPlayerMs": 100,
+      "navigationToPlayerMs": 319,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "warm",
+      "startupPromptMs": 87,
+      "continueToPlayerMs": 57,
+      "navigationToPlayerMs": 144,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "warm-repeat",
+      "startupPromptMs": 87,
+      "continueToPlayerMs": 80,
+      "navigationToPlayerMs": 167,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-portrait",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "cold-resume",
+      "startupPromptMs": 203,
+      "continueToPlayerMs": 99,
+      "navigationToPlayerMs": 303,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "warm",
+      "startupPromptMs": 83,
+      "continueToPlayerMs": 92,
+      "navigationToPlayerMs": 176,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "warm-repeat",
+      "startupPromptMs": 87,
+      "continueToPlayerMs": 82,
+      "navigationToPlayerMs": 170,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 1,
+      "cache": "cold-resume",
+      "startupPromptMs": 213,
+      "continueToPlayerMs": 87,
+      "navigationToPlayerMs": 300,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "warm",
+      "startupPromptMs": 83,
+      "continueToPlayerMs": 68,
+      "navigationToPlayerMs": 152,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "warm-repeat",
+      "startupPromptMs": 106,
+      "continueToPlayerMs": 70,
+      "navigationToPlayerMs": 176,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 2,
+      "cache": "cold-resume",
+      "startupPromptMs": 212,
+      "continueToPlayerMs": 98,
+      "navigationToPlayerMs": 310,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "warm",
+      "startupPromptMs": 81,
+      "continueToPlayerMs": 72,
+      "navigationToPlayerMs": 153,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "warm-repeat",
+      "startupPromptMs": 82,
+      "continueToPlayerMs": 74,
+      "navigationToPlayerMs": 157,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "writes": [
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1112,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:backup:v1",
+          "codeUnits": 1111,
+          "durationMs": 0
+        },
+        {
+          "key": "tactics-guru:phaser:battle:primary:v1",
+          "codeUnits": 1110,
+          "durationMs": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "profile": "iphone-landscape",
+      "browserVersion": "26.6",
+      "repetition": 3,
+      "cache": "cold-resume",
+      "startupPromptMs": 217,
+      "continueToPlayerMs": 99,
+      "navigationToPlayerMs": 316,
+      "build": {
+        "commit": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+        "dirty": false
+      },
+      "errors": []
+    }
+  ]
+}

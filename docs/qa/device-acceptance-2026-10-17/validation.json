@@ -1,0 +1,86 @@
+{
+  "testedMain": "13418626fab4cc40609cd2255d54800c15e34805",
+  "localFinalRuntime": "a362aaa0db70c930f841c2e3d8a17d524dacfc92",
+  "guidancePR": "https://github.com/luminari-gurus/tactics-guru-v2/pull/125",
+  "acceptancePR": "https://github.com/luminari-gurus/tactics-guru-v2/pull/126",
+  "inputs": {
+    "AGENTS.md": "555e46199c24c3991d564d6f3d75b8e4c55e8f9fa8fd52a2b3a517ef0f1b6694",
+    "src/ui/dialogs.ts": "40f9138cee37ef3a541c24738c0e45b510bf21cd44de2015408c827a44aa7943",
+    "src/ui/persistence.ts": "f2d0b25b3e2df967f775d29b600842027d9fa7223177a0b39a58d26b52c1079e",
+    "tests/battle-audio.spec.ts": "1c447b39ffa6162b7bc0bbf08d97c7fab2280779e3c53f541a733f345f8a724a",
+    "tests/battle-persistence.spec.ts": "2b4650a694072240b2f6026ed69e16ad0ccbc3c43a0809121d572352cb897848",
+    "tests/run-progression.spec.ts": "03e07aee1af21bc6f7b60440059f9dcbe996660bef70aebc26a11cba790ffb7b",
+    "tests/battle-loop.spec.ts": "3be5a6d1194e862cd6c4905c6ab7cbf658fb43d74ab09027bd456f858b14e3f6",
+    "playwright.device-acceptance.config.ts": "1934c46ced6f32efd24afc89b0f38e9c79828f2af19a8c62970f619696b9fa25",
+    "package.json": "1aea488e60265ffca7c4ccf0d2b6a5c2e3912a6ba7fe4ba6a46a941efe546530",
+    "package-lock.json": "e05e63e5c84dddd65df26c9f97204cb248c5adcd07aad4612bad4047b8e8b310"
+  },
+  "results": {
+    "initialWebKit": {
+      "passed": 48,
+      "failed": 4
+    },
+    "afterTabFixWebKit": {
+      "passed": 52,
+      "failed": 2
+    },
+    "finalAffectedWebKit": {
+      "passed": 6,
+      "failed": 0
+    },
+    "finalChromiumFocus": {
+      "passed": 24,
+      "failed": 0
+    },
+    "unit": 674,
+    "content": 167,
+    "encounterPosttest": 18,
+    "itemPosttest": 21,
+    "codecMeasurements": 160,
+    "resumeMeasurements": 45,
+    "deployedSamplesPerRoute": 18
+  },
+  "evidenceSha256": {
+    "run-progression-run-startu-8f838-torage-permits-unsaved-play-acceptance-webkit-landscape-failure.txt": "054470ba89f18609ce92f6ec46c32203fdff1ed11f9a405aa91918e721ba758f",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-portrait.json": "51a72f33f47c8b84f2d79f073f6f758f98e2ce507d67a3a0e065b299c406d16f",
+    "battle-loop-complete-legal-c217e-hrough-controls-and-replays-acceptance-webkit-landscape-playerWin.png": "30bd6dfa1faaaad453a2d5e40330e3efef8623edc0e54c31cfd7b491a263b97a",
+    "battle-loop-complete-legal-c217e-hrough-controls-and-replays-acceptance-webkit-portrait-playerWin.png": "6e15cdeb0203af2982e77143feb79da0b6a7074b454b6aa295d3978a89088c7a",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-landscape-run-reward.png": "6d274472ade7ba5fcf2ee354acd2d85da02e889b191637eaba5ae5da9772fd08",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-portrait-run-victory.png": "a695948b9e315246b6dc4a817eaa4960991a5383cb58b836affe3396d87062ce",
+    "posttests.txt": "cd43fd70014823d80ee43a3c1e50a19047492266e3a8c85cd9bab8d360584f45",
+    "unit.txt": "6710198cf42df2d356dd29eacb87a69ce3a3d95f5560489922bf59cc447a1ac0",
+    "deployed-run.json": "45532e57e4aa2632a8e4c9c9a3549cdb510e7e0fa335602cb0eb1225b13147ce",
+    "codec-timing.json": "72ab721ef9dd57b6b60281c6f0b6e28e798d6c59badb2f37775b760367a1faf8",
+    "codec.txt": "0c96e51ae12db8835c48fce777acc1742446939679e9fde7a4c2163eef4d2d0c",
+    "webkit-before.txt": "4bc4009a3703b59a40e0855bb45471c07c23b79f8271e8aaa6ad43d863986420",
+    "resume-timing.json": "8b82d39fcd4382ade12988be9b233209dca96b46cdc508e59d2f89caebeccaca",
+    "battle-audio-sound-control-3d8d9-ocus-and-restart-preference-acceptance-webkit-portrait-failure.txt": "5d3dd69d7162783833cee766d27c31108ac831fddbf1b3289cc6d8c6f37c0d76",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait-return-focus-failure.txt": "60b10c8ef006b0fd4bf9180c0feeb473f0bd23daf7f1e5c3231eee62410a65d7",
+    "battle-loop-complete-legal-9136d-hrough-controls-and-replays-acceptance-webkit-landscape-playerLoss.png": "65dda78600bdf0c78e1b011621f8090ec88552256b37beb14dc352d384b615cc",
+    "build.txt": "0842ab68165eeec87812419fc853253543c6b27a6f365e2ae8c3faf9ba9beacf",
+    "battle-audio-sound-control-3d8d9-ocus-and-restart-preference-acceptance-webkit-landscape-failure.txt": "5d3dd69d7162783833cee766d27c31108ac831fddbf1b3289cc6d8c6f37c0d76",
+    "resume.mjs.txt": "7fb3b84bd374987cd7cc1520e8f97c445339402a7d228f10648e8fc54d7119bd",
+    "webkit-return-fixed.txt": "d80eb141645db2e08b0feb413188380fb0c72897c7c36666b8b5c821d4d811e0",
+    "deployed-battle.json": "e9236c6971d6790b91eb8725830abd46477a84df1ba661390465c254378a56f0",
+    "chromium-focus.txt": "e8090401513ac14a6dbaebad2e9d4d9d05a02f39eb397ed8861a0236f2618d65",
+    "final-battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait-continue.png": "2ef5569e1d0edfdc79bef3a7cd22f24d881fa9445b3512de7354954fa3f02170",
+    "webkit-tab-fixed.txt": "8d88006f3063e790a9f6e7a6bf689bfe6a42c928a69f1d9475f31906c78e8056",
+    "codec-timing.test.ts.txt": "a69618c2a62dbf60dc823b098a19b68b4ad3bb78116fad6cbd1d2bcde1f32533",
+    "final-battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait-recovery.png": "eb3825540a662bfeb6b0d5d6636a27840de28a7ec3b66c491f1b4d140d199329",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape-return-focus-failure.txt": "60b10c8ef006b0fd4bf9180c0feeb473f0bd23daf7f1e5c3231eee62410a65d7",
+    "measure.ts.txt": "2e4f12b1d4936424b7daed5207fa9ee96ace9fd5e45c100b842bae6e8f76546e",
+    "gates.json": "c401e5ff2f97c46e2ad66148e00ed7b50459ed4b71d44a976d3d3896f49513f3",
+    "evaluate.py": "b871c99214226d8253c743b8193948e31622fa337feb883d2a8f246e2dc3d9c7",
+    "battle-loop-complete-legal-9136d-hrough-controls-and-replays-acceptance-webkit-portrait-playerLoss.png": "616df860aefb98bc5995111e3e407e0c546a07449caac83776ecc670a8fae21f",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait-continue.png": "2ef5569e1d0edfdc79bef3a7cd22f24d881fa9445b3512de7354954fa3f02170",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-landscape-run-victory.png": "5ebc9b064632298ba884e4560aca252da4225d19111e72b1083612c680563e6c",
+    "run-progression-run-startu-8f838-torage-permits-unsaved-play-acceptance-webkit-portrait-failure.txt": "054470ba89f18609ce92f6ec46c32203fdff1ed11f9a405aa91918e721ba758f",
+    "final-battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape-continue.png": "70546a7e259ae6c62664a6f68cd69fa73e03eefaa5e228ed1fc47ef37c1435f1",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-landscape.json": "6b2a7b086725f082b427b4ecd05030170fcc8b4c9976c4043876f350a0cbe63d",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape-recovery.png": "2ecc0860d49ad1486d6c64d1eb933eca87b1da46656e6c55ed700356688bff85",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait-recovery.png": "eb3825540a662bfeb6b0d5d6636a27840de28a7ec3b66c491f1b4d140d199329",
+    "run-progression-legal-thre-6c350-al-resume-and-fresh-restart-acceptance-webkit-portrait-run-reward.png": "98caa86dd2be10a12f01359e9aa340932d98461421b5a112284a156ccbb5f715",
+    "final-battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape-recovery.png": "2ecc0860d49ad1486d6c64d1eb933eca87b1da46656e6c55ed700356688bff85",
+    "battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape-continue.png": "70546a7e259ae6c62664a6f68cd69fa73e03eefaa5e228ed1fc47ef37c1435f1"
+  }
+}

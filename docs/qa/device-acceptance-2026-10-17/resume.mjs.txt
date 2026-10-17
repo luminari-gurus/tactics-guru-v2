@@ -1,0 +1,46 @@
+import { chromium,webkit,devices } from '@playwright/test';
+import { spawn } from 'node:child_process';
+import { isDeepStrictEqual } from 'node:util';
+import { writeFile } from 'node:fs/promises';
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','4174','--strictPort'],{stdio:'ignore'});
+const rows=[];
+try {
+ for(let n=0;n<100;n++){try{if((await fetch('http://127.0.0.1:4174')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+ for(const [engine,type,profiles] of [['chromium',chromium,[['desktop',devices['Desktop Chrome']],['android-portrait',devices['Pixel 7']],['android-landscape',{...devices['Pixel 7'],viewport:{width:915,height:412}}]]],['webkit',webkit,[['iphone-portrait',devices['iPhone 13']],['iphone-landscape',devices['iPhone 13 landscape']]]]]) {
+  const browser=await type.launch(engine==='chromium'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:{});
+  try {for(const [profile,options] of profiles)for(let repetition=1;repetition<=3;repetition++) {
+   const context=await browser.newContext(options),page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+   await context.addInitScript(()=>{
+    const writes=[];const set=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(key,value){const start=performance.now();try{return set.call(this,key,value);}finally{if(key.startsWith('tactics-guru:phaser:'))writes.push({key,codeUnits:value.length,durationMs:performance.now()-start});}};
+    window.deviceAcceptanceWrites=writes;
+   });
+   try {
+    await page.goto('http://127.0.0.1:4174');await page.locator('#game[data-phase="player"]').waitFor();
+    await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();await page.locator('#game[data-phase="player"]').waitFor();
+    const expected=JSON.parse(await page.locator('#game').getAttribute('data-session')).state,writes=await page.evaluate(()=>window.deviceAcceptanceWrites);
+    for(const cache of ['warm','warm-repeat']) {
+     await page.reload();await page.locator('#save-continue').waitFor();const startup=await page.evaluate(()=>performance.now());
+     const started=await page.evaluate(()=>performance.now());await page.locator('#save-continue').click();await page.locator('#game[data-phase="player"]').waitFor();
+     const current=JSON.parse(await page.locator('#game').getAttribute('data-session')).state;
+     const timing=await page.evaluate(()=>({now:performance.now(),build:window.fitDiagnostics().build}));
+     if(!isDeepStrictEqual(current,expected))throw Error('Resumed state drift');
+     rows.push({engine,profile,browserVersion:browser.version(),repetition,cache,startupPromptMs:startup,continueToPlayerMs:timing.now-started,navigationToPlayerMs:timing.now,build:timing.build,writes,errors:[...errors]});
+    }
+    const coldContext=await browser.newContext({...options,storageState:await context.storageState()}),cold=await coldContext.newPage();
+    const coldErrors=[];cold.on('pageerror',e=>coldErrors.push(e.message));cold.on('console',m=>{if(m.type()==='error')coldErrors.push(m.text());});
+    try {
+      await cold.goto('http://127.0.0.1:4174');await cold.locator('#save-continue').waitFor();
+      const startup=await cold.evaluate(()=>performance.now()),started=await cold.evaluate(()=>performance.now());
+      await cold.locator('#save-continue').click();await cold.locator('#game[data-phase="player"]').waitFor();
+      const current=JSON.parse(await cold.locator('#game').getAttribute('data-session')).state;
+      if(!isDeepStrictEqual(current,expected))throw Error('Cold resumed state drift');
+      const timing=await cold.evaluate(()=>({now:performance.now(),build:window.fitDiagnostics().build}));
+      rows.push({engine,profile,browserVersion:browser.version(),repetition,cache:'cold-resume',startupPromptMs:startup,continueToPlayerMs:timing.now-started,navigationToPlayerMs:timing.now,build:timing.build,errors:coldErrors});
+    }finally{await coldContext.close();}
+   }finally{await context.close();}
+  }}finally{await browser.close();}
+ }
+}finally{
+ await writeFile('/tmp/tg-device-resume-timing.json',JSON.stringify({method:'host emulation; no network throttling; three fresh contexts per profile then two same-context saved reloads; prompt navigation timing separate from automated Continue click-to-player; OS discard simulated by real reload',measuredAt:new Date().toISOString(),rows},null,2));server.kill();
+}
