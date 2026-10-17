@@ -1,5 +1,6 @@
 import '../style.css';
 import { diagnosticsSnapshot, measurements } from '../diagnostics/browser';
+import { mountBattleLayout } from '../ui/battleLayout';
 
 const container = document.querySelector<HTMLElement>('#game')!;
 const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;
@@ -19,6 +20,7 @@ if (battle) {
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
   document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
   restartButton.textContent = 'Restart battle';
+  mountBattleLayout();
 }
 if (contentSmoke) {
   document.querySelectorAll('#fit-panel > :not(.fit-controls), .fit-controls > :not(#fit-status)').forEach(element => { (element as HTMLElement).hidden = true; });

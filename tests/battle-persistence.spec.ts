@@ -79,12 +79,13 @@ test('held confirmation Enter cannot flow through Restart and replace either sav
   for(const text of Object.values(await stored(page)))expect(text).not.toBe(accepted.primary);
 });
 
-for(const side of ['player','enemy'] as const)test(`reload during legal ${side} presentation matches an uninterrupted browser`,async({page,browser})=>{
+for(const side of ['player','enemy'] as const)test(`reload during legal ${side} presentation matches an uninterrupted browser`,async({page,browser,baseURL})=>{
   test.setTimeout(60000);
-  const controlContext=await browser.newContext({viewport:page.viewportSize(),baseURL:'http://127.0.0.1:4173'}),control=await controlContext.newPage();
+  const controlContext=await browser.newContext({viewport:page.viewportSize(),baseURL}),control=await controlContext.newPage();
   const errors:string[]=[];for(const p of [page,control])p.on('pageerror',e=>errors.push(e.message));
   try {
     for(const p of [page,control]){await p.clock.install();await seedTwo(p);}
+    expect(await control.evaluate(()=>window.fitDiagnostics().build)).toEqual(await page.evaluate(()=>window.fitDiagnostics().build));
     if(side==='player'){
       for(const p of [page,control]){await chooseMove(p);await freeze(p);await p.locator('#dialog-confirm').click({force:true});}
     }else {

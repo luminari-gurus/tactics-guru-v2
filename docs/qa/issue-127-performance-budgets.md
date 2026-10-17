@@ -56,7 +56,7 @@ The prefixed test then reproduced a real URL-parser bug: stripping the trailing 
 
 Collector chunk is published ready for review in [PR #129](https://github.com/luminari-gurus/tactics-guru-v2/pull/129) at `6477ac5`, with clean Git status and local/remote parity. The configured Cloudflare integration automatically created a branch preview; no deployment command, production configuration change or release tag was issued.
 
-## Scene loading chunk (in progress)
+## Scene-isolation experiment (not retained)
 
 Branch `branch/issue-127-scene-loading` depends on #129. `createGame.ts` imports no scenes and preserves the existing engine/audio configuration. Single-battle startup awaits only the selected scene and retains existing error, restart and BFCache behavior; authored runs import the engine helper directly. Both typechecks and the production build pass. The [focused browser run](issue-127-performance-budgets/split-browser.json) passes **84/84 cases** without retries/skips: boot, independent scene loading, missing selected chunks, content loading/failures and public asset bases/controls. The [split module inventory](issue-127-performance-budgets/split-modules.json) confirms separate proof/content-smoke chunks.
 
@@ -91,3 +91,11 @@ Cached-history failures reproduce on unchanged full-Phaser baseline in packaged 
 [Windows WebKit capabilities](issue-127-performance-budgets/webkit-windows-capabilities.json) report no AudioContext. The full-Phaser current-main baseline also [fails its initial audio expectation](issue-127-performance-budgets/webkit-windows-baseline-audio.json), so this is not attributed to the Arcade distribution. The same official WebKit 26.6 in WSL has [Web Audio support](issue-127-performance-budgets/webkit-linux-capabilities.json) and [passes that baseline audio case](issue-127-performance-budgets/webkit-linux-baseline-audio.json). Only the browser cache was installed in the existing WSL environment; no system-package or application dependency change was needed. Final WebKit verification uses this supported Linux build, with the same configured emulated devices and tests.
 
 Main is now `a009a3e`. Collector PR #129 incorporates it at `f1184d5`, fixes the comparison origin with an explicit same-build assertion, and uses the new drawable-board rectangle for pan/zoom. Its 12 root and six prefixed checks pass. Carry that base into #130 and rerun complete final acceptance on the combined revision; do not present the earlier runs as proof of the new HUD.
+
+## Current-main collector integration
+
+PR #119 merged as `a009a3ec4c35b3e57adc58ac700e56721af9ae8f` during the runtime follow-up. This branch merges that exact main without changing its reviewed runtime files. The only merge conflict was the handoff: the #127 plan is retained above the latest upstream handoff.
+
+The maintained collector now obtains its zoom/drag anchor from the actual `#battle-board-region` used by the responsive renderer/input gate. Its top-panel fallback is retained for the already-recorded older builds. Existing actual-control tests exercise zoom and pan on both battle/run routes, including prefixed deployments. A confirmed validation defect is also fixed: the interrupted/uninterrupted persistence comparison uses the configured `baseURL` for both pages and asserts matching served build identities, rather than silently opening another worktree on port 4173.
+
+Fresh integration checks: 36 focused measurement tests, both typechecks, production builds, [12 root cases](issue-127-performance-budgets/collector-responsive-root.json) (six collector + six corrected persistence comparisons), and [six prefixed collector cases](issue-127-performance-budgets/collector-responsive-prefix.json) all pass with no retries/skips. Browser checks use installed Edge 155.0.4283.45 through the existing executable override. Exact collector v4 receipts are retained. Runtime optimization, fresh complete performance matrices and the active implementation handoff remain in [PR #130](https://github.com/luminari-gurus/tactics-guru-v2/pull/130); older `0b317e3` measurements are not claims about this updated main.

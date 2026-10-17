@@ -5,7 +5,8 @@ import { writeFileSync } from 'node:fs';
 test('player HUD and preview cancellation preserve state and modal capture', async ({page})=>{
   await page.goto('/');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await expect(page.locator('#battle-party img')).toHaveCount(3);
+  await expect(page.locator('#battle-portraits img:visible')).toBeVisible();
+  await expect(page.locator('#battle-party')).toHaveText('Inspect party');
   await expect(page.getByRole('button',{name:'Basic attack',exact:true})).toBeVisible();
   const before = await page.locator('#game').getAttribute('data-session');
   await page.getByRole('button',{name:'Move',exact:true}).click();
@@ -17,11 +18,14 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   const after = JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   const initial = JSON.parse(before!);
   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
-  await expect(page.locator('#fit-restart')).toBeFocused();
-  // The Cancel button has the same callback as Escape; neither may leave focus
-  // on the Review button that cancellation just disabled.
+  // WebKit pointer activation leaves focus on the usable scroll region. Other
+  // browsers focus Review and need the Restart fallback after it is disabled.
+  await expect(page.locator('#fit-restart:focus, #battle-scroll:focus')).toHaveCount(1);
+  // Keyboard activation makes Review the invoker on every browser, so Cancel
+  // must use the fallback rather than leave focus on the now-disabled button.
   await page.locator('#battle-target').selectOption({index:1});
-  await page.getByRole('button',{name:'Review action'}).click();
+  await page.getByRole('button',{name:'Review action'}).focus();
+  await page.keyboard.press('Enter');
   await page.locator('#dialog-cancel').click();
   await expect(page.locator('#fit-restart')).toBeFocused();
   const cancelled=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
@@ -129,12 +133,15 @@ test('battle HUD targets fit portrait and short landscape with a bounded readabl
   for(const viewport of [{width:390,height:844},{width:844,height:390},{width:360,height:640}]){
     await page.setViewportSize(viewport);
     const boxes=await page.evaluate(()=>{
-      const details=document.querySelector<HTMLDetailsElement>('#battle-log-panel')!;details.open=true;
-      return [...document.querySelectorAll<HTMLElement>('#fit-panel button, #battle-target, #battle-log-panel summary')].filter(e=>e.getClientRects().length).map(e=>{e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return {text:e.textContent,width:r.width,height:r.height,left:r.left,right:r.right,bottom:r.bottom};});
+
+      return [...document.querySelectorAll<HTMLElement>('#fit-panel button, #battle-target')].filter(e=>e.getClientRects().length).map(e=>{e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return {text:e.textContent,width:r.width,height:r.height,left:r.left,right:r.right,bottom:r.bottom};});
     });
     for(const b of boxes){expect(b.width,b.text!).toBeGreaterThanOrEqual(44);expect(b.height,b.text!).toBeGreaterThanOrEqual(44);expect(b.left).toBeGreaterThanOrEqual(0);expect(b.right).toBeLessThanOrEqual(viewport.width);expect(b.bottom).toBeLessThanOrEqual(viewport.height);}
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.locator('#fit-panel').evaluate(e=>{e.scrollTop=0;});
+    await page.locator('#battle-log-open').click();
+    await expect(page.getByRole('dialog')).toContainText('Battle log');
+    await page.locator('#log-close').click();
+    await page.locator('#battle-scroll').evaluate(e=>{e.scrollTop=0;});
     await page.screenshot({path:test.info().outputPath(`hud-${viewport.width}.png`)});
   }
 });
@@ -231,7 +238,7 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.waitForFunction(()=>window.fitDiagnostics().frames.count>=5);
   const before=await session(page);
-  const point=await page.evaluate(()=>{const panel=document.querySelector('#fit-panel')!.getBoundingClientRect();return {x:innerWidth/2,y:panel.bottom+(innerHeight-panel.bottom)*0.65};});
+  const point=await page.evaluate(()=>{const r=document.querySelector('#battle-board-region')!.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height*0.65};});
   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
   await page.waitForFunction(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();
@@ -261,4 +268,96 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   expect((await page.evaluate(()=>window.fitDiagnostics())).interactions).toEqual([]);
   await expect(page.locator('canvas')).toHaveCount(1);
   expect(errors).toEqual([]);
+});
+
+test('live actor, inspection and cancellation remain independent of pending intent',async({page},info)=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const seen=new Set<string>();
+  for(let turn=0;turn<12 && seen.size<3;turn++){
+    const current=await session(page),actor=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
+    if(actor.side!=='player')throw Error('Expected player');
+    const def=catalog.heroes[actor.defId],signature=Object.values(catalog.abilities).find(a=>a.id!=='ability:basic_attack'&&a.owners.includes(actor.defId))!;
+    seen.add(actor.defId);
+    await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
+    await page.screenshot({path:info.outputPath(`actor-${actor.defId}.png`)});
+    await expect(page.locator('#battle-actor-name')).toHaveText(actor.defId[0].toUpperCase()+actor.defId.slice(1));
+    await expect(page.locator('#battle-hp')).toHaveText(`HP ${actor.hp}/${def.stats.maxHp}`);
+    await expect(page.locator('[data-action="signature"] strong')).toHaveText(signature.id.slice(8).split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '));
+    await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+    const before=await page.locator('#game').getAttribute('data-session'),preview=await page.locator('#battle-preview').textContent();
+    const actorText=await page.locator('#battle-actor').textContent();
+    await page.locator('#battle-party').click();
+    for(const unit of current.state.units){
+      await page.locator(`#inspect-unit-${unit.id}`).click();
+      await expect(page.locator('#battle-dialog-title')).toContainText('Inspection only');
+      const def=unit.side==='player'?catalog.heroes[unit.defId]:catalog.enemies[unit.defId];
+      await expect(page.locator('#battle-dialog-message')).toContainText(`HP ${unit.hp}/${def.stats.maxHp}`);
+      await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${def.stats.armorClass+(unit.guarded?2:0)}`);
+      expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+      expect(await page.locator('#battle-actor').textContent()).toBe(actorText);
+      await page.keyboard.press('Shift+Tab');expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
+    }
+    await page.locator('#inspection-close').click();await expect(page.locator('#battle-party')).toBeFocused();
+    expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+    expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+    // Both nonmodal cancellation routes preserve the authoritative state/RNG.
+    for(const keyboard of [true,false]){
+      await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+      if(keyboard){await page.locator('#battle-target').focus();await page.keyboard.press('Escape');}else await page.locator('#battle-cancel').click();
+      await expect(page.locator('#battle-move')).toBeFocused();
+      const cancelled=await session(page);expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();expect(cancelled.state).toEqual(current.state);
+    }
+    await page.locator('#battle-next').click();
+    await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  }
+  expect([...seen].sort()).toEqual(['fighter','mage','ranger']);
+  // Spent movement changes the shared focus fallback to Wait.
+  const current=await session(page);await playCommand(page,{type:'move',unitId:current.state.initiative[current.state.activeIndex],to:JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).reachable.find((c:any)=>c.x!==current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!.cell.x)});
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.locator('#battle-move')).toBeDisabled();
+  await page.locator('[data-action="basic"]').click();const spent=await session(page);
+  await page.locator('#battle-cancel').click();await expect(page.locator('#battle-next')).toBeFocused();
+  expect((await session(page)).state).toEqual(spent.state);
+  await page.locator('[data-action="basic"]').click();await page.keyboard.press('Escape');await expect(page.locator('#battle-next')).toBeFocused();
+});
+
+test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const measurements=[];
+  for(const [width,height] of [[1280,720],[412,915],[915,412],[320,568],[568,320]]){
+    await page.setViewportSize({width,height});
+    for(const stress of [false,true]){
+      await page.evaluate(stress=>{document.documentElement.style.fontSize=stress?'32px':'';for(const [side,size] of Object.entries({top:24,right:24,bottom:34,left:24}))document.body.style.setProperty('--safe-'+side,stress?size+'px':'0px');document.querySelector('#battle-scroll')!.scrollTop=0;document.querySelector('#battle-actor')!.scrollTop=0;},stress);
+      await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual({width,height});
+      await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
+      if(!stress){await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+      const measurement=await page.evaluate(()=>{
+        const rect=(s:string)=>document.querySelector(s)!.getBoundingClientRect().toJSON();
+        const controls=[...document.querySelectorAll<HTMLElement>('#fit-panel button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
+          e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect(),p=document.querySelector('#battle-scroll')!.getBoundingClientRect();
+          return {name:e.textContent,width:r.width,height:r.height,left:r.left,right:r.right,reachable:r.bottom>p.top&&r.top<p.bottom};
+        });
+        const rgb=(s:string)=>s.match(/[\d.]+/g)!.slice(0,3).map(Number);
+        const luminance=(c:string)=>rgb(c).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
+        const ratio=(a:string,b:string)=>(Math.max(luminance(a),luminance(b))+.05)/(Math.min(luminance(a),luminance(b))+.05);
+        const b=getComputedStyle(document.querySelector('#battle-move')!),hint=getComputedStyle(document.querySelector('#battle-move span')!);
+        return {region:rect('#battle-board-region'),panel:rect('#fit-panel'),actor:rect('#battle-actor'),overflow:document.documentElement.scrollWidth>innerWidth,controls,
+          contrast:{text:ratio(b.color,b.backgroundColor),hint:ratio(hint.color,b.backgroundColor),edge:ratio(b.borderTopColor,b.backgroundColor)}};
+      });
+      expect(measurement.region.height+.02).toBeGreaterThanOrEqual(height*(width>height&&height<=500?.55:.3));
+      const r=measurement.region,p=measurement.panel;expect(r.right<=p.x||r.bottom<=p.y).toBe(true);
+      expect(measurement.overflow).toBe(false);expect(measurement.actor.height).toBeLessThanOrEqual(measurement.panel.height*.45+.02);
+      for(const control of measurement.controls){expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(44);expect(control.left).toBeGreaterThanOrEqual(0);expect(control.right).toBeLessThanOrEqual(width);expect(control.reachable,control.name!).toBe(true);}
+      expect(measurement.contrast.text).toBeGreaterThan(4.5);expect(measurement.contrast.hint).toBeGreaterThan(4.5);expect(measurement.contrast.edge).toBeGreaterThan(3);
+      await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
+      await page.screenshot({path:info.outputPath(`responsive-${width}x${height}${stress?'-stress':''}.png`)});
+      await page.locator('#battle-actor').focus();await page.keyboard.press('End');await page.keyboard.press('Tab');
+      expect(await page.evaluate(()=>document.activeElement!==document.body)).toBe(true);
+      measurements.push({width,height,stress,...measurement});
+    }
+  }
+  writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });

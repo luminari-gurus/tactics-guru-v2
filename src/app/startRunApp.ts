@@ -12,6 +12,7 @@ import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import type Phaser from 'phaser';
 import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
+import { mountBattleLayout } from '../ui/battleLayout';
 
 const context: RunSaveContext = { definition: authoredRun, encounters: authoredEncounters, catalog: runCatalog, items: itemCatalog };
 const storage=createRunStorage(context),initial=storage.load();
@@ -31,6 +32,8 @@ panel.append(nav);
 document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
+mountBattleLayout();
+const shell = document.querySelector<HTMLElement>('#battle-shell')!;
 let engine: Phaser.Game | null = null, host: RunBattleHost | null = null, mounted: (()=>void) | null = null;
 let live=true, playing=false, startup=true;
 const sound={enabled:false};
@@ -55,7 +58,8 @@ function startBattle() {
  // Save callbacks during construction publish evidence, not a competing screen.
  playing=true;const session=controller.startEncounter();
  if(!session){playing=false;render();return;}
- unmount();controller.onChange=()=>{evidence();const label=persistence.querySelector('span');if(label)label.textContent=controller.status;};screen.hidden=true;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
+ unmount();controller.onChange=()=>{evidence();const label=persistence.querySelector('span');if(label)label.textContent=controller.status;};screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
+ renderProgress();
  persistence.hidden=false;
  persistence.replaceChildren(button('Save recovery',()=>showRecovery()),document.createElement('span'));
  persistence.querySelector('span')!.textContent=controller.status;
@@ -110,12 +114,16 @@ function continueRun(review:RunLoadResult) {
  startup=false;render();
  if(controller.snapshot.activeBattle)startBattle();
 }
+function renderProgress() {
+ const run=controller.snapshot.items.run;
+ const label=`Encounter ${run.encounterIndex+1} of 3 · ${run.encounters[run.encounterIndex].replace('encounter:','').replaceAll('_',' ')}`;
+ progress.textContent=label;
+ document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=label;
+}
 function render() {
- if(!live)return;evidence();
- const snapshot=controller.snapshot,run=snapshot.items.run;
- progress.textContent=`Encounter ${run.encounterIndex+1} of 3 · ${run.encounters[run.encounterIndex].replace('encounter:','').replaceAll('_',' ')}`;
+ if(!live)return;evidence();renderProgress();
  if(playing){const label=persistence.querySelector('span');if(label)label.textContent=controller.status;return;}
- unmount();panel.hidden=true;screen.hidden=false;container.style.visibility='hidden';
+ unmount();shell.hidden=true;panel.hidden=true;screen.hidden=false;container.style.visibility='hidden';
  screen.replaceChildren(items,actions);actions.replaceChildren();
  mounted=mountRunItems(items,controller,dialogs,{continueRun,recover:showRecovery});
  const itemRender=controller.onChange!;

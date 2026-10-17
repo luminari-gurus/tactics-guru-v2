@@ -8,7 +8,7 @@ export interface BoardInputTarget {
 }
 
 /** CSS coordinates are converted through the canvas rectangle, independent of DPR. */
-export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarget, size: () => {width:number;height:number}, enabled: () => boolean = () => true) {
+export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarget, size: () => {width:number;height:number}, enabled: (point:Point) => boolean = () => true) {
   const pointers = new Map<number, { start: Point; point: Point }>();
   let gesture = false;
   const previousTouchAction = canvas.style.touchAction;
@@ -19,14 +19,14 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     return { x: (event.clientX - rect.left) * viewport.width / rect.width, y: (event.clientY - rect.top) * viewport.height / rect.height };
   };
   const down = (event: PointerEvent): void => {
-    if (!enabled() || event.button !== 0) return;
+    if (!enabled(point(event)) || event.button !== 0) return;
     const p = point(event);
     pointers.set(event.pointerId, { start: p, point: p });
     if (pointers.size > 1) gesture = true;
     canvas.setPointerCapture(event.pointerId);
   };
   const move = (event: PointerEvent): void => {
-    if (!enabled()) { reset(); return; }
+    if (!enabled(point(event))) { reset(); return; }
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
     const next = point(event);
@@ -45,7 +45,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     pointer.point = next;
   };
   const end = (event: PointerEvent): void => {
-    if (!enabled()) { reset(); return; }
+    if (!enabled(point(event))) { reset(); return; }
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
     const next = point(event);
@@ -57,7 +57,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const wheel = (event: WheelEvent): void => {
     event.preventDefault();
-    if (!enabled()) { reset(); return; }
+    if (!enabled(point(event))) { reset(); return; }
     if (pointers.size) gesture = true;
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
