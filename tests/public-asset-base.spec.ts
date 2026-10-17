@@ -79,7 +79,9 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
             expectedSession.finishPresentation(step.token);
           }
           expect((await readSession(page)).state).toEqual(expectedSession.state);
-          await page.locator('#battle-sound').click();
+          const sound = page.locator('#battle-sound');
+          if (test.info().project.use.hasTouch) await sound.tap();
+          else await sound.click();
           await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
           // The scene, early hint and portrait share one image request per visit.
           for (const asset of Object.values(battleCatalog.assets)) expect(paths.get(base + asset.runtimePath.slice(1)), asset.id).toBe(1);
