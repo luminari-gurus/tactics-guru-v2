@@ -27,7 +27,7 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 - [x] 5.1 On the exact final candidate run configured unit/content/browser checks, encounter/item posttests, both typechecks, production build and the WebKit device-acceptance matrix. Retain actual commands, failures, retries and limitations; confirm battle/run/recovery/audio/replay and all entry routes still work.
 - [x] 5.2 Capture and evaluate all 36 battle/run cold/warm samples sequentially on the exact candidate and comparable baseline. Verify every L1/L2/L3/L4/F1/F2 result, clean served identity, raw intervals, source hashes, workload completeness and absence of browser errors; separately identify local versus approved deployed evidence.
-- [ ] 5.3 Complete the QA report and acceptance map, run strict OpenSpec and whitespace checks, commit/push focused changes and verify remote parity. Open a PR with `Refs #127` if any deployed or budget gate remains, or `Closes #127` only when all criteria are verified; reference #57/#64/#81 without closing them by proxy.
+- [x] 5.3 Complete the QA report and acceptance map, run strict OpenSpec and whitespace checks, commit/push focused changes and verify remote parity. Open a PR with `Refs #127` if any deployed or budget gate remains, or `Closes #127` only when all criteria are verified; reference #57/#64/#81 without closing them by proxy.
 
 ## 6. Resolve the remaining deployed loading gates
 
