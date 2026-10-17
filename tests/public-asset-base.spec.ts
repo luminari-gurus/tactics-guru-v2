@@ -8,7 +8,7 @@ import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-cont
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
 for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
-  const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',baseURL!+route],{}));
+  const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await navigateCapture(page,target,'cold');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -112,11 +112,36 @@ test('content fixture uses the base and still validates input', async ({ page, b
 });
 
 test('extracted map route still loads directly and on refresh at the base', async ({ page }) => {
+  const requests:string[]=[];page.on('request',r=>requests.push(new URL(r.url()).pathname));
   await page.goto('./map');
   await expect(page.locator('#map-grid span')).toHaveCount(400);
   await page.reload();
   await expect(page.locator('#map-grid span')).toHaveCount(400);
   await expect(page.locator('canvas')).toHaveCount(0);
+  expect(requests.some(path=>/\/(?:start(?:Battle|Run)App|start)-[^/]+\.js$/.test(path) || /\/src\/phaser\//.test(path))).toBe(false);
+});
+
+test('built startup hints preserve a supplied script nonce', async ({page})=>{
+  test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Resource hints are a production-build behavior');
+  const nonce='preload-test-nonce',errors:string[]=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await page.route('**/*',async route=>{
+    if(route.request().resourceType()!=='document'){await route.continue();return;}
+    const response=await route.fetch();
+    const body=(await response.text()).replace(/<script([^>]*\bdata-game-preloads\b[^>]*)>/,
+      (_tag,attrs:string)=>`<script nonce="${nonce}"${attrs.replace(/\snonce="[^"]*"/g,'')}>`);
+    const headers:Record<string,string>={...response.headers(),'content-security-policy':`script-src 'self' 'nonce-${nonce}'`};
+    for(const name of ['content-encoding','content-length','transfer-encoding'])delete headers[name];
+    await route.fulfill({status:response.status(),headers,body});
+  });
+  await page.goto('./');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.locator('script[data-game-preloads]')).toHaveCount(1);
+  const engineHints=page.locator('link[rel="modulepreload"][href*="/assets/start-"]');
+  expect(await engineHints.count()).toBeGreaterThan(0);
+  expect(await engineHints.evaluateAll((links,expected)=>links.every(link=>(link as HTMLLinkElement).nonce===expected),nonce)).toBe(true);
+  expect(errors).toEqual([]);
 });
 
 for (const failure of ['missing', 'corrupt', 'stalled'] as const) {

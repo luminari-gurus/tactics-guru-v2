@@ -1,0 +1,11 @@
+{
+  "baseCommit": "a0693284d8f0086f48e793d8353ca14df0ec4e40",
+  "kind": "Uncommitted exploratory build; not acceptance",
+  "sha256": {
+    "startup-preload-v1-vite.config.ts.txt": "96190f0d38f8458d2c38160a782eb4ca2c4f807e4daa485eb00368f368c3665b",
+    "startup-preload-v1-index.html.txt": "02ffa7d91484ceaa14d8544af66bff338215abeceb4bd2bb8f3eca6aefe696ef",
+    "startup-probe-v1-stock.json": "78307703ca09cb92edd776d8f7e6bafc676ea0f629a9d8f8f07284526a67331e",
+    "startup-probe-v1-hints.json": "3d04d76d91a841e1245662953bf69ec9f9b1a14e8cd60d4424ab340a1015aeb1",
+    "startup-preload-reuse-v1.json": "6540e0b9f3a86f2e12232879e11b054cdc6334f582df971cf496d98cf1e27a9c"
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "purpose": "Preload reuse diagnostic, not acceptance",
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4194/battle/terrain/grass.png",
+      "type": "other",
+      "origin": "http://127.0.0.1:4194",
+      "accept": "*/*",
+      "mode": "cors",
+      "destination": "empty"
+    },
+    {
+      "url": "http://127.0.0.1:4194/battle/terrain/grass.png",
+      "type": "xhr",
+      "origin": null,
+      "accept": "*/*",
+      "mode": "cors",
+      "destination": "empty"
+    }
+  ],
+  "timing": [
+    {
+      "name": "http://127.0.0.1:4194/battle/terrain/grass.png",
+      "entryType": "resource",
+      "startTime": 11.5,
+      "duration": 35.5,
+      "navigationId": 1365,
+      "initiatorType": "link",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.1",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "image/png",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 11.5,
+      "domainLookupStart": 11.5,
+      "domainLookupEnd": 11.5,
+      "connectStart": 11.5,
+      "secureConnectionStart": 0,
+      "connectEnd": 11.5,
+      "requestStart": 21.30000001192093,
+      "responseStart": 30.80000001192093,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 30.80000001192093,
+      "responseEnd": 47,
+      "transferSize": 140620,
+      "encodedBodySize": 140320,
+      "decodedBodySize": 140320,
+      "responseStatus": 200,
+      "serverTiming": []
+    },
+    {
+      "name": "http://127.0.0.1:4194/battle/terrain/grass.png",
+      "entryType": "resource",
+      "startTime": 328.10000002384186,
+      "duration": 2.299999952316284,
+      "navigationId": 1365,
+      "initiatorType": "xmlhttprequest",
+      "deliveryType": "cache",
+      "nextHopProtocol": "",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "image/png",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 328.10000002384186,
+      "domainLookupStart": 328.10000002384186,
+      "domainLookupEnd": 328.10000002384186,
+      "connectStart": 328.10000002384186,
+      "secureConnectionStart": 0,
+      "connectEnd": 328.10000002384186,
+      "requestStart": 328.60000002384186,
+      "responseStart": 330,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 330,
+      "responseEnd": 330.39999997615814,
+      "transferSize": 300,
+      "encodedBodySize": 140320,
+      "decodedBodySize": 140320,
+      "responseStatus": 200,
+      "serverTiming": []
+    }
+  ],
+  "messages": [
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/terrain/grass.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/terrain/grass_path.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/terrain/stone.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/terrain/forest.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/terrain/water.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/proof/fighter.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/portraits/fighter.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/source/ranger_sprite.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/portraits/ranger.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/source/mage_sprite.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/portraits/mage.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/source/goblin_grunt_sprite.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/portraits/goblin_grunt.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/source/goblin_archer_sprite.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "A preload for 'http://127.0.0.1:4194/battle/portraits/goblin_archer.png' is found, but is not used because the new request loads the content as a blob."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/source/goblin_archer_sprite.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/terrain/forest.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/portraits/goblin_archer.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/source/goblin_grunt_sprite.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/terrain/grass.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/portraits/goblin_grunt.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/source/mage_sprite.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/portraits/ranger.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/portraits/fighter.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/proof/fighter.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/terrain/stone.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/source/ranger_sprite.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/terrain/water.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/terrain/grass_path.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://127.0.0.1:4194/battle/portraits/mage.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    }
+  ]
+}

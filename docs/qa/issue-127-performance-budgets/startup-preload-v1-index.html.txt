@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script data-game-preloads>(()=>{const p={"base":"/","battle":{"js":["assets/startBattleApp-DyxWdUBj.js","assets/preload-helper-DjzSQ1t3.js","assets/battleLayout-BVayxngr.js","assets/browser-lq09RoMi.js","assets/start-DJR2YKH2.js","assets/start-DgrVoN1W.js","assets/rng-BCcJOpRP.js"],"css":["assets/battleLayout-C6wfuIJB.css"]},"run":{"js":["assets/startRunApp-BUf_WjpM.js","assets/start-DgrVoN1W.js","assets/browser-lq09RoMi.js","assets/rng-BCcJOpRP.js","assets/battleLayout-BVayxngr.js"],"css":["assets/startRunApp-y3YtRGS5.css","assets/battleLayout-C6wfuIJB.css"]},"images":["battle/terrain/grass.png","battle/terrain/grass_path.png","battle/terrain/stone.png","battle/terrain/forest.png","battle/terrain/water.png","proof/fighter.png","battle/portraits/fighter.png","battle/source/ranger_sprite.png","battle/portraits/ranger.png","battle/source/mage_sprite.png","battle/portraits/mage.png","battle/source/goblin_grunt_sprite.png","battle/portraits/goblin_grunt.png","battle/source/goblin_archer_sprite.png","battle/portraits/goblin_archer.png"]},root=new URL(p.base,location.origin).pathname.replace(/\/$/,""),path=location.pathname.replace(/\/$/,"");if(path===root+"/map")return;const run=path===root+"/run",route=run?p.run:p.battle,nonce=document.currentScript?.nonce;const add=(file,rel,as)=>{const link=document.createElement("link");link.rel=rel;link.href=p.base+file;link.crossOrigin="";if(as)link.as=as;if(nonce)link.nonce=nonce;document.head.appendChild(link)};route.js.forEach(file=>add(file,"modulepreload"));route.css.forEach(file=>add(file,"preload","style"));const scene=new URLSearchParams(location.search).get("scene");if(run||(scene!=="proof"&&scene!=="content-smoke"))p.images.forEach(file=>add(file,"preload","fetch"))})();</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#172033" />
+    <link rel="icon" href="data:," />
+    <title>Tactics Guru v2</title>
+    <script type="module" crossorigin src="/assets/index-CjguLGpJ.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/preload-helper-DjzSQ1t3.js">
+  </head>
+  <body>
+    <main id="game" aria-label="Tactics Guru game canvas" data-ready="false"></main>
+    <div id="battle-shell">
+    <section id="battlefield" aria-label="Battlefield" hidden>
+      <header id="battle-heading"><p>Tactics Guru</p><h1>Forest Ruins</h1></header>
+      <div id="battle-board-region"></div>
+      <p id="battle-board-caption">Gold: active · White: selected · Teal: reachable</p>
+    </section>
+    <aside id="fit-panel" aria-label="Proof scene diagnostics">
+      <div class="fit-controls">
+        <span id="fit-status" role="status" aria-live="polite">Loading</span>
+        <button id="fit-restart" type="button" disabled>Restart proof scene</button>
+        <img id="proof-portrait" alt="Fighter portrait" width="48" height="48" hidden />
+      </div>
+      <div id="battle-persistence" class="fit-controls" hidden></div>
+      <div id="battle-controls" hidden>
+        <p id="battle-active"></p>
+        <div class="fit-controls">
+          <button id="battle-move" disabled>Move</button>
+          <button id="battle-next" disabled>Wait / End turn</button>
+          <span id="battle-selection" aria-live="polite">Select a tile</span>
+        </div>
+      </div>
+      <details id="fit-board-controls" open>
+        <summary>Board controls</summary>
+        <div class="fit-controls" aria-label="Occlusion fixtures">
+          <button data-fixture="ground-behind" disabled>Ground: Behind</button>
+          <button data-fixture="ground-front" disabled>Ground: In front</button>
+          <button data-fixture="raised-behind" disabled>Raised: Behind</button>
+          <button data-fixture="raised-front" disabled>Raised: In front</button>
+        </div>
+        <div class="fit-controls fit-opacity">
+          <label for="tree-opacity">Tree opacity (unit behind)</label>
+          <input id="tree-opacity" type="range" min="0" max="100" step="1" value="40" disabled />
+          <span id="tree-opacity-value">40%</span>
+        </div>
+        <div class="fit-controls">
+          <label for="move-destination">Move destination</label>
+          <select id="move-destination" disabled><option value="" disabled selected>Choose a tile</option><option value="raised-front">Raised tile (2, 2)</option></select>
+          <button id="move-start" disabled>Start diagnostic move</button>
+          <span id="move-status" aria-live="polite">Idle</span>
+        </div>
+        <div class="fit-controls">
+          <button id="audio-play" type="button" disabled>Play test sound</button>
+          <span id="audio-status" aria-live="polite">Loading</span>
+        </div>
+      </details>
+      <p id="board-caption">Elevated board · Tap to select · Drag to pan · Wheel/pinch to zoom</p>
+      <details>
+        <summary>Measurements</summary>
+        <button id="fit-snapshot" type="button">Refresh measurements</button>
+        <pre id="fit-report">Refresh to capture current measurements.</pre>
+      </details>
+    </aside>
+    </div>
+  </body>
+</html>

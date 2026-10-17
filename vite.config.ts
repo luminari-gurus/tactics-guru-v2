@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
@@ -9,7 +9,50 @@ const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' 
 // The game owns deterministic grid rules and uses no Matter physics. This stock
 // Phaser distribution retains both renderers, audio and all scene/game APIs.
 const phaserArcade = resolve(dirname(createRequire(import.meta.url).resolve('phaser/package.json')), 'dist/phaser-arcade-physics.js');
+
+/** Start only the selected game route's required requests while its entry script loads. */
+function gamePreloads(): Plugin {
+  let base = '/', nonce: string | undefined;
+  return {
+    name: 'game-startup-preloads',
+    apply: 'build',
+    configResolved(config) { base = config.base; nonce = config.html?.cspNonce; },
+    transformIndexHtml: { order: 'post', handler(_html, {bundle}) {
+      if (!bundle) return;
+      const chunks = Object.values(bundle).filter(chunk => chunk.type === 'chunk');
+      const entry = (source: string) => {
+        const chunk = chunks.find(chunk => chunk.facadeModuleId?.replaceAll('\\', '/').endsWith('/' + source));
+        if (!chunk) throw new Error(`Missing startup entry: ${source}`);
+        return chunk.fileName;
+      };
+      const dependencies = (entries: string[]) => {
+        const js = new Set<string>(), css = new Set<string>();
+        const visit = (file: string) => {
+          if (js.has(file)) return;
+          const chunk = bundle[file];
+          if (chunk?.type !== 'chunk') return;
+          js.add(file);
+          for (const style of chunk.viteMetadata?.importedCss ?? []) css.add(style);
+          chunk.imports.forEach(visit);
+        };
+        entries.forEach(visit);
+        return {js: [...js], css: [...css]};
+      };
+      const plan = {
+        base,
+        battle: dependencies([entry('src/app/startBattleApp.ts'), entry('src/phaser/start.ts')]),
+        run: dependencies([entry('src/app/startRunApp.ts')]),
+      };
+      // JSON is embedded as script text, never as executable content from a path.
+      const data = JSON.stringify(plan).replaceAll('<', '\\u003c');
+      const script = `(()=>{const p=${data},root=new URL(p.base,location.origin).pathname.replace(/\\/$/,""),path=location.pathname.replace(/\\/$/,"");if(path===root+"/map")return;const route=path===root+"/run"?p.run:p.battle,nonce=document.currentScript?.nonce;const add=(file,rel,as)=>{const link=document.createElement("link");link.rel=rel;link.href=p.base+file;link.crossOrigin="";if(as)link.as=as;if(nonce)link.nonce=nonce;document.head.appendChild(link)};route.js.forEach(file=>add(file,"modulepreload"));route.css.forEach(file=>add(file,"preload","style"))})();`;
+      return [{tag: 'script', attrs: {'data-game-preloads': true, ...(nonce === undefined ? {} : {nonce})}, children: script, injectTo: 'head-prepend'}];
+    }},
+  };
+}
+
 export default defineConfig({
+  plugins: [gamePreloads()],
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
   define: { __BUILD_INFO__: JSON.stringify({ commit, dirty }) },
 });
