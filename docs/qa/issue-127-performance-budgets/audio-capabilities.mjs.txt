@@ -1,0 +1,14 @@
+import {webkit,devices} from '@playwright/test';
+import {writeFileSync} from 'node:fs';
+import os from 'node:os';
+const browser=await webkit.launch();
+try {
+  const context=await browser.newContext(devices['iPhone 13']);
+  const page=await context.newPage();
+  const capabilities=await page.evaluate(()=>{
+    const audio=document.createElement('audio');
+    return {audioContext:typeof window.AudioContext,mp3:audio.canPlayType('audio/mpeg'),ogg:audio.canPlayType('audio/ogg; codecs="vorbis"'),wav:audio.canPlayType('audio/wav')};
+  });
+  const result={host:os.platform(),release:os.release(),browser:browser.version(),capabilities};
+  writeFileSync(process.argv[2],JSON.stringify(result,null,2)+'\n');console.log(result);
+} finally {await browser.close();}

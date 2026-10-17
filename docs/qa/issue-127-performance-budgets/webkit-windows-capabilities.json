@@ -1,0 +1,11 @@
+{
+  "host": "win32",
+  "release": "10.0.26300",
+  "browser": "26.6",
+  "capabilities": {
+    "audioContext": "undefined",
+    "mp3": "probably",
+    "ogg": "",
+    "wav": "probably"
+  }
+}

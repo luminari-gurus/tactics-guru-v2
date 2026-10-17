@@ -1,0 +1,11 @@
+{
+  "host": "linux",
+  "release": "6.6.114.1-microsoft-standard-WSL2",
+  "browser": "26.6",
+  "capabilities": {
+    "audioContext": "function",
+    "mp3": "maybe",
+    "ogg": "probably",
+    "wav": "maybe"
+  }
+}
