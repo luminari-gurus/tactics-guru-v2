@@ -1,0 +1,151 @@
+[WebServer] (node:37397) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 52 tests using 1 worker
+
+(node:37438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (1.2s)
+(node:37451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:53:1 › mute, hidden and context interruptions discard active feedback while commands finish (4.1s)
+  ✓   3 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.3s)
+  ✓   4 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (32.5s)
+  ✓   5 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (18.3s)
+  ✓   6 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.8s)
+(node:37550) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:81:47 › reload during legal player presentation matches an uninterrupted browser (5.4s)
+  ✓   8 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:81:47 › reload during legal enemy presentation matches an uninterrupted browser (4.8s)
+  ✓   9 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:121:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.7s)
+  ✓  10 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:142:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.3s)
+  ✓  11 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:160:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.7s)
+  ✓  12 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:178:1 › changed saved data refuses an old confirmation and requires fresh review (2.3s)
+  ✓  13 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:187:1 › successful reset with failed fresh save cannot recover an old battle on reload (3.0s)
+  ✓  14 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:197:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓  15 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:197:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+(node:37607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (52.2s)
+  ✓  17 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.9s)
+  ✓  18 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.4s)
+  ✓  19 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.1s)
+  ✘  20 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (243ms)
+(node:37807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.6s)
+  ✓  22 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (15.0s)
+  ✓  23 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.0s)
+  ✓  24 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.8s)
+  ✓  25 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓  26 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+(node:37956) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  27 [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (1.2s)
+(node:37970) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  28 [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:53:1 › mute, hidden and context interruptions discard active feedback while commands finish (4.1s)
+  ✓  29 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.3s)
+  ✓  30 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (33.7s)
+  ✓  31 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (18.6s)
+  ✓  32 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.9s)
+(node:38051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  33 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:81:47 › reload during legal player presentation matches an uninterrupted browser (5.3s)
+  ✓  34 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:81:47 › reload during legal enemy presentation matches an uninterrupted browser (5.3s)
+  ✓  35 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:121:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.7s)
+  ✓  36 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:142:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.3s)
+  ✓  37 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:160:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.6s)
+  ✓  38 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:178:1 › changed saved data refuses an old confirmation and requires fresh review (2.4s)
+  ✓  39 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:187:1 › successful reset with failed fresh save cannot recover an old battle on reload (3.1s)
+  ✓  40 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:197:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓  41 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:197:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+(node:38082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  42 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (52.0s)
+  ✓  43 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.8s)
+  ✓  44 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.4s)
+  ✓  45 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.0s)
+  ✘  46 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (254ms)
+(node:38277) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  47 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:104:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.7s)
+  ✓  48 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:131:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (15.2s)
+  ✓  49 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:148:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.1s)
+  ✓  50 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:164:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.5s)
+  ✓  51 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓  52 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+
+
+  1) [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+
+    Error: browserContext.newCDPSession: CDP session is only available in Chromium
+
+      31 |   const box=(await page.locator('#battle-sound').boundingBox())!;
+      32 |   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
+    > 33 |   const cdp=await page.context().newCDPSession(page);
+         |                                  ^
+      34 |   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2,id:1}]});
+      35 |   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      36 |   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready',started:0});
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/battle-audio.spec.ts:33:34
+
+    Error Context: ../../../../../../tmp/tg-device-functional-results/battle-audio-sound-control-3d8d9-ocus-and-restart-preference-acceptance-webkit-portrait/error-context.md
+
+  2) [acceptance-webkit-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+       97 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');
+       98 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');
+    >  99 |  for(let i=0;i<8;i++){await page.keyboard.press('Tab');expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);}
+          |                                                                                                                                     ^
+      100 |  await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+      101 |  await page.reload();await page.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});});await page.reload();
+      102 |  await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/run-progression.spec.ts:99:133
+
+    Error Context: ../../../../../../tmp/tg-device-functional-results/run-progression-run-startu-8f838-torage-permits-unsaved-play-acceptance-webkit-portrait/error-context.md
+
+  3) [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+
+    Error: browserContext.newCDPSession: CDP session is only available in Chromium
+
+      31 |   const box=(await page.locator('#battle-sound').boundingBox())!;
+      32 |   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
+    > 33 |   const point={x:box.x+box.width/2,y:box.y+box.height/2};
+         |                                  ^
+      34 |   if(test.info().project.use.hasTouch)await page.touchscreen.tap(point.x,point.y);
+      35 |   else {
+      36 |     const cdp=await page.context().newCDPSession(page);
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/battle-audio.spec.ts:33:34
+
+    Error Context: ../../../../../../tmp/tg-device-functional-results/battle-audio-sound-control-3d8d9-ocus-and-restart-preference-acceptance-webkit-landscape/error-context.md
+
+  4) [acceptance-webkit-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+       97 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');
+       98 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');
+    >  99 |  const visited=new Set<string>();
+          |                                  ^
+      100 |  for(const key of ['Tab','Shift+Tab'])for(let i=0;i<8;i++){
+      101 |   await page.keyboard.press(key);expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
+      102 |   visited.add(await page.evaluate(()=>document.activeElement!.id));
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/run-progression.spec.ts:99:133
+
+    Error Context: ../../../../../../tmp/tg-device-functional-results/run-progression-run-startu-8f838-torage-permits-unsaved-play-acceptance-webkit-landscape/error-context.md
+
+  4 failed
+    [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+    [acceptance-webkit-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play
+    [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference
+    [acceptance-webkit-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play
+  48 passed (6.7m)

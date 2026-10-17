@@ -1,0 +1,18 @@
+import { expect, test } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { saveFixtures } from '../helpers/saveFixtures';
+import { decodeBattleSave, encodeBattleSave } from '../../src/domain/saveEnvelope';
+
+test('record codec encode and validated restore costs without a fabricated budget',()=>{
+  const rows=[];
+  for(const fixture of saveFixtures()) {
+    for(let n=0;n<20;n++) {
+      const start=performance.now(),encoded=encodeBattleSave(fixture.state,fixture.catalog),encodedAt=performance.now();
+      expect(encoded.ok).toBe(true);if(!encoded.ok)throw Error(encoded.reason);
+      const restoreStart=performance.now(),restored=decodeBattleSave(encoded.text,fixture.catalog),restoredAt=performance.now();
+      expect(restored.ok).toBe(true);if(restored.ok)expect(restored.state).toEqual(fixture.state);
+      rows.push({label:fixture.name,iteration:n,codeUnits:encoded.text.length,encodeMs:encodedAt-start,decodeMs:restoredAt-restoreStart});
+    }
+  }
+  writeFileSync('/tmp/tg-device-codec-timing.json',JSON.stringify({method:'host Node performance.now; 20 repetitions per existing valid save fixture; no encode/decode-specific limit is established',rows},null,2));
+});

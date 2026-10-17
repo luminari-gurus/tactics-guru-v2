@@ -1,0 +1,203 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: battle-audio.spec.ts >> sound control uses real gestures, preserves previews, modal focus and restart preference
+- Location: tests/battle-audio.spec.ts:21:1
+
+# Error details
+
+```
+Error: browserContext.newCDPSession: CDP session is only available in Chromium
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main "Tactics Guru game canvas" [ref=e2]:
+    - generic "Battle board. Arrow keys navigate, Enter selects, Escape cancels." [ref=e3]
+  - complementary "Battle controls" [ref=e4]:
+    - generic [ref=e5]:
+      - status [ref=e6]: Battle ready
+      - button "Restart battle" [ref=e7] [cursor=pointer]
+    - generic [ref=e8]:
+      - generic [ref=e9]: Battle saved on this device
+      - button "Save recovery" [ref=e10] [cursor=pointer]
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - button "Enable sound" [ref=e13] [cursor=pointer]
+        - generic [ref=e14]: Sound off
+      - generic "Heroes" [ref=e15]:
+        - 'button "Fighter portrait Fighter #1 · HP 18/18" [ref=e16] [cursor=pointer]':
+          - img "Fighter portrait" [ref=e17]
+          - generic [ref=e18]: "Fighter #1 · HP 18/18"
+        - 'button "Ranger portrait Ranger #2 · HP 12/12" [ref=e19] [cursor=pointer]':
+          - img "Ranger portrait" [ref=e20]
+          - generic [ref=e21]: "Ranger #2 · HP 12/12"
+        - 'button "Mage portrait Mage #3 · HP 11/11" [ref=e22] [cursor=pointer]':
+          - img "Mage portrait" [ref=e23]
+          - generic [ref=e24]: "Mage #3 · HP 11/11"
+      - paragraph [ref=e25]: "Round 1 · Your turn · Mage #3 · HP 11/11 · Move ready / Action ready"
+      - generic [ref=e26]:
+        - button "Move" [ref=e27] [cursor=pointer]
+        - button "Basic attack" [ref=e28] [cursor=pointer]
+        - 'button "Signature: Magic Missile" [ref=e29] [cursor=pointer]'
+        - button "Wait / End turn" [ref=e30] [cursor=pointer]
+      - text: Target (or select a board cell)
+      - combobox "Target (or select a board cell)" [disabled] [ref=e31]:
+        - option "Choose target" [selected]
+      - paragraph [ref=e32]: Select a tile
+      - paragraph [ref=e33]: Choose an action and target
+      - generic [ref=e34]:
+        - button "Review action" [disabled] [ref=e35]
+        - button "Cancel action" [disabled] [ref=e36]
+      - group [ref=e37]:
+        - generic "Battle log" [ref=e38] [cursor=pointer]
+    - paragraph [ref=e39]: "Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels"
+    - link "Play three-encounter run" [ref=e40]:
+      - /url: /run
+```
+
+# Test source
+
+```ts
+  1   | import { confirmRestart } from './helpers/battlePolicy';
+  2   | import { expect, test, type Page } from '@playwright/test';
+  3   | import { session, playCommand, playerDecision } from './helpers/battlePolicy';
+  4   | import { battleCatalog as catalog } from '../src/content/catalog';
+  5   | import { replayBattle } from '../src/domain/turns';
+  6   | import { battleCues, type BattleCue } from '../src/audio/battleCues';
+  7   | import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';
+  8   |
+  9   | const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
+  10  | async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+  11  | async function enable(page:Page) {
+  12  |   await page.locator('#battle-sound').click();
+  13  |   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
+  14  | }
+  15  | function errors(page:Page) {
+  16  |   const found:string[]=[];
+  17  |   page.on('pageerror',e=>found.push(e.message));
+  18  |   page.on('console',m=>{if(m.type()==='error')found.push(m.text());});return found;
+  19  | }
+  20  |
+  21  | test('sound control uses real gestures, preserves previews, modal focus and restart preference',async({page})=>{
+  22  |   const found=errors(page);await page.goto('/');await ready(page);
+  23  |   expect(await audio(page)).toMatchObject({enabled:false,started:0,status:'muted'});
+  24  |   const before=await session(page);
+  25  |   await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
+  26  |   await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
+  27  |   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
+  28  |   expect((await session(page)).state).toEqual(before.state);
+  29  |   await page.locator('#battle-sound').click();
+  30  |   await page.locator('#battle-sound').scrollIntoViewIfNeeded();
+  31  |   const box=(await page.locator('#battle-sound').boundingBox())!;
+  32  |   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
+> 33  |   const point={x:box.x+box.width/2,y:box.y+box.height/2};
+      |                                  ^ Error: browserContext.newCDPSession: CDP session is only available in Chromium
+  34  |   if(test.info().project.use.hasTouch)await page.touchscreen.tap(point.x,point.y);
+  35  |   else {
+  36  |     const cdp=await page.context().newCDPSession(page);
+  37  |     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});
+  38  |     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  39  |     await cdp.detach();
+  40  |   }
+  41  |   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready',started:0});
+  42  |   expect((await session(page)).state).toEqual(before.state);
+  43  |   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+  44  |   await page.locator('#battle-review').click();await page.keyboard.press('Tab');
+  45  |   expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
+  46  |   await page.keyboard.press('Escape');expect((await audio(page)).started).toBe(0);
+  47  |   expect((await session(page)).state).toEqual(before.state);
+  48  |   for(let run=2;run<=6;run++){
+  49  |     if(run===4)await page.locator('#battle-sound').click();
+  50  |     await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));
+  51  |     await ready(page);expect((await audio(page)).enabled).toBe(run<4);
+  52  |     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
+  53  |     await expect(page.locator('#battle-sound')).toHaveCount(1);
+  54  |   }
+  55  |   await page.reload();await page.locator('#save-continue').click();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
+  56  | });
+  57  |
+  58  | test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
+  59  |   // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
+  60  |   const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);await enable(page);
+  61  |   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
+  62  |   await page.clock.pauseAt(start+60000);
+  63  |   const before=(await session(page)).state.commandCount;
+  64  |   await page.locator('#dialog-confirm').click({force:true});
+  65  |   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  66  |   expect((await audio(page)).recent).toContain('move');
+  67  |   await page.locator('#battle-sound').click({force:true});expect((await audio(page)).active).toBeNull();
+  68  |   await page.clock.resume();await ready(page);expect((await session(page)).state.commandCount).toBe(before+1);
+  69  |   await enable(page);
+  70  |   await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
+  71  |   await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',active:null});
+  72  |   const count=(await audio(page)).started;
+  73  |   await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
+  74  |   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:count});
+  75  |   await page.locator('#battle-next').click();
+  76  |   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+  77  |   expect((await audio(page)).active).toBeNull();
+  78  |   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));});
+  79  |   await ready(page);await page.locator('#battle-sound').click();expect((await audio(page)).enabled).toBe(false);
+  80  |   await enable(page);
+  81  |   await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page); // Seed 2 begins with a player.
+  82  |   await page.clock.pauseAt(start+120000);
+  83  |   let enemy:Awaited<ReturnType<typeof session>>|undefined;
+  84  |   for(let i=0;i<12;i++) {
+  85  |     const current=await session(page),command=current.replay.commands.at(-1);
+  86  |     if(current.phase==='presenting' && command && current.state.units.find(u=>u.id===command.unitId)!.side==='enemy') {enemy=current;break;}
+  87  |     if(current.phase==='player')await page.locator('#battle-next').click({force:true});
+  88  |     await page.clock.runFor(48);
+  89  |   }
+  90  |   expect(enemy).toBeDefined();
+  91  |   await expect(page.locator('#battle-sound')).toBeEnabled();
+  92  |   await page.locator('#battle-sound').click({force:true});
+  93  |   expect(await audio(page)).toMatchObject({enabled:false,active:null});expect((await session(page)).state).toEqual(enemy!.state);
+  94  |   await page.clock.resume();await ready(page);
+  95  |   expect(found).toEqual([]);
+  96  | });
+  97  |
+  98  | for(const mode of ['reject','pending'] as const) test(`gesture unlock ${mode} remains bounded and retryable`,async({page})=>{
+  99  |   const found=errors(page);
+  100 |   await page.addInitScript(mode=>{
+  101 |     const original=AudioContext.prototype.resume;
+  102 |     const state=Object.getOwnPropertyDescriptor(BaseAudioContext.prototype,'state')!.get!;
+  103 |     // Guarantee Phaser sees the initial lock, even when headless autoplay starts running.
+  104 |     Object.defineProperty(AudioContext.prototype,'state',{get(){return window.__allowAudio?state.call(this):'suspended';}});
+  105 |     AudioContext.prototype.resume=function(){return window.__allowAudio?original.call(this):mode==='reject'?Promise.reject(Error('refused')):new Promise(()=>{});};
+  106 |   },mode);
+  107 |   await page.goto('/');await ready(page);await page.locator('#battle-sound').click();
+  108 |   await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',started:0});
+  109 |   await expect(page.locator('#battle-next')).toBeEnabled();
+  110 |   await page.evaluate(()=>{window.__allowAudio=true;});await page.locator('#battle-sound-retry').click();
+  111 |   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});expect(found).toEqual([]);
+  112 | });
+  113 |
+  114 | for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode} after successful unlock stays nonfatal and bounded`,async({page})=>{
+  115 |   const found=errors(page);
+  116 |   await page.addInitScript(mode=>{
+  117 |     const Original=AudioContext, resume=Original.prototype.resume;
+  118 |     window.AudioContext=new Proxy(Original,{construct(target,args){
+  119 |       const context=new target(...args);window.__battleContext=context;return context;
+  120 |     }});
+  121 |     window.__resumeCalls=0;
+  122 |     Original.prototype.resume=function(){
+  123 |       if(!window.__resumeFailure)return resume.call(this);
+  124 |       window.__resumeCalls!++;
+  125 |       return mode==='reject'?Promise.reject(new DOMException('Resume refused','NotAllowedError')):new Promise<void>((resolve,reject)=>{
+  126 |         window.__releaseResume=()=>{void resume.call(this).then(resolve,reject);};
+  127 |       });
+  128 |     };
+  129 |   },mode);
+  130 |   await page.goto('/');await ready(page);await enable(page);
+  131 |   await page.evaluate(async()=>{window.__resumeFailure=true;await window.__battleContext!.suspend();window.dispatchEvent(new Event('focus'));});
+  132 |   await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',active:null});
+  133 |   await expect(page.locator('#battle-sound-retry')).toBeVisible();
+```
