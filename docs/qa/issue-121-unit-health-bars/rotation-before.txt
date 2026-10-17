@@ -32,7 +32,7 @@ Running 9 tests using 1 worker
   ✓  9 [mobile-landscape] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
 
 
-  1) [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact 
+  1) [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
 
     Error: expect(received).not.toEqual(expected) // deep equality
 
@@ -51,5 +51,5 @@ Running 9 tests using 1 worker
     Error Context: ../../../../../../tmp/tg121-rotation-results/battle-animations-elevated-135a1-ough-rotation-during-impact-desktop-repeat1/error-context.md
 
   1 failed
-    [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact 
+    [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
   8 passed (15.7s)

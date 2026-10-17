@@ -488,7 +488,7 @@ Running 453 tests using 1 worker
   ✓  453 [mobile-landscape] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.2s)
 
 
-  1) [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact 
+  1) [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
 
     Error: expect(received).not.toEqual(expected) // deep equality
 
@@ -507,5 +507,5 @@ Running 453 tests using 1 worker
     Error Context: test-results/battle-animations-elevated-135a1-ough-rotation-during-impact-desktop/error-context.md
 
   1 failed
-    [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact 
+    [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
   452 passed (25.6m)

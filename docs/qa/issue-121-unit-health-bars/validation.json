@@ -72,5 +72,25 @@
     "build": "passed; existing chunk warning",
     "openspecStrict": "passed",
     "whitespace": "passed"
+  },
+  "originalLogSha256": {
+    "posttests.txt": "68183b67b20de6e8b13890d78ad84e1480e4edc9c9cf953e011ef823c9f27fad",
+    "unit.txt": "0c16147f93198a5d6aee8e7be3f2e21267675e19bd1ffd487584cd5983159c19",
+    "rotation-before.txt": "fedd5f748113be07c649e2ec0cf69aedbe1dc1a43dcbfcec923f8b8f7e3df17d",
+    "health-matrix.txt": "268e3f0edaf4a9876b2ebb85f83ba4cbf59f07d34817d7cc7ba4d31b869cd274",
+    "build.txt": "1b9d11389a1836829afa4249cbb379069f2d0043de6df1adf16758a116a2e2eb",
+    "initial-rotation-failure.txt": "6ee4d837e96716cacb132cb273174b36f2bb2fa66d97ca956f456adbbbd997ef",
+    "browser-full.txt": "14b3679fffd2f686cfddf3fa7f914342f3c7e234da9a6063c349953f6cce1f1a",
+    "rotation-after.txt": "110e1b73a6794d815aefeb3c9fc3ef9dea2d1f09b7399ce6287459d894b9882f"
+  },
+  "normalizedLogSha256": {
+    "posttests.txt": "68183b67b20de6e8b13890d78ad84e1480e4edc9c9cf953e011ef823c9f27fad",
+    "unit.txt": "b7b1c7b491e372f3ac53dc5e5d17b6d4305489657f6fa1f7b06520078049eea2",
+    "rotation-before.txt": "64ee5aea53b60b01397167552e7615f09e62bc81485418f4435acfa988c56473",
+    "health-matrix.txt": "268e3f0edaf4a9876b2ebb85f83ba4cbf59f07d34817d7cc7ba4d31b869cd274",
+    "build.txt": "950b342246d806cb249b44a674c77692df62ca9f2cd488675ea449c3ede694b7",
+    "initial-rotation-failure.txt": "e6b2ea623b0b0ac4718475dde601110da3fbd41f9190f5d5f00662262b26c8ed",
+    "browser-full.txt": "81608f042387172df92f241522f1eaa8a0e36f4308e475ddfffb0555cc032551",
+    "rotation-after.txt": "110e1b73a6794d815aefeb3c9fc3ef9dea2d1f09b7399ce6287459d894b9882f"
   }
 }

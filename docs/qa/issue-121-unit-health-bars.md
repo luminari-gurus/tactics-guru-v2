@@ -43,7 +43,7 @@ The existing Vite large-chunk warning remains. No package/lockfile or save-forma
 | `npm run posttest` | 18 authored-encounter and 21 run-item cases passed |
 | Strict OpenSpec / whitespace | Passed |
 
-The failing rotation check advanced a paused virtual clock before the browser delivered its native resize event, then read the old 1280x720 viewport. The test now waits for native resize delivery before advancing Phaser callbacks and asserts the exact rotated dimensions. This is a test-only synchronization repair in `tests/battle-animations.spec.ts`, not a gameplay timing change or weakened assertion. The full suite was not rerun after this test-only change; the affected case passed nine focused repeats. Raw full/before/after logs and the initial error are retained alongside the passing matrix evidence.
+The failing rotation check advanced a paused virtual clock before the browser delivered its native resize event, then read the old 1280x720 viewport. The test now waits for native resize delivery before advancing Phaser callbacks and asserts the exact rotated dimensions. This is a test-only synchronization repair in `tests/battle-animations.spec.ts`, not a gameplay timing change or weakened assertion. The full suite was not rerun after this test-only change; the affected case passed nine focused repeats. Full/before/after logs and the initial error are retained alongside the passing matrix evidence.
 
 Commands used (Chromium commands set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`):
 
@@ -61,7 +61,7 @@ git diff --check
 
 Environment: macOS, Playwright 1.63.0; Google Chrome 155.0.8059.80; Playwright WebKit revision 2359, manifest version 26.6. Profiles: desktop 1280x720, Pixel 7 portrait/915x412 landscape, iPhone 13 portrait/landscape, plus 320x568 and 568x320 stress views. These are emulated profiles, not branded physical browser runs.
 
-The production build identifies planning HEAD bb835b380227c8969e4b0a40633ae14a2c130b65 with dirty=true. [validation.json](issue-121-unit-health-bars/validation.json) binds the exact tested source/test/config bytes and PNGs; it records the original and repaired rotation-test hashes separately. Runtime sources were unchanged through the full suite, test repair and posttests. Unit/content counts overlap and are not distinct totals.
+The production build identifies planning HEAD bb835b380227c8969e4b0a40633ae14a2c130b65 with dirty=true. [validation.json](issue-121-unit-health-bars/validation.json) binds the exact tested source/test/config bytes and PNGs; it records the original and repaired rotation-test hashes separately. Runtime sources were unchanged through the full suite, test repair and posttests. Captured text logs normalize only trailing whitespace and terminal blank lines; original and normalized log SHA256 hashes are retained. Unit/content counts overlap and are not distinct totals.
 
 The corrected cancellation screenshots advance a render frame after restoring visibility so they show completed health, not the prior paused canvas frame. Visual review covered the repaired hero bars, fitted/zoomed desktop and mobile, moving/elevated views, narrow rotation, post-damage/defeat and next-encounter states.
 

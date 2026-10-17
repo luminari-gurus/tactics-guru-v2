@@ -17,4 +17,3 @@ Error: expect(received).not.toEqual(expected) // deep equality
 Expected: not {"height": 720, "width": 1280}
 
 ```
-
