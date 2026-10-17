@@ -60,7 +60,12 @@ export class BattleDialogs {
     if(this.open)return;
     if(prior?.isConnected && prior!==document.body && prior!==document.documentElement && !prior.closest('dialog') && !prior.matches(':disabled')) {
       prior.focus();
-      if(document.activeElement===prior)return;
+      if(document.activeElement===prior){
+        // Native dialog restoration can already have focused an offscreen
+        // control, making focus() alone a no-op in the nested battle scroller.
+        prior.scrollIntoView({block:'nearest',inline:'nearest'});
+        return;
+      }
     }
     document.querySelector<HTMLElement>('#fit-restart')?.focus();
   }

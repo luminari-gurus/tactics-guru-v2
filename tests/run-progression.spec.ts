@@ -188,6 +188,11 @@ for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissa
  async function checkFocus(){
   const recovery=page.getByRole('button',{name:'Save recovery',exact:true});const before=await snapshot(page);
   await recovery.focus();await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();
+  if(before.activeBattle){
+   const viewport=page.viewportSize()!;
+   await page.setViewportSize({width:viewport.height,height:viewport.width});
+   await page.setViewportSize(viewport);
+  }
   if(dismiss==='Escape')await page.keyboard.press('Escape');
   else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();await expect(recovery).toBeInViewport();
