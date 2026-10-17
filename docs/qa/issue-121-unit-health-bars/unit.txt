@@ -1,0 +1,13 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2
+
+
+ Test Files  40 passed (40)
+      Tests  674 passed (674)
+   Start at  08:14:33
+   Duration  5.07s (tests 84%, transform 9%, import 6%)
+

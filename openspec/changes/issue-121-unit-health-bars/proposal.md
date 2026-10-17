@@ -4,7 +4,7 @@
 
 [Issue #121](https://github.com/luminari-gurus/tactics-guru-v2/issues/121) requests visible unit health without selecting each unit. Reproduce the legacy shallow curved treatment using the current authoritative battle presentation.
 
-Caller: `dubstylee`. Branch: `work/issue-121-unit-health-bars`. Base: `origin/main` at `718107de00d58a19996386146d792075e3c5c023`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-121-unit-health-bars`. Base: `origin/main` at `718107de00d58a19996386146d792075e3c5c023`. Implementation approval: user approved this published plan in chat on 2026-10-17. Main and unmerged PR #119 were rechecked; base remains unchanged.
 
 ## What Changes
 

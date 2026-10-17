@@ -1,0 +1,76 @@
+{
+  "base": "718107de00d58a19996386146d792075e3c5c023",
+  "inputs": {
+    "src/phaser/BoardRenderer.ts": "c671ece40f12b61d1a018f9eb1d197ef5d22820060f73ba44d3aadd24a748053",
+    "src/phaser/healthBar.ts": "aa55706ef6cfbdb043c14bf1c08d86f7e85401dba75d3d73063764db06ea3874",
+    "tests/unit/healthBar.test.ts": "667451d985c4133f68ea0a7267ce5af28122a8d189e2b93585b8287de22c38d9",
+    "tests/unit-health-bars.spec.ts": "c1e43f20f88a3ec9f466a27c2ec9f253907909bbb1d57b98a0453ea325817026",
+    "playwright.health-bars.config.ts": "e9124acdc5ad5f4ef08a7eb8695ebb0f8f25517b4d8dda0c5b3f98173c330fce",
+    "playwright.config.ts": "82a4eeaf511602bb8ffb2b0d39845c9148b74150e16fbd9f2eb0166a8dcf4c7e",
+    "package.json": "1aea488e60265ffca7c4ccf0d2b6a5c2e3912a6ba7fe4ba6a46a941efe546530",
+    "package-lock.json": "e05e63e5c84dddd65df26c9f97204cb248c5adcd07aad4612bad4047b8e8b310",
+    "tests/battle-animations.spec.ts": "106537668f261687aae6b2f86eeca53333addbd6de1a79f006fe3d2a7758bd1c"
+  },
+  "screenshots": {
+    "health-iphone-portrait-health-568x320.png": "b15d0628cd037b035df91f5ba1f583c343ff2ec7812262e4d47cf250cd21cec3",
+    "health-iphone-landscape-health-fitted.png": "b370135ab7c2c67574fdc976bbd55332c558eda2fd27624245245853179ddec1",
+    "health-desktop-health-moving.png": "3d7baf3bdce0efc53420ff0f42625fab1c2dc1dfbee6bbd2a8c9651358f8ef81",
+    "health-android-landscape-health-zoomed.png": "9ccd4123d8db327a420209bdd57914bdeb5fb897fc689da8ffe579ad58b7ba42",
+    "health-iphone-portrait-health-moving.png": "3feadd37966dbe7a304744dbb931e27c1bed617060f6d3b1db3452aed0b19eaf",
+    "health-iphone-portrait-health-elevated.png": "7f94b6bd073e8d0f855112be2b5531f622b2de0a5679444c78e42849d1ee2da3",
+    "health-desktop-health-damage-impact.png": "c8787aa645980a2a65bfa8f1dee8abd9e7169daa1d89960612f5e1bb98f8a215",
+    "health-iphone-portrait-health-damage-complete.png": "7708e592aaa1e5b749970680d5ff8363f074c77662791629c8e83c960f3c2934",
+    "health-desktop-health-zoomed.png": "19dd0a740e7b4dcc079fadcc60865ae75cfa515c2ca409522dec7d70c176e042",
+    "health-iphone-portrait-health-damage-impact.png": "484e611ca4f4b20c61ae55b6d74e611cecaf9048cfb429878a401d3fcf486e9f",
+    "health-android-portrait-health-zoomed.png": "6b85924a452de5df715f0186aeac4b59b94e28fd07ca9dd05f2559bbe88b4045",
+    "health-desktop-health-second-encounter.png": "0671f187ea69811f4126e2d48d964c37d2ec132d6912757ecf813f57b8cb4bb2",
+    "health-desktop-health-damage-complete.png": "9f64b350bcc22b323b463bc652bc96b615f771152c3b90c632272a2b34d55851",
+    "health-iphone-portrait-health-zoomed.png": "6429fce77d026add783da55ed60571b5eb47093c3b693021f802203940a50b9a",
+    "health-desktop-health-elevated.png": "6dee12eea4e09a6832c6cc7b4ac9765e2a79c6a0380508cdf52c53da109dc103",
+    "health-android-landscape-health-fitted.png": "319022237a1338483c9d8812a45f0dfedc245d7334c742267511e0ecca1b954a",
+    "health-iphone-landscape-health-zoomed.png": "dbbfd47ef6751e515c6dd4803a1fd50fd815de7e4038bcb41bf07daaf9797c76",
+    "health-iphone-portrait-health-defeat-complete.png": "be621772ca1a12bc7edc752752440839f4e46e9569e9eb4174ad2466d073916c",
+    "health-iphone-portrait-health-320x568.png": "99738c98af35b49a9995c217beb8751b39360c6bf6aa58b30fa3b013a97c2f84",
+    "health-android-portrait-health-fitted.png": "dcd8e8f3f8c6b00444755d1592aa681b87f687b62d2cdb987e646a125e8cb52d",
+    "health-desktop-health-fitted.png": "85fa35b9efcaf65b0162d0b2643ed9b838fd6f86dffb84b9c93f7deb78415dbe",
+    "health-iphone-portrait-health-fitted.png": "6d186ff431e30fece4f3e2f728bef70d7c1abfcebddcb15e6f4322d13e1c2dd4",
+    "health-desktop-health-defeat-complete.png": "d55819b36a054ea4b31345cf3b12348dca5ad5d0241a7cfbd2af0508696b337e",
+    "health-iphone-portrait-health-second-encounter.png": "68fc9ac8de10ed0ae4ea941c2559fb1339dff805061111c4f3941a46eaf697c4"
+  },
+  "originalRotationTestSha256": "2bf9da8f1a96693d93f934be91e07bb5ed40af02d73dd010be1f87da8f57fe7f",
+  "results": {
+    "unit": {
+      "passed": 674
+    },
+    "content": {
+      "passed": 167
+    },
+    "healthMatrix": {
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0
+    },
+    "fullBrowserBeforeTestRepair": {
+      "passed": 452,
+      "failed": 1
+    },
+    "rotationBeforeTestRepair": {
+      "passed": 8,
+      "failed": 1
+    },
+    "rotationAfterTestRepair": {
+      "passed": 9,
+      "failed": 0
+    },
+    "encounters": {
+      "passed": 18
+    },
+    "runItems": {
+      "passed": 21
+    },
+    "typecheck": "passed both configurations",
+    "build": "passed; existing chunk warning",
+    "openspecStrict": "passed",
+    "whitespace": "passed"
+  }
+}

@@ -1,0 +1,20 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: battle-animations.spec.ts >> elevated target remains anchored through rotation during impact
+- Location: tests/battle-animations.spec.ts:183:1
+
+# Error details
+
+```
+Error: expect(received).not.toEqual(expected) // deep equality
+
+Expected: not {"height": 720, "width": 1280}
+
+```
+
