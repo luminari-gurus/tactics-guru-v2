@@ -1,7 +1,34 @@
 # Issue #111 — responsive battle controls verification
 
-Updated 2026-10-16 (Asia/Jerusalem). [PR #118](https://github.com/luminari-gurus/tactics-guru-v2/pull/118) is merged. Both review findings in [PR #119](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) are repaired and verified; it remains open and ready to merge. See the [continuation plan](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
+Updated 2026-10-17 (Asia/Jerusalem). PR #118 is merged. PR #119 integration and its review repairs are documented below; the [PR](https://github.com/luminari-gurus/tactics-guru-v2/pull/119) records the final merge state. See the [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-111-responsive-battle-controls/tasks.md).
 
+## Merge integration — 2026-10-17
+
+The PR head `2b419eff2f4183c3e9357d45b75caaeceb12bc70` was merged locally with main `0b317e35bb5c4ce713c242311f0673fc27923637` in `743bd0a1599df1b3c3e22a746f0b23086d2d1ad5`. Both GitHub review threads were resolved and the prior head approved. Conflicts were in startup wiring, styles and the handoff. The original implementation ancestry and newer run progression, health bars and WebKit focus repairs are preserved.
+
+The initial integration failed the existing `/run` accepted-presentation reload case: the run entry point did not create the new actor container or drawable shell. `mountBattleLayout()` now supplies the same existing shell to both entry points. Run boundaries hide it and active encounters restore it. The regression passed across all three Chromium profiles after repair.
+
+Fresh broad proof on `743bd0a`:
+
+- Unit suite: **675/675** across 40 files.
+- Build: **167/167** content checks, both TypeScript configurations and production Vite build passed.
+- Complete configured browser suite: **480/480**, 160 each on desktop, portrait and landscape; 27.7 minutes, no retries or skips.
+- Configured posttests: **18/18** encounters and **21/21** run-item cases.
+- Strict OpenSpec and whitespace checks passed.
+
+Visual review of the second-encounter screenshots then found a stale heading: Woodland Crossing still showed `Encounter 1 of 3 · forest ruins`. The added health/run regression reproduced that mismatch in WebKit. Follow-up `1fe9e09` derives both heading and progress from the authoritative current run snapshot, including after reward transitions.
+
+The first focused WebKit pass also found two overly specific test expectations. Pointer activation leaves focus on the connected, visible, keyboard-accessible `#battle-scroll`; dialog dismissal correctly restores it. The test now accepts that valid pointer return point, then explicitly opens Review by keyboard and still requires the Restart fallback when cancellation disables Review. That assertion repair changed no modal production behavior.
+
+A subsequent WebKit matrix on `1fe9e09` observed one intermittent failure: recovery focus was connected and correct, but the control was outside the visible scroll region. Three isolated repeats passed. Commit `2ba14d9` explicitly scrolls a successfully restored invoker into the nearest visible area; existing recovery tests also rotate while the modal is open. This preserves native focus ownership and adds no timer or command behavior.
+
+Final verification on `2ba14d9edbad03df5520804e47161f848f405400` passed: **42/42** Chromium control/modal/recovery cases, **30/30** WebKit executions (three repeats of ten cases), and **25/25** health-bar/encounter-transition cases across desktop, Android portrait/landscape and iPhone portrait/landscape. The rebuilt application passed **167/167** content checks and both typechecks. Both posttest suites passed again: **18/18** encounters and **21/21** run items. No retries or skips occurred in these final runs. The corrected second-encounter captures show Woodland Crossing in both labels. The full 480-case result above predates the encounter-label and focus-visibility follow-ups; it is not presented as a second full-suite run. Subsequent documentation commits preserve the tested source/test objects.
+
+Commands: `npm run test:unit`, `npm run build`, `playwright test`, `npm run posttest`, `playwright test tests/battle-loop.spec.ts --grep "player HUD"`, `playwright test -c playwright.device-acceptance.config.ts --grep "accepted player presentation reload|review: recovery dismissal|player HUD|keyboard-only"`, `playwright test -c playwright.health-bars.config.ts`, and `openspec validate issue-111-responsive-battle-controls --strict`.
+
+Environment: Windows, repository Playwright, installed Edge for Chromium projects, installed WebKit for iPhone 13 portrait/landscape emulation, one worker, local dev/preview on `http://127.0.0.1:4173/`. Browser plugin unavailable. Visual inspection covered desktop/narrow standalone controls and second-encounter run captures; interaction checks include native modal focus, touch/pinch, commands, save/reload and encounter transitions. The standing repository policy accepts Playwright emulation for this work; no physical hardware or screen-reader test is claimed.
+
+Logs and screenshots are retained outside the repository at `C:/Users/apexw/.codex/tmp/pr119-merge/`: `red.txt`, `green.txt`, `unit.txt`, `build-final.txt`, `full.txt`, `posttests.txt`, `webkit.txt`, `focus-probe.mjs`, `heading-red.txt`, `build-heading.txt`, `final-focus.txt`, `final-webkit.txt`, `final-health.txt`, `build-focus.txt`, `verified-controls.txt`, `verified-webkit.txt`, `verified-health.txt`, `verified-posttests.txt` and their artifact folders. `verify-final.ps1` retains the exact final command sequence, including the affected-control selection and three WebKit repeats. Earlier failure logs remain evidence, not unresolved product findings. Existing bundle-size warnings and separately tracked performance/release acceptance remain outside this merge.
 ## PR #119 review repairs — 2026-10-16
 
 Repair source/test commit: `617830999bd4fc7539b47188b1b41b1bcf1f7b4e`, on `453cf2d`, containing main `21f5023`. Both published P2 findings were valid and reproduced before editing runtime code.
