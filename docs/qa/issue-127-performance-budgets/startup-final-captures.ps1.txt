@@ -1,0 +1,21 @@
+$ErrorActionPreference = 'Stop'
+$runningTests = Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'playwright.*\btest\b' }
+if ($runningTests) { throw 'Do not overlap acceptance capture with browser tests.' }
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+$captureSpecs = @(
+  @{Name='startup-final-preview-battle'; Url='https://b0761a21.tactics-guru-v2.pages.dev/'},
+  @{Name='startup-final-preview-run'; Url='https://b0761a21.tactics-guru-v2.pages.dev/run'},
+  @{Name='startup-final-local-battle'; Url='http://127.0.0.1:4199/'},
+  @{Name='startup-final-local-run'; Url='http://127.0.0.1:4199/run'}
+)
+foreach ($captureSpec in $captureSpecs) {
+  $receiptPath = "docs/qa/issue-127-performance-budgets/$($captureSpec.Name).json"
+  $evaluationPath = "docs/qa/issue-127-performance-budgets/$($captureSpec.Name)-gates.json"
+  if ((Test-Path -LiteralPath $receiptPath) -or (Test-Path -LiteralPath $evaluationPath)) { throw "Preserve existing attempt: $receiptPath" }
+  node --experimental-strip-types scripts/measure-fit.ts $receiptPath --scene battle --url $captureSpec.Url *> "tmp/$($captureSpec.Name).log"
+  if ($LASTEXITCODE -ne 0) { throw "Invalid capture retained at $receiptPath" }
+  node -e "const r=JSON.parse(require('fs').readFileSync(process.argv[1]));if(r.measuredBuild?.commit!=='06ad2435c28c96b1614eb083acd8f953f76c8fe7'||r.measuredBuild.dirty||r.samples.length!==18||r.failures.length)throw Error('Unexpected source or incomplete capture');" $receiptPath
+  if ($LASTEXITCODE -ne 0) { throw "Source/completeness mismatch retained at $receiptPath" }
+  node --experimental-strip-types scripts/evaluate-fit.ts $receiptPath $evaluationPath
+  # Evaluator exit 1 is a numeric budget result; preserve it without replacing samples.
+}

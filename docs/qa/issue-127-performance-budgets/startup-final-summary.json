@@ -1,0 +1,137 @@
+{
+  "browser": "155.0.4283.45",
+  "samples": 72,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "floatNoiseToleranceMs": 0.000001,
+  "allGatesPass": false,
+  "captures": {
+    "startup-final-preview-battle": {
+      "commit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+      "measuredAt": "2026-10-17T22:39:54.303Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 380113,
+        "max": 380261
+      },
+      "coldUsableMs": {
+        "min": 774.8000000119209,
+        "max": 1489.199999988079
+      },
+      "warmUsableMs": {
+        "min": 639.6000000238419,
+        "max": 691.4000000357628
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.399999976158142,
+      "worstInteractionP95Ms": 11.099999964237213,
+      "duplicateImageRequests": [],
+      "violations": {}
+    },
+    "startup-final-preview-run": {
+      "commit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+      "measuredAt": "2026-10-17T22:41:00.261Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 1,
+      "coldCodeBytes": {
+        "min": 388744,
+        "max": 388860
+      },
+      "coldUsableMs": {
+        "min": 841.5,
+        "max": 1057.800000011921
+      },
+      "warmUsableMs": {
+        "min": 677.5,
+        "max": 777.3999999761581
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.399999976158142,
+      "worstInteractionP95Ms": 12.199999988079071,
+      "duplicateImageRequests": [],
+      "violations": {
+        "usableMs": 1
+      }
+    },
+    "startup-final-local-battle": {
+      "commit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+      "measuredAt": "2026-10-17T22:42:02.405Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 379530,
+        "max": 379530
+      },
+      "coldUsableMs": {
+        "min": 573.3999999761581,
+        "max": 743.6000000238419
+      },
+      "warmUsableMs": {
+        "min": 584.5,
+        "max": 670.4000000357628
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.300000011920929,
+      "worstInteractionP95Ms": 10.800000011920929,
+      "duplicateImageRequests": [],
+      "violations": {}
+    },
+    "startup-final-local-run": {
+      "commit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+      "measuredAt": "2026-10-17T22:43:05.836Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 387804,
+        "max": 387804
+      },
+      "coldUsableMs": {
+        "min": 651.2000000476837,
+        "max": 877.8999999761581
+      },
+      "warmUsableMs": {
+        "min": 664.3999999761581,
+        "max": 713.6999999880791
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.599999964237213,
+      "worstInteractionP95Ms": 15.199999988079071,
+      "duplicateImageRequests": [],
+      "violations": {}
+    }
+  },
+  "rawCaptureSha256": {
+    "startup-final-preview-battle.json": "1a0ce86e37a905d67b7558b272a7b999a3f168396a47dabf688976bda78acffc",
+    "startup-final-preview-run.json": "a9d176b7ab1c079e66dcde7f910a7efda1ec2a2618ffccff25976d5252b89166",
+    "startup-final-local-battle.json": "25711d0638dc22a4ad1ac27cef045711a6c96161a2c9bf587057dd1f20e90b4b",
+    "startup-final-local-run.json": "09a260a0482fe6c7b97c7fb52935bf303570e3be20612e268afe38ef7428e8e7"
+  }
+}

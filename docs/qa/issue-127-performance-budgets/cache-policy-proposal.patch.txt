@@ -1,0 +1,36 @@
+Proposed follow-up to PR #133; not applied.
+
+Outcome: avoid network revalidation of generated, content-hashed JS/CSS on warm loads.
+Scope: emit Cloudflare Pages _headers alongside the build, using exact emitted paths
+and the configured base. No rule matches HTML, fixed-name images/audio, saves or APIs.
+No dashboard changes, production deployment, merge or release tag are proposed.
+
+Implementation addition inside the existing build-only Vite plugin:
+
+    generateBundle(_options, bundle) {
+      const root = new URL(base, 'https://build.invalid').pathname;
+      const paths = Object.values(bundle)
+        .map(file => file.fileName)
+        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
+      this.emitFile({ type: 'asset', fileName: '_headers', source: paths
+        .map(file => `${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`)
+        .join('\n') });
+    },
+
+OpenSpec revisions required before implementation:
+- proposal/design: select this narrow cache-policy source change as a separate chunk;
+  preserve the production-activation boundary and unchanged performance limits.
+- battle-frame-performance spec: retain honest delivery authorization and explicitly
+  allow this approved generated-header source change on the existing branch preview.
+- tasks: add generated-header root/prefix coverage, unchanged HTML/fixed-asset policy,
+  actual preview header/cache verification, full unchanged performance matrices, and
+  a focused stacked PR. Keep the 777.4 ms failure and every earlier attempt.
+
+Proof: inspect every generated rule against actual emitted files; root and /tactics/
+builds; inspect the preview's response headers; confirm warm JS/CSS cache reuse;
+rerun the same complete battle/run matrix without interception or cache disabling.
+Reuse functional results only after verifying application/public/package tree parity.
+
+Sources:
+https://developers.cloudflare.com/pages/configuration/headers/
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching

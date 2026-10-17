@@ -1,0 +1,193 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: public-asset-base.spec.ts >> proof direct entry and refresh resolve public assets
+- Location: tests/public-asset-base.spec.ts:36:3
+
+# Error details
+
+```
+Error: expect(locator).toHaveText(expected) failed
+
+Locator:  locator('#fit-status')
+Expected: "Ready"
+Received: "Loading"
+Timeout:  5000ms
+
+Call log:
+  - Expect "toHaveText" locator('#fit-status') with timeout 5000ms
+  - waiting for locator('#fit-status')
+    14 × locator resolved to <span role="status" id="fit-status" aria-live="polite">Loading</span>
+       - unexpected value "Loading"
+
+```
+
+```yaml
+- status: Loading
+```
+
+# Test source
+
+```ts
+  1   | import { expect, test } from '@playwright/test';
+  2   | import { battleCatalog } from '../src/content/catalog';
+  3   | import { BATTLE_CUES } from '../src/audio/battleCues';
+  4   | import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
+  5   | import { BattleSession } from '../src/app/BattleSession';
+  6   | import { readSession } from './helpers/battlePolicy';
+  7   | import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
+  8   | import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
+  9   | 
+  10  | for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
+  11  |   const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
+  12  |   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  13  |   await navigateCapture(page,target,'cold');
+  14  |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  15  |   const cold=await page.evaluate(()=>window.fitDiagnostics());
+  16  |   expect(cold.controlsUsableMs).not.toBeNull();
+  17  |   const point=await battleGesturePoint(page);
+  18  |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
+  19  |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);
+  20  |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();
+  21  |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);
+  22  |   await page.evaluate(()=>{
+  23  |     localStorage.setItem('legacy-save','keep');
+  24  |     localStorage.setItem('tactics-guru:phaser:unrelated','keep');
+  25  |     for(const kind of ['battle','run']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
+  26  |   });
+  27  |   await navigateCapture(page,target,'warm');
+  28  |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  29  |   await expect(page.getByRole('dialog')).not.toBeVisible();
+  30  |   expect(await page.evaluate(()=>[localStorage.getItem('legacy-save'),localStorage.getItem('tactics-guru:phaser:unrelated')])).toEqual(['keep','keep']);
+  31  |   expect(errors).toEqual([]);
+  32  |   await page.screenshot({path:test.info().outputPath(`collector-${route || 'battle'}-warm.png`)});
+  33  | });
+  34  | 
+  35  | for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
+  36  |   test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {
+  37  |     const paths = new Map<string, number>(), errors: string[] = [];
+  38  |     page.on('request', request => {
+  39  |       const path = new URL(request.url()).pathname;
+  40  |       paths.set(path, (paths.get(path) ?? 0) + 1);
+  41  |     });
+  42  |     page.on('pageerror', error => errors.push(error.message));
+  43  |     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  44  |     const base = new URL(baseURL!).pathname;
+  45  |     const expected = scene === 'proof' ? PROOF_ASSETS.map(asset => asset.url)
+  46  |       : [...Object.values(battleCatalog.assets).map(asset => asset.runtimePath),
+  47  |         ...(scene === 'battle' ? Object.values(BATTLE_CUES).map(cue => cue.url) : [])];
+  48  |     await page.goto(`./?scene=${scene}`);
+  49  |     for (let visit = 0; visit < 2; visit++) {
+  50  |       if (visit) {
+  51  |         paths.clear();
+  52  |         await page.reload();
+  53  |         if (scene === 'battle') await page.locator('#save-continue').click();
+  54  |       }
+> 55  |       await expect(page.locator('#fit-status')).toHaveText(scene === 'proof' ? 'Ready' : scene === 'battle' ? 'Battle ready' : 'Content ready');
+      |                                                 ^ Error: expect(locator).toHaveText(expected) failed
+  56  |       await expect(page.locator('canvas')).toHaveCount(1);
+  57  |       for (const path of expected) await expect.poll(() => paths.has(base + path.slice(1))).toBe(true);
+  58  |       if (base !== '/') for (const path of expected) expect(paths.has(path)).toBe(false);
+  59  |       if (scene !== 'content-smoke') {
+  60  |         const portraits = page.locator(scene === 'proof' ? '#proof-portrait' : '#battle-portraits img');
+  61  |         expect(await portraits.count()).toBeGreaterThan(0);
+  62  |         await expect.poll(() => portraits.evaluateAll(images => images.every(image => {
+  63  |           const img = image as HTMLImageElement;
+  64  |           return img.complete && img.naturalWidth > 0;
+  65  |         }))).toBe(true);
+  66  |         for (const src of await portraits.evaluateAll(images => images.map(image => (image as HTMLImageElement).src))) {
+  67  |           expect(new URL(src).pathname.startsWith(base)).toBe(true);
+  68  |         }
+  69  |         if (scene === 'proof') {
+  70  |           await expect(page.locator('#audio-play')).toBeEnabled();
+  71  |           await page.locator('#audio-play').click();
+  72  |           await expect(page.locator('#audio-status')).toHaveText('Played');
+  73  |         } else {
+  74  |           // A base change must not alter the seeded state or save identity.
+  75  |           await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  76  |           const expectedSession = new BattleSession(battleCatalog, 'map:forest_ruins', 1);
+  77  |           while (expectedSession.phase === 'enemy') {
+  78  |             const step = expectedSession.nextEnemy()!;
+  79  |             expectedSession.finishPresentation(step.token);
+  80  |           }
+  81  |           expect((await readSession(page)).state).toEqual(expectedSession.state);
+  82  |           await page.locator('#battle-sound').click();
+  83  |           await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
+  84  |           // The scene, early hint and portrait share one image request per visit.
+  85  |           for (const asset of Object.values(battleCatalog.assets)) expect(paths.get(base + asset.runtimePath.slice(1)), asset.id).toBe(1);
+  86  |         }
+  87  |       }
+  88  |     }
+  89  |     expect(errors).toEqual([]);
+  90  |     await page.screenshot({ path: test.info().outputPath(`${scene}.png`) });
+  91  |   });
+  92  | }
+  93  | 
+  94  | for (const backend of ['Web Audio', 'HTML5']) test(`${backend} battle audio loads at the base and plays a committed move`, async ({ page }) => {
+  95  |   if (backend === 'HTML5') await page.addInitScript(() => {
+  96  |     Object.defineProperty(window, 'AudioContext', { value: undefined });
+  97  |     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
+  98  |   });
+  99  |   await page.goto('./');
+  100 |   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  101 |   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load)).toBe('ready');
+  102 |   await page.locator('#battle-sound').click();
+  103 |   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
+  104 |   await page.locator('#battle-move').click();
+  105 |   await page.locator('#battle-target').selectOption({ index: 1 });
+  106 |   await page.locator('#battle-review').click();
+  107 |   await page.locator('#dialog-confirm').click();
+  108 |   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.completed)).toBeGreaterThan(0);
+  109 |   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  110 | });
+  111 | 
+  112 | test('content fixture uses the base and still validates input', async ({ page, baseURL }) => {
+  113 |   const fixtureURL = new URL('battle/content-fixture.json', baseURL!).href;
+  114 |   await page.route(fixtureURL, route => route.fulfill({ json: { invalid: true } }));
+  115 |   await page.goto('./?scene=content-smoke&contentFixture=1');
+  116 |   await expect(page.locator('#fit-status')).toContainText('Invalid content:');
+  117 |   await expect(page.locator('#fit-status')).not.toContainText('fixture could not load');
+  118 | });
+  119 | 
+  120 | test('extracted map route still loads directly and on refresh at the base', async ({ page }) => {
+  121 |   const requests:string[]=[];page.on('request',r=>requests.push(new URL(r.url()).pathname));
+  122 |   await page.goto('./map');
+  123 |   await expect(page.locator('#map-grid span')).toHaveCount(400);
+  124 |   await page.reload();
+  125 |   await expect(page.locator('#map-grid span')).toHaveCount(400);
+  126 |   await expect(page.locator('canvas')).toHaveCount(0);
+  127 |   expect(requests.some(path=>/\/(?:start(?:Battle|Run)App|start)-[^/]+\.js$/.test(path) || /\/src\/phaser\//.test(path))).toBe(false);
+  128 | });
+  129 | 
+  130 | test('built startup hints preserve a supplied script nonce', async ({page})=>{
+  131 |   test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Resource hints are a production-build behavior');
+  132 |   const nonce='preload-test-nonce',errors:string[]=[];
+  133 |   page.on('pageerror',e=>errors.push(e.message));
+  134 |   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  135 |   await page.route('**/*',async route=>{
+  136 |     if(route.request().resourceType()!=='document'){await route.continue();return;}
+  137 |     const response=await route.fetch();
+  138 |     const body=(await response.text()).replace(/<script([^>]*\bdata-game-preloads\b[^>]*)>/,
+  139 |       (_tag,attrs:string)=>`<script nonce="${nonce}"${attrs.replace(/\snonce="[^"]*"/g,'')}>`);
+  140 |     const headers:Record<string,string>={...response.headers(),'content-security-policy':`script-src 'self' 'nonce-${nonce}'`};
+  141 |     for(const name of ['content-encoding','content-length','transfer-encoding'])delete headers[name];
+  142 |     await route.fulfill({status:response.status(),headers,body});
+  143 |   });
+  144 |   await page.goto('./');
+  145 |   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  146 |   await expect(page.locator('script[data-game-preloads]')).toHaveCount(1);
+  147 |   const engineHints=page.locator('link[rel="modulepreload"][href*="/assets/start-"]');
+  148 |   expect(await engineHints.count()).toBeGreaterThan(0);
+  149 |   expect(await engineHints.evaluateAll((links,expected)=>links.every(link=>(link as HTMLLinkElement).nonce===expected),nonce)).toBe(true);
+  150 |   expect(errors).toEqual([]);
+  151 | });
+  152 | 
+  153 | for (const scene of ['battle', 'content-smoke']) for (const failure of ['missing', 'corrupt', 'stalled', 'dimensions'] as const) {
+  154 |   test(`${scene} image ${failure} stays controlled at the base`, async ({ page }) => {
+  155 |     const errors: string[] = [];
+```

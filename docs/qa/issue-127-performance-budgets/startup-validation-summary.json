@@ -1,0 +1,208 @@
+{
+  "measuredRuntimeCommit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+  "currentSourceCommit": "9382f135be8b845b2a5425c16c3ea1badc5a00f0",
+  "testOnlyChanges": [
+    "tests/battle-board.spec.ts",
+    "tests/public-asset-base.spec.ts"
+  ],
+  "unchangedRuntimeInputs": {
+    "src": "52aafbff15732e76ce20674330995c7df6a5cf2b",
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "vite.config.ts": "9669a96e2e5640ef91be7cdb964d826467976f89",
+    "index.html": "ab88c53028a4f6d8151f3eb779d0bf8897478d4c",
+    "package.json": "e84a0a7f8f6fc6a368d5059f255ddf1c9824da65",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+    "tsconfig.json": "072c6d9d3b8770da23bddd41db2e0fc477b9895b",
+    "tsconfig.domain.json": "231561e38f4baf69afd169d885edd1f6e31fa62a"
+  },
+  "unitTests": 697,
+  "contentChecks": 167,
+  "typechecks": 2,
+  "allRequiredCasesHavePassingEvidence": true,
+  "cleanFirstAttempt": false,
+  "proofTimeoutDisposition": "One initial WebKit portrait proof readiness timeout remains retained and unreproduced. Baseline/candidate exact-case repeats and the final native-touch sequence pass; no causal application fix is claimed.",
+  "inputDisposition": "One synthetic-mouse activation remained muted during a diagnostic sequence. The asset-path test now uses native taps on touch profiles; desktop retains mouse clicks. All 18 targeted root/prefix/WebKit cases pass. Product audio handling is unchanged.",
+  "fixtureDisposition": "The board smoke fixture expected duplicate portrait requests. It now requires one request for every image; all three repaired profiles pass.",
+  "reports": {
+    "startup-final-browser": {
+      "startTime": "2026-10-17T22:43:19.654Z",
+      "duration": 1719935.768,
+      "expected": 516,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0,
+      "failures": [
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "desktop",
+          "messages": [
+            "Error: expect(received).toHaveLength(expected)\n\nExpected length: 2\nReceived length: 1\nReceived array:  [\"/battle/portraits/fighter.png\"]\n\n  202 |   }\n  203 |   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());\n> 204 |   for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);\n      |                                                                                                                  ^\n  205 |   expect(errors).toEqual([]);\n  206 | });\n  207 |\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-board.spec.ts:204:114"
+          ]
+        },
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "mobile-portrait",
+          "messages": [
+            "Error: expect(received).toHaveLength(expected)\n\nExpected length: 2\nReceived length: 1\nReceived array:  [\"/battle/portraits/fighter.png\"]\n\n  202 |   }\n  203 |   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());\n> 204 |   for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);\n      |                                                                                                                  ^\n  205 |   expect(errors).toEqual([]);\n  206 | });\n  207 |\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-board.spec.ts:204:114"
+          ]
+        },
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "mobile-landscape",
+          "messages": [
+            "Error: expect(received).toHaveLength(expected)\n\nExpected length: 2\nReceived length: 1\nReceived array:  [\"/battle/portraits/fighter.png\"]\n\n  202 |   }\n  203 |   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());\n> 204 |   for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);\n      |                                                                                                                  ^\n  205 |   expect(errors).toEqual([]);\n  206 | });\n  207 |\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-board.spec.ts:204:114"
+          ]
+        }
+      ]
+    },
+    "startup-final-board-recheck": {
+      "startTime": "2026-10-17T23:12:53.264Z",
+      "duration": 17864.213,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-final-encounters": {
+      "startTime": "2026-10-17T23:13:11.508Z",
+      "duration": 36741.401999999995,
+      "expected": 18,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-final-items": {
+      "startTime": "2026-10-17T23:13:48.612Z",
+      "duration": 18119.952,
+      "expected": 21,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-final-webkit": {
+      "startTime": "2026-10-17T23:14:08.240Z",
+      "duration": 466176.32,
+      "expected": 54,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-final-webkit-boundaries": {
+      "startTime": "2026-10-17T23:22:15.247Z",
+      "duration": 67125.12999999999,
+      "expected": 25,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0,
+      "failures": [
+        {
+          "title": "proof direct entry and refresh resolve public assets",
+          "project": "acceptance-webkit-portrait",
+          "messages": [
+            "Error: expect(locator).toHaveText(expected) failed\n\nLocator:  locator('#fit-status')\nExpected: \"Ready\"\nReceived: \"Loading\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toHaveText\" locator('#fit-status') with timeout 5000ms\n  - waiting for locator('#fit-status')\n    14 × locator resolved to <span role=\"status\" id=\"fit-status\" aria-live=\"polite\">Loading</span>\n       - unexpected value \"Loading\"\n\n\n  53 |         if (scene === 'battle') await page.locator('#save-continue').click();\n  54 |       }\n> 55 |       await expect(page.locator('#fit-status')).toHaveText(scene === 'proof' ? 'Ready' : scene === 'battle' ? 'Battle ready' : 'Content ready');\n     |                                                 ^\n  56 |       await expect(page.locator('canvas')).toHaveCount(1);\n  57 |       for (const path of expected) await expect.poll(() => paths.has(base + path.slice(1))).toBe(true);\n  58 |       if (base !== '/') for (const path of expected) expect(paths.has(path)).toBe(false);\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:55:49"
+          ]
+        }
+      ]
+    },
+    "startup-startup-final-prefix": {
+      "startTime": "2026-10-17T22:36:17.903Z",
+      "duration": 141515.22,
+      "expected": 63,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-proof-baseline-recheck": {
+      "startTime": "2026-10-17T23:28:08.939Z",
+      "duration": 18896.029,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-proof-candidate-recheck": {
+      "startTime": "2026-10-17T23:28:30.568Z",
+      "duration": 18146.803,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-proof-sequence-recheck": {
+      "startTime": "2026-10-17T23:30:23.011Z",
+      "duration": 36142.827,
+      "expected": 11,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0,
+      "failures": [
+        {
+          "title": "battle direct entry and refresh resolve public assets",
+          "project": "acceptance-webkit-portrait",
+          "messages": [
+            "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: \"ready\"\nReceived: \"muted\"\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  81 |           expect((await readSession(page)).state).toEqual(expectedSession.state);\n  82 |           await page.locator('#battle-sound').click();\n> 83 |           await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');\n     |                                                                                                     ^\n  84 |           // The scene, early hint and portrait share one image request per visit.\n  85 |           for (const asset of Object.values(battleCatalog.assets)) expect(paths.get(base + asset.runtimePath.slice(1)), asset.id).toBe(1);\n  86 |         }\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:83:101"
+          ]
+        }
+      ]
+    },
+    "startup-webkit-input-diagnostic": {
+      "startTime": "2026-10-17T23:35:43.533Z",
+      "duration": 22300.971999999998,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-native-touch-root": {
+      "startTime": "2026-10-17T23:39:44.766Z",
+      "duration": 7179.799,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-native-touch-prefix": {
+      "startTime": "2026-10-17T23:39:52.354Z",
+      "duration": 8432.255000000001,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    },
+    "startup-native-touch-webkit": {
+      "startTime": "2026-10-17T23:40:03.463Z",
+      "duration": 31247.957,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "failures": []
+    }
+  },
+  "rawReportSha256": {
+    "startup-final-browser.json": "3a0ef1f6b3a9e30d64eac9234de4a82d88c7fb8c4e1f77bfd518c2e0efe014c9",
+    "startup-final-board-recheck.json": "6ccd89ece99d29e5416541703025ef71fea9e1e05f3d681d653550a768ce1d22",
+    "startup-final-encounters.json": "f7b51f78ab57019fce6af75ecc891bc9d8a0ff175aa25d7347fa4430fe90d4b5",
+    "startup-final-items.json": "2d2ac98d818cffd957d94fbcac48e4a1345a5b6cbda17565083287aaa965f2be",
+    "startup-final-webkit.json": "a01cf3efd7343f25af6e14ea9745d46d85e9730968258e3b4ba31302a7a4d83d",
+    "startup-final-webkit-boundaries.json": "2b3e313608f28fa64487bb5105a5d1ce1887208a455460f8bb1bcf3594d7492d",
+    "startup-startup-final-prefix.json": "55c2ecb9b514666e47de0b336627b61852d07dfaf50dc09ef0f45c159d9eb434",
+    "startup-proof-baseline-recheck.json": "bd69b4c12991a13d0bd63e5fd973b17a0c4700e5e1a77211f3ebbdb4980ea555",
+    "startup-proof-candidate-recheck.json": "403b121b91654e10a87997c99db2f54c034d4e50b906344b140164344c480075",
+    "startup-proof-sequence-recheck.json": "7d8046b800d5a7cedbbd7bdd9b13e86ddf4e62d34f2ee7405cd483d156b32e76",
+    "startup-webkit-input-diagnostic.json": "4617b7fac5032f6e432bd1b37581022cf24c0a9e95f303ffb0ee60b02a1a36c5",
+    "startup-native-touch-root.json": "683c1d619fd543f0416169c101e4bde6b1eab7b54a4d01f5819198ede328f827",
+    "startup-native-touch-prefix.json": "3ec557fa4dfedffb54ef6ed1c015728300eee6197d4904715a8c78a6260302c9",
+    "startup-native-touch-webkit.json": "4b9de291307214a59621139643e3090dc36646f400f2b07ed4c234b54c8c81f1"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "baseline": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+  "candidate": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+  "main": "a009a3ec4c35b3e57adc58ac700e56721af9ae8f",
+  "sharedInputs": {
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "index.html": "ab88c53028a4f6d8151f3eb779d0bf8897478d4c",
+    "package.json": "e84a0a7f8f6fc6a368d5059f255ddf1c9824da65",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7"
+  },
+  "sourceDifferences": [
+    "src/phaser/contentLoading.ts"
+  ],
+  "files": {
+    "vite.config.ts": {
+      "gitBlob": "9669a96e2e5640ef91be7cdb964d826467976f89",
+      "checkoutSha256": "a9b9d7f263430f40d8ceac2a7c58f7795b6fffe84747a6ceff327d564600e984"
+    },
+    "src/phaser/contentLoading.ts": {
+      "gitBlob": "2468e971a5b3c17fb05441778c1259d41ad484e8",
+      "checkoutSha256": "f5a56fe3ea40c47b2a2b4beccab48367d3d3bec108b98463d26820a7a87cbbc4"
+    },
+    "tests/public-asset-base.spec.ts": {
+      "gitBlob": "f58f264d7bb8f156c778ec3db9e4ae11ad280906",
+      "checkoutSha256": "2b2185c2f6a742ca2bb1b3c90c77dc78bae8bcf7ef80fc838b91b5c6dd4a5c55"
+    }
+  },
+  "collectorSha256": {
+    "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+    "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+    "measure-fit-evaluate.ts": "45d68ddb87c0b5bd83caeca1e08a9aa5d51408d0c4a026b859facd0deca27fde"
+  },
+  "collectorSourceDirectory": "collector-v4-final",
+  "runtimeDifference": "Route-specific build HTML hints and the existing content loader selecting Phaser HTMLImageElement transport. No other application/public/package changes relative to f28f331.",
+  "preview": "https://b0761a21.tactics-guru-v2.pages.dev/",
+  "local": "http://127.0.0.1:4199/",
+  "buildNote": "Root and prefix artifacts were built from clean 06ad243 before additional QA files. Collector sourceDirty reflects accumulated QA, not dirty served artifacts."
+}

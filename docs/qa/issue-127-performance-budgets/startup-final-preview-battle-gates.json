@@ -1,0 +1,255 @@
+{
+  "floatNoiseToleranceMs": 0.000001,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "build": {
+    "commit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+    "dirty": false
+  },
+  "captureFailures": [],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1489.199999988079,
+        "codeBytes": 380261,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.899999976158142
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 661.3999999761581,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.400000035762787
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 780.6000000238419,
+        "codeBytes": 380180,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 681.4000000357628,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.399999976158142
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 785.1999999880791,
+        "codeBytes": 380261,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 685.6999999880791,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.600000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 800.0999999642372,
+        "codeBytes": 380180,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 690.8999999761581,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 10.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 803.8000000119209,
+        "codeBytes": 380113,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.300000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 691.4000000357628,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 10.099999964237213
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 783.8000000119209,
+        "codeBytes": 380180,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.300000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 645.5,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 10.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 787.8000000119209,
+        "codeBytes": 380180,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 645.6000000238419,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 10.300000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 774.8000000119209,
+        "codeBytes": 380261,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 639.6000000238419,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 10
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 782.2000000476837,
+        "codeBytes": 380180,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 645.6000000238419,
+        "codeBytes": 4840,
+        "assetBytes": 6900,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 10.399999976158142
+      },
+      "violations": []
+    }
+  ],
+  "failedSamples": 0,
+  "passed": true
+}

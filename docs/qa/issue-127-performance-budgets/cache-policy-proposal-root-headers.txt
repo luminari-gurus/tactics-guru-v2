@@ -1,0 +1,38 @@
+/assets/index-CtE8Wep-.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/battleLayout-BVayxngr.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/browser-DnUF-IGp.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/preload-helper-DjzSQ1t3.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/rng-BCcJOpRP.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/start-DBWnUGcq.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/start-OTNKirRz.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/startBattleApp-DWGHwLWE.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/startRunApp-Bkx9aKL2.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/view-BnnHIjS4.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/battleLayout-C6wfuIJB.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/startRunApp-y3YtRGS5.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/view-BBW_du9E.css
+  Cache-Control: public, max-age=31536000, immutable

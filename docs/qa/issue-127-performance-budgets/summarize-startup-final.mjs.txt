@@ -1,0 +1,39 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {evaluateCapture,LIMITS,FLOAT_NOISE_MS} from '../scripts/measure-fit-evaluate.ts';
+const qa='docs/qa/issue-127-performance-budgets/';
+const source=JSON.parse(fs.readFileSync(qa+'current-source-binding.json'));
+const captures={},hashes={};
+for(const location of ['preview','local'])for(const route of ['battle','run']){
+  const name='startup-final-'+location+'-'+route,raw=fs.readFileSync(qa+name+'.json'),capture=JSON.parse(raw);
+  assert.equal(capture.measuredBuild.commit,'06ad2435c28c96b1614eb083acd8f953f76c8fe7');
+  assert.equal(capture.measuredBuild.dirty,false);
+  assert.deepEqual(capture.collectorSha256,source.collectorSha256);
+  assert.equal(capture.browserVersion,'155.0.4283.45');
+  const result=evaluateCapture(capture),saved=JSON.parse(fs.readFileSync(qa+name+'-gates.json'));
+  assert.deepEqual(result.rows,saved.rows);assert.deepEqual(result.captureFailures,[]);
+  assert.equal(result.rows.length,18);
+  const duplicates=[];
+  for(const sample of capture.samples){
+    const images=sample.diagnostics.resources.map(r=>new URL(r.url).pathname).filter(p=>p.endsWith('.png'));
+    for(const image of new Set(images))if(images.filter(p=>p===image).length!==1)duplicates.push({profile:sample.profile,repetition:sample.repetition,cache:sample.cache,image});
+  }
+  assert.deepEqual(duplicates,[],'Image requests must be reused without duplicate loads');
+  const cold=result.rows.filter(r=>r.cache==='cold'),warm=result.rows.filter(r=>r.cache==='warm');
+  const violations={};for(const row of result.rows)for(const v of row.violations)violations[v.metric]=(violations[v.metric]??0)+1;
+  const range=values=>({min:Math.min(...values),max:Math.max(...values)});
+  captures[name]={commit:capture.measuredBuild.commit,measuredAt:capture.measuredAt,samples:18,captureFailures:0,
+    budgetFailedSamples:result.failedSamples,coldCodeBytes:range(cold.map(r=>r.values.codeBytes)),
+    coldUsableMs:range(cold.map(r=>r.values.usableMs)),warmUsableMs:range(warm.map(r=>r.values.usableMs)),
+    coldAssetBytes:range(cold.map(r=>r.values.assetBytes)),
+    worstIdleP50Ms:Math.max(...result.rows.map(r=>r.values.idleP50Ms)),
+    worstIdleP95Ms:Math.max(...result.rows.map(r=>r.values.idleP95Ms)),
+    worstInteractionP95Ms:Math.max(...capture.samples.flatMap(s=>s.diagnostics.workloads.filter(w=>['pan','zoom','move'].includes(w.action)).map(w=>w.frames.p95Ms))),
+    duplicateImageRequests:duplicates,violations};
+  hashes[name+'.json']=createHash('sha256').update(raw).digest('hex');
+}
+const summary={browser:'155.0.4283.45',samples:72,limits:LIMITS,floatNoiseToleranceMs:FLOAT_NOISE_MS,
+  allGatesPass:Object.values(captures).every(c=>c.budgetFailedSamples===0),captures,rawCaptureSha256:hashes};
+fs.writeFileSync(qa+'startup-final-summary.json',JSON.stringify(summary,null,2)+'\n');
+console.log(JSON.stringify(summary,null,2));
