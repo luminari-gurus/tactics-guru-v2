@@ -1,0 +1,10 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { evaluateCapture, LIMITS, FLOAT_NOISE_MS } from './measure-fit-evaluate.ts';
+
+const [input, output] = process.argv.slice(2);
+if (!input || !output || process.argv.length !== 4 || resolve(input) === resolve(output)) throw new Error('Usage: node --experimental-strip-types scripts/evaluate-fit.ts <capture.json> <evaluation.json> (distinct paths)');
+const evaluation = evaluateCapture(JSON.parse(await readFile(input, 'utf8')));
+await writeFile(output, JSON.stringify({floatNoiseToleranceMs:FLOAT_NOISE_MS,limits:LIMITS,...evaluation},null,2)+'\n');
+console.log(`${evaluation.rows.length} samples; ${evaluation.failedSamples} budget failures; ${evaluation.captureFailures.length} capture failures. ${output}`);
+if (!evaluation.passed) process.exitCode=1;

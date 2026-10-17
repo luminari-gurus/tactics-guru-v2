@@ -35,18 +35,22 @@ export function parseMeasureArgs(argv: readonly string[], env: { FIT_URL?: strin
   let parsed: URL | null = null;
   try { parsed = new URL(url); } catch { /* reported below */ }
   if (parsed === null || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')) throw new Error(`--url must be an absolute http(s) URL; got "${url}"`);
-  return { output: output ?? DEFAULT_OUTPUT, url: url.replace(/\/+$/, ''), remote: true, scene };
+  // A prefixed document URL needs its trailing slash (Vite and other static hosts
+  // distinguish /game/ from /game). Only canonicalize the origin-root spelling.
+  const originOnly = parsed.pathname === '/' && !parsed.search && !parsed.hash;
+  return { output: output ?? DEFAULT_OUTPUT, url: originOnly ? parsed.origin : parsed.href, remote: true, scene };
 }
 
 /** The `conditions` block written into the results file. */
 export function collectorConditions(options: MeasureOptions) {
+  const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(options.url).hostname);
   return {
     url: options.url,
     mode: 'headless Chromium; mobile profiles are emulation',
-    network: options.remote
-      ? 'host network to the deployed origin over HTTPS, CDN and TLS included; no throttling'
+    network: options.remote && !loopback
+      ? `host network to the supplied origin over ${new URL(options.url).protocol.slice(0, -1).toUpperCase()}; no throttling; inspect response encodings`
       : 'unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview',
-    cache: options.remote
+    cache: options.remote && !loopback
       ? 'cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes'
       : 'cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes',
     frames: options.scene === 'proof'
@@ -69,8 +73,10 @@ export function buildIdentity(samples: readonly { diagnostics: { build: BuildIde
 /** Shared route and real readiness control, used by local and remote captures. */
 export function captureTarget(options: MeasureOptions) {
   const url = new URL(options.url);
+  const run = /\/run\/?$/.test(url.pathname);
+  if (run && options.scene !== 'battle') throw new Error('The run route requires --scene battle');
   url.searchParams.set('scene', options.scene);
-  return {url: url.href, restart: options.scene === 'battle' ? 'Restart battle' : 'Restart proof scene'};
+  return {url: url.href, route: run ? 'run' as const : options.scene, restart: run ? 'Start new run' : options.scene === 'battle' ? 'Restart battle' : 'Restart proof scene'};
 }
 
 /** Validate without losing the raw samples when identity or browser checks fail. */

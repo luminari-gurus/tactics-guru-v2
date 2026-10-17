@@ -1,6 +1,18 @@
 # Issue #127 — restore battle and run performance budgets
 
-Updated 2026-10-17 (Asia/Jerusalem). **Planning only; implementation has not started.**
+Updated 2026-10-17 (Asia/Jerusalem). **Implementation authorized and in progress.**
+
+## Current execution handoff
+
+The caller explicitly requested implementation with OpenSpec, ablation, autonomous issue repair and focused PR publication. That supersedes the historical planning-only pause below. Use OpenSpec change `issue-127-performance-budgets` and [current QA](../qa/issue-127-performance-budgets.md). No deployment, release tag or parent-issue closure is implied.
+
+Refreshed `origin/main` remains `0b317e35bb5c4ce713c242311f0673fc27923637`; planning head is `c4ec0d0`. #127 remains assigned to `moshehbenavraham`; PR #119 remains open at `2b419eff`, and #128 remains assigned to `florysaxz`. Their work is preserved. The clean baseline worktree is `tmp/baseline` at exact main; it is a detached checkout with ignored build/dependencies.
+
+**Outcome:** preserve the complete game while producing reliable source-bound budget evidence and the measured critical-code remedy. **Non-goals:** runtime redesign, new assets, dependency updates, deployment or release configuration. **Files:** existing measurement scripts/tests, selected scene boot modules, these OpenSpec/QA documents. **Proof:** retained-data equivalence, actual-control complete capture matrices, required functional suites, both typechecks and production builds. The ablation pass retains the planned seams and removes any need for a second collector or speculative frame-loop optimization.
+
+Publication sequence: finish and publish the collector/evaluator chunk on the requested branch, then stack the measured scene-loading chunk. Completed chunks are review-ready per the caller; all unmet deployed/budget acceptance remains explicit with `Refs #127`. The aggregate issue remains open until its gates pass.
+
+Progress: **5/12 OpenSpec tasks complete** (baseline and collector/evaluator). Historical gate reevaluation exactly matches the original. Complete fresh local and deployed-main matrices plus rejected attempts are retained in QA. Local cold code remains 407,286 battle / 415,497 run bytes. Current deployed main still fails transfer and has warm-loading/frame failures; the old deployed build is no longer served. The collector handles real run startup, warm storage isolation, prefixed paths and source identity; 36 focused unit tests, both typechecks, 45 root-route tests and six prefixed collector tests pass. A real trailing-slash collector bug found in the prefix check was fixed and its failed run retained. Next: publish this completed collector chunk, stack `branch/issue-127-scene-loading`, isolate scene imports, and measure the result before selecting further optimization. Full final suites, profiling and candidate matrices remain pending.
 
 - Issue: [#127 — Resolve deployed cold-code transfer and run idle-budget failures](https://github.com/luminari-gurus/tactics-guru-v2/issues/127).
 - Owner: `moshehbenavraham`; [we're-on-it comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/127#issuecomment-6238136484).
@@ -77,9 +89,9 @@ The retained evaluator has fixed `/tmp` input/output names; use a scratch copy w
 
 ## Completion and authorization boundary
 
-This session's deliverable is the assigned issue, kickoff comment, reviewed planning artifacts, committed/pushed branch and native issue link. No runtime tests, optimization or fresh deployed capture is performed as part of planning. All implementation checkboxes remain open.
+The original planning session delivered the assigned issue, kickoff comment, reviewed artifacts and published branch. The implementation session is now authorized; its current status and evidence are recorded above and in the QA report.
 
-Implementation starts after approval of this concrete plan. The repository [work-work-work skill](../../.agents/skills/work-work-work/SKILL.md) states: “Implementation requires explicit approval of the concrete implementation plan.” The user requested planning and branch publication in this session. Production deployment, release-target changes and closing #57/#64/#81 are not implied by either step. If implementation leaves deployed verification or a budget unmet, publish a draft PR with `Refs #127`; use `Closes #127` only when all its criteria are verified.
+The caller's implementation request supplies approval of this concrete plan. Production deployment, release-target changes and closing #57/#64/#81 remain separate. Publish completed focused chunks ready for review, as explicitly requested, with `Refs #127` while any budget or deployed verification is unmet; use `Closes #127` only when all criteria are verified.
 
 Planning validation passed strict OpenSpec, 31 local document links, four acceptance mappings and 12 unchecked implementation tasks. No runtime validation is implied. Final whitespace, staged scope, issue assignment/comment/native branch linkage, clean Git status and local/remote parity are checked at publication; the resulting commit and receipts are recorded in the linked issue comment. The prior project handoff below is preserved as historical context; the #127 plan above governs this branch.
 

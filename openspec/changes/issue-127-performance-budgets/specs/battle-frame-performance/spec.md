@@ -37,7 +37,7 @@ Evidence SHALL use only the existing approved release path. Missing release acce
 
 #### Scenario: Acceptance remains incomplete
 - **WHEN** a deployed gate fails or the approved release cannot serve the intended build
-- **THEN** retained evidence states the gap and delivery remains a draft referencing issue #127 without closing it
+- **THEN** retained evidence states the gap and completed focused chunks are published ready for review, as explicitly requested by the caller, referencing issue #127 without closing it
 - **AND** #57, #64 and #81 retain their own acceptance decisions; unavailable physical hardware alone is not a gate under the standing device policy
 
 #### Scenario: Local optimization verification

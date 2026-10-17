@@ -1,5 +1,69 @@
 import { describe, expect, it } from 'vitest';
 import { FitMeasurements } from '../../src/diagnostics/measurements';
+import { readFileSync } from 'node:fs';
+import { evaluateCapture, type Capture } from '../../scripts/measure-fit-evaluate';
+
+describe('capture acceptance', () => {
+  const receipt = (route = 'run'): Capture => JSON.parse(readFileSync(`docs/qa/device-acceptance-2026-10-17/deployed-${route}.json`,'utf8'));
+  const gates = JSON.parse(readFileSync('docs/qa/device-acceptance-2026-10-17/gates.json','utf8')).captures;
+  for (const route of ['battle','run']) it(`exactly reproduces retained ${route} numeric gates`, () => {
+    const evaluation = evaluateCapture(receipt(route));
+    expect(evaluation.captureFailures).toEqual([]);
+    expect(evaluation.rows).toEqual(gates[route].rows);
+    expect(evaluation.failedSamples).toBe(route === 'battle' ? 9 : 10);
+    expect(evaluation.passed).toBe(false);
+  });
+  const invalid: [string,(c: Capture) => void][] = [
+    ['missing sample',c => {c.samples.pop();}],
+    ['duplicate sample',c => {c.samples[1]=structuredClone(c.samples[0]);}],
+    ['dirty build',c => {c.samples.forEach(s => {s.diagnostics.build.dirty=true;});}],
+    ['mixed build',c => {c.samples[0].diagnostics.build.commit='a'.repeat(40);}],
+    ['idle build mismatch',c => {c.samples[0].idleDiagnostics.build.commit='a'.repeat(40);}],
+    ['browser error',c => {c.samples[0].errors.push('error');}],
+    ['collector failure',c => {c.failures.push('timeout');}],
+    ['partial capture',c => {c.failedCapture={profile:'desktop'};}],
+    ['missing timing',c => {c.samples[0].diagnostics.controlsUsableMs=null;}],
+    ['invalid timing',c => {c.samples[0].diagnostics.controlsUsableMs=NaN;}],
+    ['missing workload',c => {c.samples[0].diagnostics.workloads=c.samples[0].diagnostics.workloads.filter(w=>w.action!=='zoom');}],
+    ['empty workload',c => {c.samples[0].diagnostics.workloads[0].intervalsMs=[];}],
+    ['missing raw idle',c => {c.samples[0].diagnostics.idleIntervalsMs=[];}],
+    ['fabricated summary',c => {c.samples[0].diagnostics.frames.medianMs=1;}],
+    ['invalid bytes',c => {c.samples[0].diagnostics.resources[0].transferBytes=-1;}],
+    ['missing navigation',c => {c.samples[0].diagnostics.resources.shift();}],
+    ['wrong method',c => {c.samples[0].diagnostics.measurementMethod.version=2;}],
+  ];
+  for (const [name,mutate] of invalid) it(`rejects ${name} instead of claiming acceptance`, () => {
+    const data=receipt();mutate(data);
+    const evaluated=evaluateCapture(data);
+    expect(evaluated.captureFailures.length).toBeGreaterThan(0);
+    expect(evaluated.passed).toBe(false);
+  });
+  it('rejects malformed JSON shapes and preserves the historical near-60Hz failure', () => {
+    expect(evaluateCapture(null as unknown as Capture).passed).toBe(false);
+    expect(evaluateCapture({} as Capture).passed).toBe(false);
+    const row=evaluateCapture(receipt()).rows.at(-1)!;
+    expect(row.violations).toContainEqual({metric:'idleP50Ms',actual:16.799999952316284,limit:16.7});
+  });
+  it('accepts a complete valid matrix and fails a single numeric regression', () => {
+    const data=receipt();
+    for (const sample of data.samples) {
+      for (const d of [sample.idleDiagnostics,sample.diagnostics]) {
+        d.controlsUsableMs=600;
+        d.idleIntervalsMs=d.idleIntervalsMs.map(()=>16.7);
+        d.frames={count:d.idleIntervalsMs.length,medianMs:16.7,p95Ms:16.7,maxMs:16.7};
+      }
+      for (const [index,r] of sample.diagnostics.resources.entries()) if (index===0 || /\.(js|css)$/.test(new URL(r.url).pathname)) r.transferBytes=300;
+    }
+    expect(evaluateCapture(data).passed).toBe(true);
+    const d=data.samples[0].diagnostics;
+    d.idleIntervalsMs=d.idleIntervalsMs.map(()=>16.70001);
+    d.frames={count:d.idleIntervalsMs.length,medianMs:16.70001,p95Ms:16.70001,maxMs:16.70001};
+    const result=evaluateCapture(data);
+    expect(result.captureFailures).toEqual([]);
+    expect(result.failedSamples).toBe(1);
+    expect(result.passed).toBe(false);
+  });
+});
 
 describe('proof measurements', () => {
   it('keeps navigation-relative scene and controls timing separate, and resets on restart', () => {

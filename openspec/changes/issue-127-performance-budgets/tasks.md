@@ -1,17 +1,17 @@
 # Tasks
 
-All implementation tasks are unstarted. Approval of the concrete [plan](../../../docs/ongoing-projects/plan.md) is required before applying this change.
+Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is explicitly authorized by the caller. See the current QA report for evidence and remaining gates.
 
 ## 1. Reproduce and bind the baseline
 
-- [ ] 1.1 Refresh main, #127 ownership and PR #119/#128 status; record the approved plan and exact source/browser/host identities in `docs/qa/issue-127-performance-budgets.md`. Verify no duplicate claim or unrelated branch changes before implementation.
-- [ ] 1.2 Restore the retained collector/evaluator in isolated scratch, verify their recorded hashes and reevaluate both historical JSON files. Confirm 18 samples per route, nine cold L3 failures on each and the run landscape repetition-3 warm F1 failure; retain all original bytes.
-- [ ] 1.3 Capture the recorded release if still accessible without deploying it, then a clean current-main baseline on the same host/browser intended for candidate comparison. Inventory navigation, JS/CSS, encoding, request overhead, deferred loads and bundle module contributions; record any unavailable historical-build reproduction distinctly from retained-data analysis.
+- [x] 1.1 Refresh main, #127 ownership and PR #119/#128 status; record the approved plan and exact source/browser/host identities in `docs/qa/issue-127-performance-budgets.md`. Verify no duplicate claim or unrelated branch changes before implementation.
+- [x] 1.2 Restore the retained collector/evaluator in isolated scratch, verify their recorded hashes and reevaluate both historical JSON files. Confirm 18 samples per route, nine cold L3 failures on each and the run landscape repetition-3 warm F1 failure; retain all original bytes.
+- [x] 1.3 Capture the recorded release if still accessible without deploying it, then a clean current-main baseline on the same host/browser intended for candidate comparison. Inventory navigation, JS/CSS, encoding, request overhead, deferred loads and bundle module contributions; record any unavailable historical-build reproduction distinctly from retained-data analysis.
 
 ## 2. Maintain the capture protocol
 
-- [ ] 2.1 Integrate the retained warm save isolation and real run-start controls into the existing collector, with correct root/prefixed route recognition and playable-region gestures. Extend the existing option tests and focused actual-control collector checks; document the exact commands and method differences.
-- [ ] 2.2 Add or adapt the bounded evaluator to reject incomplete/dirty/mixed/error captures, missing workloads or metrics, and to retain all numeric failures. Verify against the original receipts plus meaningful invalid-input fixtures; use unchanged limits, nearest-rank percentiles and only sub-1e-6 ms arithmetic tolerance.
+- [x] 2.1 Integrate the retained warm save isolation and real run-start controls into the existing collector, with correct root/prefixed route recognition and playable-region gestures. Extend the existing option tests and focused actual-control collector checks; document the exact commands and method differences.
+- [x] 2.2 Add or adapt the bounded evaluator to reject incomplete/dirty/mixed/error captures, missing workloads or metrics, and to retain all numeric failures. Verify against the original receipts plus meaningful invalid-input fixtures; use unchanged limits, nearest-rank percentiles and only sub-1e-6 ms arithmetic tolerance.
 
 ## 3. Reduce measured critical transfer
 

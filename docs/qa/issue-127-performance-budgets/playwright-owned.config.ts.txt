@@ -1,0 +1,16 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import standard from '../playwright.config';
+import encounters from '../playwright.encounters.config';
+import items from '../playwright.run-items.config';
+import webkit from '../playwright.device-acceptance.config';
+const kind=process.env.TG_SUITE ?? 'standard';
+const base=kind==='encounters'?encounters:kind==='items'?items:kind==='webkit'?webkit:standard;
+const path=process.env.PLAYWRIGHT_BASE_PATH ?? '/';
+const port=4187;
+const url=`http://127.0.0.1:${port}${path}`;
+const dev=kind==='encounters' || kind==='items';
+export default defineConfig({...base,testDir:resolve('tests'),outputDir:resolve('test-results'),
+  use:{...base.use,baseURL:url},
+  webServer:{command:`node node_modules/vite/bin/vite.js ${dev?'':'preview'} --host 127.0.0.1 --base=${path} --port ${port} --strictPort`,
+    cwd:resolve('.'),url,reuseExistingServer:false}});
