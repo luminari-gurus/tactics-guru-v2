@@ -4,7 +4,7 @@ import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
 import { readSession } from './helpers/battlePolicy';
-import { navigateCapture } from '../scripts/measure-fit-controls';
+import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
 for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
@@ -14,6 +14,11 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const cold=await page.evaluate(()=>window.fitDiagnostics());
   expect(cold.controlsUsableMs).not.toBeNull();
+  const point=await battleGesturePoint(page);
+  await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);
+  await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);
   await page.evaluate(()=>{
     localStorage.setItem('legacy-save','keep');
     localStorage.setItem('tactics-guru:phaser:unrelated','keep');
@@ -48,7 +53,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
       for (const path of expected) await expect.poll(() => paths.has(base + path.slice(1))).toBe(true);
       if (base !== '/') for (const path of expected) expect(paths.has(path)).toBe(false);
       if (scene !== 'content-smoke') {
-        const portraits = page.locator(scene === 'proof' ? '#proof-portrait' : '#battle-party img');
+        const portraits = page.locator(scene === 'proof' ? '#proof-portrait' : '#battle-portraits img');
         expect(await portraits.count()).toBeGreaterThan(0);
         await expect.poll(() => portraits.evaluateAll(images => images.every(image => {
           const img = image as HTMLImageElement;

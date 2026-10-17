@@ -166,5 +166,7 @@ test('real run reward healing carries into the next encounter without old bars',
   expect(healed.items.run.party.find(h=>h.heroId===hero.heroId)!.hp).toBeGreaterThan(hero.hp);
   await page.locator('#run-start-encounter').click();await ready(page);const state=(await readSession(page)).state,r=await settled(page);check(r,state);
   expect(state.mapId).toBe('map:woodland_crossing');expect(r.units.filter((u:any)=>u.health.visible).length).toBe(state.units.filter(u=>u.hp>0).length);
+  await expect(page.locator('#battle-heading h1')).toHaveText('Encounter 2 of 3 · woodland crossing');
+  await expect(page.locator('#run-progress')).toHaveText('Encounter 2 of 3 · woodland crossing');
   await page.screenshot({path:info.outputPath('health-second-encounter.png')});
 });

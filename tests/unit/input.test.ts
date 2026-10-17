@@ -44,6 +44,24 @@ function pointer(type: string, id: number, x: number, y: number): PointerEvent {
   return { type, pointerId: id, button: 0, clientX: x, clientY: y } as unknown as PointerEvent;
 }
 
+it('drops captured gestures at the drawable boundary, including outside release and wheel', () => {
+  const f=fake();
+  const cleanup=bindBoardInput(f.canvas,board(f),()=>({width:400,height:600}),p=>p.x>=20&&p.x<220&&p.y>=40&&p.y<300);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100));
+  f.listeners.get('pointermove')!(pointer('pointermove',1,240,100));
+  f.listeners.get('pointermove')!(pointer('pointermove',1,110,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100));
+  expect(f.released).toContain(1);expect(f.board.pans).toEqual([]);expect(f.board.selections).toBe(0);
+  // A release alone can cross the boundary without a delivered pointermove.
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,219,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',2,221,100));
+  expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',3,100,100));
+  f.listeners.get('wheel')!({clientX:240,clientY:100,deltaY:-100,preventDefault(){}} as unknown as Event);
+  f.listeners.get('pointerup')!(pointer('pointerup',3,100,100));
+  expect(f.board.selections).toBe(0);cleanup();
+});
+
 it('removes every listener and restores touch style on shutdown', () => {
   const f = fake();
   const cleanup = bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));

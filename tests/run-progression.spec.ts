@@ -9,7 +9,13 @@ import {replayRunBattle} from '../src/domain/runBattle';
 test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
-async function start(page:Page){await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+async function start(page:Page){
+ await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await expect(page.locator('#battle-actor')).toBeVisible();
+ const drawable=await page.locator('#battle-board-region').boundingBox();
+ expect(drawable!.width).toBeGreaterThan(0);
+ expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
+}
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
 async function fight(page:Page,wait=false){
  for(let i=0;i<500;i++){
@@ -182,6 +188,11 @@ for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissa
  async function checkFocus(){
   const recovery=page.getByRole('button',{name:'Save recovery',exact:true});const before=await snapshot(page);
   await recovery.focus();await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();
+  if(before.activeBattle){
+   const viewport=page.viewportSize()!;
+   await page.setViewportSize({width:viewport.height,height:viewport.width});
+   await page.setViewportSize(viewport);
+  }
   if(dismiss==='Escape')await page.keyboard.press('Escape');
   else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();await expect(recovery).toBeInViewport();

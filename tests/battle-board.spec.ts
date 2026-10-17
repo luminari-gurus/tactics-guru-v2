@@ -33,11 +33,11 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
   const panned = await settledReport(page);
   expect(panned.transform.x).toBeGreaterThan(zoomed.transform.x);
   expect(panned.selectionEvents).toBe(0);
-  for (const cell of [{ x: 11, y: 11, elevation: 0 }, null, { x: 0, y: 0, elevation: 0 }, { x: 11, y: 11, elevation: 0 }]) {
+  for (const cell of [{ x: 11, y: 11, elevation: 0 }, null, { x: 5, y: 5, elevation: 2 }, { x: 11, y: 11, elevation: 0 }]) {
     const current = await settledReport(page);
     const point = cell ? projectTile(cell) : { x: 0, y: 0 };
     const screen = cell ? { x: current.transform.x + point.x * current.transform.scale, y: current.transform.y + point.y * current.transform.scale }
-      : { x: 5, y: current.viewport.height - 5 };
+      : { x: current.region.x+5, y: current.region.y+current.region.height-5 };
     expect(screen.x).toBeGreaterThanOrEqual(0);
     expect(screen.x).toBeLessThan(current.viewport.width);
     expect(screen.y).toBeGreaterThanOrEqual(0);
@@ -63,7 +63,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
     await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state.commandCount).toBeGreaterThan(beforeCount);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const after = await settledReport(page);
-    activeLabels.add((await page.locator('#battle-active').textContent())!);
+    activeLabels.add((await page.locator('#battle-actor-name').textContent())!);
     expect(after.transform).toEqual(panned.transform);
     expect(after.commandCount).toBeGreaterThan(beforeCount);
   }
@@ -81,7 +81,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
   expect(restarted.objectCount).toBe(initial.objectCount);
   // A different seed/active hero can change HUD height. Reset must fit the
   // current available area rather than reuse the prior seed's absolute origin.
-  const panelBottom=await page.locator('#fit-panel').evaluate(el=>el.getBoundingClientRect().bottom);
+
   // Reported bounds are screen-space and include canopy/unit art; recover the
   // unchanged map's local extent from the original fit, not the reset transform.
   const localBounds={
@@ -90,7 +90,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
     top:(initial.bounds.top-initial.transform.y)/initial.transform.scale,
     bottom:(initial.bounds.bottom-initial.transform.y)/initial.transform.scale,
   };
-  const expectedFit=fitBoard(localBounds,{x:0,y:panelBottom,width:restarted.viewport.width,height:restarted.viewport.height-panelBottom});
+  const expectedFit=fitBoard(localBounds,restarted.region);
   expect(restarted.transform.scale).toBeCloseTo(expectedFit.scale,5);
   expect(restarted.transform.x).toBeCloseTo(expectedFit.x,5);
   expect(restarted.transform.y).toBeCloseTo(expectedFit.y,5);
@@ -109,7 +109,7 @@ test('authored camera keeps zoom bounds and refits on real orientation changes',
     await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const fitted = await settledReport(page);
-    await page.mouse.move(viewport.width - 5, viewport.height - 5);
+    await page.mouse.move(fitted.region.x+5,fitted.region.y+fitted.region.height-5);
     for (let wheel = 0; wheel < 8; wheel++) {
       // Chromium scales native wheel deltas by emulated DPR; exceed the input
       // clamp deliberately, and settle each event rather than assuming delivery.
@@ -121,16 +121,16 @@ test('authored camera keeps zoom bounds and refits on real orientation changes',
     const nextViewport = { width: viewport.height, height: viewport.width };
     await page.setViewportSize(nextViewport);
     await expect.poll(async () => (await report(page)).viewport).toEqual(nextViewport);
-    const panelBottom = await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().bottom);
+
     const localBounds = {
       left: (fitted.bounds.left - fitted.transform.x) / fitted.transform.scale,
       right: (fitted.bounds.right - fitted.transform.x) / fitted.transform.scale,
       top: (fitted.bounds.top - fitted.transform.y) / fitted.transform.scale,
       bottom: (fitted.bounds.bottom - fitted.transform.y) / fitted.transform.scale,
     };
-    const nextFit = fitBoard(localBounds, {x:0,y:panelBottom,width:nextViewport.width,height:nextViewport.height-panelBottom});
+    const nextFit = fitBoard(localBounds, (await settledReport(page)).region);
     expect((await settledReport(page)).transform.scale).toBeCloseTo(nextFit.scale * MAX_ZOOM, 5);
-    await page.mouse.move(nextViewport.width - 5, nextViewport.height - 5);
+    await page.mouse.move((await report(page)).region.x+5,(await report(page)).region.y+5);
     for (let wheel = 0; wheel < 8; wheel++) {
       await page.mouse.wheel(0, 10000);
       await settledReport(page);
@@ -144,7 +144,7 @@ test('authored camera keeps zoom bounds and refits on real orientation changes',
     expect(resized.bounds.left).toBeGreaterThanOrEqual(15);
     expect(resized.bounds.right).toBeLessThanOrEqual(viewport.width - 15);
     expect(resized.bounds.bottom).toBeLessThanOrEqual(viewport.height - 15);
-    expect(resized.bounds.top).toBeGreaterThanOrEqual(await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().bottom + 15));
+    expect(resized.bounds.top).toBeGreaterThanOrEqual(await page.locator('#battle-board-region').evaluate(region => region.getBoundingClientRect().top + 15));
   }
 });
 
@@ -178,7 +178,7 @@ test('default authored board renders canonical units, highlights and stable rest
     expect(value.bounds.left).toBeGreaterThanOrEqual(15);
     expect(value.bounds.right).toBeLessThanOrEqual(viewport.width - 15);
     expect(value.bounds.bottom).toBeLessThanOrEqual(viewport.height - 15);
-    expect(value.bounds.top).toBeGreaterThanOrEqual(await page.locator('#fit-panel').evaluate(panel => panel.getBoundingClientRect().bottom + 15));
+    expect(value.bounds.top).toBeGreaterThanOrEqual(await page.locator('#battle-board-region').evaluate(region => region.getBoundingClientRect().top + 15));
     await page.screenshot({ path: test.info().outputPath(`authored-${orientation}.png`) });
   }
   for (let run = 0; run < 4; run++) {
@@ -201,7 +201,7 @@ test('default authored board renders canonical units, highlights and stable rest
     await expect(page.locator('canvas')).toHaveCount(1);
   }
   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());
-  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait' && ['asset:fighter_portrait','asset:ranger_portrait','asset:mage_portrait'].includes(asset.id)?2:1);
+  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);
   expect(errors).toEqual([]);
 });
 
@@ -343,4 +343,27 @@ test('touch pinch and cancelled pointer cannot select or move a unit', async ({ 
   await touch('touchStart', [{ x, y, id: 3 }]);
   await touch('touchCancel', []);
   expect((await report(page)).selectionEvents).toBe(selected.selectionEvents);
+});
+
+test('drawable boundaries and layout changes discard captured gestures without board pass-through',async({page})=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial=await settledReport(page),r=initial.region,x=r.x+r.width/2,y=r.y+r.height/2;
+  await page.mouse.move(x,y);await page.mouse.down();
+  await page.mouse.move(r.x+r.width+15,y);await page.mouse.move(x+15,y);await page.mouse.up();
+  let after=await settledReport(page);expect(after.transform).toEqual(initial.transform);expect(after.selectionEvents).toBe(initial.selectionEvents);
+  await page.locator('#battle-scroll').hover();await page.mouse.wheel(0,200);after=await settledReport(page);
+  expect(after.transform).toEqual(initial.transform);expect(after.commandCount).toBe(initial.commandCount);
+  const cdp=await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:x-10,y,id:1},{x:x+10,y,id:2}]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x-10,y,id:1},{x:x+10,y,id:2}]});
+  const outside=await settledReport(page);
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-20,y,id:1},{x:x+20,y,id:2}]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  after=await settledReport(page);expect(after.transform).toEqual(outside.transform);expect(after.selectionEvents).toBe(initial.selectionEvents);
+  await page.mouse.move(x,y);await page.mouse.down();
+  const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});
+  await expect.poll(async()=>(await report(page)).viewport).toEqual({width:size.height,height:size.width});
+  const resized=await settledReport(page);await page.mouse.move(resized.region.x+30,resized.region.y+30);await page.mouse.up();
+  after=await settledReport(page);expect(after.transform).toEqual(resized.transform);expect(after.selectionEvents).toBe(initial.selectionEvents);
+  expect(after.commandCount).toBe(initial.commandCount);await expect(page.locator('canvas')).toHaveCount(1);await cdp.detach();
 });

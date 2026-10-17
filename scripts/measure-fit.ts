@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { arch, cpus, platform, release } from 'node:os';
 import { chromium, devices, type Page } from '@playwright/test';
 import { buildIdentity, collectorConditions, parseMeasureArgs, captureTarget, captureFailures } from './measure-fit-options.ts';
-import { navigateCapture } from './measure-fit-controls.ts';
+import { navigateCapture, battleGesturePoint } from './measure-fit-controls.ts';
 import { evaluateCapture } from './measure-fit-evaluate.ts';
 
 // `measure:fit [output] [--url <origin>]`: without --url the collector serves `dist` itself on the preview port;
@@ -49,14 +49,7 @@ async function battleWorkload(page: Page) {
   await settleWorkloads(page);
   const workloadStartIndex = await page.evaluate(() => window.fitDiagnostics().workloads.length);
   const canvas = page.locator('canvas');
-  const point = await page.evaluate(() => {
-    const panel = document.querySelector('#fit-panel')!.getBoundingClientRect();
-    const point = {x:innerWidth/2, y:panel.bottom+(innerHeight-panel.bottom)*0.65};
-    const canvas = document.querySelector('canvas');
-    if (document.elementFromPoint(point.x,point.y) !== canvas ||
-        document.elementFromPoint(point.x+40,point.y-25) !== canvas) throw new Error('Workload gesture is outside the playable canvas');
-    return point;
-  });
+  const point = await battleGesturePoint(page);
   await page.mouse.move(point.x, point.y);
   await page.mouse.wheel(0, -100);
   await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
