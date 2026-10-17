@@ -1,0 +1,1125 @@
+{
+  "method": "host Node performance.now; 20 repetitions per existing valid save fixture; no encode/decode-specific limit is established",
+  "rows": [
+    {
+      "label": "start-1",
+      "iteration": 0,
+      "codeUnits": 1112,
+      "encodeMs": 0.21875,
+      "decodeMs": 0.23029199999996308
+    },
+    {
+      "label": "start-1",
+      "iteration": 1,
+      "codeUnits": 1112,
+      "encodeMs": 0.1038340000000062,
+      "decodeMs": 0.1014589999999771
+    },
+    {
+      "label": "start-1",
+      "iteration": 2,
+      "codeUnits": 1112,
+      "encodeMs": 0.09600000000000364,
+      "decodeMs": 0.06154200000014498
+    },
+    {
+      "label": "start-1",
+      "iteration": 3,
+      "codeUnits": 1112,
+      "encodeMs": 0.0798339999998916,
+      "decodeMs": 0.05499999999983629
+    },
+    {
+      "label": "start-1",
+      "iteration": 4,
+      "codeUnits": 1112,
+      "encodeMs": 0.06383299999993142,
+      "decodeMs": 0.05420800000001691
+    },
+    {
+      "label": "start-1",
+      "iteration": 5,
+      "codeUnits": 1112,
+      "encodeMs": 0.06708300000013878,
+      "decodeMs": 0.054082999999991443
+    },
+    {
+      "label": "start-1",
+      "iteration": 6,
+      "codeUnits": 1112,
+      "encodeMs": 0.06058400000006259,
+      "decodeMs": 0.06016700000009223
+    },
+    {
+      "label": "start-1",
+      "iteration": 7,
+      "codeUnits": 1112,
+      "encodeMs": 0.059166000000004715,
+      "decodeMs": 0.06066699999996672
+    },
+    {
+      "label": "start-1",
+      "iteration": 8,
+      "codeUnits": 1112,
+      "encodeMs": 0.05958399999985886,
+      "decodeMs": 0.05516599999987193
+    },
+    {
+      "label": "start-1",
+      "iteration": 9,
+      "codeUnits": 1112,
+      "encodeMs": 0.06570800000008603,
+      "decodeMs": 0.11599999999998545
+    },
+    {
+      "label": "start-1",
+      "iteration": 10,
+      "codeUnits": 1112,
+      "encodeMs": 0.0906249999998181,
+      "decodeMs": 0.06570800000008603
+    },
+    {
+      "label": "start-1",
+      "iteration": 11,
+      "codeUnits": 1112,
+      "encodeMs": 0.06562499999995453,
+      "decodeMs": 0.05600000000004002
+    },
+    {
+      "label": "start-1",
+      "iteration": 12,
+      "codeUnits": 1112,
+      "encodeMs": 0.11299999999982901,
+      "decodeMs": 0.13737500000002
+    },
+    {
+      "label": "start-1",
+      "iteration": 13,
+      "codeUnits": 1112,
+      "encodeMs": 0.13225000000011278,
+      "decodeMs": 0.08774999999991451
+    },
+    {
+      "label": "start-1",
+      "iteration": 14,
+      "codeUnits": 1112,
+      "encodeMs": 0.07929200000012315,
+      "decodeMs": 0.06799999999998363
+    },
+    {
+      "label": "start-1",
+      "iteration": 15,
+      "codeUnits": 1112,
+      "encodeMs": 0.0732500000001437,
+      "decodeMs": 0.06454200000007404
+    },
+    {
+      "label": "start-1",
+      "iteration": 16,
+      "codeUnits": 1112,
+      "encodeMs": 0.07120799999984229,
+      "decodeMs": 0.06445800000005875
+    },
+    {
+      "label": "start-1",
+      "iteration": 17,
+      "codeUnits": 1112,
+      "encodeMs": 0.06899999999995998,
+      "decodeMs": 0.07829100000003564
+    },
+    {
+      "label": "start-1",
+      "iteration": 18,
+      "codeUnits": 1112,
+      "encodeMs": 0.06612500000005639,
+      "decodeMs": 0.060624999999845386
+    },
+    {
+      "label": "start-1",
+      "iteration": 19,
+      "codeUnits": 1112,
+      "encodeMs": 0.06899999999995998,
+      "decodeMs": 0.05950000000007094
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 0,
+      "codeUnits": 1122,
+      "encodeMs": 0.08479099999999562,
+      "decodeMs": 0.08291699999995217
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 1,
+      "codeUnits": 1122,
+      "encodeMs": 0.07170800000017152,
+      "decodeMs": 0.06320800000003146
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 2,
+      "codeUnits": 1122,
+      "encodeMs": 0.06791699999985212,
+      "decodeMs": 0.06150000000002365
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 3,
+      "codeUnits": 1122,
+      "encodeMs": 0.07008399999995163,
+      "decodeMs": 0.05995899999993526
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 4,
+      "codeUnits": 1122,
+      "encodeMs": 0.06587500000000546,
+      "decodeMs": 0.06266600000003564
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 5,
+      "codeUnits": 1122,
+      "encodeMs": 0.06824999999980719,
+      "decodeMs": 0.06691700000010314
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 6,
+      "codeUnits": 1122,
+      "encodeMs": 0.06820799999991323,
+      "decodeMs": 0.06333300000005693
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 7,
+      "codeUnits": 1122,
+      "encodeMs": 0.06804200000010496,
+      "decodeMs": 0.060083000000076936
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 8,
+      "codeUnits": 1122,
+      "encodeMs": 0.06600000000003092,
+      "decodeMs": 0.060042000000066764
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 9,
+      "codeUnits": 1122,
+      "encodeMs": 0.07416699999998855,
+      "decodeMs": 0.06129099999998289
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 10,
+      "codeUnits": 1122,
+      "encodeMs": 0.06645800000001145,
+      "decodeMs": 0.06404099999986101
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 11,
+      "codeUnits": 1122,
+      "encodeMs": 0.07941700000014862,
+      "decodeMs": 0.05970800000000054
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 12,
+      "codeUnits": 1122,
+      "encodeMs": 0.06674999999995634,
+      "decodeMs": 0.060500000000047294
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 13,
+      "codeUnits": 1122,
+      "encodeMs": 0.07124999999996362,
+      "decodeMs": 0.060042000000066764
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 14,
+      "codeUnits": 1122,
+      "encodeMs": 0.06829199999992852,
+      "decodeMs": 0.06070799999997689
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 15,
+      "codeUnits": 1122,
+      "encodeMs": 0.06916599999999562,
+      "decodeMs": 0.05929199999991397
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 16,
+      "codeUnits": 1122,
+      "encodeMs": 0.06670800000006238,
+      "decodeMs": 0.06037500000002183
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 17,
+      "codeUnits": 1122,
+      "encodeMs": 0.0676659999999174,
+      "decodeMs": 0.05975000000012187
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 18,
+      "codeUnits": 1122,
+      "encodeMs": 0.06620799999996052,
+      "decodeMs": 0.05995800000005147
+    },
+    {
+      "label": "playerLoss",
+      "iteration": 19,
+      "codeUnits": 1122,
+      "encodeMs": 0.06625000000008185,
+      "decodeMs": 0.05916700000011588
+    },
+    {
+      "label": "start-2",
+      "iteration": 0,
+      "codeUnits": 1113,
+      "encodeMs": 0.07795800000008057,
+      "decodeMs": 0.06533299999978226
+    },
+    {
+      "label": "start-2",
+      "iteration": 1,
+      "codeUnits": 1113,
+      "encodeMs": 0.06825000000003456,
+      "decodeMs": 0.0599170000000413
+    },
+    {
+      "label": "start-2",
+      "iteration": 2,
+      "codeUnits": 1113,
+      "encodeMs": 0.0655420000000504,
+      "decodeMs": 0.2610829999998714
+    },
+    {
+      "label": "start-2",
+      "iteration": 3,
+      "codeUnits": 1113,
+      "encodeMs": 0.1071670000001177,
+      "decodeMs": 0.08004100000016479
+    },
+    {
+      "label": "start-2",
+      "iteration": 4,
+      "codeUnits": 1113,
+      "encodeMs": 0.09487500000000182,
+      "decodeMs": 0.06999999999993634
+    },
+    {
+      "label": "start-2",
+      "iteration": 5,
+      "codeUnits": 1113,
+      "encodeMs": 0.07341699999983575,
+      "decodeMs": 0.061875000000100044
+    },
+    {
+      "label": "start-2",
+      "iteration": 6,
+      "codeUnits": 1113,
+      "encodeMs": 0.06904099999997015,
+      "decodeMs": 0.06633300000021336
+    },
+    {
+      "label": "start-2",
+      "iteration": 7,
+      "codeUnits": 1113,
+      "encodeMs": 0.06970800000021882,
+      "decodeMs": 0.06395899999984067
+    },
+    {
+      "label": "start-2",
+      "iteration": 8,
+      "codeUnits": 1113,
+      "encodeMs": 0.1192079999998441,
+      "decodeMs": 0.07312500000011823
+    },
+    {
+      "label": "start-2",
+      "iteration": 9,
+      "codeUnits": 1113,
+      "encodeMs": 0.1277909999998883,
+      "decodeMs": 0.1199579999999969
+    },
+    {
+      "label": "start-2",
+      "iteration": 10,
+      "codeUnits": 1113,
+      "encodeMs": 0.09629199999994853,
+      "decodeMs": 0.06858299999998962
+    },
+    {
+      "label": "start-2",
+      "iteration": 11,
+      "codeUnits": 1113,
+      "encodeMs": 0.06583399999999529,
+      "decodeMs": 0.055791999999883046
+    },
+    {
+      "label": "start-2",
+      "iteration": 12,
+      "codeUnits": 1113,
+      "encodeMs": 0.05920800000012605,
+      "decodeMs": 0.05345800000009149
+    },
+    {
+      "label": "start-2",
+      "iteration": 13,
+      "codeUnits": 1113,
+      "encodeMs": 0.06529199999999946,
+      "decodeMs": 0.08104200000002493
+    },
+    {
+      "label": "start-2",
+      "iteration": 14,
+      "codeUnits": 1113,
+      "encodeMs": 0.06345799999985502,
+      "decodeMs": 0.055000000000063665
+    },
+    {
+      "label": "start-2",
+      "iteration": 15,
+      "codeUnits": 1113,
+      "encodeMs": 0.05820799999992232,
+      "decodeMs": 0.05987500000014734
+    },
+    {
+      "label": "start-2",
+      "iteration": 16,
+      "codeUnits": 1113,
+      "encodeMs": 0.08979199999998855,
+      "decodeMs": 0.06845900000007532
+    },
+    {
+      "label": "start-2",
+      "iteration": 17,
+      "codeUnits": 1113,
+      "encodeMs": 0.06208299999980227,
+      "decodeMs": 0.09345800000005511
+    },
+    {
+      "label": "start-2",
+      "iteration": 18,
+      "codeUnits": 1113,
+      "encodeMs": 0.07416699999998855,
+      "decodeMs": 0.05729199999996126
+    },
+    {
+      "label": "start-2",
+      "iteration": 19,
+      "codeUnits": 1113,
+      "encodeMs": 0.06066699999996672,
+      "decodeMs": 0.05854199999998855
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 0,
+      "codeUnits": 1112,
+      "encodeMs": 0.06937500000003638,
+      "decodeMs": 0.05349999999998545
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 1,
+      "codeUnits": 1112,
+      "encodeMs": 0.05708300000014788,
+      "decodeMs": 0.05054200000017772
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 2,
+      "codeUnits": 1112,
+      "encodeMs": 0.05625000000009095,
+      "decodeMs": 0.1588339999998425
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 3,
+      "codeUnits": 1112,
+      "encodeMs": 0.12062500000001819,
+      "decodeMs": 0.05887499999994361
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 4,
+      "codeUnits": 1112,
+      "encodeMs": 0.11487499999998363,
+      "decodeMs": 0.08862500000009277
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 5,
+      "codeUnits": 1112,
+      "encodeMs": 0.07925000000000182,
+      "decodeMs": 0.07370799999989686
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 6,
+      "codeUnits": 1112,
+      "encodeMs": 0.06925000000001091,
+      "decodeMs": 0.06533399999989342
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 7,
+      "codeUnits": 1112,
+      "encodeMs": 0.059375000000045475,
+      "decodeMs": 0.05087499999990541
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 8,
+      "codeUnits": 1112,
+      "encodeMs": 0.1586250000000291,
+      "decodeMs": 0.247333000000026
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 9,
+      "codeUnits": 1112,
+      "encodeMs": 0.09229200000004312,
+      "decodeMs": 0.06437499999992724
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 10,
+      "codeUnits": 1112,
+      "encodeMs": 0.08754199999998491,
+      "decodeMs": 0.06116700000006858
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 11,
+      "codeUnits": 1112,
+      "encodeMs": 0.06091700000001765,
+      "decodeMs": 0.051832999999987805
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 12,
+      "codeUnits": 1112,
+      "encodeMs": 0.05662499999993997,
+      "decodeMs": 0.06470899999999347
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 13,
+      "codeUnits": 1112,
+      "encodeMs": 0.06687499999998181,
+      "decodeMs": 0.05491700000015953
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 14,
+      "codeUnits": 1112,
+      "encodeMs": 0.056874999999990905,
+      "decodeMs": 0.050666000000092026
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 15,
+      "codeUnits": 1112,
+      "encodeMs": 0.07983400000011898,
+      "decodeMs": 0.05708300000014788
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 16,
+      "codeUnits": 1112,
+      "encodeMs": 0.06429099999991195,
+      "decodeMs": 0.055250000000114596
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 17,
+      "codeUnits": 1112,
+      "encodeMs": 0.05600000000004002,
+      "decodeMs": 0.050125000000207365
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 18,
+      "codeUnits": 1112,
+      "encodeMs": 0.06070799999997689,
+      "decodeMs": 0.04975000000013097
+    },
+    {
+      "label": "enemy-presenting",
+      "iteration": 19,
+      "codeUnits": 1112,
+      "encodeMs": 0.05462499999998727,
+      "decodeMs": 0.04870900000014444
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 0,
+      "codeUnits": 1111,
+      "encodeMs": 0.08733300000017152,
+      "decodeMs": 0.09300000000007458
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 1,
+      "codeUnits": 1111,
+      "encodeMs": 0.09620800000016061,
+      "decodeMs": 0.07275000000004184
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 2,
+      "codeUnits": 1111,
+      "encodeMs": 0.07212499999991451,
+      "decodeMs": 0.09387500000002547
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 3,
+      "codeUnits": 1111,
+      "encodeMs": 0.07150000000001455,
+      "decodeMs": 0.0625840000000153
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 4,
+      "codeUnits": 1111,
+      "encodeMs": 0.0669589999999971,
+      "decodeMs": 0.06154200000014498
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 5,
+      "codeUnits": 1111,
+      "encodeMs": 0.07404199999996308,
+      "decodeMs": 0.06266699999991943
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 6,
+      "codeUnits": 1111,
+      "encodeMs": 0.06933299999991505,
+      "decodeMs": 0.06987499999991087
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 7,
+      "codeUnits": 1111,
+      "encodeMs": 0.06791599999996834,
+      "decodeMs": 0.06091599999990649
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 8,
+      "codeUnits": 1111,
+      "encodeMs": 0.06641700000000128,
+      "decodeMs": 0.061208000000078755
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 9,
+      "codeUnits": 1111,
+      "encodeMs": 0.06612500000005639,
+      "decodeMs": 0.06162500000004911
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 10,
+      "codeUnits": 1111,
+      "encodeMs": 0.07324999999991633,
+      "decodeMs": 0.06179199999996854
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 11,
+      "codeUnits": 1111,
+      "encodeMs": 0.06670800000006238,
+      "decodeMs": 0.06066599999985556
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 12,
+      "codeUnits": 1111,
+      "encodeMs": 0.0677499999999327,
+      "decodeMs": 0.06058400000006259
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 13,
+      "codeUnits": 1111,
+      "encodeMs": 0.06666700000005221,
+      "decodeMs": 0.06104200000004312
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 14,
+      "codeUnits": 1111,
+      "encodeMs": 0.06587500000000546,
+      "decodeMs": 0.05958299999997507
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 15,
+      "codeUnits": 1111,
+      "encodeMs": 0.06583299999988412,
+      "decodeMs": 0.0597499999998945
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 16,
+      "codeUnits": 1111,
+      "encodeMs": 0.06549999999992906,
+      "decodeMs": 0.05983399999990979
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 17,
+      "codeUnits": 1111,
+      "encodeMs": 0.06562499999995453,
+      "decodeMs": 0.09024999999996908
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 18,
+      "codeUnits": 1111,
+      "encodeMs": 0.06820899999979702,
+      "decodeMs": 0.060750000000098225
+    },
+    {
+      "label": "player-presenting",
+      "iteration": 19,
+      "codeUnits": 1111,
+      "encodeMs": 0.06633299999998599,
+      "decodeMs": 0.06087500000012369
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 0,
+      "codeUnits": 1120,
+      "encodeMs": 0.07933300000013332,
+      "decodeMs": 0.0687910000001466
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 1,
+      "codeUnits": 1120,
+      "encodeMs": 0.08908400000018446,
+      "decodeMs": 0.05141600000001745
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 2,
+      "codeUnits": 1120,
+      "encodeMs": 0.05400000000008731,
+      "decodeMs": 0.04866700000002311
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 3,
+      "codeUnits": 1120,
+      "encodeMs": 0.053625000000010914,
+      "decodeMs": 0.056166999999959444
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 4,
+      "codeUnits": 1120,
+      "encodeMs": 0.053625000000010914,
+      "decodeMs": 0.04870800000003328
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 5,
+      "codeUnits": 1120,
+      "encodeMs": 0.053707999999915046,
+      "decodeMs": 0.07229100000017752
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 6,
+      "codeUnits": 1120,
+      "encodeMs": 0.05329200000005585,
+      "decodeMs": 0.04891700000007404
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 7,
+      "codeUnits": 1120,
+      "encodeMs": 0.053583000000116954,
+      "decodeMs": 0.04754099999991013
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 8,
+      "codeUnits": 1120,
+      "encodeMs": 0.05333399999994981,
+      "decodeMs": 0.04825000000005275
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 9,
+      "codeUnits": 1120,
+      "encodeMs": 0.05308300000001509,
+      "decodeMs": 0.04737499999987449
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 10,
+      "codeUnits": 1120,
+      "encodeMs": 0.05625000000009095,
+      "decodeMs": 0.0475410000001375
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 11,
+      "codeUnits": 1120,
+      "encodeMs": 0.053166000000146596,
+      "decodeMs": 0.0472500000000764
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 12,
+      "codeUnits": 1120,
+      "encodeMs": 0.05354200000010678,
+      "decodeMs": 0.048833000000058746
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 13,
+      "codeUnits": 1120,
+      "encodeMs": 0.053167000000030384,
+      "decodeMs": 0.04745900000011716
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 14,
+      "codeUnits": 1120,
+      "encodeMs": 0.052917000000206826,
+      "decodeMs": 0.04866700000002311
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 15,
+      "codeUnits": 1120,
+      "encodeMs": 0.052999999999883585,
+      "decodeMs": 0.04754200000002129
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 16,
+      "codeUnits": 1120,
+      "encodeMs": 0.05358400000000074,
+      "decodeMs": 0.04775000000017826
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 17,
+      "codeUnits": 1120,
+      "encodeMs": 0.05283400000007532,
+      "decodeMs": 0.04774999999995089
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 18,
+      "codeUnits": 1120,
+      "encodeMs": 0.05674999999996544,
+      "decodeMs": 0.04820799999993142
+    },
+    {
+      "label": "guarded-presenting",
+      "iteration": 19,
+      "codeUnits": 1120,
+      "encodeMs": 0.053208000000040556,
+      "decodeMs": 0.04837500000007822
+    },
+    {
+      "label": "playerWin",
+      "iteration": 0,
+      "codeUnits": 1123,
+      "encodeMs": 0.08033300000010968,
+      "decodeMs": 0.06266600000003564
+    },
+    {
+      "label": "playerWin",
+      "iteration": 1,
+      "codeUnits": 1123,
+      "encodeMs": 0.06562499999995453,
+      "decodeMs": 0.05829100000005383
+    },
+    {
+      "label": "playerWin",
+      "iteration": 2,
+      "codeUnits": 1123,
+      "encodeMs": 0.07633400000008805,
+      "decodeMs": 0.059375000000045475
+    },
+    {
+      "label": "playerWin",
+      "iteration": 3,
+      "codeUnits": 1123,
+      "encodeMs": 0.07387500000004366,
+      "decodeMs": 0.058333999999831576
+    },
+    {
+      "label": "playerWin",
+      "iteration": 4,
+      "codeUnits": 1123,
+      "encodeMs": 0.06291700000019773,
+      "decodeMs": 0.05787500000019463
+    },
+    {
+      "label": "playerWin",
+      "iteration": 5,
+      "codeUnits": 1123,
+      "encodeMs": 0.06337499999995089,
+      "decodeMs": 0.05766700000003766
+    },
+    {
+      "label": "playerWin",
+      "iteration": 6,
+      "codeUnits": 1123,
+      "encodeMs": 0.06400000000007822,
+      "decodeMs": 0.26016599999979917
+    },
+    {
+      "label": "playerWin",
+      "iteration": 7,
+      "codeUnits": 1123,
+      "encodeMs": 0.06662499999993088,
+      "decodeMs": 0.059665999999879205
+    },
+    {
+      "label": "playerWin",
+      "iteration": 8,
+      "codeUnits": 1123,
+      "encodeMs": 0.06254100000001017,
+      "decodeMs": 0.05720800000017334
+    },
+    {
+      "label": "playerWin",
+      "iteration": 9,
+      "codeUnits": 1123,
+      "encodeMs": 0.0627079999999296,
+      "decodeMs": 0.0574579999999969
+    },
+    {
+      "label": "playerWin",
+      "iteration": 10,
+      "codeUnits": 1123,
+      "encodeMs": 0.06279199999994489,
+      "decodeMs": 0.057583000000022366
+    },
+    {
+      "label": "playerWin",
+      "iteration": 11,
+      "codeUnits": 1123,
+      "encodeMs": 0.06337500000017826,
+      "decodeMs": 0.05679200000008677
+    },
+    {
+      "label": "playerWin",
+      "iteration": 12,
+      "codeUnits": 1123,
+      "encodeMs": 0.06283299999995506,
+      "decodeMs": 0.0576659999999265
+    },
+    {
+      "label": "playerWin",
+      "iteration": 13,
+      "codeUnits": 1123,
+      "encodeMs": 0.06312500000012733,
+      "decodeMs": 0.05770799999982046
+    },
+    {
+      "label": "playerWin",
+      "iteration": 14,
+      "codeUnits": 1123,
+      "encodeMs": 0.06275000000005093,
+      "decodeMs": 0.057583000000022366
+    },
+    {
+      "label": "playerWin",
+      "iteration": 15,
+      "codeUnits": 1123,
+      "encodeMs": 0.06333399999994072,
+      "decodeMs": 0.05720899999982976
+    },
+    {
+      "label": "playerWin",
+      "iteration": 16,
+      "codeUnits": 1123,
+      "encodeMs": 0.06283299999995506,
+      "decodeMs": 0.06441700000004857
+    },
+    {
+      "label": "playerWin",
+      "iteration": 17,
+      "codeUnits": 1123,
+      "encodeMs": 0.07145900000000438,
+      "decodeMs": 0.06391700000017408
+    },
+    {
+      "label": "playerWin",
+      "iteration": 18,
+      "codeUnits": 1123,
+      "encodeMs": 0.06679099999996652,
+      "decodeMs": 0.0570829999999205
+    },
+    {
+      "label": "playerWin",
+      "iteration": 19,
+      "codeUnits": 1123,
+      "encodeMs": 0.06262500000002547,
+      "decodeMs": 0.05729199999996126
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 0,
+      "codeUnits": 1130,
+      "encodeMs": 0.08737500000006548,
+      "decodeMs": 0.06462499999997817
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 1,
+      "codeUnits": 1130,
+      "encodeMs": 0.06683399999997164,
+      "decodeMs": 0.06137499999999818
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 2,
+      "codeUnits": 1130,
+      "encodeMs": 0.0652500000001055,
+      "decodeMs": 0.05962499999986903
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 3,
+      "codeUnits": 1130,
+      "encodeMs": 0.06374999999979991,
+      "decodeMs": 0.0597499999998945
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 4,
+      "codeUnits": 1130,
+      "encodeMs": 0.06362500000000182,
+      "decodeMs": 0.059874999999919964
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 5,
+      "codeUnits": 1130,
+      "encodeMs": 0.06375000000002728,
+      "decodeMs": 0.060332999999900494
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 6,
+      "codeUnits": 1130,
+      "encodeMs": 0.06441599999993741,
+      "decodeMs": 0.059625000000096406
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 7,
+      "codeUnits": 1130,
+      "encodeMs": 0.06366699999989578,
+      "decodeMs": 0.05995800000005147
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 8,
+      "codeUnits": 1130,
+      "encodeMs": 0.06345899999996618,
+      "decodeMs": 0.05983399999990979
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 9,
+      "codeUnits": 1130,
+      "encodeMs": 0.06337499999995089,
+      "decodeMs": 0.0600409999999556
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 10,
+      "codeUnits": 1130,
+      "encodeMs": 0.06383300000015879,
+      "decodeMs": 0.060000000000172804
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 11,
+      "codeUnits": 1130,
+      "encodeMs": 0.06362500000000182,
+      "decodeMs": 0.06024999999999636
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 12,
+      "codeUnits": 1130,
+      "encodeMs": 0.08329200000002857,
+      "decodeMs": 0.0911670000000413
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 13,
+      "codeUnits": 1130,
+      "encodeMs": 0.08191699999997581,
+      "decodeMs": 0.0655410000001666
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 14,
+      "codeUnits": 1130,
+      "encodeMs": 0.06700000000000728,
+      "decodeMs": 0.06170800000018062
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 15,
+      "codeUnits": 1130,
+      "encodeMs": 0.06625000000008185,
+      "decodeMs": 0.061916999999994005
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 16,
+      "codeUnits": 1130,
+      "encodeMs": 0.0647079999998823,
+      "decodeMs": 0.1558749999999236
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 17,
+      "codeUnits": 1130,
+      "encodeMs": 0.11895800000002055,
+      "decodeMs": 0.0725840000000062
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 18,
+      "codeUnits": 1130,
+      "encodeMs": 0.06916599999999562,
+      "decodeMs": 0.06958400000007714
+    },
+    {
+      "label": "maximum-commands",
+      "iteration": 19,
+      "codeUnits": 1130,
+      "encodeMs": 0.06566700000007586,
+      "decodeMs": 0.06083300000000236
+    }
+  ]
+}

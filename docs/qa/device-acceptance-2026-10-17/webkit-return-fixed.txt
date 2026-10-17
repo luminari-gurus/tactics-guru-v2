@@ -1,0 +1,25 @@
+[WebServer] (node:39190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:39231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.5s)
+(node:39245) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.8s)
+(node:39259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.5s)
+(node:39293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.2s)
+(node:39307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.9s)
+(node:39324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.5s)
+
+  6 passed (19.9s)

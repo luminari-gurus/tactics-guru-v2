@@ -19,6 +19,7 @@ async function chooseMove(page:Page) {
 }
 async function touch(page:Page,selector:string) {
   const element=page.locator(selector);await element.scrollIntoViewIfNeeded();const box=(await element.boundingBox())!;
+  if(test.info().project.use.hasTouch){await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);return;}
   const cdp=await page.context().newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2,id:1}]});
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();

@@ -1,0 +1,35 @@
+{
+  "reportedCommit": "85ed3d63127fcf7654364db868141f503a9ca688",
+  "testedCommit": "a8bc639c652611081b0281987c384edf2c6e74c0",
+  "red": {
+    "failedKeyboardDismissals": 2,
+    "failure": "Both Escape and Close lost focused Save recovery after preparation rerender before app changes."
+  },
+  "green": {
+    "unit": 654,
+    "content": 167,
+    "typecheck": "both configurations passed",
+    "productionBuild": "passed",
+    "chromiumAffectedCases": 21,
+    "webkitFocusCases": 4
+  },
+  "scope": "Both keyboard dismissals assert connected, visible, focused and in-viewport recovery controls at preparation, startup and battle boundaries. Existing Continue/read-failure/export regressions rerun on desktop and Pixel 7 portrait/landscape. Focus cases rerun on iPhone-sized WebKit portrait/landscape. No full repository-wide browser rerun for this scoped callback fix.",
+  "notes": "Green tests strengthen the original focused-control assertions with viewport inclusion. Production preview was built from the clean tested commit. Terminal outputs normalize trailing whitespace.",
+  "sourceSha256": {
+    "src/app/startRunApp.ts": "f20fa73fcd2d2fbf65881028410a1d601c537ed48d4b9482942f2d14104aae86",
+    "src/ui/runItems.ts": "b0a1634bf1e3d763ea188842d092b7cde88697a1bca46641b8ec83d58acc8842",
+    "src/ui/dialogs.ts": "ab656664b115e220e5bc09d075c0d94f8d74466fc8738323eca8daca8666f1c9",
+    "tests/run-progression.spec.ts": "be611221d839edd64248f4291d7f6b8f3d57362ebfbe4e21c7f6d101fd6a3df8",
+    "package.json": "1aea488e60265ffca7c4ccf0d2b6a5c2e3912a6ba7fe4ba6a46a941efe546530",
+    "package-lock.json": "e05e63e5c84dddd65df26c9f97204cb248c5adcd07aad4612bad4047b8e8b310"
+  },
+  "evidenceSha256": {
+    "focus-matrix.txt": "57ac60d2c31cd24d63016c6641d6e6f8155c145fb615540f3c4d257eb5d355f4",
+    "focus-webkit.config.ts.txt": "f5957134e5e2762c22cdca9960258661ea3247918ea92601b8332ee327202ff2",
+    "focus-build.txt": "d69822f1fb0c5bc45e916bbbb14fe90f34607ef7db40e1991080334c17d70206",
+    "focus-red.txt": "155d20e1ec8b393b0409a581054edb4ec2539bbe56d52725982c23c0006dbb34",
+    "focus-unit.txt": "731ae965cdae3688f674800085062b1007e8600a0b068d72258c8e31f14e3a19",
+    "focus-webkit.txt": "dca7eade2976a1c1c6067541698be5e755e5995cbcc2b5adf0f4a0d9a9d0a5e3",
+    "focus-webkit-results.json": "bd208534ef0071172edfd985a1e9dc7c70d6ed40e151ba49b8c91738ecbb6432"
+  }
+}

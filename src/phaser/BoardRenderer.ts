@@ -5,6 +5,7 @@ import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresent
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
+import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 
 const REACHABLE_COLOR = 0x46d7c7;
@@ -20,6 +21,8 @@ export class BoardRenderer {
   private readonly bounds: Bounds;
   private readonly highlights = new Map<string, Phaser.GameObjects.Image>();
   private readonly images = new Map<number, Phaser.GameObjects.Image>();
+  private readonly healthBars = new Map<number, Phaser.GameObjects.Graphics>();
+  private moving: { unitId: number; point: Point; depth: number } | null = null;
   private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
@@ -82,10 +85,16 @@ export class BoardRenderer {
       const ring = scene.add.graphics();
       this.images.set(occupant.id, image);
       this.rings.set(occupant.id, ring);
-      this.root.add([ring, image]);
+      const health = scene.add.graphics();
+      this.healthBars.set(occupant.id, health);
+      this.root.add([ring, image, health]);
     }
     // Reserve sprite space on every cell so moving never escapes the fitted bounds.
-    const rectangles = [boardBounds(this.board.tiles), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
+    // Reserve the maximum bounded bar extent on every cell (also during movement).
+    const rectangles = [boardBounds(this.board.tiles), ...this.board.tiles.map(tile => {
+      const p = projectTile(tile);
+      return {left:p.x-24, right:p.x+24, top:p.y+7, bottom:p.y+19};
+    }), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
       ...this.board.tiles.flatMap(tile => this.board.occupants.map(occupant => {
         const asset = catalog.assets[occupant.assetId];
         return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
@@ -147,7 +156,13 @@ export class BoardRenderer {
       const tile = this.byCell.get(cellKey(unit.cell))!;
       const point = projectTile(tile);
       const depth = tile.depth;
-      this.images.get(unit.id)!.setPosition(point.x, point.y).setDepth(depth + OCCUPANT_LAYER).setVisible(unit.hp > 0);
+      const moving = this.moving?.unitId === unit.id ? this.moving : null;
+      const position = moving?.point ?? point;
+      const unitDepth = moving?.depth ?? depth;
+      this.images.get(unit.id)!.setPosition(position.x, position.y).setDepth(unitDepth + OCCUPANT_LAYER).setVisible(unit.hp > 0);
+      const definition = unit.side === 'player' ? this.catalog.heroes[unit.defId] : this.catalog.enemies[unit.defId];
+      this.drawHealth(unit.id, healthFraction(unit.hp, definition.stats.maxHp), unit.hp > 0);
+      this.placeHealth(unit.id, position, unitDepth);
       const ring = this.rings.get(unit.id)!.clear().setDepth(depth + 2.25).setVisible(unit.hp > 0);
       ring.lineStyle(unit.id === activeId ? 3 : 2, unit.id === activeId ? ACTIVE_COLOR : unit.side === 'player' ? 0x6ddbf5 : 0xf17a73)
         .strokeEllipse(point.x, point.y, 26, 12);
@@ -202,7 +217,7 @@ export class BoardRenderer {
     const finish=()=>{
       if(finished)return;finished=true;tween?.stop();
       labels.forEach(l=>{if(l.scene)l.destroy();});if(graphics?.scene)graphics.destroy();
-      this.effectLabels=[];this.animatedSnapshot=undefined;this.effect=null;
+      this.effectLabels=[];this.animatedSnapshot=undefined;this.effect=null;this.moving=null;
       // Scene shutdown destroys the display list before canceling this presentation.
       // Resolve cancellation without touching images whose scene/texture binding is gone.
       if(this.root.scene)this.present(after,[],null);
@@ -269,7 +284,10 @@ export class BoardRenderer {
       if(i<0)return;
       const a=this.byCell.get(cellKey(move.path[i]))!,b=this.byCell.get(cellKey(move.path[i+1]))!;
       const p=projectTile(a),q=projectTile(b),t=progress-i;
-      this.images.get(move.unitId)!.setPosition(p.x+(q.x-p.x)*t,p.y+(q.y-p.y)*t).setDepth((t<0.5?a:b).depth+OCCUPANT_LAYER);
+      const point = {x:p.x+(q.x-p.x)*t,y:p.y+(q.y-p.y)*t}, depth = (t<0.5?a:b).depth;
+      this.moving = {unitId:move.unitId,point,depth};
+      this.images.get(move.unitId)!.setPosition(point.x,point.y).setDepth(depth+OCCUPANT_LAYER);
+      this.placeHealth(move.unitId,point,depth);
       const movingTile={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,elevation:a.elevation+(b.elevation-a.elevation)*t};
       for(const canopy of this.canopies){
         const overlaps=before.units.some(unit=>{
@@ -281,6 +299,15 @@ export class BoardRenderer {
         canopy.graphics.setAlpha(overlaps?CANOPY_ART.fadedAlpha:1);
       }
       this.root.sort('depth');
+      const game=document.querySelector<HTMLElement>('#game')!;
+      const report=JSON.parse(game.dataset.battleReport!);
+      const unit=report.units.find((u:{id:number})=>u.id===move.unitId);
+      const bar=this.healthBars.get(move.unitId)!;
+      unit.position=point;unit.depth=depth+OCCUPANT_LAYER;
+      unit.health.position={x:bar.x,y:bar.y};unit.health.depth=bar.depth;
+      const screen=this.root.getWorldTransformMatrix().transformPoint(bar.x,bar.y);
+      unit.health.screen={x:screen.x,y:screen.y};
+      game.dataset.battleReport=JSON.stringify(report);
     },onComplete:finish});
     return {done,cancel:finish};
   }
@@ -312,7 +339,26 @@ export class BoardRenderer {
     this.view = constrainView(view, this.bounds, this.region, this.fitScale);
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
+    for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
     this.publish();
+  }
+
+  // Informational annotations must clear foreground tiles; combat effects start at 10000.
+  private placeHealth(id:number, point:Point, depth:number):void {
+    this.healthBars.get(id)!.setPosition(point.x,point.y+HEALTH_BAR.offsetY).setDepth(9000+depth/10000);
+  }
+
+  private drawHealth(id:number, ratio:number, visible:boolean):void {
+    const bar=this.healthBars.get(id)!;
+    bar.clear().setVisible(visible).setScale(healthBarScale(this.view.scale));
+    const stroke=(fraction:number,width:number,color:number)=>{
+      const points=healthArc(fraction);
+      bar.lineStyle(width,color,1).beginPath().moveTo(points[0].x,points[0].y);
+      for(const p of points.slice(1))bar.lineTo(p.x,p.y);
+      bar.strokePath();
+    };
+    stroke(1,HEALTH_BAR.track,HEALTH_COLORS.background);
+    if(ratio>0)stroke(ratio,HEALTH_BAR.fill,healthColor(ratio));
   }
 
   private layoutFeedback():void {
@@ -402,6 +448,15 @@ export class BoardRenderer {
       const expected = matrix.transformPoint(projected.x, projected.y);
       const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
       return { id: unit.id, unitId: unit.defId, side: unit.side, tile: { ...unit.cell, elevation: tile.elevation },
+        health: (()=>{
+          const bar=this.healthBars.get(unit.id)!;
+          const definition=unit.side==='player'?this.catalog.heroes[unit.defId]:this.catalog.enemies[unit.defId];
+          const ratio=healthFraction(unit.hp,definition.stats.maxHp);
+          const screen=matrix.transformPoint(bar.x,bar.y);
+          return {hp:unit.hp,maxHp:definition.stats.maxHp,ratio,color:healthColor(ratio),visible:bar.visible,
+            position:{x:bar.x,y:bar.y},screen:{x:screen.x,y:screen.y},depth:bar.depth,scale:bar.scaleX,
+            interactive:!!bar.input};
+        })(),
         assetId: image.texture.key, origin: { x: image.originX, y: image.originY }, depth: image.depth,
         position: { x: image.x, y: image.y }, anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
     });

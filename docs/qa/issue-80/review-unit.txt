@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2
+
+
+ Test Files  39 passed (39)
+      Tests  654 passed (654)
+   Start at  06:56:13
+   Duration  4.64s (tests 84%, transform 9%, import 6%)

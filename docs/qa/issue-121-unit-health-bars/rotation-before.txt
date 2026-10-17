@@ -1,0 +1,55 @@
+[WebServer] (node:34363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:34404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.1s)
+(node:34422) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (935ms)
+(node:34438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [mobile-portrait] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [mobile-portrait] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 [mobile-portrait] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [mobile-landscape] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34555) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  8 [mobile-landscape] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+(node:34570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  9 [mobile-landscape] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact (1.2s)
+
+
+  1) [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
+
+    Error: expect(received).not.toEqual(expected) // deep equality
+
+    Expected: not {"height": 720, "width": 1280}
+
+
+      187 |   expect(before.tiles.find((t:any)=>t.x===unit.cell.x && t.y===unit.cell.y).elevation).toBeGreaterThan(0);
+      188 |   const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});await page.clock.runFor(64);
+    > 189 |   const after=await report(page);aligned(after,fixture);expect(after.viewport).not.toEqual(before.viewport);
+          |                                                                                    ^
+      190 |   await page.screenshot({path:info.outputPath('elevated-rotated-impact.png')});
+      191 |   await page.clock.runFor(500);expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.after);
+      192 | });
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/battle-animations.spec.ts:189:84
+
+    Error Context: ../../../../../../tmp/tg121-rotation-results/battle-animations-elevated-135a1-ough-rotation-during-impact-desktop-repeat1/error-context.md
+
+  1 failed
+    [desktop] › tests/battle-animations.spec.ts:183:1 › elevated target remains anchored through rotation during impact
+  8 passed (15.7s)

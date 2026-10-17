@@ -1,0 +1,10 @@
+[WebServer] (node:99814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:99897) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/battle-animations.spec.ts:180:1 › elevated target remains anchored through rotation during impact (1.1s)
+
+  1 passed (2.2s)

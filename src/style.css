@@ -118,3 +118,6 @@ dialog button { touch-action: manipulation; }
 @media (orientation:landscape) and (max-height:500px) and (max-width:640px) { .battle-mode #battle-shell { grid-template-columns:minmax(0,1fr) 244px; } }
 @media (orientation:portrait) and (max-width:450px) and (max-height:700px) { .battle-mode #battle-heading { display:none; } }
 @media (prefers-reduced-motion:reduce) { .battle-mode * { scroll-behavior:auto; } }
+
+
+.run-entry-link { display:inline-flex; align-items:center; min-width:44px; min-height:44px; color:inherit; padding:4px 8px; box-sizing:border-box; }

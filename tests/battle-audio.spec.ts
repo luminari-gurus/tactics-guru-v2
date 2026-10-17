@@ -30,9 +30,14 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   await page.locator('#battle-sound').scrollIntoViewIfNeeded();
   const box=(await page.locator('#battle-sound').boundingBox())!;
   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
-  const cdp=await page.context().newCDPSession(page);
-  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2,id:1}]});
-  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const point={x:box.x+box.width/2,y:box.y+box.height/2};
+  if(test.info().project.use.hasTouch)await page.touchscreen.tap(point.x,point.y);
+  else {
+    const cdp=await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await cdp.detach();
+  }
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready',started:0});
   expect((await session(page)).state).toEqual(before.state);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});

@@ -1,0 +1,58 @@
+# Test info
+
+- Name: battle-audio.spec.ts >> sound control uses real gestures, preserves previews, modal focus and restart preference
+- Location: tests/battle-audio.spec.ts:21:1
+
+# Error details
+
+```
+Error: browserContext.newCDPSession: CDP session is only available in Chromium
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main "Tactics Guru game canvas" [ref=e2]:
+    - generic "Battle board. Arrow keys navigate, Enter selects, Escape cancels." [ref=e3]
+  - complementary "Battle controls" [ref=e4]:
+    - generic [ref=e5]:
+      - status [ref=e6]: Battle ready
+      - button "Restart battle" [ref=e7] [cursor=pointer]
+    - generic [ref=e8]:
+      - generic [ref=e9]: Battle saved on this device
+      - button "Save recovery" [ref=e10] [cursor=pointer]
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - button "Enable sound" [ref=e13] [cursor=pointer]
+        - generic [ref=e14]: Sound off
+      - generic "Heroes" [ref=e15]:
+        - 'button "Fighter portrait Fighter #1 · HP 18/18" [ref=e16] [cursor=pointer]':
+          - img "Fighter portrait" [ref=e17]
+          - generic [ref=e18]: "Fighter #1 · HP 18/18"
+        - 'button "Ranger portrait Ranger #2 · HP 12/12" [ref=e19] [cursor=pointer]':
+          - img "Ranger portrait" [ref=e20]
+          - generic [ref=e21]: "Ranger #2 · HP 12/12"
+        - 'button "Mage portrait Mage #3 · HP 11/11" [ref=e22] [cursor=pointer]':
+          - img "Mage portrait" [ref=e23]
+          - generic [ref=e24]: "Mage #3 · HP 11/11"
+      - paragraph [ref=e25]: "Round 1 · Your turn · Mage #3 · HP 11/11 · Move ready / Action ready"
+      - generic [ref=e26]:
+        - button "Move" [ref=e27] [cursor=pointer]
+        - button "Basic attack" [ref=e28] [cursor=pointer]
+        - 'button "Signature: Magic Missile" [ref=e29] [cursor=pointer]'
+        - button "Wait / End turn" [ref=e30] [cursor=pointer]
+      - text: Target (or select a board cell)
+      - combobox "Target (or select a board cell)" [disabled] [ref=e31]:
+        - option "Choose target" [selected]
+      - paragraph [ref=e32]: Select a tile
+      - paragraph [ref=e33]: Choose an action and target
+      - generic [ref=e34]:
+        - button "Review action" [disabled] [ref=e35]
+        - button "Cancel action" [disabled] [ref=e36]
+      - group [ref=e37]:
+        - generic "Battle log" [ref=e38] [cursor=pointer]
+    - paragraph [ref=e39]: "Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels"
+    - link "Play three-encounter run" [ref=e40]:
+      - /url: /run
+```

@@ -1,0 +1,42 @@
+[WebServer] (node:31410) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 25 tests using 1 worker
+
+(node:31451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [health-desktop] › tests/unit-health-bars.spec.ts:66:1 › health bars are visible, attached and informational through mobile navigation (2.1s)
+  ✓   2 [health-desktop] › tests/unit-health-bars.spec.ts:112:1 › elevated movement keeps bars attached through refresh, rotation and restart (2.9s)
+  ✓   3 [health-desktop] › tests/unit-health-bars.spec.ts:131:34 › health follows damage presentation, cancellation and save resume (803ms)
+  ✓   4 [health-desktop] › tests/unit-health-bars.spec.ts:131:34 › health follows defeat presentation, cancellation and save resume (802ms)
+  ✓   5 [health-desktop] › tests/unit-health-bars.spec.ts:150:1 › real run reward healing carries into the next encounter without old bars (17.8s)
+(node:31532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [health-android-portrait] › tests/unit-health-bars.spec.ts:66:1 › health bars are visible, attached and informational through mobile navigation (2.3s)
+  ✓   7 [health-android-portrait] › tests/unit-health-bars.spec.ts:112:1 › elevated movement keeps bars attached through refresh, rotation and restart (3.0s)
+  ✓   8 [health-android-portrait] › tests/unit-health-bars.spec.ts:131:34 › health follows damage presentation, cancellation and save resume (900ms)
+  ✓   9 [health-android-portrait] › tests/unit-health-bars.spec.ts:131:34 › health follows defeat presentation, cancellation and save resume (912ms)
+  ✓  10 [health-android-portrait] › tests/unit-health-bars.spec.ts:150:1 › real run reward healing carries into the next encounter without old bars (17.8s)
+(node:31623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 [health-android-landscape] › tests/unit-health-bars.spec.ts:66:1 › health bars are visible, attached and informational through mobile navigation (2.3s)
+  ✓  12 [health-android-landscape] › tests/unit-health-bars.spec.ts:112:1 › elevated movement keeps bars attached through refresh, rotation and restart (3.0s)
+  ✓  13 [health-android-landscape] › tests/unit-health-bars.spec.ts:131:34 › health follows damage presentation, cancellation and save resume (910ms)
+  ✓  14 [health-android-landscape] › tests/unit-health-bars.spec.ts:131:34 › health follows defeat presentation, cancellation and save resume (967ms)
+  ✓  15 [health-android-landscape] › tests/unit-health-bars.spec.ts:150:1 › real run reward healing carries into the next encounter without old bars (17.7s)
+(node:31721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 [health-iphone-portrait] › tests/unit-health-bars.spec.ts:66:1 › health bars are visible, attached and informational through mobile navigation (1.7s)
+  ✓  17 [health-iphone-portrait] › tests/unit-health-bars.spec.ts:112:1 › elevated movement keeps bars attached through refresh, rotation and restart (3.1s)
+  ✓  18 [health-iphone-portrait] › tests/unit-health-bars.spec.ts:131:34 › health follows damage presentation, cancellation and save resume (991ms)
+  ✓  19 [health-iphone-portrait] › tests/unit-health-bars.spec.ts:131:34 › health follows defeat presentation, cancellation and save resume (986ms)
+  ✓  20 [health-iphone-portrait] › tests/unit-health-bars.spec.ts:150:1 › real run reward healing carries into the next encounter without old bars (20.0s)
+(node:31748) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [health-iphone-landscape] › tests/unit-health-bars.spec.ts:66:1 › health bars are visible, attached and informational through mobile navigation (1.7s)
+  ✓  22 [health-iphone-landscape] › tests/unit-health-bars.spec.ts:112:1 › elevated movement keeps bars attached through refresh, rotation and restart (3.0s)
+  ✓  23 [health-iphone-landscape] › tests/unit-health-bars.spec.ts:131:34 › health follows damage presentation, cancellation and save resume (937ms)
+  ✓  24 [health-iphone-landscape] › tests/unit-health-bars.spec.ts:131:34 › health follows defeat presentation, cancellation and save resume (950ms)
+  ✓  25 [health-iphone-landscape] › tests/unit-health-bars.spec.ts:150:1 › real run reward healing carries into the next encounter without old bars (20.3s)
+
+  25 passed (2.2m)

@@ -1,0 +1,34 @@
+# Test info
+
+- Name: run-progression.spec.ts >> run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play
+- Location: tests/run-progression.spec.ts:95:1
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=f1e1]:
+  - region "Authored run" [ref=f1e2]:
+    - heading "Three-encounter run" [level=1] [ref=f1e4]
+    - generic [ref=f1e5]:
+      - button "Start new run" [ref=f1e6] [cursor=pointer]
+      - button "Save recovery" [ref=f1e7] [cursor=pointer]
+      - link "Single battle" [ref=f1e8]:
+        - /url: /
+  - dialog [ref=f1e9]:
+    - heading "Run save recovery" [level=2] [ref=f1e10]
+    - paragraph [ref=f1e11]: "primary: invalid. backup: missing. Saved data needs recovery. Progress is unsaved until Save recovery resolves damaged or unreadable data."
+    - generic [ref=f1e12]:
+      - button "Export primary save" [ref=f1e13] [cursor=pointer]
+      - button "Remove primary save" [ref=f1e14] [cursor=pointer]
+      - button "Retry storage" [ref=f1e15] [cursor=pointer]
+      - button "Close" [ref=f1e16] [cursor=pointer]
+```

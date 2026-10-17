@@ -11,7 +11,10 @@ export class BattleSaveControls {
     private readonly activate:(session:BattleSession)=>void, private readonly replaced:()=>void) {
     this.root.hidden=false;
     this.root.innerHTML='<span id="battle-save-status" aria-live="polite"></span><button id="battle-recovery" type="button">Save recovery</button>';
-    this.root.querySelector('button')!.addEventListener('click',()=>this.recovery(),{signal:this.abort.signal});
+    this.root.querySelector('button')!.addEventListener('click',event=>{
+      // WebKit touch activation does not focus buttons; retain the actual invoker.
+      (event.currentTarget as HTMLButtonElement).focus();this.recovery();
+    },{signal:this.abort.signal});
     persistence.onChange=()=>this.render();this.render();
   }
   private render(){this.root.querySelector('#battle-save-status')!.textContent=this.persistence.status;}

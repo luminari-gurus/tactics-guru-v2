@@ -265,8 +265,14 @@ test('elevated target remains anchored through rotation during impact',async({pa
   await page.clock.runFor(288);const before=await report(page);aligned(before,fixture);
   const unit=fixture.before.units.find(u=>u.id===before.effect.targetId)!;
   expect(before.tiles.find((t:any)=>t.x===unit.cell.x && t.y===unit.cell.y).elevation).toBeGreaterThan(0);
-  const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});await page.clock.runFor(64);
-  const after=await report(page);aligned(after,fixture);expect(after.viewport).not.toEqual(before.viewport);
+  const size=page.viewportSize()!,rotated={width:size.height,height:size.width};
+  // Native resize delivery is independent of the paused animation clock. Wait
+  // for that event before advancing Phaser's resize/presentation callbacks.
+  await page.evaluate(()=>window.addEventListener('resize',()=>{document.documentElement.dataset.impactResize='observed';},{once:true}));
+  await page.setViewportSize(rotated);
+  await expect(page.locator('html')).toHaveAttribute('data-impact-resize','observed');
+  await page.clock.runFor(64);
+  const after=await report(page);aligned(after,fixture);expect(after.viewport).toEqual(rotated);
   await page.screenshot({path:info.outputPath('elevated-rotated-impact.png')});
   await page.clock.runFor(500);expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.after);
 });

@@ -1,0 +1,19 @@
+[WebServer] (node:14159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 4 tests using 1 worker
+
+(node:14200) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/4] [iphone-webkit-portrait] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus
+[2/4] [iphone-webkit-portrait] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus
+(node:14217) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[3/4] [iphone-webkit-landscape] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus
+[4/4] [iphone-webkit-landscape] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus
+  4 passed (7.3s)

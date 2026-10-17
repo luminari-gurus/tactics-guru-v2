@@ -1,0 +1,72 @@
+[WebServer] (node:13166) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:13207) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (5.3s)
+(node:13228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus (5.3s)
+
+
+  1) [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: 'Save recovery', exact: true })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('button', { name: 'Save recovery', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Save recovery', exact: true })
+        14 × locator resolved to <button type="button">Save recovery</button>
+           - unexpected value "inactive"
+
+
+      180 |   if(dismiss==='Escape')await page.keyboard.press('Escape');
+      181 |   else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
+    > 182 |   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();
+          |                                                                                                                        ^
+      183 |   expect(await recovery.evaluate(node=>node.isConnected && document.activeElement===node)).toBe(true);expect(await snapshot(page)).toEqual(before);
+      184 |  }
+      185 |  await page.goto('/run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+        at checkFocus (/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:182:120)
+        at /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:186:2
+
+    Error Context: test-results/run-progression-review-rec-9100f-cted-visible-keyboard-focus-desktop/error-context.md
+
+  2) [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: 'Save recovery', exact: true })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('button', { name: 'Save recovery', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Save recovery', exact: true })
+        14 × locator resolved to <button type="button">Save recovery</button>
+           - unexpected value "inactive"
+
+
+      180 |   if(dismiss==='Escape')await page.keyboard.press('Escape');
+      181 |   else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
+    > 182 |   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();
+          |                                                                                                                        ^
+      183 |   expect(await recovery.evaluate(node=>node.isConnected && document.activeElement===node)).toBe(true);expect(await snapshot(page)).toEqual(before);
+      184 |  }
+      185 |  await page.goto('/run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+        at checkFocus (/Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:182:120)
+        at /Users/brian/.codex/worktrees/issue-80-run-progression/tactics-guru-v2/tests/run-progression.spec.ts:186:2
+
+    Error Context: test-results/run-progression-review-rec-47472-cted-visible-keyboard-focus-desktop/error-context.md
+
+  2 failed
+    [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Escape retains connected visible keyboard focus
+    [desktop] › tests/run-progression.spec.ts:176:50 › review: recovery dismissal via Close retains connected visible keyboard focus

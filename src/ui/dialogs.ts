@@ -24,9 +24,13 @@ export class BattleDialogs {
     this.element.addEventListener('keydown',e=>{
       if(e.key!=='Tab')return;
       const buttons=[...this.element.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')];
-      const first=buttons[0],last=buttons.at(-1);
-      if(e.shiftKey && document.activeElement===first){e.preventDefault();last?.focus();}
-      else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first?.focus();}
+      if(!buttons.length){e.preventDefault();return;}
+      // WebKit's native Tab policy can skip buttons and leave the document.
+      // Own the complete cycle, including focus initially on the dialog itself.
+      const current=buttons.findIndex(button=>button===document.activeElement);
+      const next=current<0?(e.shiftKey?buttons.length-1:0)
+        :(current+(e.shiftKey?-1:1)+buttons.length)%buttons.length;
+      e.preventDefault();buttons[next].focus();
     },{signal});
   }
   get open(){return this.element.open;}

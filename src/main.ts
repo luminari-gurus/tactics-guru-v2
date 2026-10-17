@@ -1,7 +1,9 @@
 const basePath = new URL(import.meta.env.BASE_URL, location.origin).pathname.replace(/\/$/, '');
 const path = location.pathname.replace(/\/$/, '');
 try {
-  if (path === `${basePath}/map`) {
+  if (path === `${basePath}/run`) {
+    await import('./app/startRunApp');
+  } else if (path === `${basePath}/map`) {
     const { startMap } = await import('./map/view');
     startMap();
   } else {
