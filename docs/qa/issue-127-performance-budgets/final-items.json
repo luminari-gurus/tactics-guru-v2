@@ -1,0 +1,838 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\node_modules\\playwright\\cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-owned.config.ts"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\playwright-owned.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/playwright-artifacts/items",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/run-items.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/playwright-artifacts/items",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/run-items.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/playwright-artifacts/items",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/run-items.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\docs\\qa\\issue-127-performance-budgets\\final-items.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js  --host 127.0.0.1 --base=/ --port 4187 --strictPort",
+      "cwd": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru",
+      "url": "http://127.0.0.1:4187/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "run-items.spec.ts",
+      "file": "run-items.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1931,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:05.133Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-4b43e12150cdf167bbed",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 540,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:07.310Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-aff8a23654e9715e9add",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 607,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:07.856Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-41b491a3296fe41d5e10",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1152,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:08.473Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-ac8214a2dd167286c7c2",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 384,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:09.632Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-c46a8e79569407231fd1",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 667,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:10.026Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-1f192850f2e57adc6fad",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 514,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:10.700Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6aaa3bf2f2c86783347c",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        },
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 617,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:11.889Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6909c702fe87aa095708",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 678,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:12.812Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-df0bea338d29a40bdd74",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 582,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:13.496Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-d718d5bdaa70ca117dc3",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 775,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:14.083Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-4b8c7f3a87ac05834fb9",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 301,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:14.865Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-63d5391743fd950a12f8",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 451,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:15.174Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6b0b9deb196152bb1b4c",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 590,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:15.633Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-91acbb70a2fae9745589",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        },
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 563,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:16.890Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-072a6f0d752b90b0d84e",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 663,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:17.707Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6a2375e872b88466098e",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 565,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:18.377Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-a7bc5b4b95442d71f79b",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 766,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:18.949Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-5dd15b966cdea33a92c7",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 299,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:19.722Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-d2d8e0c49c1458847c99",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 397,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:20.028Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-8f9f231a224b9ed33df1",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 468,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:20.431Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6170ecdfe403c814acfb",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T20:11:04.254Z",
+    "duration": 17377.067,
+    "expected": 21,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

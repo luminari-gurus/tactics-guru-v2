@@ -1,0 +1,30 @@
+
+ RUN  v5.0.3 C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru
+
+
+ Test Files  5 passed (5)
+      Tests  167 passed (167)
+   Start at  22:39:35
+   Duration  7.65s (tests 91%, import 5%, transform 4%)
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             3.51 kB │ gzip:   1.21 kB
+dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+dist/assets/start-CdNa8b79.js               0.06 kB │ gzip:   0.07 kB
+dist/assets/battleLayout-BVayxngr.js        0.55 kB │ gzip:   0.31 kB
+dist/assets/preload-helper-DjzSQ1t3.js      1.38 kB │ gzip:   0.75 kB
+dist/assets/rng-BCcJOpRP.js                 1.65 kB │ gzip:   0.81 kB
+dist/assets/index-D88e0aA2.js               1.75 kB │ gzip:   0.89 kB
+dist/assets/startBattleApp-DGVNnygS.js      2.78 kB │ gzip:   1.17 kB
+dist/assets/browser-B3xqGy3Q.js             3.26 kB │ gzip:   1.37 kB
+dist/assets/view-AtAZgSY1.js                8.83 kB │ gzip:   3.51 kB
+dist/assets/startRunApp-Bilq3hma.js        25.55 kB │ gzip:   8.75 kB
+dist/assets/start-2SqJG_gt.js           1,417.34 kB │ gzip: 368.30 kB
+
+✓ built in 1.08s

@@ -1,0 +1,351 @@
+{
+  "floatNoiseToleranceMs": 0.000001,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "build": {
+    "commit": "13418626fab4cc40609cd2255d54800c15e34805",
+    "dirty": false
+  },
+  "captureFailures": [],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1910.2000000476837,
+        "codeBytes": 408717,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408717,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 813.5999999642372,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 813.5999999642372,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1024.800000011921,
+        "codeBytes": 408717,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408717,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 705.8999999761581,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.899999976158142
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1001.8999999761581,
+        "codeBytes": 408717,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408717,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 726.8999999761581,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.800000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 985.8000000119209,
+        "codeBytes": 408844,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408844,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 753.6999999880791,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 753.6999999880791,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1786.800000011921,
+        "codeBytes": 408717,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408717,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1111.199999988079,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1111.199999988079,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 957.6999999880791,
+        "codeBytes": 408911,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408911,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 838.5,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.800000011920929
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 838.5,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1422.5,
+        "codeBytes": 408844,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.200000047683716
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408844,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1102.699999988079,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.800000011920929
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1102.699999988079,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1202.8999999761581,
+        "codeBytes": 408856,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 8.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408856,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 825.8000000119209,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.800000011920929
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 825.8000000119209,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1014.6999999880791,
+        "codeBytes": 408856,
+        "assetBytes": 848829,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.5
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408856,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 882.2000000476837,
+        "codeBytes": 3748,
+        "assetBytes": 7800,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 882.2000000476837,
+          "limit": 750
+        }
+      ]
+    }
+  ],
+  "failedSamples": 16,
+  "passed": false
+}

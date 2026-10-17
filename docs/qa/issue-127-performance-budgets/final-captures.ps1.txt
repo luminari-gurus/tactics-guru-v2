@@ -1,0 +1,26 @@
+$ErrorActionPreference = 'Stop'
+$runningTests = Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'playwright.*\btest\b' }
+if ($runningTests) { throw 'Browser tests are still running; do not overlap performance capture.' }
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+$captureSpecs = @(
+  @{Name='historical-release-battle'; Url='https://86327a77.tactics-guru-v2.pages.dev/'; Commit='13418626fab4cc40609cd2255d54800c15e34805'},
+  @{Name='historical-release-run'; Url='https://86327a77.tactics-guru-v2.pages.dev/run'; Commit='13418626fab4cc40609cd2255d54800c15e34805'},
+  @{Name='baseline-edge-battle'; Url='http://127.0.0.1:4174/'; Commit='f1184d5ab474a97df418183edb4f56f4831a4366'},
+  @{Name='baseline-edge-run'; Url='http://127.0.0.1:4174/run'; Commit='f1184d5ab474a97df418183edb4f56f4831a4366'},
+  @{Name='candidate-edge-battle'; Url='http://127.0.0.1:4188/'; Commit='f28f33181f2d1d4cb6eacf284e7753e56c674397'},
+  @{Name='candidate-edge-run'; Url='http://127.0.0.1:4188/run'; Commit='f28f33181f2d1d4cb6eacf284e7753e56c674397'},
+  @{Name='candidate-preview-battle'; Url='https://10caa3ab.tactics-guru-v2.pages.dev/'; Commit='f28f33181f2d1d4cb6eacf284e7753e56c674397'},
+  @{Name='candidate-preview-run'; Url='https://10caa3ab.tactics-guru-v2.pages.dev/run'; Commit='f28f33181f2d1d4cb6eacf284e7753e56c674397'}
+)
+foreach ($captureSpec in $captureSpecs) {
+  $receiptPath = "docs/qa/issue-127-performance-budgets/$($captureSpec.Name).json"
+  $evaluationPath = "docs/qa/issue-127-performance-budgets/$($captureSpec.Name)-gates.json"
+  if ((Test-Path -LiteralPath $receiptPath) -or (Test-Path -LiteralPath $evaluationPath)) { throw "Preserve the existing attempt: $receiptPath" }
+  node --experimental-strip-types scripts/measure-fit.ts $receiptPath --scene battle --url $captureSpec.Url *> "tmp/$($captureSpec.Name).log"
+  $captureExit = $LASTEXITCODE
+  if ($captureExit -ne 0) { throw "Invalid capture retained at $receiptPath; inspect its log before continuing." }
+  node -e "const r=JSON.parse(require('fs').readFileSync(process.argv[1]));if(r.measuredBuild?.commit!==process.argv[2]||r.measuredBuild.dirty||r.samples.length!==18||r.failures.length)throw Error('Unexpected source or incomplete capture');" $receiptPath $captureSpec.Commit
+  if ($LASTEXITCODE -ne 0) { throw "Source/completeness mismatch retained at $receiptPath" }
+  node --experimental-strip-types scripts/evaluate-fit.ts $receiptPath $evaluationPath
+  # Exit 1 from the evaluator is an actual budget result, not grounds to replace a sample.
+}
