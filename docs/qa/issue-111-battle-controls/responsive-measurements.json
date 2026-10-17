@@ -1,0 +1,1392 @@
+[
+  {
+    "width": 1280,
+    "height": 720,
+    "stress": false,
+    "region": {
+      "x": 13,
+      "y": 93.109375,
+      "width": 890,
+      "height": 576.09375,
+      "top": 93.109375,
+      "right": 903,
+      "bottom": 669.203125,
+      "left": 13
+    },
+    "panel": {
+      "x": 916,
+      "y": 12,
+      "width": 352,
+      "height": 696,
+      "top": 12,
+      "right": 1268,
+      "bottom": 708,
+      "left": 916
+    },
+    "actor": {
+      "x": 917,
+      "y": 13,
+      "width": 350,
+      "height": 188.015625,
+      "top": 13,
+      "right": 1267,
+      "bottom": 201.015625,
+      "left": 917
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 150,
+        "height": 66,
+        "left": 933,
+        "right": 1083,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 150,
+        "height": 66,
+        "left": 1091,
+        "right": 1241,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 150,
+        "height": 66,
+        "left": 933,
+        "right": 1083,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 150,
+        "height": 66,
+        "left": 1091,
+        "right": 1241,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 308,
+        "height": 44,
+        "left": 933,
+        "right": 1241,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 150,
+        "height": 44,
+        "left": 933,
+        "right": 1083,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 150,
+        "height": 44,
+        "left": 1091,
+        "right": 1241,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 99.078125,
+        "height": 44,
+        "left": 933,
+        "right": 1032.078125,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 79.96875,
+        "height": 44,
+        "left": 1038.078125,
+        "right": 1118.046875,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 102.015625,
+        "height": 44,
+        "left": 1124.046875,
+        "right": 1226.0625,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 308,
+        "height": 44,
+        "left": 933,
+        "right": 1241,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 308,
+        "height": 44,
+        "left": 933,
+        "right": 1241,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "stress": true,
+    "region": {
+      "x": 25,
+      "y": 149.265625,
+      "width": 866,
+      "height": 481.140625,
+      "top": 149.265625,
+      "right": 891,
+      "bottom": 630.40625,
+      "left": 25
+    },
+    "panel": {
+      "x": 904,
+      "y": 24,
+      "width": 352,
+      "height": 662,
+      "top": 24,
+      "right": 1256,
+      "bottom": 686,
+      "left": 904
+    },
+    "actor": {
+      "x": 905,
+      "y": 25,
+      "width": 350,
+      "height": 297,
+      "top": 25,
+      "right": 1255,
+      "bottom": 322,
+      "left": 905
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 150,
+        "height": 134.578125,
+        "left": 921,
+        "right": 1071,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 150,
+        "height": 134.578125,
+        "left": 1079,
+        "right": 1229,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 150,
+        "height": 230.5625,
+        "left": 921,
+        "right": 1071,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 150,
+        "height": 230.5625,
+        "left": 1079,
+        "right": 1229,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 308,
+        "height": 58,
+        "left": 921,
+        "right": 1229,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 150,
+        "height": 109.59375,
+        "left": 921,
+        "right": 1071,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 150,
+        "height": 109.59375,
+        "left": 1079,
+        "right": 1229,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 172.15625,
+        "height": 55.828125,
+        "left": 921,
+        "right": 1093.15625,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 133.9375,
+        "height": 55.828125,
+        "left": 921,
+        "right": 1054.9375,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 178.03125,
+        "height": 55.828125,
+        "left": 921,
+        "right": 1099.03125,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 308,
+        "height": 55.828125,
+        "left": 921,
+        "right": 1229,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 308,
+        "height": 55.828125,
+        "left": 921,
+        "right": 1229,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "stress": false,
+    "region": {
+      "x": 9,
+      "y": 71.109375,
+      "width": 394,
+      "height": 292.78125,
+      "top": 71.109375,
+      "right": 403,
+      "bottom": 363.890625,
+      "left": 9
+    },
+    "panel": {
+      "x": 8,
+      "y": 403.5625,
+      "width": 396,
+      "height": 503.4375,
+      "top": 403.5625,
+      "right": 404,
+      "bottom": 907,
+      "left": 8
+    },
+    "actor": {
+      "x": 9,
+      "y": 404.5625,
+      "width": 394,
+      "height": 180.015625,
+      "top": 404.5625,
+      "right": 403,
+      "bottom": 584.578125,
+      "left": 9
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 176,
+        "height": 66,
+        "left": 21,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 176,
+        "height": 66,
+        "left": 205,
+        "right": 381,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 176,
+        "height": 66,
+        "left": 21,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 176,
+        "height": 66,
+        "left": 205,
+        "right": 381,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 360,
+        "height": 44,
+        "left": 21,
+        "right": 381,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 176,
+        "height": 44,
+        "left": 21,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 176,
+        "height": 44,
+        "left": 205,
+        "right": 381,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 99.078125,
+        "height": 44,
+        "left": 21,
+        "right": 120.078125,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 79.96875,
+        "height": 44,
+        "left": 126.078125,
+        "right": 206.046875,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 102.015625,
+        "height": 44,
+        "left": 212.046875,
+        "right": 314.0625,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 360,
+        "height": 44,
+        "left": 21,
+        "right": 381,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 360,
+        "height": 44,
+        "left": 21,
+        "right": 381,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "stress": true,
+    "region": {
+      "x": 25,
+      "y": 77.421875,
+      "width": 362,
+      "height": 274.5,
+      "top": 77.421875,
+      "right": 387,
+      "bottom": 351.921875,
+      "left": 25
+    },
+    "panel": {
+      "x": 24,
+      "y": 401.09375,
+      "width": 364,
+      "height": 479.90625,
+      "top": 401.09375,
+      "right": 388,
+      "bottom": 881,
+      "left": 24
+    },
+    "actor": {
+      "x": 25,
+      "y": 402.09375,
+      "width": 362,
+      "height": 215.046875,
+      "top": 402.09375,
+      "right": 387,
+      "bottom": 617.140625,
+      "left": 25
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 160,
+        "height": 134.578125,
+        "left": 37,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 160,
+        "height": 134.578125,
+        "left": 205,
+        "right": 365,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 160,
+        "height": 163.375,
+        "left": 37,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 160,
+        "height": 163.375,
+        "left": 205,
+        "right": 365,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 328,
+        "height": 58,
+        "left": 37,
+        "right": 365,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 160,
+        "height": 109.59375,
+        "left": 37,
+        "right": 197,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 160,
+        "height": 109.59375,
+        "left": 205,
+        "right": 365,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 172.15625,
+        "height": 55.828125,
+        "left": 37,
+        "right": 209.15625,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 133.9375,
+        "height": 55.828125,
+        "left": 215.15625,
+        "right": 349.09375,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 178.03125,
+        "height": 55.828125,
+        "left": 37,
+        "right": 215.03125,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 328,
+        "height": 55.828125,
+        "left": 37,
+        "right": 365,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 328,
+        "height": 55.828125,
+        "left": 37,
+        "right": 365,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 915,
+    "height": 412,
+    "stress": false,
+    "region": {
+      "x": 9,
+      "y": 66.109375,
+      "width": 609,
+      "height": 307.09375,
+      "top": 66.109375,
+      "right": 618,
+      "bottom": 373.203125,
+      "left": 9
+    },
+    "panel": {
+      "x": 627,
+      "y": 8,
+      "width": 280,
+      "height": 396,
+      "top": 8,
+      "right": 907,
+      "bottom": 404,
+      "left": 627
+    },
+    "actor": {
+      "x": 628,
+      "y": 9,
+      "width": 278,
+      "height": 171.015625,
+      "top": 9,
+      "right": 906,
+      "bottom": 180.015625,
+      "left": 628
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 120,
+        "height": 66,
+        "left": 638,
+        "right": 758,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 120,
+        "height": 66,
+        "left": 766,
+        "right": 886,
+        "reachable": true
+      },
+      {
+        "name": "Magic MissileUses action",
+        "width": 120,
+        "height": 96.15625,
+        "left": 638,
+        "right": 758,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 120,
+        "height": 96.15625,
+        "left": 766,
+        "right": 886,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 248,
+        "height": 44,
+        "left": 638,
+        "right": 886,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 120,
+        "height": 64.78125,
+        "left": 638,
+        "right": 758,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 120,
+        "height": 64.78125,
+        "left": 766,
+        "right": 886,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 99.078125,
+        "height": 44,
+        "left": 638,
+        "right": 737.078125,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 79.96875,
+        "height": 44,
+        "left": 743.078125,
+        "right": 823.046875,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 102.015625,
+        "height": 44,
+        "left": 638,
+        "right": 740.015625,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 248,
+        "height": 44,
+        "left": 638,
+        "right": 886,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 248,
+        "height": 44,
+        "left": 638,
+        "right": 886,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 915,
+    "height": 412,
+    "stress": true,
+    "region": {
+      "x": 25,
+      "y": 108.234375,
+      "width": 577,
+      "height": 226.59375,
+      "top": 108.234375,
+      "right": 602,
+      "bottom": 334.828125,
+      "left": 25
+    },
+    "panel": {
+      "x": 611,
+      "y": 24,
+      "width": 280,
+      "height": 354,
+      "top": 24,
+      "right": 891,
+      "bottom": 378,
+      "left": 611
+    },
+    "actor": {
+      "x": 612,
+      "y": 25,
+      "width": 278,
+      "height": 158.390625,
+      "top": 25,
+      "right": 890,
+      "bottom": 183.390625,
+      "left": 612
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 120,
+        "height": 163.375,
+        "left": 622,
+        "right": 742,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 120,
+        "height": 163.375,
+        "left": 750,
+        "right": 870,
+        "reachable": true
+      },
+      {
+        "name": "Magic MissileUses action",
+        "width": 120,
+        "height": 259.359375,
+        "left": 622,
+        "right": 742,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 120,
+        "height": 259.359375,
+        "left": 750,
+        "right": 870,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 248,
+        "height": 58,
+        "left": 622,
+        "right": 870,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 120,
+        "height": 154.390625,
+        "left": 622,
+        "right": 742,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 120,
+        "height": 154.390625,
+        "left": 750,
+        "right": 870,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 172.15625,
+        "height": 55.828125,
+        "left": 622,
+        "right": 794.15625,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 133.9375,
+        "height": 55.828125,
+        "left": 622,
+        "right": 755.9375,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 178.03125,
+        "height": 55.828125,
+        "left": 622,
+        "right": 800.03125,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 248,
+        "height": 55.828125,
+        "left": 622,
+        "right": 870,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 248,
+        "height": 55.828125,
+        "left": 622,
+        "right": 870,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "stress": false,
+    "region": {
+      "x": 9,
+      "y": 9,
+      "width": 302,
+      "height": 202.21875,
+      "top": 9,
+      "right": 311,
+      "bottom": 211.21875,
+      "left": 9
+    },
+    "panel": {
+      "x": 8,
+      "y": 250.890625,
+      "width": 304,
+      "height": 309.109375,
+      "top": 250.890625,
+      "right": 312,
+      "bottom": 560,
+      "left": 8
+    },
+    "actor": {
+      "x": 9,
+      "y": 251.890625,
+      "width": 302,
+      "height": 138.1875,
+      "top": 251.890625,
+      "right": 311,
+      "bottom": 390.078125,
+      "left": 9
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 130,
+        "height": 66,
+        "left": 21,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 130,
+        "height": 66,
+        "left": 159,
+        "right": 289,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 130,
+        "height": 96.15625,
+        "left": 21,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 130,
+        "height": 96.15625,
+        "left": 159,
+        "right": 289,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 268,
+        "height": 44,
+        "left": 21,
+        "right": 289,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 130,
+        "height": 44,
+        "left": 21,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 130,
+        "height": 44,
+        "left": 159,
+        "right": 289,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 99.078125,
+        "height": 44,
+        "left": 21,
+        "right": 120.078125,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 79.96875,
+        "height": 44,
+        "left": 126.078125,
+        "right": 206.046875,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 102.015625,
+        "height": 44,
+        "left": 21,
+        "right": 123.015625,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 268,
+        "height": 44,
+        "left": 21,
+        "right": 289,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 268,
+        "height": 44,
+        "left": 21,
+        "right": 289,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "stress": true,
+    "region": {
+      "x": 25,
+      "y": 25,
+      "width": 270,
+      "height": 170.390625,
+      "top": 25,
+      "right": 295,
+      "bottom": 195.390625,
+      "left": 25
+    },
+    "panel": {
+      "x": 24,
+      "y": 248.40625,
+      "width": 272,
+      "height": 285.59375,
+      "top": 248.40625,
+      "right": 296,
+      "bottom": 534,
+      "left": 24
+    },
+    "actor": {
+      "x": 25,
+      "y": 249.40625,
+      "width": 270,
+      "height": 127.609375,
+      "top": 249.40625,
+      "right": 295,
+      "bottom": 377.015625,
+      "left": 25
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 114,
+        "height": 201.765625,
+        "left": 37,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 114,
+        "height": 201.765625,
+        "left": 159,
+        "right": 273,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 114,
+        "height": 259.359375,
+        "left": 37,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 114,
+        "height": 259.359375,
+        "left": 159,
+        "right": 273,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 236,
+        "height": 58,
+        "left": 37,
+        "right": 273,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 114,
+        "height": 154.390625,
+        "left": 37,
+        "right": 151,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 114,
+        "height": 154.390625,
+        "left": 159,
+        "right": 273,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 172.15625,
+        "height": 55.828125,
+        "left": 37,
+        "right": 209.15625,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 133.9375,
+        "height": 55.828125,
+        "left": 37,
+        "right": 170.9375,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 178.03125,
+        "height": 55.828125,
+        "left": 37,
+        "right": 215.03125,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 236,
+        "height": 55.828125,
+        "left": 37,
+        "right": 273,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 236,
+        "height": 55.828125,
+        "left": 37,
+        "right": 273,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 568,
+    "height": 320,
+    "stress": false,
+    "region": {
+      "x": 9,
+      "y": 66.109375,
+      "width": 298,
+      "height": 215.09375,
+      "top": 66.109375,
+      "right": 307,
+      "bottom": 281.203125,
+      "left": 9
+    },
+    "panel": {
+      "x": 316,
+      "y": 8,
+      "width": 244,
+      "height": 304,
+      "top": 8,
+      "right": 560,
+      "bottom": 312,
+      "left": 316
+    },
+    "actor": {
+      "x": 317,
+      "y": 9,
+      "width": 242,
+      "height": 135.890625,
+      "top": 9,
+      "right": 559,
+      "bottom": 144.890625,
+      "left": 317
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 102,
+        "height": 81.765625,
+        "left": 327,
+        "right": 429,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 102,
+        "height": 81.765625,
+        "left": 437,
+        "right": 539,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 102,
+        "height": 96.15625,
+        "left": 327,
+        "right": 429,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 102,
+        "height": 96.15625,
+        "left": 437,
+        "right": 539,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 212,
+        "height": 44,
+        "left": 327,
+        "right": 539,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 102,
+        "height": 64.78125,
+        "left": 327,
+        "right": 429,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 102,
+        "height": 64.78125,
+        "left": 437,
+        "right": 539,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 99.078125,
+        "height": 44,
+        "left": 327,
+        "right": 426.078125,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 79.96875,
+        "height": 44,
+        "left": 432.078125,
+        "right": 512.046875,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 102.015625,
+        "height": 44,
+        "left": 327,
+        "right": 429.015625,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 212,
+        "height": 44,
+        "left": 327,
+        "right": 539,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 212,
+        "height": 44,
+        "left": 327,
+        "right": 539,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  },
+  {
+    "width": 568,
+    "height": 320,
+    "stress": true,
+    "region": {
+      "x": 25,
+      "y": 65.265625,
+      "width": 266,
+      "height": 176,
+      "top": 65.265625,
+      "right": 291,
+      "bottom": 241.265625,
+      "left": 25
+    },
+    "panel": {
+      "x": 300,
+      "y": 24,
+      "width": 244,
+      "height": 262,
+      "top": 24,
+      "right": 544,
+      "bottom": 286,
+      "left": 300
+    },
+    "actor": {
+      "x": 301,
+      "y": 25,
+      "width": 242,
+      "height": 117,
+      "top": 25,
+      "right": 543,
+      "bottom": 142,
+      "left": 301
+    },
+    "overflow": false,
+    "controls": [
+      {
+        "name": "MoveUses movement",
+        "width": 102,
+        "height": 201.765625,
+        "left": 311,
+        "right": 413,
+        "reachable": true
+      },
+      {
+        "name": "Basic attackUses action",
+        "width": 102,
+        "height": 201.765625,
+        "left": 421,
+        "right": 523,
+        "reachable": true
+      },
+      {
+        "name": "High ShotUses action",
+        "width": 102,
+        "height": 259.359375,
+        "left": 311,
+        "right": 413,
+        "reachable": true
+      },
+      {
+        "name": "Wait / End turnEnds turn immediately",
+        "width": 102,
+        "height": 259.359375,
+        "left": 421,
+        "right": 523,
+        "reachable": true
+      },
+      {
+        "name": "Choose target",
+        "width": 212,
+        "height": 58,
+        "left": 311,
+        "right": 523,
+        "reachable": true
+      },
+      {
+        "name": "Review action",
+        "width": 102,
+        "height": 199.1875,
+        "left": 311,
+        "right": 413,
+        "reachable": true
+      },
+      {
+        "name": "Cancel action",
+        "width": 102,
+        "height": 199.1875,
+        "left": 421,
+        "right": 523,
+        "reachable": true
+      },
+      {
+        "name": "Inspect party",
+        "width": 172.15625,
+        "height": 55.828125,
+        "left": 311,
+        "right": 483.15625,
+        "reachable": true
+      },
+      {
+        "name": "Battle log",
+        "width": 133.9375,
+        "height": 55.828125,
+        "left": 311,
+        "right": 444.9375,
+        "reachable": true
+      },
+      {
+        "name": "Enable sound",
+        "width": 178.03125,
+        "height": 55.828125,
+        "left": 311,
+        "right": 489.03125,
+        "reachable": true
+      },
+      {
+        "name": "Restart battle",
+        "width": 212,
+        "height": 55.828125,
+        "left": 311,
+        "right": 523,
+        "reachable": true
+      },
+      {
+        "name": "Save recovery",
+        "width": 212,
+        "height": 55.828125,
+        "left": 311,
+        "right": 523,
+        "reachable": true
+      }
+    ],
+    "contrast": {
+      "text": 10.688115650479352,
+      "hint": 7.4977794586974635,
+      "edge": 4.337554873555449
+    }
+  }
+]
