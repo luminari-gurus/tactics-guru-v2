@@ -1,0 +1,49 @@
+[WebServer] (node:39372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 24 tests using 1 worker
+
+(node:39413) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.2s)
+  ✓   2 [desktop] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.1s)
+  ✓   3 [desktop] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.9s)
+(node:39443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 [desktop] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.8s)
+  ✓   5 [desktop] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+(node:39464) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 [desktop] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.5s)
+  ✓   7 [desktop] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.2s)
+  ✓   8 [desktop] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.2s)
+(node:39485) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [mobile-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.1s)
+  ✓  10 [mobile-portrait] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.1s)
+  ✓  11 [mobile-portrait] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.9s)
+(node:39508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [mobile-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.7s)
+  ✓  13 [mobile-portrait] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+(node:39532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  14 [mobile-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.5s)
+  ✓  15 [mobile-portrait] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.2s)
+  ✓  16 [mobile-portrait] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.2s)
+(node:39553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [mobile-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.1s)
+  ✓  18 [mobile-landscape] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.1s)
+  ✓  19 [mobile-landscape] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.9s)
+(node:39577) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  20 [mobile-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.8s)
+  ✓  21 [mobile-landscape] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+(node:39598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  22 [mobile-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.4s)
+  ✓  23 [mobile-landscape] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.2s)
+  ✓  24 [mobile-landscape] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.2s)
+
+  24 passed (57.3s)

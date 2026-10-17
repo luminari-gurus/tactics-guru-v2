@@ -96,7 +96,12 @@ test('run startup preserves corrupt bytes, recovery captures input, and unavaila
  await page.goto('/run');await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();
  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');
  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');
- for(let i=0;i<8;i++){await page.keyboard.press('Tab');expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);}
+ const visited=new Set<string>();
+ for(const key of ['Tab','Shift+Tab'])for(let i=0;i<8;i++){
+  await page.keyboard.press(key);expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
+  visited.add(await page.evaluate(()=>document.activeElement!.id));
+ }
+ for(const id of await page.getByRole('dialog').getByRole('button').evaluateAll(buttons=>buttons.map(b=>b.id)))expect(visited.has(id)).toBe(true);
  await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
  await page.reload();await page.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});});await page.reload();
  await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');

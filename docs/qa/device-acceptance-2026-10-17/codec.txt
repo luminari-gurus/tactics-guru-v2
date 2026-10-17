@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/deviceAcceptanceTiming.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:59:31
+   Duration  1.48s (tests 86%, import 9%, transform 5%)

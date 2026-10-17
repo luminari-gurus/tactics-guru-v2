@@ -1,0 +1,26 @@
+# Test info
+
+- Name: battle-persistence.spec.ts >> startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+- Location: tests/battle-persistence.spec.ts:28:1
+
+# Error details
+
+```
+Error: expect(locator).toBeFocused() failed
+
+Locator:  locator('#battle-recovery')
+Expected: focused
+Received: inactive
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeFocused" locator('#battle-recovery') with timeout 5000ms
+  - waiting for locator('#battle-recovery')
+    14 × locator resolved to <button type="button" id="battle-recovery">Save recovery</button>
+       - unexpected value "inactive"
+
+```
+
+```yaml
+- button "Save recovery"
+```

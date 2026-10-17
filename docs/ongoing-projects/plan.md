@@ -1,5 +1,11 @@
 # Current project handoff — 2026-10-16
 
+## Device acceptance policy and closeout — 2026-10-17
+
+[PR #125](https://github.com/luminari-gurus/tactics-guru-v2/pull/125) merged the standing caller instruction: Playwright/device emulation is sufficient for all existing and future device acceptance unless the caller explicitly requests physical testing for that task. Historical hardware-only gates below are superseded.
+
+[Current device audit](../qa/device-acceptance-2026-10-17.md) records WebKit recovery-focus repairs in [PR #126](https://github.com/luminari-gurus/tactics-guru-v2/pull/126), verified persistence acceptance (#74/#58, closes on merge), and the unreproduced #66 restart disposition. #64/#81/#57 remain open for actual deployed transfer/idle failures in [#127](https://github.com/luminari-gurus/tactics-guru-v2/issues/127), not hardware availability. Original failures and source-bound measurements are retained. Release decisions remain separate.
+
 Main is `b175ddb5dabed2ee8457e132e345e9a2fc2affdb` after [PR #120](https://github.com/luminari-gurus/tactics-guru-v2/pull/120) merged the playable three-encounter run. Initial local source inspection used `work/issue-79-reward-item-controls` at `3060060`; the documentation PR is based on the main revision above. Tracker status was checked on 2026-10-16; no runtime tests or physical certification were performed for this documentation refresh.
 
 ## Delivered
