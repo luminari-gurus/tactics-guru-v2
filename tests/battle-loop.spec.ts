@@ -18,11 +18,14 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   const after = JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   const initial = JSON.parse(before!);
   expect(after.state).toEqual(initial.state); expect(after.replay).toEqual(initial.replay);
-  await expect(page.locator('#fit-restart')).toBeFocused();
-  // The Cancel button has the same callback as Escape; neither may leave focus
-  // on the Review button that cancellation just disabled.
+  // WebKit pointer activation leaves focus on the usable scroll region. Other
+  // browsers focus Review and need the Restart fallback after it is disabled.
+  await expect(page.locator('#fit-restart:focus, #battle-scroll:focus')).toHaveCount(1);
+  // Keyboard activation makes Review the invoker on every browser, so Cancel
+  // must use the fallback rather than leave focus on the now-disabled button.
   await page.locator('#battle-target').selectOption({index:1});
-  await page.getByRole('button',{name:'Review action'}).click();
+  await page.getByRole('button',{name:'Review action'}).focus();
+  await page.keyboard.press('Enter');
   await page.locator('#dialog-cancel').click();
   await expect(page.locator('#fit-restart')).toBeFocused();
   const cancelled=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
