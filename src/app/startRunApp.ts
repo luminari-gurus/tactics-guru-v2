@@ -8,7 +8,7 @@ import { RunItemSession } from './RunItemSession';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
-import { createGame } from '../phaser/createGame';
+import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import type Phaser from 'phaser';
 import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';

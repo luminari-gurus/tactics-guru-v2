@@ -34,6 +34,14 @@ Propagate asynchronous scene loading through the existing startup error handling
 
 This is the first bounded hypothesis, not a guarantee that scene separation alone saves the run's minimum 17,514 bytes. If it cannot satisfy the budget, retain the unsuccessful comparison and use the measured module contributions to propose the next bounded change. A dependency upgrade, custom engine build or renderer rewrite requires a revised plan, rather than silently broadening this one.
 
+### Measured revision: select the stock distribution without unused Matter physics
+
+The scene-isolation experiment passed 84 focused browser cases, but actual cold probes at clean `6c18fa7` transferred 407,063 battle / 414,354 run bytes, only 223 / 1,143 below the complete clean baseline. Extra chunks and request overhead consumed most of the saving. It cannot meet L3. Keep the experiment's source, raw probes and module inventory as evidence, but revert its source changes: the goal does not require asynchronous scene loading.
+
+The pinned Phaser 4.2.1 package ships `dist/phaser-arcade-physics.js`; its `src/phaser-arcade-physics.js` entry explicitly excludes Matter.js while retaining every other engine namespace used by this application. The package's distribution configuration enables both Canvas/WebGL renderers and sound. Source inspection finds no Phaser physics consumer in this project, whose simulation is already pure grid/domain code.
+
+Use an exact Vite alias from `phaser` to that existing package distribution. Resolve it from the installed package metadata, without changing package versions, editing vendor sources, building a custom engine, or changing runtime initialization. Extend the boot checks for engine-load errors and Canvas fallback, then run all required functional suites and complete matched matrices. This smaller change addresses the dominant measured module and retains the existing startup/lifecycle implementation.
+
 ### 3. Investigate idle timing separately
 
 Capture current baseline and candidate sequentially on the same host/browser, with no competing browser workload or profiling overhead in acceptance runs. Compare the original failing profile/repetition/cache, raw interval distributions, renderer, visibility and workload boundaries. Use a separate CPU/render trace to identify repeated application work, listener accumulation or scheduler effects; tracing must not be presented as a comparable acceptance sample.

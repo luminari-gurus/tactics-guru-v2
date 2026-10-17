@@ -8,7 +8,7 @@
 
 - Extend the existing performance acceptance contract explicitly to the authored run route, retaining the same limits and source-bound cold/warm protocol.
 - Reproduce the retained release and compare current main before changing code. Reuse the retained collector's isolated save handling and real run-start controls; report per-request transfer and every sample.
-- Separate engine creation from proof/content-smoke scene selection, then load only the requested scene graph if the bundle inventory confirms avoidable critical code. Preserve all scene entry points, engine/audio setup and gameplay. Measure the saving before choosing any additional optimization.
+- Evaluate selective scene loading, retain its measured comparison, then use the stock pinned Phaser Arcade distribution to omit unused Matter physics. The scene split saved too little and is removed from the final source. Preserve all entry points, both renderers, engine/audio setup and gameplay.
 - Investigate the run idle outlier with paired uninstrumented captures and separate profiling. Change runtime work only when a measured cause supports it; preserve unresolved failures.
 - Verify both routes against loading, transfer and frame budgets plus functional regressions. Keep local proof, deployed verification and production authorization distinct.
 

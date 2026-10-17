@@ -57,7 +57,7 @@ window.addEventListener('unhandledrejection', () => showError('The scene encount
 
 try {
   const { startProof } = await import('../phaser/start');
-  restart = await startProof(setStatus, showError);
+  restart = startProof(setStatus, showError);
 } catch {
   showError('Could not load or start Phaser');
 }

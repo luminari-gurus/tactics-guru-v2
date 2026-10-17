@@ -1,17 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-for (const route of ['', 'run']) test(`starts ${route || 'battle'} without loading unrelated scenes`, async ({page}) => {
-  const requests:string[]=[];page.on('request',r=>requests.push(r.url()));
-  await page.goto('./'+route);
-  if(route) { await page.locator('#run-start').click();await page.locator('#run-start-encounter').click(); }
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect(requests.some(url=>/\/(FitScene|ContentSmokeScene)[-.]/.test(url))).toBe(false);
-});
-
-for (const [route,chunk] of [['?scene=proof','FitScene'],['?scene=content-smoke','ContentSmokeScene'],['','BattleScene'],['run','BattleScene']]) {
-  test(`missing selected scene reports a recoverable startup error on ${route || 'battle'}`, async ({page}) => {
+for (const route of ['', '?scene=proof', '?scene=content-smoke', 'run']) {
+  test(`missing engine chunk reports a recoverable startup error on ${route || 'battle'}`, async ({page}) => {
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-    await page.route(new RegExp('/'+chunk+'-[^/]+\\.js$'),r=>r.abort());
+    await page.route(/\/start-[^/]+\.js$/,r=>r.abort());
     await page.goto('./'+route);
     await expect(page.locator('#fit-status')).toContainText('Could not load');
     await expect(page.locator('#fit-status')).toContainText('Reload');
@@ -19,6 +11,20 @@ for (const [route,chunk] of [['?scene=proof','FitScene'],['?scene=content-smoke'
     expect(errors).toEqual([]);
   });
 }
+
+test('battle keeps its Canvas renderer fallback without WebGL', async ({page}) => {
+  await page.addInitScript(()=>{
+    const original=HTMLCanvasElement.prototype.getContext as (this:HTMLCanvasElement,id:string,options?:unknown)=>RenderingContext|null;
+    HTMLCanvasElement.prototype.getContext=function(this:HTMLCanvasElement,id:string,options?:unknown){
+      if (['webgl','webgl2','experimental-webgl'].includes(id))return null;
+      return original.call(this,id,options);
+    } as typeof HTMLCanvasElement.prototype.getContext;
+  });
+  await page.goto('./');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect(await page.locator('canvas').evaluate(canvas=>(canvas as HTMLCanvasElement).getContext('2d')!==null)).toBe(true);
+  await page.screenshot({path:test.info().outputPath('canvas-fallback.png')});
+});
 
 test('boots a Phaser scene and fits the viewport after resize', async ({ page }) => {
   const errors: string[] = [];
