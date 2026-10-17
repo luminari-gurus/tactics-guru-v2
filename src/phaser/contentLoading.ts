@@ -41,7 +41,10 @@ export function loadContentAssets(scene: Phaser.Scene, catalog: ContentCatalog, 
   });
   scene.load.on('loaderror', onError);
   scene.load.once('complete', onComplete);
+  // Phaser still owns completion/texture creation; image requests can reuse HTML
+  // preloads and the portraits' decoded images without a second blob-XHR request.
+  scene.load.imageLoadType = 'HTMLImageElement';
   const pending = Object.values(catalog.assets).filter(asset => !scene.textures.exists(asset.id));
-  for (const asset of pending) scene.load.image(asset.id, publicAssetUrl(asset.runtimePath), { responseType: 'blob', timeout: CONTENT_LOAD_TIMEOUT_MS });
+  for (const asset of pending) scene.load.image(asset.id, publicAssetUrl(asset.runtimePath));
   if (pending.length) scene.load.start(); else onComplete();
 }

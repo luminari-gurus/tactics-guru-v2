@@ -34,8 +34,11 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
 
 for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {
-    const paths = new Set<string>(), errors: string[] = [];
-    page.on('request', request => paths.add(new URL(request.url()).pathname));
+    const paths = new Map<string, number>(), errors: string[] = [];
+    page.on('request', request => {
+      const path = new URL(request.url()).pathname;
+      paths.set(path, (paths.get(path) ?? 0) + 1);
+    });
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     const base = new URL(baseURL!).pathname;
@@ -45,6 +48,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
     await page.goto(`./?scene=${scene}`);
     for (let visit = 0; visit < 2; visit++) {
       if (visit) {
+        paths.clear();
         await page.reload();
         if (scene === 'battle') await page.locator('#save-continue').click();
       }
@@ -77,6 +81,8 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
           expect((await readSession(page)).state).toEqual(expectedSession.state);
           await page.locator('#battle-sound').click();
           await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
+          // The scene, early hint and portrait share one image request per visit.
+          for (const asset of Object.values(battleCatalog.assets)) expect(paths.get(base + asset.runtimePath.slice(1)), asset.id).toBe(1);
         }
       }
     }
@@ -144,18 +150,22 @@ test('built startup hints preserve a supplied script nonce', async ({page})=>{
   expect(errors).toEqual([]);
 });
 
-for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
-  test(`content image ${failure} stays controlled at the base`, async ({ page }) => {
+for (const scene of ['battle', 'content-smoke']) for (const failure of ['missing', 'corrupt', 'stalled', 'dimensions'] as const) {
+  test(`${scene} image ${failure} stays controlled at the base`, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.route('**/battle/terrain/grass.png', route => failure === 'stalled' ? undefined
-      : route.fulfill(failure === 'missing' ? { status: 404 } : { contentType: 'image/png', body: 'invalid PNG' }));
-    await page.goto('./?scene=content-smoke');
+      : route.fulfill(failure === 'missing' ? { status: 404 } : failure === 'dimensions'
+        ? { contentType: 'image/png', path: 'public/proof/fighter.png' }
+        : { contentType: 'image/png', body: 'invalid PNG' }));
+    await page.goto(`./?scene=${scene}`);
     await expect(page.locator('#fit-status')).toContainText('Error: Asset load failed:', { timeout: 15000 });
     await expect(page.locator('#game')).toHaveAttribute('data-ready', 'false');
+    if (failure === 'dimensions') await expect(page.locator('#fit-status')).toContainText('dimensions');
     expect(errors).toEqual([]);
   });
-
+}
+for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
   test(`battle audio ${failure} stays nonfatal at the base`, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
