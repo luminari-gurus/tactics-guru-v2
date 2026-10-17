@@ -1,0 +1,46 @@
+
+> tactics-guru-v2@0.0.0 build
+> npm run validate:content && npm run typecheck && vite build
+
+
+> tactics-guru-v2@0.0.0 validate:content
+> vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2
+
+
+ Test Files  5 passed (5)
+      Tests  167 passed (167)
+   Start at  08:14:08
+   Duration  4.05s (tests 94%, transform 5%, import 1%)
+
+
+> tactics-guru-v2@0.0.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.domain.json
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 78 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             3.11 kB │ gzip:   1.09 kB
+dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+dist/assets/style-DfrBuVe7.css              3.57 kB │ gzip:   1.30 kB
+dist/assets/start-C6DvbJ8A.js               0.06 kB │ gzip:   0.07 kB
+dist/assets/preload-helper-DjzSQ1t3.js      1.38 kB │ gzip:   0.75 kB
+dist/assets/rng-BCcJOpRP.js                 1.65 kB │ gzip:   0.81 kB
+dist/assets/index-C4tkV33D.js               1.71 kB │ gzip:   0.87 kB
+dist/assets/startBattleApp-D_okXQzx.js      2.78 kB │ gzip:   1.17 kB
+dist/assets/browser-vK3k0uvE.js             3.26 kB │ gzip:   1.37 kB
+dist/assets/view-DkwKaiDT.js                8.83 kB │ gzip:   3.51 kB
+dist/assets/startRunApp-BT793o_x.js        25.36 kB │ gzip:   8.69 kB
+dist/assets/start-BzPLfN-_.js           1,520.17 kB │ gzip: 399.29 kB
+
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 267ms
