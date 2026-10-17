@@ -1,0 +1,2 @@
+# These are source receipts whose recorded SHA-256 includes original line endings.
+collector-v*/*.txt -text
