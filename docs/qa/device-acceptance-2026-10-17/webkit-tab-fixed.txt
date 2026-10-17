@@ -1,0 +1,135 @@
+[WebServer] (node:38543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 54 tests using 1 worker
+
+(node:38584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.4s)
+  ✓   2 [acceptance-webkit-portrait] › tests/battle-audio.spec.ts:58:1 › mute, hidden and context interruptions discard active feedback while commands finish (4.0s)
+  ✓   3 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.3s)
+  ✓   4 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (34.5s)
+  ✓   5 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (18.6s)
+  ✓   6 [acceptance-webkit-portrait] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (3.0s)
+(node:38615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (8.9s)
+(node:38641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:82:47 › reload during legal player presentation matches an uninterrupted browser (5.4s)
+  ✓   9 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:82:47 › reload during legal enemy presentation matches an uninterrupted browser (4.9s)
+  ✓  10 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:122:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.7s)
+  ✓  11 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:143:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.3s)
+  ✓  12 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:161:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.7s)
+  ✓  13 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:179:1 › changed saved data refuses an old confirmation and requires fresh review (2.4s)
+  ✓  14 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:188:1 › successful reset with failed fresh save cannot recover an old battle on reload (3.1s)
+  ✓  15 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:198:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓  16 [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:198:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+(node:38666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (51.8s)
+  ✓  18 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.9s)
+  ✓  19 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.4s)
+  ✓  20 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.0s)
+  ✓  21 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.4s)
+  ✓  22 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:109:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.6s)
+  ✓  23 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:136:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.9s)
+  ✓  24 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:153:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.1s)
+  ✓  25 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:169:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.9s)
+  ✓  26 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓  27 [acceptance-webkit-portrait] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+(node:38710) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  28 [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:21:1 › sound control uses real gestures, preserves previews, modal focus and restart preference (3.6s)
+  ✓  29 [acceptance-webkit-landscape] › tests/battle-audio.spec.ts:58:1 › mute, hidden and context interruptions discard active feedback while commands finish (4.0s)
+  ✓  30 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:5:1 › player HUD and preview cancellation preserve state and modal capture (1.3s)
+  ✓  31 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 1 reaches playerLoss through controls and replays (32.7s)
+  ✓  32 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:37:3 › complete legal authored battle seed 2 reaches playerWin through controls and replays (18.5s)
+  ✓  33 [acceptance-webkit-landscape] › tests/battle-loop.spec.ts:175:1 › keyboard-only movement, attack confirmation and Wait use the shared decision flow (2.9s)
+(node:38790) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  34 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (8.9s)
+(node:38831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  35 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:82:47 › reload during legal player presentation matches an uninterrupted browser (5.5s)
+  ✓  36 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:82:47 › reload during legal enemy presentation matches an uninterrupted browser (4.9s)
+  ✓  37 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:122:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.7s)
+  ✓  38 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:143:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.3s)
+  ✓  39 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:161:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.6s)
+  ✓  40 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:179:1 › changed saved data refuses an old confirmation and requires fresh review (2.2s)
+  ✓  41 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:188:1 › successful reset with failed fresh save cannot recover an old battle on reload (3.1s)
+  ✓  42 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:198:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓  43 [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:198:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+(node:38860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  44 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:38:1 › legal three encounter run, rewards, preparation, final resume and fresh restart (52.5s)
+  ✓  45 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:58:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.8s)
+  ✓  46 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:66:1 › accepted player presentation reload preserves exact boundary without old cues (1.5s)
+  ✓  47 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:73:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.1s)
+  ✓  48 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:95:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.3s)
+  ✓  49 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:109:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.5s)
+  ✓  50 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:136:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (15.3s)
+  ✓  51 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:153:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.1s)
+  ✓  52 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:169:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.9s)
+  ✓  53 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓  54 [acceptance-webkit-landscape] › tests/run-progression.spec.ts:181:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+
+
+  1) [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  locator('#battle-recovery')
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" locator('#battle-recovery') with timeout 5000ms
+      - waiting for locator('#battle-recovery')
+        14 × locator resolved to <button type="button" id="battle-recovery">Save recovery</button>
+           - unexpected value "inactive"
+
+
+      52 |   await page.screenshot({path:test.info().outputPath('recovery.png')});
+      53 |   await touch(page,'#save-close');await expect(page.getByRole('dialog')).not.toBeVisible();
+    > 54 |   await expect(page.locator('#battle-recovery')).toBeFocused();expect((await readSession(page)).state).toEqual(before.state);
+         |                                                  ^
+      55 | });
+      56 |
+      57 | test('held confirmation Enter cannot flow through Restart and replace either saved slot',async({page})=>{
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/battle-persistence.spec.ts:54:50
+
+    Error Context: ../../../../../../tmp/tg-device-fixed-results/battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-portrait/error-context.md
+
+  2) [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  locator('#battle-recovery')
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" locator('#battle-recovery') with timeout 5000ms
+      - waiting for locator('#battle-recovery')
+        14 × locator resolved to <button type="button" id="battle-recovery">Save recovery</button>
+           - unexpected value "inactive"
+
+
+      52 |   await page.screenshot({path:test.info().outputPath('recovery.png')});
+      53 |   await touch(page,'#save-close');await expect(page.getByRole('dialog')).not.toBeVisible();
+    > 54 |   await expect(page.locator('#battle-recovery')).toBeFocused();expect((await readSession(page)).state).toEqual(before.state);
+         |                                                  ^
+      55 | });
+      56 |
+      57 | test('held confirmation Enter cannot flow through Restart and replace either saved slot',async({page})=>{
+        at /Users/brian/.codex/worktrees/issue-121-health-bars/tactics-guru-v2/tests/battle-persistence.spec.ts:54:50
+
+    Error Context: ../../../../../../tmp/tg-device-fixed-results/battle-persistence-startup-c6beb-covery-captures-touch-focus-acceptance-webkit-landscape/error-context.md
+
+  2 failed
+    [acceptance-webkit-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+    [acceptance-webkit-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+  52 passed (7.1m)
