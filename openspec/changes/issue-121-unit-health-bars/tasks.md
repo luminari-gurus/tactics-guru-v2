@@ -14,7 +14,7 @@
 ## 3. Integrated acceptance and delivery
 
 - [x] 3.1 Run all configured unit/content tests, both typechecks, production build, full browser suite with encounter/run-item posttests, focused desktop/mobile Chromium/WebKit health-bar configuration, strict OpenSpec and whitespace checks; map each of the six issue criteria to exact revision/results/screenshots and disclose any failure or missing evidence.
-- [ ] 3.2 Review final diff against the approved plan, commit only this issue's source/tests/evidence/artifacts, push and create or reuse/attach its PR; verify remote head and PR contents, use Closes #121 only with all acceptance verified and otherwise open a draft with Refs #121.
+- [x] 3.2 Review final diff against the approved plan, commit only this issue's source/tests/evidence/artifacts, push and create or reuse/attach its PR; verify remote head and PR contents, use Closes #121 only with all acceptance verified and otherwise open a draft with Refs #121.
 
 ## Workflow follow-up
 

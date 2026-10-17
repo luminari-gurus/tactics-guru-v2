@@ -71,3 +71,5 @@ Selected retained evidence:
 - [iPhone portrait: completed damage boundary](issue-121-unit-health-bars/health-iphone-portrait-health-damage-complete.png)
 - [iPhone portrait: second encounter after healing](issue-121-unit-health-bars/health-iphone-portrait-health-second-encounter.png)
 - [Complete evidence directory](issue-121-unit-health-bars/)
+
+Delivery: [PR #124](https://github.com/luminari-gurus/tactics-guru-v2/pull/124), open against main and attached to the Codex task. Runtime implementation commit: 827c54a; subsequent commits update QA/log formatting/task status only.
