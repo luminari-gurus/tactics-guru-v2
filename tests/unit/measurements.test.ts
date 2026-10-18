@@ -1,15 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { FitMeasurements } from '../../src/diagnostics/measurements';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, linkSync, symlinkSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { evaluateCapture, type Capture } from '../../scripts/measure-fit-evaluate';
 
 describe('capture acceptance', () => {
   const receipt = (route = 'run'): Capture => JSON.parse(readFileSync(`docs/qa/device-acceptance-2026-10-17/deployed-${route}.json`,'utf8'));
   const gates = JSON.parse(readFileSync('docs/qa/device-acceptance-2026-10-17/gates.json','utf8')).captures;
-  for (const route of ['battle','run']) it(`exactly reproduces retained ${route} numeric gates`, () => {
+  for (const route of ['battle','run']) it(`preserves retained ${route} gates and independently evaluates initial idle`, () => {
     const evaluation = evaluateCapture(receipt(route));
     expect(evaluation.captureFailures).toEqual([]);
-    expect(evaluation.rows).toEqual(gates[route].rows);
+    expect(evaluation.rows.map(row => ({...row,violations:row.violations.filter(v=>!v.metric.startsWith('initialIdle'))}))).toEqual(gates[route].rows);
+    expect(evaluation.rows.flatMap(row => row.violations.filter(v=>v.metric.startsWith('initialIdle')).map(v=>({profile:row.profile,repetition:row.repetition,cache:row.cache,...v})))).toEqual(route==='battle'?[]:[
+      {profile:'mobile-landscape',repetition:3,cache:'cold',metric:'initialIdleP50Ms',actual:16.799999952316284,limit:16.7},
+      {profile:'mobile-landscape',repetition:3,cache:'warm',metric:'initialIdleP50Ms',actual:16.799999952316284,limit:16.7},
+    ]);
     expect(evaluation.failedSamples).toBe(route === 'battle' ? 9 : 10);
     expect(evaluation.passed).toBe(false);
   });
@@ -62,6 +69,55 @@ describe('capture acceptance', () => {
     expect(result.captureFailures).toEqual([]);
     expect(result.failedSamples).toBe(1);
     expect(result.passed).toBe(false);
+  });
+
+  it.each(['p50', 'p95'])('retains an initial-only idle %s failure after faster frames dilute the final summary', metric => {
+    const data = receipt();
+    const summarize = (raw: number[]) => {
+      const sorted = [...raw].sort((a,b) => a-b);
+      return {count:raw.length,medianMs:sorted[Math.ceil(raw.length*.5)-1],p95Ms:sorted[Math.ceil(raw.length*.95)-1],maxMs:sorted.at(-1)!};
+    };
+    for (const sample of data.samples) {
+      for (const d of [sample.idleDiagnostics,sample.diagnostics]) {
+        d.controlsUsableMs=600; d.idleIntervalsMs=Array(120).fill(16.6); d.frames=summarize(d.idleIntervalsMs);
+      }
+      for (const [i,r] of sample.diagnostics.resources.entries()) if (i===0 || /\.(js|css)$/.test(new URL(r.url).pathname)) r.transferBytes=300;
+    }
+    expect(evaluateCapture(data).passed).toBe(true);
+    const sample=data.samples[0];
+    sample.idleDiagnostics.idleIntervalsMs=metric==='p50' ? Array(120).fill(16.8) : [...Array(110).fill(16.6),...Array(10).fill(20.1)];
+    sample.idleDiagnostics.frames=summarize(sample.idleDiagnostics.idleIntervalsMs);
+    sample.diagnostics.idleIntervalsMs=[...sample.idleDiagnostics.idleIntervalsMs,...Array(240).fill(16.6)];
+    sample.diagnostics.frames=summarize(sample.diagnostics.idleIntervalsMs);
+    const result=evaluateCapture(data);
+    expect(result.captureFailures).toEqual([]);
+    expect(result.failedSamples).toBe(1);
+    expect(result.passed).toBe(false);
+    expect(result.rows[0].violations).toEqual([{metric:metric==='p50'?'initialIdleP50Ms':'initialIdleP95Ms',actual:metric==='p50'?16.8:20.1,limit:metric==='p50'?16.7:20}]);
+  });
+
+  it('CLI refuses existing output and filesystem aliases without altering capture bytes', () => {
+    const dir=mkdtempSync(join(tmpdir(),'fit-evaluator-'));
+    try {
+      const input=join(dir,'raw.json');
+      const raw=JSON.stringify(receipt()); writeFileSync(input,raw);
+      const outputs=[input,join(dir,'hard.json'),join(dir,'existing.json')];
+      linkSync(input,outputs[1]); writeFileSync(outputs[2],'retain previous evaluation');
+      if (process.platform==='win32') outputs.push(join(dir,'RAW.json'));
+      else {const alias=join(dir,'symlink.json');symlinkSync(input,alias);outputs.push(alias);}
+      for (const output of outputs) {
+        const before=readFileSync(output,'utf8');
+        const result=spawnSync(process.execPath,[resolve('scripts/evaluate-fit.ts'),input,output],{encoding:'utf8'});
+        expect(result.status).not.toBe(0);
+        expect(readFileSync(input,'utf8')).toBe(raw);
+        expect(readFileSync(output,'utf8')).toBe(before);
+      }
+      const output=join(dir,'new-evaluation.json');
+      const result=spawnSync(process.execPath,[resolve('scripts/evaluate-fit.ts'),input,output],{encoding:'utf8'});
+      expect(result.status).toBe(1); // Historical budget failures still produce a retained evaluation.
+      expect(JSON.parse(readFileSync(output,'utf8')).rows).toHaveLength(18);
+      expect(readFileSync(input,'utf8')).toBe(raw);
+    } finally {rmSync(dir,{recursive:true,force:true});}
   });
 });
 

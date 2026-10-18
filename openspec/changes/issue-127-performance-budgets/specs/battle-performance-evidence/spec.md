@@ -43,3 +43,11 @@ The QA report SHALL compare proof, battle and run evidence against unchanged app
 #### Scenario: Retained evidence inspection
 - **WHEN** an existing capture is inspected or reevaluated without collecting a new browser run
 - **THEN** the report labels the result as retained-evidence analysis and does not describe it as fresh reproduction
+
+#### Scenario: Initial idle failure followed by faster frames
+- **WHEN** the initial idle snapshot fails F1 but the final snapshot passes after additional frames
+- **THEN** evaluation retains the initial failure independently of any final-window failures
+
+#### Scenario: Evaluation output aliases retained input
+- **WHEN** an output path already exists, including a case, hard-link or symlink alias of the capture
+- **THEN** the CLI refuses the write and preserves the existing file bytes

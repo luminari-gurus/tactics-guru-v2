@@ -46,6 +46,16 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [x] 8.1 Compare the pinned package's stock minified Arcade build and direct stock source entry against the current candidate with the same browser and real cold/warm control workload; retain every diagnostic and actual output-size result. Reject the ineffective minified-file/minifier alternatives; select direct bundling with the published feature flags, without changing audio ownership, animation, measurement markers or budgets.
 - [x] 8.2 Verify any retained engine-distribution change with applicable full functional, Canvas/WebGL, audio/lifecycle, prefixed-route and device checks, both typechecks/build, then clean complete local/preview performance matrices. Publish source and evidence in focused dependent PRs; reconcile task 6.3 only when all gates pass.
 
+## Review repair: PR #129
+
+- [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.
+- [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
+- [x] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
+
+## Review stack integration
+
+- [ ] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
+
 ## Workflow follow-up
 
 - Any production target/build/activation decision remains separately authorized under #83-#85.

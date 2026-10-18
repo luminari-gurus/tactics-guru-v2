@@ -1,0 +1,3 @@
+import {defineConfig} from '@playwright/test';
+import base from '../../playwright.config';
+export default defineConfig({...base,testDir:'../../tests',outputDir:'./browser-results',use:{...base.use,baseURL:'http://127.0.0.1:4196/',launchOptions:{executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'}},webServer:{cwd:process.cwd(),command:'node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4196 --strictPort',url:'http://127.0.0.1:4196/',reuseExistingServer:false}});
