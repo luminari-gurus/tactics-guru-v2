@@ -1,6 +1,16 @@
 # Issue #127 performance repair evidence
 
-Updated 2026-10-18 (Asia/Jerusalem). **Cold-code repair verified; deployed loading gates remain open.** The accepted runtime head is `f28f331`; the evidence below distinguishes completed checks from remaining work.
+## PR #129 review repair (2026-10-18)
+
+Both reported evaluator defects reproduced before repair: the new regressions failed in three cases. Repair `3fe5a53` gates initial idle p50/p95 independently of the final snapshot and exclusively creates CLI output (`wx`), refusing existing paths including Windows case and hard-link aliases. Raw captures are unchanged. The original run capture also contains an initial landscape repetition-3 **cold** p50 of 16.799999952316284 ms; the old final-only report concealed that F1 violation, although the same sample already failed L3. Cold/warm initial failures and the final warm failure are now retained separately; the original total remains 10 failing run samples.
+
+Fresh local proof: `node node_modules/vitest/vitest.mjs run tests/unit/measurements.test.ts tests/unit/measureFitOptions.test.ts` passes 39 tests, including initial-only p50/p95, final-only failure, CLI alias refusal, byte preservation, new-output creation, and historical gates. Both `tsc --noEmit` configurations, strict OpenSpec, and `git diff --check` pass. These script-only changes do not alter the served runtime. Publication uses a forward commit on the existing PR branch; downstream carries follow in order. No new browser timing capture is claimed.
+
+## Retained cold-code stage
+
+PR #132 review carry: all five inherited findings are repaired by the updated #129/#130 base and the focused PR #131 source/evidence commits. The visual-guide files are excluded. The combined branch passes 44 focused evaluator/session tests, both typechecks, production build and 18 Edge recovery regressions. Re-evaluation of all 144 retained samples reproduces the saved gate rows and verifies source/collector/raw hashes; their initial idle windows also pass. Those receipts remain evidence for their original commits. Final combined-runtime performance verification is tracked by OpenSpec task RS.1.
+
+Updated 2026-10-18 (Asia/Jerusalem). **Cold-code repair verified; deployed loading gates remain open.** The measured runtime head is `f28f331`; the evidence below belongs to that original source. The save-recovery repair carried from PR #131 changes runtime code; its functional proof is in [the recovery QA note](pr-131-run-recovery.md). New performance acceptance for the combined runtime follows at the final stack head.
 
 ## Authority, source and scope
 

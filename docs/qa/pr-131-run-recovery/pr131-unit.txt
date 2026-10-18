@@ -1,0 +1,8 @@
+
+ RUN  v5.0.3 C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru
+
+
+ Test Files  40 passed (40)
+      Tests  677 passed (677)
+   Start at  17:46:23
+   Duration  8.78s (tests 80%, import 11%, transform 9%, worker 1%)

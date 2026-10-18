@@ -1,0 +1,31 @@
+{
+  "reviewedBase": "f04093e9bb3c20d05025b616b0b07272f69396fb",
+  "repairCommit": "6767be19cd052671cf0fa912076f16e2b53c6ef2",
+  "note": "Functional build made before source commit while repair was dirty; these exact source bytes were committed. No clean-build performance claim.",
+  "hashes": [
+    {
+      "path": "src/app/RunItemSession.ts",
+      "gitBlob": "cae7eee10ed3f75086509ced2e7b2fc45e18280e",
+      "checkoutBlob": "cae7eee10ed3f75086509ced2e7b2fc45e18280e",
+      "sha256": "75c01ef88b8f2669ae788faa122b9b0b10e1d74c83968a92378d64c7b63672f5"
+    },
+    {
+      "path": "src/app/startRunApp.ts",
+      "gitBlob": "1dde5c506d93f2eed40a77d0706f3542097aa284",
+      "checkoutBlob": "1dde5c506d93f2eed40a77d0706f3542097aa284",
+      "sha256": "41c65cebbcb5fc9eb791f83fe8ffc99642f1e9fc027780ed21a186f92cc3b3aa"
+    },
+    {
+      "path": "tests/run-progression.spec.ts",
+      "gitBlob": "8f1381c1b124183c931a73f10ef6ac328da4d19e",
+      "checkoutBlob": "8f1381c1b124183c931a73f10ef6ac328da4d19e",
+      "sha256": "765d62e312db8e2747144705ec1fe7b5e6cef39e55390d6ffb82b3c44765f687"
+    },
+    {
+      "path": "tests/unit/RunItemSession.test.ts",
+      "gitBlob": "419d2f323537c0623c24bd38ba06c96ec2197c24",
+      "checkoutBlob": "419d2f323537c0623c24bd38ba06c96ec2197c24",
+      "sha256": "efd3433e4243f41891925dc3383717bb049968517545b08657c33a3427f59c9c"
+    }
+  ]
+}
