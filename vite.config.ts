@@ -1,4 +1,6 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
@@ -23,14 +25,27 @@ const phaserDefines = {
 /** Start only the selected game route's required requests while its entry script loads. */
 function gamePreloads(): Plugin {
   let base = '/', nonce: string | undefined;
+  const imageUrls: Record<string, string> = {};
+  const images: {fileName: string; source: Buffer}[] = [];
   return {
     name: 'game-startup-preloads',
-    apply: 'build',
+    config(_config, {command}) {
+      if (command === 'build') for (const asset of Object.values(battleAssets)) {
+        const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
+        const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
+        const fileName = `assets/${hash}${asset.runtimePath}`;
+        images.push({fileName, source});
+        imageUrls[asset.runtimePath] = '/' + fileName;
+      }
+      return {define: {__BATTLE_IMAGE_URLS__: JSON.stringify(imageUrls)}};
+    },
     configResolved(config) { base = config.base; nonce = config.html?.cspNonce; },
     generateBundle(_options, bundle) {
+      for (const image of images) this.emitFile({type: 'asset', ...image});
       const root = new URL(base, 'https://build.invalid').pathname;
       const paths = Object.values(bundle).map(file => file.fileName)
-        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
+        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file))
+        .concat(images.map(image => image.fileName));
       this.emitFile({ type: 'asset', fileName: '_headers', source: paths
         .map(file => `${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`)
         .join('\n') });
@@ -60,7 +75,7 @@ function gamePreloads(): Plugin {
         base,
         battle: dependencies([entry('src/app/startBattleApp.ts'), entry('src/phaser/start.ts')]),
         run: dependencies([entry('src/app/startRunApp.ts')]),
-        images: Object.values(battleAssets).map(asset => asset.runtimePath.slice(1)),
+        images: Object.values(imageUrls).map(path => path.slice(1)),
       };
       // JSON is embedded as script text, never as executable content from a path.
       const data = JSON.stringify(plan).replaceAll('<', '\\u003c');

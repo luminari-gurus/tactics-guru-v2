@@ -56,7 +56,7 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 - [x] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
 
-The review repair and its validation are complete. Tasks 6.3 and 8.2 are reopened for the nine retained deployed loading failures; see `docs/qa/pr-129-138-review-repair.md`. No performance acceptance exception is taken.
+The review repair and its validation are complete. Tasks 6.3 and 8.2 remain incomplete: the latest bounded image-cache/run-initialization fix passes 36/36 locally and 34/36 on preview. On 2026-10-18 the owner explicitly requested merging that fix and stopping, deferring the remaining 754.2/827.7 ms warm-run misses; issue #127 remains closed by owner direction. See the current `docs/qa/issue-127-performance-budgets.md` section and its preserved receipts. No failed budget is represented as passing; further work is deferred.
 
 ## Workflow follow-up
 

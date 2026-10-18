@@ -1,3 +1,5 @@
+> Current disposition (2026-10-18): the owner requested merging the bounded image-cache/run-initialization fix and stopping. Issue #127 stays closed; the two remaining warm-run timing misses are deferred. See [current evidence](../qa/issue-127-performance-budgets.md). Historical keep-open and continuation instructions below are superseded by that direction.
+
 # Issue #127 — restore battle and run performance budgets
 
 Updated 2026-10-18 (Asia/Jerusalem). **PR review repairs complete; deployed loading acceptance remains open.**

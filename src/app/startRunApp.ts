@@ -10,7 +10,6 @@ import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
 import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
-import type Phaser from 'phaser';
 import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
 
@@ -34,7 +33,7 @@ document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to selec
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
 mountBattleLayout();
 const shell = document.querySelector<HTMLElement>('#battle-shell')!;
-let engine: Phaser.Game | null = null, host: RunBattleHost | null = null, mounted: (()=>void) | null = null;
+let host: RunBattleHost | null = null, mounted: (()=>void) | null = null;
 let live=true, playing=false, startup=true;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>host?.modalTransition(),()=>requestNew());
@@ -50,7 +49,7 @@ function setStatus(value:'loading'|'ready'|'error') {
 }
 function unmount() {mounted?.();mounted=null;}
 function stopBattle() {
- playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';
+ playing=false;host=null;engine.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';
 }
 function endBattle() {if(!live || !playing)return;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();}
 function startBattle() {
@@ -66,8 +65,7 @@ function startBattle() {
  host={catalog:session.catalog,session,dialogs,sound,modalTransition:()=>{},ended:endBattle,restart:requestNew};
  const scene=new BattleScene(setStatus,fail,host);
  setStatus('loading');
- if(!engine)engine=createGame(scene,true);
- else {engine.scene.remove('battle');engine.scene.add('battle',scene,true);}
+ engine.scene.remove('battle');engine.scene.add('battle',scene,true);
  evidence();
 }
 function replace(review:RunLoadResult) {
@@ -166,3 +164,6 @@ window.addEventListener('unhandledrejection',()=>fail('The run encountered an as
 window.addEventListener('pagehide',()=>{live=false;controller.dispose();stopBattle();unmount();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 render();
+// Prepare the one engine while the read-only start screen is displayed. No
+// battle scene or save is created until the existing controls request it.
+const engine=createGame([],true);

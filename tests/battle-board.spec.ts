@@ -154,7 +154,7 @@ test('default authored board renders canonical units, highlights and stable rest
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const assetPaths = new Set(Object.values(battleCatalog.assets).map(asset => asset.runtimePath));
-  page.on('request', request => { const path = new URL(request.url()).pathname; if (assetPaths.has(path)) assetRequests.push(path); });
+  page.on('request', request => { const path = new URL(request.url()).pathname.replace(/^\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, ''); if (assetPaths.has(path)) assetRequests.push(path); });
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

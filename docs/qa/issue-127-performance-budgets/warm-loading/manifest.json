@@ -1,0 +1,650 @@
+{
+  "applicationSource": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+  "collectorSource": "e0554bdd422610bf32c1a8ab31c8c13738975003",
+  "disposition": "Owner requested merge and stop; remaining timing misses deferred, not waived or reported as passing.",
+  "captures": {
+    "main-battle": {
+      "source": "94436688a4738ed1dea7133dead597c794d96bcf",
+      "served": {
+        "commit": "94436688a4738ed1dea7133dead597c794d96bcf",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://tactics-guru-v2.pages.dev",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "https://tactics-guru-v2.pages.dev/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 1208.3999999761581,
+      "maxWarmMs": 639.6000000238419,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "main-run": {
+      "source": "94436688a4738ed1dea7133dead597c794d96bcf",
+      "served": {
+        "commit": "94436688a4738ed1dea7133dead597c794d96bcf",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://tactics-guru-v2.pages.dev/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "https://tactics-guru-v2.pages.dev/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 1,
+      "maxColdMs": 1831.5999999642372,
+      "maxWarmMs": 1005.1000000238419,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 1005.1000000238419,
+          "limit": 750
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-local-battle": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "http://127.0.0.1:4198",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+        "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "http://127.0.0.1:4198/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 776.8000000119209,
+      "maxWarmMs": 613.1999999880791,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-local-run": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "http://127.0.0.1:4198/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+        "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "http://127.0.0.1:4198/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 863.6999999880791,
+      "maxWarmMs": 649.3000000119209,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-preview-battle": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://77bd44ef.tactics-guru-v2.pages.dev",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "https://77bd44ef.tactics-guru-v2.pages.dev/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 1,
+      "maxColdMs": 3341.199999988079,
+      "maxWarmMs": 639.5,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "cache": "cold",
+          "metric": "usableMs",
+          "actual": 3341.199999988079,
+          "limit": 2500
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-preview-run": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://77bd44ef.tactics-guru-v2.pages.dev/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "https://77bd44ef.tactics-guru-v2.pages.dev/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 4,
+      "maxColdMs": 1347.6000000238419,
+      "maxWarmMs": 777.6999999880791,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 754,
+          "limit": 750
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 777.6999999880791,
+          "limit": 750
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 766.5999999642372,
+          "limit": 750
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 772.1999999880791,
+          "limit": 750
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-preview-recheck-battle": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://77bd44ef.tactics-guru-v2.pages.dev",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "https://77bd44ef.tactics-guru-v2.pages.dev/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 1006.4000000357628,
+      "maxWarmMs": 714.8000000119209,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "candidate-preview-recheck-run": {
+      "source": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+      "served": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://77bd44ef.tactics-guru-v2.pages.dev/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "https://77bd44ef.tactics-guru-v2.pages.dev/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 1,
+      "maxColdMs": 1178.5,
+      "maxWarmMs": 763.0999999642372,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 763.0999999642372,
+          "limit": 750
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "accept-local-battle": {
+      "source": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "http://127.0.0.1:4198",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+        "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "http://127.0.0.1:4198/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 816,
+      "maxWarmMs": 605.2999999523163,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "accept-local-run": {
+      "source": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "http://127.0.0.1:4198/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+        "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "http://127.0.0.1:4198/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 808.8000000119209,
+      "maxWarmMs": 726.5,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "accept-preview-battle": {
+      "source": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://16a22948.tactics-guru-v2.pages.dev",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "https://16a22948.tactics-guru-v2.pages.dev/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 2,
+      "maxColdMs": 3925.2999999523163,
+      "maxWarmMs": 2588.5,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "cache": "cold",
+          "metric": "usableMs",
+          "actual": 3925.2999999523163,
+          "limit": 2500
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 2588.5,
+          "limit": 750
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "accept-preview-run": {
+      "source": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://16a22948.tactics-guru-v2.pages.dev/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "https://16a22948.tactics-guru-v2.pages.dev/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 1782.2000000476837,
+      "maxWarmMs": 739.8000000119209,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "navigation-battle": {
+      "source": "e0554bdd422610bf32c1a8ab31c8c13738975003",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://16a22948.tactics-guru-v2.pages.dev",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "battle",
+        "sceneUrl": "https://16a22948.tactics-guru-v2.pages.dev/?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": true,
+      "failedSamples": 0,
+      "maxColdMs": 1951.6000000238419,
+      "maxWarmMs": 726.4000000357628,
+      "violations": [],
+      "collectorSha256": {
+        "measure-fit.ts": "fa91a4780f2014674562f17586de212ddfdced033f7ed0ed553114127b39760d",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    },
+    "navigation-run": {
+      "source": "e0554bdd422610bf32c1a8ab31c8c13738975003",
+      "served": {
+        "commit": "d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9",
+        "dirty": false
+      },
+      "browser": "155.0.4283.62",
+      "conditions": {
+        "url": "https://16a22948.tactics-guru-v2.pages.dev/run",
+        "mode": "headless Chromium; mobile profiles are emulation",
+        "network": "host network to the supplied origin over HTTPS; no throttling; inspect response encodings",
+        "cache": "cold: fresh browser context, CDN edge cache state not controlled; warm: same-context reload; inspect per-resource transfer bytes",
+        "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+        "scene": "battle",
+        "route": "run",
+        "sceneUrl": "https://16a22948.tactics-guru-v2.pages.dev/run?scene=battle",
+        "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+      },
+      "passed": false,
+      "failedSamples": 2,
+      "maxColdMs": 1708.8999999761581,
+      "maxWarmMs": 827.6999999880791,
+      "violations": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 754.1999999880791,
+          "limit": 750
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "cache": "warm",
+          "metric": "usableMs",
+          "actual": 827.6999999880791,
+          "limit": 750
+        }
+      ],
+      "collectorSha256": {
+        "measure-fit.ts": "fa91a4780f2014674562f17586de212ddfdced033f7ed0ed553114127b39760d",
+        "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+        "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+        "measure-fit-evaluate.ts": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb"
+      }
+    }
+  },
+  "reports": {
+    "root-browser": {
+      "startTime": "2026-10-18T16:46:55.852Z",
+      "duration": 263904.961,
+      "expected": 123,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "prefix-browser": {
+      "startTime": "2026-10-18T16:51:32.528Z",
+      "duration": 46547.854,
+      "expected": 21,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "dev-browser": {
+      "startTime": "2026-10-18T16:52:19.517Z",
+      "duration": 20199.446999999996,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "webkit-browser": {
+      "startTime": "2026-10-18T16:53:21.907Z",
+      "duration": 19355.149999999998,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "eager-browser": {
+      "startTime": "2026-10-18T17:11:33.196Z",
+      "duration": 344687.656,
+      "expected": 51,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "eager-audio-browser": {
+      "startTime": "2026-10-18T17:18:30.702Z",
+      "duration": 21523.82,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "ready-prefix-browser": {
+      "startTime": "2026-10-18T17:19:29.665Z",
+      "duration": 6578.403,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "eager-webkit-browser": {
+      "startTime": "2026-10-18T17:19:38.731Z",
+      "duration": 139684.205,
+      "expected": 10,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "collectorFiles": {
+    "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e": "collector-a8692aad8281-measure-fit.ts.txt",
+    "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a": "collector-d43b9b8cdcb3-measure-fit-options.ts.txt",
+    "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8": "collector-685b90325450-measure-fit-controls.ts.txt",
+    "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb": "collector-dd19c408a5c3-measure-fit-evaluate.ts.txt",
+    "fa91a4780f2014674562f17586de212ddfdced033f7ed0ed553114127b39760d": "collector-fa91a4780f20-measure-fit.ts.txt"
+  },
+  "files": {
+    "collector-a8692aad8281-measure-fit.ts.txt": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+    "collector-d43b9b8cdcb3-measure-fit-options.ts.txt": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "collector-685b90325450-measure-fit-controls.ts.txt": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+    "collector-dd19c408a5c3-measure-fit-evaluate.ts.txt": "dd19c408a5c32e34a94c408952c3023bbe1a30b89ad13cda77d42f7002365ccb",
+    "main-battle.json": "22a421d3e21f0b2c0b63f959d6008ce1eb1c1e898e294d07c4a243729dd0be78",
+    "main-battle-gates.json": "5e59f765712d1075b5fa85bd35d3e07fb4bfb127b6ed93f0259dc97f0b7ea448",
+    "main-run.json": "c3f52c6f60094d8509d5dfe9c14ba9ab2d96fdfa54a29b2d8c8c95a7d70dab76",
+    "main-run-gates.json": "802e311e28688c3cabc693cf3e0076b404aceb76f12d00a92883e58ea89d2002",
+    "candidate-local-battle.json": "02f275347a0f585ca5ee0b4fe2f4d2413e684dc31dc97d384e97bea86841f439",
+    "candidate-local-battle-gates.json": "d8a6c92fce8c267660cf707e28a24b10b31346386561063de8637b832c37584c",
+    "candidate-local-run.json": "d241fe21b5284f5821267b878c32bff841de7be31be4dff8962de99eb7941fd5",
+    "candidate-local-run-gates.json": "d7e4cf6235db131573e246545b8c9c52fc80bbc7000b077709eda870dc1d4a2a",
+    "candidate-preview-battle.json": "6e2f8bd34cc040e02a84a1155e030695bef757ca13bfebcbbfcca169f5cbbd8b",
+    "candidate-preview-battle-gates.json": "2e88c7d3f5b6bde98321de6d1c86886cf791a4b1d9d5ce2089e1989f05e9bb80",
+    "candidate-preview-run.json": "3e05d4f9684455f200537c579968d344cab8b58eb91777db166f890938d7f8c6",
+    "candidate-preview-run-gates.json": "06a45e7e661c51d36a6fa895f72974703db8755c6261e414adbbdfdd74cf7ac3",
+    "candidate-preview-recheck-battle.json": "b5d02f6265f935a1aa1037376527f473a2668790acf8774589f9e835bd8c9dbb",
+    "candidate-preview-recheck-battle-gates.json": "29663af25867f39d83039d8e7cefe8888658ecd7623b1045ea0d78ba08b87c39",
+    "candidate-preview-recheck-run.json": "40ff14c4c5db2c54e3d18f25e389b4325fa283f1cc8a8163c344496459e226b5",
+    "candidate-preview-recheck-run-gates.json": "77a80623d1e046648b7dee3f503493e4bd020e830c26597ee21e2053ccf0bb2f",
+    "accept-local-battle.json": "01a39cbd60040eb427c2b32aaffa2b6affb73893b28413ba4b01e8fc49a4adea",
+    "accept-local-battle-gates.json": "b451054ea8d9af1d3d8a098682b2e2bab2c1e195097b03e1ce79db5bb73c9e81",
+    "accept-local-run.json": "1801581db56759c6681e8077708863779b55018dfaf1b0573158a7719becd8b8",
+    "accept-local-run-gates.json": "117b6275663fee4140b3bf621d03a1cf1949ee28cdc07b9820db30d51770f04e",
+    "accept-preview-battle.json": "e4e41ba0633436f5b787bfb2e97db9e2e1e53baec7e5f903094287dcb6c8465e",
+    "accept-preview-battle-gates.json": "76954b10207b6d7d21a3ab5b60ee4c247e6d3271f7c049ad28da6273bb84e540",
+    "accept-preview-run.json": "96f97751af1fcb86c2a83c6bc964315a38123f3e8a02ce9e01accb4c9c7b31af",
+    "accept-preview-run-gates.json": "f737afcaff8680e148c45e7d59ed666b41480f25a16d8862e919d588061eed58",
+    "collector-fa91a4780f20-measure-fit.ts.txt": "fa91a4780f2014674562f17586de212ddfdced033f7ed0ed553114127b39760d",
+    "navigation-battle.json": "6e92ab550188c5ecfc1b000d92a7b829bc9d0289c015ed10eeaf6a5cd9ea0248",
+    "navigation-battle-gates.json": "17d0dcb17ebdd06dba7c3cb5d5cb4350c6f70d6d0357e721bc605c3a993fb2b0",
+    "navigation-run.json": "f5fa42b45bc08c9e6b11511b73d431b6f4ac4549a76f14738fb307d2b1b7e920",
+    "navigation-run-gates.json": "f856e7eb7e7960edfe2eba85726243a65614b0f4539ed60314d2b9ada5e996ba",
+    "root-browser.json": "7bb9a7152d3e388175307c21e9135979763fe3e7afdc6d2b902c2e856effacc6",
+    "prefix-browser.json": "80b20eda18bfcf46967e7cbf782b4ae01d9329855e718148540bc81ff58ea142",
+    "dev-browser.json": "67fd725240e6b2e8b3e06a5fa8c72847322f92ed0294f8c80a02aa70d532a38e",
+    "webkit-browser.json": "5c1670bd8e2607d80835439e49b382224892a66603b288b0b4f8c8230741469c",
+    "eager-browser.json": "ec6a3fb5c23072c3355e21853c73c8dc662a48372bb11fbac688b5919ef5843d",
+    "eager-audio-browser.json": "57d9747023783e1aa096deaa2feb2e8c03e49693bf02e267f1f225164045a9d2",
+    "ready-prefix-browser.json": "29527559efddffbd5356913e0b5378187564ea83d25b78656fdfd5ffd3915677",
+    "eager-webkit-browser.json": "6e109144dd2373e7f10a265101dbcbdfc4236bec9a2209ac0d5d49569fa5ce87",
+    "deployment-verification.json": "21a51c2b558bfc0aba064374c957a5b6cd91dda204aa1bafad1e443eed069372",
+    "candidate-preview-verification.json": "45bf531ff76f7b7b2a7536424c214b28924dfe87c770f779584c10faa23b2e33",
+    "accept-preview-verification.json": "d595e44c964715fadb8816eb17b6af225c113e7fd4acfdc59b2f28aa157674bd",
+    "compare-run-init.json": "9e1cd43542bee19f5a96d6f11ad7501c4bfb152dfda5a9a198530f88e7731891",
+    "candidate-startup-diagnostic.json": "62e9c677fd960478d398b27edc9d6872b95f4ce6549801d699fe93f080f51adf",
+    "candidate-unit.txt": "1fc794d8f2ca6ec2827dc6f8a83df042d0a4a8fa95b0b7f22b16f9f06669375b",
+    "candidate-unit-fixed-config.txt": "73adf955689ad4e043cd2a11a3e97cada122ab76f5064297e2f913169eba45a6",
+    "cache-regression-before.txt": "bdf3e540e471fc6ed8edeb344c545849ebd6e9d3e5665130af58193364c3bec7",
+    "cache-regression-after.txt": "d2f5d0d8a6d59cfc906277538e27594e959503e2185b663e62a119c265940779",
+    "eager-unit.txt": "6c90f445df4ba51a7a0287501ace7984008042da06022a4b867b9038e9d28126",
+    "navigation-collector-unit.txt": "3a2eea8b296bab871aa1fa9b13fc638a560eb9829c76913a549e85cb6fe9d3de",
+    "accept-root-build.txt": "5d9ff4d69841a884cfce741384a9508000a8e3044d20e3e0cf83692265d61da0",
+    "accept-prefix-build.txt": "ae8b99d8346975db8efc59b0b5acb30f8bac1ca00d4d6c56d78090b09845d996"
+  }
+}

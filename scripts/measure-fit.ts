@@ -122,8 +122,11 @@ try {
               const idleDiagnostics = await page.evaluate(() => window.fitDiagnostics());
               const workload = options.scene === 'battle' ? await battleWorkload(page) : { actions: [], workloadStartIndex: 0 };
               const diagnostics = await page.evaluate(() => window.fitDiagnostics());
+              // Navigation duration includes load-event work; retain the actual
+              // DNS/connection/response timestamps instead of calling it HTML latency.
+              const navigationTiming = await page.evaluate(() => performance.getEntriesByType('navigation')[0]?.toJSON() ?? null);
               const responseInventory = await Promise.all(responses);
-              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, ...workload, responseInventory, errors: [...errors] });
+              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, navigationTiming, ...workload, responseInventory, errors: [...errors] });
             }
           } catch (error) {
             const diagnostics = await page.evaluate(()=>window.fitDiagnostics?.() ?? null).catch(()=>null);

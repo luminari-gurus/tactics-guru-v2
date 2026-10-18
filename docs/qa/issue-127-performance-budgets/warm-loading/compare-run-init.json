@@ -1,0 +1,149 @@
+{
+  "purpose": "Interleaved local startup diagnostic, not acceptance; cold idle followed by warm real controls",
+  "rows": [
+    {
+      "name": "existing",
+      "repetition": 1,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 358.80000001192093,
+      "ready": 467.19999998807907,
+      "usable": 821.6000000238419
+    },
+    {
+      "name": "existing",
+      "repetition": 1,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 252.30000001192093,
+      "ready": 290.10000002384186,
+      "usable": 647.8000000119209
+    },
+    {
+      "name": "eager",
+      "repetition": 1,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 263.7000000476837,
+      "ready": 319.9000000357628,
+      "usable": 667.7000000476837
+    },
+    {
+      "name": "eager",
+      "repetition": 1,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 218.10000002384186,
+      "ready": 254.9000000357628,
+      "usable": 597.9000000357628
+    },
+    {
+      "name": "existing",
+      "repetition": 2,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 277.39999997615814,
+      "ready": 328.19999998807907,
+      "usable": 677.5
+    },
+    {
+      "name": "existing",
+      "repetition": 2,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 229.89999997615814,
+      "ready": 269.5999999642372,
+      "usable": 628.2999999523163
+    },
+    {
+      "name": "eager",
+      "repetition": 2,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 235.10000002384186,
+      "ready": 291.5,
+      "usable": 637.1000000238419
+    },
+    {
+      "name": "eager",
+      "repetition": 2,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 210.69999998807907,
+      "ready": 249,
+      "usable": 590.6999999880791
+    },
+    {
+      "name": "existing",
+      "repetition": 3,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 247.4000000357628,
+      "ready": 298.30000001192093,
+      "usable": 650.3000000119209
+    },
+    {
+      "name": "existing",
+      "repetition": 3,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": false
+      },
+      "started": 225.19999998807907,
+      "ready": 266.7999999523163,
+      "usable": 625.1999999880791
+    },
+    {
+      "name": "eager",
+      "repetition": 3,
+      "cache": "cold",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 250,
+      "ready": 304.39999997615814,
+      "usable": 652.7999999523163
+    },
+    {
+      "name": "eager",
+      "repetition": 3,
+      "cache": "warm",
+      "build": {
+        "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+        "dirty": true
+      },
+      "started": 218.19999998807907,
+      "ready": 256,
+      "usable": 598.4000000357628
+    }
+  ]
+}
