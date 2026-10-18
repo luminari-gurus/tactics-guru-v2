@@ -35,6 +35,12 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [ ] 6.2 Implement and measure route-specific resource hints only if they reduce the demonstrated wait. Preserve both renderers, error handling, persistence, audio, startup movement and the original controls-usable marker; include every requested byte and reject any duplicate-load or route regression. Hosting/cache configuration and production activation remain outside this change.
 - [ ] 6.3 Verify the resulting source with appropriate full functional, prefixed-route and unchanged complete performance matrices, preserving all earlier failures. Publish a focused dependent PR when ready and reconcile the loading gates without changing limits or substituting diagnostic retries for acceptance.
 
+## Review repair: PR #129
+
+- [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.
+- [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
+- [x] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
+
 ## Workflow follow-up
 
 - Any production target/build/activation decision remains separately authorized under #83-#85.
