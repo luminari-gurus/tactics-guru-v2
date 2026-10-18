@@ -367,3 +367,38 @@ test('drawable boundaries and layout changes discard captured gestures without b
   after=await settledReport(page);expect(after.transform).toEqual(resized.transform);expect(after.selectionEvents).toBe(initial.selectionEvents);
   expect(after.commandCount).toBe(initial.commandCount);await expect(page.locator('canvas')).toHaveCount(1);await cdp.detach();
 });
+
+for(const route of ['/', '/run'])for(const collapsed of [false,true]) {
+  test(`landscape native pinch and pan ${route} collapsed=${collapsed}`,async({page})=>{
+    await page.setViewportSize({width:390,height:844});await page.goto(route);
+    if(route==='/run'){await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();}
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    if(collapsed){
+      if(test.info().project.use.hasTouch)await page.locator('#battle-hud-toggle').tap();
+      else await page.locator('#battle-hud-toggle').click();
+    }
+    await page.setViewportSize({width:915,height:412});
+    await expect.poll(async()=>(await settledReport(page)).viewport).toEqual({width:915,height:412});
+    const initial=await settledReport(page),r=initial.region,x=r.x+r.width/2,y=r.y+r.height/2;
+    const cdp=await page.context().newCDPSession(page);
+    const touch=(type:'touchStart'|'touchMove'|'touchEnd'|'touchCancel',points:{x:number;y:number;id:number}[])=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points});
+    await touch('touchStart',[{x:x-35,y,id:1},{x:x+35,y,id:2}]);
+    for(let i=1;i<=8;i++)await touch('touchMove',[{x:x-35-i*4,y,id:1},{x:x+35+i*4,y,id:2}]);
+    const zoomed=await settledReport(page);
+    expect(zoomed.transform.scale).toBeGreaterThan(initial.transform.scale*1.5);
+    await touch('touchEnd',[{x:x+67,y,id:2}]);
+    const oneFinger=await settledReport(page);
+    for(let i=1;i<=8;i++)await touch('touchMove',[{x:x-67+i*4,y,id:1}]);
+    const continued=await settledReport(page);
+    expect(continued.transform.x).toBeGreaterThan(oneFinger.transform.x+20);
+    expect(continued.transform.scale).toBeCloseTo(oneFinger.transform.scale,8);
+    await touch('touchEnd',[]);
+    const pannedStart=await settledReport(page);
+    await touch('touchStart',[{x,y,id:3}]);
+    for(let i=1;i<=8;i++)await touch('touchMove',[{x:x+i*4,y:y+i,id:3}]);
+    await touch('touchEnd',[]);
+    const panned=await settledReport(page);expect(panned.transform.x).toBeGreaterThan(pannedStart.transform.x+20);
+    expect(panned.selectionEvents).toBe(initial.selectionEvents);expect(panned.commandCount).toBe(initial.commandCount);
+    await cdp.detach();
+  });
+}

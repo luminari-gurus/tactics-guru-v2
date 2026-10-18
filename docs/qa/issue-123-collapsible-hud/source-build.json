@@ -95,5 +95,11 @@
       "tests/battle-persistence.spec.ts": "6fc3d4f172041400ced65642aa804d3ae7b5a2d65cc851b8f28603c6c050820f",
       "tests/run-progression.spec.ts": "bad45b6376843239390b9384d74f23b3311eef4eb0d5336a3ac4e8c4fa0e6f4c"
     }
+  },
+  "nativeGestureFollowup": {
+    "test": "tests/battle-board.spec.ts",
+    "sha256": "eb2069d2fc8a8fec1cb1ad862c49b79a16c33606eea1b343ec35430cebdf84c7",
+    "result": "12 passed; reported device/browser failure not yet reproduced",
+    "runtimeUnchanged": true
   }
 }

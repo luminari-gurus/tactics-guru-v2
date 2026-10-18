@@ -55,3 +55,11 @@ Mobile WebKit has native tap coverage in `playwright.hud.config.ts`. Its wheel/C
 `issue-123-collapsible-hud/bundle.json` compares all built JS/CSS files with the exact base using Python gzip with `mtime=0`: +1,503 raw bytes and +457 gzip bytes. This aggregate is a size comparison, not route transfer or network timing acceptance. The first temporary archive build lacked Git metadata required by Vite; the successful baseline uses the exact base commit and index. Both builds retain the existing large-chunk warning.
 
 The independent deployed cold-code/loading/frame failures tracked by #127 remain open. No deployment, budget relaxation, parent certification or merge is part of this issue.
+
+## Landscape gesture follow-up — 2026-10-18
+
+The caller reports failed pinch zoom and flaky panning in landscape. This remains unconfirmed on the current branch; device/browser, URL, HUD state and rotation sequence have been requested. No application fix is claimed.
+
+Added native CDP multitouch cases to `tests/battle-board.spec.ts`, covering both `/` and `/run`, expanded/collapsed HUD, portrait-to-landscape rotation, asserted pinch scale increase, two-finger to one-finger continuation with unchanged scale, and a fresh pan without selections or commands. All 12 cases passed across the three configured Chromium profiles. Command: `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npx playwright test tests/battle-board.spec.ts -g 'landscape native' --output=/tmp/tg123-landscape-regression-results`.
+
+The initial contained landscape probe passed all four cases. An intermediate diagnostic failed four continuation assertions because the test ended the wrong CDP touch contact and then introduced a new contact; pointer event traces identified that harness error. Correcting the lifted contact passed all four rotation/continuation cases. These diagnostic logs and the final 12-case log are retained; they do not establish reproduction or resolution of the caller's reported failure. Mobile WebKit's actual multitouch sequence remains unverified by these CDP checks.
