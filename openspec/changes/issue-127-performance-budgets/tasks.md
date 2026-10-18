@@ -44,7 +44,7 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 ## 8. Reduce remaining measured engine startup work
 
 - [x] 8.1 Compare the pinned package's stock minified Arcade build and direct stock source entry against the current candidate with the same browser and real cold/warm control workload; retain every diagnostic and actual output-size result. Reject the ineffective minified-file/minifier alternatives; select direct bundling with the published feature flags, without changing audio ownership, animation, measurement markers or budgets.
-- [ ] 8.2 Verify any retained engine-distribution change with applicable full functional, Canvas/WebGL, audio/lifecycle, prefixed-route and device checks, both typechecks/build, then clean complete local/preview performance matrices. Publish source and evidence in focused dependent PRs; reconcile task 6.3 only when all gates pass.
+- [x] 8.2 Verify any retained engine-distribution change with applicable full functional, Canvas/WebGL, audio/lifecycle, prefixed-route and device checks, both typechecks/build, then clean complete local/preview performance matrices. Publish source and evidence in focused dependent PRs; reconcile task 6.3 only when all gates pass.
 
 ## Workflow follow-up
 
