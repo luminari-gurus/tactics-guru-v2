@@ -8,6 +8,8 @@ Fresh local proof: `node node_modules/vitest/vitest.mjs run tests/unit/measureme
 
 ## Retained cold-code stage
 
+PR #133 review carry: the updated #132 parent incorporates all five repaired findings. The combined startup-hint/recovery runtime passes 702 unit tests, both typechecks, root/prefix production builds, [129 root browser checks](issue-127-performance-budgets/review-pr133-browser.json) and [seven prefixed route/CSP/collector checks](issue-127-performance-budgets/review-pr133-prefix.json), with no retries/skips. Both OpenSpec changes and whitespace checks pass. Historical timing receipts remain unchanged and source-bound; RS.1 tracks final combined-runtime performance verification.
+
 PR #132 review carry: all five inherited findings are repaired by the updated #129/#130 base and the focused PR #131 source/evidence commits. The visual-guide files are excluded. The combined branch passes 44 focused evaluator/session tests, both typechecks, production build and 18 Edge recovery regressions. Re-evaluation of all 144 retained samples reproduces the saved gate rows and verifies source/collector/raw hashes; their initial idle windows also pass. Those receipts remain evidence for their original commits. Final combined-runtime performance verification is tracked by OpenSpec task RS.1.
 
 Updated 2026-10-18 (Asia/Jerusalem). **Cold-code repair verified; deployed loading gates remain open.** The measured runtime head is `f28f331`; the evidence below belongs to that original source. The save-recovery repair carried from PR #131 changes runtime code; its functional proof is in [the recovery QA note](pr-131-run-recovery.md). New performance acceptance for the combined runtime follows at the final stack head.
