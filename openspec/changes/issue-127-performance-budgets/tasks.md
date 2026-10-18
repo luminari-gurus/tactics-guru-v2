@@ -31,5 +31,11 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 ## Workflow follow-up
 
+## Review repair: PR #129
+
+- [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.
+- [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
+- [ ] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
+
 - Any production target/build/activation decision remains separately authorized under #83-#85.
 - Sync/archive this OpenSpec change only after the implementation is merged and the repository's completion requirements are met.
