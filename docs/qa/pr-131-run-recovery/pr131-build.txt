@@ -1,0 +1,26 @@
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             3.51 kB │ gzip:   1.21 kB
+dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+dist/assets/start-BCO6seNK.js               0.06 kB │ gzip:   0.07 kB
+dist/assets/battleLayout-BVayxngr.js        0.55 kB │ gzip:   0.31 kB
+dist/assets/preload-helper-DjzSQ1t3.js      1.38 kB │ gzip:   0.75 kB
+dist/assets/rng-BCcJOpRP.js                 1.65 kB │ gzip:   0.81 kB
+dist/assets/index-BqAshnyd.js               1.75 kB │ gzip:   0.89 kB
+dist/assets/startBattleApp-r27vZwi_.js      2.78 kB │ gzip:   1.17 kB
+dist/assets/browser-DFAOmOzH.js             3.26 kB │ gzip:   1.37 kB
+dist/assets/view-Bb-Yv632.js                8.83 kB │ gzip:   3.51 kB
+dist/assets/startRunApp-f_ELHnd9.js        26.01 kB │ gzip:   8.87 kB
+dist/assets/start-BzWJH7wt.js           1,527.21 kB │ gzip: 401.64 kB
+
+✓ built in 498ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
