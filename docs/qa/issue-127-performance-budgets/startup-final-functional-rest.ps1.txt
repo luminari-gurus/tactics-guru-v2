@@ -1,0 +1,16 @@
+$ErrorActionPreference = 'Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+node node_modules/@playwright/test/cli.js test -c tmp/playwright-startup-board-recheck.config.ts *> tmp/startup-final-board-recheck-progress.txt
+if ($LASTEXITCODE -ne 0) { throw 'Corrected board assertion failed; preserve its output and investigate.' }
+foreach ($kind in @('encounters','items')) {
+  $env:TG_SUITE = $kind
+  $env:TG_REPORT_FILE = "docs/qa/issue-127-performance-budgets/startup-final-$kind.json"
+  node node_modules/@playwright/test/cli.js test -c tmp/playwright-owned.config.ts *> "tmp/startup-final-$kind-progress.txt"
+  if ($LASTEXITCODE -ne 0) { throw "$kind posttest failed; preserve its output and investigate." }
+}
+wsl.exe --cd /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru --exec env -u PLAYWRIGHT_CHROMIUM_EXECUTABLE TG_PROBE_URL=http://127.0.0.1:4201/ TG_PROBE_NAME=startup-final TG_REPORT_FILE=docs/qa/issue-127-performance-budgets/startup-final-webkit.json node node_modules/@playwright/test/cli.js test -c tmp/playwright-external-webkit.config.ts *> tmp/startup-final-webkit-progress.txt
+if ($LASTEXITCODE -ne 0) { throw 'WebKit acceptance failed; preserve its output and investigate.' }
+wsl.exe --cd /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru --exec env -u PLAYWRIGHT_CHROMIUM_EXECUTABLE node node_modules/@playwright/test/cli.js test -c tmp/playwright-startup-webkit-boundaries.config.ts *> tmp/startup-final-webkit-boundaries-progress.txt
+if ($LASTEXITCODE -ne 0) { throw 'WebKit boundaries failed; preserve its output and investigate.' }
+Write-Output 'Corrected assertion, posttests and WebKit suites passed.'
+

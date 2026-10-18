@@ -1,0 +1,8 @@
+import {defineConfig,devices} from '@playwright/test';
+import {resolve} from 'node:path';
+export default defineConfig({testDir:resolve('tmp'),testMatch:'probe-input.spec.ts',
+  grep:/battle direct entry and refresh resolve public assets/,repeatEach:6,workers:1,
+  outputDir:resolve('tmp','input-probe-artifacts'),
+  reporter:[['line'],['json',{outputFile:resolve('docs/qa/issue-127-performance-budgets/startup-webkit-input-diagnostic.json')}]],
+  projects:[{name:'webkit-portrait',use:{...devices['iPhone 13']}}],
+  use:{baseURL:'http://127.0.0.1:4201/',trace:'retain-on-failure',screenshot:'only-on-failure'}});

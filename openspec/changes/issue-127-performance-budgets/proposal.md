@@ -12,6 +12,7 @@ Review-repair authorization (2026-10-18): the caller requested all findings on P
 - Reproduce the retained release and compare current main before changing code. Reuse the retained collector's isolated save handling and real run-start controls; report per-request transfer and every sample.
 - Evaluate selective scene loading, retain its measured comparison, then use the stock pinned Phaser Arcade distribution to omit unused Matter physics. The scene split saved too little and is removed from the final source. Preserve all entry points, both renderers, engine/audio setup and gameplay.
 - Investigate the run idle outlier with paired uninstrumented captures and separate profiling. Change runtime work only when a measured cause supports it; preserve unresolved failures.
+- Advance selected-route JS/CSS/image requests using emitted-bundle hints and Phaser's supported image-element transport. Preserve the existing content loader's validation, timeout and shutdown ownership while sharing image requests with portraits.
 - Verify both routes against loading, transfer and frame budgets plus functional regressions. Keep local proof, deployed verification and production authorization distinct.
 
 ## Capabilities
@@ -27,8 +28,8 @@ None.
 
 ## Impact
 
-Initial planning base was `0b317e35bb5c4ce713c242311f0673fc27923637`; implementation now includes main `a009a3e` through collector base `f1184d5` and runtime candidate `f28f331`. PR #129 is the collector prerequisite; PR #130 is the runtime remedy. Caller: `moshehbenavraham`.
+Initial planning base was `0b317e35bb5c4ce713c242311f0673fc27923637`; implementation includes main `a009a3e` through collector base `f1184d5`, stock-distribution candidate `f28f331` and startup candidate `06ad243`. PR #129 is the collector prerequisite, #130 the cold-code remedy, #132 its evidence, and #133 the startup remedy. Test-only follow-ups `99ee537` and `9382f13` preserve the measured application inputs. Caller: `moshehbenavraham`.
 
-Implementation changes the Vite distribution selection, existing measurement scripts/options and their unit/actual-control tests, plus boot and comparison-origin checks. Application source under `src/` matches current main; the experimental scene-start changes were reverted. Source-bound QA receipts live under `docs/qa/issue-127-performance-budgets/`.
+Implementation changes Vite's distribution selection and build hints, the existing measurement scripts/options and their tests, plus boot and comparison-origin checks. The startup follow-up changes only `src/phaser/contentLoading.ts` under application source, selecting image-element loading through the existing Phaser loader. The experimental scene-start changes remain reverted. Source-bound QA receipts live under `docs/qa/issue-127-performance-budgets/`.
 
-No combat/content/save changes, dependency upgrade, custom engine build, renderer rewrite, analytics integration or deployment configuration change is selected. PR #119 merged independently and its reviewed runtime is incorporated; issue #128 remains separately owned. The caller authorized implementation of [plan.md](../../../docs/ongoing-projects/plan.md); its execution handoff and QA report record current progress.
+No combat rules, authored content, save schemas, dependencies, custom engine build, renderer, analytics or deployment configuration are changed. A separate cache-header proposal remains unapplied pending caller confirmation; the deployed warm gate is still open. PR #119 merged independently and its reviewed runtime is incorporated; issue #128 remains separately owned. The caller authorized implementation of [plan.md](../../../docs/ongoing-projects/plan.md); its execution handoff and QA report record current progress.

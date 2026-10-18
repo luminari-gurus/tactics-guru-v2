@@ -1,0 +1,8 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from '../playwright.config';
+export default defineConfig({...base,testDir:resolve('tests'),webServer:undefined,
+  outputDir:resolve('tmp','startup-final-browser-artifacts'),
+  reporter:[['line'],['json',{outputFile:resolve('docs/qa/issue-127-performance-budgets/startup-final-browser.json')}]],
+  use:{...base.use,baseURL:'http://127.0.0.1:4199/'}});
+

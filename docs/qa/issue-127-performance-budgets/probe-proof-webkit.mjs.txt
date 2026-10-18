@@ -1,0 +1,31 @@
+import {webkit,devices} from '@playwright/test';
+import fs from 'node:fs';
+const browser=await webkit.launch(),records=[];
+try {
+  for(const [name,origin] of [['baseline','http://127.0.0.1:4188'],['candidate','http://127.0.0.1:4201']])
+  for(const profile of ['iPhone 13','iPhone 13 landscape'])for(let repetition=1;repetition<=3;repetition++){
+    const context=await browser.newContext(devices[profile]),page=await context.newPage(),errors=[],requests=[],finished=[];
+    page.on('pageerror',e=>errors.push(e.message));
+    page.on('console',m=>{if(['error','warning'].includes(m.type()))errors.push(m.type()+': '+m.text());});
+    page.on('request',r=>requests.push(r.url()));page.on('requestfinished',r=>finished.push(r.url()));
+    page.on('requestfailed',r=>errors.push('request: '+r.url()+' '+JSON.stringify(r.failure())));
+    for(const visit of ['cold','reload']){
+      requests.length=0;finished.length=0;errors.length=0;let failure=null;
+      try{
+        if(visit==='cold')await page.goto(origin+'/?scene=proof');else await page.reload();
+        await page.waitForFunction(()=>document.querySelector('#fit-status')?.textContent==='Ready',{},{timeout:5000});
+        await page.locator('#audio-play').click();
+        await page.waitForFunction(()=>document.querySelector('#audio-status')?.textContent==='Played',{},{timeout:5000});
+      }catch(e){failure=e.message;}
+      const state=await page.evaluate(()=>({url:location.href,readyState:document.readyState,visibility:document.visibilityState,
+        status:document.querySelector('#fit-status')?.textContent,diagnostics:window.fitDiagnostics?.()??null,
+        canvas:[...document.querySelectorAll('canvas')].map(c=>({width:c.width,height:c.height})),
+        portrait:document.querySelector('#proof-portrait')?{complete:document.querySelector('#proof-portrait').complete,width:document.querySelector('#proof-portrait').naturalWidth,src:document.querySelector('#proof-portrait').src}:null,
+        resources:performance.getEntriesByType('resource').map(r=>r.toJSON())}));
+      records.push({name,profile,repetition,visit,failure,errors:[...errors],pending:requests.filter(url=>!finished.includes(url)),state});
+      console.log(JSON.stringify({name,profile,repetition,visit,failure,status:state.status,build:state.diagnostics?.build,canvas:state.canvas,pending:records.at(-1).pending}));
+      if(failure)break;
+    }
+    await context.close();
+  }
+}finally{await browser.close();fs.writeFileSync('docs/qa/issue-127-performance-budgets/startup-proof-webkit-diagnostic.json',JSON.stringify({purpose:'Baseline/candidate functional diagnosis; not performance acceptance or replacement',records},null,2)+'\n');}

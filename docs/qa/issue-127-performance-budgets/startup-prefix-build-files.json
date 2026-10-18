@@ -1,0 +1,366 @@
+{
+  "candidate": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+  "base": "/tactics/",
+  "files": [
+    {
+      "path": "assets/battleLayout-BVayxngr.js",
+      "bytes": 559,
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "assets/battleLayout-C6wfuIJB.css",
+      "bytes": 10757,
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "assets/browser-DnUF-IGp.js",
+      "bytes": 3264,
+      "sha256": "687e410fecaeca67b4fbdbd0c324183f5e148786656c24e197898b85b0e14f31"
+    },
+    {
+      "path": "assets/index-qyHfp4FY.js",
+      "bytes": 1764,
+      "sha256": "276cf30ad813c6b417659cf9fd84b0e8f5f972c26fc33217835183006f2ab46c"
+    },
+    {
+      "path": "assets/preload-helper-3gX2X29a.js",
+      "bytes": 1391,
+      "sha256": "d0aa6af6c31632aab3c125680faab698384d28cfcaf5e3b9de910a953b490c25"
+    },
+    {
+      "path": "assets/rng-BCcJOpRP.js",
+      "bytes": 1651,
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "assets/start-Bw2Yc9UB.js",
+      "bytes": 64,
+      "sha256": "583702ea7f961618cbce10b8c0a8a2700169d1912007c61eadc0383567d34f4a"
+    },
+    {
+      "path": "assets/start-FRKFQ9z8.js",
+      "bytes": 1417361,
+      "sha256": "b63adaf1f2b2ed40ef35521c50df0160fc96c265e1f443ba4f78998e9cc6ebf8"
+    },
+    {
+      "path": "assets/startBattleApp-D8UbxnZ5.js",
+      "bytes": 2797,
+      "sha256": "8766fd19a8bb47f0b7ca2f76d03e662a7f29cb098da5b05808dbd9d856e9655f"
+    },
+    {
+      "path": "assets/startRunApp-BYVUtksN.js",
+      "bytes": 25559,
+      "sha256": "47f29ddc071a95313b1e959f3c5ffd8f2fc8fada5792cbd055695ef861c1122e"
+    },
+    {
+      "path": "assets/startRunApp-y3YtRGS5.css",
+      "bytes": 2130,
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "assets/view-BBW_du9E.css",
+      "bytes": 2617,
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "assets/view-D3FGqi0p.js",
+      "bytes": 8844,
+      "sha256": "c3577afa4f2b42a9d43499e3ae2bf48e3f55bd92f00de00a411b09b1e8c01c69"
+    },
+    {
+      "path": "audio/battle/critical.mp3",
+      "bytes": 1376,
+      "sha256": "f419892404a9224fd4bf984892eb69f33a2c0704d8776873ee21bc58bd5901f8"
+    },
+    {
+      "path": "audio/battle/hit.mp3",
+      "bytes": 958,
+      "sha256": "607244384c2d238211fa46631325a07232728d15fbfca68bcaaa87a5b65bee41"
+    },
+    {
+      "path": "audio/battle/loss.mp3",
+      "bytes": 2212,
+      "sha256": "cee68cbe441f8622a7b559414305e3bcc459fb48f46115951f9f5097291ca6a5"
+    },
+    {
+      "path": "audio/battle/magic.mp3",
+      "bytes": 1481,
+      "sha256": "ddab11c45966c473523560aed11b3722cca9e8108b4eb49f1e46387dcc2a6a65"
+    },
+    {
+      "path": "audio/battle/miss.mp3",
+      "bytes": 1063,
+      "sha256": "46c4680c22025042552972330e4237ce23c5480eac6db0e08a65e2ca0e8381e6"
+    },
+    {
+      "path": "audio/battle/move.mp3",
+      "bytes": 958,
+      "sha256": "987ac8ce55959343212675696e3201821717fca9718ad7e5b26bd420f45e5d34"
+    },
+    {
+      "path": "audio/battle/unit-defeat.mp3",
+      "bytes": 1481,
+      "sha256": "a9a5264dacbfacba180c562dbfe4f4aeed8848f73171c3413009a8e2a2396df4"
+    },
+    {
+      "path": "audio/battle/victory.mp3",
+      "bytes": 2212,
+      "sha256": "1d6e4fd2177d1013b4cce4c9ee480ba67cf107a81e6ae1033b561f6619790758"
+    },
+    {
+      "path": "battle/portraits/fighter.png",
+      "bytes": 20759,
+      "sha256": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3"
+    },
+    {
+      "path": "battle/portraits/goblin_archer.png",
+      "bytes": 20415,
+      "sha256": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b"
+    },
+    {
+      "path": "battle/portraits/goblin_grunt.png",
+      "bytes": 20552,
+      "sha256": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7"
+    },
+    {
+      "path": "battle/portraits/mage.png",
+      "bytes": 20670,
+      "sha256": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95"
+    },
+    {
+      "path": "battle/portraits/ranger.png",
+      "bytes": 19887,
+      "sha256": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7"
+    },
+    {
+      "path": "battle/source/goblin_archer_portrait.png",
+      "bytes": 3246286,
+      "sha256": "a4ee1b8eb0ab4ed959a6cb160f9b8db330c2e4125b99122c17e175cd2becde4e"
+    },
+    {
+      "path": "battle/source/goblin_archer_sprite.png",
+      "bytes": 10218,
+      "sha256": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e"
+    },
+    {
+      "path": "battle/source/goblin_grunt_portrait.png",
+      "bytes": 3315031,
+      "sha256": "73248f68e4ada0036bb8cf379352631acec98b058ef63cc35ee17bc97f0b8992"
+    },
+    {
+      "path": "battle/source/goblin_grunt_sprite.png",
+      "bytes": 9301,
+      "sha256": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97"
+    },
+    {
+      "path": "battle/source/mage_portrait.png",
+      "bytes": 3341167,
+      "sha256": "f40dcba51ab801afbbcb6588579e18229cb74360497972991bfa50e679610c5c"
+    },
+    {
+      "path": "battle/source/mage_sprite.png",
+      "bytes": 9565,
+      "sha256": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b"
+    },
+    {
+      "path": "battle/source/ranger_portrait.png",
+      "bytes": 3217805,
+      "sha256": "bd8c8786e1006f85df5db3dc423d3535ee7664dee4b32b1a679041b59cc1cb8a"
+    },
+    {
+      "path": "battle/source/ranger_sprite.png",
+      "bytes": 9093,
+      "sha256": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332"
+    },
+    {
+      "path": "battle/terrain/forest.png",
+      "bytes": 139184,
+      "sha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26"
+    },
+    {
+      "path": "battle/terrain/grass_path.png",
+      "bytes": 139394,
+      "sha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9"
+    },
+    {
+      "path": "battle/terrain/grass.png",
+      "bytes": 140320,
+      "sha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8"
+    },
+    {
+      "path": "battle/terrain/stone.png",
+      "bytes": 142882,
+      "sha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a"
+    },
+    {
+      "path": "battle/terrain/water.png",
+      "bytes": 118205,
+      "sha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622"
+    },
+    {
+      "path": "index.html",
+      "bytes": 5311,
+      "sha256": "93f6155c860678b4e0738992c7cec93fe42fbaeeb56cbb68324aba2fc22d0e41"
+    },
+    {
+      "path": "map-art/legacy-8bit/00_terrain_grass_plains.png",
+      "bytes": 277,
+      "sha256": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f"
+    },
+    {
+      "path": "map-art/legacy-8bit/01_terrain_forest.png",
+      "bytes": 435,
+      "sha256": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013"
+    },
+    {
+      "path": "map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+      "bytes": 406,
+      "sha256": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e"
+    },
+    {
+      "path": "proof/fighter-portrait-96.webp",
+      "bytes": 4568,
+      "sha256": "e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8"
+    },
+    {
+      "path": "proof/fighter-portrait.png",
+      "bytes": 3285110,
+      "sha256": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190"
+    },
+    {
+      "path": "proof/fighter.png",
+      "bytes": 8843,
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "proof/grass-material-v1-348.png",
+      "bytes": 260162,
+      "sha256": "002fe98dc7d904b4813205b076e90bf605b594e8a51767e1e6abadbb7605920d"
+    },
+    {
+      "path": "proof/grass-material-v1.png",
+      "bytes": 2980361,
+      "sha256": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2"
+    },
+    {
+      "path": "proof/tree-grass-v1-480.webp",
+      "bytes": 54200,
+      "sha256": "d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32"
+    },
+    {
+      "path": "proof/tree-grass-v1.png",
+      "bytes": 1117492,
+      "sha256": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5"
+    },
+    {
+      "path": "proof/unlock-tone.mp3",
+      "bytes": 1462,
+      "sha256": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec"
+    },
+    {
+      "path": "proof/unlock-tone.ogg",
+      "bytes": 3768,
+      "sha256": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d"
+    },
+    {
+      "path": "textures/terrain/ash-top-down-v1.png",
+      "bytes": 4187512,
+      "sha256": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b"
+    },
+    {
+      "path": "textures/terrain/cliff-top-down-v1.png",
+      "bytes": 3786663,
+      "sha256": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06"
+    },
+    {
+      "path": "textures/terrain/forest-top-down-v1.png",
+      "bytes": 3534917,
+      "sha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b"
+    },
+    {
+      "path": "textures/terrain/grass_path-top-down-v1.png",
+      "bytes": 3133231,
+      "sha256": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154"
+    },
+    {
+      "path": "textures/terrain/grass-top-down-v1.png",
+      "bytes": 3184845,
+      "sha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8"
+    },
+    {
+      "path": "textures/terrain/lava-top-down-v1.png",
+      "bytes": 3557231,
+      "sha256": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea"
+    },
+    {
+      "path": "textures/terrain/mud-top-down-v1.png",
+      "bytes": 2904905,
+      "sha256": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8"
+    },
+    {
+      "path": "textures/terrain/runtime/ash-top-down-v1.png",
+      "bytes": 137926,
+      "sha256": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74"
+    },
+    {
+      "path": "textures/terrain/runtime/cliff-top-down-v1.png",
+      "bytes": 141652,
+      "sha256": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295"
+    },
+    {
+      "path": "textures/terrain/runtime/forest-top-down-v1.png",
+      "bytes": 140495,
+      "sha256": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7"
+    },
+    {
+      "path": "textures/terrain/runtime/grass_path-top-down-v1.png",
+      "bytes": 140735,
+      "sha256": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61"
+    },
+    {
+      "path": "textures/terrain/runtime/grass-top-down-v1.png",
+      "bytes": 141658,
+      "sha256": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93"
+    },
+    {
+      "path": "textures/terrain/runtime/lava-top-down-v1.png",
+      "bytes": 142572,
+      "sha256": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86"
+    },
+    {
+      "path": "textures/terrain/runtime/mud-top-down-v1.png",
+      "bytes": 130199,
+      "sha256": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f"
+    },
+    {
+      "path": "textures/terrain/runtime/sand-top-down-v1.png",
+      "bytes": 95984,
+      "sha256": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d"
+    },
+    {
+      "path": "textures/terrain/runtime/stone-top-down-v1.png",
+      "bytes": 144308,
+      "sha256": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442"
+    },
+    {
+      "path": "textures/terrain/runtime/water-top-down-v1.png",
+      "bytes": 119204,
+      "sha256": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1"
+    },
+    {
+      "path": "textures/terrain/sand-top-down-v1.png",
+      "bytes": 2786755,
+      "sha256": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db"
+    },
+    {
+      "path": "textures/terrain/stone-top-down-v1.png",
+      "bytes": 3643289,
+      "sha256": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7"
+    },
+    {
+      "path": "textures/terrain/water-top-down-v1.png",
+      "bytes": 2209240,
+      "sha256": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e"
+    }
+  ]
+}

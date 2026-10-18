@@ -66,6 +66,8 @@ This is a measured client-loading experiment, not approval for hosting/cache-pol
 
 The first fetch-image hints are rejected because Chromium cannot reuse them for Phaser's blob XHR; JS/CSS-only hints advance requests but leave warm failures. The next bounded experiment selects Phaser's supported `HTMLImageElement` transport inside the existing content loader and uses matching `as=image` hints. This keeps the loader's texture creation, dimension/error checks, application-owned deadline and shutdown cleanup. Prove actual single-request reuse and all failure paths; do not add a second loader or an application cache. Proof/content-smoke/map must not receive battle-image hints.
 
+That experiment is retained in measured runtime `06ad243`: every required image is requested once, all 36 local samples pass, and deployed battle passes all 18 samples. Deployed run retains one warm failure at 777.4 ms; the unchanged limit is 750 ms. Test-only follow-ups correct the old duplicate-request expectation and use native taps on touch profiles. The initial WebKit proof readiness timeout remains retained and unreproduced after baseline/candidate and sequence checks; no unsupported application fix is claimed. A separate generated-cache-header proposal is prepared but not applied because hosting/cache-policy scope requires the caller's confirmation. Keep task 6.3 and #127 open while the remaining gate is unmet.
+
 ## Risks / Trade-offs
 
 - Scene separation may save too little or increase request overhead -> compare route totals before committing to further changes; no speculative custom build.

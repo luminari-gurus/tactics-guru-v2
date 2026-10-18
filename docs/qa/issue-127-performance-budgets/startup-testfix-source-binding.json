@@ -1,0 +1,22 @@
+{
+  "measuredRuntimeCommit": "06ad2435c28c96b1614eb083acd8f953f76c8fe7",
+  "testRepairCommit": "99ee537c33fc9929e23474e26666a6c73442cdea",
+  "changedFiles": [
+    "tests/battle-board.spec.ts"
+  ],
+  "unchangedRuntimeInputs": {
+    "src": "52aafbff15732e76ce20674330995c7df6a5cf2b",
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "vite.config.ts": "9669a96e2e5640ef91be7cdb964d826467976f89",
+    "index.html": "ab88c53028a4f6d8151f3eb779d0bf8897478d4c",
+    "package.json": "e84a0a7f8f6fc6a368d5059f255ddf1c9824da65",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+    "tsconfig.json": "072c6d9d3b8770da23bddd41db2e0fc477b9895b",
+    "tsconfig.domain.json": "231561e38f4baf69afd169d885edd1f6e31fa62a"
+  },
+  "diff": "diff --git a/tests/battle-board.spec.ts b/tests/battle-board.spec.ts\nindex 2dcb4bb..55cc7df 100644\n--- a/tests/battle-board.spec.ts\n+++ b/tests/battle-board.spec.ts\n@@ -201,7 +201,7 @@ test('default authored board renders canonical units, highlights and stable rest\n     await expect(page.locator('canvas')).toHaveCount(1);\n   }\n   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());\n-  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);\n+  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(1);\n   expect(errors).toEqual([]);\n });",
+  "reason": "The earlier fixture expected duplicate portrait requests. The new loader shares one image request; preserve the assertion and require one for every catalog image across four restarts.",
+  "followupArtifact": "tmp/cache-followup/tmp/startup-testfix-dist",
+  "followupLocalUrl": "http://127.0.0.1:4201/",
+  "proofBoundary": "Performance remains bound to clean 06ad243. The follow-up changes only the test; build-identity metadata changes with the commit. It is not a new performance acceptance attempt."
+}

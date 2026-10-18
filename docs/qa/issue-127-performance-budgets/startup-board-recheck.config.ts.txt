@@ -1,0 +1,11 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from './playwright-startup-final.config';
+export default defineConfig({...base,
+  testMatch:'**/battle-board.spec.ts',grep:/default authored board renders canonical units, highlights and stable restarts/,
+  outputDir:resolve('tmp','startup-board-recheck-artifacts'),
+  use:{...base.use,baseURL:'http://127.0.0.1:4201/'},
+  reporter:[['line'],['json',{outputFile:resolve('docs/qa/issue-127-performance-budgets/startup-final-board-recheck.json')}]],
+});
+
+

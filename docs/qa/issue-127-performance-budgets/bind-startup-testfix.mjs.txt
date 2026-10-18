@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+const baseline='06ad2435c28c96b1614eb083acd8f953f76c8fe7',followup='99ee537c33fc9929e23474e26666a6c73442cdea';
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const changedFiles=git('diff','--name-only',baseline,followup).split('\n');
+assert.deepEqual(changedFiles,['tests/battle-board.spec.ts']);
+const inputs={};for(const file of ['src','public','vite.config.ts','index.html','package.json','package-lock.json','tsconfig.json','tsconfig.domain.json']){
+  const before=git('rev-parse',baseline+':'+file),after=git('rev-parse',followup+':'+file);
+  assert.equal(before,after);inputs[file]=after;
+}
+const result={measuredRuntimeCommit:baseline,testRepairCommit:followup,changedFiles,unchangedRuntimeInputs:inputs,
+  diff:git('diff',baseline,followup,'--','tests/battle-board.spec.ts'),
+  reason:'The earlier fixture expected duplicate portrait requests. The new loader shares one image request; preserve the assertion and require one for every catalog image across four restarts.',
+  followupArtifact:'tmp/cache-followup/tmp/startup-testfix-dist',followupLocalUrl:'http://127.0.0.1:4201/',
+  proofBoundary:'Performance remains bound to clean 06ad243. The follow-up changes only the test; build-identity metadata changes with the commit. It is not a new performance acceptance attempt.'};
+fs.writeFileSync('docs/qa/issue-127-performance-budgets/startup-testfix-source-binding.json',JSON.stringify(result,null,2)+'\n');
+console.log('Verified a one-line test-only repair with identical runtime inputs.');

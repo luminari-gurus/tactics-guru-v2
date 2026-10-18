@@ -1,0 +1,23 @@
+// Local-only proposal rendering: no source configuration or hosted policy is changed.
+import {build} from 'vite';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+for(const base of ['/', '/tactics/']){
+  const outDir='tmp/cache-proposal-'+(base==='/'?'root':'prefix');
+  await build({base,logLevel:'error',build:{outDir},plugins:[{
+    name:'render-cache-policy-proposal',apply:'build',
+    generateBundle(_options,bundle){
+      const root=new URL(base,'https://build.invalid').pathname;
+      const paths=Object.values(bundle).map(file=>file.fileName)
+        .filter(file=>/^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
+      assert(paths.length>0&&paths.length<=100);
+      assert(paths.every(file=>bundle[file]));
+      this.emitFile({type:'asset',fileName:'_headers',source:paths
+        .map(file=>`${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`).join('\n')});
+    },
+  }]});
+  const rules=fs.readFileSync(outDir+'/_headers','utf8').trim().split(/\n\n/);
+  assert(rules.every(rule=>rule.startsWith(base+'assets/')));
+  assert(!rules.some(rule=>/index\.html|battle\/|proof\/|audio\//.test(rule)));
+  console.log(JSON.stringify({purpose:'Unapplied proposal only',base,rules:rules.length,headers:outDir+'/_headers'}));
+}

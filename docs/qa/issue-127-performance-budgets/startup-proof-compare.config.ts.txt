@@ -1,0 +1,9 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from '../playwright.device-acceptance.config';
+export default defineConfig({...base,testDir:resolve('tests'),webServer:undefined,
+  testMatch:'**/public-asset-base.spec.ts',grep:/proof direct entry and refresh resolve public assets/,
+  repeatEach:3,
+  outputDir:resolve('tmp','proof-compare-artifacts',process.env.TG_PROBE_NAME!),
+  reporter:[['line'],['json',{outputFile:resolve(process.env.TG_REPORT_FILE!)}]],
+  use:{...base.use,baseURL:process.env.TG_PROBE_URL!,trace:'retain-on-failure',screenshot:'only-on-failure'}});

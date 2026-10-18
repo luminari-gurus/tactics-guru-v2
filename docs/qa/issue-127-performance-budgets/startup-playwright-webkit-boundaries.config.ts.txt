@@ -1,0 +1,9 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from '../playwright.device-acceptance.config';
+export default defineConfig({...base,testDir:resolve('tests'),webServer:undefined,
+  testMatch:'**/public-asset-base.spec.ts',grep:/direct entry and refresh|image .*controlled|extracted map route|built startup hints/,
+  outputDir:resolve('tmp','startup-final-webkit-boundaries-artifacts'),
+  reporter:[['line'],['json',{outputFile:resolve('docs/qa/issue-127-performance-budgets/startup-final-webkit-boundaries.json')}]],
+  use:{...base.use,baseURL:'http://127.0.0.1:4201/'}});
+
