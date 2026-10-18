@@ -1,0 +1,9 @@
+
+ RUN  v5.0.3 C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru
+
+
+ Test Files  2 passed (2)
+      Tests  39 passed (39)
+   Start at  20:30:58
+   Duration  685ms (tests 78%, transform 11%, import 10%, worker 1%)
+

@@ -1,8 +1,22 @@
 # Issue #127 performance repair evidence
 
-## Current review repair status (2026-10-18)
+## Current bounded fix and owner-directed stop (2026-10-18)
 
-**All five review defects are repaired; deployed loading acceptance remains open.** Clean source `6e615dc` passes 704 unit tests, both typechecks/build and 705 browser checks. Local performance passes 36/36; two complete preview matrices pass 31/36 and 32/36. All 108 samples and nine loading failures are retained. [Current repair report and handoff](pr-129-138-review-repair.md) binds the fresh results and explains the navigation diagnostic. Keep #127 open; this status supersedes the historical closeout below without altering its receipts.
+The owner requested merging the implemented fix and stopping, with remaining timing misses deferred. Issue #127 remains closed by that direction; this is not a claim that every performance gate passes.
+
+Application source `d7a36e9efabc19f77fb9ed5ddf32c3f920e94fe9` makes two small changes: the existing build plugin emits byte-identical battle images at content-hashed URLs with immutable headers, and the run initializes its single engine on the read-only start screen instead of at the first encounter click. The existing resolver serves the same URL to preloads, textures and portraits. Canonical files, saves, rules, audio backends, startup movement and readiness/budget definitions remain unchanged. An interleaved local diagnostic measured a 27–50 ms warm-run improvement from the initialization change; it is diagnostic evidence, not a replacement acceptance matrix.
+
+Validation: 704 unit tests and both TypeScript configurations pass, as do root/prefix builds. The image change passed 158 focused browser executions. The initialization change passed all 54 run-progression cases (51 initially, then three after correcting the new assertion's wait for the startup screen), six new audio cases, three prefix cases and ten WebKit cases. Initial test/configuration failures remain retained. Exact preview `16a22948` matches all 28 versioned local files and their immutable headers; HTML and canonical fixed-file policies are unchanged.
+
+The final application passes 36/36 local performance samples. Its first complete preview matrix passed 34/36. With the additional navigation breakdown, the latest complete preview matrix also passed 34/36: battle 18/18, run 16/18. The remaining desktop warm-run results are **754.2 ms and 827.7 ms against 750 ms**. These are failures, explicitly deferred by the owner. All code, asset and frame gates pass; warm versioned-image transfer is zero. All 252 samples from this follow-up, including every earlier failed attempt, are preserved in the [manifest and receipts](issue-127-performance-budgets/warm-loading/manifest.json).
+
+Collector commit `e0554bdd422610bf32c1a8ab31c8c13738975003` adds native navigation timestamps after the existing measurements; the application inputs are identical to `d7a36e9`. **Attribution correction:** navigation `duration` runs through `loadEventEnd`, so the older receipts' navigation duration alone does not prove an HTML/server delay. See the [Navigation Timing specification](https://www.w3.org/TR/navigation-timing-2/#relation-to-the-performanceentry-interface). The new `navigationTiming` field separates DNS, connection, response and load timestamps. No upstream cause is asserted from the older aggregate field.
+
+Commands: `node node_modules/vitest/vitest.mjs run`; both `node node_modules/typescript/bin/tsc --noEmit` configurations; root and `--base=/tactics/` Vite builds; the existing Playwright suites with Edge and Linux WebKit; `node scripts/measure-fit.ts <new-output.json> --scene battle --url <origin-or-run-url>` and `node scripts/evaluate-fit.ts <capture> <new-gates.json>`. Capture conditions, exact served/collector commits, browser version, original collector bytes and SHA-256 values are retained in the manifest. Browser/device emulation was used. The historical failed #138 build is superseded by the successful merged-main deployment at `9443668`; later preview bytes were verified directly while their GitHub check remained in progress. No further tuning or capture loop is authorized by this closeout.
+
+## Retained review repair status (2026-10-18)
+
+**All five review defects were repaired; deployed loading acceptance remained open at this stage.** Clean source `6e615dc` passes 704 unit tests, both typechecks/build and 705 browser checks. Local performance passes 36/36; two complete preview matrices pass 31/36 and 32/36. All 108 samples and nine loading failures are retained. The [repair report and handoff](pr-129-138-review-repair.md) binds those results. The current owner-directed disposition and navigation-attribution correction above supersede its keep-open instruction without altering any receipt.
 
 ## PR #129 review repair (2026-10-18)
 

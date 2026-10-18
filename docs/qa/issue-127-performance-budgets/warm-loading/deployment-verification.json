@@ -1,0 +1,172 @@
+{
+  "commit": "94436688a4738ed1dea7133dead597c794d96bcf",
+  "verifiedAt": "2026-10-18T16:40:11.434Z",
+  "results": [
+    {
+      "origin": "https://tactics-guru-v2.pages.dev",
+      "code": [
+        {
+          "path": "/assets/index-ChxPc2cU.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "caa9911b0076adfd5f5a5c4737a93520302d7bd236b4702794adf2a74ddd788f"
+        },
+        {
+          "path": "/assets/battleLayout-BVayxngr.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+        },
+        {
+          "path": "/assets/browser-CPArYTVb.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "7c2c777fab8a8082162057281da4bd7ac52150d9beb897ca0665f3b8ccf18394"
+        },
+        {
+          "path": "/assets/preload-helper-DjzSQ1t3.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+        },
+        {
+          "path": "/assets/rng-BCcJOpRP.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+        },
+        {
+          "path": "/assets/start-BMEazfrA.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "1f5078c96850634da46e625c62408d749c141d3ac143d67510163d1512035bc3"
+        },
+        {
+          "path": "/assets/start-sZrwFnH0.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "b2b377cfca9894a3381f883a4ff946de4320c76d3796451a0043330d8fa374b7"
+        },
+        {
+          "path": "/assets/startBattleApp-DUjbmptA.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "d6b9059657724b51091ef0afc5a58394c1e6b8e8f92e07610b9db472755366c8"
+        },
+        {
+          "path": "/assets/startRunApp-i_lUoUsY.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "256283ffd804acc073e6e4b51e8080e20ceb6408ab8b2fec47ca6c057a7c613c"
+        },
+        {
+          "path": "/assets/view-BNM5a77d.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "dda320b7dff441df1f447b4c78d385da2931b9fb0b61105f94997e4e21e470e3"
+        },
+        {
+          "path": "/assets/battleLayout-C6wfuIJB.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+        },
+        {
+          "path": "/assets/startRunApp-y3YtRGS5.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+        },
+        {
+          "path": "/assets/view-BBW_du9E.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+        }
+      ]
+    },
+    {
+      "origin": "https://a4bc1760.tactics-guru-v2.pages.dev",
+      "code": [
+        {
+          "path": "/assets/index-ChxPc2cU.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "caa9911b0076adfd5f5a5c4737a93520302d7bd236b4702794adf2a74ddd788f"
+        },
+        {
+          "path": "/assets/battleLayout-BVayxngr.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+        },
+        {
+          "path": "/assets/browser-CPArYTVb.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "7c2c777fab8a8082162057281da4bd7ac52150d9beb897ca0665f3b8ccf18394"
+        },
+        {
+          "path": "/assets/preload-helper-DjzSQ1t3.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+        },
+        {
+          "path": "/assets/rng-BCcJOpRP.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+        },
+        {
+          "path": "/assets/start-BMEazfrA.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "1f5078c96850634da46e625c62408d749c141d3ac143d67510163d1512035bc3"
+        },
+        {
+          "path": "/assets/start-sZrwFnH0.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "b2b377cfca9894a3381f883a4ff946de4320c76d3796451a0043330d8fa374b7"
+        },
+        {
+          "path": "/assets/startBattleApp-DUjbmptA.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "d6b9059657724b51091ef0afc5a58394c1e6b8e8f92e07610b9db472755366c8"
+        },
+        {
+          "path": "/assets/startRunApp-i_lUoUsY.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "256283ffd804acc073e6e4b51e8080e20ceb6408ab8b2fec47ca6c057a7c613c"
+        },
+        {
+          "path": "/assets/view-BNM5a77d.js",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "dda320b7dff441df1f447b4c78d385da2931b9fb0b61105f94997e4e21e470e3"
+        },
+        {
+          "path": "/assets/battleLayout-C6wfuIJB.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+        },
+        {
+          "path": "/assets/startRunApp-y3YtRGS5.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+        },
+        {
+          "path": "/assets/view-BBW_du9E.css",
+          "status": 200,
+          "cacheControl": "public, max-age=31536000, immutable",
+          "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+        }
+      ]
+    }
+  ]
+}

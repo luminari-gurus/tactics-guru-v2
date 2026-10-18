@@ -1,0 +1,459 @@
+{
+  "config": {
+    "argv": [
+      "/home/aiwithapex/.nvm/versions/node/v24.15.0/bin/node",
+      "/mnt/c/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/node_modules/@playwright/test/cli.js",
+      "test",
+      "-c",
+      "/mnt/c/Users/apexw/.codex/verification/tactics-guru-loading-20261018/playwright.eager-webkit.config.ts"
+    ],
+    "configFile": "/mnt/c/Users/apexw/.codex/verification/tactics-guru-loading-20261018/playwright.eager-webkit.config.ts",
+    "rootDir": "/mnt/c/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-webkit-test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-portrait",
+        "name": "acceptance-webkit-portrait",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/public-asset-base.spec.ts",
+          "**/run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-webkit-test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-landscape",
+        "name": "acceptance-webkit-landscape",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/public-asset-base.spec.ts",
+          "**/run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json",
+        {
+          "outputFile": "/mnt/c/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-webkit-browser.json"
+        }
+      ],
+      [
+        "line",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "public-asset-base.spec.ts",
+      "file": "public-asset-base.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Web Audio run audio loads at the base and plays a committed move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2580,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:19:41.181Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-2848fc21b843bd9a68ed",
+          "file": "public-asset-base.spec.ts",
+          "line": 101,
+          "column": 86
+        },
+        {
+          "title": "HTML5 run audio loads at the base and plays a committed move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2063,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:19:46.398Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-f5c0ab52ff373503fb45",
+          "file": "public-asset-base.spec.ts",
+          "line": 101,
+          "column": 86
+        },
+        {
+          "title": "Web Audio run audio loads at the base and plays a committed move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2274,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:20:58.313Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-c34efe1f626a804f09a3",
+          "file": "public-asset-base.spec.ts",
+          "line": 101,
+          "column": 86
+        },
+        {
+          "title": "HTML5 run audio loads at the base and plays a committed move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:21:00.683Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-5fc383608f4f03f304ee",
+          "file": "public-asset-base.spec.ts",
+          "line": 101,
+          "column": 86
+        }
+      ]
+    },
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 57541,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:19:50.089Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a8ef7ae3f89bae60aaca",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1933,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:20:50.356Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-90c48e1fba4d37ab41bd",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2114,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:20:52.295Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-edb6e26bd88c884d915d",
+          "file": "run-progression.spec.ts",
+          "line": 231,
+          "column": 1
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 57355,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:21:04.332Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2524bb8a8447d1c08cc4",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1975,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:22:06.956Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d76ae05a105eae65a8a1",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2103,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:22:08.939Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-4120b3378916cdff6408",
+          "file": "run-progression.spec.ts",
+          "line": 231,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T17:19:38.731Z",
+    "duration": 139684.205,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

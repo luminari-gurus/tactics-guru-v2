@@ -1,0 +1,36 @@
+
+ RUN  v5.0.3 C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru
+
+ ❯ tests/unit/buildHeaders.test.ts (2 tests | 2 failed) 902ms
+   × built cache rules cover only versioned code and unchanged battle images at / 511ms
+   × built cache rules cover only versioned code and unchanged battle images at /tactics/ 390ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/buildHeaders.test.ts > built cache rules cover only versioned code and unchanged battle images at /
+ FAIL  tests/unit/buildHeaders.test.ts > built cache rules cover only versioned code and unchanged battle images at /tactics/
+AssertionError: asset:terrain_grass: expected undefined to be 'asset' // Object.is equality
+
+- Expected:
+"asset"
+
++ Received:
+undefined
+
+ ❯ tests/unit/buildHeaders.test.ts:28:39
+     26|       const path = `assets/${hash}${asset.runtimePath}`;
+     27|       const emitted = result.output.find(file => file.fileName === pat…
+     28|       expect(emitted?.type, asset.id).toBe('asset');
+       |                                       ^
+     29|       if (emitted?.type !== 'asset') throw new Error(`Missing versione…
+     30|       expect(Buffer.from(emitted.source)).toEqual(bytes);
+ ❯ tests/unit/buildHeaders.test.ts:23:48
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  19:44:52
+   Duration  1.16s (tests 85%, import 11%, transform 3%)
+

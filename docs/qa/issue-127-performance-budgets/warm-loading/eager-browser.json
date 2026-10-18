@@ -1,0 +1,2055 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "-c",
+      "C:/Users/apexw/.codex/verification/tactics-guru-loading-20261018/playwright.eager.config.ts",
+      "tests/run-progression.spec.ts"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\verification\\tactics-guru-loading-20261018\\playwright.eager.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/.codex/worktrees/merge-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json",
+        {
+          "outputFile": "C:/Users/apexw/.codex/verification/tactics-guru-loading-20261018/eager-browser.json"
+        }
+      ],
+      [
+        "line",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 47574,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:11:33.720Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-15be9987854f922823b0",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13369,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:21.551Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-ce3b462773c6d2637788",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1697,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:34.926Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1c4ef7c00c455fe2810b",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5894,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:36.632Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-67a33fb6854ff09ee1d2",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 247,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of null (reading 'activeBattle')",
+                    "stack": "TypeError: Cannot read properties of null (reading 'activeBattle')\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 32,
+                      "line": 104
+                    },
+                    "snippet": "  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 32,
+                        "line": 104
+                      },
+                      "message": "TypeError: Cannot read properties of null (reading 'activeBattle')\n\n  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:42.532Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\verification\\tactics-guru-loading-20261018\\eager-test-results\\run-progression-run-startu-8f838-torage-permits-unsaved-play-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 32,
+                    "line": 104
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b6cbe4c445e878a865f7",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1338,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:43.434Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-92de3229fc9cc3c60d06",
+          "file": "run-progression.spec.ts",
+          "line": 118,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2007,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:45.027Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-e30fd4031da28f42a065",
+          "file": "run-progression.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12532,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:47.040Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5cc35e5db4c3618f2e08",
+          "file": "run-progression.spec.ts",
+          "line": 145,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1733,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:12:59.578Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-8409d2453425b61ac9af",
+          "file": "run-progression.spec.ts",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12975,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:01.317Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-16c936faa42bc226ff18",
+          "file": "run-progression.spec.ts",
+          "line": 178,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1773,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:14.301Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c5b946ea4c61fd567b11",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1759,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:16.081Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-7497d7ea84fbc182de50",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 656,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:17.846Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-22983cc1ad0236740d33",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 638,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:18.511Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2d9fd325406679938589",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 780,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:19.153Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-86c96542030150750f02",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1883,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:19.939Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-250819ad071425ed66f0",
+          "file": "run-progression.spec.ts",
+          "line": 230,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2326,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:21.828Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5f292dcdd3b24b4ce3fa",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2816,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:24.159Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0b54aab0e6586b3b5d83",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 47390,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:13:27.678Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-499dbf35138b455a3669",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13749,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:15.331Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3cb1da4fd4f243c22e69",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1670,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:29.086Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-272680e084cbdda91393",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5733,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:30.762Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-776ce8b4ecc25a1958c6",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 280,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of null (reading 'activeBattle')",
+                    "stack": "TypeError: Cannot read properties of null (reading 'activeBattle')\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 32,
+                      "line": 104
+                    },
+                    "snippet": "  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 32,
+                        "line": 104
+                      },
+                      "message": "TypeError: Cannot read properties of null (reading 'activeBattle')\n\n  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:36.502Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\verification\\tactics-guru-loading-20261018\\eager-test-results\\run-progression-run-startu-8f838-torage-permits-unsaved-play-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 32,
+                    "line": 104
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-73a5992ad6946b004097",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1716,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:37.463Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1aaaf727a292259b183c",
+          "file": "run-progression.spec.ts",
+          "line": 118,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1987,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:39.440Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9609366939035932f595",
+          "file": "run-progression.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12616,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:41.432Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2c46757a28226a2deb1c",
+          "file": "run-progression.spec.ts",
+          "line": 145,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2248,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:54.054Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c0dd991c1962a2c88b33",
+          "file": "run-progression.spec.ts",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12553,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:14:56.309Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d7747b64296743427310",
+          "file": "run-progression.spec.ts",
+          "line": 178,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1681,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:08.871Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-61961a59ea234f715443",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:10.558Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-8f31cef9a99deca5d83e",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 657,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:12.318Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-74870bd2a19de0e0cd11",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 672,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:12.980Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-bb7d723257cba36ba297",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 760,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:13.658Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-681490cd5b4b300fc70a",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2014,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:14.425Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-eba13c11f5b9663da36a",
+          "file": "run-progression.spec.ts",
+          "line": 230,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2753,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:16.445Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c8da709630ecf309fb00",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2755,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:19.204Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9cf21bec81de95499156",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 47727,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:15:22.585Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-6fa24f96572b8968daa5",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14304,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:10.572Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-285aec39eaa2c8df3983",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1703,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:24.883Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a09108363ce0e6f0f27b",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5743,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:26.593Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-7fb8a49f20939e14cef7",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 258,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of null (reading 'activeBattle')",
+                    "stack": "TypeError: Cannot read properties of null (reading 'activeBattle')\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 32,
+                      "line": 104
+                    },
+                    "snippet": "  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 32,
+                        "line": 104
+                      },
+                      "message": "TypeError: Cannot read properties of null (reading 'activeBattle')\n\n  102 |  await page.goto('/run');\n  103 |  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);\n> 104 |  expect((await snapshot(page)).activeBattle).toBeNull();\n      |                                ^\n  105 |  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();\n  106 |  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');\n  107 |  await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');\n    at C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:104:32"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:32.346Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\verification\\tactics-guru-loading-20261018\\eager-test-results\\run-progression-run-startu-8f838-torage-permits-unsaved-play-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\merge-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 32,
+                    "line": 104
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0f4859e904e32f44de24",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1713,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:33.227Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3ec2cb6d12e2f40aa61d",
+          "file": "run-progression.spec.ts",
+          "line": 118,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1975,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:35.175Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d88f255c5e2f97f01190",
+          "file": "run-progression.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12574,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:37.156Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2b753526a279b3a47ba0",
+          "file": "run-progression.spec.ts",
+          "line": 145,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2222,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:49.737Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-208840648e736a7286be",
+          "file": "run-progression.spec.ts",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12473,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:16:51.967Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c80078ddc9851f871bf1",
+          "file": "run-progression.spec.ts",
+          "line": 178,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1696,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:04.449Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-34ce60fb2789c5f75c4c",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1727,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:06.152Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a88ad030e7a9af23e8b2",
+          "file": "run-progression.spec.ts",
+          "line": 190,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 647,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:07.885Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-cae82cbb2116f79bc190",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 669,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:08.538Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b5f6d3cf02b9807c1d35",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 804,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:09.213Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c0aa4a8cd39668aff918",
+          "file": "run-progression.spec.ts",
+          "line": 211,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1998,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:10.023Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2e7e4f27a9c67b5d2a56",
+          "file": "run-progression.spec.ts",
+          "line": 230,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2768,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:12.027Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-cf2936b7d10aa4bef517",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2769,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T17:17:14.800Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-dd7c4a4c194b8be3f504",
+          "file": "run-progression.spec.ts",
+          "line": 243,
+          "column": 53
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T17:11:33.196Z",
+    "duration": 344687.656,
+    "expected": 51,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}
