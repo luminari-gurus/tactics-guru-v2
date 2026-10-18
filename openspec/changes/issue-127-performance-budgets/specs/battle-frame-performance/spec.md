@@ -44,3 +44,9 @@ Evidence SHALL use only the existing approved release path. Missing release acce
 - **WHEN** a locally served candidate meets all functional and measurement checks
 - **THEN** its results remain local proof until the exact candidate is verified on an approved deployed origin
 - **AND** publication of source or a plan does not authorize deployment, production activation or closure of parent issues
+
+#### Scenario: Explicitly approved versioned-asset cache policy
+- **WHEN** building the caller-approved cache follow-up for the existing branch preview
+- **THEN** generated headers cache only exact emitted content-hashed JavaScript and CSS paths for one year with `immutable`, respecting root and prefixed base paths
+- **AND** HTML and fixed-name asset policies remain unchanged; actual hosted headers, warm cache reuse and every unchanged performance gate are verified before acceptance
+- **AND** this source change and preview verification do not authorize production activation or closure of parent issues
