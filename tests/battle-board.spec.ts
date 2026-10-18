@@ -201,7 +201,7 @@ test('default authored board renders canonical units, highlights and stable rest
     await expect(page.locator('canvas')).toHaveCount(1);
   }
   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());
-  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);
+  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(1);
   expect(errors).toEqual([]);
 });
 

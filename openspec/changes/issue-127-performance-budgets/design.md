@@ -64,6 +64,8 @@ Investigate earlier route-specific HTML hints, using the actual emitted JS/CSS d
 
 This is a measured client-loading experiment, not approval for hosting/cache-policy changes or production activation. Retain it only if it improves the demonstrated wait while all functional, prefix, byte and timing contracts hold; preserve unsuccessful attempts and continue investigating instead of changing limits.
 
+The first fetch-image hints are rejected because Chromium cannot reuse them for Phaser's blob XHR; JS/CSS-only hints advance requests but leave warm failures. The next bounded experiment selects Phaser's supported `HTMLImageElement` transport inside the existing content loader and uses matching `as=image` hints. This keeps the loader's texture creation, dimension/error checks, application-owned deadline and shutdown cleanup. Prove actual single-request reuse and all failure paths; do not add a second loader or an application cache. Proof/content-smoke/map must not receive battle-image hints.
+
 ## Risks / Trade-offs
 
 - Scene separation may save too little or increase request overhead -> compare route totals before committing to further changes; no speculative custom build.

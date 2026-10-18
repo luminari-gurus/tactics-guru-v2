@@ -31,7 +31,7 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 ## 6. Resolve the remaining deployed loading gates
 
-- [ ] 6.1 Trace the current preview's navigation, dependency and scene-asset sequence against the measured loading failures. Select a bounded client-side early-loading experiment from the emitted bundle graph and existing asset registry; preserve the authoritative loader and keep the map route lightweight.
+- [x] 6.1 Trace the current preview's navigation, dependency and scene-asset sequence against the measured loading failures. Select a bounded client-side early-loading experiment from the emitted bundle graph and existing asset registry; preserve the authoritative loader and keep the map route lightweight.
 - [ ] 6.2 Implement and measure route-specific resource hints only if they reduce the demonstrated wait. Preserve both renderers, error handling, persistence, audio, startup movement and the original controls-usable marker; include every requested byte and reject any duplicate-load or route regression. Hosting/cache configuration and production activation remain outside this change.
 - [ ] 6.3 Verify the resulting source with appropriate full functional, prefixed-route and unchanged complete performance matrices, preserving all earlier failures. Publish a focused dependent PR when ready and reconcile the loading gates without changing limits or substituting diagnostic retries for acceptance.
 

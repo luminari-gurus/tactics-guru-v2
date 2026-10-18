@@ -1,0 +1,19 @@
+import {chromium} from '@playwright/test';
+import fs from 'node:fs';
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+try{
+  const page=await browser.newPage(),messages=[],requests=[];
+  page.on('console',message=>{if(['warning','error'].includes(message.type()))messages.push({type:message.type(),text:message.text()});});
+  page.on('request',request=>{if(request.url().endsWith('/battle/terrain/grass.png'))requests.push(request.allHeaders().then(h=>({
+    url:request.url(),type:request.resourceType(),origin:h.origin??null,accept:h.accept??null,
+    mode:h['sec-fetch-mode']??null,destination:h['sec-fetch-dest']??null,
+  })));});
+  await page.goto('http://127.0.0.1:4198/?scene=battle');
+  await page.waitForFunction(()=>document.querySelector('#game')?.getAttribute('data-phase')==='player');
+  await new Promise(resolve=>setTimeout(resolve,4000));
+  const timing=await page.evaluate(()=>performance.getEntriesByType('resource').filter(r=>r.name.endsWith('/battle/terrain/grass.png')).map(r=>r.toJSON()));
+  const result={purpose:'Preload reuse diagnostic, not acceptance',requests:await Promise.all(requests),timing,messages};
+  fs.writeFileSync('docs/qa/issue-127-performance-budgets/startup-preload-reuse-v3.json',JSON.stringify(result,null,2)+'\n');
+  console.log(result);
+}finally{await browser.close();}
+

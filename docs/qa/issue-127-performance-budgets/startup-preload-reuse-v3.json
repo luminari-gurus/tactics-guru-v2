@@ -1,0 +1,52 @@
+{
+  "purpose": "Preload reuse diagnostic, not acceptance",
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4198/battle/terrain/grass.png",
+      "type": "image",
+      "origin": null,
+      "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      "mode": "no-cors",
+      "destination": "image"
+    }
+  ],
+  "timing": [
+    {
+      "name": "http://127.0.0.1:4198/battle/terrain/grass.png",
+      "entryType": "resource",
+      "startTime": 20.900000035762787,
+      "duration": 46.799999952316284,
+      "navigationId": 6522,
+      "initiatorType": "link",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.1",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "image/png",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 20.900000035762787,
+      "domainLookupStart": 20.900000035762787,
+      "domainLookupEnd": 20.900000035762787,
+      "connectStart": 20.900000035762787,
+      "secureConnectionStart": 0,
+      "connectEnd": 20.900000035762787,
+      "requestStart": 34,
+      "responseStart": 58.90000003576279,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 58.90000003576279,
+      "responseEnd": 67.69999998807907,
+      "transferSize": 140620,
+      "encodedBodySize": 140320,
+      "decodedBodySize": 140320,
+      "responseStatus": 200,
+      "serverTiming": []
+    }
+  ],
+  "messages": []
+}

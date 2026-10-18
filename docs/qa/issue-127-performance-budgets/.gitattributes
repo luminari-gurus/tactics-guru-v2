@@ -3,3 +3,7 @@ collector-v*/*.txt -text whitespace=cr-at-eol
 split-probe.ts.txt -text whitespace=cr-at-eol
 *.mjs.txt -text whitespace=cr-at-eol
 *.ps1.txt -text whitespace=cr-at-eol
+startup-*.txt -text whitespace=cr-at-eol
+# Exact generated HTML contains a doubled CR; preserve this rejected artifact's hash.
+startup-preload-v1-index.html.txt -whitespace
+probe-preload-reuse-v3.mjs.txt whitespace=cr-at-eol,-blank-at-eof

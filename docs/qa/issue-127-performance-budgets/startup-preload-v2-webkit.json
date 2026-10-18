@@ -1,0 +1,501 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/node_modules/playwright/cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-preload-webkit.config.ts"
+    ],
+    "configFile": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/playwright-preload-webkit.config.ts",
+    "rootDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-portrait",
+        "name": "acceptance-webkit-portrait",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/public-asset-base.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-landscape",
+        "name": "acceptance-webkit-landscape",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/public-asset-base.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/docs/qa/issue-127-performance-budgets/startup-preload-v2-webkit.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "public-asset-base.spec.ts",
+      "file": "public-asset-base.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1754,
+                  "error": {
+                    "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+                    "stack": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59",
+                    "location": {
+                      "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                      "column": 59,
+                      "line": 18
+                    },
+                    "snippet": "  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                        "column": 59,
+                        "line": 18
+                      },
+                      "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:34.937Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts/public-asset-base-collecto-f3a35--and-isolates-only-v2-saves-acceptance-webkit-portrait/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                    "column": 59,
+                    "line": 18
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-1024996e7c66bc515b74",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1522,
+                  "error": {
+                    "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+                    "stack": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59",
+                    "location": {
+                      "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                      "column": 59,
+                      "line": 18
+                    },
+                    "snippet": "  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                        "column": 59,
+                        "line": 18
+                      },
+                      "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:38.061Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts/public-asset-base-collecto-f0c57--and-isolates-only-v2-saves-acceptance-webkit-portrait/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                    "column": 59,
+                    "line": 18
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-c7e63b85c70fd31a245e",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "extracted map route still loads directly and on refresh at the base",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 236,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:40.758Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-c06ab9ec6cde6c2de48d",
+          "file": "public-asset-base.spec.ts",
+          "line": 114,
+          "column": 1
+        },
+        {
+          "title": "built startup hints preserve a supplied script nonce",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1167,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:41.087Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-078ed1e8e5f29b033311",
+          "file": "public-asset-base.spec.ts",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1234,
+                  "error": {
+                    "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+                    "stack": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59",
+                    "location": {
+                      "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                      "column": 59,
+                      "line": 18
+                    },
+                    "snippet": "  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                        "column": 59,
+                        "line": 18
+                      },
+                      "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:43.347Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts/public-asset-base-collecto-f3a35--and-isolates-only-v2-saves-acceptance-webkit-landscape/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                    "column": 59,
+                    "line": 18
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-53f372ad1dfe8c6948c3",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1525,
+                  "error": {
+                    "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+                    "stack": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59",
+                    "location": {
+                      "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                      "column": 59,
+                      "line": 18
+                    },
+                    "snippet": "  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                        "column": 59,
+                        "line": 18
+                      },
+                      "message": "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  16 |   expect(cold.controlsUsableMs).not.toBeNull();\n  17 |   const point=await battleGesturePoint(page);\n> 18 |   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);\n     |                                                           ^\n  19 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);\n  20 |   await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();\n  21 |   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);\n    at /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts:18:59"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:45.843Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/preload-webkit-artifacts/public-asset-base-collecto-f0c57--and-isolates-only-v2-saves-acceptance-webkit-landscape/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests/public-asset-base.spec.ts",
+                    "column": 59,
+                    "line": 18
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-940ad8e758ce562728aa",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "extracted map route still loads directly and on refresh at the base",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 269,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:48.658Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-0bd7c7e892258a0403ba",
+          "file": "public-asset-base.spec.ts",
+          "line": 114,
+          "column": 1
+        },
+        {
+          "title": "built startup hints preserve a supplied script nonce",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1191,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T22:19:49.021Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-eff41179b0e31f3da55b",
+          "file": "public-asset-base.spec.ts",
+          "line": 124,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T22:19:33.301Z",
+    "duration": 16963.878999999997,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  }
+}
