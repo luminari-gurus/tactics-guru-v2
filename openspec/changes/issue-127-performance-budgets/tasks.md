@@ -15,7 +15,7 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 ## 3. Reduce measured critical transfer
 
-- [ ] 3.1 If the baseline module inventory confirms avoidable scene imports, isolate shared engine creation and import only the selected scene. Verify default battle, proof, content-smoke, run and map entry/loading errors, prefixed assets, restart and audio lifecycle with existing focused browser tests and both typechecks; document measured module/request changes.
+- [ ] 3.1 Evaluate the scene-isolation hypothesis and retain its measured comparison. Apply the revised minimal stock-Phaser-distribution remedy after the split proves insufficient; verify default battle, proof, content-smoke, run and map entry/loading errors, both renderers, prefixed assets, restart and audio lifecycle with focused browser tests and both typechecks. Document module/request changes.
 - [ ] 3.2 Compare full cold transfer totals on both routes, including response overhead and any newly deferred requests. Record a before/after artifact-bound receipt and preserve any failing candidate; if the bounded change is insufficient, revise the concrete remedy before expanding into dependency/custom-engine/renderer changes.
 
 ## 4. Investigate the idle failure

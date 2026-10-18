@@ -1,0 +1,1852 @@
+{
+  "measuredAt": "2026-10-17T18:40:56.667Z",
+  "sourceCommit": "6c18fa7a30f68f7f6480fa7ae6416e90b913443e",
+  "sourceDirty": true,
+  "measuredBuild": {
+    "commit": "6c18fa7a30f68f7f6480fa7ae6416e90b913443e",
+    "dirty": false
+  },
+  "browserVersion": "153.0.8010.12",
+  "collectorSha256": {
+    "measure-fit.ts": "737b5c124b0c087a7af5e7bb6258b9068be42da60d17ef3578dbaff9238e7df2",
+    "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "measure-fit-controls.ts": "4fb5dea371a5083a4fd5c2e69b0f7df3b4d552351427183a88cc5d388becaef6",
+    "measure-fit-evaluate.ts": "45d68ddb87c0b5bd83caeca1e08a9aa5d51408d0c4a026b859facd0deca27fde"
+  },
+  "probeSha256": "f15530a398fab97b03ecad95d6aa8fb3c8747844f8720c8e83afed568801bff7",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.19.0"
+  },
+  "conditions": {
+    "url": "http://127.0.0.1:4188/run",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+    "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "v3: first >=120 visible player-idle post-render intervals, startup movement sampled before controls usability with interval timestamps; then separated real selection/pan/zoom/move windows (50 ms after prior window); raw idle intervals; nearest-rank p50/p95; cap 600 per window, 60 windows; first post-render input response",
+    "scene": "battle",
+    "route": "run",
+    "sceneUrl": "http://127.0.0.1:4188/run?scene=battle",
+    "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+  },
+  "buildFiles": null,
+  "failures": [
+    "Expected exactly 18 samples",
+    "Incomplete capture matrix"
+  ],
+  "failedCapture": null,
+  "samples": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "idleDiagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 337.10000002384186,
+        "sceneReadyMs": 486.4000000357628,
+        "controlsUsableMs": 987.4000000357628,
+        "frames": {
+          "count": 120,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.099999964237213,
+          "maxMs": 19.80000001192093
+        },
+        "idleIntervalsMs": [
+          14.900000035762787,
+          17.099999964237213,
+          16.69999998807907,
+          16.5,
+          16.700000047683716,
+          16.899999976158142,
+          17,
+          16.80000001192093,
+          16.30000001192093,
+          16.19999998807907,
+          17.399999976158142,
+          16.19999998807907,
+          16,
+          17.100000023841858,
+          17,
+          16.399999976158142,
+          16.900000035762787,
+          16.399999976158142,
+          16.69999998807907,
+          17.400000035762787,
+          16.099999964237213,
+          17.200000047683716,
+          15.299999952316284,
+          17.600000023841858,
+          17,
+          17.19999998807907,
+          15.900000035762787,
+          16.19999998807907,
+          17.30000001192093,
+          16.799999952316284,
+          16.900000035762787,
+          16.69999998807907,
+          15,
+          19.80000001192093,
+          14.5,
+          17,
+          16,
+          16.899999976158142,
+          17.19999998807907,
+          16.30000001192093,
+          17.100000023841858,
+          16.19999998807907,
+          16.899999976158142,
+          16.400000035762787,
+          16.69999998807907,
+          16.30000001192093,
+          17,
+          18.099999964237213,
+          15.100000023841858,
+          17,
+          16.399999976158142,
+          16,
+          17.200000047683716,
+          16.69999998807907,
+          17.599999964237213,
+          17,
+          15.400000035762787,
+          16.30000001192093,
+          17,
+          17.099999964237213,
+          16.69999998807907,
+          17.100000023841858,
+          16.600000023841858,
+          16,
+          17.299999952316284,
+          16.30000001192093,
+          16.400000035762787,
+          16.69999998807907,
+          15.800000011920929,
+          18.099999964237213,
+          15.699999988079071,
+          17.30000001192093,
+          16,
+          16.600000023841858,
+          17.099999964237213,
+          17.600000023841858,
+          15.5,
+          16,
+          18.69999998807907,
+          15,
+          17,
+          16.80000001192093,
+          17,
+          16.5,
+          16.30000001192093,
+          16.80000001192093,
+          16.899999976158142,
+          16.5,
+          16.5,
+          17,
+          16.30000001192093,
+          16.30000001192093,
+          16.5,
+          16.799999952316284,
+          17.200000047683716,
+          17.599999964237213,
+          15.699999988079071,
+          16.700000047683716,
+          16.599999964237213,
+          19.100000023841858,
+          13.800000011920929,
+          18.899999976158142,
+          14.5,
+          17.5,
+          16.69999998807907,
+          15.800000011920929,
+          17.30000001192093,
+          16,
+          16.599999964237213,
+          17.5,
+          16.400000035762787,
+          16.399999976158142,
+          16.80000001192093,
+          16.600000023841858,
+          17,
+          16.5,
+          19.799999952316284,
+          13.200000047683716,
+          18,
+          15.699999988079071
+        ],
+        "workloads": [
+          {
+            "action": "move",
+            "startedMs": 512.5,
+            "untilMs": 1187.1000000238419,
+            "frames": {
+              "count": 32,
+              "medianMs": 16,
+              "p95Ms": 42.30000001192093,
+              "maxMs": 137.5
+            },
+            "intervalsMs": [
+              137.5,
+              16.19999998807907,
+              14.899999976158142,
+              16.900000035762787,
+              39.80000001192093,
+              22,
+              14.5,
+              18.5,
+              15.899999976158142,
+              16,
+              15,
+              15.300000011920929,
+              16.30000001192093,
+              12.399999976158142,
+              17.5,
+              22.19999998807907,
+              13.600000023841858,
+              21,
+              10.699999988079071,
+              14.899999976158142,
+              18.5,
+              42.30000001192093,
+              12.199999988079071,
+              15.700000047683716,
+              13.599999964237213,
+              15.300000011920929,
+              15.800000011920929,
+              17,
+              15.899999976158142,
+              17.400000035762787,
+              16.099999964237213,
+              17.5
+            ],
+            "intervalStartedMs": [
+              512.6000000238419,
+              650.1000000238419,
+              666.3000000119209,
+              681.1999999880791,
+              698.1000000238419,
+              737.9000000357628,
+              759.9000000357628,
+              774.4000000357628,
+              792.9000000357628,
+              808.8000000119209,
+              824.8000000119209,
+              839.8000000119209,
+              855.1000000238419,
+              871.4000000357628,
+              883.8000000119209,
+              901.3000000119209,
+              923.5,
+              937.1000000238419,
+              958.1000000238419,
+              968.8000000119209,
+              983.6999999880791,
+              1002.1999999880791,
+              1044.5,
+              1056.699999988079,
+              1072.4000000357628,
+              1086,
+              1101.300000011921,
+              1117.1000000238419,
+              1134.1000000238419,
+              1150,
+              1167.4000000357628,
+              1183.5
+            ]
+          }
+        ],
+        "interactions": [],
+        "measurementMethod": {
+          "version": 3,
+          "frameObservation": "post-render"
+        },
+        "board": null,
+        "proof": null,
+        "audio": null,
+        "battleAudio": {
+          "enabled": false,
+          "status": "muted",
+          "load": "ready",
+          "context": "running",
+          "error": null,
+          "generation": 2,
+          "lastToken": 2,
+          "started": 0,
+          "completed": 0,
+          "dropped": 1,
+          "active": null,
+          "recent": [],
+          "ownedSounds": 0
+        },
+        "lifecycle": null,
+        "capturedAt": "2026-10-17T18:40:54.781Z",
+        "build": {
+          "commit": "6c18fa7a30f68f7f6480fa7ae6416e90b913443e",
+          "dirty": false
+        },
+        "scene": "battle",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4188/run?scene=battle",
+            "transferBytes": 1401,
+            "encodedBodyBytes": 1101,
+            "decodedBodyBytes": 3170,
+            "durationMs": 42
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/index-Su_4SENp.js",
+            "transferBytes": 1286,
+            "encodedBodyBytes": 986,
+            "decodedBodyBytes": 1926,
+            "durationMs": 6.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/preload-helper-DjzSQ1t3.js",
+            "transferBytes": 1049,
+            "encodedBodyBytes": 749,
+            "decodedBodyBytes": 1383,
+            "durationMs": 6.699999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/startRunApp-CfNcqMkK.js",
+            "transferBytes": 9006,
+            "encodedBodyBytes": 8706,
+            "decodedBodyBytes": 25489,
+            "durationMs": 9.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/browser-ClNjxGVf.js",
+            "transferBytes": 1666,
+            "encodedBodyBytes": 1366,
+            "decodedBodyBytes": 3264,
+            "durationMs": 3.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/contentLoading--RoY19ly.js",
+            "transferBytes": 8133,
+            "encodedBodyBytes": 7833,
+            "decodedBodyBytes": 37265,
+            "durationMs": 14
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/validation-DcTWv_L4.js",
+            "transferBytes": 888,
+            "encodedBodyBytes": 588,
+            "decodedBodyBytes": 588,
+            "durationMs": 11.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/iso-BWvOnVL7.js",
+            "transferBytes": 1230,
+            "encodedBodyBytes": 930,
+            "decodedBodyBytes": 930,
+            "durationMs": 11.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/BattleScene-S1Bhea0i.js",
+            "transferBytes": 27503,
+            "encodedBodyBytes": 27203,
+            "decodedBodyBytes": 84778,
+            "durationMs": 17.400000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/rng-BnVmGYby.js",
+            "transferBytes": 910,
+            "encodedBodyBytes": 610,
+            "decodedBodyBytes": 1108,
+            "durationMs": 15.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/phaser.esm-CTbIuaw5.js",
+            "transferBytes": 356127,
+            "encodedBodyBytes": 355827,
+            "decodedBodyBytes": 1374548,
+            "durationMs": 62.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/createGame-CFjUg2AT.js",
+            "transferBytes": 727,
+            "encodedBodyBytes": 427,
+            "decodedBodyBytes": 427,
+            "durationMs": 15.900000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/BoardInput-Cfy_gxrO.js",
+            "transferBytes": 1725,
+            "encodedBodyBytes": 1425,
+            "decodedBodyBytes": 3271,
+            "durationMs": 16.30000001192093
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/startRunApp-y3YtRGS5.css",
+            "transferBytes": 1102,
+            "encodedBodyBytes": 802,
+            "decodedBodyBytes": 2130,
+            "durationMs": 12.599999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/style-DfrBuVe7.css",
+            "transferBytes": 1601,
+            "encodedBodyBytes": 1301,
+            "decodedBodyBytes": 3574,
+            "durationMs": 12.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/grass.png",
+            "transferBytes": 140620,
+            "encodedBodyBytes": 140320,
+            "decodedBodyBytes": 140320,
+            "durationMs": 11
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/grass_path.png",
+            "transferBytes": 139694,
+            "encodedBodyBytes": 139394,
+            "decodedBodyBytes": 139394,
+            "durationMs": 10.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/stone.png",
+            "transferBytes": 143182,
+            "encodedBodyBytes": 142882,
+            "decodedBodyBytes": 142882,
+            "durationMs": 11
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/forest.png",
+            "transferBytes": 139484,
+            "encodedBodyBytes": 139184,
+            "decodedBodyBytes": 139184,
+            "durationMs": 11.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 9.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/water.png",
+            "transferBytes": 118505,
+            "encodedBodyBytes": 118205,
+            "decodedBodyBytes": 118205,
+            "durationMs": 11.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+            "transferBytes": 21059,
+            "encodedBodyBytes": 20759,
+            "decodedBodyBytes": 20759,
+            "durationMs": 14.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/ranger_sprite.png",
+            "transferBytes": 9393,
+            "encodedBodyBytes": 9093,
+            "decodedBodyBytes": 9093,
+            "durationMs": 15
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+            "transferBytes": 20187,
+            "encodedBodyBytes": 19887,
+            "decodedBodyBytes": 19887,
+            "durationMs": 15.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/mage_sprite.png",
+            "transferBytes": 9865,
+            "encodedBodyBytes": 9565,
+            "decodedBodyBytes": 9565,
+            "durationMs": 15
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/goblin_grunt_sprite.png",
+            "transferBytes": 9601,
+            "encodedBodyBytes": 9301,
+            "decodedBodyBytes": 9301,
+            "durationMs": 15.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+            "transferBytes": 20970,
+            "encodedBodyBytes": 20670,
+            "decodedBodyBytes": 20670,
+            "durationMs": 16.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/goblin_grunt.png",
+            "transferBytes": 20852,
+            "encodedBodyBytes": 20552,
+            "decodedBodyBytes": 20552,
+            "durationMs": 20.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/goblin_archer_sprite.png",
+            "transferBytes": 10518,
+            "encodedBodyBytes": 10218,
+            "decodedBodyBytes": 10218,
+            "durationMs": 20.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/goblin_archer.png",
+            "transferBytes": 20715,
+            "encodedBodyBytes": 20415,
+            "decodedBodyBytes": 20415,
+            "durationMs": 20.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/move.mp3",
+            "transferBytes": 1258,
+            "encodedBodyBytes": 958,
+            "decodedBodyBytes": 958,
+            "durationMs": 5.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/miss.mp3",
+            "transferBytes": 1363,
+            "encodedBodyBytes": 1063,
+            "decodedBodyBytes": 1063,
+            "durationMs": 6.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/hit.mp3",
+            "transferBytes": 1258,
+            "encodedBodyBytes": 958,
+            "decodedBodyBytes": 958,
+            "durationMs": 5.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/critical.mp3",
+            "transferBytes": 1676,
+            "encodedBodyBytes": 1376,
+            "decodedBodyBytes": 1376,
+            "durationMs": 6.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/magic.mp3",
+            "transferBytes": 1781,
+            "encodedBodyBytes": 1481,
+            "decodedBodyBytes": 1481,
+            "durationMs": 6.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/unit-defeat.mp3",
+            "transferBytes": 1781,
+            "encodedBodyBytes": 1481,
+            "decodedBodyBytes": 1481,
+            "durationMs": 5.900000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/victory.mp3",
+            "transferBytes": 2512,
+            "encodedBodyBytes": 2212,
+            "decodedBodyBytes": 2212,
+            "durationMs": 9.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/loss.mp3",
+            "transferBytes": 2512,
+            "encodedBodyBytes": 2212,
+            "decodedBodyBytes": 2212,
+            "durationMs": 9.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 20759,
+            "decodedBodyBytes": 20759,
+            "durationMs": 2.199999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 19887,
+            "decodedBodyBytes": 19887,
+            "durationMs": 2.699999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 20670,
+            "decodedBodyBytes": 20670,
+            "durationMs": 3.100000023841858
+          }
+        ],
+        "totalTransferBytes": 1263183
+      },
+      "diagnostics": {
+        "run": 1,
+        "navigationStartMs": 0,
+        "sceneStartedMs": 337.10000002384186,
+        "sceneReadyMs": 486.4000000357628,
+        "controlsUsableMs": 987.4000000357628,
+        "frames": {
+          "count": 154,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.30000001192093,
+          "maxMs": 19.80000001192093
+        },
+        "idleIntervalsMs": [
+          14.900000035762787,
+          17.099999964237213,
+          16.69999998807907,
+          16.5,
+          16.700000047683716,
+          16.899999976158142,
+          17,
+          16.80000001192093,
+          16.30000001192093,
+          16.19999998807907,
+          17.399999976158142,
+          16.19999998807907,
+          16,
+          17.100000023841858,
+          17,
+          16.399999976158142,
+          16.900000035762787,
+          16.399999976158142,
+          16.69999998807907,
+          17.400000035762787,
+          16.099999964237213,
+          17.200000047683716,
+          15.299999952316284,
+          17.600000023841858,
+          17,
+          17.19999998807907,
+          15.900000035762787,
+          16.19999998807907,
+          17.30000001192093,
+          16.799999952316284,
+          16.900000035762787,
+          16.69999998807907,
+          15,
+          19.80000001192093,
+          14.5,
+          17,
+          16,
+          16.899999976158142,
+          17.19999998807907,
+          16.30000001192093,
+          17.100000023841858,
+          16.19999998807907,
+          16.899999976158142,
+          16.400000035762787,
+          16.69999998807907,
+          16.30000001192093,
+          17,
+          18.099999964237213,
+          15.100000023841858,
+          17,
+          16.399999976158142,
+          16,
+          17.200000047683716,
+          16.69999998807907,
+          17.599999964237213,
+          17,
+          15.400000035762787,
+          16.30000001192093,
+          17,
+          17.099999964237213,
+          16.69999998807907,
+          17.100000023841858,
+          16.600000023841858,
+          16,
+          17.299999952316284,
+          16.30000001192093,
+          16.400000035762787,
+          16.69999998807907,
+          15.800000011920929,
+          18.099999964237213,
+          15.699999988079071,
+          17.30000001192093,
+          16,
+          16.600000023841858,
+          17.099999964237213,
+          17.600000023841858,
+          15.5,
+          16,
+          18.69999998807907,
+          15,
+          17,
+          16.80000001192093,
+          17,
+          16.5,
+          16.30000001192093,
+          16.80000001192093,
+          16.899999976158142,
+          16.5,
+          16.5,
+          17,
+          16.30000001192093,
+          16.30000001192093,
+          16.5,
+          16.799999952316284,
+          17.200000047683716,
+          17.599999964237213,
+          15.699999988079071,
+          16.700000047683716,
+          16.599999964237213,
+          19.100000023841858,
+          13.800000011920929,
+          18.899999976158142,
+          14.5,
+          17.5,
+          16.69999998807907,
+          15.800000011920929,
+          17.30000001192093,
+          16,
+          16.599999964237213,
+          17.5,
+          16.400000035762787,
+          16.399999976158142,
+          16.80000001192093,
+          16.600000023841858,
+          17,
+          16.5,
+          19.799999952316284,
+          13.200000047683716,
+          18,
+          15.699999988079071,
+          16,
+          17.399999976158142,
+          17.19999998807907,
+          15.800000011920929,
+          17.600000023841858,
+          16.69999998807907,
+          15.899999976158142,
+          16.200000047683716,
+          17.799999952316284,
+          16.200000047683716,
+          16.599999964237213,
+          16,
+          17.5,
+          16.900000035762787,
+          16.099999964237213,
+          17.600000023841858,
+          16,
+          18.30000001192093,
+          14.699999988079071,
+          16.5,
+          16.80000001192093,
+          16.600000023841858,
+          16.5,
+          16.799999952316284,
+          19.200000047683716,
+          13.5,
+          18.399999976158142,
+          16.899999976158142,
+          16.600000023841858,
+          15.399999976158142,
+          16.69999998807907,
+          16,
+          16.69999998807907,
+          17
+        ],
+        "workloads": [
+          {
+            "action": "move",
+            "startedMs": 512.5,
+            "untilMs": 1187.1000000238419,
+            "frames": {
+              "count": 32,
+              "medianMs": 16,
+              "p95Ms": 42.30000001192093,
+              "maxMs": 137.5
+            },
+            "intervalsMs": [
+              137.5,
+              16.19999998807907,
+              14.899999976158142,
+              16.900000035762787,
+              39.80000001192093,
+              22,
+              14.5,
+              18.5,
+              15.899999976158142,
+              16,
+              15,
+              15.300000011920929,
+              16.30000001192093,
+              12.399999976158142,
+              17.5,
+              22.19999998807907,
+              13.600000023841858,
+              21,
+              10.699999988079071,
+              14.899999976158142,
+              18.5,
+              42.30000001192093,
+              12.199999988079071,
+              15.700000047683716,
+              13.599999964237213,
+              15.300000011920929,
+              15.800000011920929,
+              17,
+              15.899999976158142,
+              17.400000035762787,
+              16.099999964237213,
+              17.5
+            ],
+            "intervalStartedMs": [
+              512.6000000238419,
+              650.1000000238419,
+              666.3000000119209,
+              681.1999999880791,
+              698.1000000238419,
+              737.9000000357628,
+              759.9000000357628,
+              774.4000000357628,
+              792.9000000357628,
+              808.8000000119209,
+              824.8000000119209,
+              839.8000000119209,
+              855.1000000238419,
+              871.4000000357628,
+              883.8000000119209,
+              901.3000000119209,
+              923.5,
+              937.1000000238419,
+              958.1000000238419,
+              968.8000000119209,
+              983.6999999880791,
+              1002.1999999880791,
+              1044.5,
+              1056.699999988079,
+              1072.4000000357628,
+              1086,
+              1101.300000011921,
+              1117.1000000238419,
+              1134.1000000238419,
+              1150,
+              1167.4000000357628,
+              1183.5
+            ]
+          },
+          {
+            "action": "zoom",
+            "startedMs": 3299.100000023842,
+            "untilMs": 3549.100000023842,
+            "frames": {
+              "count": 16,
+              "medianMs": 16.600000023841858,
+              "p95Ms": 17.600000023841858,
+              "maxMs": 17.600000023841858
+            },
+            "intervalsMs": [
+              16.599999964237213,
+              16.700000047683716,
+              15.5,
+              17.599999964237213,
+              16.400000035762787,
+              15.899999976158142,
+              16.5,
+              16.69999998807907,
+              17.400000035762787,
+              16.099999964237213,
+              17.30000001192093,
+              16.600000023841858,
+              16.69999998807907,
+              17,
+              16.399999976158142,
+              17.600000023841858
+            ],
+            "intervalStartedMs": [
+              3283.600000023842,
+              3300.199999988079,
+              3316.900000035763,
+              3332.400000035763,
+              3350,
+              3366.400000035763,
+              3382.300000011921,
+              3398.800000011921,
+              3415.5,
+              3432.900000035763,
+              3449,
+              3466.300000011921,
+              3482.900000035763,
+              3499.600000023842,
+              3516.600000023842,
+              3533
+            ]
+          },
+          {
+            "action": "pan",
+            "startedMs": 3665.5,
+            "untilMs": 4048.600000023842,
+            "frames": {
+              "count": 24,
+              "medianMs": 16.900000035762787,
+              "p95Ms": 17.900000035762787,
+              "maxMs": 18
+            },
+            "intervalsMs": [
+              16.900000035762787,
+              17.5,
+              15.199999988079071,
+              17.599999964237213,
+              16.100000023841858,
+              17.19999998807907,
+              17.30000001192093,
+              15,
+              17.600000023841858,
+              15.299999952316284,
+              17.30000001192093,
+              16.80000001192093,
+              17.5,
+              17.30000001192093,
+              14.5,
+              17.099999964237213,
+              17.900000035762787,
+              15.300000011920929,
+              16.69999998807907,
+              18,
+              15.800000011920929,
+              17.19999998807907,
+              16.099999964237213,
+              16.30000001192093
+            ],
+            "intervalStartedMs": [
+              3650,
+              3666.900000035763,
+              3684.400000035763,
+              3699.600000023842,
+              3717.199999988079,
+              3733.300000011921,
+              3750.5,
+              3767.800000011921,
+              3782.800000011921,
+              3800.400000035763,
+              3815.699999988079,
+              3833,
+              3849.800000011921,
+              3867.300000011921,
+              3884.600000023842,
+              3899.100000023842,
+              3916.199999988079,
+              3934.100000023842,
+              3949.400000035763,
+              3966.100000023842,
+              3984.100000023842,
+              3999.900000035763,
+              4017.100000023842,
+              4033.199999988079
+            ]
+          },
+          {
+            "action": "selection",
+            "startedMs": 4198.100000023842,
+            "untilMs": 4448.100000023842,
+            "frames": {
+              "count": 15,
+              "medianMs": 16.30000001192093,
+              "p95Ms": 36.89999997615814,
+              "maxMs": 36.89999997615814
+            },
+            "intervalsMs": [
+              23.19999998807907,
+              36.89999997615814,
+              12.5,
+              12.600000023841858,
+              15.800000011920929,
+              15.899999976158142,
+              16.30000001192093,
+              17.899999976158142,
+              15.5,
+              16.100000023841858,
+              17.30000001192093,
+              17.5,
+              15.699999988079071,
+              17.399999976158142,
+              16.30000001192093
+            ],
+            "intervalStartedMs": [
+              4182.600000023842,
+              4205.800000011921,
+              4242.699999988079,
+              4255.199999988079,
+              4267.800000011921,
+              4283.600000023842,
+              4299.5,
+              4315.800000011921,
+              4333.699999988079,
+              4349.199999988079,
+              4365.300000011921,
+              4382.600000023842,
+              4400.100000023842,
+              4415.800000011921,
+              4433.199999988079
+            ]
+          },
+          {
+            "action": "move",
+            "startedMs": 4658.400000035763,
+            "untilMs": 4983.600000023842,
+            "frames": {
+              "count": 22,
+              "medianMs": 16.30000001192093,
+              "p95Ms": 18.69999998807907,
+              "maxMs": 28
+            },
+            "intervalsMs": [
+              28,
+              16.100000023841858,
+              14.100000023841858,
+              14.899999976158142,
+              13.600000023841858,
+              14.199999988079071,
+              16.19999998807907,
+              15.800000011920929,
+              17.599999964237213,
+              18,
+              15.100000023841858,
+              16.80000001192093,
+              16,
+              17.5,
+              16.5,
+              16.399999976158142,
+              16.30000001192093,
+              16.80000001192093,
+              18.69999998807907,
+              16.30000001192093,
+              15.099999964237213,
+              16.900000035762787
+            ],
+            "intervalStartedMs": [
+              4632.699999988079,
+              4660.699999988079,
+              4676.800000011921,
+              4690.900000035763,
+              4705.800000011921,
+              4719.400000035763,
+              4733.600000023842,
+              4749.800000011921,
+              4765.600000023842,
+              4783.199999988079,
+              4801.199999988079,
+              4816.300000011921,
+              4833.100000023842,
+              4849.100000023842,
+              4866.600000023842,
+              4883.100000023842,
+              4899.5,
+              4915.800000011921,
+              4932.600000023842,
+              4951.300000011921,
+              4967.600000023842,
+              4982.699999988079
+            ]
+          }
+        ],
+        "interactions": [
+          {
+            "action": "zoom",
+            "inputMs": 3299.100000023842,
+            "renderedMs": 3300.199999988079,
+            "responseMs": 1.0999999642372131,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3665.5,
+            "renderedMs": 3666.900000035763,
+            "responseMs": 1.4000000357627869,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3683.300000011921,
+            "renderedMs": 3684.400000035763,
+            "responseMs": 1.100000023841858,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3715.5,
+            "renderedMs": 3717.199999988079,
+            "responseMs": 1.699999988079071,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3732.300000011921,
+            "renderedMs": 3733.300000011921,
+            "responseMs": 1,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3748.900000035763,
+            "renderedMs": 3750.5,
+            "responseMs": 1.5999999642372131,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3765.800000011921,
+            "renderedMs": 3767.800000011921,
+            "responseMs": 2,
+            "renderedFrames": 1
+          },
+          {
+            "action": "pan",
+            "inputMs": 3798.600000023842,
+            "renderedMs": 3800.400000035763,
+            "responseMs": 1.800000011920929,
+            "renderedFrames": 1
+          },
+          {
+            "action": "selection",
+            "inputMs": 4198.100000023842,
+            "renderedMs": 4205.800000011921,
+            "responseMs": 7.699999988079071,
+            "renderedFrames": 1
+          }
+        ],
+        "measurementMethod": {
+          "version": 3,
+          "frameObservation": "post-render"
+        },
+        "board": null,
+        "proof": null,
+        "audio": null,
+        "battleAudio": {
+          "enabled": false,
+          "status": "muted",
+          "load": "ready",
+          "context": "running",
+          "error": null,
+          "generation": 3,
+          "lastToken": 3,
+          "started": 0,
+          "completed": 0,
+          "dropped": 2,
+          "active": null,
+          "recent": [],
+          "ownedSounds": 0
+        },
+        "lifecycle": null,
+        "capturedAt": "2026-10-17T18:40:56.649Z",
+        "build": {
+          "commit": "6c18fa7a30f68f7f6480fa7ae6416e90b913443e",
+          "dirty": false
+        },
+        "scene": "battle",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "dpr": 1
+        },
+        "visibility": "visible",
+        "navigationType": "navigate",
+        "sampleLimit": 600,
+        "resources": [
+          {
+            "url": "http://127.0.0.1:4188/run?scene=battle",
+            "transferBytes": 1401,
+            "encodedBodyBytes": 1101,
+            "decodedBodyBytes": 3170,
+            "durationMs": 42
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/index-Su_4SENp.js",
+            "transferBytes": 1286,
+            "encodedBodyBytes": 986,
+            "decodedBodyBytes": 1926,
+            "durationMs": 6.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/preload-helper-DjzSQ1t3.js",
+            "transferBytes": 1049,
+            "encodedBodyBytes": 749,
+            "decodedBodyBytes": 1383,
+            "durationMs": 6.699999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/startRunApp-CfNcqMkK.js",
+            "transferBytes": 9006,
+            "encodedBodyBytes": 8706,
+            "decodedBodyBytes": 25489,
+            "durationMs": 9.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/browser-ClNjxGVf.js",
+            "transferBytes": 1666,
+            "encodedBodyBytes": 1366,
+            "decodedBodyBytes": 3264,
+            "durationMs": 3.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/contentLoading--RoY19ly.js",
+            "transferBytes": 8133,
+            "encodedBodyBytes": 7833,
+            "decodedBodyBytes": 37265,
+            "durationMs": 14
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/validation-DcTWv_L4.js",
+            "transferBytes": 888,
+            "encodedBodyBytes": 588,
+            "decodedBodyBytes": 588,
+            "durationMs": 11.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/iso-BWvOnVL7.js",
+            "transferBytes": 1230,
+            "encodedBodyBytes": 930,
+            "decodedBodyBytes": 930,
+            "durationMs": 11.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/BattleScene-S1Bhea0i.js",
+            "transferBytes": 27503,
+            "encodedBodyBytes": 27203,
+            "decodedBodyBytes": 84778,
+            "durationMs": 17.400000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/rng-BnVmGYby.js",
+            "transferBytes": 910,
+            "encodedBodyBytes": 610,
+            "decodedBodyBytes": 1108,
+            "durationMs": 15.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/phaser.esm-CTbIuaw5.js",
+            "transferBytes": 356127,
+            "encodedBodyBytes": 355827,
+            "decodedBodyBytes": 1374548,
+            "durationMs": 62.200000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/createGame-CFjUg2AT.js",
+            "transferBytes": 727,
+            "encodedBodyBytes": 427,
+            "decodedBodyBytes": 427,
+            "durationMs": 15.900000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/BoardInput-Cfy_gxrO.js",
+            "transferBytes": 1725,
+            "encodedBodyBytes": 1425,
+            "decodedBodyBytes": 3271,
+            "durationMs": 16.30000001192093
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/startRunApp-y3YtRGS5.css",
+            "transferBytes": 1102,
+            "encodedBodyBytes": 802,
+            "decodedBodyBytes": 2130,
+            "durationMs": 12.599999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/assets/style-DfrBuVe7.css",
+            "transferBytes": 1601,
+            "encodedBodyBytes": 1301,
+            "decodedBodyBytes": 3574,
+            "durationMs": 12.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/grass.png",
+            "transferBytes": 140620,
+            "encodedBodyBytes": 140320,
+            "decodedBodyBytes": 140320,
+            "durationMs": 11
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/grass_path.png",
+            "transferBytes": 139694,
+            "encodedBodyBytes": 139394,
+            "decodedBodyBytes": 139394,
+            "durationMs": 10.899999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/stone.png",
+            "transferBytes": 143182,
+            "encodedBodyBytes": 142882,
+            "decodedBodyBytes": 142882,
+            "durationMs": 11
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/forest.png",
+            "transferBytes": 139484,
+            "encodedBodyBytes": 139184,
+            "decodedBodyBytes": 139184,
+            "durationMs": 11.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/proof/fighter.png",
+            "transferBytes": 9143,
+            "encodedBodyBytes": 8843,
+            "decodedBodyBytes": 8843,
+            "durationMs": 9.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/terrain/water.png",
+            "transferBytes": 118505,
+            "encodedBodyBytes": 118205,
+            "decodedBodyBytes": 118205,
+            "durationMs": 11.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+            "transferBytes": 21059,
+            "encodedBodyBytes": 20759,
+            "decodedBodyBytes": 20759,
+            "durationMs": 14.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/ranger_sprite.png",
+            "transferBytes": 9393,
+            "encodedBodyBytes": 9093,
+            "decodedBodyBytes": 9093,
+            "durationMs": 15
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+            "transferBytes": 20187,
+            "encodedBodyBytes": 19887,
+            "decodedBodyBytes": 19887,
+            "durationMs": 15.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/mage_sprite.png",
+            "transferBytes": 9865,
+            "encodedBodyBytes": 9565,
+            "decodedBodyBytes": 9565,
+            "durationMs": 15
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/goblin_grunt_sprite.png",
+            "transferBytes": 9601,
+            "encodedBodyBytes": 9301,
+            "decodedBodyBytes": 9301,
+            "durationMs": 15.299999952316284
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+            "transferBytes": 20970,
+            "encodedBodyBytes": 20670,
+            "decodedBodyBytes": 20670,
+            "durationMs": 16.099999964237213
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/goblin_grunt.png",
+            "transferBytes": 20852,
+            "encodedBodyBytes": 20552,
+            "decodedBodyBytes": 20552,
+            "durationMs": 20.700000047683716
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/source/goblin_archer_sprite.png",
+            "transferBytes": 10518,
+            "encodedBodyBytes": 10218,
+            "decodedBodyBytes": 10218,
+            "durationMs": 20.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/goblin_archer.png",
+            "transferBytes": 20715,
+            "encodedBodyBytes": 20415,
+            "decodedBodyBytes": 20415,
+            "durationMs": 20.5
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/move.mp3",
+            "transferBytes": 1258,
+            "encodedBodyBytes": 958,
+            "decodedBodyBytes": 958,
+            "durationMs": 5.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/miss.mp3",
+            "transferBytes": 1363,
+            "encodedBodyBytes": 1063,
+            "decodedBodyBytes": 1063,
+            "durationMs": 6.100000023841858
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/hit.mp3",
+            "transferBytes": 1258,
+            "encodedBodyBytes": 958,
+            "decodedBodyBytes": 958,
+            "durationMs": 5.800000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/critical.mp3",
+            "transferBytes": 1676,
+            "encodedBodyBytes": 1376,
+            "decodedBodyBytes": 1376,
+            "durationMs": 6.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/magic.mp3",
+            "transferBytes": 1781,
+            "encodedBodyBytes": 1481,
+            "decodedBodyBytes": 1481,
+            "durationMs": 6.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/unit-defeat.mp3",
+            "transferBytes": 1781,
+            "encodedBodyBytes": 1481,
+            "decodedBodyBytes": 1481,
+            "durationMs": 5.900000035762787
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/victory.mp3",
+            "transferBytes": 2512,
+            "encodedBodyBytes": 2212,
+            "decodedBodyBytes": 2212,
+            "durationMs": 9.399999976158142
+          },
+          {
+            "url": "http://127.0.0.1:4188/audio/battle/loss.mp3",
+            "transferBytes": 2512,
+            "encodedBodyBytes": 2212,
+            "decodedBodyBytes": 2212,
+            "durationMs": 9.300000011920929
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 20759,
+            "decodedBodyBytes": 20759,
+            "durationMs": 2.199999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 19887,
+            "decodedBodyBytes": 19887,
+            "durationMs": 2.699999988079071
+          },
+          {
+            "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+            "transferBytes": 300,
+            "encodedBodyBytes": 20670,
+            "decodedBodyBytes": 20670,
+            "durationMs": 3.100000023841858
+          }
+        ],
+        "totalTransferBytes": 1263183
+      },
+      "workloadStartIndex": 1,
+      "actions": [
+        "zoom: wheel -100",
+        "pan: drag +40/-25 in eight steps",
+        "selection: legal Move target",
+        "move: Review and Confirm"
+      ],
+      "responseInventory": [
+        {
+          "url": "http://127.0.0.1:4188/run?scene=battle",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/preload-helper-DjzSQ1t3.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/index-Su_4SENp.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/startRunApp-y3YtRGS5.css",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/style-DfrBuVe7.css",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/browser-ClNjxGVf.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/startRunApp-CfNcqMkK.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/validation-DcTWv_L4.js",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "588",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/iso-BWvOnVL7.js",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "930",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/contentLoading--RoY19ly.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/rng-BnVmGYby.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/createGame-CFjUg2AT.js",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "427",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/BoardInput-Cfy_gxrO.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/BattleScene-S1Bhea0i.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/assets/phaser.esm-CTbIuaw5.js",
+          "status": 200,
+          "encoding": "gzip",
+          "contentLength": null,
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/terrain/grass.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "140320",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/terrain/grass_path.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "139394",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/terrain/stone.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "142882",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/terrain/forest.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "139184",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/proof/fighter.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "8843",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/terrain/water.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "118205",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20759",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/source/ranger_sprite.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9093",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "19887",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/source/mage_sprite.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9565",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/source/goblin_grunt_sprite.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9301",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20670",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/source/goblin_archer_sprite.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "10218",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/goblin_grunt.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20552",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/goblin_archer.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20415",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/3bcbeb27-a96d-4ea9-b281-fb675382ecb0",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "140320",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/651d14cb-69d4-4684-9b92-f808dfcff24b",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "139394",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/e4ef43ac-f351-4185-bb88-f2e3dc33482d",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "142882",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/b704fffc-8bbc-415f-a290-76c48418b82d",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "139184",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/f0eb9fb9-13d7-47ed-8643-4bacf4f4328d",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "8843",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/b44187fb-415c-4cff-8f37-f6026b8d5053",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "118205",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/cac49caa-8b75-4abb-9436-42215de5161c",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20759",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/5c77a196-8dc8-4c08-8846-9e342bb2ae25",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9093",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/7b241db4-e7d5-4138-950c-8622640da3bb",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "19887",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/f477bf8e-239e-41d0-8faf-eb24137d9cec",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9565",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/a9ab4c53-4549-4a3b-b252-73fd1d4e4351",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "9301",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/e640c30c-d812-4fbb-906f-d3eece49c1a5",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20670",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/a7cbabf1-f56f-44f5-871f-83a4141ab652",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "10218",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/c54af4a0-82bc-4dae-bafa-eee6c961f333",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20552",
+          "cacheControl": null
+        },
+        {
+          "url": "blob:http://127.0.0.1:4188/daec2c21-0156-417c-b167-e6bce5b0cf58",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "20415",
+          "cacheControl": null
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/fighter.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": null,
+          "cacheControl": null
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/ranger.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": null,
+          "cacheControl": null
+        },
+        {
+          "url": "http://127.0.0.1:4188/battle/portraits/mage.png",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": null,
+          "cacheControl": null
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/move.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "958",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/hit.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "958",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/miss.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "1063",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/unit-defeat.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "1481",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/critical.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "1376",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/magic.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "1481",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/victory.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "2212",
+          "cacheControl": "no-cache"
+        },
+        {
+          "url": "http://127.0.0.1:4188/audio/battle/loss.mp3",
+          "status": 200,
+          "encoding": "identity",
+          "contentLength": "2212",
+          "cacheControl": "no-cache"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

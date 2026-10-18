@@ -60,7 +60,43 @@ The first prefixed-route test invocation ran zero tests because another task's `
 
 The prefixed test then reproduced a real URL-parser bug: stripping the trailing slash from `/tactics/` navigated to the wrong document on Vite preview (three battle cases failed, all three run cases passed). The [failed report](issue-127-performance-budgets/collector-browser-prefix-before-fix.json) is preserved. Collector v3 preserves path trailing slashes while keeping origin-root compatibility; it adds no change to root battle/run timing, gestures or frame limits. The [final prefix run](issue-127-performance-budgets/collector-browser-prefix.json) passes all **6 cases**, no retries/skips. [Exact v3 source](issue-127-performance-budgets/collector-v3/measure-fit.ts.txt) and [isolated-port configuration](issue-127-performance-budgets/playwright-owned.config.ts.txt) are retained. Both typechecks and 36 focused unit tests pass after the repair.
 
-Collector chunk is complete and ready for review. Next: the measured scene-import split and the final functional/performance proof. No causal fix is assigned to the idle outlier. No deployment or release tag is authorized by this work.
+Collector chunk is published ready for review in [PR #129](https://github.com/luminari-gurus/tactics-guru-v2/pull/129) at `6477ac5`, with clean Git status and local/remote parity. The configured Cloudflare integration automatically created a branch preview; no deployment command, production configuration change or release tag was issued.
+
+## Scene-isolation experiment (not retained)
+
+Branch `branch/issue-127-scene-loading` depends on #129. `createGame.ts` imports no scenes and preserves the existing engine/audio configuration. Single-battle startup awaits only the selected scene and retains existing error, restart and BFCache behavior; authored runs import the engine helper directly. Both typechecks and the production build pass. The [focused browser run](issue-127-performance-budgets/split-browser.json) passes **84/84 cases** without retries/skips: boot, independent scene loading, missing selected chunks, content loading/failures and public asset bases/controls. The [split module inventory](issue-127-performance-budgets/split-modules.json) confirms separate proof/content-smoke chunks.
+
+The exploratory [battle](issue-127-performance-budgets/split-probe-battle.json) and [run](issue-127-performance-budgets/split-probe-run.json) probes transferred **407,063 / 414,354 bytes**, saving only 223 / 1,143 bytes. They each contain one desktop cold sample and are correctly rejected as incomplete matrices. [Exact probe source](issue-127-performance-budgets/split-probe.ts.txt) differs from the maintained collector only by the one-sample limit, scratch imports and its own hash. The actual scene-split artifact is clean commit `6c18fa7a30f68f7f6480fa7ae6416e90b913443e`.
+
+### Revised remedy and ablation
+
+The final branch is `branch/issue-127-runtime-budget`. Revert the scene-start experiment and select the pinned package's stock `phaser-arcade-physics.js` via one exact Vite alias. That distribution excludes Matter.js and retains the APIs, audio and both renderers the game uses. No source under `src/` consumes Phaser physics. The shipped package's own entry/configuration establishes this boundary; no custom engine, dependency upgrade or vendor edit is involved.
+
+This removes the new async startup boundary, engine-creation module and extra chunk requests. Existing game initialization, restart, BFCache and audio recovery code remains byte-identical to the collector PR. The initial stock-distribution build estimates 365.98 kB gzip for the shared start chunk, versus 399.32 kB baseline; this estimate is not acceptance. **696 unit tests, 167 content checks, both typechecks, production build and 18 boot checks pass** (including every route's missing-engine error and real Canvas fallback). Full functional checks, separate profiling and complete candidate matrices are next. No causal fix is assigned to the idle outlier.
+
+### Separate idle/lifecycle profiles
+
+The final runtime candidate is clean `b9108cb7e978119592c2986ab6d5259a4ff600ec`, published as [PR #130](https://github.com/luminari-gurus/tactics-guru-v2/pull/130), stacked on #129. The existing Cloudflare integration automatically created [its exact preview](https://71112cea.tactics-guru-v2.pages.dev/); this task issued no deployment command or production change.
+
+Before browser regression/acceptance runs, [profile-run.mjs.txt](issue-127-performance-budgets/profile-run.mjs.txt) captured a separate 5-second CPU profile of the warm run at 915×412, then three real new-run/encounter restarts with explicit GC before DOM counter snapshots. [Baseline summary](issue-127-performance-budgets/baseline-profile.json) / [CPU trace](issue-127-performance-budgets/baseline-profile.cpuprofile) and [candidate summary](issue-127-performance-budgets/candidate-profile.json) / [CPU trace](issue-127-performance-budgets/candidate-profile.cpuprofile) are diagnostic evidence, **not acceptance samples**.
+
+Both traces report clean served identities, no browser errors, unchanged serialized battle state across the idle window, and the same listener progression: 154 before restart, then 155/155/155. This does not show a growing DOM-listener leak over the measured three restarts. Both report ANGLE/SwiftShader software rendering. Neither trace identifies a repeated application/diagnostic hot path sufficient to attribute the retained 16.8 ms outlier; these observations do not establish a host-scheduler or renderer root cause.
+
+The [baseline](issue-127-performance-budgets/baseline-profile.png) and [candidate](issue-127-performance-budgets/candidate-profile.png) warm landscape screenshots are byte-identical (SHA-256 `56a657849210241a39d197dea781e9e9fe609b8ceca7b0561934ce59bdf50c40`) and visually inspected. Accordingly no speculative hot-path change, timer adjustment, percentile change, sample filtering or budget relaxation is selected. Final uninstrumented matrices will retain any recurring frame/loading failures explicitly.
+
+## Pre-integration regression run and environment diagnosis
+
+These runs tested runtime `b9108cb`, before main advanced with PR #119, and remain historical evidence:
+
+- [Chromium 153](issue-127-performance-budgets/pre-main-browser.json): 449 passed / 25 failed, no skips/retries. Failures are 21 cached-history assertions and four interrupted/uninterrupted comparisons. All six comparison cases (including two that passed) are invalidated because their control page hard-coded another worktree's port 4173.
+- [Encounter posttests](issue-127-performance-budgets/pre-main-encounters.json): 18 passed; [item posttests](issue-127-performance-budgets/pre-main-items.json): 21 passed.
+- [Windows WebKit](issue-127-performance-budgets/pre-main-webkit.json): 46 passed / 8 failed. Four failures concern unavailable audio; four use the same wrong-origin comparison fixture.
+
+Cached-history failures reproduce on unchanged full-Phaser baseline in packaged Chromium 153 and pass on installed Edge 155.0.4283.45. Both an animation and a persistence baseline case were checked, with all [nine candidate animation-history cases](issue-127-performance-budgets/bfcache-candidate-edge-all.json) passing in Edge. The downloaded full Chrome binary could not launch; those attempts are retained. No game behavior is changed to bypass these browser differences.
+
+[Windows WebKit capabilities](issue-127-performance-budgets/webkit-windows-capabilities.json) report no AudioContext. The full-Phaser current-main baseline also [fails its initial audio expectation](issue-127-performance-budgets/webkit-windows-baseline-audio.json), so this is not attributed to the Arcade distribution. The same official WebKit 26.6 in WSL has [Web Audio support](issue-127-performance-budgets/webkit-linux-capabilities.json) and [passes that baseline audio case](issue-127-performance-budgets/webkit-linux-baseline-audio.json). Only the browser cache was installed in the existing WSL environment; no system-package or application dependency change was needed. Final WebKit verification uses this supported Linux build, with the same configured emulated devices and tests.
+
+Main is now `a009a3e`. Collector PR #129 incorporates it at `f1184d5`, fixes the comparison origin with an explicit same-build assertion, and uses the new drawable-board rectangle for pan/zoom. Its 12 root and six prefixed checks pass. Carry that base into #130 and rerun complete final acceptance on the combined revision; do not present the earlier runs as proof of the new HUD.
 
 ## Current-main collector integration
 
