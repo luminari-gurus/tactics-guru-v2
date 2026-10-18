@@ -41,6 +41,10 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
 - [x] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
 
+## Review stack integration
+
+- [ ] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
+
 ## Workflow follow-up
 
 - Any production target/build/activation decision remains separately authorized under #83-#85.
