@@ -26,6 +26,8 @@ Explicitly identify single battle versus run within the existing battle capture 
 
 Acceptance requires 18 samples per route, one clean served identity, valid numeric metrics, sufficient idle samples, nonempty real pan/zoom/move windows and retained console/page errors. Missing metrics or workloads cannot silently pass. Evaluate original raw intervals and include every failed sample and attempt.
 
+Review repair #129 gates both the initial idle snapshot and the final snapshot independently with unchanged F1 limits. The evaluator CLI exclusively creates a new output file; this filesystem operation also rejects case, hard-link and symlink aliases without truncating raw evidence. Existing output must be retained or a new filename selected.
+
 ### 2. Isolate scene dependencies before considering larger changes
 
 First inspect the production bundle's module graph, request inventory and compression/headers. If it confirms avoidable proof/content-smoke dependencies, extract `createGame` into a small shared module that imports no scene classes. Preserve the existing Phaser configuration and audio-recovery ownership exactly. `startRunApp` imports that engine helper directly; the single-battle startup selects and dynamically imports only the requested scene. Preserve the default battle, `?scene=proof`, `?scene=content-smoke` and `/map` routes and prefixed asset paths.

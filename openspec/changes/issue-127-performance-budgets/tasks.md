@@ -29,6 +29,12 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [ ] 5.2 Capture and evaluate all 36 battle/run cold/warm samples sequentially on the exact candidate and comparable baseline. Verify every L1/L2/L3/L4/F1/F2 result, clean served identity, raw intervals, source hashes, workload completeness and absence of browser errors; separately identify local versus approved deployed evidence.
 - [ ] 5.3 Complete the QA report and acceptance map, run strict OpenSpec and whitespace checks, commit/push focused changes and verify remote parity. Open a PR with `Refs #127` if any deployed or budget gate remains, or `Closes #127` only when all criteria are verified; reference #57/#64/#81 without closing them by proxy.
 
+## Review repair: PR #129
+
+- [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.
+- [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
+- [x] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
+
 ## Workflow follow-up
 
 - Any production target/build/activation decision remains separately authorized under #83-#85.

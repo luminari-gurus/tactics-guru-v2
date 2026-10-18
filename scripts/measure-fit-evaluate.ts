@@ -75,6 +75,8 @@ export function evaluateCapture(capture: Capture) {
           if (!finite(actual) || actual > limit + tolerance) violations.push({metric,actual,limit,...(window === undefined ? {} : {window})});
         };
         gate('usableMs',values.usableMs,sample.cache === 'cold' ? LIMITS.L1_cold_ms : LIMITS.L2_warm_ms);
+        gate('initialIdleP50Ms',sample.idleDiagnostics.frames.medianMs,LIMITS.F1_p50_ms);
+        gate('initialIdleP95Ms',sample.idleDiagnostics.frames.p95Ms,LIMITS.F1_p95_ms);
         gate('idleP50Ms',values.idleP50Ms,LIMITS.F1_p50_ms);
         gate('idleP95Ms',values.idleP95Ms,LIMITS.F1_p95_ms);
         if (sample.cache === 'cold') { gate('codeBytes',codeBytes,LIMITS.L3_cold_code_bytes,0); gate('assetBytes',assetBytes,LIMITS.L4_cold_assets_bytes,0); }
