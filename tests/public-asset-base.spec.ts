@@ -4,6 +4,33 @@ import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
 import { readSession } from './helpers/battlePolicy';
+import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
+import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
+
+for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
+  const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',baseURL!+route],{}));
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await navigateCapture(page,target,'cold');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const cold=await page.evaluate(()=>window.fitDiagnostics());
+  expect(cold.controlsUsableMs).not.toBeNull();
+  const point=await battleGesturePoint(page);
+  await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'))).toBe(true);
+  await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().interactions.some(i=>i.action==='pan'))).toBe(true);
+  await page.evaluate(()=>{
+    localStorage.setItem('legacy-save','keep');
+    localStorage.setItem('tactics-guru:phaser:unrelated','keep');
+    for(const kind of ['battle','run']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
+  });
+  await navigateCapture(page,target,'warm');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect(await page.evaluate(()=>[localStorage.getItem('legacy-save'),localStorage.getItem('tactics-guru:phaser:unrelated')])).toEqual(['keep','keep']);
+  expect(errors).toEqual([]);
+  await page.screenshot({path:test.info().outputPath(`collector-${route || 'battle'}-warm.png`)});
+});
 
 for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {

@@ -5,12 +5,18 @@ import { join } from 'node:path';
 import { arch, cpus, platform, release } from 'node:os';
 import { chromium, devices, type Page } from '@playwright/test';
 import { buildIdentity, collectorConditions, parseMeasureArgs, captureTarget, captureFailures } from './measure-fit-options.ts';
+import { navigateCapture, battleGesturePoint } from './measure-fit-controls.ts';
+import { evaluateCapture } from './measure-fit-evaluate.ts';
 
 // `measure:fit [output] [--url <origin>]`: without --url the collector serves `dist` itself on the preview port;
 // with --url (or FIT_URL) it measures that deployed origin and reads the served build from the page.
 const options = parseMeasureArgs(process.argv.slice(2), process.env);
 const { output, url } = options;
 const target = captureTarget(options);
+// Bind the collector actually loaded, before a long capture can overlap later source edits.
+const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const sourceDirty = Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim());
+const collectorSha256 = Object.fromEntries(await Promise.all(['measure-fit.ts','measure-fit-options.ts','measure-fit-controls.ts','measure-fit-evaluate.ts'].map(async name => [name,createHash('sha256').update(await readFile(new URL(name,import.meta.url))).digest('hex')])));
 const server = options.remote ? null : spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'pipe' });
 let serverError = '';
 let previewListening = false;
@@ -43,10 +49,7 @@ async function battleWorkload(page: Page) {
   await settleWorkloads(page);
   const workloadStartIndex = await page.evaluate(() => window.fitDiagnostics().workloads.length);
   const canvas = page.locator('canvas');
-  const point = await page.evaluate(() => {
-    const panel = document.querySelector('#fit-panel')!.getBoundingClientRect();
-    return {x:innerWidth/2, y:panel.bottom+(innerHeight-panel.bottom)*0.65};
-  });
+  const point = await battleGesturePoint(page);
   await page.mouse.move(point.x, point.y);
   await page.mouse.wheel(0, -100);
   await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
@@ -101,21 +104,26 @@ try {
           page.setDefaultTimeout(18000);
           page.setDefaultNavigationTimeout(30000);
           const errors: string[] = [];
+          let responses: Promise<{url:string;status:number;encoding:string;contentLength:string|null;cacheControl:string|null}>[] = [];
           let currentCache = 'cold';
           try {
             page.on('pageerror', error => errors.push(error.message));
             page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+            page.on('response', response => responses.push(response.allHeaders().then(headers => ({
+              url:response.url(),status:response.status(),encoding:headers['content-encoding'] ?? 'identity',
+              contentLength:headers['content-length'] ?? null,cacheControl:headers['cache-control'] ?? null,
+            }))));
             // No routing/interception: Playwright routing would disable the HTTP cache.
             for (const cache of ['cold', 'warm'] as const) {
               currentCache = cache;
-              if (cache === 'cold') await page.goto(target.url);
-              else await page.reload();
-              await page.getByRole('button', { name: target.restart }).waitFor();
+              responses = [];
+              await navigateCapture(page, target, cache);
               await page.waitForFunction(() => window.fitDiagnostics?.().controlsUsableMs !== null && window.fitDiagnostics?.().frames.count >= 120);
               const idleDiagnostics = await page.evaluate(() => window.fitDiagnostics());
               const workload = options.scene === 'battle' ? await battleWorkload(page) : { actions: [], workloadStartIndex: 0 };
               const diagnostics = await page.evaluate(() => window.fitDiagnostics());
-              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, ...workload, errors: [...errors] });
+              const responseInventory = await Promise.all(responses);
+              samples.push({ profile: profile.name, repetition, cache, idleDiagnostics, diagnostics, ...workload, responseInventory, errors: [...errors] });
             }
           } catch (error) {
             const diagnostics = await page.evaluate(()=>window.fitDiagnostics?.() ?? null).catch(()=>null);
@@ -126,32 +134,28 @@ try {
       }
     } catch (error) { captureError = error instanceof Error ? error.message : String(error); }
     const failures = captureFailures(samples);
-    if (options.scene === 'battle') for (const sample of samples) {
-      const usable = sample.diagnostics.controlsUsableMs;
-      const startup = sample.diagnostics.workloads.slice(0, sample.workloadStartIndex).filter(w => w.action === 'move');
-      if (usable === null || !startup.length || startup.some(w =>
-        !w.intervalStartedMs?.some((start, index) => start + w.intervalsMs[index] < usable))) {
-        failures.push(`Missing pre-controls startup movement intervals: ${sample.profile}/${sample.repetition}/${sample.cache}`);
-      }
-    }
     if (captureError) failures.push(captureError);
     let measuredBuild = null;
     try { measuredBuild = buildIdentity(samples); } catch { /* retained below */ }
     const result = {
       measuredAt: new Date().toISOString(),
-      sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
-      sourceDirty: Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim()),
+      sourceCommit,
+      sourceDirty,
       // The build the pages were actually served from (baked `__BUILD_INFO__`); for a deployed origin this is the deployed commit.
       measuredBuild,
       browserVersion: browser.version(),
+      collectorSha256,
       host: { platform: platform(), release: release(), arch: arch(), cpu: cpus()[0]?.model, node: process.version },
-      conditions: { ...collectorConditions(options), scene: options.scene, sceneUrl: target.url },
+      conditions: { ...collectorConditions(options), scene: options.scene, route: target.route, sceneUrl: target.url,
+        warmStorage: 'four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume' },
       buildFiles: options.remote ? null : await buildFiles('dist'),
       failures,
       failedCapture,
       samples,
     };
     if (!options.remote && measuredBuild?.commit !== result.sourceCommit) failures.push(`dist was built from ${measuredBuild?.commit} but source is ${result.sourceCommit}; rebuild before measuring`);
+    const evaluation = evaluateCapture(result);
+    failures.push(...evaluation.captureFailures.filter(failure => !failures.includes(failure)));
     await mkdir(join(output, '..'), { recursive: true });
     await writeFile(output, JSON.stringify(result, null, 2) + '\n');
     console.log(`Recorded ${samples.length} ${options.scene} cold/warm samples in ${output}`);

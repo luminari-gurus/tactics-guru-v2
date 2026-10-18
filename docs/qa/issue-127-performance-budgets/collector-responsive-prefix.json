@@ -1,0 +1,334 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\baseline\\node_modules\\playwright\\cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-collector.config.ts",
+      "tests/public-asset-base.spec.ts",
+      "--grep",
+      "collector cold/warm",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\baseline\\tmp\\playwright-collector.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tmp/collector-artifacts/prefix",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tmp/collector-artifacts/prefix",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tmp/collector-artifacts/prefix",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/baseline/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --base=/tactics/ --port 4190 --strictPort",
+      "cwd": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\baseline",
+      "url": "http://127.0.0.1:4190/tactics/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "public-asset-base.spec.ts",
+      "file": "public-asset-base.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2637,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:04.019Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-ad01dde95bc4d767f1d8",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2511,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:06.889Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-1a54672bf9c4708ada61",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2583,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:10.017Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-4db72e73bb57472d8b3d",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2584,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:12.844Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-3dfbd4b365fecbd573cf",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2572,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:16.044Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-de0d75c8ea7094081a51",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2671,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T19:29:18.855Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-f9dc6cc9b2646591bb4d",
+          "file": "public-asset-base.spec.ts",
+          "line": 10,
+          "column": 34
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T19:29:03.222Z",
+    "duration": 19061.724,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

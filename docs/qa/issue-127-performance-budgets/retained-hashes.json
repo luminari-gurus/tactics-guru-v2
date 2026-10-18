@@ -1,0 +1,32 @@
+{
+  "hashes": {
+    "measure.ts.txt": {
+      "gitBlobSha256": "2e4f12b1d4936424b7daed5207fa9ee96ace9fd5e45c100b842bae6e8f76546e",
+      "checkoutSha256": "c3ad2504b417a0ae01241f4542c9ffc378e9c68b49fec6d977eff92e3cf22778"
+    },
+    "evaluate.py": {
+      "gitBlobSha256": "b871c99214226d8253c743b8193948e31622fa337feb883d2a8f246e2dc3d9c7",
+      "checkoutSha256": "679d40605ac22abf1887146e590e8decd119bf401c614f7598b531d750511db8"
+    },
+    "deployed-battle.json": {
+      "gitBlobSha256": "e9236c6971d6790b91eb8725830abd46477a84df1ba661390465c254378a56f0",
+      "checkoutSha256": "83febf80649a6c14ecb8bfbfd53b23db4f6ce755e4665dbd31cfae234202890e"
+    },
+    "deployed-run.json": {
+      "gitBlobSha256": "45532e57e4aa2632a8e4c9c9a3549cdb510e7e0fa335602cb0eb1225b13147ce",
+      "checkoutSha256": "309afd62f8ffdca431e64de9e3c5cccbabc5b1a7a930bd08ca861b9f6116ce6c"
+    },
+    "gates.json": {
+      "gitBlobSha256": "c401e5ff2f97c46e2ad66148e00ed7b50459ed4b71d44a976d3d3896f49513f3",
+      "checkoutSha256": "8fafa0fa5222b0400c8c5ae8a24cdd2968a074109421afc1876ffb9fe0d7909d"
+    }
+  },
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.19.0"
+  },
+  "note": "Git blobs match the recorded SHA-256 hashes. Windows checkout CRLF conversion changes text-file hashes; restored scratch uses exact Git bytes."
+}

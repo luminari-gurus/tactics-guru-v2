@@ -46,11 +46,24 @@ describe('measure:fit options', () => {
 it('selects battle readiness explicitly while preserving proof default', () => {
   const options = parseMeasureArgs(['--scene', 'battle', 'battle.json'], {});
   expect(options.scene).toBe('battle');
-  expect(captureTarget(options)).toEqual({url: PREVIEW_URL + '/?scene=battle', restart: 'Restart battle'});
+  expect(captureTarget(options)).toEqual({url: PREVIEW_URL + '/?scene=battle', route: 'battle', restart: 'Restart battle'});
   expect(captureTarget(parseMeasureArgs([], {})).restart).toBe('Restart proof scene');
   expect(parseMeasureArgs(['--scene=proof'], {}).scene).toBe('proof');
   expect(() => parseMeasureArgs(['--scene=bad'], {})).toThrow(/scene/);
   expect(() => parseMeasureArgs(['--scene'], {})).toThrow(/scene/);
+});
+
+it('recognizes root and prefixed run routes, preserves query parameters and rejects proof on run', () => {
+  for (const path of ['/run', '/game/run/', '/game/run?seed=13']) {
+    const target = captureTarget(parseMeasureArgs(['--scene=battle','--url','https://example.test'+path],{}));
+    expect(target.route).toBe('run');
+    expect(target.restart).toBe('Start new run');
+    if (path.includes('?')) expect(new URL(target.url).searchParams.get('seed')).toBe('13');
+  }
+  expect(captureTarget(parseMeasureArgs(['--scene=battle','--url','http://localhost:4174/running'],{})).route).toBe('battle');
+  expect(captureTarget(parseMeasureArgs(['--scene=battle','--url','http://localhost:4174/tactics/'],{})).url).toBe('http://localhost:4174/tactics/?scene=battle');
+  expect(() => captureTarget(parseMeasureArgs(['--url','http://localhost:4174/run'],{}))).toThrow(/requires --scene battle/);
+  expect(collectorConditions(parseMeasureArgs(['--url','http://127.0.0.1:4174/run','--scene=battle'],{})).network).toMatch(/loopback/);
 });
 it('retains validation failures for error or mixed-build output', () => {
   const sample = (commit: string, errors: string[] = []) => ({diagnostics: {build: {commit, dirty: false}}, errors});

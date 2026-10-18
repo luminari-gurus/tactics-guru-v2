@@ -1,0 +1,347 @@
+{
+  "build": {
+    "commit": "0b317e35bb5c4ce713c242311f0673fc27923637",
+    "dirty": false
+  },
+  "captureFailures": [],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 857.7000000476837,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 33.80000001192093,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 819.6999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 819.6999999880791,
+          "limit": 750
+        },
+        {
+          "metric": "move p95",
+          "actual": 33.80000001192093,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 830.6999999880791,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 34.30000001192093,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 759.1999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 759.1999999880791,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 832.1000000238419,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 36.5,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 842.8999999761581,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.599999964237213,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 842.8999999761581,
+          "limit": 750
+        },
+        {
+          "metric": "move p95",
+          "actual": 41.40000003576279,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 695.5999999642372,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.599999964237213,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 690.1000000238419,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.30000001192093
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 691,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18.099999964237213
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 706.3999999761581,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.799999952316284
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 706.3000000119209,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.799999952316284
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 656.0999999642372,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 694.4000000357628,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 657.1999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.5,
+        "idleP95Ms": 18
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 673.6999999880791,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 738.6999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.600000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 703,
+        "codeBytes": 415497,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.69999998807907
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 415497,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 672.5,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.900000035762787
+      },
+      "violations": []
+    }
+  ],
+  "failedSamples": 12,
+  "passed": false
+}
