@@ -1,3 +1,7 @@
+## Loading policy supersession — 2026-10-18
+
+The owner removed the former 750 ms warm-loading gate. Any load above 1000 ms is a warning. Compare repeated loads under the same route/profile/cache/network conditions; a majority of three above 1000 ms flags review, not an automatic warm-loading failure. Isolated slow loads without a sustained slowdown are historical information only. The retained 754.2 ms and 827.7 ms observations are below the new warning threshold. Prior captures, original pass/fail counts and historical task wording below remain unchanged as evidence; they do not impose the retired gate. Cold loading (2500 ms), transfer and frame gates remain unchanged. No new deployed measurements were taken for this policy update.
+
 # Issue #127 performance repair evidence
 
 ## Current bounded fix and owner-directed stop (2026-10-18)

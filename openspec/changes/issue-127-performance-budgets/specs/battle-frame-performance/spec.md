@@ -15,7 +15,7 @@ Visible, usable single-battle and authored-run battles SHALL meet idle frame int
 - **THEN** it fails the 16.7 ms limit and remains in the report without rounding, filtering or retry replacement
 
 ### Requirement: Preserved battle behavior and loading budgets
-Performance changes MUST preserve state, RNG, accepted-command replay, picking, modal capture, audio, persistence and lifecycle/restart behavior on both battle and run routes. Deployed usable loading MUST remain <=2500 ms cold and <=750 ms warm; cold code transfer MUST remain <=400000 bytes and scene assets <=1500000 bytes, using the retained transfer accounting including response overhead.
+Performance changes MUST preserve state, RNG, accepted-command replay, picking, modal capture, audio, persistence and lifecycle/restart behavior on both battle and run routes. Deployed usable loading MUST remain <=2500 ms cold; cold code transfer MUST remain <=400000 bytes and scene assets <=1500000 bytes, using the retained transfer accounting including response overhead.
 
 #### Scenario: Optimized battle run
 - **WHEN** the same seed and legal commands run before and after a focused performance change
@@ -50,3 +50,16 @@ Evidence SHALL use only the existing approved release path. Missing release acce
 - **THEN** generated headers cache only exact emitted content-hashed JavaScript and CSS paths for one year with `immutable`, respecting root and prefixed base paths
 - **AND** HTML and fixed-name asset policies remain unchanged; actual hosted headers, warm cache reuse and every unchanged performance gate are verified before acceptance
 - **AND** this source change and preview verification do not authorize production activation or closure of parent issues
+
+
+### Requirement: Loading warnings and history
+
+Loads above 1000 ms MUST produce warnings with raw timings. Warm loading MUST NOT have a fixed pass/fail time limit. Comparable repeated loads MUST be reviewed for sustained slowdown; isolated spikes SHALL remain historical information. Original captures and evaluations MUST remain unchanged.
+
+#### Scenario: Isolated slow warm load
+- **WHEN** one warm load exceeds 1000 ms and subsequent comparable loads return below that threshold
+- **THEN** the report records the warning and raw timings as history without a warm-loading budget failure
+
+#### Scenario: Repeated slow loading
+- **WHEN** a majority of three loads on the same route, device profile, cache and network conditions exceed 1000 ms
+- **THEN** the report flags the repeated slowdown for review and retains every sample without imposing a new warm-loading hard gate

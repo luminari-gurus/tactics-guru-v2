@@ -162,6 +162,8 @@ try {
     await mkdir(join(output, '..'), { recursive: true });
     await writeFile(output, JSON.stringify(result, null, 2) + '\n');
     console.log(`Recorded ${samples.length} ${options.scene} cold/warm samples in ${output}`);
+    for (const row of evaluation.rows) for (const warning of row.warnings) console.warn(`Load warning: ${row.profile}/${row.cache} repetition ${row.repetition}: ${warning.actual} ms > ${warning.threshold} ms`);
+    for (const group of evaluation.loadingHistory) if (group.disposition === 'review-repeated-slow-loads') console.warn(`Review repeated slow loads: ${group.profile}/${group.cache}`);
     if (failures.length) throw new Error(failures.join('; '));
   } finally { await browser.close(); }
 } finally { server?.kill(); }
