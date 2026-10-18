@@ -131,3 +131,31 @@ it('modal guards and explicit reset discard held pointers before input is re-ena
   f.listeners.get('pointerup')!(pointer('pointerup',2,100,100));expect(f.board.selections).toBe(1);
   cleanup();
 });
+
+it('tracks native touch contacts without depending on touch pointer capture',()=>{
+  const f=fake();
+  Object.assign(f.canvas.ownerDocument,{defaultView:{TouchEvent:class {}}});
+  const zooms:number[]=[];
+  const cleanup=bindBoardInput(f.canvas,{...board(f),zoom:factor=>zooms.push(factor)},()=>({width:400,height:600}));
+  const contact=(identifier:number,x:number,y=100)=>({identifier,clientX:x,clientY:y});
+  const touch=(type:string,changedTouches:ReturnType<typeof contact>[])=>{
+    const event={type,changedTouches,cancelable:true,preventDefault(){}} as unknown as Event;
+    f.listeners.get(type)?.(event);
+  };
+  touch('touchstart',[contact(1,100),contact(2,140)]);
+  // A browser delivering both streams must not register extra contacts.
+  f.listeners.get('pointerdown')!(Object.assign(pointer('pointerdown',91,100,100),{pointerType:'touch'}));
+  touch('touchmove',[contact(1,80),contact(2,160)]);
+  expect(zooms.reduce((total,n)=>total*n,1)).toBeCloseTo(2);
+  touch('touchend',[contact(2,160)]);
+  const before=f.board.pans.reduce((sum,n)=>sum+n,0);
+  touch('touchmove',[contact(1,100)]);
+  expect(f.board.pans.reduce((sum,n)=>sum+n,0)-before).toBe(20);
+  touch('touchend',[contact(1,100)]);
+  expect(f.board.selections).toBe(0);expect(f.captured.size).toBe(0);
+  touch('touchstart',[contact(3,100)]);cleanup.reset();touch('touchmove',[contact(3,140)]);touch('touchend',[contact(3,140)]);
+  expect(f.board.selections).toBe(0);
+  touch('touchstart',[contact(4,100)]);touch('touchend',[contact(4,100)]);expect(f.board.selections).toBe(1);
+  touch('touchstart',[contact(5,100)]);touch('touchcancel',[contact(5,100)]);touch('touchend',[contact(5,100)]);expect(f.board.selections).toBe(1);
+  cleanup();expect(f.listeners.size).toBe(0);
+});

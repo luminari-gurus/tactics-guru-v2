@@ -26,3 +26,9 @@ Keep visibility local to the shared shell; domain/session state remains authorit
 ## Migration Plan
 
 No data migration or deployment operation. Deliver a normal reviewed PR; reverting the shell/CSS change restores the prior expanded behavior. Application changes await explicit approval of this plan.
+
+## iPhone landscape gesture follow-up
+
+The caller reports no pinch zoom and flaky pan on iPhone Chrome at the branch preview, with either HUD state. Served commit `ddc9044` was verified, ruling out a stale preview. Native Chromium contained/rotated pinch and pan passed, so the specific iPhone failure is not represented by those tests.
+
+Use native Touch Events as the touch transport when available; keep Pointer Events for mouse/pen and the existing fallback where Touch Events are absent. Both feed one contact map and one existing pinch/pan calculation. Do not process duplicate touch pointer events or depend on pointer capture for touch contacts. Preserve bounds rejection, cancellation, lifecycle reset, modal capture and cleanup. This is within the approved board/input integration scope and the caller explicitly requested the follow-up fix. No UA-specific branch, second gesture algorithm or viewport zoom restriction is added. A modeled touch-only stream is red on the old handler; native Chromium multitouch and modeled WebKit contacts verify the new transport. Physical iPhone event-stream causality has not been captured and is not claimed.

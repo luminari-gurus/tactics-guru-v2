@@ -93,3 +93,34 @@ test('collapsed runtime errors remain reachable and recovery modal returns to vi
   await page.locator('#save-cancel-reset').click();await expect(page.locator('#battle-hud-toggle')).toBeFocused();
   await expect(page.locator('#battle-hud-contents')).toBeHidden();
 });
+
+for(const route of ['/', '/run'])for(const collapsed of [false,true]) {
+  test(`touch contact stream supports landscape pinch and pan ${route} collapsed=${collapsed}`,async({page})=>{
+    await page.setViewportSize({width:915,height:412});await page.goto(route);
+    if(route==='/run'){await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();}
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');if(collapsed)await activate(page);
+    const initial=await settled(page),r=initial.region,x=r.x+r.width/2,y=r.y+r.height/2;
+    const contact=(identifier:number,x:number)=>({identifier,clientX:x,clientY:y});
+    const touch=async(type:string,changed:ReturnType<typeof contact>[],active=changed)=>page.evaluate(({type,changed,active})=>{
+      const canvas=document.querySelector('canvas')!;
+      // WebKit exposes Touch but prohibits constructing it. Inject contact records
+      // through DOM listeners; native Chromium multitouch is tested separately.
+      const make=(p:{identifier:number;clientX:number;clientY:number})=>({...p,target:canvas,pageX:p.clientX,pageY:p.clientY,screenX:p.clientX,screenY:p.clientY});
+      const event=Object.assign(new Event(type,{bubbles:true,cancelable:true}),{changedTouches:changed.map(make),touches:active.map(make),targetTouches:active.map(make)});
+      canvas.dispatchEvent(event);
+    },{type,changed,active});
+    await touch('touchstart',[contact(1,x-30),contact(2,x+30)]);
+    // Compatibility pointer events must not add a third contact or reset touches.
+    await page.locator('canvas').dispatchEvent('pointerdown',{pointerType:'touch',pointerId:700,button:0,clientX:x-30,clientY:y});
+    await page.locator('canvas').dispatchEvent('pointercancel',{pointerType:'touch',pointerId:700,clientX:0,clientY:0});
+    await touch('touchmove',[contact(1,x-60),contact(2,x+60)]);
+    const zoomed=await settled(page);expect(zoomed.transform.scale).toBeCloseTo(initial.transform.scale*2,6);
+    await touch('touchend',[contact(2,x+60)],[contact(1,x-60)]);
+    await touch('touchmove',[contact(1,x-30)]);
+    const panned=await settled(page);expect(panned.transform.scale).toBeCloseTo(zoomed.transform.scale,6);expect(panned.transform.x).toBeCloseTo(zoomed.transform.x+30,6);
+    await touch('touchcancel',[contact(1,x-30)],[]);
+    await touch('touchmove',[contact(1,x)],[]);
+    const cancelled=await settled(page);expect(cancelled.transform).toEqual(panned.transform);
+    expect(cancelled.selectionEvents).toBe(initial.selectionEvents);expect(cancelled.commandCount).toBe(initial.commandCount);
+  });
+}
