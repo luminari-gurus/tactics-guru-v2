@@ -1,0 +1,21 @@
+$ErrorActionPreference='Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+$targets=@(
+ @{Name='pr137-local-battle';Url=$null},
+ @{Name='pr137-local-run';Url='http://127.0.0.1:4197/run'},
+ @{Name='pr137-preview-battle';Url='https://f2ba4504.tactics-guru-v2.pages.dev'},
+ @{Name='pr137-preview-run';Url='https://f2ba4504.tactics-guru-v2.pages.dev/run'}
+)
+$failedBudget=$false
+foreach($target in $targets){
+ $raw="tmp/review/$($target.Name).json"
+ $gates="tmp/review/$($target.Name)-gates.json"
+ if((Test-Path -LiteralPath $raw) -or (Test-Path -LiteralPath $gates)){throw 'Retain existing captures; choose a new attempt name'}
+ $captureArgs=@('scripts/measure-fit.ts',$raw,'--scene','battle')
+ if($target.Url){$captureArgs+=@('--url',$target.Url)}
+ node @captureArgs > "tmp/review/$($target.Name).log" 2>&1
+ if($LASTEXITCODE -ne 0){throw "Capture failed: $raw"}
+ node scripts/evaluate-fit.ts $raw $gates
+ if($LASTEXITCODE -ne 0){$failedBudget=$true}
+}
+if($failedBudget){throw 'Complete matrices retained; numeric budget failures require review'}

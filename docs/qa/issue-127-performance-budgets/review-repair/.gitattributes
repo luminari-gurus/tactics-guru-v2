@@ -1,0 +1,6 @@
+# Preserve exact capture, collector and console receipt bytes across checkout.
+*.json -text
+*.txt -text whitespace=cr-at-eol,-blank-at-eof
+# Verbatim build/audit stdout contains intentional trailing spaces in code frames.
+pr137-build.txt -whitespace
+pr138-original-manifest-audit.txt -whitespace
