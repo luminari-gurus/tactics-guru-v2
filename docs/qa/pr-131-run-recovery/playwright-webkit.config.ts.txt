@@ -1,0 +1,5 @@
+import {defineConfig,devices} from '@playwright/test';
+import base from '../../playwright.config';
+export default defineConfig({...base,testDir:'../../tests',testMatch:'**/run-progression.spec.ts',webServer:undefined,
+ outputDir:'./webkit-results',use:{...base.use,baseURL:'http://127.0.0.1:4197/',launchOptions:{}},
+ projects:[{name:'webkit-desktop',use:{...devices['Desktop Safari']}},{name:'webkit-portrait',use:{...devices['iPhone 13']}},{name:'webkit-landscape',use:{...devices['iPhone 13 landscape']}}]});
