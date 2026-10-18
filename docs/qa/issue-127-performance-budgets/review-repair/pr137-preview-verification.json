@@ -1,0 +1,115 @@
+{
+  "source": "6e615dca32f19bdde9afab5f3233ba089aaa74b4",
+  "origin": "https://f2ba4504.tactics-guru-v2.pages.dev",
+  "verifiedAt": "2026-10-18T15:19:23.218Z",
+  "code": [
+    {
+      "file": "/assets/index-AgTEWWth.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 1756,
+      "sha256": "cc55479e92b4c22b768dfa09dd4a2cb0fc0703d5e2a64888066add89162dfa9a"
+    },
+    {
+      "file": "/assets/battleLayout-BVayxngr.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 559,
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "file": "/assets/browser-C-2WZqQQ.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 3264,
+      "sha256": "f34f5d6aff71299779ecdec53b7ec50cb8ef22ab4d9479e0e7d35d1d3c87514f"
+    },
+    {
+      "file": "/assets/preload-helper-DjzSQ1t3.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 1383,
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "file": "/assets/rng-BCcJOpRP.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 1651,
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "file": "/assets/start-BOADROL2.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 64,
+      "sha256": "a7f89c04bdcc0ba29a98b721bf9b5216e927eeabef7534b31f153288951622da"
+    },
+    {
+      "file": "/assets/start-BxcxqBPI.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 1406098,
+      "sha256": "44cc2557f07ea6bf2dfd8a82fce89d446a49a30f2971f5d330de7f3721fea0ad"
+    },
+    {
+      "file": "/assets/startBattleApp-B9D0617J.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 2789,
+      "sha256": "b2b8512e778c22e346f46ef2612ad419b0aac149b51b2dfd145a02c1e9305e71"
+    },
+    {
+      "file": "/assets/startRunApp-FvW9EEqG.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 26018,
+      "sha256": "71ea03c41e4699483866bbc53ee6bcb8f4edf642c8f85c96b164e57837afcba2"
+    },
+    {
+      "file": "/assets/view-BkTnGP2w.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 8836,
+      "sha256": "b03d2cdf38bbb8fb058b7f4aa0b9b1fd79e57fe46330d2550b669d20f33a69b2"
+    },
+    {
+      "file": "/assets/battleLayout-C6wfuIJB.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 10757,
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "file": "/assets/startRunApp-y3YtRGS5.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 2130,
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "file": "/assets/view-BBW_du9E.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 2617,
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    }
+  ],
+  "fixed": [
+    {
+      "file": "/",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "file": "/battle/terrain/grass.png",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "file": "/audio/battle/move.mp3",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    }
+  ]
+}

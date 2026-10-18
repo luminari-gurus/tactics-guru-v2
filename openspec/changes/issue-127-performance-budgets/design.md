@@ -86,6 +86,10 @@ Three interleaved local diagnostic pairs, with the original cold gameplay worklo
 
 Keep audio ownership, native AudioContext initialization, controls, gameplay/startup movement, timing markers and limits unchanged. Run the complete functional, dev fixture, renderer, audio/lifecycle, prefixed and WebKit checks, then clean local/preview matrices. The caller directed autonomous remaining decisions on 2026-10-18; no further scope question is pending for this bounded implementation work.
 
+### Verified closeout
+
+Clean `74088a4344a5082ca44f86bd255bc5adba444be4` passes all 72 local/preview samples, with worst deployed warm battle/run 679.2/737.9 ms against 750 ms. All 707 current functional checks pass; the initial dev optimizer regression was repaired and its failed reports retained. Production byte parity justifies reusing the full Edge/prefix suites across that dev-only repair. QA preserves every earlier failure and browser-version boundary. Review/merge, production activation and parent-issue acceptance remain separate.
+
 ## Risks / Trade-offs
 
 - Scene separation may save too little or increase request overhead -> compare route totals before committing to further changes; no speculative custom build.

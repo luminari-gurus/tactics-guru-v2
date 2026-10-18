@@ -1,0 +1,26 @@
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import {evaluateCapture} from '../../scripts/measure-fit-evaluate.ts';
+const root='tmp/review/', source='6e615dca32f19bdde9afab5f3233ba089aaa74b4';
+const read=name=>JSON.parse(fs.readFileSync(root+name));
+const hash=name=>crypto.createHash('sha256').update(fs.readFileSync(root+name)).digest('hex');
+const reports={}, captures={}, files={};
+for(const name of ['pr137-full-browser','pr137-dev','pr137-prefix','pr137-webkit']){
+ const r=read(name+'.json');let attempts=0;const failures=[];
+ function walk(s){for(const sp of s.specs??[])for(const t of sp.tests??[])for(const result of t.results??[]){attempts++;if(result.status!=='passed')failures.push({title:sp.title,project:t.projectName,status:result.status});}for(const c of s.suites??[])walk(c);}
+ walk(r);assert.deepEqual(r.errors,[]);assert.deepEqual(failures,[]);assert.equal(attempts,r.stats.expected);assert.equal(r.stats.unexpected+r.stats.skipped+r.stats.flaky,0);
+ reports[name]={...r.stats,attempts};files[name+'.json']=hash(name+'.json');
+}
+let collector,browser;
+for(const name of ['pr137-local-battle','pr137-local-run','pr137-preview-battle','pr137-preview-run','pr137-preview-v2-battle','pr137-preview-v2-run']){
+ const c=read(name+'.json'),e=evaluateCapture(c);assert.equal(c.sourceCommit,source);assert.equal(c.sourceDirty,false);assert.deepEqual(c.measuredBuild,{commit:source,dirty:false});assert.equal(c.samples.length,18);assert.deepEqual(e.captureFailures,[]);
+ if(collector)assert.deepEqual(c.collectorSha256,collector);else collector=c.collectorSha256;
+ if(browser)assert.equal(c.browserVersion,browser);else browser=c.browserVersion;
+ const warm=c.samples.filter(s=>s.cache==='warm'),cold=e.rows.filter(s=>s.cache==='cold');
+ captures[name]={build:c.measuredBuild,conditions:c.conditions,passed:e.passed,failedSamples:e.failedSamples,violations:e.rows.flatMap(r=>r.violations.map(v=>({profile:r.profile,repetition:r.repetition,cache:r.cache,...v}))),maxColdUsableMs:Math.max(...cold.map(r=>r.values.usableMs)),maxWarmUsableMs:Math.max(...e.rows.filter(r=>r.cache==='warm').map(r=>r.values.usableMs)),maxColdCodeBytes:Math.max(...cold.map(r=>r.values.codeBytes)),warmCodeResourceBytes:warm.map(s=>s.diagnostics.resources.filter(r=>/\.(js|css)$/.test(new URL(r.url).pathname)).reduce((n,r)=>n+r.transferBytes,0))};
+ files[name+'.json']=hash(name+'.json');files[name+'-gates.json']=hash(name+'-gates.json');assert.deepEqual(read(name+'-gates.json').rows,e.rows);
+}
+const result={source,browser,collectorSha256:collector,reports,captures,files,retainedSamples:Object.keys(captures).length*18,retainedFailedSamples:Object.values(captures).reduce((n,c)=>n+c.failedSamples,0),localPassed:captures['pr137-local-battle'].passed&&captures['pr137-local-run'].passed,latestPreviewPassed:captures['pr137-preview-v2-battle'].passed&&captures['pr137-preview-v2-run'].passed,passed:Object.values(captures).every(c=>c.passed)};
+fs.writeFileSync(root+'pr137-final-summary.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));
+if(!result.passed)process.exitCode=1;

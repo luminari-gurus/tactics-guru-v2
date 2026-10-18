@@ -1,0 +1,5 @@
+import {defineConfig} from '@playwright/test';
+import base from '../../playwright.device-acceptance.config';
+export default defineConfig({...base,testDir:'../../tests',webServer:undefined,
+ grep:new RegExp(base.grep!.source+'|review repair:'),outputDir:'./final-webkit-results',
+ use:{...base.use,baseURL:'http://127.0.0.1:4197/',launchOptions:{}}});

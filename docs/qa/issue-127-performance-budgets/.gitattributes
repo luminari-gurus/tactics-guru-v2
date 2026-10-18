@@ -26,3 +26,8 @@ engine-*.txt -text whitespace=cr-at-eol,-blank-at-eof
 probe-engine-*.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
 # Raw build stdout includes a reporter line ending in a space.
 engine-*.log.txt -whitespace
+# Preserve executed Playwright config receipts, including terminal blank lines.
+playwright-engine*.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
+# Exact final audit/probe sources retain their executed terminal newline.
+summarize-engine-final.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof
+verify-engine-repaired-preview.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof

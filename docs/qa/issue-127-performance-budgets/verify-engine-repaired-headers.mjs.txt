@@ -1,0 +1,10 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
+const origin='https://5e9c90ae.tactics-guru-v2.pages.dev/';
+const records=[];for(const rule of fs.readFileSync('tmp/engine-repaired-dist/_headers','utf8').trim().split('\n\n')){
+ const path=rule.split('\n')[0],response=await fetch(new URL(path,origin)),body=Buffer.from(await response.arrayBuffer());
+ const hash=createHash('sha256').update(body).digest('hex');
+ records.push({path,status:response.status,cacheControl:response.headers.get('cache-control'),sha256:hash});
+ assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'public, max-age=31536000, immutable');
+ assert.equal(hash,createHash('sha256').update(fs.readFileSync('tmp/engine-repaired-dist'+path)).digest('hex'));
+}
+fs.writeFileSync('tmp/engine-repaired-preview-headers.json',JSON.stringify({origin,source:'74088a4344a5082ca44f86bd255bc5adba444be4',records},null,2)+'\n');console.log('All 13 preview code paths have exact matching bytes and immutable headers.');

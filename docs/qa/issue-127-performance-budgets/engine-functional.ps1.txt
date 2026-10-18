@@ -1,0 +1,13 @@
+$ErrorActionPreference='Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+foreach($suite in @('browser','prefix','encounters','items')){
+ $env:TG_SUITE=$suite
+ node node_modules/@playwright/test/cli.js test -c tmp/playwright-engine.config.ts *> "tmp/engine-$suite-progress.log"
+ if($LASTEXITCODE -ne 0){throw "$suite failed; preserve its report and investigate"}
+ Write-Output "$suite suite passed."
+}
+foreach($suite in @('webkit','webkit-boundaries')){
+ wsl.exe --cd /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup --exec env -u PLAYWRIGHT_CHROMIUM_EXECUTABLE TG_SUITE=$suite node node_modules/@playwright/test/cli.js test -c tmp/playwright-engine.config.ts *> "tmp/engine-$suite-progress.log"
+ if($LASTEXITCODE -ne 0){throw "$suite failed; preserve its report and investigate"}
+ Write-Output "$suite suite passed."
+}

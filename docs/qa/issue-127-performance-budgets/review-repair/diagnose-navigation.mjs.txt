@@ -1,0 +1,21 @@
+import fs from 'node:fs';
+import {chromium,devices} from '@playwright/test';
+import {navigateCapture} from '../../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../../scripts/measure-fit-options.ts';
+const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'}),rows=[];
+try {
+ for(const [label,origin] of [['reviewed-baseline','https://5e9c90ae.tactics-guru-v2.pages.dev'],['repaired-candidate','https://f2ba4504.tactics-guru-v2.pages.dev']]){
+  for(let repetition=1;repetition<=2;repetition++){
+   const context=await browser.newContext({...devices['Pixel 7'],viewport:{width:915,height:412}}),page=await context.newPage();
+   const target=captureTarget(parseMeasureArgs(['--scene','battle','--url',origin+'/run'],{}));
+   let headers;
+   page.on('response',async r=>{if(r.request().isNavigationRequest())headers={status:r.status(),headers:await r.allHeaders()};});
+   for(const cache of ['cold','warm']){
+    await navigateCapture(page,target,cache);await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+    const row={label,origin,repetition,cache,...await page.evaluate(()=>({build:window.fitDiagnostics().build,sceneStartedMs:window.fitDiagnostics().sceneStartedMs,sceneReadyMs:window.fitDiagnostics().sceneReadyMs,controlsUsableMs:window.fitDiagnostics().controlsUsableMs,navigation:performance.getEntriesByType('navigation')[0].toJSON()})),headers};
+    rows.push(row);console.log(JSON.stringify({label,repetition,cache,build:row.build,usable:row.controlsUsableMs,dns:row.navigation.domainLookupEnd-row.navigation.domainLookupStart,connect:row.navigation.connectEnd-row.navigation.connectStart,ttfb:row.navigation.responseStart-row.navigation.requestStart,responseEnd:row.navigation.responseEnd,status:headers?.status,serverTiming:headers?.headers['server-timing'],ray:headers?.headers['cf-ray']}));
+   }
+   await context.close();
+  }
+ }
+}finally{await browser.close();fs.writeFileSync('tmp/review/pr137-navigation-diagnostic.json',JSON.stringify({purpose:'Separate navigation diagnostic; not replacement acceptance evidence',browser:browser.version(),rows},null,2)+'\n');}

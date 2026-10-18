@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const expected={browser:519,prefix:63,'repaired-browser':3,'repaired-prefix':3,'repaired-encounters':18,'repaired-items':21,'repaired-webkit':54,'repaired-webkit-boundaries':26};
+const reports={};
+for(const [suite,count]of Object.entries(expected)){
+ const path=`tmp/engine-${suite}.json`,raw=fs.readFileSync(path),report=JSON.parse(raw);
+ const tests=[];const visit=s=>{for(const spec of s.specs??[])for(const test of spec.tests)tests.push({title:spec.title,...test});for(const child of s.suites??[])visit(child)};visit(report);
+ assert.equal(tests.length,count);assert.equal(report.stats.expected,count);assert.equal(report.stats.unexpected,0);assert.equal(report.stats.flaky,0);assert.equal(report.stats.skipped,0);
+ assert(tests.every(t=>t.results.length===1&&t.results[0].status==='passed'&&t.results[0].retry===0));
+ reports[suite]={file:path,stats:report.stats,tests:count,skips:0,retries:0,sha256:createHash('sha256').update(raw).digest('hex')};
+}
+const binding=JSON.parse(fs.readFileSync('tmp/engine-repaired-source-binding.json'));
+const failed=JSON.parse(fs.readFileSync('tmp/engine-encounters.json'));assert.equal(failed.stats.unexpected,18);
+const parity=JSON.parse(fs.readFileSync('tmp/engine-devfix-production-parity.json'));assert(Object.values(parity.results).every(r=>r.allBytesIdentical&&r.files===73));
+fs.writeFileSync('tmp/engine-validation-summary.json',JSON.stringify({source:binding.source,browser:'Edge 155.0.4283.62; official Linux WebKit 26.6',functionalCases:Object.values(expected).reduce((a,b)=>a+b,0),unitTests:699,contentChecks:167,bothTypechecks:true,rootAndPrefixBuilds:true,reports,allCurrentRequiredCasesPassed:true,cleanFirstAttempt:false,retainedFailures:{developmentEncounterCases:18,zeroTestSelectorInvocation:true},productionChecksReusedFrom:parity.baseline,productionParity:parity.results},null,2)+'\n');
+console.log('707 current functional cases passed, no skips/retries; initial 18 failures and zero-test invocation retained.');

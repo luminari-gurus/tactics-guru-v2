@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const source='74088a4344a5082ca44f86bd255bc5adba444be4',baseline='ab513ce6197e9f94923840f4de3610652bfe38f9';
+assert.equal(execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),source);
+assert.equal(execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),'');
+const sharedInputs={};for(const file of ['src','public','index.html','package.json','package-lock.json','tsconfig.json','tsconfig.domain.json','scripts']){
+ const head=execFileSync('git',['rev-parse',source+':'+file],{encoding:'utf8'}).trim();
+ assert.equal(head,execFileSync('git',['rev-parse',baseline+':'+file],{encoding:'utf8'}).trim());sharedInputs[file]=head;
+}
+const sha=data=>createHash('sha256').update(data).digest('hex');
+const collectorSha256=Object.fromEntries(['measure-fit.ts','measure-fit-options.ts','measure-fit-controls.ts','measure-fit-evaluate.ts'].map(n=>[n,sha(fs.readFileSync('scripts/'+n))]));
+assert.deepEqual(collectorSha256,JSON.parse(fs.readFileSync('docs/qa/issue-127-performance-budgets/cache-source-binding.json')).collectorSha256);
+const packageInputs=Object.fromEntries(['src/phaser-arcade-physics.js','config/webpack.dist.config.js'].map(file=>[file,sha(fs.readFileSync('node_modules/phaser/'+file))]));
+assert.equal(JSON.parse(fs.readFileSync('node_modules/phaser/package.json')).version,'4.2.1');
+const stock=fs.readFileSync('node_modules/phaser/config/webpack.dist.config.js','utf8');
+const flags={CANVAS_RENDERER:true,WEBGL_RENDERER:true,WEBGL_DEBUG:false,FEATURE_SOUND:true};
+for(const [name,value]of Object.entries(flags))assert(stock.includes(`"typeof ${name}": JSON.stringify(${value})`));
+const builds={};for(const [base,directory]of [['/','tmp/engine-repaired-dist'],['/tactics/','tmp/engine-repaired-prefix-dist']]){
+ const files=fs.readdirSync(directory,{recursive:true}).filter(f=>fs.statSync(directory+'/'+f).isFile());
+ const headers=fs.readFileSync(directory+'/_headers','utf8'),rules=headers.trim().split('\n\n');
+ const paths=rules.map(r=>{const [p,h,...extra]=r.split('\n');assert.equal(h,'  Cache-Control: public, max-age=31536000, immutable');assert.deepEqual(extra,[]);assert(p.startsWith(base));return p.slice(base.length)});
+ assert.deepEqual(paths.slice().sort(),files.filter(f=>/^assets[\\/].+\.(js|css)$/.test(f)).map(f=>f.replaceAll('\\','/')).sort());
+ builds[base]={directory,headers,rules:rules.length,files:files.map(f=>({path:f.replaceAll('\\','/'),bytes:fs.statSync(directory+'/'+f).size,sha256:sha(fs.readFileSync(directory+'/'+f))}))};
+}
+fs.writeFileSync('tmp/engine-repaired-source-binding.json',JSON.stringify({source,baseline,sharedInputs,collectorSha256,phaserVersion:'4.2.1',packageInputs,flags,global:'globalThis',builds},null,2)+'\n');
+console.log('Clean source, shared application/package/collector inputs, published feature flags and both build inventories verified.');

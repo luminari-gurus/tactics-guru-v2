@@ -54,7 +54,9 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 
 ## Review stack integration
 
-- [ ] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
+- [x] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
+
+The review repair and its validation are complete. Tasks 6.3 and 8.2 are reopened for the nine retained deployed loading failures; see `docs/qa/pr-129-138-review-repair.md`. No performance acceptance exception is taken.
 
 ## Workflow follow-up
 

@@ -1,0 +1,4 @@
+engine-final-preview-battle {"samples":18,"failed":0,"initialIdleFailures":0,"duplicateImages":0,"violations":[]}
+engine-final-preview-run {"samples":18,"failed":0,"initialIdleFailures":0,"duplicateImages":0,"violations":[]}
+engine-final-local-battle {"samples":18,"failed":0,"initialIdleFailures":0,"duplicateImages":0,"violations":[]}
+engine-final-local-run {"samples":18,"failed":0,"initialIdleFailures":0,"duplicateImages":0,"violations":[]}

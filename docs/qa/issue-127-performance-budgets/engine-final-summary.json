@@ -1,0 +1,360 @@
+{
+  "source": "74088a4344a5082ca44f86bd255bc5adba444be4",
+  "browser": "155.0.4283.62",
+  "samples": 72,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "floatNoiseToleranceMs": 0.000001,
+  "allGatesPass": true,
+  "captures": {
+    "engine-final-preview-battle": {
+      "commit": "74088a4344a5082ca44f86bd255bc5adba444be4",
+      "measuredAt": "2026-10-18T08:07:00.170Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 371747,
+        "max": 371828
+      },
+      "coldUsableMs": {
+        "min": 768.6999999880791,
+        "max": 1077.199999988079
+      },
+      "warmUsableMs": {
+        "min": 584.2000000476837,
+        "max": 679.1999999880791
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.300000011920929,
+      "worstIdleP95Ms": 10.400000035762787,
+      "worstInteractionP95Ms": 10.899999976158142,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        }
+      ]
+    },
+    "engine-final-preview-run": {
+      "commit": "74088a4344a5082ca44f86bd255bc5adba444be4",
+      "measuredAt": "2026-10-18T08:08:07.732Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 380305,
+        "max": 380422
+      },
+      "coldUsableMs": {
+        "min": 855.8000000119209,
+        "max": 1837.699999988079
+      },
+      "warmUsableMs": {
+        "min": 664.3999999761581,
+        "max": 737.8999999761581
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.199999988079071,
+      "worstInteractionP95Ms": 10.699999988079071,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        }
+      ]
+    },
+    "engine-final-local-battle": {
+      "commit": "74088a4344a5082ca44f86bd255bc5adba444be4",
+      "measuredAt": "2026-10-18T08:09:09.329Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 374789,
+        "max": 374789
+      },
+      "coldUsableMs": {
+        "min": 552.5999999642372,
+        "max": 793.1999999880791
+      },
+      "warmUsableMs": {
+        "min": 557.6000000238419,
+        "max": 608.1000000238419
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.300000011920929,
+      "worstIdleP95Ms": 10.400000035762787,
+      "worstInteractionP95Ms": 11.200000047683716,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        }
+      ]
+    },
+    "engine-final-local-run": {
+      "commit": "74088a4344a5082ca44f86bd255bc5adba444be4",
+      "measuredAt": "2026-10-18T08:10:12.194Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 383058,
+        "max": 383058
+      },
+      "coldUsableMs": {
+        "min": 632.1000000238419,
+        "max": 788.3000000119209
+      },
+      "warmUsableMs": {
+        "min": 632.2000000476837,
+        "max": 720.9000000357628
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.5,
+      "worstInteractionP95Ms": 10.900000035762787,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        }
+      ]
+    }
+  },
+  "rawCaptureSha256": {
+    "engine-final-preview-battle.json": "c71cb0c44580c92b024ca3f97dd29f09302da95fd0ad886914a6de3e9f449d63",
+    "engine-final-preview-run.json": "b6a3e7ccc4cd08acaa7172ab6c859e138293b675572e0d6aecf3b4416088f1cc",
+    "engine-final-local-battle.json": "d3ec19f4f5987e823141b672377560537af8ffc2dfa7e894b9441a224eab4816",
+    "engine-final-local-run.json": "99d4fba417cd65506db544350191be92aaf26eae8136992d1b4c3feec6106f80"
+  }
+}
