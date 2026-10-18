@@ -1,0 +1,26 @@
+{
+  "os": "macOS-27.0.1-arm64-arm-64bit",
+  "chrome": "155.0.8059.80",
+  "webkit": {
+    "name": "webkit",
+    "revision": "2359",
+    "installByDefault": true,
+    "revisionOverrides": {
+      "mac14": "2251",
+      "mac14-arm64": "2251"
+    },
+    "browserVersion": "26.6",
+    "title": "WebKit"
+  },
+  "node": "26.11.0",
+  "playwright": "1.63.0",
+  "chromiumProfiles": [
+    "Desktop Chrome",
+    "Pixel 7",
+    "Pixel 7 at 915x412"
+  ],
+  "webkitProfiles": [
+    "iPhone 13",
+    "iPhone 13 landscape"
+  ]
+}

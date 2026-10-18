@@ -23,14 +23,35 @@ The shared shell owns one hidden/inert contents wrapper. Actor updates cannot re
 
 ## Verification record
 
-Validation is in progress; final commands and counts are recorded below when complete.
+The production preview build is bound to clean application revision `8856e52ea147e2be619f158d328d4d95a7fe94ac`. Test-only follow-up `32b1abf` corrects two baseline-reproduced mouse-focus expectations; `source-build.json` records both sets of fixture hashes and the unchanged runtime/build inputs. Evidence/progress edits do not change those inputs.
+
+| Command | Result |
+| --- | --- |
+| `npm run test:unit` | 675 tests / 40 files passed |
+| `npm run validate:content` | 167 tests / 5 files passed |
+| `npm run typecheck` | Both TypeScript configurations passed |
+| `npm run build` | Passed; existing large-chunk warning retained |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm test -- --output=/tmp/tg123-final-results` | 498 main + 18 encounter + 21 item checks passed (537 total) |
+| Chromium focus follow-up: two relevant tests on all three configured profiles | 6 passed |
+| `npx playwright test -c playwright.hud.config.ts --output=/tmp/tg123-webkit-hud-results` | 10 passed |
+| WebKit focus follow-up: two relevant tests on both configured profiles | 4 passed |
+| `npx playwright test -c playwright.device-acceptance.config.ts --output=/tmp/tg123-webkit-acceptance-fixed-results` | 54 passed |
+| `openspec validate issue-123-collapsible-hud --strict` and `git diff --check` | Passed |
+
+Host: macOS 27.0.1 arm64, Chrome 155.0.8059.80, bundled WebKit 26.6/revision 2359, Node 26.11.0 and Playwright 1.63.0. See `environment.json` for the exact emulation profiles. Raw logs are compressed without byte changes; `reports.json` records their uncompressed hashes.
 
 The initial full Chromium run retained in `issue-123-collapsible-hud/initial-browser.log.gz` passed 493/498. Three new tests attempted keyboard Restart before the asynchronous desktop breakpoint revealed its invoker; the corrected test waits for visible contents. Two new run tests compared snapshots across progressing enemy animations (one extra enemy command was visible). The run test now checks visibility during presentation and relies on its final deterministic replay/state assertions; the separate paused-presentation test checks the command-count boundary with time stopped. No application behavior or acceptance limit was changed to satisfy these assertions. Initial failure contexts are retained as gzip files alongside the log, preserving their exact bytes.
+
+The first broader WebKit acceptance run passed 50/54. Two pointer-modal focus assertions failed in both orientations; all four failures reproduced against the clean unchanged base build with the original tests. WebKit retains focus on the battle scroll region after mouse activation, a valid outcome already covered in `battle-loop.spec.ts`. The two assertions now accept either Restart or that region and explicitly require visibility. Exact keyboard-invoker and collapsed-toggle focus checks remain unchanged. Baseline and candidate failure logs/contexts are retained; no runtime fix is claimed. One prematurely launched verification run was interrupted after a guarded edit detected an additional matching assertion; its log is retained and is not acceptance evidence.
+
+Representative native-touch screenshots: [portrait](issue-123-collapsible-hud/chromium-390x844.png), [narrow](issue-123-collapsible-hud/chromium-360x640.png), [short landscape](issue-123-collapsible-hud/chromium-844x390.png), [landscape](issue-123-collapsible-hud/chromium-915x412.png).
+
+WebKit screenshots: [portrait](issue-123-collapsible-hud/webkit-390x844.png), [landscape](issue-123-collapsible-hud/webkit-844x390.png). All final matrices completed without skipped cases or configured retries.
 
 Mobile WebKit has native tap coverage in `playwright.hud.config.ts`. Its wheel/CDP scenario is covered by Chromium because those Playwright APIs are unavailable for mobile WebKit; this config explicitly excludes that scenario. Emulation is used; no physical hardware claim is made.
 
 ## Size and remaining performance work
 
-`issue-123-collapsible-hud/bundle.json` compares all built JS/CSS files with the exact base using Python gzip with `mtime=0`: +1,503 raw bytes and +456 gzip bytes. This aggregate is a size comparison, not route transfer or network timing acceptance. The first temporary archive build lacked Git metadata required by Vite; the successful baseline uses the exact base commit and index. Both builds retain the existing large-chunk warning.
+`issue-123-collapsible-hud/bundle.json` compares all built JS/CSS files with the exact base using Python gzip with `mtime=0`: +1,503 raw bytes and +457 gzip bytes. This aggregate is a size comparison, not route transfer or network timing acceptance. The first temporary archive build lacked Git metadata required by Vite; the successful baseline uses the exact base commit and index. Both builds retain the existing large-chunk warning.
 
 The independent deployed cold-code/loading/frame failures tracked by #127 remain open. No deployment, budget relaxation, parent certification or merge is part of this issue.
