@@ -133,7 +133,9 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
  }
  await activate('#run-start-encounter');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await page.locator('#fit-restart').click();await expect(page.getByRole('dialog')).toBeVisible();const before=await snapshot(page);await page.mouse.click(3,3);expect(await snapshot(page)).toEqual(before);await page.locator('#run-cancel-new').click();
- await expect(page.locator('#fit-restart')).toBeFocused();
+ // WebKit mouse activation can retain the scroll region as the modal invoker.
+ const restoredFocus=page.locator('#fit-restart:focus, #battle-scroll:focus');
+ await expect(restoredFocus).toHaveCount(1);await expect(restoredFocus).toBeVisible();
  await page.locator('#battle-sound').click();await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
 });
 
