@@ -98,12 +98,13 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   });
 }
 
-for (const backend of ['Web Audio', 'HTML5']) test(`${backend} battle audio loads at the base and plays a committed move`, async ({ page }) => {
+for (const route of ['battle', 'run']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
   if (backend === 'HTML5') await page.addInitScript(() => {
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
   });
-  await page.goto('./');
+  await page.goto(route === 'run' ? './run' : './');
+  if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load)).toBe('ready');
   await page.locator('#battle-sound').click();
