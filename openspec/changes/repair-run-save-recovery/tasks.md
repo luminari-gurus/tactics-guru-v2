@@ -9,8 +9,8 @@
 
 ## 2. Validate the combined repair
 
-- [ ] 2.1 Run local unit/type/build checks and run lifecycle/browser regressions on desktop, portrait, landscape and WebKit; inspect screenshots and record actual results and limitations.
-- [ ] 2.2 Validate strict OpenSpec and whitespace, preserve design-guide changes, publish the focused repair with verified remote parity and respond to each review finding.
+- [x] 2.1 Run local unit/type/build checks and run lifecycle/browser regressions on desktop, portrait, landscape and WebKit; inspect screenshots and record actual results and limitations.
+- [x] 2.2 Validate strict OpenSpec and whitespace, preserve design-guide changes, publish the focused repair with verified remote parity and respond to each review finding.
 
 ## Workflow follow-up
 

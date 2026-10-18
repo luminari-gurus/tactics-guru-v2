@@ -1,0 +1,1958 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/node_modules/@playwright/test/cli.js",
+      "test",
+      "-c",
+      "tmp/review/playwright-run-webkit.config.ts",
+      "--reporter=json"
+    ],
+    "configFile": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/playwright-run-webkit.config.ts",
+    "rootDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/webkit-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit-desktop",
+        "name": "webkit-desktop",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/webkit-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit-portrait",
+        "name": "webkit-portrait",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/webkit-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit-landscape",
+        "name": "webkit-landscape",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/run-progression.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 61778,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:53:39.658Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d3f690fd1ef61ef746d0",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17508,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:54:44.037Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d44ea91a5f2730154605",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2114,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:03.870Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1c5030e799699e5faa65",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6982,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:05.999Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-453a789b9c02ff3d6fd7",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1807,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:12.994Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b3c26f2017b7c46ca2fb",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1816,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:14.815Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-6f59ecc3bafe7a7ecf75",
+          "file": "run-progression.spec.ts",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2096,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:16.642Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-92ab9d6677912b149d7e",
+          "file": "run-progression.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15825,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:18.747Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d4eb4a960a5642525391",
+          "file": "run-progression.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3270,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:36.899Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b639d11e535660b89cb3",
+          "file": "run-progression.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17804,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:55:40.184Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-f6290e78cd65426ac137",
+          "file": "run-progression.spec.ts",
+          "line": 175,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1849,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:00.331Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2d8b376b04265c677ba0",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1838,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:02.196Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d3c135579b1d0aa87414",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 587,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:04.043Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-ec3fdfb84aa49d57a662",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 543,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:04.641Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c95b1df62b2fe7d5b947",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 592,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:05.196Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c3059f5cb24f5f06ce4c",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2459,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:05.795Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-81d1a84d30a979be89ef",
+          "file": "run-progression.spec.ts",
+          "line": 227,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3736,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:08.272Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-f860ebd39fd6e80a81ca",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-desktop",
+              "projectName": "webkit-desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3263,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:12.021Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-60eb29e2bbc784f52092",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 58322,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:56:16.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-82ef5128046b38b7c482",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16365,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:19.720Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3dc4718794e968074884",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2243,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:36.094Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-95c6a0620cd8a2e09100",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6593,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:40.842Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-fd768e05a1b408e52bc7",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1761,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:47.443Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2d5f74361d2462210b1c",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2080,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:49.218Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a840ff699bddf9595fd7",
+          "file": "run-progression.spec.ts",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2038,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:51.306Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-dfefeae9009a0c7fe6d7",
+          "file": "run-progression.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15316,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:57:53.356Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-048493026bc5dd4b17b5",
+          "file": "run-progression.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2344,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:08.684Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-715394206ebfd3425dfd",
+          "file": "run-progression.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:11.038Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-191603350c0efdd52b14",
+          "file": "run-progression.spec.ts",
+          "line": 175,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1691,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:28.455Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-625ae9b3b68feac358c9",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1728,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:30.154Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-e8c44775c49a5572301d",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 534,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:31.890Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d1d22d072d99dd606978",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 501,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:32.433Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d7d8578e957ff3deaf1a",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 581,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:32.942Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-157852a692e5c3084034",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2082,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:33.532Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-661f2b30c701bab7f2d0",
+          "file": "run-progression.spec.ts",
+          "line": 227,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2858,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:35.626Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2160b6cb1aa0c55cd635",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-portrait",
+              "projectName": "webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3047,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:38.492Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-75073af32e9f4b352616",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 55557,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:58:42.828Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-ad3ec7d70e475390f30f",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17537,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:42.844Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0cee5edafda01bb24281",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1858,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:02.688Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-aaceb1065da8f0435ab4",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6309,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:04.555Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b50f341fb1fe4cb74de7",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1727,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:10.875Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-7fa20cce7b084af57cb5",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1900,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:12.611Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1114358abea5ae1d900e",
+          "file": "run-progression.spec.ts",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1993,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:14.519Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-743dbb63639d7a533c93",
+          "file": "run-progression.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15401,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:16.520Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-88396df059a45a4a41e2",
+          "file": "run-progression.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2349,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:34.194Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b271554b8b5f12ffad5a",
+          "file": "run-progression.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15216,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:36.553Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5f9615ce51ca7e01add8",
+          "file": "run-progression.spec.ts",
+          "line": 175,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1659,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:51.777Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a0d9b0d4af946f711c79",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1668,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:53.443Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-49aaf70e414954ddc935",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 519,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:55.118Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-10f7e9f136e051c34709",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 499,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:55.644Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9bb3326a89cd2c20d366",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 570,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:56.151Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-34adb49df74574816b14",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2138,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:56.729Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c3241d777c93effd4458",
+          "file": "run-progression.spec.ts",
+          "line": 227,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2883,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:00:58.877Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-87930ae1f9323785eaf8",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit-landscape",
+              "projectName": "webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3283,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:01:01.768Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-214a32483422a0e20c62",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:53:35.315Z",
+    "duration": 420082.503,
+    "expected": 54,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
