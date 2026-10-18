@@ -1,0 +1,16 @@
+{
+  "purpose": "Compare production output with identical build metadata; not an acceptance artifact",
+  "baseline": "ad50e392749ccb792ea9b10a1e10307cb5a7dc3c",
+  "results": {
+    "/": {
+      "files": 73,
+      "allBytesIdentical": true,
+      "headersSha256": "50fbf9a9a101b25984cfeae92d31756f1f70d0fd4d249a72bb97b92550b8c664"
+    },
+    "/tactics/": {
+      "files": 73,
+      "allBytesIdentical": true,
+      "headersSha256": "eb6379bf56a05cfbb9c56ec2b1ae38acebd91ca87470b68d328a450c18258e29"
+    }
+  }
+}
