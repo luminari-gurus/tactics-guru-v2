@@ -1,0 +1,33 @@
+import {chromium, devices} from '@playwright/test';
+import {writeFileSync} from 'node:fs';
+import {navigateCapture} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const [origin, output] = process.argv.slice(2);
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+try {
+  const context=await browser.newContext(devices['Desktop Chrome']);
+  await context.addInitScript(()=>{
+    window.startupCosts=[];
+    const wrap=(proto,name)=>{
+      const original=proto[name];if(!original)return;
+      proto[name]=function(...args){const start=performance.now();try{return original.apply(this,args);}finally{
+        const duration=performance.now()-start;if(duration>1)window.startupCosts.push({name,start,duration});
+      }};
+    };
+    wrap(HTMLCanvasElement.prototype,'getContext');
+    for(const type of [window.WebGLRenderingContext,window.WebGL2RenderingContext])if(type){
+      for(const name of ['compileShader','linkProgram','getShaderParameter','getProgramParameter','texImage2D','readPixels','drawArrays','drawElements'])wrap(type.prototype,name);
+    }
+  });
+  const page=await context.newPage(), target=captureTarget(parseMeasureArgs(['--scene=battle','--url',origin],{}));
+  await navigateCapture(page,target,'cold');
+  await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+  const cdp=await context.newCDPSession(page);
+  await cdp.send('Profiler.enable');await cdp.send('Profiler.start');
+  await navigateCapture(page,target,'warm');
+  await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+  const {profile}=await cdp.send('Profiler.stop');
+  const result=await page.evaluate(()=>({diagnostics:window.fitDiagnostics(),nativeCosts:window.startupCosts,navigation:performance.getEntriesByType('navigation').map(r=>r.toJSON())}));
+  writeFileSync(output,JSON.stringify({purpose:'Instrumented warm startup diagnostic, not acceptance',...result,profile},null,2)+'\n');
+  console.log(JSON.stringify({build:result.diagnostics.build,usable:result.diagnostics.controlsUsableMs,nativeCosts:result.nativeCosts},null,2));
+} finally {await browser.close();}

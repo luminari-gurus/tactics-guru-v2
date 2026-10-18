@@ -1,0 +1,20 @@
+$ErrorActionPreference='Stop'
+$runningTests=Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'playwright.*\btest\b' }
+if($runningTests){throw 'Do not overlap browser tests with acceptance capture'}
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+$specs=@(
+ @{Name='cache-final-preview-battle';Url='https://7129419b.tactics-guru-v2.pages.dev/'},
+ @{Name='cache-final-preview-run';Url='https://7129419b.tactics-guru-v2.pages.dev/run'},
+ @{Name='cache-final-local-battle';Url='http://127.0.0.1:4202/'},
+ @{Name='cache-final-local-run';Url='http://127.0.0.1:4202/run'}
+)
+foreach($spec in $specs){
+ $receipt="tmp/$($spec.Name).json"; $gates="tmp/$($spec.Name)-gates.json"
+ if((Test-Path $receipt)-or(Test-Path $gates)){throw "Preserve existing capture: $receipt"}
+ node --experimental-strip-types scripts/measure-fit.ts $receipt --scene battle --url $spec.Url *> "tmp/$($spec.Name).log"
+ if($LASTEXITCODE -ne 0){throw "Invalid capture preserved: $receipt"}
+ node -e "const r=JSON.parse(require('fs').readFileSync(process.argv[1]));if(r.measuredBuild?.commit!=='ab513ce6197e9f94923840f4de3610652bfe38f9'||r.measuredBuild.dirty||r.sourceDirty||r.samples.length!==18||r.failures.length)throw Error('Source/completeness mismatch');" $receipt
+ if($LASTEXITCODE -ne 0){throw "Source/completeness mismatch: $receipt"}
+ node --experimental-strip-types scripts/evaluate-fit.ts $receipt $gates
+ # Numeric failures stay retained; continue the complete matrix.
+}

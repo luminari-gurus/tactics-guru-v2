@@ -38,8 +38,8 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 ## 7. Approved versioned-asset cache follow-up
 
 - [x] 7.1 Emit exact content-hashed JS/CSS one-year immutable rules through the existing build plugin; verify every rule against actual root and `/tactics/` outputs and exclude HTML/fixed assets. Verify runtime-source parity before reusing functional results, and run focused route checks, both typechecks and production builds.
-- [ ] 7.2 Commit and publish the focused dependent source PR, inspect its exact preview headers and warm cache reuse, then capture the unchanged complete battle/run matrix without request interception or overlapping test workloads. Preserve every failed attempt and bind source/build/browser/collector identities.
-- [ ] 7.3 Publish the acceptance receipts and current handoff, reconcile task 6.3 only from complete passing evidence, and verify strict OpenSpec, document links, Git scope and remote parity. Leave the full stack ready for review without merging or production activation.
+- [x] 7.2 Commit and publish the focused dependent source PR, inspect its exact preview headers and warm cache reuse, then capture the unchanged complete battle/run matrix without request interception or overlapping test workloads. Preserve every failed attempt and bind source/build/browser/collector identities.
+- [x] 7.3 Publish the acceptance receipts and current handoff, reconcile task 6.3 only from complete passing evidence, and verify strict OpenSpec, document links, Git scope and remote parity. Leave the full stack ready for review without merging or production activation.
 
 ## Review repair: PR #129
 
