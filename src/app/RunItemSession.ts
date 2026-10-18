@@ -22,6 +22,8 @@ export class RunItemSession {
   private battle: BattleSession | null = null;
   private retained: { slot: RunStorageSlot; text: string }[] = [];
   private disposed = false;
+  private unsavedOnly = false;
+  get isUnsavedOnly() { return this.unsavedOnly; }
   private lastRecord: unknown = null;
   get completedBattle(): unknown { return JSON.parse(JSON.stringify(this.lastRecord)); }
   status = 'Progress has not been saved';
@@ -83,7 +85,7 @@ export class RunItemSession {
       this.review = null; this.report('Reset incomplete. Run and seed unchanged. Review saved data again.'); return false;
     }
     this.battle?.dispose(); this.battle = null; this.current = next; this.review = null; this.retained = []; this.lastRecord = null;
-    this.save(); return true;
+    this.unsavedOnly = false; this.save(); return true;
   }
   boundary() {
     const { run, itemRevision } = this.current.items;
@@ -107,8 +109,16 @@ export class RunItemSession {
     this.save();
     return { ...result, state: this.snapshot.items };
   }
+  playUnsaved() {
+    if (this.disposed) return;
+    this.unsavedOnly = true; this.review = null; this.save();
+  }
   save() {
     if (this.disposed) return { ok: false, reason: 'invalidState' } as const;
+    if (this.unsavedOnly) {
+      this.report('Progress unsaved by choice. Review saved data to Continue or Start new run before saving.');
+      return { ok: false, reason: 'unsaved' } as const;
+    }
     const result = this.storage.save(this.current);
     this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
       ? `Progress unsaved: storage ${result.kind}. Open Save recovery to retry.`
@@ -129,7 +139,7 @@ export class RunItemSession {
     if (!checked.ok) return false;
     this.battle?.dispose(); this.battle = null;
     this.current = checked.state;
-    this.review = null;
+    this.review = null; this.unsavedOnly = false;
     const blocked = Object.values(review.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable');
     this.report((review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved run') +
       (blocked ? ' Progress unsaved until Save recovery resolves damaged or unreadable data.' : ''));

@@ -41,6 +41,16 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [x] 7.2 Commit and publish the focused dependent source PR, inspect its exact preview headers and warm cache reuse, then capture the unchanged complete battle/run matrix without request interception or overlapping test workloads. Preserve every failed attempt and bind source/build/browser/collector identities.
 - [x] 7.3 Publish the acceptance receipts and current handoff, reconcile task 6.3 only from complete passing evidence, and verify strict OpenSpec, document links, Git scope and remote parity. Leave the full stack ready for review without merging or production activation.
 
+## Review repair: PR #129
+
+- [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.
+- [x] R129.2 Exclusively create evaluator output to preserve raw captures across case, hard-link and symlink aliases; prove the CLI refuses aliases without changing input bytes.
+- [x] R129.3 Run local measurement regressions and both typechecks, validate OpenSpec, publish the focused repair and verify the exact remote head. Carry the repair through each dependent PR in order.
+
+## Review stack integration
+
+- [ ] RS.1 After carrying the verified evaluator and save-recovery repairs through PRs #132-#137, run applicable final functional checks and source-bound complete battle/run performance matrices on the combined runtime; retain prior failures and record current acceptance in PR #138.
+
 ## Workflow follow-up
 
 - Any production target/build/activation decision remains separately authorized under #83-#85.
