@@ -36,7 +36,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {
     const paths = new Map<string, number>(), errors: string[] = [];
     page.on('request', request => {
-      const path = new URL(request.url()).pathname;
+      const path = new URL(request.url()).pathname.replace(/\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, '');
       paths.set(path, (paths.get(path) ?? 0) + 1);
     });
     page.on('pageerror', error => errors.push(error.message));
@@ -46,6 +46,11 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
       : [...Object.values(battleCatalog.assets).map(asset => asset.runtimePath),
         ...(scene === 'battle' ? Object.values(BATTLE_CUES).map(cue => cue.url) : [])];
     await page.goto(`./?scene=${scene}`);
+    if (scene === 'battle' && process.env.PLAYWRIGHT_SERVER_MODE !== 'dev') {
+      const hintedImages = await page.locator('link[rel="preload"][as="image"]').evaluateAll(links => links.map(link => (link as HTMLLinkElement).href));
+      expect(hintedImages).toHaveLength(Object.keys(battleCatalog.assets).length);
+      for (const url of hintedImages) expect(new URL(url).pathname).toContain(base + 'assets/');
+    }
     for (let visit = 0; visit < 2; visit++) {
       if (visit) {
         paths.clear();
