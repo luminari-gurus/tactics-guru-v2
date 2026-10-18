@@ -11,3 +11,8 @@ startup-preload-v1-index.html.txt -whitespace
 probe-preload-reuse-v3.mjs.txt whitespace=cr-at-eol,-blank-at-eof
 # Verbatim Playwright error context includes padding in its embedded code frame.
 startup-webkit-proof-timeout.txt -whitespace
+
+# Cache-phase source-bound receipts preserve exact captured bytes.
+cache-*.json -text
+cache-*.txt -text whitespace=cr-at-eol,-blank-at-eof
+playwright-cache.config.ts.txt -text whitespace=cr-at-eol,-blank-at-eof

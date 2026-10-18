@@ -1,0 +1,438 @@
+{
+  "source": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+  "browser": "155.0.4283.62",
+  "samples": 72,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "floatNoiseToleranceMs": 0.000001,
+  "allGatesPass": false,
+  "captures": {
+    "cache-final-preview-battle": {
+      "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+      "measuredAt": "2026-10-18T06:55:34.578Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 380167,
+        "max": 380234
+      },
+      "coldUsableMs": {
+        "min": 782.1999999880791,
+        "max": 1151.5
+      },
+      "warmUsableMs": {
+        "min": 651.6999999880791,
+        "max": 744
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.5,
+      "worstInteractionP95Ms": 11.699999988079071,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        }
+      ]
+    },
+    "cache-final-preview-run": {
+      "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+      "measuredAt": "2026-10-18T06:56:40.920Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 3,
+      "coldCodeBytes": {
+        "min": 388730,
+        "max": 388797
+      },
+      "coldUsableMs": {
+        "min": 849.9000000357628,
+        "max": 1014.3000000119209
+      },
+      "warmUsableMs": {
+        "min": 733.5,
+        "max": 818.5999999642372
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.399999976158142,
+      "worstInteractionP95Ms": 11.600000023841858,
+      "failedRows": [
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "cache": "warm",
+          "values": {
+            "usableMs": 790.5999999642372,
+            "codeBytes": 2136,
+            "assetBytes": 6900,
+            "idleP50Ms": 8.300000011920929,
+            "idleP95Ms": 10
+          },
+          "violations": [
+            {
+              "metric": "usableMs",
+              "actual": 790.5999999642372,
+              "limit": 750
+            }
+          ]
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "cache": "warm",
+          "values": {
+            "usableMs": 818.5999999642372,
+            "codeBytes": 2136,
+            "assetBytes": 6900,
+            "idleP50Ms": 8.300000011920929,
+            "idleP95Ms": 10.399999976158142
+          },
+          "violations": [
+            {
+              "metric": "usableMs",
+              "actual": 818.5999999642372,
+              "limit": 750
+            }
+          ]
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "cache": "warm",
+          "values": {
+            "usableMs": 780.8000000119209,
+            "codeBytes": 2136,
+            "assetBytes": 6900,
+            "idleP50Ms": 8.300000011920929,
+            "idleP95Ms": 9.5
+          },
+          "violations": [
+            {
+              "metric": "usableMs",
+              "actual": 780.8000000119209,
+              "limit": 750
+            }
+          ]
+        }
+      ],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 0
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 0
+        }
+      ]
+    },
+    "cache-final-local-battle": {
+      "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+      "measuredAt": "2026-10-18T06:57:43.142Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 379534,
+        "max": 379534
+      },
+      "coldUsableMs": {
+        "min": 580.5,
+        "max": 807.6000000238419
+      },
+      "warmUsableMs": {
+        "min": 599.8000000119209,
+        "max": 638.5
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.5,
+      "worstInteractionP95Ms": 11,
+      "failedRows": [],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        }
+      ]
+    },
+    "cache-final-local-run": {
+      "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+      "measuredAt": "2026-10-18T06:58:46.709Z",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 1,
+      "coldCodeBytes": {
+        "min": 387804,
+        "max": 387804
+      },
+      "coldUsableMs": {
+        "min": 652,
+        "max": 802.6999999880791
+      },
+      "warmUsableMs": {
+        "min": 683,
+        "max": 751.0999999642372
+      },
+      "coldAssetBytes": {
+        "min": 847929,
+        "max": 847929
+      },
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.399999976158142,
+      "worstInteractionP95Ms": 11.600000023841858,
+      "failedRows": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "cache": "warm",
+          "values": {
+            "usableMs": 751.0999999642372,
+            "codeBytes": 3000,
+            "assetBytes": 6900,
+            "idleP50Ms": 8.300000011920929,
+            "idleP95Ms": 9.699999988079071
+          },
+          "violations": [
+            {
+              "metric": "usableMs",
+              "actual": 751.0999999642372,
+              "limit": 750
+            }
+          ]
+        }
+      ],
+      "duplicateImages": [],
+      "warmCode": [
+        {
+          "profile": "desktop",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "desktop",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-portrait",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 1,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 2,
+          "requests": 9,
+          "transferBytes": 2700
+        },
+        {
+          "profile": "mobile-landscape",
+          "repetition": 3,
+          "requests": 9,
+          "transferBytes": 2700
+        }
+      ]
+    }
+  },
+  "rawCaptureSha256": {
+    "cache-final-preview-battle.json": "f6710ee44ad71a9524607c2bf420c9dd4eb6eb8a290fd9f873e9fb788596f0c3",
+    "cache-final-preview-run.json": "34910e497a6d3a76d35e761e5ab520ceef4f98448c3837e178b08bb8e6d4c3ac",
+    "cache-final-local-battle.json": "8f58ca811623edacacd2d159652b51ddc1e9ae20280377673bca125202d40f14",
+    "cache-final-local-run.json": "8b583b46d970b6bbca788a00d9ede7603af10a064155288c8987299da1384df8"
+  }
+}

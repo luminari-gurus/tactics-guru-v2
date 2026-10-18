@@ -1,0 +1,12 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from '../playwright.config';
+const prefix=process.env.CACHE_PREFIX==='1';
+const url=prefix?'http://127.0.0.1:4203/tactics/':'http://127.0.0.1:4202/';
+export default defineConfig({...base,testDir:resolve('tests'),testMatch:'public-asset-base.spec.ts',
+  grep:/direct entry and refresh|extracted map route|collector cold\/warm/,
+  outputDir:resolve('tmp',prefix?'cache-prefix-artifacts':'cache-root-artifacts'),
+  reporter:[['line'],['json',{outputFile:resolve('tmp',prefix?'cache-prefix-functional.json':'cache-root-functional.json')}]],
+  use:{...base.use,baseURL:url},
+  webServer:{command:`node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --base=${prefix?'/tactics/':'/'} --outDir ${prefix?'tmp/cache-prefix-dist':'dist'} --port ${prefix?4203:4202} --strictPort`,
+    cwd:resolve('.'),url,reuseExistingServer:false}});
