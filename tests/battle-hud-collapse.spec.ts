@@ -124,3 +124,19 @@ for(const route of ['/', '/run'])for(const collapsed of [false,true]) {
     expect(cancelled.selectionEvents).toBe(initial.selectionEvents);expect(cancelled.commandCount).toBe(initial.commandCount);
   });
 }
+
+ test('opt-in input report captures landscape touches locally',async({page})=>{
+  await page.setViewportSize({width:844,height:390});
+  await page.goto('/?input-debug=1');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const region=(await page.locator('#battle-board-region').boundingBox())!;
+  await page.touchscreen.tap(region.x+region.width/2,region.y+region.height/2);
+  await page.getByText('Input report',{exact:true}).click();
+  await page.getByRole('button',{name:'Capture / copy report'}).click();
+  const report=JSON.parse(await page.getByRole('textbox',{name:'Input diagnostic report'}).inputValue());
+  expect(report.counts.touchstart).toBeGreaterThan(0);
+  expect(report.counts['accepted-start']).toBeGreaterThan(0);
+  expect(report.build.commit).toBeTruthy();
+  await page.goto('/');
+  await expect(page.getByText('Input report',{exact:true})).toHaveCount(0);
+});

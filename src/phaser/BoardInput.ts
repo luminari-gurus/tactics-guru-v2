@@ -1,3 +1,4 @@
+import { inputTrace } from '../diagnostics/inputTrace';
 import { DRAG_THRESHOLD } from '../geometry/picking';
 import type { Point } from '../geometry/iso';
 
@@ -20,7 +21,8 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     return { x: (event.clientX-rect.left)*viewport.width/rect.width, y: (event.clientY-rect.top)*viewport.height/rect.height };
   };
   const begin = (id:string, p:Point, capture:number|null): boolean => {
-    if (!enabled(p)) return false;
+    if (!enabled(p)) { inputTrace('rejected-start', {p}); return false; }
+    inputTrace('accepted-start', {p,id});
     pointers.set(id, {start:p,point:p,capture});
     if (pointers.size>1) gesture=true;
     if (capture!==null) canvas.setPointerCapture(capture);
@@ -28,10 +30,11 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const moveContact = (id:string, next:Point): boolean => {
     const pointer=pointers.get(id);
-    if (!pointer) return false;
-    if (!enabled(next)) { reset(); return true; }
+    if (!pointer) { inputTrace('missing-contact', {id,next}); return false; }
+    if (!enabled(next)) { inputTrace('rejected-contact', {id,next}); reset(); return true; }
     const other=[...pointers.entries()].find(([key])=>key!==id)?.[1];
     if (other) {
+      inputTrace('pinch', {id,next,previous:pointer.point,other:other.point});
       const before=Math.hypot(pointer.point.x-other.point.x,pointer.point.y-other.point.y);
       const after=Math.hypot(next.x-other.point.x,next.y-other.point.y);
       if (before>0) board.zoom(after/before,{x:(pointer.point.x+other.point.x)/2,y:(pointer.point.y+other.point.y)/2});
@@ -44,8 +47,8 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const finish = (id:string, next:Point, select:boolean): boolean => {
     const pointer=pointers.get(id);
-    if (!pointer) return false;
-    if (!enabled(next)) { reset(); return true; }
+    if (!pointer) { inputTrace('missing-contact', {id,next}); return false; }
+    if (!enabled(next)) { inputTrace('rejected-contact', {id,next}); reset(); return true; }
     if (select && !gesture && pointers.size===1 && Math.hypot(next.x-pointer.start.x,next.y-pointer.start.y)<DRAG_THRESHOLD) board.select(next);
     pointers.delete(id);
     if (pointer.capture!==null && canvas.hasPointerCapture(pointer.capture)) canvas.releasePointerCapture(pointer.capture);
@@ -74,6 +77,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
   const reset = ():void => {
+    inputTrace('reset', {contacts:pointers.size});
     const captured=[...pointers.values()];pointers.clear();gesture=false;
     for (const pointer of captured) if (pointer.capture!==null && canvas.hasPointerCapture(pointer.capture)) canvas.releasePointerCapture(pointer.capture);
   };
