@@ -1,5 +1,7 @@
 # Collapsible mobile battle HUD (#123)
 
+Current touch-input runtime: `443ab22`. Latest verification: 676 unit tests, 522 main Chromium + 39 posttests, 18 focused WebKit + 54 WebKit acceptance cases pass. Earlier matrices below retain their original source identities. See the final section and `iphone-touch/` for the iPhone-specific follow-up.
+
 Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/123
 Branch: `work/issue-123-collapsible-hud`; base `a009a3ec4c35b3e57adc58ac700e56721af9ae8f`.
 The caller approved the published OpenSpec plan in chat on 2026-10-18.
@@ -63,3 +65,15 @@ The caller reports failed pinch zoom and flaky panning in landscape. This remain
 Added native CDP multitouch cases to `tests/battle-board.spec.ts`, covering both `/` and `/run`, expanded/collapsed HUD, portrait-to-landscape rotation, asserted pinch scale increase, two-finger to one-finger continuation with unchanged scale, and a fresh pan without selections or commands. All 12 cases passed across the three configured Chromium profiles. Command: `PLAYWRIGHT_CHROMIUM_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npx playwright test tests/battle-board.spec.ts -g 'landscape native' --output=/tmp/tg123-landscape-regression-results`.
 
 The initial contained landscape probe passed all four cases. An intermediate diagnostic failed four continuation assertions because the test ended the wrong CDP touch contact and then introduced a new contact; pointer event traces identified that harness error. Correcting the lifted contact passed all four rotation/continuation cases. These diagnostic logs and the final 12-case log are retained; they do not establish reproduction or resolution of the caller's reported failure. Mobile WebKit's actual multitouch sequence remains unverified by these CDP checks.
+
+## iPhone Chrome touch transport fix
+
+The caller identified iPhone Chrome at `https://work-issue-123-collapsible-h.tactics-guru-v2.pages.dev/`, with pinch failing in either HUD state. The served build was verified as clean `ddc9044`, so this was not a stale alias.
+
+Runtime follow-up `443ab225835f5fb9ce5a76485bb65dbd81201006` handles native touch contacts directly when Touch Events are available. Mouse/pen Pointer Events and native touch contacts feed the same contact map and pinch/pan calculation. Compatibility touch pointer events are ignored on that path, preventing duplicate processing and removing touch dependence on pointer capture. Bounds rejection, taps, cancellation, visibility reset and scene cleanup remain in the shared pipeline. No browser UA check, second gesture algorithm, new dependency or page-wide zoom restriction is added.
+
+The new touch-only unit sequence fails against the old handler and passes after the change. This demonstrates the missing touch transport, not reproduction of the original physical iPhone event stream. The latter was not captured, and exact device-specific causality is not claimed.
+
+Checks completed before the full frozen rerun: 676 unit tests, content/type/build checks, 30 focused Chromium gesture cases (including native multitouch), 18 WebKit HUD/contact cases and all 54 WebKit acceptance cases passed. WebKit contact tests inject DOM contact records; WebKit native taps and Chromium native multitouch remain separately identified. An initial contact fixture used a prohibited WebKit Touch constructor (8 fixture errors, 10 existing passes); replacing only that constructor-dependent fixture produced all 18 passes. All attempts are retained under `iphone-touch/`.
+
+The preview was verified to serve clean `443ab22` after publication. The caller was invited to retry `/?gesture=443ab22` while the full regression rerun continues. The clean frozen full Chromium rerun passed all 522 main cases, 18 authored-encounter posttests and 21 run-item posttests (561 total), without skips or configured retries. The current JS/CSS aggregate is +2,106 raw / +701 gzip bytes against the exact base; this is not a route transfer or timing acceptance claim. All follow-up implementation and automated checks are complete. The caller’s physical iPhone event stream was not captured and direct device confirmation has not been received; no claim of physical-device testing or proven original-event causality is made. `iphone-touch/source-build.json` binds the input files, frozen build inventory and observed preview identity. WebKit validation used the precommit working-tree build of the same source; the clean committed build is used for the full Chromium rerun.

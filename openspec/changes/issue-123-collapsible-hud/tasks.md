@@ -25,4 +25,4 @@
 ## 4. iPhone landscape gesture follow-up
 
 - [x] 4.1 Handle native touch contacts through the shared gesture pipeline and ignore duplicate touch pointer events; verify the touch-only unit regression fails before/passes after, native Chromium pinch/pan and modeled WebKit contact delivery pass in both HUD states and both routes.
-- [ ] 4.2 Run the full configured browser regressions, unit/content/type/build checks, retain exact follow-up source and failure evidence, update PR #139 and verify the served preview revision.
+- [x] 4.2 Run the full configured browser regressions, unit/content/type/build checks, retain exact follow-up source and failure evidence, update PR #139 and verify the served preview revision.
