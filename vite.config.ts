@@ -18,6 +18,14 @@ function gamePreloads(): Plugin {
     name: 'game-startup-preloads',
     apply: 'build',
     configResolved(config) { base = config.base; nonce = config.html?.cspNonce; },
+    generateBundle(_options, bundle) {
+      const root = new URL(base, 'https://build.invalid').pathname;
+      const paths = Object.values(bundle).map(file => file.fileName)
+        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
+      this.emitFile({ type: 'asset', fileName: '_headers', source: paths
+        .map(file => `${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`)
+        .join('\n') });
+    },
     transformIndexHtml: { order: 'post', handler(_html, {bundle}) {
       if (!bundle) return;
       const chunks = Object.values(bundle).filter(chunk => chunk.type === 'chunk');
