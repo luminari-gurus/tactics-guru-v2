@@ -100,6 +100,7 @@ test('enemy presentation reload resumes the same commands and RNG as an uninterr
 });
 test('run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play',async({page})=>{
  await page.goto('/run');
+ await expect(page.locator('#run-start')).toBeVisible();
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);
  expect((await snapshot(page)).activeBattle).toBeNull();
  await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();
