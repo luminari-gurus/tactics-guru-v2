@@ -28,13 +28,13 @@ Acceptance requires 18 samples per route, one clean served identity, valid numer
 
 Review repair #129 gates both the initial idle snapshot and the final snapshot independently with unchanged F1 limits. The evaluator CLI exclusively creates a new output file; this filesystem operation also rejects case, hard-link and symlink aliases without truncating raw evidence. Existing output must be retained or a new filename selected.
 
-### 2. Isolate scene dependencies before considering larger changes
+### 2. Evaluate scene isolation before selecting the distribution
 
-First inspect the production bundle's module graph, request inventory and compression/headers. If it confirms avoidable proof/content-smoke dependencies, extract `createGame` into a small shared module that imports no scene classes. Preserve the existing Phaser configuration and audio-recovery ownership exactly. `startRunApp` imports that engine helper directly; the single-battle startup selects and dynamically imports only the requested scene. Preserve the default battle, `?scene=proof`, `?scene=content-smoke` and `/map` routes and prefixed asset paths.
+The baseline module graph confirmed avoidable proof/content-smoke dependencies. A bounded experiment separated engine creation and loaded only the requested scene, preserving all routes, error handling, audio and lifecycle behavior. Its source commit and functional proof are retained in QA.
 
-Propagate asynchronous scene loading through the existing startup error handling. Preserve restart readiness, BFCache/pagehide disposal and audio preBoot behavior. Do not defer code actually needed for the first usable turn past the measurement window, fetch missing game features later without accounting, or drop recovery/diagnostics solely to pass L3. Inspect actual transfer totals after each candidate, including extra request overhead. A warning threshold or smaller individual chunk is not proof of a smaller critical transfer total.
+Aggregate cold transfer, including extra requests, showed that the experiment saved too little to meet L3. It was removed from the final source. Required code is not deferred beyond the measurement window, and recovery/diagnostics remain present. Neither a warning threshold nor a smaller named chunk is treated as proof of a smaller route total.
 
-This is the first bounded hypothesis, not a guarantee that scene separation alone saves the run's minimum 17,514 bytes. If it cannot satisfy the budget, retain the unsuccessful comparison and use the measured module contributions to propose the next bounded change. A dependency upgrade, custom engine build or renderer rewrite requires a revised plan, rather than silently broadening this one.
+The supported stock-distribution choice below is the revised remedy. It adds no dependency, custom engine build or renderer rewrite, and retains the original startup implementation.
 
 ### Measured revision: select the stock distribution without unused Matter physics
 
@@ -55,6 +55,14 @@ If a runtime cost is demonstrated, change only that hot path and prove lifecycle
 Run focused boot/content-loading/asset-base and battle/run lifecycle tests after import changes. Verify default battle, proof, content-smoke and map entry points; audio unlock/mute/retry, confirmation/cancel, recovery, accepted-command save/resume, deterministic replay and three-encounter rewards/restart remain required. Run configured unit/content/browser suites, encounter/item posttests, both TypeScript configurations, production build and the WebKit device-acceptance matrix on the final candidate.
 
 Then run complete sequential 36-sample battle/run matrices on clean comparable artifacts. Retain L1/L2/L3/L4/F1/F2 decisions per sample, request-level bytes, raw intervals, conditions, build/collector hashes and failures. A local compressed-size estimate supports investigation; only actual browser transfer on the tested origin establishes that origin's L3 result.
+
+### 5. Follow through on the remaining deployed loading gate
+
+The cold-code remedy passes every local gate and deployed L3/L4/F1/F2, but the deployed candidate retains one cold L1 and fifteen warm L2 failures. Section 6 of the task list keeps this work open. A separate warm diagnostic records substantial time between HTML response completion and scene initialization, plus repeated 304 validations. Existing emitted Vite code already preloads each asynchronous entry when its caller executes, so adding the same entry to its dependency list would be a no-op.
+
+Investigate earlier route-specific HTML hints, using the actual emitted JS/CSS dependency graph and the existing blocking-image registry. Keep the map route lightweight and avoid loading battle imagery for proof/content-smoke modes unnecessarily. Hints must not execute app initialization before its normal DOM/style boundary, weaken CSP/nonce policy, replace loader validation, or create duplicate transfer. Count inline hint code and every requested byte. Preserve startup movement and the original controls-usable marker.
+
+This is a measured client-loading experiment, not approval for hosting/cache-policy changes or production activation. Retain it only if it improves the demonstrated wait while all functional, prefix, byte and timing contracts hold; preserve unsuccessful attempts and continue investigating instead of changing limits.
 
 ## Risks / Trade-offs
 

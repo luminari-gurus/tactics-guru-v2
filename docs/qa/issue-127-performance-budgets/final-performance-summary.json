@@ -1,0 +1,185 @@
+{
+  "browser": "155.0.4283.45",
+  "samples": 144,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "floatNoiseToleranceMs": 0.000001,
+  "localCandidateAllGatesPass": true,
+  "deployedColdCodePass": true,
+  "deployedAllGatesPass": false,
+  "localColdCodeSaving": {
+    "battle": 33104,
+    "run": 33105
+  },
+  "captures": {
+    "historical-release-battle": {
+      "commit": "13418626fab4cc40609cd2255d54800c15e34805",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 16,
+      "coldCodeBytes": {
+        "min": 408717,
+        "max": 408911
+      },
+      "worstColdUsableMs": 1910.2000000476837,
+      "worstWarmUsableMs": 1111.199999988079,
+      "worstAssetBytes": 848829,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 9.5,
+      "worstInteractionP95Ms": 11.199999988079071,
+      "violations": {
+        "codeBytes": 9,
+        "usableMs": 7
+      }
+    },
+    "historical-release-run": {
+      "commit": "13418626fab4cc40609cd2255d54800c15e34805",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 18,
+      "coldCodeBytes": {
+        "min": 417165,
+        "max": 417415
+      },
+      "worstColdUsableMs": 2621.399999976158,
+      "worstWarmUsableMs": 1189.5,
+      "worstAssetBytes": 848829,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 9.800000011920929,
+      "worstInteractionP95Ms": 13,
+      "violations": {
+        "usableMs": 10,
+        "codeBytes": 9
+      }
+    },
+    "baseline-edge-battle": {
+      "commit": "f1184d5ab474a97df418183edb4f56f4831a4366",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 10,
+      "coldCodeBytes": {
+        "min": 411983,
+        "max": 411983
+      },
+      "worstColdUsableMs": 1676.3999999761581,
+      "worstWarmUsableMs": 937.1999999880791,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 11.699999988079071,
+      "worstInteractionP95Ms": 25.19999998807907,
+      "violations": {
+        "codeBytes": 9,
+        "usableMs": 1
+      }
+    },
+    "baseline-edge-run": {
+      "commit": "f1184d5ab474a97df418183edb4f56f4831a4366",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 13,
+      "coldCodeBytes": {
+        "min": 420256,
+        "max": 420256
+      },
+      "worstColdUsableMs": 1513,
+      "worstWarmUsableMs": 873.5,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 13,
+      "worstInteractionP95Ms": 22.899999976158142,
+      "violations": {
+        "codeBytes": 9,
+        "usableMs": 4
+      }
+    },
+    "candidate-edge-battle": {
+      "commit": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 378879,
+        "max": 378879
+      },
+      "worstColdUsableMs": 1059.300000011921,
+      "worstWarmUsableMs": 615.7000000476837,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.300000011920929,
+      "worstIdleP95Ms": 9.199999988079071,
+      "worstInteractionP95Ms": 16.899999976158142,
+      "violations": {}
+    },
+    "candidate-edge-run": {
+      "commit": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 0,
+      "coldCodeBytes": {
+        "min": 387151,
+        "max": 387151
+      },
+      "worstColdUsableMs": 910.8999999761581,
+      "worstWarmUsableMs": 696.8000000119209,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 9.100000023841858,
+      "worstInteractionP95Ms": 11.699999988079071,
+      "violations": {}
+    },
+    "candidate-preview-battle": {
+      "commit": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 7,
+      "coldCodeBytes": {
+        "min": 379469,
+        "max": 379607
+      },
+      "worstColdUsableMs": 2592.699999988079,
+      "worstWarmUsableMs": 1896.6000000238419,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.300000011920929,
+      "worstIdleP95Ms": 9.5,
+      "worstInteractionP95Ms": 11.699999988079071,
+      "violations": {
+        "usableMs": 7
+      }
+    },
+    "candidate-preview-run": {
+      "commit": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+      "samples": 18,
+      "captureFailures": 0,
+      "budgetFailedSamples": 9,
+      "coldCodeBytes": {
+        "min": 388088,
+        "max": 388220
+      },
+      "worstColdUsableMs": 1588.2000000476837,
+      "worstWarmUsableMs": 1183.0999999642372,
+      "worstAssetBytes": 849429,
+      "worstIdleP50Ms": 8.399999976158142,
+      "worstIdleP95Ms": 10.400000035762787,
+      "worstInteractionP95Ms": 14.299999952316284,
+      "violations": {
+        "usableMs": 9
+      }
+    }
+  },
+  "rawCaptureSha256": {
+    "historical-release-battle.json": "138138cf7c69d972d10cf96b55bd1ae5ffd0b332a8764c0f9ef20b91e0a38407",
+    "historical-release-run.json": "835b3d674c69fd913a7d7f84ab800f563173945ae0e39fce767ee46adeaf9aad",
+    "baseline-edge-battle.json": "b3f8c51e1e4d8edf7887b2731a8c13428359d47665b9112346d2235677cef7ed",
+    "baseline-edge-run.json": "65226f2d850b999ad86670417997a7afed687a6dbc1b394221047a8d2cb8adf8",
+    "candidate-edge-battle.json": "7092c2b97194a873a0a74083ffc2f6a1d38b032e8da9e7444aa6e227932df909",
+    "candidate-edge-run.json": "1acb9ee32afd3f1b9aa86fab68ee1dc47220755dad3e7f52626d1a4853e68251",
+    "candidate-preview-battle.json": "55f2c01592731013a979d166c438648c502290e74e61a825951444eb98538a83",
+    "candidate-preview-run.json": "371d0ef53abb7078bd78c0ef887d2726d090845ae9f49aca7bccb11f860d329b"
+  }
+}

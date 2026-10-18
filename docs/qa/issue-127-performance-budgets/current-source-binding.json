@@ -1,0 +1,21 @@
+{
+  "baseline": "f1184d5ab474a97df418183edb4f56f4831a4366",
+  "candidate": "f28f33181f2d1d4cb6eacf284e7753e56c674397",
+  "main": "a009a3ec4c35b3e57adc58ac700e56721af9ae8f",
+  "sharedInputs": {
+    "src": "4ca2f404c6b3fe0f1436812994aa5e191c5a277b",
+    "public": "6f239df3c5775f89c679ac4abf532dc3448bd161",
+    "index.html": "ab88c53028a4f6d8151f3eb779d0bf8897478d4c",
+    "package.json": "e84a0a7f8f6fc6a368d5059f255ddf1c9824da65",
+    "package-lock.json": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7"
+  },
+  "runtimeDifference": "vite.config.ts selects the stock Phaser Arcade distribution; build commit metadata differs",
+  "collectorSha256": {
+    "measure-fit.ts": "a8692aad828178228e8f772ece0179f4267644f6dbc35eb95cbd0963e9fd5b0e",
+    "measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+    "measure-fit-evaluate.ts": "45d68ddb87c0b5bd83caeca1e08a9aa5d51408d0c4a026b859facd0deca27fde"
+  },
+  "collectorSourceDirectory": "collector-v4-final",
+  "collectorNote": "Same v4 protocol; preserves exact final-checkout bytes, including line endings."
+}

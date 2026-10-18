@@ -1,5 +1,7 @@
 # Proposal
 
+Review-repair authorization (2026-10-18): the caller requested all findings on PRs #129-#138 be addressed in order. The inherited save-recovery repairs are specified separately in `repair-run-save-recovery` and carried into this stack without changing the save format or combat. Earlier performance receipts remain bound to their original runtime; validate the final combined source before renewing acceptance claims.
+
 ## Why
 
 [Issue #127](https://github.com/luminari-gurus/tactics-guru-v2/issues/127) records cold code transfers above 400,000 bytes on both battle and run routes and one run idle median above 16.7 ms. These failures hold up #57, #64 and #81; a focused, measured remedy has more immediate downstream value than starting another feature.
@@ -25,8 +27,8 @@ None.
 
 ## Impact
 
-Planning base: `main` at `0b317e35bb5c4ce713c242311f0673fc27923637`. Planned branch: `work/issue-127-performance-budgets`; caller: `moshehbenavraham`.
+Initial planning base was `0b317e35bb5c4ce713c242311f0673fc27923637`; implementation now includes main `a009a3e` through collector base `f1184d5` and runtime candidate `f28f331`. PR #129 is the collector prerequisite; PR #130 is the runtime remedy. Caller: `moshehbenavraham`.
 
-Likely implementation seams: `src/phaser/start.ts`, a small shared engine-creation module, `src/app/startBattleApp.ts`, `src/app/startRunApp.ts`, the existing measurement scripts/options, measurement unit tests and route/lifecycle browser tests. `BattleScene.ts`, `BoardRenderer.ts`, diagnostics and Vite configuration change only where a demonstrated cost or measurement defect warrants it. New QA receipts live under `docs/qa/issue-127-performance-budgets/`.
+Implementation changes the Vite distribution selection, existing measurement scripts/options and their unit/actual-control tests, plus boot and comparison-origin checks. Application source under `src/` matches current main; the experimental scene-start changes were reverted. Source-bound QA receipts live under `docs/qa/issue-127-performance-budgets/`.
 
-No combat/content/save changes, dependency upgrade, custom engine build, renderer rewrite, analytics integration or deployment change is selected. PR #119 and issue #128 remain separately owned. The caller has authorized implementation of [plan.md](../../../docs/ongoing-projects/plan.md); its execution handoff and QA report record current progress.
+No combat/content/save changes, dependency upgrade, custom engine build, renderer rewrite, analytics integration or deployment configuration change is selected. PR #119 merged independently and its reviewed runtime is incorporated; issue #128 remains separately owned. The caller authorized implementation of [plan.md](../../../docs/ongoing-projects/plan.md); its execution handoff and QA report record current progress.

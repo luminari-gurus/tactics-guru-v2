@@ -32,9 +32,12 @@ try{
   });
   const restarts=[];
   for(let index=0;index<3;index++){
+    const priorRun=await page.evaluate(()=>window.fitDiagnostics().run);
     await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();
-    await page.locator('#run-start-encounter').click();await ready();
-    restarts.push(await counters());
+    await page.locator('#run-start-encounter').click();
+    await page.waitForFunction(prior=>window.fitDiagnostics().run>prior && window.fitDiagnostics().frames.count>=120 &&
+      document.querySelector('#game')?.getAttribute('data-phase')==='player',priorRun);
+    restarts.push({run:await page.evaluate(()=>window.fitDiagnostics().run),...await counters()});
   }
   const samples=new Map();
   for(let i=0;i<(profile.samples?.length??0);i++)samples.set(profile.samples[i],(samples.get(profile.samples[i])??0)+(profile.timeDeltas?.[i]??0));

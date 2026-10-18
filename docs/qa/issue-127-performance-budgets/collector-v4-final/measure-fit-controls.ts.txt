@@ -1,0 +1,34 @@
+import type { Page } from '@playwright/test';
+import type { captureTarget } from './measure-fit-options.ts';
+
+/** Follow the measured drawable region; retain support for the recorded pre-rail builds. */
+export async function battleGesturePoint(page: Page) {
+  return page.evaluate(() => {
+    const drawable = document.querySelector('#battle-board-region');
+    const panel = document.querySelector('#fit-panel')!.getBoundingClientRect();
+    const region = drawable?.getBoundingClientRect() ?? {left:0,top:panel.bottom,width:innerWidth,height:innerHeight-panel.bottom};
+    const point = {x:region.left+region.width*.5,y:region.top+region.height*.65};
+    const canvas = document.querySelector('canvas');
+    if (document.elementFromPoint(point.x,point.y) !== canvas ||
+        document.elementFromPoint(point.x+40,point.y-25) !== canvas) throw new Error('Workload gesture is outside the playable canvas');
+    return point;
+  });
+}
+
+/** Only used in fresh collector-owned browser contexts; keep the HTTP cache and legacy saves. */
+export async function navigateCapture(page: Page, target: ReturnType<typeof captureTarget>, cache: 'cold' | 'warm') {
+  if (cache === 'cold') await page.goto(target.url);
+  else {
+    await page.evaluate(() => {
+      for (const kind of ['battle', 'run']) for (const slot of ['primary', 'backup']) {
+        localStorage.removeItem(`tactics-guru:phaser:${kind}:${slot}:v1`);
+      }
+    });
+    await page.reload();
+  }
+  if (target.route === 'run') {
+    await page.locator('#run-start').click();
+    await page.locator('#run-start-encounter').click();
+  }
+  await page.getByRole('button', { name: target.restart, exact: true }).waitFor();
+}

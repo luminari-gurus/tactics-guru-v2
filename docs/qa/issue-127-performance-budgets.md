@@ -6,7 +6,11 @@ Both reported evaluator defects reproduced before repair: the new regressions fa
 
 Fresh local proof: `node node_modules/vitest/vitest.mjs run tests/unit/measurements.test.ts tests/unit/measureFitOptions.test.ts` passes 39 tests, including initial-only p50/p95, final-only failure, CLI alias refusal, byte preservation, new-output creation, and historical gates. Both `tsc --noEmit` configurations, strict OpenSpec, and `git diff --check` pass. These script-only changes do not alter the served runtime. Publication uses a forward commit on the existing PR branch; downstream carries follow in order. No new browser timing capture is claimed.
 
-Updated 2026-10-17 (Asia/Jerusalem). Work in progress; no deployed acceptance or runtime remedy is claimed yet.
+## Retained cold-code stage
+
+PR #132 review carry: all five inherited findings are repaired by the updated #129/#130 base and the focused PR #131 source/evidence commits. The visual-guide files are excluded. The combined branch passes 44 focused evaluator/session tests, both typechecks, production build and 18 Edge recovery regressions. Re-evaluation of all 144 retained samples reproduces the saved gate rows and verifies source/collector/raw hashes; their initial idle windows also pass. Those receipts remain evidence for their original commits. Final combined-runtime performance verification is tracked by OpenSpec task RS.1.
+
+Updated 2026-10-18 (Asia/Jerusalem). **Cold-code repair verified; deployed loading gates remain open.** The measured runtime head is `f28f331`; the evidence below belongs to that original source. The save-recovery repair carried from PR #131 changes runtime code; its functional proof is in [the recovery QA note](pr-131-run-recovery.md). New performance acceptance for the combined runtime follows at the final stack head.
 
 ## Authority, source and scope
 
@@ -105,3 +109,44 @@ PR #119 merged as `a009a3ec4c35b3e57adc58ac700e56721af9ae8f` during the runtime 
 The maintained collector now obtains its zoom/drag anchor from the actual `#battle-board-region` used by the responsive renderer/input gate. Its top-panel fallback is retained for the already-recorded older builds. Existing actual-control tests exercise zoom and pan on both battle/run routes, including prefixed deployments. A confirmed validation defect is also fixed: the interrupted/uninterrupted persistence comparison uses the configured `baseURL` for both pages and asserts matching served build identities, rather than silently opening another worktree on port 4173.
 
 Fresh integration checks: 36 focused measurement tests, both typechecks, production builds, [12 root cases](issue-127-performance-budgets/collector-responsive-root.json) (six collector + six corrected persistence comparisons), and [six prefixed collector cases](issue-127-performance-budgets/collector-responsive-prefix.json) all pass with no retries/skips. Browser checks use installed Edge 155.0.4283.45 through the existing executable override. Exact collector v4 receipts are retained. Runtime optimization, fresh complete performance matrices and the active implementation handoff remain in [PR #130](https://github.com/luminari-gurus/tactics-guru-v2/pull/130); older `0b317e3` measurements are not claims about this updated main.
+
+## Verified cold-code repair on current main
+
+Runtime `f28f33181f2d1d4cb6eacf284e7753e56c674397` includes current main `a009a3e` through collector base `f1184d5`. [Source binding](issue-127-performance-budgets/current-source-binding.json), [base build inventory](issue-127-performance-budgets/current-base-build-files.json) and [candidate inventory](issue-127-performance-budgets/current-candidate-build-files.json) verify identical application, public-asset and package inputs. Vite's stock-distribution selection is the runtime difference. Collector v4-final preserves the exact executed script bytes, including checkout line endings; `sourceDirty` in captures reflects accumulating QA documents, while every **served build is clean**.
+
+All fresh functional checks pass, with no retries/skips:
+
+- 697 unit tests and 167 content checks; both TypeScript configurations; production build. [Unit receipt](issue-127-performance-budgets/current-unit.txt), [build receipt](issue-127-performance-budgets/current-build.txt).
+- [501 Edge cases](issue-127-performance-budgets/final-browser.json), [18 encounter posttests](issue-127-performance-budgets/final-encounters.json), [21 item posttests](issue-127-performance-budgets/final-items.json), and [54 Linux WebKit cases](issue-127-performance-budgets/final-webkit.json).
+- [45 prefixed-path cases](issue-127-performance-budgets/final-prefix.json), on a clean `f28f331` build with `--base=/tactics/`. The prefix build has its own output directory, preserving the root artifact.
+- Representative [Canvas fallback](issue-127-performance-budgets/final-canvas-fallback.png) and [portrait reward](issue-127-performance-budgets/final-run-reward-portrait.png) screenshots were inspected. The game, controls and progression remain readable and usable.
+
+The existing test configurations were inherited with isolated ports/output directories. Windows runs used Edge 155.0.4283.45 via `PLAYWRIGHT_CHROMIUM_EXECUTABLE`; WebKit 26.6 ran through WSL against the same frozen Windows-served artifact. [Windows driver](issue-127-performance-budgets/playwright-owned.config.ts.txt), [WebKit driver](issue-127-performance-budgets/playwright-external-webkit.config.ts.txt), [prefix driver](issue-127-performance-budgets/playwright-prefix.config.ts.txt). WebKit was installed in the existing WSL browser cache; no system packages, application dependencies, physical-device testing or production settings were changed.
+
+### Complete performance matrices
+
+[Final summary and raw hashes](issue-127-performance-budgets/final-performance-summary.json) cover **144 fresh samples**: four source/origin pairs × two routes × 18 samples. Every capture has the expected clean served commit, identical collector hashes, browser 155.0.4283.45, a complete unique matrix and zero console/page/capture errors. All samples and numeric failures are retained. [Exact capture commands](issue-127-performance-budgets/final-captures.ps1.txt) and [audit script](issue-127-performance-budgets/summarize-final.mjs.txt) reproduce the collection/evaluation process.
+
+The exact historical release was recovered through its [GitHub deployment check](issue-127-performance-budgets/historical-deployment.json) at [immutable preview 86327a77](https://86327a77.tactics-guru-v2.pages.dev/), without redeployment. Earlier statements about the mutable main URL describe that earlier inspection, not the availability of this recovered immutable deployment.
+
+- **Historical release `13418626`, deployed:** [battle](issue-127-performance-budgets/historical-release-battle.json) cold code 408,717–408,911 bytes; [run](issue-127-performance-budgets/historical-release-run.json) 417,165–417,415. All nine cold L3 samples on each route still fail. The new host also records loading failures; the original Mac receipt is preserved separately.
+- **Current base `f1184d5`, local:** [battle](issue-127-performance-budgets/baseline-edge-battle.json) 411,983 cold code bytes; [run](issue-127-performance-budgets/baseline-edge-run.json) 420,256. Both exceed L3.
+- **Candidate `f28f331`, local:** [battle](issue-127-performance-budgets/candidate-edge-battle.json) **378,879 bytes**; [run](issue-127-performance-budgets/candidate-edge-run.json) **387,151 bytes**. The reductions are **33,104 / 33,105 bytes** in aggregate route transfer. All **36 samples pass every L1/L2/L3/L4/F1/F2 gate**. Worst warm usability is 615.7 / 696.8 ms.
+- **Same candidate, [deployed preview 10caa3ab](https://10caa3ab.tactics-guru-v2.pages.dev/):** [battle](issue-127-performance-budgets/candidate-preview-battle.json) cold code **379,469–379,607 bytes**; [run](issue-127-performance-budgets/candidate-preview-run.json) **388,088–388,220**. Every cold code, asset and frame gate passes. Loading remains incomplete: battle has **one cold L1 failure** (2592.7 ms) and **six warm L2 failures** (worst 1896.6 ms); run has **nine warm L2 failures** (worst 1183.1 ms). Adjacent `-gates.json` files retain every per-sample decision.
+
+### Idle disposition and loading diagnosis
+
+Separate [Edge baseline profile](issue-127-performance-budgets/baseline-edge-profile.json) and [candidate profile](issue-127-performance-budgets/candidate-edge-profile.json), with adjacent CPU traces, show unchanged battle state across idle and stable listener counts across three explicitly verified new scene runs (2, 3, 4): 155 initially, then 156/156/156. Both use Intel Arc/D3D11. Their screenshots are byte-identical (SHA-256 `baa936772f50d0b36b9426bfac4be7f8d49a824bff593a15e15c97ee6858c691`). No supported application hot-path cost or growing listener leak was identified, so no runtime frame-loop change is made.
+
+Edge's observed idle cadence is approximately 8.3–8.4 ms, unlike the earlier approximately 16.7 ms Chromium/Mac captures. Passing Edge intervals therefore **do not prove a causal fix** for the original 16.799999952316284 ms outlier. The historical failure remains retained and the outlier is unreproduced under the final matched conditions. Limits, nearest-rank calculation, observation point and arithmetic tolerance are unchanged.
+
+The separate [loading diagnostic](issue-127-performance-budgets/preview-loading-diagnostic.json) is not an acceptance retry. One warm battle trace records HTML response completion at 95.1 ms, scene start at 515.5 ms, scene readiness at 647.7 ms, and usable controls at 999.8 ms, with nine HTTP 304 validations. A diagnostic run warm sample of 732 ms does not replace any of the nine failed run acceptance samples. Startup presentation remains about 350 ms and is preserved. The evidence supports investigating earlier client resource loading; it does not establish a single cause for the cold navigation outlier or authorize hosting/cache changes.
+
+### Acceptance map and remaining work
+
+1. Historical source and failures: exact original hashes/reevaluation plus fresh source-bound captures are complete.
+2. Cold critical code: all nine samples per route pass locally and on the deployed candidate, with complete functional preservation.
+3. Idle investigation: paired matrices, separate profiles, state/lifecycle checks and honest unreproduced-outlier disposition are complete; no unsupported causal fix is claimed.
+4. Functional checks and unchanged full matrices: complete. **Full deployed acceptance is not complete because L1/L2 loading failures remain.**
+
+Keep #127 open with `Refs #127`; #57/#64/#81 retain their own acceptance decisions. OpenSpec section 6 tracks a focused follow-up: test route-specific early hints derived from emitted JS/CSS dependencies and existing blocking-image paths, preserve the map route's light loading and the authoritative loader, and measure before retaining any change. Do not move the usability marker, shorten startup movement, relax limits, hide failures, or change hosting/cache policy as a shortcut.
