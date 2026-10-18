@@ -20,3 +20,9 @@ playwright-cache.config.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
 diagnose-cache-startup-workload.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
 summarize-cache-final.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof
 verify-cache-preview.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof
+
+engine-*.json -text
+engine-*.txt -text whitespace=cr-at-eol,-blank-at-eof
+probe-engine-*.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
+# Raw build stdout includes a reporter line ending in a space.
+engine-*.log.txt -whitespace

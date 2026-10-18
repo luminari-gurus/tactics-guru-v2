@@ -1,0 +1,9 @@
+import {build} from 'vite';
+import {minify} from 'file:///C:/Users/apexw/AppData/Local/npm-cache/_npx/38b67d23a7cced3f/node_modules/terser/main.js';
+// Diagnostic build with Vite's Terser options; no package or persistent config change.
+await build({build:{outDir:'tmp/engine-terser-probe-dist',minify:false,cssMinify:'lightningcss'},plugins:[{
+ name:'diagnostic-terser',enforce:'post',async renderChunk(code,chunk,options){
+  const result=await minify(code,{safari10:true,sourceMap:false,module:options.format.startsWith('es'),toplevel:options.format==='cjs'});
+  return {code:result.code,map:null};
+ }
+}]});

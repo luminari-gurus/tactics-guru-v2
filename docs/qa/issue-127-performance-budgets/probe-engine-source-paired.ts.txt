@@ -1,0 +1,71 @@
+import type {Page} from '@playwright/test';
+async function settleWorkloads(page: Page) {
+  await page.waitForFunction(() => {
+    const snapshot = window.fitDiagnostics();
+    return snapshot.workloads.every(window => window.untilMs < performance.now() - 50);
+  });
+}
+async function battleWorkload(page: Page) {
+  await page.locator('#game[data-phase="player"]').waitFor();
+  await settleWorkloads(page);
+  const workloadStartIndex = await page.evaluate(() => window.fitDiagnostics().workloads.length);
+  const canvas = page.locator('canvas');
+  const point = await battleGesturePoint(page);
+  await page.mouse.move(point.x, point.y);
+  await page.mouse.wheel(0, -100);
+  await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));
+  await settleWorkloads(page);
+  await page.mouse.down();
+  await page.mouse.move(point.x+40, point.y-25, {steps:8});
+  await page.mouse.up();
+  await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='pan'));
+  await settleWorkloads(page);
+  // The first non-placeholder Move option is supplied by shared legal reachability.
+  await page.getByRole('button',{name:'Move',exact:true}).click();
+  await page.locator('#battle-target').selectOption({index:1});
+  await page.waitForFunction(() => window.fitDiagnostics().interactions.some(i=>i.action==='selection'));
+  await settleWorkloads(page);
+  await page.getByRole('button',{name:'Review action'}).click();
+  await page.getByRole('button',{name:'Confirm',exact:true}).click();
+  await page.locator('#game[data-phase="player"]').waitFor();
+  await page.waitForFunction(() => window.fitDiagnostics().workloads.some(w=>w.action==='move' && w.frames.count>0));
+  await settleWorkloads(page);
+  if (await canvas.count() !== 1) throw new Error('Unexpected battle canvas count');
+  return { workloadStartIndex, actions: ['zoom: wheel -100', 'pan: drag +40/-25 in eight steps', 'selection: legal Move target', 'move: Review and Confirm'] };
+}
+
+import {chromium,devices} from '@playwright/test';
+import fs from 'node:fs';
+import {navigateCapture,battleGesturePoint} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const results=[];
+try {
+ for(const [name,device,origin] of [1,2,3].flatMap(n=>[['base-'+n,devices['Pixel 7'],'http://127.0.0.1:4202/run'],['source-'+n,devices['Pixel 7'],'http://127.0.0.1:4205/run']])) {
+  const context=await browser.newContext(device);
+  await context.addInitScript(()=>{
+   window.startupCosts=[];
+   const record=(name,start,duration=0)=>window.startupCosts.push({name,start,duration});
+   document.addEventListener('click',e=>record('click:'+e.target.id,performance.now()),true);
+   document.addEventListener('DOMContentLoaded',()=>record('DOMContentLoaded',performance.now()));
+   window.addEventListener('load',()=>record('load',performance.now()));
+   const AC=window.AudioContext;
+   if(AC)window.AudioContext=new Proxy(AC,{construct(target,args,newTarget){const start=performance.now();try{return Reflect.construct(target,args,newTarget)}finally{record('AudioContext',start,performance.now()-start)}}});
+   const original=HTMLCanvasElement.prototype.getContext;
+   HTMLCanvasElement.prototype.getContext=function(...args){const start=performance.now();try{return original.apply(this,args)}finally{const duration=performance.now()-start;if(duration>1)record('getContext:'+args[0],start,duration)}};
+   const observer=new PerformanceObserver(list=>{for(const e of list.getEntries())record('longtask',e.startTime,e.duration)});observer.observe({type:'longtask',buffered:true});
+  });
+  const page=await context.newPage(),target=captureTarget(parseMeasureArgs(['--scene=battle','--url',origin],{}));
+  await navigateCapture(page,target,'cold');await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+  await page.waitForFunction(()=>window.fitDiagnostics().frames.count>=120);await battleWorkload(page);
+  for(let repetition=1;repetition<=1;repetition++) {
+   await navigateCapture(page,target,'warm');await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+   results.push({name,repetition,...await page.evaluate(()=>({diagnostics:window.fitDiagnostics(),costs:window.startupCosts,navigation:performance.getEntriesByType('navigation').map(r=>r.toJSON()),resources:performance.getEntriesByType('resource').map(r=>r.toJSON())}))});
+  }
+  await context.close();
+ }
+}finally{await browser.close()}
+fs.writeFileSync('tmp/engine-source-paired-comparison.json',JSON.stringify({purpose:'Instrumented diagnostic; not acceptance',results},null,2)+'\n');
+for(const r of results)console.log(JSON.stringify({profile:r.name,rep:r.repetition,start:r.diagnostics.sceneStartedMs,ready:r.diagnostics.sceneReadyMs,usable:r.diagnostics.controlsUsableMs,costs:r.costs}));
+
+
