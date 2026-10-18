@@ -17,11 +17,17 @@ async function start(page:Page){
  expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
 }
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
-async function fight(page:Page,wait=false){
+async function fight(page:Page,wait=false,collapse=false){
  for(let i=0;i<500;i++){
   await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
+  if(collapse && await page.locator('#battle-hud-toggle').isVisible() && await page.locator('#battle-hud-toggle').getAttribute('aria-expanded')==='false')await page.locator('#battle-hud-toggle').click();
   const battle=await readSession(page);expect(battle.phase).toBe('player');const catalog=runBattleCatalog(current.items,runContext)!;
   await playCommand(page,wait?{type:'endTurn',unitId:battle.state.initiative[battle.state.activeIndex]}:playerDecision(battle.state,catalog));
+  if(collapse && await page.locator('#battle-hud-toggle').isVisible()) {
+   // Enemy presentations continue while the toggle is used; final replay/state
+   // equivalence below verifies the run without assuming time stopped here.
+   await page.locator('#battle-hud-toggle').click();
+  }
  }
  await expect(page.locator('#run-screen')).toBeVisible();
 }
@@ -44,13 +50,17 @@ async function prepare(page:Page){
 test('legal three encounter run, rewards, preparation, final resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){
-  await fight(page);if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
+  await fight(page,false,true);if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(index<2){
    // The pending offer and claimed/prepared boundary survive the real Continue path.
    if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(current);}
    await prepare(page);const prepared=await snapshot(page);if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(prepared);}
    await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   if(await page.locator('#battle-hud-toggle').isVisible()){
+    await expect(page.locator('#battle-hud-toggle')).toHaveAttribute('aria-expanded',index===0?'false':'true');
+    if(index===0)await page.locator('#battle-hud-toggle').click();
+   }
    await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed',index===0?'true':'false');
   }
  }

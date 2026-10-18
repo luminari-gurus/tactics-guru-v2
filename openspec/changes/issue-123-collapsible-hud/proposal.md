@@ -4,7 +4,7 @@
 
 [#123](https://github.com/luminari-gurus/tactics-guru-v2/issues/123) lets mobile players reclaim board space after the responsive HUD merged in #119 and #118. The shared shell serves both standalone battles and authored run encounters.
 
-Caller: `dubstylee`. Branch: `work/issue-123-collapsible-hud`. Base: `origin/main` at `a009a3ec4c35b3e57adc58ac700e56721af9ae8f`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-123-collapsible-hud`. Base: `origin/main` at `a009a3ec4c35b3e57adc58ac700e56721af9ae8f`. Implementation approval: caller explicitly approved this published plan in chat on 2026-10-18.
 
 ## What Changes
 

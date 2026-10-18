@@ -2,7 +2,7 @@
 
 ## 1. Shared visibility and accessible controls
 
-- [ ] 1.1 Record caller approval in proposal.md before implementation; verify approval names this concrete plan and branch.
+- [x] 1.1 Record caller approval in proposal.md before implementation; verify approval names this concrete plan and branch.
 - [ ] 1.2 Add shared mobile toggle and compact layout in battleLayout.ts/style.css, starting expanded and retaining only the app-session choice; add browser checks for portrait, narrow, short landscape, desktop and repeated toggles, verifying 44px targets, accessible state, safe-area spacing, visible focus, hidden tab stops and no board click-through (issue criteria 1, 4).
 - [ ] 1.3 Verify actor, inspection, target, availability and prepared intent survive toggles through state/replay/RNG assertions; document default/session behavior and screenshot evidence in docs/qa/issue-123-collapsible-hud.md (criterion 2).
 
