@@ -12,13 +12,31 @@ describe('capture acceptance', () => {
   for (const route of ['battle','run']) it(`preserves retained ${route} gates and independently evaluates initial idle`, () => {
     const evaluation = evaluateCapture(receipt(route));
     expect(evaluation.captureFailures).toEqual([]);
-    expect(evaluation.rows.map(row => ({...row,violations:row.violations.filter(v=>!v.metric.startsWith('initialIdle'))}))).toEqual(gates[route].rows);
+    expect(evaluation.rows.map(({warnings,...row}) => ({...row,violations:row.violations.filter(v=>!v.metric.startsWith('initialIdle'))}))).toEqual(gates[route].rows);
     expect(evaluation.rows.flatMap(row => row.violations.filter(v=>v.metric.startsWith('initialIdle')).map(v=>({profile:row.profile,repetition:row.repetition,cache:row.cache,...v})))).toEqual(route==='battle'?[]:[
       {profile:'mobile-landscape',repetition:3,cache:'cold',metric:'initialIdleP50Ms',actual:16.799999952316284,limit:16.7},
       {profile:'mobile-landscape',repetition:3,cache:'warm',metric:'initialIdleP50Ms',actual:16.799999952316284,limit:16.7},
     ]);
     expect(evaluation.failedSamples).toBe(route === 'battle' ? 9 : 10);
     expect(evaluation.passed).toBe(false);
+  });
+  it('warns only above 1s, retains isolated loads as history, and flags repeated slow loads without warm violations', () => {
+    const data=receipt('battle');
+    const warm=data.samples.filter(sample => sample.profile==='desktop' && sample.cache==='warm');
+    const setTime=(index: number, ms: number) => {
+      warm[index].diagnostics.controlsUsableMs=ms;
+      warm[index].idleDiagnostics.controlsUsableMs=ms;
+    };
+    setTime(0,827.7); setTime(1,1000); setTime(2,1000.1);
+    const isolated=evaluateCapture(data);
+    expect(isolated.rows.filter(row=>row.profile==='desktop' && row.cache==='warm').map(row=>row.warnings.length)).toEqual([0,0,1]);
+    expect(isolated.loadingHistory.find(group=>group.profile==='desktop' && group.cache==='warm')).toMatchObject({slowLoads:1,disposition:'historical-only'});
+    setTime(1,1100);
+    const repeated=evaluateCapture(data);
+    expect(repeated.loadingHistory.find(group=>group.profile==='desktop' && group.cache==='warm')).toMatchObject({slowLoads:2,disposition:'review-repeated-slow-loads'});
+    expect(repeated.rows.filter(row=>row.cache==='warm').flatMap(row=>row.violations.filter(v=>v.metric==='usableMs'))).toEqual([]);
+    expect(repeated.failedSamples).toBe(isolated.failedSamples);
+    expect(repeated.captureFailures).toEqual([]);
   });
   const invalid: [string,(c: Capture) => void][] = [
     ['missing sample',c => {c.samples.pop();}],
@@ -62,6 +80,12 @@ describe('capture acceptance', () => {
       for (const [index,r] of sample.diagnostics.resources.entries()) if (index===0 || /\.(js|css)$/.test(new URL(r.url).pathname)) r.transferBytes=300;
     }
     expect(evaluateCapture(data).passed).toBe(true);
+    for (const sample of data.samples.filter(sample=>sample.cache==='warm')) {
+      sample.diagnostics.controlsUsableMs=1200; sample.idleDiagnostics.controlsUsableMs=1200;
+    }
+    const warningsOnly=evaluateCapture(data);
+    expect(warningsOnly.passed).toBe(true);
+    expect(warningsOnly.warningSamples).toBe(9);
     const d=data.samples[0].diagnostics;
     d.idleIntervalsMs=d.idleIntervalsMs.map(()=>16.70001);
     d.frames={count:d.idleIntervalsMs.length,medianMs:16.70001,p95Ms:16.70001,maxMs:16.70001};

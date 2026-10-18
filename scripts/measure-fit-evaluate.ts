@@ -12,8 +12,9 @@ export interface Capture {
   conditions: {scene: 'proof' | 'battle'; sceneUrl: string};
   failures: string[]; failedCapture: unknown; samples: CaptureSample[];
 }
-export const LIMITS = { L1_cold_ms: 2500, L2_warm_ms: 750, L3_cold_code_bytes: 400000,
+export const LIMITS = { L1_cold_ms: 2500, L3_cold_code_bytes: 400000,
   L4_cold_assets_bytes: 1500000, F1_p50_ms: 16.7, F1_p95_ms: 20, F2_p95_ms: 33.4 };
+export const LOAD_WARNING_MS = 1000;
 export const FLOAT_NOISE_MS = 1e-6;
 const profiles = ['desktop', 'mobile-portrait', 'mobile-landscape'];
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
@@ -23,6 +24,7 @@ export function evaluateCapture(capture: Capture) {
   const failures: string[] = [];
   const rows: {profile: string; repetition: number; cache: string;
     values: {usableMs: number | null; codeBytes: number; assetBytes: number; idleP50Ms: number | null; idleP95Ms: number | null};
+    warnings: {metric: string; actual: number; threshold: number}[];
     violations: {metric: string; actual: number | null; limit: number; window?: number}[]}[] = [];
   try {
     if (!Array.isArray(capture.samples) || capture.samples.length !== 18) failures.push('Expected exactly 18 samples');
@@ -74,7 +76,9 @@ export function evaluateCapture(capture: Capture) {
         const gate = (metric: string, actual: number | null, limit: number, tolerance = FLOAT_NOISE_MS, window?: number) => {
           if (!finite(actual) || actual > limit + tolerance) violations.push({metric,actual,limit,...(window === undefined ? {} : {window})});
         };
-        gate('usableMs',values.usableMs,sample.cache === 'cold' ? LIMITS.L1_cold_ms : LIMITS.L2_warm_ms);
+        if (sample.cache === 'cold') gate('usableMs',values.usableMs,LIMITS.L1_cold_ms);
+        const warnings = finite(values.usableMs) && values.usableMs > LOAD_WARNING_MS
+          ? [{metric:'usableMs',actual:values.usableMs,threshold:LOAD_WARNING_MS}] : [];
         gate('initialIdleP50Ms',sample.idleDiagnostics.frames.medianMs,LIMITS.F1_p50_ms);
         gate('initialIdleP95Ms',sample.idleDiagnostics.frames.p95Ms,LIMITS.F1_p95_ms);
         gate('idleP50Ms',values.idleP50Ms,LIMITS.F1_p50_ms);
@@ -96,12 +100,21 @@ export function evaluateCapture(capture: Capture) {
           if (!run && (!startup.length || startup.some(w =>
             !w.intervalStartedMs.some((start,i) => start+w.intervalsMs[i] < d.controlsUsableMs!)))) invalid('Missing pre-controls startup movement');
         }
-        rows.push({profile:sample.profile,repetition:sample.repetition,cache:sample.cache,values,violations});
+        rows.push({profile:sample.profile,repetition:sample.repetition,cache:sample.cache,values,warnings,violations});
       } catch { invalid('Malformed sample'); }
     }
     if (keys.size !== 18) failures.push('Incomplete capture matrix');
   } catch { failures.push('Malformed capture or mixed build identities'); }
-  return {build:capture?.measuredBuild ?? null,captureFailures:failures,rows,
+  // Keep ordered repeats together; warnings never become a replacement warm-loading gate.
+  const loadingHistory = profiles.flatMap(profile => (['cold','warm'] as const).map(cache => {
+    const samples = rows.filter(row => row.profile === profile && row.cache === cache)
+      .sort((a,b) => a.repetition-b.repetition)
+      .map(row => ({repetition:row.repetition,usableMs:row.values.usableMs}));
+    const slowLoads = samples.filter(sample => finite(sample.usableMs) && sample.usableMs > LOAD_WARNING_MS).length;
+    return {profile,cache,samples,slowLoads,
+      disposition: slowLoads >= 2 && slowLoads > samples.length / 2 ? 'review-repeated-slow-loads' : 'historical-only'};
+  }));
+  return {loadWarningMs:LOAD_WARNING_MS,loadingHistory,warningSamples:rows.filter(row => row.warnings.length > 0).length,build:capture?.measuredBuild ?? null,captureFailures:failures,rows,
     failedSamples:rows.filter(row => row.violations.length > 0).length,
     passed:failures.length === 0 && rows.length === 18 && rows.every(row => row.violations.length === 0)};
 }

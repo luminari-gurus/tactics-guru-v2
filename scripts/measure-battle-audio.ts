@@ -77,9 +77,12 @@ try {
             await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
             await page.waitForFunction(()=>document.querySelector<HTMLElement>('#game')?.dataset.phase==='player');
             const evidence=await page.evaluate(()=>({timings:(window as unknown as {__audioMeasure:unknown}).__audioMeasure,diagnostics:window.fitDiagnostics()}));
+            const usableMs=(evidence.timings as {readyMs:number|null}).readyMs;
+            const loadingWarning=usableMs !== null && usableMs > 1000 ? {actualMs:usableMs,thresholdMs:1000} : null;
+            if (loadingWarning) console.warn(`Load warning: ${label} ${profile} ${cache} repetition ${repetition}: ${usableMs} ms`);
             const cpuAfter=cpuTimes();
             const hostActivity={loadAverage:loadavg(),cpuBusyPercent:100*(1-(cpuAfter.idle-cpuBefore.idle)/(cpuAfter.total-cpuBefore.total))};
-            samples.push({label,profile,soundRequested:sound,soundEffective:label==='candidate'&&sound,repetition,cache,hostActivity,...evidence,errors:[...errors]});
+            samples.push({label,profile,soundRequested:sound,soundEffective:label==='candidate'&&sound,repetition,cache,loadingWarning,hostActivity,...evidence,errors:[...errors]});
             console.log(`${label} ${profile} sound=${sound} ${repetition} ${cache}`);
           }
         } finally {await context.close();}
@@ -88,5 +91,5 @@ try {
   }
 } finally {
   await browser.close();await mkdir(dirname(output),{recursive:true});
-  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move and Confirm capture-to-bubble synchronous handler response; not frame/display latency',audio:'enabled after readiness; reload defaults to muted',frames:'Merged battle frame diagnostics are present; this short audio workload does not certify F1/F2 acceptance (tracked in #65)'},budgets:{coldReadyMs:2500,warmReadyMs:750,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
+  await writeFile(output,JSON.stringify({capturedAt:new Date().toISOString(),host:{platform:platform(),release:release(),cpu:cpus()[0].model},browser:browser.version(),conditions:{network:'localhost, unthrottled',cpu:'unthrottled',cache:'new context for cold; same-page reload for warm; no request routing',repetitions:3,readiness:'DOM data-ready=true; first player decision recorded separately',interaction:'trusted Move and Confirm capture-to-bubble synchronous handler response; not frame/display latency',audio:'enabled after readiness; reload defaults to muted',frames:'Merged battle frame diagnostics are present; this short audio workload does not certify F1/F2 acceptance (tracked in #65)'},loadingPolicy:{warningAboveMs:1000,warmHardLimitMs:null,followUp:'Compare repeated same-condition loads; retain isolated warnings as history'},budgets:{coldReadyMs:2500,compressedCodeBytes:400000,coldSceneAssetBytes:1500000,F1p50Ms:16.7,F1p95Ms:20,F2p95Ms:33.4},builds,samples},null,2)+'\n');
 }

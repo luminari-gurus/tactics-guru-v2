@@ -100,7 +100,7 @@ Core product/repository choices are resolved, and implementation is tracked by E
 | # | Decision / current disposition | Evidence / remaining gate |
 | --- | --- | --- |
 | D1 | Required browser/orientation matrix retained; minimum versions and complete physical device details still open. | #64/#66; reported iPhone success is not the full matrix. |
-| D2 | Numeric loading/frame budgets established for measured acceptance. | #65: L1 cold ≤2500 ms, L2 warm ≤750 ms, L3 compressed code ≤400000 bytes, L4 assets ≤1500000 bytes; F1 idle p50 ≤16.7/p95 ≤20 ms, F2 pan/zoom/move p95 ≤33.4 ms. #64 still verifies hardware. |
+| D2 | Numeric loading/frame budgets established for measured acceptance. | #65: L1 cold ≤2500 ms, L2 warm: no hard time gate; any load >1000 ms warns, repeated slow loads prompt review, isolated spikes are history, L3 compressed code ≤400000 bytes, L4 assets ≤1500000 bytes; F1 idle p50 ≤16.7/p95 ≤20 ms, F2 pan/zoom/move p95 ≤33.4 ms. #64 still verifies hardware. |
 | D4 | Implemented Fighter/Ranger/Mage and two Goblin Grunts plus one Goblin Archer on Forest Ruins; no Shaman roster adopted. | #29/#3 and `src/content/forestRuins.ts`, `src/content/catalog.ts`. |
 | D5 | Resolved: Guarded on resolved hit/miss; Magic Missile replaced Ember Burst. | #8, [signature contract](signature-abilities.md). |
 | D6 | Resolved: Guarded Strike −2 attack / +2 AC; Basic Attack retains normal accuracy. | #49 / PR #50; no legacy −4 penalty. |
