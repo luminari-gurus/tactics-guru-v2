@@ -19,7 +19,7 @@ dist/assets/startRunApp-f_ELHnd9.js        26.01 kB │ gzip:   8.87 kB
 dist/assets/start-BzWJH7wt.js           1,527.21 kB │ gzip: 401.64 kB
 
 ✓ built in 498ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting

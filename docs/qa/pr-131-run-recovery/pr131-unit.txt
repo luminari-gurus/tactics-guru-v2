@@ -6,4 +6,3 @@
       Tests  677 passed (677)
    Start at  17:46:23
    Duration  8.78s (tests 80%, import 11%, transform 9%, worker 1%)
-
