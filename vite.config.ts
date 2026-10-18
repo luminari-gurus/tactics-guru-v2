@@ -8,8 +8,17 @@ const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).
 const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
 
 // The game owns deterministic grid rules and uses no Matter physics. This stock
-// Phaser distribution retains both renderers, audio and all scene/game APIs.
-const phaserArcade = resolve(dirname(createRequire(import.meta.url).resolve('phaser/package.json')), 'dist/phaser-arcade-physics.js');
+// Phaser entry retains both renderers, audio and all scene/game APIs. Let Vite
+// bundle it once instead of embedding the package's nested webpack runtime.
+const phaserArcade = resolve(dirname(createRequire(import.meta.url).resolve('phaser/package.json')), 'src/phaser-arcade-physics.js');
+// Match phaser/config/webpack.dist.config.js's Arcade feature flags exactly.
+const phaserDefines = {
+  'typeof CANVAS_RENDERER': 'true',
+  'typeof WEBGL_RENDERER': 'true',
+  'typeof WEBGL_DEBUG': 'false',
+  'typeof FEATURE_SOUND': 'true',
+  global: 'globalThis',
+};
 
 /** Start only the selected game route's required requests while its entry script loads. */
 function gamePreloads(): Plugin {
@@ -64,5 +73,7 @@ function gamePreloads(): Plugin {
 export default defineConfig({
   plugins: [gamePreloads()],
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
-  define: { __BUILD_INFO__: JSON.stringify({ commit, dirty }) },
+  // Vite's dev dependency optimizer does not inherit the top-level define map.
+  optimizeDeps: { rolldownOptions: { transform: { define: phaserDefines } } },
+  define: { __BUILD_INFO__: JSON.stringify({ commit, dirty }), ...phaserDefines },
 });

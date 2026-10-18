@@ -1,0 +1,34 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+tmp/engine-terser-probe-dist/_headers                               1.08 kB
+tmp/engine-terser-probe-dist/index.html                             5.28 kB │ gzip:   1.86 kB
+tmp/engine-terser-probe-dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+tmp/engine-terser-probe-dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+tmp/engine-terser-probe-dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+tmp/engine-terser-probe-dist/assets/start-BoSlSmI6.js               0.07 kB │ gzip:   0.08 kB
+tmp/engine-terser-probe-dist/assets/battleLayout-bwVadXez.js        0.61 kB │ gzip:   0.33 kB
+tmp/engine-terser-probe-dist/assets/preload-helper-e3qMHxDh.js      1.75 kB │ gzip:   0.87 kB
+tmp/engine-terser-probe-dist/assets/index-BQ1gLDU3.js               2.03 kB │ gzip:   0.97 kB
+tmp/engine-terser-probe-dist/assets/rng-CorH983j.js                 2.25 kB │ gzip:   0.95 kB
+tmp/engine-terser-probe-dist/assets/startBattleApp-Dy4M3gaZ.js      3.14 kB │ gzip:   1.25 kB
+tmp/engine-terser-probe-dist/assets/browser-KxRkKYIP.js             4.11 kB │ gzip:   1.59 kB
+tmp/engine-terser-probe-dist/assets/view-B0Fn9DRr.js               11.02 kB │ gzip:   3.93 kB
+tmp/engine-terser-probe-dist/assets/startRunApp-BtKKSE1X.js        31.63 kB │ gzip:   9.83 kB
+tmp/engine-terser-probe-dist/assets/start-Cvu3SxWw.js           2,177.72 kB │ gzip: 414.19 kB
+
+✓ built in 4.79s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 4.3s of this 4.8s build (90%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin diagnostic-terser renderChunk (88%, 4.2s, 10 calls)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+1 callback is listed without a time. Its calls overlapped, so the time inside one call includes work from other calls. To find its cost, profile the build with `node --cpu-prof`:
+  - plugin vite:css transform (4 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+

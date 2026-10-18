@@ -1,0 +1,31 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 1772 modules transformed.
+rendering chunks...
+computing gzip size...
+tmp/engine-native-flags-probe-dist/_headers                               1.08 kB
+tmp/engine-native-flags-probe-dist/index.html                             5.28 kB │ gzip:   1.85 kB
+tmp/engine-native-flags-probe-dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+tmp/engine-native-flags-probe-dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+tmp/engine-native-flags-probe-dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+tmp/engine-native-flags-probe-dist/assets/start-CsEM0Cil.js               0.06 kB │ gzip:   0.07 kB
+tmp/engine-native-flags-probe-dist/assets/battleLayout-BVayxngr.js        0.55 kB │ gzip:   0.31 kB
+tmp/engine-native-flags-probe-dist/assets/preload-helper-DjzSQ1t3.js      1.38 kB │ gzip:   0.75 kB
+tmp/engine-native-flags-probe-dist/assets/rng-BCcJOpRP.js                 1.65 kB │ gzip:   0.81 kB
+tmp/engine-native-flags-probe-dist/assets/index-C-2-FxGc.js               1.75 kB │ gzip:   0.88 kB
+tmp/engine-native-flags-probe-dist/assets/startBattleApp-DMxEZ9pc.js      2.78 kB │ gzip:   1.16 kB
+tmp/engine-native-flags-probe-dist/assets/browser-DuWnOS51.js             3.26 kB │ gzip:   1.37 kB
+tmp/engine-native-flags-probe-dist/assets/view-vwDs_uCX.js                8.83 kB │ gzip:   3.51 kB
+tmp/engine-native-flags-probe-dist/assets/startRunApp-DhLetGlk.js        25.55 kB │ gzip:   8.74 kB
+tmp/engine-native-flags-probe-dist/assets/start-Cviuggab.js           1,406.09 kB │ gzip: 363.88 kB
+
+✓ built in 381ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

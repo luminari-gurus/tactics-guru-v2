@@ -41,6 +41,11 @@ Implementation of the concrete [plan](../../../docs/ongoing-projects/plan.md) is
 - [x] 7.2 Commit and publish the focused dependent source PR, inspect its exact preview headers and warm cache reuse, then capture the unchanged complete battle/run matrix without request interception or overlapping test workloads. Preserve every failed attempt and bind source/build/browser/collector identities.
 - [x] 7.3 Publish the acceptance receipts and current handoff, reconcile task 6.3 only from complete passing evidence, and verify strict OpenSpec, document links, Git scope and remote parity. Leave the full stack ready for review without merging or production activation.
 
+## 8. Reduce remaining measured engine startup work
+
+- [x] 8.1 Compare the pinned package's stock minified Arcade build and direct stock source entry against the current candidate with the same browser and real cold/warm control workload; retain every diagnostic and actual output-size result. Reject the ineffective minified-file/minifier alternatives; select direct bundling with the published feature flags, without changing audio ownership, animation, measurement markers or budgets.
+- [ ] 8.2 Verify any retained engine-distribution change with applicable full functional, Canvas/WebGL, audio/lifecycle, prefixed-route and device checks, both typechecks/build, then clean complete local/preview performance matrices. Publish source and evidence in focused dependent PRs; reconcile task 6.3 only when all gates pass.
+
 ## Review repair: PR #129
 
 - [x] R129.1 Gate the initial idle p50/p95 as well as the final window so later frames cannot erase an observed failure; prove initial-only and final-only failures with raw intervals.

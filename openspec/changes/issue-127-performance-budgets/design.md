@@ -14,7 +14,7 @@ The retained collector adds warm-context save clearing and real run-start clicks
 
 **Goals:** preserve current behavior, make both routes satisfy the existing transfer/frame/loading limits, and retain enough source-bound evidence to distinguish application changes from measurement or environment effects.
 
-**Non-Goals:** dependency upgrades, engine replacement/custom distribution, broad code cleanup, changing combat or save formats, adding analytics, merging PR #119, selecting a release path, deploying, or closing parent acceptance trackers by proxy.
+**Non-Goals:** dependency upgrades, engine replacement/fork or a handpicked engine feature subset, broad code cleanup, changing combat or save formats, adding analytics, merging PR #119, selecting a release path, deploying, or closing parent acceptance trackers by proxy.
 
 ## Decisions
 
@@ -73,6 +73,18 @@ That experiment is retained in measured runtime `06ad243`: every required image 
 Extend the existing build-only Vite plugin to emit Cloudflare Pages `_headers` rules for actual generated `assets/*-<hash>.js` and `.css` paths. Use `Cache-Control: public, max-age=31536000, immutable`; changing file content changes its URL. Resolve the configured base path so root and `/tactics/` outputs have exact matching rules. Exclude HTML, fixed-name images/audio, APIs and saves. No application cache, service worker, new dependency, dashboard setting or production activation is needed.
 
 Verify the complete emitted rule set against both root and prefixed builds, then inspect actual preview response headers and warm cache reuse without request interception. Bind receipts to a clean commit and preserve the earlier 777.4 ms failure. Run the unchanged full battle/run performance matrices; do not assume cached files alone prove the loading gate. Reuse the prior broad functional evidence only after verifying application/public/package tree parity, with focused actual-route checks on the new build. Publish this as a focused dependent PR.
+
+### 7. Bundle the stock engine entry once
+
+The immutable-code candidate still has four warm-run failures in its complete 72-sample matrix on Edge 155.0.4283.62. Separate diagnostics including the cold gameplay workload reproduce 804.4 ms and a 116 ms application-module long task; another CPU profile records 83.2 ms of program time plus 54.7 ms constructing AudioContext. Do not infer timing improvement across the browser update from .45.
+
+The stock pre-minified Arcade file saves only about 2.3 kB of emitted code and shows no timing benefit; reject it. The standard Terser alternative likewise yields no useful size reduction; retain neither a new dependency nor a custom minifier plugin. Both results remain diagnostic evidence.
+
+Select the package's **unmodified stock `src/phaser-arcade-physics.js` entry**, bundled directly by Vite, with exactly the four feature flags from the installed `webpack.dist.config.js`: Canvas and WebGL renderers and sound enabled, WebGL debug disabled. Map the package's `global` reference to browser `globalThis`. Vite's built-in `define` supports these exact expressions; share the same map with `optimizeDeps.rolldownOptions.transform.define`, because the dev dependency optimizer does not inherit top-level definitions. The real dev fixture failure and repair are retained in QA. No transform plugin, vendor edit, custom engine entry, feature subset or dependency change is needed. The source graph and feature set match the existing stock Arcade distribution, while removing the nested webpack module runtime.
+
+Three interleaved local diagnostic pairs, with the original cold gameplay workload before warm navigation, show baseline 796.7 / 694.3 / 717.2 ms versus source-entry 659.2 / 637.7 / 631.2 ms. One baseline has an additional 77.4 ms WebGL context outlier; do not attribute that outlier to the bundle change. Baseline module long tasks remain 100/114 ms in the other pairs and are absent above the 50 ms long-task threshold on all source candidates. This supports full verification, not acceptance by itself. Source output saves about 11 kB decoded and 4 kB gzip; use actual transfer for budgets.
+
+Keep audio ownership, native AudioContext initialization, controls, gameplay/startup movement, timing markers and limits unchanged. Run the complete functional, dev fixture, renderer, audio/lifecycle, prefixed and WebKit checks, then clean local/preview matrices. The caller directed autonomous remaining decisions on 2026-10-18; no further scope question is pending for this bounded implementation work.
 
 ## Risks / Trade-offs
 
