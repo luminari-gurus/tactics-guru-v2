@@ -1,7 +1,8 @@
 import { assert, expect, it } from 'vitest';
 import { RunItemSession } from '../../src/app/RunItemSession';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
-import { createRunStorage } from '../../src/persistence/runStorage';
+import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
+import { freshRunSnapshot } from '../../src/domain/runBattle';
 const unavailable = () => createRunStorage(runContext, () => null);
 it('commits claim once, rejects stale review and preserves accepted state after storage failure', () => {
   const s = new RunItemSession(rewardSnapshot(), runContext, unavailable());
@@ -41,4 +42,18 @@ it('uses once and restores a reviewed saved boundary without mutating RNG', () =
   expect(restored.continue(review)).toBe(true); expect(restored.snapshot).toEqual(after);
   expect(restored.continue(review)).toBe(false);
   expect(restored.dispatch(use).ok).toBe(false); expect(restored.snapshot).toEqual(after);
+});
+
+for(const choice of ['continue','replace'] as const)it(`keeps explicit unsaved item boundaries and retries from writing until reviewed ${choice}`,()=>{
+  const data=new Map<string,string>();let deny=false;
+  const storage=createRunStorage(runContext,()=>({getItem:k=>{if(deny)throw new DOMException('Denied','SecurityError');return data.get(k)??null;},setItem:(k,v)=>{data.set(k,v);},removeItem:k=>{data.delete(k);}}));
+  const saved=freshRunSnapshot('saved-run',14,runContext);assert(storage.save(saved).ok);const before=[...data];
+  deny=true;const s=new RunItemSession(rewardSnapshot(),runContext,storage);s.playUnsaved();s.inspect();deny=false;
+  const command={...s.boundary(),type:'claimReward' as const,offerId:s.snapshot.items.offer!.id,itemId:s.snapshot.items.offer!.options[0].itemId};
+  expect(s.dispatch(command).ok).toBe(true);expect(s.save()).toEqual({ok:false,reason:'unsaved'});expect([...data]).toEqual(before);
+  const stale=s.inspect();const current=s.inspect();expect(s.continue(stale)).toBe(false);expect(s.replace(stale,'new-run',15)).toBe(false);expect(s.isUnsavedOnly).toBe(true);
+  if(choice==='continue'){expect(s.continue(current)).toBe(true);expect(s.snapshot).toEqual(saved);}
+  else expect(s.replace(current,'new-run',15)).toBe(true);
+  expect(s.isUnsavedOnly).toBe(false);expect(s.save().ok).toBe(true);
+  expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).payload.items.run.id).toBe(choice==='continue'?'saved-run':'new-run');
 });

@@ -78,10 +78,11 @@ function replace(review:RunLoadResult) {
 function requestNew() {
  if(!live || dialogs.open)return;
  const review=controller.inspect();
+ const cancel=()=>{if(startup){render();screen.querySelector<HTMLElement>('#run-start')?.focus();}else restart.focus();};
  dialogs.showChoices('Start new run?', 'Replace this run with a full party, empty inventory and a fresh seed? Export saved data first if needed.',[
   {id:'run-confirm-new',label:'Start new run',run:()=>replace(review)},
-  {id:'run-cancel-new',label:'Cancel',run:()=>restart.focus()},
- ],()=>restart.focus());
+  {id:'run-cancel-new',label:'Cancel',run:cancel},
+ ],cancel);
 }
 function showRecovery() {
  const closeRecovery=()=>{
@@ -94,7 +95,7 @@ function showRecovery() {
  for(const [index,{slot,text}] of controller.recoveryTexts(review).entries()) {
   choices.push({id:`run-export-${slot}-${index}`,label:`Export ${slot} save`,run:()=>{
    const url=URL.createObjectURL(new Blob([JSON.stringify({slot,text})],{type:'application/json'}));
-   const link=document.createElement('a');link.href=url;link.download=`tactics-guru-run-${slot}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+   const link=document.createElement('a');link.href=url;link.download=`tactics-guru-run-${slot}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);closeRecovery();
   }});
   if(review.ok && 'text' in review.inspection[slot] && review.inspection[slot].text===text)choices.push({id:`run-remove-${slot}`,label:`Remove ${slot} save`,run:()=>{
    dialogs.showChoices('Remove reviewed save?',`Export first if needed. Remove the reviewed ${slot} bytes?`,[
@@ -103,15 +104,15 @@ function showRecovery() {
    ]);
   }});
  }
- if(startup && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
+ if((startup || controller.isUnsavedOnly) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
  choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(!startup)controller.save();showRecovery();}},
   {id:'run-close-recovery',label:'Close',run:closeRecovery});
  const message=review.ok?`primary: ${review.inspection.primary.status}. backup: ${review.inspection.backup.status}. ${controller.status}`:`Storage ${review.kind}. Your run can continue unsaved.`;
  dialogs.showChoices('Run save recovery',message,choices,closeRecovery);
 }
 function continueRun(review:RunLoadResult) {
- if(!controller.continue(review))return;
- startup=false;render();
+ if(!controller.continue(review)){showRecovery();return;}
+ startup=false;stopBattle();render();
  if(controller.snapshot.activeBattle)startBattle();
 }
 function renderProgress() {
@@ -134,11 +135,13 @@ function render() {
   const title=items.querySelector('h1')!;title.textContent='Three-encounter run';
   if(review.ok && review.selected)actions.append(button('Continue saved run',()=>continueRun(review),'run-continue'));
   actions.append(button('Start new run',()=>{
+   const review=controller.inspect();
    if(review.ok && Object.values(review.inspection).every(s=>s.status==='missing')) {
-    startup=false;controller.save();render();
+    if(initial.ok && initial.selected)replace(review);
+    else {startup=false;controller.save();render();}
    } else requestNew();
   },'run-start'));
-  if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.save();render();},'run-unsaved'));
+  if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
   items.replaceChildren(title);actions.append(nav.cloneNode(true));controller.onChange=()=>{evidence();};

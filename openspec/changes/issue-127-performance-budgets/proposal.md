@@ -1,5 +1,7 @@
 # Proposal
 
+Review-repair authorization (2026-10-18): the caller requested all findings on PRs #129-#138 be addressed in order. The inherited save-recovery repairs are specified separately in `repair-run-save-recovery` and carried into this stack without changing the save format or combat. Earlier performance receipts remain bound to their original runtime; validate the final combined source before renewing acceptance claims.
+
 ## Why
 
 [Issue #127](https://github.com/luminari-gurus/tactics-guru-v2/issues/127) records cold code transfers above 400,000 bytes on both battle and run routes and one run idle median above 16.7 ms. These failures hold up #57, #64 and #81; a focused, measured remedy has more immediate downstream value than starting another feature.
