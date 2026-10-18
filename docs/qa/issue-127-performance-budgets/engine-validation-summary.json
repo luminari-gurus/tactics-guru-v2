@@ -1,0 +1,150 @@
+{
+  "source": "74088a4344a5082ca44f86bd255bc5adba444be4",
+  "browser": "Edge 155.0.4283.62; official Linux WebKit 26.6",
+  "functionalCases": 707,
+  "unitTests": 699,
+  "contentChecks": 167,
+  "bothTypechecks": true,
+  "rootAndPrefixBuilds": true,
+  "reports": {
+    "browser": {
+      "file": "tmp/engine-browser.json",
+      "stats": {
+        "startTime": "2026-10-18T07:17:12.701Z",
+        "duration": 1697637.505,
+        "expected": 519,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 519,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "77ab59d9b4ded2677513c0901bd0b440561688673579bf6651d024ea99c26b2a"
+    },
+    "prefix": {
+      "file": "tmp/engine-prefix.json",
+      "stats": {
+        "startTime": "2026-10-18T07:45:30.739Z",
+        "duration": 138061.293,
+        "expected": 63,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 63,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "c14ef29b21ee6e395bf41fc36554e49d579c2f7f8221e632771558fa68b6fe94"
+    },
+    "repaired-browser": {
+      "file": "tmp/engine-repaired-browser.json",
+      "stats": {
+        "startTime": "2026-10-18T07:54:16.171Z",
+        "duration": 7103.628000000001,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 3,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "31751439b94f133b4c53fb04af2e216472d4df95d5605f38877a129eb4d93c49"
+    },
+    "repaired-prefix": {
+      "file": "tmp/engine-repaired-prefix.json",
+      "stats": {
+        "startTime": "2026-10-18T07:54:23.669Z",
+        "duration": 8031.678999999999,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 3,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "e963f99b8e44836d35389d96364c23c1d9dd1aacb7ddfcf8b0aa89a9a3746b9c"
+    },
+    "repaired-encounters": {
+      "file": "tmp/engine-repaired-encounters.json",
+      "stats": {
+        "startTime": "2026-10-18T07:54:32.106Z",
+        "duration": 26704.18,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 18,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "565188467108084ec176f66f3ad009b4318d550cd107973edf651df1e40b65d9"
+    },
+    "repaired-items": {
+      "file": "tmp/engine-repaired-items.json",
+      "stats": {
+        "startTime": "2026-10-18T07:54:59.193Z",
+        "duration": 15319.609,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 21,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "c2f6196ec22c3c2acd998340cd2e70c4bb0553488634e98c62d3e80f778acd8d"
+    },
+    "repaired-webkit": {
+      "file": "tmp/engine-repaired-webkit.json",
+      "stats": {
+        "startTime": "2026-10-18T07:55:16.401Z",
+        "duration": 472614.86100000003,
+        "expected": 54,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 54,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "3b8f8b1f26d3bff0fa618bf2e68ccc220d4f2243876ce2978820f8248e27900a"
+    },
+    "repaired-webkit-boundaries": {
+      "file": "tmp/engine-repaired-webkit-boundaries.json",
+      "stats": {
+        "startTime": "2026-10-18T08:03:39.070Z",
+        "duration": 62437.081999999995,
+        "expected": 26,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": 26,
+      "skips": 0,
+      "retries": 0,
+      "sha256": "c04919e7db34f645b565a2cce52bba9c436f9fe0f265535099486c103b5b3485"
+    }
+  },
+  "allCurrentRequiredCasesPassed": true,
+  "cleanFirstAttempt": false,
+  "retainedFailures": {
+    "developmentEncounterCases": 18,
+    "zeroTestSelectorInvocation": true
+  },
+  "productionChecksReusedFrom": "ad50e392749ccb792ea9b10a1e10307cb5a7dc3c",
+  "productionParity": {
+    "/": {
+      "files": 73,
+      "allBytesIdentical": true,
+      "headersSha256": "50fbf9a9a101b25984cfeae92d31756f1f70d0fd4d249a72bb97b92550b8c664"
+    },
+    "/tactics/": {
+      "files": 73,
+      "allBytesIdentical": true,
+      "headersSha256": "eb6379bf56a05cfbb9c56ec2b1ae38acebd91ca87470b68d328a450c18258e29"
+    }
+  }
+}

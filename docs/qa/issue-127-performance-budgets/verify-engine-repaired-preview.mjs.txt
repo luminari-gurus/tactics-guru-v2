@@ -1,0 +1,47 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {chromium,devices} from '@playwright/test';
+import {navigateCapture} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const origin='https://5e9c90ae.tactics-guru-v2.pages.dev/';
+const baseline='https://7129419b.tactics-guru-v2.pages.dev/';
+const rules=fs.readFileSync('tmp/engine-repaired-dist/_headers','utf8').trim().split('\n\n');
+const headerChecks=[];
+for(const rule of rules){
+ const path=rule.split('\n')[0];const response=await fetch(new URL(path,origin));
+ const bytes=Buffer.from(await response.arrayBuffer());
+ const row={path,status:response.status,cacheControl:response.headers.get('cache-control'),sha256:createHash('sha256').update(bytes).digest('hex')};
+ assert.equal(row.status,200);assert.equal(row.cacheControl,'public, max-age=31536000, immutable');
+ assert.equal(row.sha256,createHash('sha256').update(fs.readFileSync('tmp/engine-repaired-dist'+path)).digest('hex'));
+ headerChecks.push(row);
+}
+const unchangedPolicy=[];
+for(const path of ['', 'battle/terrain/grass.png','audio/battle/move.mp3']){
+ const a=await fetch(new URL(path,baseline),{method:'HEAD'}),b=await fetch(new URL(path,origin),{method:'HEAD'});
+ assert.equal(a.status,200);assert.equal(b.status,200);
+ const row={path,baseline:a.headers.get('cache-control'),candidate:b.headers.get('cache-control')};
+ assert.equal(row.candidate,row.baseline);assert(!row.candidate?.includes('immutable'));unchangedPolicy.push(row);
+}
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const visits=[];
+try {
+ for(const route of ['', 'run']) {
+  const context=await browser.newContext(devices['Pixel 7']);const page=await context.newPage();
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+  const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,origin).href],{}));
+  for(const cache of ['cold','warm']){
+   await navigateCapture(page,target,cache);
+   await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null&&window.fitDiagnostics().frames.count>=120);
+   const diagnostic=await page.evaluate(()=>window.fitDiagnostics());
+   assert.equal(diagnostic.build.commit,'74088a4344a5082ca44f86bd255bc5adba444be4');assert.equal(diagnostic.build.dirty,false);
+   const code=diagnostic.resources.filter(r=>/\.(js|css)(?:\?|$)/.test(r.url));
+   if(cache==='warm')assert(code.length>0&&code.every(r=>r.transferBytes===0),'Warm code must be reused from browser cache');
+   visits.push({route:route||'battle',cache,build:diagnostic.build,code:code.map(r=>({url:r.url,transferBytes:r.transferBytes})),errors:[...errors]});
+  }
+  assert.deepEqual(errors,[]);await context.close();
+ }
+} finally {await browser.close();}
+fs.writeFileSync('tmp/engine-repaired-preview-verification.json',JSON.stringify({purpose:'Header and cache-reuse diagnostic; separate from acceptance timing',origin,baseline,headerChecks,unchangedPolicy,visits},null,2)+'\n');
+console.log(JSON.stringify({codePaths:headerChecks.length,unchangedPolicy,visits:visits.map(v=>({route:v.route,cache:v.cache,codeRequests:v.code.length,codeTransfer:v.code.reduce((n,r)=>n+r.transferBytes,0)}))}));
+

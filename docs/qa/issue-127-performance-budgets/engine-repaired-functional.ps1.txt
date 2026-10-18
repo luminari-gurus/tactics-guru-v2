@@ -1,0 +1,21 @@
+$ErrorActionPreference='Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+$env:TG_REPAIRED='1';$env:TG_ATTEMPT='repaired-';$env:TG_SMOKE='1'
+foreach($suite in @('browser','prefix')){
+ $env:TG_SUITE=$suite
+ node node_modules/@playwright/test/cli.js test -c tmp/playwright-engine.config.ts *> "tmp/engine-repaired-$suite-progress.log"
+ if($LASTEXITCODE -ne 0){throw "Repaired $suite smoke failed"}
+ Write-Output "Repaired $suite smoke passed."
+}
+Remove-Item Env:TG_SMOKE
+foreach($suite in @('encounters','items')){
+ $env:TG_SUITE=$suite
+ node node_modules/@playwright/test/cli.js test -c tmp/playwright-engine.config.ts *> "tmp/engine-repaired-$suite-progress.log"
+ if($LASTEXITCODE -ne 0){throw "Repaired $suite failed"}
+ Write-Output "Repaired $suite passed."
+}
+foreach($suite in @('webkit','webkit-boundaries')){
+ wsl.exe --cd /mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup --exec env -u PLAYWRIGHT_CHROMIUM_EXECUTABLE TG_SUITE=$suite TG_REPAIRED=1 TG_ATTEMPT=repaired- node node_modules/@playwright/test/cli.js test -c tmp/playwright-engine.config.ts *> "tmp/engine-repaired-$suite-progress.log"
+ if($LASTEXITCODE -ne 0){throw "Repaired $suite failed"}
+ Write-Output "Repaired $suite passed."
+}
