@@ -16,3 +16,7 @@ startup-webkit-proof-timeout.txt -whitespace
 cache-*.json -text
 cache-*.txt -text whitespace=cr-at-eol,-blank-at-eof
 playwright-cache.config.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
+# Preserve exact diagnostic script bytes, including their terminal newline.
+diagnose-cache-startup-workload.ts.txt -text whitespace=cr-at-eol,-blank-at-eof
+summarize-cache-final.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof
+verify-cache-preview.mjs.txt -text whitespace=cr-at-eol,-blank-at-eof
