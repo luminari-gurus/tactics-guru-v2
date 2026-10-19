@@ -1,0 +1,33 @@
+{
+  "stats": {
+    "startTime": "2026-10-19T12:19:05.042Z",
+    "duration": 1854390.3900000001,
+    "expected": 551,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "failures": [
+    {
+      "file": "battle-animations.spec.ts",
+      "title": "magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result",
+      "project": "desktop",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "errors": [
+            {
+              "location": {
+                "file": "/Users/brian/.codex/worktrees/issue-144-active-unit-bob/tactics-guru-v2/tests/battle-animations.spec.ts",
+                "column": 49,
+                "line": 175
+              },
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#battle-preview')\nExpected substring: \u001b[32m\"Unavailable\"\u001b[39m\nReceived string:    \u001b[31m\"Select a target\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('#battle-preview') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#battle-preview')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <p aria-live=\"polite\" id=\"battle-preview\">Select a target</p>\u001b[22m\n\u001b[2m       - unexpected value \"Select a target\"\u001b[22m\n\n\n  173 |   // A signature aimed at its own actor must remain a rejected preview, with no cue or save.\n  174 |   await press(page,'[data-action=\"signature\"]',keyboard);await page.locator('canvas').focus();await page.keyboard.press('Enter');\n> 175 |   await expect(page.locator('#battle-preview')).toContainText('Unavailable');await expect(page.locator('#battle-review')).toBeDisabled();\n      |                                                 ^\n  176 |   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);\n  177 |   await press(page,'#battle-cancel',keyboard);\n  178 |   await review(page,fixture,keyboard);await page.keyboard.press('Escape');\n    at /Users/brian/.codex/worktrees/issue-144-active-unit-bob/tactics-guru-v2/tests/battle-animations.spec.ts:175:49"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

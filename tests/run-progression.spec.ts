@@ -53,7 +53,18 @@ test('legal three encounter run, rewards, preparation, final resume and fresh re
   await page.mouse.click(board.transform.x+x*board.transform.scale,board.transform.y+y*board.transform.scale);
   expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:11,y:11,elevation:corner.elevation});
   expect(await snapshot(page)).toEqual(runBefore);
-  await fight(page);if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
+  // Each new scene owns exactly its current actor cue; a finished encounter tears it down.
+  await expect.poll(async()=>{
+   const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+   const actor=report.units.find((unit:any)=>unit.id===report.activeId);
+   expect(report.units.filter((unit:any)=>unit.id!==report.activeId).every((unit:any)=>unit.bobOffset===0)).toBe(true);
+   return actor.bobOffset;
+  }).toBeLessThan(-0.2);
+  const beforeBob=await snapshot(page);
+  await page.screenshot({path:test.info().outputPath(`encounter-${index+1}-active-bob.png`)});
+  expect(await snapshot(page)).toEqual(beforeBob);
+  await fight(page);
+  await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(index<2){
    // The pending offer and claimed/prepared boundary survive the real Continue path.
