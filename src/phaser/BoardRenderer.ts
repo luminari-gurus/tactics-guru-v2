@@ -7,7 +7,7 @@ import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNE
 import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
-import type { TargetOverlay } from '../ui/targetPreview';
+import type { TargetOverlay, MovementHover } from '../ui/targetPreview';
 
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
@@ -34,6 +34,7 @@ export class BoardRenderer {
   private snapshot: BattleState | undefined;
   private reachable: readonly CellPosition[] = [];
   private targets: readonly TargetOverlay[] = [];
+  private hoverPreview: MovementHover | null = null;
   private selected: Tile | null = null;
   private selectionEvents = 0;
   private animatedSnapshot: BattleState | undefined;
@@ -107,7 +108,7 @@ export class BoardRenderer {
     };
   }
 
-  /** Local shape cache, bounded by elevations and the 16 overlay combinations.
+  /** Local shape cache, bounded by elevations and the overlay flag combinations.
    * Six pixels per board unit preserves the maximum fitted 1.5 × 4 zoom density.
    * Textures are owned by this game's manager and reused across scene restarts.
    */
@@ -135,6 +136,12 @@ export class BoardRenderer {
       if(flags&2) graphics.lineStyle(3,ACTIVE_COLOR).strokePoints(vertices,true);
       if(flags&4) graphics.lineStyle(2.5,0xb9b1ff).strokePoints(vertices,true);
       if(flags&8) graphics.lineStyle(2.5,SELECTED_COLOR).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.78,p.y*0.78)),true);
+      if(flags&128) {
+        graphics.fillStyle(0xb48aff,0.25).fillPoints(vertices,true);
+        graphics.lineStyle(1.5,0xd3b7ff).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.9,p.y*0.9)),true);
+        graphics.fillStyle(0xffffff).fillCircle(-3,13,1.3).fillCircle(3,13,1.3);
+      }
+      if(flags&256) graphics.lineStyle(2.5,0xffffff).strokeEllipse(0,0,18,9);
       if(flags&48) {
         const valid=!!(flags&16),color=valid?0x63eba0:0xff867c;
         graphics.fillStyle(color,0.32).fillPoints(vertices,true);
@@ -147,24 +154,27 @@ export class BoardRenderer {
     });
   }
 
-  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = [], targets: readonly TargetOverlay[] = []): void {
+  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = [], targets: readonly TargetOverlay[] = [], hover: MovementHover | null = null): void {
     // Modal/layout refreshes must not remove a defeated target before impact.
     snapshot = this.animatedSnapshot ?? snapshot;
     this.snapshot = snapshot;
     this.reachable = reachable;
     this.targets = this.animatedSnapshot ? [] : targets;
+    this.hoverPreview = this.animatedSnapshot ? null : hover;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
     const activeId = snapshot.initiative[snapshot.activeIndex];
     const active = snapshot.units.find(unit => unit.id === activeId)!;
     const reachableKeys = new Set(reachable.map(cellKey));
     const pathKeys = new Set(path.map(cellKey));
     const targetByCell = new Map(this.targets.map(target => [cellKey(target.cell),target]));
+    const hoverKeys = new Set(this.hoverPreview?.cells.map(cellKey));
     for (const tile of this.board.tiles) {
       const key = cellKey(tile);
       const target = targetByCell.get(key);
       const flags = (reachableKeys.has(key) && key !== cellKey(active.cell) ? 1 : 0)
         | (key === cellKey(active.cell) ? 2 : 0) | (pathKeys.has(key) ? 4 : 0) | (this.selected === tile && !target ? 8 : 0)
-        | (target ? target.valid ? 16 : 32 : 0) | (target?.selected ? 64 : 0);
+        | (target ? target.valid ? 16 : 32 : 0) | (target?.selected ? 64 : 0)
+        | (hoverKeys.has(key) ? 128 : 0) | (this.hoverPreview && key===cellKey(this.hoverPreview.origin) ? 256 : 0);
       this.highlights.get(key)!.setTexture(this.highlightTexture(flags));
     }
     for (const unit of snapshot.units) {
@@ -440,8 +450,12 @@ export class BoardRenderer {
 
   select(point: Point): void {
     this.selectionEvents++;
+    this.onSelect(this.cellAt(point));
+  }
+
+  cellAt(point: Point): CellPosition | null {
     const tile = pickTile(this.board.tiles, screenToBoard(point, this.view));
-    this.onSelect(tile ? { x: tile.x, y: tile.y } : null);
+    return tile ? { x: tile.x, y: tile.y } : null;
   }
 
   private publish(): void {
@@ -479,7 +493,7 @@ export class BoardRenderer {
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
       viewport: this.viewport, region: this.region, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
-      reachable: this.reachable, targets: this.targets, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
+      reachable: this.reachable, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
       effect: this.effect,
       feedbackBounds: this.feedbackBounds(),

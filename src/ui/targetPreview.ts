@@ -1,6 +1,18 @@
 import type { CellPosition } from '../content/types';
 import type { BattleSession } from '../app/BattleSession';
 import { actionCommand, type Action } from './hud';
+import { previewMovement } from '../domain/grid';
+
+export interface MovementHover {
+  readonly origin: CellPosition;
+  readonly cells: readonly CellPosition[];
+}
+
+export function movementHover(session: BattleSession, origin: CellPosition | null): MovementHover | null {
+  if (session.phase !== 'player' || !origin) return null;
+  const reach = previewMovement(session.state, session.active.id, session.catalog, origin);
+  return reach.ok ? {origin, cells:reach.cells.map(c=>c.cell)} : null;
+}
 
 export interface TargetOverlay {
   readonly cell: CellPosition;

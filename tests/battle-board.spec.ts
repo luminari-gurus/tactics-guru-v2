@@ -4,6 +4,7 @@ import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
+import { previewMovement } from '../src/domain/grid';
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -14,6 +15,49 @@ async function settledReport(page: Page) {
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
   return report(page);
 }
+
+test('hovered origins show hypothetical movement range without changing selection, pending commands or saves',async({page},info)=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
+  const state=JSON.parse(before!).state,origin={x:11,y:11};
+  expect(initial.reachable).not.toContainEqual(origin);
+  const expected=previewMovement(state,initial.activeId,battleCatalog,origin);if(!expected.ok)throw Error(expected.reason);
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const hover=async(cell:{x:number;y:number})=>{
+    const r=await settledReport(page),tile=r.tiles.find((t:any)=>t.x===cell.x&&t.y===cell.y),p=projectTile(tile);
+    await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
+  };
+  await hover(origin);
+  await expect.poll(async()=>(await report(page)).hover).toEqual({origin,cells:expected.cells.map(c=>c.cell)});
+  await expect(page.locator('#battle-board-caption')).toContainText('Purple dots: hypothetical Move');
+  const shown=await settledReport(page);expect(shown.selected).toBeNull();expect(shown.selectionEvents).toBe(initial.selectionEvents);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('hover-movement-range.png')});
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.mouse.wheel(0,-100);
+  await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+  const prepared=await page.locator('#game').getAttribute('data-session'),destination=JSON.parse(prepared!).pending.to;
+  await hover(origin);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(origin);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(destination);
+  await page.locator('#battle-review').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#dialog-cancel').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  // Native destination controls and keyboard navigation expose the same hypothetical-origin query.
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>(await report(page)).hover).not.toBeNull();
+  const selected=(await report(page)).selected;
+  const next=[{key:'ArrowRight',x:selected.x+1,y:selected.y},{key:'ArrowDown',x:selected.x,y:selected.y+1},
+    {key:'ArrowLeft',x:selected.x-1,y:selected.y},{key:'ArrowUp',x:selected.x,y:selected.y-1}]
+    .find(c=>previewMovement(state,initial.activeId,battleCatalog,{x:c.x,y:c.y}).ok)!;
+  await page.locator('canvas').focus();await page.keyboard.press(next.key);
+  const navigated=await report(page);expect(navigated.hover?.origin).toMatchObject({x:navigated.selected.x,y:navigated.selected.y});
+  await page.keyboard.press('Escape');await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.locator('#fit-restart').click();await confirmRestart(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await report(page)).hover).toBeNull();
+  expect((await report(page)).objectCount).toBe(initial.objectCount);
+});
 
 test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
   await page.goto('/');

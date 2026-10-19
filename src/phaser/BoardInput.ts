@@ -5,6 +5,7 @@ export interface BoardInputTarget {
   pan(dx: number, dy: number): void;
   zoom(factor: number, anchor: Point): void;
   select(point: Point): void;
+  hover?(point: Point | null): void;
 }
 
 /** CSS coordinates are converted through the canvas rectangle, independent of DPR. */
@@ -20,6 +21,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const down = (event: PointerEvent): void => {
     if (!enabled(point(event)) || event.button !== 0) return;
+    board.hover?.(null);
     const p = point(event);
     pointers.set(event.pointerId, { start: p, point: p });
     if (pointers.size > 1) gesture = true;
@@ -28,7 +30,10 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   const move = (event: PointerEvent): void => {
     if (!enabled(point(event))) { reset(); return; }
     const pointer = pointers.get(event.pointerId);
-    if (!pointer) return;
+    if (!pointer) {
+      if (!pointers.size && event.buttons === 0 && (event.pointerType === 'mouse' || event.pointerType === 'pen')) board.hover?.(point(event));
+      return;
+    }
     const next = point(event);
     const other = [...pointers.entries()].find(([id]) => id !== event.pointerId)?.[1];
     if (other) {
@@ -46,6 +51,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const end = (event: PointerEvent): void => {
     if (!enabled(point(event))) { reset(); return; }
+    board.hover?.(null);
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
     const next = point(event);
@@ -58,6 +64,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   const wheel = (event: WheelEvent): void => {
     event.preventDefault();
     if (!enabled(point(event))) { reset(); return; }
+    board.hover?.(null);
     if (pointers.size) gesture = true;
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
@@ -65,12 +72,14 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     for (const id of pointers.keys()) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
     pointers.clear();
     gesture = false;
+    board.hover?.(null);
   };
   // A finger down at an app switch may never deliver pointerup; drop it so resume cannot pan without a press.
   const owner = canvas.ownerDocument;
   const visibility = (): void => { if (owner.visibilityState === 'hidden') reset(); };
   canvas.addEventListener('pointerdown', down);
   canvas.addEventListener('pointermove', move);
+  canvas.addEventListener('pointerleave', reset);
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
   canvas.addEventListener('lostpointercapture', end);
@@ -80,6 +89,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     owner.removeEventListener('visibilitychange', visibility);
     canvas.removeEventListener('pointerdown', down);
     canvas.removeEventListener('pointermove', move);
+    canvas.removeEventListener('pointerleave', reset);
     canvas.removeEventListener('pointerup', end);
     canvas.removeEventListener('pointercancel', end);
     canvas.removeEventListener('lostpointercapture', end);

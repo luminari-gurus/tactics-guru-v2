@@ -7,6 +7,7 @@ Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders
 The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.
 
 During attack targeting, board diamonds show ✓ valid and × unavailable targets; a double outline marks the selected cell. Movement highlights return when targeting is cancelled. See the [legacy overlay review and target preview behavior](docs/target-preview-overlays.md).
+Hover a free, walkable tile to preview movement from that tile with the active unit's Move/Jump stats. Purple dotted diamonds show this hypothetical range and a white ring marks its origin. Keyboard navigation and a prepared Move destination expose the same preview; hovering never changes selection or prepares a command.
 
 ## Requirements
 

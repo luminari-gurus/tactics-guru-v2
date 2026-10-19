@@ -26,6 +26,26 @@ Changing action/target recomputes overlays. Review and inspection preserve the c
 
 ## Verification
 
+### Hover movement from a hypothetical origin
+
+The follow-up source review uses current legacy revision `e9433f6b608ae6b2d95418615cce9cf17dadcf74`: [BattleView.gd:2791](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/view/BattleView.gd#L2791) publishes the hovered cell; [BattleController.gd:270](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L270) previews a movement path and a [move-then-attack plan](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L1260). The caller selected a movement-origin preview using the **active unit's Move/Jump stats**, centered on the hovered tile.
+
+The v2 overlay adapts that hover interaction to a hypothetical movement query. Purple dotted diamonds show tiles reachable from the preview origin; a white ring marks that origin. The active unit stays on its actual tile. The query shares the same weighted movement search as real moves: terrain cost, uphill cost, Jump, occupancy and full current Move allowance all apply. A different hypothetical origin releases the actor's actual cell for this query. Occupied, unwalkable and out-of-bounds origins produce no preview, and spent movement or non-player phases disable it. The origin may lie outside actual reach; this is planning, not an extra move.
+
+Mouse/pen hover changes neither selection nor pending commands, budgets, RNG, state or saves. Drag/zoom, leaving the board, modal entry, resize, suspension and action/lifecycle transitions clear the pointer origin. A prepared Move destination supplies the same range for touch and keyboard users and restores its preview after hovering elsewhere. Arrow navigation also previews its cursor cell. Cancellation clears the relevant preview; review hides it, and resolution/restart/encounter replacement removes it. The stable caption explains the shapes without resizing when the hover changes.
+
+Hover screenshots: [desktop](qa/issue-142-target-previews/desktop-hover-movement.png), [portrait](qa/issue-142-target-previews/mobile-portrait-hover-movement.png), [landscape](qa/issue-142-target-previews/mobile-landscape-hover-movement.png).
+
+The hover extension passed `npm run build` (including content validation and both TypeScript checks), all 708 unit tests, and the focused hover scenario in all three browser profiles. Its regression command was:
+
+```sh
+npm test -- tests/battle-board.spec.ts tests/input.spec.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts --grep-invert 'complete legal authored battle|cached return|reload resumes accepted save|repeated cancellation|feedback matches resolved events|panned-edge actor|visible action feedback|elevated target remains anchored|spent action and effective'
+```
+
+With `PLAYWRIGHT_CHROMIUM_EXECUTABLE` pointing to installed Chrome, all 84 scoped browser checks passed. The configured posttests added 18 authored-encounter checks and 21 run-item checks (123 browser checks total). The complete battle/run scenarios below are retained from the initial target-overlay validation; they were not repeated for this hover extension. No physical-device, WebKit or deployment result is claimed. `git diff --check` also passed.
+
+### Initial target overlay validation
+
 The battle animation browser suite checks selected valid targets for all three signatures, including keyboard and mobile controls, preservation during review, and clearing during resolution. Its focused overlay scenario checks ally rejection, arrow navigation, actual board click/tap on an elevated target, action switches, both cancellation paths, unchanged state/save slots and restart. Screenshots include valid signature previews and invalid selections in desktop, mobile portrait and mobile landscape projects. See the test run results accompanying this change for executed checks and limitations.
 
 | Browser profile | Valid target preview | Invalid selection |
@@ -34,7 +54,7 @@ The battle animation browser suite checks selected valid targets for all three s
 | Mobile portrait | [High Shot](qa/issue-142-target-previews/mobile-portrait-valid-target.png) | [Ally rejection](qa/issue-142-target-previews/mobile-portrait-invalid-target.png) |
 | Mobile landscape | [High Shot](qa/issue-142-target-previews/mobile-landscape-valid-target.png) | [Ally rejection](qa/issue-142-target-previews/mobile-landscape-invalid-target.png) |
 
-Validated on 2026-10-18 with Node 23.11.1 and installed Google Chrome:
+The initial target-overlay implementation at `fe78f1c` was validated on 2026-10-18 with Node 23.11.1 and installed Google Chrome:
 
 - `npm run build`: passed content validation (167 tests), both TypeScript checks and the production build. Existing Vite configuration/chunk-size warnings remain.
 - `npm run test:unit`: 706 tests passed across 41 files.

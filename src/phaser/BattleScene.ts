@@ -9,7 +9,7 @@ import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, actionCommand, previewText, displayName, unitFeedback, unitLabel, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
-import { targetOverlays } from '../ui/targetPreview';
+import { targetOverlays, movementHover } from '../ui/targetPreview';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
@@ -55,17 +55,19 @@ export class BattleScene extends Phaser.Scene {
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false;
+    let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
-    const clear=()=>{session.cancel();action=null;message='Choose an action and target';};
+    const clear=()=>{session.cancel();action=null;hovered=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
-      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected));
+      const hover=!dialogs.open?movementHover(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
+      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected),hover);
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
@@ -88,8 +90,14 @@ export class BattleScene extends Phaser.Scene {
       if(changed)measurements.interaction('selection',inputMs);
     };
     const board=new BoardRenderer(this,catalog,session.state.mapId,select);
+    const hover=(point:Point|null)=>{
+      const cell=point && session.phase==='player' && !dialogs.open?board.cellAt(point):null;
+      if(hovered?.x===cell?.x && hovered?.y===cell?.y)return;
+      hovered=cell;refresh();
+    };
     const removeInput=bindBoardInput(canvas,{
       select:(point:Point)=>board.select(point),
+      hover,
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
     },()=>({width:this.scale.width,height:this.scale.height}),point=>ready && !initialFit && !dialogs.open
@@ -130,7 +138,7 @@ export class BattleScene extends Phaser.Scene {
         ],()=>{});
     };
     const hud=new BattleHud(session,{
-      action:a=>{session.cancel();action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
+      action:a=>{session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
       target:select,review,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
@@ -147,10 +155,10 @@ export class BattleScene extends Phaser.Scene {
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
       if(event.key==='Escape'){cancel();event.preventDefault();return;}
-      if(['Enter',' '].includes(event.key)){event.preventDefault();select(cursor);return;}
+      if(['Enter',' '].includes(event.key)){event.preventDefault();hovered=null;select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
       if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[session.state.mapId];
-      cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};select(cursor);
+      cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};hovered=cursor;select(cursor);
     };
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
