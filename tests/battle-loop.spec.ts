@@ -1,7 +1,7 @@
 import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
-import { previewMovement } from '../src/domain/grid';
+import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
 
 test('default Move initializes once per usable player turn and preserves explicit choices',async({page})=>{
@@ -163,6 +163,10 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   for(let y=actor.cell.y;y!==ty;y+=y<ty?1:-1)await page.keyboard.press(y<ty?'ArrowDown':'ArrowUp');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button',{name:'Review action'})).toBeEnabled();
+  const command={type:'move' as const,unitId:actor.id,to:{x:tx,y:ty}},preview=previewMove(initial.state,command,catalog);
+  if(!preview.ok)throw Error(preview.reason);
+  await expect(page.locator('#battle-preview')).toHaveText(`Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toEqual(command);
   expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
