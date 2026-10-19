@@ -1,0 +1,120 @@
+{
+  "runtimeCommit": "a8c3cd088189bf394ea61deb55e38b371507ff70",
+  "buildStamp": {
+    "commit": "a8c3cd088189bf394ea61deb55e38b371507ff70",
+    "dirty": false
+  },
+  "node": "v24.19.0",
+  "platform": "win32",
+  "playwright": "1.63.0",
+  "source": [
+    {
+      "path": "src/geometry/picking.ts",
+      "sha256": "9a999b60346c0f919e94f11e8201db4ba61ecffe457380f00d0bf35c47e89627",
+      "gitBlob": "a5fe226727b144f4f492862af512fb81d0083de1",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardRenderer.ts",
+      "sha256": "f631da0c27607c4d2fc1584017f19a7457217ccbd94d990b288d07774b727b70",
+      "gitBlob": "ee2150796a8ddc9d77b5180f16b8ffb825352dc5",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardInput.ts",
+      "sha256": "e1ecc75fde156de7500fdccad8ace367fc14a41ca37c2e12813cf499008eaaf5",
+      "gitBlob": "b7613f616bb313765077e20ddb40b5e27618c898",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BattleScene.ts",
+      "sha256": "a65380b3128dd814232b0ed14403ea3cca2c50f8714794ec25e9c6a310aa0c44",
+      "gitBlob": "4730aad2743c970665cad9c0d8c5f3269c31d258",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/battle-board.spec.ts",
+      "sha256": "673f28698fc545e507e3a0daa15317af514f7cedb3a79871a72fcbeb7d4ddd5c",
+      "gitBlob": "d6b4b5b265d87f6c0193b1f3b7dbd7c491e34ac8",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/run-progression.spec.ts",
+      "sha256": "c698c0f27179c8afb001aaad9f4d6e951201a7ce8d646697cac2c58866b31ffe",
+      "gitBlob": "9f2ff05f7c295f7ce380ff2d5f91c07b56662cf8",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/unit/picking.test.ts",
+      "sha256": "6c09d5d3ef1038c19cfa91194bee97ed6dd9cb0784abfa513dc017d77c27403c",
+      "gitBlob": "0e8f685201439e5d8b8aabac420ff7ca5163ee21",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/unit/input.test.ts",
+      "sha256": "f227bcb8857e3a4b78da69776eb5c472e5ce1cef38d5b617f11f7964d021f802",
+      "gitBlob": "549d324101136155efcb9ef424e2b34ee97f75b0",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cca93aa63c82908ae9c2efab0cf7d0166932d250276b17c41293238f502eda12",
+      "gitBlob": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+      "matchesPublishedRuntime": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "dist/assets/battleLayout-BVayxngr.js",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "dist/assets/battleLayout-C6wfuIJB.css",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "dist/assets/browser-C6WRpz_u.js",
+      "sha256": "b2671e87bcecd0dfca6a918f84ad70c629c13af4c1a19ec98bf8ebf74f36aa63"
+    },
+    {
+      "path": "dist/assets/index-BFBJq92I.js",
+      "sha256": "35c0903acfecf8179706832aa1718d2aeea4c281f82d31ed1610cc01de077099"
+    },
+    {
+      "path": "dist/assets/preload-helper-DjzSQ1t3.js",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "dist/assets/rng-BCcJOpRP.js",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "dist/assets/start-B4FlB2iA.js",
+      "sha256": "e01c37ccc703d9130f94e40f05c89604445866986673a3af0064c383ca6e2abe"
+    },
+    {
+      "path": "dist/assets/start-WQRLxrg4.js",
+      "sha256": "8fa8baa2077f0aa1136ed2b2732d25269223313af21d14bb3b9584e868120653"
+    },
+    {
+      "path": "dist/assets/startBattleApp-CxOaGS6s.js",
+      "sha256": "e75b82dbbdda68dccaf8baefe770184059f2385fc07d425a371fb9230ed0fc81"
+    },
+    {
+      "path": "dist/assets/startRunApp-hII60bML.js",
+      "sha256": "6fe847bfedd426c02d90fee9f5d36efe4fb1210fda28d6afa831ef6b361d51b9"
+    },
+    {
+      "path": "dist/assets/startRunApp-y3YtRGS5.css",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "dist/assets/view-BBW_du9E.css",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "dist/assets/view-DmNtvCLW.js",
+      "sha256": "fab4bb94d598b050eaf376e08c24f8e1712d0192746c9db02f5be180a967d342"
+    }
+  ]
+}

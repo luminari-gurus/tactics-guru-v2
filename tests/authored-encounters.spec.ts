@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { authoredEncounters } from '../src/content/encounters';
 import { projectTile, tileFaces, type Tile } from '../src/geometry/iso';
 import { pickTile, screenToBoard } from '../src/geometry/picking';
+import { unitBounds } from '../src/geometry/canopy';
 
 const entry='tests/fixtures/encounters/index.html';
 async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }
@@ -13,6 +14,12 @@ async function selectVisible(page:Page, side=false) {
   for(const tile of r.tiles as Tile[]) {
     if(tile.elevation===0)continue;
     const faces=tileFaces(tile), p=side ? {x:(faces.right[0].x+faces.right[2].x)/2,y:(faces.right[0].y+faces.right[2].y)/2} : projectTile(tile);
+    // This helper verifies terrain; living sprite pixels now select their unit.
+    if(r.units.some((unit:any)=>{
+      if(unit.health.hp<=0)return false;
+      const bounds=unitBounds(unit.tile,unit.origin);
+      return p.x>=bounds.left&&p.x<bounds.right&&p.y>=bounds.top&&p.y<bounds.bottom;
+    }))continue;
     const point={x:r.transform.x+p.x*r.transform.scale,y:r.transform.y+p.y*r.transform.scale};
     if(point.x<20||point.x>r.viewport.width-20||point.y<50||point.y>r.viewport.height-20)continue;
     const picked=pickTile(r.tiles,screenToBoard(point,r.transform));

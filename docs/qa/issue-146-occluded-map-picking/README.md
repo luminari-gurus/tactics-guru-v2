@@ -2,6 +2,8 @@
 
 Updated 2026-10-19 (Asia/Jerusalem). Implementation verification in progress; this is the live evidence record, not final acceptance.
 
+**Moving-main handoff:** candidate a8c3cd0 now passes 710 unit tests, both typechecks/build, 558 main Edge cases, 18 encounter + 21 run-item posttests and four fresh WebKit cases. Its [clean build manifest](candidate-a8-build-manifest.json) and raw attempts are preserved. Final refresh found main advanced to 152a74d (active-unit bob PR #148) and PR #149 now conflicts. Integration and combined-tree acceptance remain required. The encounter posttest helper was aligned to avoid living-art rectangles when sampling terrain; its three initial failures are retained, all 39 posttests pass afterward, and no runtime changed for that repair.
+
 ## Reproduction
 
 Baseline runtime: planning commit `249fa0d4fb0ec407b9ffb02b09f99a33759cac31`, based on `49af40223a8e4d19eedb7a974eca34c12c1b7c88`. Its only change from main is the issue plan. No authored content or combat rules were changed. The original caller screenshot/turn is unidentified; these legally reached Forest Ruins states independently reproduce the same failure class.
