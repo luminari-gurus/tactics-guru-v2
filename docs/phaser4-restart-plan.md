@@ -8,6 +8,8 @@
 **Architecture:** deterministic, engine-independent TypeScript domain core; Phaser owns rendering/input/audio, not rules. Plain HTML/CSS handles responsive menus and accessible controls.
 **Stack (pinned on main):** Phaser **4.2.1**, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0 and Vitest 5.0.3; Node declared ≥22.12.0. Static browser build. Exact package/script versions are in `package.json`; PR #12’s release configuration is unmerged.
 
+**Map selection follow-up (#146, 2026-10-19):** [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149) adds exposed opaque living-sprite hits and repeated click/tap cycling through overlapping terrain cells via the existing selection/preview path. Hidden bodies do not override foreground terrain; the proof scene keeps frontmost-solid picking and domain legality is unchanged. This branch implementation supersedes the dated D8/T4 tile-only disposition below for battles; it is pending review, not a merged-main claim. See the [current contract and evidence](qa/issue-146-occluded-map-picking/README.md).
+
 ### Current state (verified 2026-10-16)
 
 GitHub main is [`b175ddb5dabed2ee8457e132e345e9a2fc2affdb`](https://github.com/luminari-gurus/tactics-guru-v2/commit/b175ddb5dabed2ee8457e132e345e9a2fc2affdb), the merged #80 integration (PR #120). Issue and PR states were refreshed on 2026-10-16. Initial local source inspection used `work/issue-79-reward-item-controls` at `3060060`; subsequent main changes below are confirmed by merged tracker records, not local execution. The documentation PR is based on the main revision above. Historical QA results retain their original revision/device limits; this documentation update ran no gameplay or physical-device tests.

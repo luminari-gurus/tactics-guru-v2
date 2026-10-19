@@ -1,0 +1,208 @@
+{
+  "runtimeCommit": "12081f20b3ebb1947605c775d369962ecee948ed",
+  "baseCommit": "152a74d6f0e0d5ae3c69378cf428b9edc28f1ceb",
+  "reviewedCommit": "d900aa61509158b3d83218a74f94d0f061b49907",
+  "baselineBuildCommit": "ba815ace96736100e32a40ee84f44d8dda4f8fb8",
+  "baselineRuntimeMatchesReviewed": true,
+  "buildStamp": {
+    "commit": "12081f20b3ebb1947605c775d369962ecee948ed",
+    "dirty": false
+  },
+  "node": "v24.19.0",
+  "platform": "win32",
+  "playwright": "1.63.0",
+  "source": [
+    {
+      "path": "src/phaser/BoardInput.ts",
+      "sha256": "0cef8c0199c689deec6654b0e184d566bdb7b4cbf5ba83972d4c671fdedf565c",
+      "gitBlob": "88e5162ce718e6f16eeeae7e29abad7c990974a8"
+    },
+    {
+      "path": "src/phaser/BattleScene.ts",
+      "sha256": "a0bea8c5f139636ca8ca6c6b5278a5ba9d6d5d58aabfcdde16813b30fdb84e5f",
+      "gitBlob": "698751b035ff339e709b07185d90b42c3472c594"
+    },
+    {
+      "path": "tests/unit/input.test.ts",
+      "sha256": "9554404090e93067f4cdf847320c43c57251f0fb6521e9b5d3becd3f3e2b6592",
+      "gitBlob": "1c70d3d2a643f1db20aed93a51aabf33ff67191e"
+    },
+    {
+      "path": "tests/battle-board.spec.ts",
+      "sha256": "fad8a7354aba7e88c4a01656318d36d5b734e1b3875ed5d1757b591cfaa171c8",
+      "gitBlob": "3ededcf451f0928a441e71c6d7f52d1a7a00eb3b"
+    },
+    {
+      "path": "package.json",
+      "sha256": "c4d5cb6734e3193da8e9f84c926dd23e1743e746a67c0a7a07448736e39da97b",
+      "gitBlob": "e84a0a7f8f6fc6a368d5059f255ddf1c9824da65"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cca93aa63c82908ae9c2efab0cf7d0166932d250276b17c41293238f502eda12",
+      "gitBlob": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7"
+    },
+    {
+      "path": "playwright.config.ts",
+      "sha256": "058a3d0a6c24425619f5d786926ff91b981cc85b87ed0e2a3172ea35b6cc34c9",
+      "gitBlob": "3cc3b784ff0f82e4ed8c73edc8bfaab1698995aa"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "2fbe9edc6697905272ce6037027e8ceea075d55f029e22f31933da58cc821f82",
+      "gitBlob": "97838a9701c28a333f1a4012e0825c0a109ec3ad"
+    }
+  ],
+  "output": [
+    {
+      "path": "dist/assets/battleLayout-BVayxngr.js",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "dist/assets/battleLayout-C6wfuIJB.css",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "dist/assets/browser-DrattbQP.js",
+      "sha256": "4e7693bdb87b60d581c6d5d2c7c483894b9ec443304f9eebfe31ecc033e628b7"
+    },
+    {
+      "path": "dist/assets/index-D2SzyXt_.js",
+      "sha256": "63c9291a6e8458324fce0d5ec4122d11a71ea94a3bc0e523ed68fdf5d6750f99"
+    },
+    {
+      "path": "dist/assets/preload-helper-DjzSQ1t3.js",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "dist/assets/rng-BCcJOpRP.js",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "dist/assets/start-C3Ia3bE3.js",
+      "sha256": "64be90d639888665361843d70ffc6f9a1d7d953407298306c29ac1c7abf87406"
+    },
+    {
+      "path": "dist/assets/start-CylJCl8c.js",
+      "sha256": "089177db8285c032110823fe0947d2d7639df8d41f5b0cee9fdfaaa923851ffd"
+    },
+    {
+      "path": "dist/assets/startBattleApp-hVgGHYfD.js",
+      "sha256": "e1d37b723aad0122c796b11e814b999426d754cdf26f78265c714dcf1d2e035d"
+    },
+    {
+      "path": "dist/assets/startRunApp-W4RyAuxN.js",
+      "sha256": "696416447df0d3c0edfec1209214ba0c7c896d650d5ec098b299bc99413e1fc4"
+    },
+    {
+      "path": "dist/assets/startRunApp-y3YtRGS5.css",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "dist/assets/view-BBW_du9E.css",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "dist/assets/view-B_Gy6UGt.js",
+      "sha256": "f61177722d5e068f8eb8b64020e3cb371ef5a9a9d7c0438db9c7c6766a2b6235"
+    }
+  ],
+  "browsers": {
+    "edge": "155.0.4283.62",
+    "webkit": "26.6"
+  },
+  "gates": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run tests/unit/input.test.ts",
+      "runtime": "d900aa61509158b3d83218a74f94d0f061b49907",
+      "expectedFailure": true,
+      "failed": 2,
+      "receipt": "receipts/baseline-unit.log.gz",
+      "receiptSha256": "2e66ddc0cdd50c22bc4fe181557623fd8f08bdd580f7fc19193cd909f9773499"
+    },
+    {
+      "command": "node node_modules/@playwright/test/cli.js test tests/battle-board.spec.ts --project=desktop --grep 'completed pen taps|right-click cancels' --reporter=line",
+      "runtime": "ba815ace96736100e32a40ee84f44d8dda4f8fb8",
+      "expectedFailure": true,
+      "failed": 2,
+      "receipt": "receipts/baseline-browser.log.gz",
+      "receiptSha256": "b7e9e9cfaddb2d46b63cbbe2a317ff7ad55ca7577c6b7dc3eda6a8c3ae57a1ad"
+    },
+    {
+      "command": "npm run test:unit -- tests/unit/input.test.ts tests/unit/picking.test.ts tests/unit/targeting.test.ts",
+      "exitCode": 0,
+      "passed": 21,
+      "receipt": "receipts/unit-focused.log.gz",
+      "sourceInputsMatchRuntime": true,
+      "receiptSha256": "2b35a4689da0f7289560dc9984ac9f7de1d9661e611552b53e5e468a987f2cb4"
+    },
+    {
+      "command": "npm run test:unit",
+      "exitCode": 0,
+      "passed": 712,
+      "receipt": "receipts/unit-all.log.gz",
+      "sourceInputsMatchRuntime": true,
+      "receiptSha256": "4360f9dd6b00374d2f115f1f2a75a8cdf8c8c659989bdcc8b0a4fe6e4dab2308"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "contentChecks": 167,
+      "bothTypechecks": true,
+      "receipt": "receipts/build-clean.log.gz",
+      "receiptSha256": "f4d05d659d238b6bda85f1a9902d93ea0a01e0c621edc97831ff6ee59277495b"
+    },
+    {
+      "command": "node node_modules/@playwright/test/cli.js test tests/battle-board.spec.ts --grep 'completed pen taps|right-click cancels|occluded archer exposed|repeated map selection|layout clamping resets' --reporter=line",
+      "exitCode": 0,
+      "passed": 15,
+      "receipt": "receipts/focused-browser.log.gz",
+      "buildStamp": {
+        "commit": "d900aa61509158b3d83218a74f94d0f061b49907",
+        "dirty": true
+      },
+      "sourceInputsMatchRuntime": true,
+      "receiptSha256": "589ffee00ebd428d8dec0531cc54ebb590569c5e94accfcb8ee01d4390c87311"
+    },
+    {
+      "command": "npm test -- --reporter=line",
+      "exitCode": 0,
+      "passed": {
+        "main": 573,
+        "encounter": 18,
+        "runItems": 21
+      },
+      "retries": 0,
+      "skipped": 0,
+      "receipt": "receipts/full-browser.log.gz",
+      "receiptSha256": "216ed53202297eb7a2df1a338295df40c42bfaa20f85ff3d307bf5f56cfea192"
+    },
+    {
+      "command": "node node_modules/@playwright/test/cli.js test -c tmp/occlusion/review-webkit.config.ts --reporter=line",
+      "exitCode": 0,
+      "passed": 6,
+      "retries": 0,
+      "skipped": 0,
+      "receipt": "receipts/webkit.log.gz",
+      "receiptSha256": "9cfdc943545e0a5bed877871a89b8634350da1111fcc078bc6860005e365ef34"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "pen-desktop.png",
+      "sha256": "2e5500a10dc56ab640381f7597f33d38dd54635da7011a6e6f13a5f4619ca3fe",
+      "runtime": "12081f20b3ebb1947605c775d369962ecee948ed"
+    },
+    {
+      "path": "pen-portrait.png",
+      "sha256": "f8f1f78519764d9583bd1aeeb6bd373e55be238dc4e0bc53a0f195f47ad39a90",
+      "runtime": "12081f20b3ebb1947605c775d369962ecee948ed"
+    },
+    {
+      "path": "cancel-landscape.png",
+      "sha256": "f9ecb31426255f321950776c51d1f96755cb1e75b45657af23ba4d5c8b730933",
+      "runtime": "12081f20b3ebb1947605c775d369962ecee948ed"
+    }
+  ],
+  "gitDecision": "Current main is an ancestor. Preserve ordinary commit/merge ancestry; no history rewrite, stack, carry-forward or release tag is needed."
+}

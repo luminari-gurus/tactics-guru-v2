@@ -1,0 +1,112 @@
+{
+  "state": {
+    "format": 1,
+    "versions": {
+      "rules": 1,
+      "rng": 1,
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+    },
+    "seed": 1,
+    "rng": {
+      "words": [
+        2432198468,
+        1724110938,
+        2750125780,
+        20
+      ],
+      "cursor": 7
+    },
+    "mapId": "map:forest_ruins",
+    "units": [
+      {
+        "id": 1,
+        "cell": {
+          "x": 1,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "player",
+        "defId": "fighter",
+        "hp": 18
+      },
+      {
+        "id": 2,
+        "cell": {
+          "x": 2,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "player",
+        "defId": "ranger",
+        "hp": 12
+      },
+      {
+        "id": 3,
+        "cell": {
+          "x": 3,
+          "y": 9
+        },
+        "hasMoved": true,
+        "hasActed": true,
+        "side": "player",
+        "defId": "mage",
+        "hp": 11
+      },
+      {
+        "id": 4,
+        "cell": {
+          "x": 6,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 9
+      },
+      {
+        "id": 5,
+        "cell": {
+          "x": 5,
+          "y": 2
+        },
+        "hasMoved": true,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_archer",
+        "hp": 8
+      },
+      {
+        "id": 6,
+        "cell": {
+          "x": 5,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 6
+      }
+    ],
+    "initiative": [
+      6,
+      3,
+      4,
+      5,
+      2,
+      1
+    ],
+    "activeIndex": 4,
+    "round": 1,
+    "outcome": "ongoing",
+    "commandCount": 9
+  },
+  "cell": {
+    "x": 3,
+    "y": 5
+  },
+  "save": "{\"digest\":\"sha256:35b70cb8427cbeeb59cba27c8704f78358d8aefa920f585b0d3229edac3c9ec7\",\"format\":1,\"kind\":\"tactics-guru:battle-snapshot\",\"payload\":{\"activeIndex\":4,\"commandCount\":9,\"format\":1,\"initiative\":[6,3,4,5,2,1],\"mapId\":\"map:forest_ruins\",\"outcome\":\"ongoing\",\"rng\":{\"cursor\":7,\"words\":[2432198468,1724110938,2750125780,20]},\"round\":1,\"seed\":1,\"units\":[{\"cell\":{\"x\":1,\"y\":8},\"defId\":\"fighter\",\"hasActed\":false,\"hasMoved\":false,\"hp\":18,\"id\":1,\"side\":\"player\"},{\"cell\":{\"x\":2,\"y\":8},\"defId\":\"ranger\",\"hasActed\":false,\"hasMoved\":false,\"hp\":12,\"id\":2,\"side\":\"player\"},{\"cell\":{\"x\":3,\"y\":9},\"defId\":\"mage\",\"hasActed\":true,\"hasMoved\":true,\"hp\":11,\"id\":3,\"side\":\"player\"},{\"cell\":{\"x\":6,\"y\":6},\"defId\":\"goblin_grunt\",\"hasActed\":false,\"hasMoved\":true,\"hp\":9,\"id\":4,\"side\":\"enemy\"},{\"cell\":{\"x\":5,\"y\":2},\"defId\":\"goblin_archer\",\"hasActed\":false,\"hasMoved\":true,\"hp\":8,\"id\":5,\"side\":\"enemy\"},{\"cell\":{\"x\":5,\"y\":6},\"defId\":\"goblin_grunt\",\"hasActed\":false,\"hasMoved\":true,\"hp\":6,\"id\":6,\"side\":\"enemy\"}],\"versions\":{\"content\":\"sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450\",\"rng\":1,\"rules\":1}}}"
+}
