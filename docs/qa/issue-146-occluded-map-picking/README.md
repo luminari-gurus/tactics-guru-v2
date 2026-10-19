@@ -1,8 +1,30 @@
 # Terrain-occluded battle map selection — issue #146
 
-Updated 2026-10-19 (Asia/Jerusalem). **Complete and ready for review in [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149).**
+Updated 2026-10-19 (Asia/Jerusalem). **Complete; both review findings addressed and [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149) ready to merge.**
 
-The tested runtime is ba815ace96736100e32a40ee84f44d8dda4f8fb8, integrating main 152a74d6f0e0d5ae3c69378cf428b9edc28f1ceb (active-unit bob PR #148). The [sealed manifest](integration/build-manifest.json) binds a clean dirty=false production build, 12 source/test/package inputs, 13 emitted JS/CSS files, browser identity and every final gate. The evidence follow-up changes documentation only; runtime and test inputs remain identical to this tested merge.
+The current tested runtime is **12081f20b3ebb1947605c775d369962ecee948ed**, including main 152a74d6f0e0d5ae3c69378cf428b9edc28f1ceb. The [review manifest](review/manifest.json) binds the clean production build, source/test/package inputs, emitted JS/CSS, browser identities and review receipts. The original ba815ac integration evidence remains in the [earlier sealed manifest](integration/build-manifest.json). The final evidence follow-up changes documentation only.
+
+## PR review repair and verification
+
+Both findings were independently reproduced against the unchanged reviewed runtime d900aa6, using its source-identical ba815ac build. The new browser regressions failed at the reported outcomes: a second pen tap still selected raised (4,5), and right-click retained the prepared move to (3,5). The corresponding unit regressions also failed. [Browser baseline](review/receipts/baseline-browser.log.gz) and [unit baseline](review/receipts/baseline-unit.log.gz) preserve these failures.
+
+- **Pen overlap cycling:** completed pen leaves now preserve overlap history, just as completed touch leaves do, and clear passive hover. A leave during an active captured gesture still cancels it. The legal seed-1/command-9 regression uses trusted CDP pen presses/releases plus an explicitly dispatched non-hover leave; it proves (4,5) → (3,5) → (4,5), dropdown/preview parity and unchanged saved bytes. This is event-sequence emulation, not physical-pen execution.
+- **Right-click cancellation:** a permitted secondary press resets the adapter's held gestures and overlap state, then calls the scene's existing cancel path. The real browser regression prepares the legal move, proves modal capture, then asserts pending=null, Move unpressed, Review disabled, normal action focus and unchanged state/replay/continuation/RNG/save bytes. Unit coverage also checks disabled/outside input and release of held pointers without a trailing selection. Existing modal and phase guards remain authoritative.
+
+The repair adds one optional cancel callback to the existing adapter and reuses the existing scene handler. It needs no new input framework, dependencies, rules or save changes. Only BoardInput, its BattleScene binding and the existing input/battle-board test files change application or test behavior.
+
+Verification on these exact committed inputs:
+
+- **712 unit tests**, **167 content checks**, both TypeScript configurations and production build pass.
+- **573 main Edge cases + 18 encounter + 21 run-item posttests** pass in one npm test lifecycle, exit 0, without retries/skips. This includes every configured desktop, portrait and landscape case, complete legal battles, persistence and three-encounter runs.
+- **15 focused Edge cases** pass on the same source/test inputs before commit; the subsequent full suite exercises those cases on the clean 12081f2 build.
+- **6 fresh WebKit 26.6 cases** pass on that same frozen production build, covering archer/ground picking and right-click cancellation in both phone orientations. No full WebKit suite or physical hardware is claimed; Playwright/device emulation satisfies AGENTS.md.
+
+[Review receipts](review/receipts/) retain the raw outputs. The [manifest](review/manifest.json) records Node 24.19.0, Playwright 1.63.0, Edge 155.0.4283.62, WebKit 26.6 and the commands. Visually inspected captures from the clean full run: [pen desktop](review/pen-desktop.png), [pen portrait](review/pen-portrait.png), [cancel landscape](review/cancel-landscape.png). Existing Vite extension/config and chunk-size warnings remain; the host npm ignored the requested reporter flag but ran the complete default suite and both posttests successfully.
+
+To repeat the focused WebKit gate, copy [its retained config](review/playwright-webkit.config.ts.txt) to ignored tmp/occlusion/review-webkit.config.ts and run `node node_modules/@playwright/test/cli.js test -c tmp/occlusion/review-webkit.config.ts --reporter=line`. The other environment setup and completion commands below still apply.
+
+Git: current main is already an ancestor; no rebase, conflict repair, squash, stack, carry-forward or release tag is warranted. Preserve the ordinary evidence-bearing commit/merge ancestry. No merge or production operation was performed.
 
 ## Behavior and scope
 
@@ -26,7 +48,7 @@ The exact original caller screenshot/turn remains unidentified. These reproduce 
 
 The [raw baseline render report](receipts/baseline-report.json.gz) retains the canvas transform, terrain/unit coordinates and dropdown-selected state for that illustration. The receipt directory also preserves the original touch-history failure and the initial dead-sprite/BFCache error contexts; these are raw diagnostic data, not continuation instructions.
 
-## Final verification
+## Original implementation verification
 
 - **710 unit tests in 41 files**, plus **167 content checks**, both TypeScript configurations and production build: passed.
 - **567 main Edge browser cases + 18 encounter + 21 run-item posttests**: passed through the complete npm test lifecycle, exit 0, no skips/retries. The combined legal three-encounter run verifies both selection and bob ownership/cleanup on all profiles.
@@ -61,4 +83,4 @@ Commands executed on the integrated source:
 
 Set PLAYWRIGHT_CHROMIUM_EXECUTABLE to C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe for the Edge gates. This host supplies npm through C:/Users/apexw/.codex/tmp/issue146-tools/node_modules/.bin on PATH, without a project dependency/lockfile change. To recreate the focused WebKit configuration in a fresh checkout, make ignored tmp/occlusion/ and copy [the retained config](playwright-webkit.config.ts.txt) there as webkit.config.ts; its relative imports then resolve. npm test invokes encounter/run-item posttests automatically on success; npm run posttest can verify them independently. Read a receipt with Node's zlib.gunzipSync or any gzip reader.
 
-All five issue criteria are implemented and verified. Next action is review of PR #149. No required implementation remains. No PR merge, release tag or production operation was performed. [Current plan](../../ongoing-projects/issue-146-occluded-map-picking/plan.md).
+All five issue criteria and both review findings are implemented and verified. The review follow-up above supersedes the original gate counts. Next action is merge of PR #149; no required repair remains. No PR merge, release tag or production operation was performed. [Current plan](../../ongoing-projects/issue-146-occluded-map-picking/plan.md).
