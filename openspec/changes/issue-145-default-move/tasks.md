@@ -8,7 +8,7 @@
 
 ## 2. Integration and review delivery
 
-- [ ] 2.1 Pass full unit, build, browser lifecycle including posttests, strict OpenSpec and whitespace checks; finish QA and handoff, commit/push and verify a focused review-ready PR.
+- [x] 2.1 Pass full unit, build, browser lifecycle including posttests, strict OpenSpec and whitespace checks; finish QA and handoff, commit/push and verify a focused review-ready PR.
 
 ## Workflow follow-up
 

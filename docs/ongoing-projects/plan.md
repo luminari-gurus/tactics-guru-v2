@@ -1,6 +1,6 @@
 # Issue #145 — default Move handoff
 
-Updated 2026-10-19 (Asia/Jerusalem). Implementation and acceptance are complete; final review-evidence publication is being sealed.
+Updated 2026-10-19 (Asia/Jerusalem). Implementation, acceptance and review-evidence publication are complete. PR #150 is ready for review.
 
 ## Current state
 
@@ -8,7 +8,7 @@ Updated 2026-10-19 (Asia/Jerusalem). Implementation and acceptance are complete;
 - Review: [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150), open/non-draft and mergeable against `main`, on `branch/issue-145-default-move`.
 - Worktree: `C:/Users/apexw/.codex/worktrees/issue-145-default-move/Tactics-Guru`. The caller's root checkout and other worktrees were preserved.
 - Implementation `bed900c`; test/capture follow-ups `2861440` and `7940d3e`; handoff-only follow-up `0677c22`. Tested production candidate: `7940d3e3b7f63bbe5ad832ff503e597d16cc5c17`. Refreshed main remains `41ca7829271b1b6873819819d1d1e7e8c2f72419`.
-- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 3/4 tasks complete, with only final publication/readback outstanding. The [main battle-controls spec](../../openspec/specs/battle-controls/spec.md) includes the new requirement.
+- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 4/4 tasks complete. Evidence commit `d895cda` was pushed and read back at the exact PR/remote head before sealing task completion. The [main battle-controls spec](../../openspec/specs/battle-controls/spec.md) includes the new requirement.
 - The [prior shared plan](plan-before-issue-145.md) is preserved byte-for-byte. Historical performance work does not expand #145. No merge, release tag or production deployment is requested.
 
 ## Outcome and minimal change
@@ -38,7 +38,7 @@ Production source blobs are `ccadc293b2d5085b524d1d37b9b7a9b290c48381` (BattleSc
 
 ## Remaining workflow
 
-Only seal the final QA/screenshots/handoff publication, verify PR and remote parity, then mark the delivery task complete. No implementation or runtime acceptance remains. Leave PR #150 open for review, #145 open until merge, and the OpenSpec change active for its later archive workflow. Do not start another broad test run, add hardening, merge or deploy.
+No implementation or runtime acceptance remains. PR #150 is left open/non-draft for review, #145 stays open until merge, and the OpenSpec change remains active for its later archive workflow. The next action is reviewer assessment, not more implementation. No new broad test run, hardening, merge or deployment is needed for this task. The final docs-only commit seals this status; inspect the current PR head rather than treating the tested-build commit as the publication head.
 
 ## Reproduction and local tools
 
