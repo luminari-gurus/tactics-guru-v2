@@ -15,13 +15,17 @@
     "test:unit": "vitest run",
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
     "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts",
-    "posttest": "playwright test -c playwright.encounters.config.ts && playwright test -c playwright.run-items.config.ts"
+    "posttest": "playwright test -c playwright.encounters.config.ts && playwright test -c playwright.run-items.config.ts",
+    "telemetry:release": "node scripts/posthog-release.mjs",
+    "test:telemetry": "playwright test -c playwright.telemetry.config.ts"
   },
   "dependencies": {
+    "@posthog/core": "1.59.1",
     "phaser": "4.2.1"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
+    "@posthog/cli": "0.18.10",
     "@types/node": "26.6.4",
     "typescript": "7.0.2",
     "vite": "8.3.2",

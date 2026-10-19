@@ -1,0 +1,44 @@
+{
+  "diagnostic": true,
+  "basedOn": "41ca782",
+  "summary": [
+    {
+      "route": "battle",
+      "samples": 3,
+      "codeBytes": 387928,
+      "maxUsableMs": 631.5999999642372,
+      "numericFailedSamples": 0,
+      "captureFailures": [
+        "Expected exactly 18 samples",
+        "Invalid or dirty served build",
+        "Measured build does not match samples",
+        "desktop/1/cold: Mixed or dirty idle/final build",
+        "desktop/1/cold: Mixed or dirty idle/final build",
+        "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+        "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+        "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+        "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+        "Incomplete capture matrix"
+      ]
+    },
+    {
+      "route": "run",
+      "samples": 3,
+      "codeBytes": 396661,
+      "maxUsableMs": 648.8000000119209,
+      "numericFailedSamples": 0,
+      "captureFailures": [
+        "Expected exactly 18 samples",
+        "Invalid or dirty served build",
+        "Measured build does not match samples",
+        "desktop/1/cold: Mixed or dirty idle/final build",
+        "desktop/1/cold: Mixed or dirty idle/final build",
+        "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+        "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+        "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+        "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+        "Incomplete capture matrix"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+import { chromium, devices } from '@playwright/test';
+import { spawn } from 'node:child_process';
+import { writeFileSync,readFileSync,readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { evaluateCapture } from '../scripts/measure-fit-evaluate.ts';
+import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls.ts';
+const origin='http://127.0.0.1:4292';
+const output='docs/qa/issue-128-telemetry/performance-policy.json';
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','tmp/issue128-perf-off','--host','127.0.0.1','--port','4292','--strictPort'],{stdio:'pipe'});
+let listening=false; server.stdout.on('data',c=>{if(String(c).includes(origin))listening=true;});
+for(let i=0;i<100&&!listening;i++)await new Promise(r=>setTimeout(r,100));
+if(!listening)throw Error('Preview failed');
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+const results:any[]=[];
+try {
+ for(const enabled of [false,true]) {
+  if(enabled) {
+   server.kill(); await new Promise(r=>server.on('exit',r));
+   const on=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','tmp/issue128-perf-on','--host','127.0.0.1','--port','4292','--strictPort'],{stdio:'pipe'});
+   (globalThis as any).onServer=on;
+   let ready=false;on.stdout.on('data',c=>{if(String(c).includes(origin))ready=true;});
+   for(let i=0;i<100&&!ready;i++)await new Promise(r=>setTimeout(r,100));
+   if(!ready)throw Error('Enabled preview failed');
+  }
+  for(const route of ['battle','run']) {
+   const samples:any[]=[];
+   for(const [profile,options] of [['desktop',devices['Desktop Chrome']],['mobile-portrait',devices['Pixel 7']],['mobile-landscape',{...devices['Pixel 7'],viewport:{width:915,height:412}}]] as const)for(let repetition=1;repetition<=1;repetition++) {
+    const context=await browser.newContext(options);let requests=0;
+    // Identical interception for both builds. This disables HTTP cache: warm rows are reload diagnostics only.
+    await context.route('https://us.i.posthog.com/**',async r=>{requests++;await r.fulfill({status:200,contentType:'application/json',body:'{"status":1}'});});
+    const page=await context.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+    const target={url:origin+(route==='run'?'/run':'/?scene=battle'),route:route as 'run'|'battle',restart:route==='run'?'Start new run':'Restart battle'};
+    for(const cache of ['cold'] as const) {
+     await navigateCapture(page,target,cache);
+     await page.waitForFunction(()=>window.fitDiagnostics?.().controlsUsableMs!==null&&window.fitDiagnostics?.().frames.count>=120);
+     const idleDiagnostics=await page.evaluate(()=>window.fitDiagnostics());
+     const settle=()=>page.waitForFunction(()=>window.fitDiagnostics().workloads.every(w=>w.untilMs<performance.now()-50));
+     await settle(); const workloadStartIndex=await page.evaluate(()=>window.fitDiagnostics().workloads.length);
+     const point=await battleGesturePoint(page);await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-100);
+     await page.waitForFunction(()=>window.fitDiagnostics().interactions.some(i=>i.action==='zoom'));await settle();
+     await page.mouse.down();await page.mouse.move(point.x+40,point.y-25,{steps:8});await page.mouse.up();await settle();
+     await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});await settle();
+     await page.getByRole('button',{name:'Review action'}).click();await page.getByRole('button',{name:'Confirm',exact:true}).click();
+     await page.locator('#game[data-phase="player"]').waitFor();await settle();
+     const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
+     samples.push({profile,repetition,cache,idleDiagnostics,diagnostics,workloadStartIndex,errors:[...errors],mockRequests:requests});
+    }
+    await context.close();
+   }
+   const capture={enabled,route,measuredBuild:samples[0].diagnostics.build,conditions:{scene:'battle' as const,sceneUrl:origin+(route==='run'?'/run':'/?scene=battle')},failures:[],failedCapture:null,samples};
+   const gates=evaluateCapture(capture);
+   results.push({...capture,gates});writeFileSync(output,JSON.stringify({diagnostic:true,cacheDisabledByMockRouting:true,browser:browser.version(),results},null,2)+'\n');
+   console.log(enabled?'enabled':'disabled',route,JSON.stringify(gates.rows.map(r=>({profile:r.profile,cache:r.cache,...r.values,violations:r.violations}))),gates.failures);
+  }
+ }
+}finally{await browser.close();server.kill();(globalThis as any).onServer?.kill();}

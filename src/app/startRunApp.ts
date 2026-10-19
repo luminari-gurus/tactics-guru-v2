@@ -1,3 +1,5 @@
+import { mountTelemetryPreferences } from '../telemetry/preferences';
+import { reportFailure } from '../telemetry/telemetry';
 import '../style.css';
 import '../ui/runFlow.css';
 import { authoredRun, authoredEncounters, runCatalog } from '../content/encounters';
@@ -42,7 +44,7 @@ function button(label:string,run:()=>void,id?:string) {
  const node=document.createElement('button');node.type='button';node.textContent=label;if(id)node.id=id;node.addEventListener('click',run);return node;
 }
 function evidence() { container.dataset.runSnapshot=JSON.stringify(controller.snapshot); container.dataset.runBattleRecord=JSON.stringify(controller.completedBattle); }
-function fail(message:string) {status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;}
+function fail(message:string,handled=true) {if(handled)reportFailure('scene_load', { route: 'run' });status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;}
 function setStatus(value:'loading'|'ready'|'error') {
  status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';
  container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';
@@ -136,13 +138,13 @@ function render() {
    const review=controller.inspect();
    if(review.ok && Object.values(review.inspection).every(s=>s.status==='missing')) {
     if(initial.ok && initial.selected)replace(review);
-    else {startup=false;controller.save();render();}
+    else {startup=false;controller.startNew();render();}
    } else requestNew();
   },'run-start'));
   if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
-  items.replaceChildren(title);actions.append(nav.cloneNode(true));controller.onChange=()=>{evidence();};
+  items.replaceChildren(title);actions.append(nav.cloneNode(true));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
  } else renderActions();
  const title=items.querySelector('h1');if(title)title.setAttribute('tabindex','-1');
 }
@@ -154,13 +156,13 @@ function renderActions() {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
   actions.append(button('Start new run',()=>replace(controller.inspect()),'run-new'));
  }
- actions.append(nav.cloneNode(true));
+ actions.append(nav.cloneNode(true));mountTelemetryPreferences(actions);
 }
 restart.addEventListener('click',requestNew);
 // Repeated activation must not cross replaced controls or trigger another destructive intent.
 document.addEventListener('keydown',e=>{if(e.repeat && (e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
-window.addEventListener('error',()=>fail('The run encountered a runtime error'));
-window.addEventListener('unhandledrejection',()=>fail('The run encountered an asynchronous error'));
+window.addEventListener('error',()=>fail('The run encountered a runtime error',false));
+window.addEventListener('unhandledrejection',()=>fail('The run encountered an asynchronous error',false));
 window.addEventListener('pagehide',()=>{live=false;controller.dispose();stopBattle();unmount();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 render();

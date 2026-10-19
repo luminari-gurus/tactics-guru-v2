@@ -1,0 +1,332 @@
+{
+  "config": {
+    "argv": [
+      "/Users/brian/.local/share/fnm/node-versions/v23.11.1/installation/bin/node",
+      "/Users/brian/Documents/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "playwright.telemetry.config.ts",
+      "--grep",
+      "privacy controls|privacy opt-out",
+      "--reporter=json"
+    ],
+    "configFile": "/Users/brian/Documents/tactics-guru-v2/playwright.telemetry.config.ts",
+    "rootDir": "/Users/brian/Documents/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/brian/Documents/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/Users/brian/Documents/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/telemetry.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/brian/Documents/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "/Users/brian/Documents/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/telemetry.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/brian/Documents/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "/Users/brian/Documents/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/telemetry.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run build -- --outDir tmp/issue128-dist && npm run preview -- --outDir tmp/issue128-dist --port 4288 --strictPort",
+      "url": "http://127.0.0.1:4288",
+      "reuseExistingServer": false,
+      "env": {
+        "POSTHOG_SOURCEMAPS": "true",
+        "VITE_POSTHOG_DEV_OPT_IN": "false",
+        "VITE_POSTHOG_ENABLED": "true",
+        "VITE_POSTHOG_KEY": "phc_test",
+        "VITE_POSTHOG_HOST": "https://us.i.posthog.com",
+        "VITE_POSTHOG_TEST_OPT_IN": "true",
+        "VITE_POSTHOG_VERIFY_ERROR": "true"
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "telemetry.spec.ts",
+      "file": "telemetry.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2476,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:09.929Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-7dc52ccf3cd16159ee42",
+          "file": "telemetry.spec.ts",
+          "line": 122,
+          "column": 1
+        },
+        {
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 503,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:12.708Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-27db45eb1bf69320697d",
+          "file": "telemetry.spec.ts",
+          "line": 150,
+          "column": 1
+        },
+        {
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2613,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:13.527Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-1b9ccc227bdd17810fcb",
+          "file": "telemetry.spec.ts",
+          "line": 122,
+          "column": 1
+        },
+        {
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 427,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:16.387Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-16f7163a0f308839d204",
+          "file": "telemetry.spec.ts",
+          "line": 150,
+          "column": 1
+        },
+        {
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2550,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:17.129Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-a6a65be3ad070d816f0d",
+          "file": "telemetry.spec.ts",
+          "line": 122,
+          "column": 1
+        },
+        {
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 482,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:10:19.889Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a7cf16ab6d0dd51a5bfe-43f3d11826193e27d78d",
+          "file": "telemetry.spec.ts",
+          "line": 150,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-19T19:10:02.724Z",
+    "duration": 17702.337000000003,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

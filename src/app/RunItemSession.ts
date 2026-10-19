@@ -1,3 +1,4 @@
+import { track, reportFailure, setTelemetryContext } from '../telemetry/telemetry';
 import { applyItemCommand, type ItemCommand, type ItemFailure } from '../domain/items';
 import { BattleSession } from './BattleSession';
 import { completeRunBattle, freshRunSnapshot } from '../domain/runBattle';
@@ -47,20 +48,26 @@ export class RunItemSession {
       const next = session.state.outcome === 'ongoing'
         ? readRunSnapshot({ ...this.current, activeBattle: session.state }, this.context)
         : completeRunBattle(this.current, session.state, this.context);
-      if (!next.ok) { this.report('Run boundary rejected. Progress unchanged.'); return; }
+      if (!next.ok) { reportFailure('run_boundary', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Run boundary rejected. Progress unchanged.'); return; }
       if (session.state.outcome !== 'ongoing') this.lastRecord = { entry, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
-      this.current = next.state; this.review = null; this.save();
+      this.current = next.state; this.review = null;
+      if (session.state.outcome !== 'ongoing') {
+        const run = this.current.items.run;
+        track('encounter_outcome', { route: 'run', encounter: run.encounterIndex, outcome: session.state.outcome === 'playerWin' ? 'victory' : 'defeat' }, `${run.id}:${run.encounterIndex}`);
+        if (run.phase === 'victory' || run.phase === 'defeat') track('run_outcome', { route: 'run', phase: run.phase, encounter: run.encounterIndex, outcome: run.phase }, run.id);
+      }
+      this.save();
     };
     const restoring = this.current.activeBattle !== null;
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog
       ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted)
       : BattleSession.fromRun(this.current.items, this.context, accepted);
-    if (!created.ok) { this.report('Could not start this encounter. Progress unchanged.'); return null; }
+    if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
     session = created.session; this.battle = session;
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     this.current = { ...this.current, activeBattle: session.state }; this.review = null;
-    if (!restoring) this.save(); return session;
+    if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.save(); } return session;
   }
   recoveryTexts(load: RunLoadResult) {
     const values = [...this.retained];
@@ -77,15 +84,20 @@ export class RunItemSession {
     for (const slot of ['backup', 'primary'] as const) {
       const value = review.inspection[slot];
       if (!('text' in value) || !this.storage.removeSlot(slot, value.text).ok) {
-        this.review = null; this.report('Reset incomplete. Run and seed unchanged. Export recovery copies, review again and retry.'); return false;
+        this.review = null; reportFailure('save_reset', { route: 'run' }); this.report('Reset incomplete. Run and seed unchanged. Export recovery copies, review again and retry.'); return false;
       }
     }
     const checked = this.storage.load();
     if (!checked.ok || Object.values(checked.inspection).some(s => s.status !== 'missing')) {
-      this.review = null; this.report('Reset incomplete. Run and seed unchanged. Review saved data again.'); return false;
+      this.review = null; reportFailure('save_reset', { route: 'run' }); this.report('Reset incomplete. Run and seed unchanged. Review saved data again.'); return false;
     }
     this.battle?.dispose(); this.battle = null; this.current = next; this.review = null; this.retained = []; this.lastRecord = null;
-    this.unsavedOnly = false; this.save(); return true;
+    this.unsavedOnly = false; this.startNew(); return true;
+  }
+  startNew() {
+    if (this.disposed) return;
+    track('run_started', { route: 'run', phase: this.current.items.run.phase }, this.current.items.run.id);
+    this.save();
   }
   boundary() {
     const { run, itemRevision } = this.current.items;
@@ -104,14 +116,16 @@ export class RunItemSession {
       this.context.definition, this.context.catalog, this.context.items);
     if (!result.ok) { this.report(`${rejectionText[result.reason]}. Nothing changed.`); return result; }
     this.battle?.dispose(); this.battle = null;
+    const encounter = this.current.items.run.encounterIndex;
     this.current = { items: result.state, activeBattle: null };
+    if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward', choice: command.itemId.replace('item:', '') as 'healing_draught' | 'warding_charm' | 'aiming_charm' }, `${this.current.items.run.id}:${encounter}`);
     this.review = null;
     this.save();
     return { ...result, state: this.snapshot.items };
   }
   playUnsaved() {
     if (this.disposed) return;
-    this.unsavedOnly = true; this.review = null; this.save();
+    this.unsavedOnly = true; this.review = null; this.startNew();
   }
   save() {
     if (this.disposed) return { ok: false, reason: 'invalidState' } as const;
@@ -119,7 +133,9 @@ export class RunItemSession {
       this.report('Progress unsaved by choice. Review saved data to Continue or Start new run before saving.');
       return { ok: false, reason: 'unsaved' } as const;
     }
+    setTelemetryContext({ phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     const result = this.storage.save(this.current);
+    if (!result.ok) reportFailure('save_write', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
       ? `Progress unsaved: storage ${result.kind}. Open Save recovery to retry.`
       : result.reason === 'recoveryRequired' ? 'Progress unsaved: saved data needs recovery. Open Save recovery.'
@@ -129,8 +145,11 @@ export class RunItemSession {
   inspect() {
     const load = this.storage.load();
     this.review = load;
-    if (!load.ok || Object.values(load.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable'))
+    if (!load.ok || Object.values(load.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable')) {
+      track('save_recovery_failed', { route: 'run', operation: 'read' });
+      reportFailure('save_read', { route: 'run' });
       this.report('Saved data needs recovery. Progress is unsaved until Save recovery resolves damaged or unreadable data.');
+    }
     return load;
   }
   continue(review: RunLoadResult) {
@@ -140,6 +159,7 @@ export class RunItemSession {
     this.battle?.dispose(); this.battle = null;
     this.current = checked.state;
     this.review = null; this.unsavedOnly = false;
+    track('run_continued', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     const blocked = Object.values(review.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable');
     this.report((review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved run') +
       (blocked ? ' Progress unsaved until Save recovery resolves damaged or unreadable data.' : ''));
@@ -152,6 +172,7 @@ export class RunItemSession {
     this.retained = this.recoveryTexts(review);
     const removed = this.storage.removeSlot(slot, value.text);
     this.review = null;
+    if (!removed.ok) reportFailure('save_remove', { route: 'run' });
     this.report(removed.ok ? 'Save removed. Retry saving when recovery is complete.' : 'Removal refused: saved data changed or storage failed. Review again.');
     return removed.ok;
   }

@@ -1,3 +1,4 @@
+import { track, reportFailure } from '../telemetry/telemetry';
 import type { ContentCatalog, MapId } from '../content/types';
 import { BattleSession } from './BattleSession';
 import { createBattleStorage, type BattleLoadResult, type BattleStorageSlot } from '../persistence/battleStorage';
@@ -24,6 +25,10 @@ export class BattlePersistence {
   inspect(): BattleLoadResult {
     const load = this.storage.load();
     this.inspection = load;
+    if (!load.ok || Object.values(load.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable')) {
+      track('save_recovery_failed', { route: 'battle', operation: 'read' });
+      reportFailure('save_read', { route: 'battle' });
+    }
     return load;
   }
   startup(): BattleSession | null {
@@ -37,7 +42,10 @@ export class BattlePersistence {
     return null;
   }
   private accepted(session: BattleSession) {
-    if (this.session === session && session.phase !== 'disposed') this.save();
+    if (this.session === session && session.phase !== 'disposed') {
+      if (session.state.outcome !== 'ongoing') track('battle_outcome', { route: 'battle', phase: 'ended', outcome: session.state.outcome === 'playerWin' ? 'victory' : 'defeat' }, `${session.state.mapId}:${session.state.seed}:${session.state.commandCount}`);
+      this.save();
+    }
   }
   private fresh(seed: number) {
     const session = new BattleSession(this.catalog, this.mapId, seed, () => this.accepted(session));
@@ -48,7 +56,7 @@ export class BattlePersistence {
     this.session = session;
     // Consume the reviewed values: a duplicate confirm cannot replace twice.
     this.inspection = null;
-    if (save) this.save();
+    if (save) { track('battle_started', { route: 'battle', phase: session.phase }); this.save(); }
     return session;
   }
   continue(review: BattleLoadResult): BattleSession | null {
@@ -57,6 +65,7 @@ export class BattlePersistence {
     if (!restored.ok) { this.report('Saved battle is invalid. Review recovery.'); return null; }
     const session = restored.session;
     this.adopt(session, false);
+    track('battle_continued', { route: 'battle', phase: session.phase });
     const blocked = slots.some(slot => ['invalid', 'unavailable'].includes(review.inspection[slot].status));
     this.report(blocked ? 'Continued recovery. Progress is unsaved until damaged or unreadable storage is resolved.'
       : review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved battle');
@@ -65,6 +74,7 @@ export class BattlePersistence {
   save() {
     if (!this.session || this.session.phase === 'disposed') return;
     const result = this.storage.save(this.session.state);
+    if (!result.ok) reportFailure('save_write', { route: 'battle', phase: this.session.phase });
     this.report(result.ok ? 'Battle saved on this device' : result.reason === 'recoveryRequired'
       ? 'Progress unsaved. Saved data needs recovery.'
       : result.reason === 'storage' ? `Progress unsaved. Storage ${result.kind}; retry in Save recovery.`
@@ -86,6 +96,7 @@ export class BattlePersistence {
   }
   private retain(review: BattleLoadResult) { this.retained = [...this.recoveryTexts(review)]; }
   private failedReset() {
+    reportFailure('save_reset', { route: 'battle' });
     this.inspect();
     this.report('Reset incomplete. Battle and seed unchanged; some slots may have been removed. Export recovery copies, review again, then retry or cancel.');
   }
@@ -96,7 +107,7 @@ export class BattlePersistence {
     this.retain(review);
     const result = this.storage.removeSlot(slot, value.text);
     this.inspect();
-    if (!result.ok) { this.report('Removal refused. Saved data changed or storage failed; review again before retrying.'); return false; }
+    if (!result.ok) { reportFailure('save_remove', { route: 'battle' }); this.report('Removal refused. Saved data changed or storage failed; review again before retrying.'); return false; }
     // A successful explicit removal no longer requires retaining that slot's copies.
     this.retained = this.retained.filter(v => v.slot !== slot);
     this.report(`${slot === 'primary' ? 'Primary' : 'Backup'} save removed. Retry saving when recovery is complete.`);

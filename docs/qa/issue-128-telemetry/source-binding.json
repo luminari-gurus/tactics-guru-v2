@@ -1,0 +1,184 @@
+{
+  "basedOn": "a75c056",
+  "dirty": true,
+  "sourceFiles": [
+    {
+      "file": "src/main.ts",
+      "sha256": "4e15a4e1a4d22f3aa512c2464894a7825cf770d270dfca9075922955131911d7"
+    },
+    {
+      "file": "src/app/BattlePersistence.ts",
+      "sha256": "473e45ff40466a468465df28cefb5e6ce8f66d8c04ce08f8d9dc37ee08e049a2"
+    },
+    {
+      "file": "src/app/BattleSession.ts",
+      "sha256": "f7a784f56aa36957aa6d2d1fcad3683304f1d1d5df86a9d980d829925b43e166"
+    },
+    {
+      "file": "src/app/RunItemSession.ts",
+      "sha256": "9c048af5bcd8ee5e09352e9d3e4f0a4d18a2634bf768c6bf21fe553fd0dc7f5d"
+    },
+    {
+      "file": "src/app/startRunApp.ts",
+      "sha256": "3943ff98515542b81c5a55ef3f178ecf2c524c72952ba033a5475a6a55d37775"
+    },
+    {
+      "file": "src/app/startBattleApp.ts",
+      "sha256": "0ded1982fade9445082d4e117c3aa867948e3a82ac8c16da968d8d76fa9ebf15"
+    },
+    {
+      "file": "src/telemetry/browser.ts",
+      "sha256": "a26efdf4fce735e6a54b2835547bb887f14c5f644823398283305075b7fc0993"
+    },
+    {
+      "file": "src/telemetry/privacy.ts",
+      "sha256": "79f5cd7c02516d28c26477c5d0a41f0e44754f5a6cb809088802757214b18dbb"
+    },
+    {
+      "file": "src/telemetry/telemetry.ts",
+      "sha256": "f0b0097c7b3ef9523ef138a08b2f19220b0bcaef3eca14eaf0dcad775873c12e"
+    },
+    {
+      "file": "src/telemetry/transport.ts",
+      "sha256": "b191278da5cf57efc2abb5c66ee4305b945e2a436f8f097be6a8affebf2d0412"
+    },
+    {
+      "file": "vite.config.ts",
+      "sha256": "a76c870aa810e0b0162a2103f68ec8b8f2ac2e549085fb8d416a6eab489a93ba"
+    },
+    {
+      "file": "package.json",
+      "sha256": "8bc9b742586128bfe3d1b7df05d78f3de11a133d647d9b2bf3f58286c525e03d"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "ec376e1328c14f1058acf79f83d4c24044c752e62df62e028b91ade06f8fc262"
+    }
+  ],
+  "builds": {
+    "off": [
+      {
+        "file": "battleLayout-BVayxngr.js",
+        "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+      },
+      {
+        "file": "battleLayout-C6wfuIJB.css",
+        "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+      },
+      {
+        "file": "browser-3gemfFKn.js",
+        "sha256": "b264ba03be8c6a121f03c45138e26fd321cb8cc1463e6a1f6bcfb849f246642a"
+      },
+      {
+        "file": "index-CM3G3LWT.js",
+        "sha256": "984dfa63989162be8166c916bab113b8480569881e9f0971e1b6495a5ab0688e"
+      },
+      {
+        "file": "preload-helper-DjzSQ1t3.js",
+        "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+      },
+      {
+        "file": "rng-BCcJOpRP.js",
+        "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+      },
+      {
+        "file": "start-HmhvRyW1.js",
+        "sha256": "082fc6688c7f592bb0c184888ba879c15fd3290a9d07556306dae36c23b28dba"
+      },
+      {
+        "file": "start-TdQpECWs.js",
+        "sha256": "6495ec020bc3374eea4ab6f49778b32d0236102c2a89eaea41c7a4a9f2b1748c"
+      },
+      {
+        "file": "startBattleApp-By9SPyDW.js",
+        "sha256": "00ff455e9a8dd27602ecb3b246c43f811b6e05f45b2f53e5cb677b8a02c693ac"
+      },
+      {
+        "file": "startRunApp-CrSTyuki.js",
+        "sha256": "a5d7f9668a9776afe16745f73d9c8623efe9d75b9aa8ce234102d699636c4a0d"
+      },
+      {
+        "file": "startRunApp-y3YtRGS5.css",
+        "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+      },
+      {
+        "file": "telemetry-BmHDnlTj.js",
+        "sha256": "12739b146b6748a8230355f927e4fd94bf1c9f087d18cbbdbf9ead0635daf3bd"
+      },
+      {
+        "file": "transport-C45OGwOG.js",
+        "sha256": "9de38d5b1d846514d1d10c74ca01b03ec7da982e0f544bbd05b2b902e1c04f28"
+      },
+      {
+        "file": "view-BBW_du9E.css",
+        "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+      },
+      {
+        "file": "view-CoxHzY_N.js",
+        "sha256": "dc3f4dc4c1e4501274536a81f28f3d330a39ac170f8d283825bb52875a99fc78"
+      }
+    ],
+    "on": [
+      {
+        "file": "battleLayout-BVayxngr.js",
+        "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+      },
+      {
+        "file": "battleLayout-C6wfuIJB.css",
+        "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+      },
+      {
+        "file": "browser-3gemfFKn.js",
+        "sha256": "b264ba03be8c6a121f03c45138e26fd321cb8cc1463e6a1f6bcfb849f246642a"
+      },
+      {
+        "file": "index-Dhic0zWa.js",
+        "sha256": "d51d88912c12ec4d9651c947170b1d9582f59a3e4a2f16ba0e97e8607af1aa47"
+      },
+      {
+        "file": "preload-helper-DjzSQ1t3.js",
+        "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+      },
+      {
+        "file": "rng-BCcJOpRP.js",
+        "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+      },
+      {
+        "file": "start-HmhvRyW1.js",
+        "sha256": "082fc6688c7f592bb0c184888ba879c15fd3290a9d07556306dae36c23b28dba"
+      },
+      {
+        "file": "start-TdQpECWs.js",
+        "sha256": "6495ec020bc3374eea4ab6f49778b32d0236102c2a89eaea41c7a4a9f2b1748c"
+      },
+      {
+        "file": "startBattleApp-By9SPyDW.js",
+        "sha256": "00ff455e9a8dd27602ecb3b246c43f811b6e05f45b2f53e5cb677b8a02c693ac"
+      },
+      {
+        "file": "startRunApp-CrSTyuki.js",
+        "sha256": "a5d7f9668a9776afe16745f73d9c8623efe9d75b9aa8ce234102d699636c4a0d"
+      },
+      {
+        "file": "startRunApp-y3YtRGS5.css",
+        "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+      },
+      {
+        "file": "telemetry-BmHDnlTj.js",
+        "sha256": "12739b146b6748a8230355f927e4fd94bf1c9f087d18cbbdbf9ead0635daf3bd"
+      },
+      {
+        "file": "transport-C45OGwOG.js",
+        "sha256": "9de38d5b1d846514d1d10c74ca01b03ec7da982e0f544bbd05b2b902e1c04f28"
+      },
+      {
+        "file": "view-BBW_du9E.css",
+        "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+      },
+      {
+        "file": "view-CoxHzY_N.js",
+        "sha256": "dc3f4dc4c1e4501274536a81f28f3d330a39ac170f8d283825bb52875a99fc78"
+      }
+    ]
+  }
+}
