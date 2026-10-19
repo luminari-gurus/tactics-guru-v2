@@ -54,6 +54,14 @@ npm test -- tests/battle-board.spec.ts tests/input.spec.ts tests/battle-loop.spe
 
 With `PLAYWRIGHT_CHROMIUM_EXECUTABLE` pointing to installed Chrome, all 84 scoped browser checks passed. The configured posttests added 18 authored-encounter checks and 21 run-item checks (123 browser checks total). The complete battle/run scenarios below are retained from the initial target-overlay validation; they were not repeated for this hover extension. No physical-device, WebKit or deployment result is claimed. `git diff --check` also passed.
 
+### Native destination review follow-up (2026-10-19)
+
+Selecting a native HUD destination now clears the previous board-hover origin before preparing the destination. This prevents arrow navigation from keeping ability reach at an old cell after the dropdown changes. Subsequent pointer hover still overrides the prepared destination, and leaving the board restores it.
+
+The browser regression uses actual canvas arrow navigation and Tab navigation, then Playwright's native `selectOption` change without pointer movement. It checks that the selected cell and complete ability preview (origin, cells and unit targets) match the pending Move destination and that saves remain unchanged. The existing scenario also checks pointer override/fallback, cancellation and restart.
+
+`npm run build` passed (167 content checks, both typechecks and production build). Nine focused overlay, hover and legal-movement browser checks passed across installed Chrome desktop and mobile emulation, using a temporary equivalent config on port 4174 because 4173 was occupied. Earlier attempts to drive the desktop native popup with Home/ArrowDown did not commit a selection, so this regression uses the native select change API after real Tab navigation. Broader signature runs showed intermittent failures in the existing Magic Missile keyboard scenario at its initial rejected-target assertion; no signature or combat code changed. The full browser suite and unit suite were not rerun for this one-handler change. `git diff --check` passed.
+
 ### Initial target overlay validation
 
 The battle animation browser suite checks selected valid targets for all three signatures, including keyboard and mobile controls, preservation during review, and clearing during resolution. Its focused overlay scenario checks ally rejection, arrow navigation, actual board click/tap on an elevated target, action switches, both cancellation paths, unchanged state/save slots and restart. Screenshots include valid signature previews and invalid selections in desktop, mobile portrait and mobile landscape projects. See the test run results accompanying this change for executed checks and limitations.

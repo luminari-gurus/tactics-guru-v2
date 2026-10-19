@@ -139,7 +139,7 @@ export class BattleScene extends Phaser.Scene {
     };
     const hud=new BattleHud(session,{
       action:a=>{session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
-      target:select,review,cancel,inspect,inspectTarget:inspect,
+      target:cell=>{hovered=null;select(cell);},review,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
         const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');

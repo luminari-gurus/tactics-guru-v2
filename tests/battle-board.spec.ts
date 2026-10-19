@@ -68,6 +68,17 @@ test('hovered origins show only ability reach without changing selection, pendin
     .find(c=>hoverPreview(new BattleSession(battleCatalog,state,state.seed),{x:c.x,y:c.y}))!;
   await page.locator('canvas').focus();await page.keyboard.press(next.key);
   const navigated=await report(page);expect(navigated.hover?.origin).toMatchObject({x:navigated.selected.x,y:navigated.selected.y});
+  // Tab to the native control without pointer movement: its destination must replace the keyboard origin.
+  for(let i=0;i<20 && !await page.locator('#battle-target').evaluate(el=>el===document.activeElement);i++)await page.keyboard.press('Tab');
+  await expect(page.locator('#battle-target')).toBeFocused();
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending?.type).toBe('move');
+  const nativeSession=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(nativeSession.pending.type).toBe('move');
+  expect(nativeSession.pending.to).not.toEqual(navigated.hover.origin);
+  await expect.poll(async()=>(await report(page)).selected).toMatchObject(nativeSession.pending.to);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(hoverPreview(new BattleSession(battleCatalog,state,state.seed),nativeSession.pending.to));
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await page.keyboard.press('Escape');await expect.poll(async()=>(await report(page)).hover).toBeNull();
   await hover(origin);await page.locator('#fit-restart').click();await confirmRestart(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await report(page)).hover).toBeNull();
