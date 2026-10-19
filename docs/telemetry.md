@@ -16,6 +16,12 @@ DNT (`navigator.doNotTrack === '1'`) and Global Privacy Control disable collecti
 
 No cookies or stable player identity are used. A random anonymous ID lasts for one document, so reloads are separate anonymous visits. The transport sends no referrer or credentials. PostHog necessarily receives connection metadata such as the source IP and browser request headers; `$geoip_disable=true` requests no GeoIP enrichment. The owner must review provider/network log retention separately. Session replay, DOM/click autocapture, console logging, flags, surveys and URL/referrer collection are absent.
 
+## Cloudflare Pages builds
+
+The owner reports the public values configured in Cloudflare Pages. The Git-integrated project's build environment supplies `VITE_POSTHOG_ENABLED=true`, `VITE_POSTHOG_KEY` (public token), and `VITE_POSTHOG_HOST=https://us.i.posthog.com`; development/test opt-ins and the verification-error flag remain false. Production and Preview values are configured separately. Keep Preview off or use a separate project there. These values are embedded at build time and apply to new builds, without requiring a deployed `.env` file. Local development can omit the telemetry variables entirely.
+
+Private `POSTHOG_CLI_*` upload credentials and the source-map upload build step below are separate from the public ingestion settings. Adding environment values alone does not execute that step or confirm PostHog retention.
+
 ## Event and property schema
 
 | Event | Authoritative boundary | Additional properties |
