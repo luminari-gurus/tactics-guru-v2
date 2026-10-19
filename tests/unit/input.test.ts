@@ -103,10 +103,10 @@ it('suppresses a trailing release after wheel zoom while a pointer is held', () 
   expect(f.board.selections).toBe(1);
 });
 
-it('preserves overlap selection after completed touch taps but clears it for cancelled gestures',()=>{
+it.each(['touch','pen'])('preserves overlap selection after completed %s taps but clears it for cancelled gestures',pointerType=>{
   const f=fake();let resets=0;
   const cleanup=bindBoardInput(f.canvas,{...board(f),resetPicking:()=>resets++},()=>({width:400,height:600}),p=>p.x>10&&p.y>10);
-  const touch=(type:string)=>({...pointer(type,1,100,100),pointerType:'touch'} as unknown as Event);
+  const touch=(type:string)=>({...pointer(type,1,100,100),pointerType} as unknown as Event);
   for(let i=0;i<2;i++){
     f.listeners.get('pointerdown')!(touch('pointerdown'));
     f.listeners.get('pointerup')!(touch('pointerup'));
@@ -124,6 +124,24 @@ it('preserves overlap selection after completed touch taps but clears it for can
   f.listeners.get('pointerdown')!(touch('pointerdown'));
   f.listeners.get('pointerleave')!(touch('pointerleave'));
   expect(resets).toBe(2);expect(f.captured.size).toBe(0);cleanup();
+});
+
+it('secondary press cancels once, resets overlap and releases held pointers only inside the enabled board',()=>{
+  const f=fake();let cancels=0,resets=0,enabled=true;
+  const cleanup=bindBoardInput(f.canvas,{...board(f),cancel:()=>cancels++,resetPicking:()=>resets++},
+    ()=>({width:400,height:600}),p=>enabled&&p.x>20);
+  const secondary=(x=100)=>({...pointer('pointerdown',1,x,100),button:2} as unknown as Event);
+  f.listeners.get('pointerdown')!(secondary(10));expect(cancels).toBe(0);expect(resets).toBe(0);
+  enabled=false;f.listeners.get('pointerdown')!(secondary());expect(cancels).toBe(0);expect(resets).toBe(0);
+  enabled=true;f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100));
+  f.listeners.get('pointerdown')!(secondary());
+  expect(cancels).toBe(1);expect(resets).toBe(1);expect(f.captured.size).toBe(0);
+  f.listeners.get('pointermove')!(pointer('pointermove',1,130,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100));
+  expect(f.board.pans).toEqual([]);expect(f.board.selections).toBe(0);expect(cancels).toBe(1);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,100,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',2,100,100));
+  expect(f.board.selections).toBe(1);cleanup();
 });
 
 it('drops a pointer that is down when the page is hidden so resume cannot pan without a press', () => {

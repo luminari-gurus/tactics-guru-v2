@@ -100,6 +100,7 @@ export class BattleScene extends Phaser.Scene {
     };
     const removeInput=bindBoardInput(canvas,{
       select:(point:Point)=>{if(session.phase==='player')board.select(point);},
+      cancel:()=>cancel(),
       resetPicking:()=>board.resetPicking(),
       hover,
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},

@@ -150,6 +150,60 @@ async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 }
 
+test('completed pen taps keep overlap cycling after leaving hover range',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await occlusionBoundary(page,9);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption('3,5');
+  const expected=await page.locator('#game').getAttribute('data-session');
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const preview=await page.locator('#battle-preview').textContent();
+  const pen=await page.context().newCDPSession(page);
+  const tap=async()=>{
+    const r=await settledReport(page),x=r.transform.x-77*r.transform.scale,y=r.transform.y+160*r.transform.scale;
+    await pen.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1,pointerType:'pen'});
+    await pen.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1,pointerType:'pen'});
+    // Emulate the post-release boundary event of a pen without hover (or leaving hover range).
+    await page.locator('canvas').dispatchEvent('pointerleave',{pointerType:'pen',pointerId:2,clientX:x,clientY:y,buttons:0});
+  };
+  await tap();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await tap();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(expected);
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  await page.screenshot({path:info.outputPath('pen-overlap-ground.png')});
+  await tap();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  expect(errors).toEqual([]);
+});
+
+test('right-click cancels a prepared move through the existing action path and respects modal locks',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await occlusionBoundary(page,9);await page.locator('#battle-move').click();
+  const p={x:-77,y:160};await boardClick(page,p);await boardClick(page,p);
+  const prepared=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(prepared.pending).toEqual({type:'move',unitId:2,to:{x:3,y:5}});
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const rightClick=async()=>{
+    const r=await settledReport(page);
+    await page.mouse.click(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale,{button:'right'});
+  };
+  await page.locator('#battle-review').click();const locked=await page.locator('#game').getAttribute('data-session');
+  await rightClick();await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(locked);
+  await page.locator('#dialog-cancel').click();
+  await page.locator('#battle-target').selectOption('3,5');
+  await rightClick();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual({...prepared,pending:null});
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('right-click-cancelled.png')});
+  // A new choice starts at the foreground, with no stale overlap index or held gesture.
+  await page.locator('#battle-move').click();await boardClick(page,p);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  expect(errors).toEqual([]);
+});
+
 async function settledReport(page: Page) {
   // Let panel layout, ResizeObserver and the next render finish before using coordinates.
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));

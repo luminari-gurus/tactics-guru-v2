@@ -5,6 +5,7 @@ export interface BoardInputTarget {
   pan(dx: number, dy: number): void;
   zoom(factor: number, anchor: Point): void;
   select(point: Point): void;
+  cancel?(): void;
   hover?(point: Point | null): void;
   resetPicking?(): void;
 }
@@ -21,7 +22,9 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     return { x: (event.clientX - rect.left) * viewport.width / rect.width, y: (event.clientY - rect.top) * viewport.height / rect.height };
   };
   const down = (event: PointerEvent): void => {
-    if (!enabled(point(event)) || event.button !== 0) return;
+    if (!enabled(point(event))) return;
+    if (event.button === 2) { reset(); board.cancel?.(); return; }
+    if (event.button !== 0) return;
     board.hover?.(null);
     const p = point(event);
     pointers.set(event.pointerId, { start: p, point: p });
@@ -77,10 +80,10 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     gesture = false;
     board.hover?.(null);
   };
-  // Touch emits pointerleave after every completed tap. Preserve overlap cycling
+  // Non-hover touch/pen devices emit pointerleave after completed taps. Preserve overlap cycling
   // between taps; leaving during a captured gesture still cancels it.
   const leave = (event:PointerEvent):void => {
-    if(event.pointerType==='touch' && !pointers.size)return;
+    if((event.pointerType==='touch'||event.pointerType==='pen') && !pointers.size){board.hover?.(null);return;}
     reset();
   };
   // A finger down at an app switch may never deliver pointerup; drop it so resume cannot pan without a press.
