@@ -4,7 +4,6 @@ import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
-import { previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
 import { hoverPreview } from '../src/ui/targetPreview';
 
@@ -18,12 +17,11 @@ async function settledReport(page: Page) {
   return report(page);
 }
 
-test('hovered origins show hypothetical movement range without changing selection, pending commands or saves',async({page},info)=>{
+test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
   const state=JSON.parse(before!).state,origin={x:11,y:11};
   expect(initial.reachable).not.toContainEqual(origin);
-  const expected=previewMovement(state,initial.activeId,battleCatalog,origin);if(!expected.ok)throw Error(expected.reason);
   const saved=await page.evaluate(()=>JSON.stringify(localStorage));
   const hover=async(cell:{x:number;y:number})=>{
     const r=await settledReport(page),tile=r.tiles.find((t:any)=>t.x===cell.x&&t.y===cell.y),p=projectTile(tile);
@@ -32,7 +30,9 @@ test('hovered origins show hypothetical movement range without changing selectio
   await hover(origin);
   const expectedHover=hoverPreview(new BattleSession(battleCatalog,state,state.seed),origin);
   await expect.poll(async()=>(await report(page)).hover).toEqual(expectedHover);
-  expect(expectedHover?.cells).toEqual(expect.arrayContaining(expected.cells.map(c=>c.cell)));
+  expect(expectedHover?.cells).not.toContainEqual(origin);
+  expect((await report(page)).reachable).toEqual(initial.reachable);
+  await expect(page.locator('#battle-board-caption')).toContainText('Purple dots: ability reach');
   await expect(page.locator('#battle-board-caption')).toContainText('Pink +: target in reach');
   const shown=await settledReport(page);expect(shown.selected).toBeNull();expect(shown.selectionEvents).toBe(initial.selectionEvents);
   expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
@@ -65,7 +65,7 @@ test('hovered origins show hypothetical movement range without changing selectio
   const selected=(await report(page)).selected;
   const next=[{key:'ArrowRight',x:selected.x+1,y:selected.y},{key:'ArrowDown',x:selected.x,y:selected.y+1},
     {key:'ArrowLeft',x:selected.x-1,y:selected.y},{key:'ArrowUp',x:selected.x,y:selected.y-1}]
-    .find(c=>previewMovement(state,initial.activeId,battleCatalog,{x:c.x,y:c.y}).ok)!;
+    .find(c=>hoverPreview(new BattleSession(battleCatalog,state,state.seed),{x:c.x,y:c.y}))!;
   await page.locator('canvas').focus();await page.keyboard.press(next.key);
   const navigated=await report(page);expect(navigated.hover?.origin).toMatchObject({x:navigated.selected.x,y:navigated.selected.y});
   await page.keyboard.press('Escape');await expect.poll(async()=>(await report(page)).hover).toBeNull();

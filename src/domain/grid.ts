@@ -8,14 +8,13 @@ type Route = ReachableCell & { readonly path: readonly CellPosition[] };
 const key = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 const compare = (a: ReachableCell, b: ReachableCell): number => a.cost - b.cost || a.cell.y - b.cell.y || a.cell.x - b.cell.x;
 /** Occupancy is derived from the current validated snapshot, never cached separately. */
-function search(state: BattleState, unitId: number, catalog: ContentCatalog, origin?: CellPosition): Map<string, Route> {
+function search(state: BattleState, unitId: number, catalog: ContentCatalog): Map<string, Route> {
   const unit = state.units.find(u => u.id === unitId)!;
   const map = catalog.maps[state.mapId];
   const stats = unit.side === 'player' ? catalog.heroes[unit.defId].stats : catalog.enemies[unit.defId].stats;
   const tiles = new Map(map.cells.map(c => [key(c), c]));
   const occupied = new Set(state.units.filter(u => u.hp > 0 && u.id !== unitId).map(u => key(u.cell)));
-  const startCell = origin ?? unit.cell;
-  const start = { cell: { ...startCell }, cost: 0, path: [{ ...startCell }] };
+  const start = { cell: { ...unit.cell }, cost: 0, path: [{ ...unit.cell }] };
   const routes = new Map<string, Route>([[key(start.cell), start]]);
   const frontier: Route[] = [start];
   while (frontier.length) {
@@ -26,37 +25,25 @@ function search(state: BattleState, unitId: number, catalog: ContentCatalog, ori
     for (const direction of MOVEMENT_DIRECTIONS) {
       const cell = { x: current.cell.x + direction.x, y: current.cell.y + direction.y };
       const tile = tiles.get(key(cell));
-      const occupiedCell = occupied.has(key(cell));
-      if (!tile || cell.x < 0 || cell.y < 0 || cell.x >= map.width || cell.y >= map.height || (occupiedCell && !origin)) continue;
+      if (!tile || cell.x < 0 || cell.y < 0 || cell.x >= map.width || cell.y >= map.height || occupied.has(key(cell))) continue;
       const terrain = catalog.terrains[tile.terrainId];
       const uphill = Math.max(0, tile.elevation - from.elevation);
       if (!terrain.walkable || uphill > stats.jump) continue;
       const cost = current.cost + terrain.moveCost + uphill;
       if (cost > stats.move || cost >= (routes.get(key(cell))?.cost ?? Infinity)) continue;
       const route = { cell, cost, path: [...current.path, cell] };
-      routes.set(key(cell), route);
-      // A hypothetical range includes occupied endpoints, but never paths through units.
-      if (!occupiedCell) frontier.push(route);
+      routes.set(key(cell), route); frontier.push(route);
     }
   }
   return routes;
 }
-/** Optional hypothetical origins include occupied endpoints for planning, without moving the actor or traversing units. */
-export function previewMovement(state: unknown, unitId: number, catalog: ContentCatalog, origin?: CellPosition): { readonly ok: true; readonly cells: readonly ReachableCell[] } | Rejection {
+/** Reachability for the active actor; includes the origin at cost zero. */
+export function previewMovement(state: unknown, unitId: number, catalog: ContentCatalog): { readonly ok: true; readonly cells: readonly ReachableCell[] } | Rejection {
   const intent = previewCommand(state, { type: 'endTurn', unitId }, catalog);
   if (!intent.ok) return intent;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   if (checked.state.units.find(u => u.id === unitId)!.hasMoved) return { ok: false, reason: 'alreadyMoved' };
-  if (origin) {
-    const map = catalog.maps[checked.state.mapId];
-    if (!Number.isInteger(origin.x) || !Number.isInteger(origin.y) || origin.x < 0 || origin.y < 0 || origin.x >= map.width || origin.y >= map.height)
-      return { ok: false, reason: 'outOfBounds' };
-    const tile = map.cells.find(c => c.x === origin.x && c.y === origin.y)!;
-    if (!catalog.terrains[tile.terrainId].walkable) return { ok: false, reason: 'notWalkable' };
-    if (checked.state.units.some(u => u.hp > 0 && u.id !== unitId && u.cell.x === origin.x && u.cell.y === origin.y))
-      return { ok: false, reason: 'occupied' };
-  }
-  return { ok: true, cells: [...search(checked.state, unitId, catalog, origin).values()].sort(compare).map(({ cell, cost }) => ({ cell, cost })) };
+  return { ok: true, cells: [...search(checked.state, unitId, catalog).values()].sort(compare).map(({ cell, cost }) => ({ cell, cost })) };
 }
 export function previewMove(state: unknown, input: unknown, catalog: ContentCatalog): { readonly ok: true; readonly command: Extract<Command, {type: 'move'}>; readonly path: readonly CellPosition[]; readonly cost: number } | Rejection {
   const intent = previewCommand(state, input, catalog);

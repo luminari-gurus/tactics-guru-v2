@@ -1,7 +1,6 @@
 import type { CellPosition } from '../content/types';
 import type { BattleSession } from '../app/BattleSession';
 import { actionCommand, type Action } from './hud';
-import { previewMovement } from '../domain/grid';
 import { lineOfSightBlocked, manhattanDistance } from '../domain/targeting';
 import { previewAttack, previewMagicMissile } from '../domain/combat';
 
@@ -12,24 +11,24 @@ export interface HoverPreview {
 }
 
 export function hoverPreview(session: BattleSession, origin: CellPosition | null): HoverPreview | null {
-  if (session.phase !== 'player' || !origin) return null;
-  const reach = previewMovement(session.state, session.active.id, session.catalog, origin);
-  if (!reach.ok) return null;
+  if (session.phase !== 'player' || !origin || session.active.hasMoved || session.active.hasActed) return null;
   const {catalog,state,active}=session;
-  const abilities=active.hasActed?[]:Object.values(catalog.abilities).filter(a=>a.owners.includes(active.defId));
-  const cells=new Map(reach.cells.map(c=>[`${c.cell.x},${c.cell.y}`,c.cell]));
-  for(const cell of catalog.maps[state.mapId].cells) {
+  const map=catalog.maps[state.mapId],tile=map.cells.find(c=>c.x===origin.x && c.y===origin.y);
+  if(!tile || !catalog.terrains[tile.terrainId].walkable
+    || state.units.some(u=>u.hp>0 && u.id!==active.id && u.cell.x===origin.x && u.cell.y===origin.y))return null;
+  const abilities=Object.values(catalog.abilities).filter(a=>a.owners.includes(active.defId));
+  const cells=map.cells.filter(cell=>{
     const distance=manhattanDistance(origin,cell);
-    if(abilities.some(a=>distance>=a.rangeMin && distance<=a.rangeMax)
-      && !lineOfSightBlocked(catalog,state.mapId,origin,cell))cells.set(`${cell.x},${cell.y}`,{x:cell.x,y:cell.y});
-  }
+    return abilities.some(a=>distance>=a.rangeMin && distance<=a.rangeMax)
+      && !lineOfSightBlocked(catalog,state.mapId,origin,cell);
+  }).map(({x,y})=>({x,y}));
   // Query a relocated snapshot only; never prepare or resolve a command in the live session.
   const hypothetical={...state,units:state.units.map(u=>u.id===active.id?{...u,cell:origin}:u)};
   const targets=state.units.filter(u=>u.hp>0 && u.id!==active.id && abilities.some(a=>{
     const command={type:'useAbility' as const,unitId:active.id,abilityId:a.id,target:{unitId:u.id}};
     return (a.kind==='magicMissile'?previewMagicMissile:previewAttack)(hypothetical,command,catalog).ok;
   })).map(u=>u.cell);
-  return {origin,cells:[...cells.values()],targets};
+  return {origin,cells,targets};
 }
 
 export interface TargetOverlay {

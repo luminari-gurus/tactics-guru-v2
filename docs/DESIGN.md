@@ -208,11 +208,11 @@ for valid targets and coral `#ff867c` X-mark diamonds for unavailable targets.
 A white inner diamond plus a heavier outer border marks the selected target;
 the board caption explains these shapes. See the [legacy review and preview
 contract](target-preview-overlays.md).
-Hypothetical movement and ability reach from the hovered tile use purple `#b48aff` fills with inset
+Ability reach from the hovered destination uses purple `#b48aff` fills with inset
 lavender outlines and paired white dots. A small white ring marks the preview
 origin. These shapes remain distinct from teal actual reach, selected diamonds
-and attack check/X markers; the board caption identifies the hypothetical range.
-Occupied cells are included when reachable. Legal ability targets from the preview
+and attack check/X markers; the board caption identifies ability reach. Movement-only cells are excluded.
+Occupied cells are included when within ability range and line of sight. Legal ability targets from the preview
 origin use pink `#ff82c4` fills and a white plus marker; direct action-target check/X
 markers retain priority while an attack is selected.
 
