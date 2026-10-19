@@ -55,6 +55,7 @@ export class BattleScene extends Phaser.Scene {
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false;
+    let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
@@ -64,6 +65,10 @@ export class BattleScene extends Phaser.Scene {
     const clear=()=>{board.resetPicking();session.cancel();action=null;hovered=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
+      if(ready && session.phase==='player' && (initializedTurn?.round!==session.state.round || initializedTurn.unitId!==session.active.id)){
+        initializedTurn={round:session.state.round,unitId:session.active.id};
+        if(previewMovement(session.state,session.active.id,catalog).ok){action='move';message='Select a destination';}
+      }
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);

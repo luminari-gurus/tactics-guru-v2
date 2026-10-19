@@ -1,6 +1,66 @@
 import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
+import { previewMovement } from '../src/domain/grid';
+import { BattleSession } from '../src/app/BattleSession';
+
+test('default Move initializes once per usable player turn and preserves explicit choices',async({page})=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const move=page.locator('#battle-move'),target=page.locator('#battle-target');
+  await expect(move).toHaveAttribute('aria-pressed','true');await expect(move).toBeEnabled();
+  const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
+  expect(initial.replay.commands.every(c=>initial.state.units.find(u=>u.id===c.unitId)!.side==='enemy')).toBe(true);
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const reach=previewMovement(initial.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);
+  expect(await target.locator('option').evaluateAll(options=>options.map(o=>(o as HTMLOptionElement).value).filter(Boolean)))
+    .toEqual(reach.cells.filter(c=>c.cost>0).map(c=>`${c.cell.x},${c.cell.y}`));
+  const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+  expect(report.reachable).toEqual(reach.cells.map(c=>c.cell));expect(report.selected).toBeNull();
+  await expect(target).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
+  await page.screenshot({path:test.info().outputPath('default-move.png')});
+  for(const action of ['basic','signature']){
+    await page.locator(`[data-action=${action}]`).click();await target.selectOption({index:1});
+    const selected=await target.inputValue(),before=await page.locator('#game').getAttribute('data-session');
+    const overlays=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets;
+    await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+    await page.locator('#battle-log-open').click();await page.locator('#log-close').click();
+    const box=(await page.locator('#battle-board-region').boundingBox())!;
+    await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+    const viewport=page.viewportSize()!;await page.setViewportSize({width:viewport.width-1,height:viewport.height});await page.setViewportSize(viewport);
+    await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});
+    await expect(page.locator(`[data-action=${action}]`)).toHaveAttribute('aria-pressed','true');await expect(move).toHaveAttribute('aria-pressed','false');
+    await expect(target).toHaveValue(selected);expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+    expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets).toEqual(overlays);
+  }
+  await page.screenshot({path:test.info().outputPath('explicit-override.png')});
+  expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.locator('#battle-cancel').click();await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+  await expect(move).toHaveAttribute('aria-pressed','false');await expect(target).toBeDisabled();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
+  // Leave an explicit action selected, then progress through actual Wait/enemy turns.
+  await page.locator('[data-action=basic]').click();
+  let otherActor=false,wrapped=false;
+  for(let i=0;i<12 && !wrapped;i++){
+    await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const current=await session(page),id=current.state.initiative[current.state.activeIndex];
+    await expect(move).toHaveAttribute('aria-pressed','true');await expect(target).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
+    if(id!==actor.id)otherActor=true;if(id===actor.id && current.state.round>initial.state.round)wrapped=true;
+  }
+  expect(otherActor).toBe(true);expect(wrapped).toBe(true);
+  const final=await session(page),replayed=replayBattle(final.replay,catalog);expect(replayed.ok).toBe(true);
+  if(replayed.ok){expect(replayed.state).toEqual(final.state);expect(replayed.events).toEqual(final.events);}
+  const playerFirstSeed=Array.from({length:20},(_,i)=>i+2).find(seed=>new BattleSession(catalog,'map:forest_ruins',seed).phase==='player');
+  expect(playerFirstSeed).toBeDefined();
+  for(let seed=2;seed<=playerFirstSeed!;seed++){
+    await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(move).toHaveAttribute('aria-pressed','true');
+  }
+  const fresh=await session(page);expect(fresh.state.seed).toBe(playerFirstSeed);expect(fresh.replay.commands).toEqual([]);
+  expect(fresh.replay.initial.units.find(u=>u.id===fresh.replay.initial.initiative[0])!.side).toBe('player');
+  await expect(move).toHaveAttribute('aria-pressed','true');
+});
 
 test('player HUD and preview cancellation preserve state and modal capture', async ({page})=>{
   await page.goto('/');
@@ -93,7 +153,8 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
 test('keyboard selection, confirmation lock, touch and restart discard old gestures and previews',async({page})=>{
   await page.clock.install();
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await page.getByRole('button',{name:'Move',exact:true}).click();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
   const targetValue=await page.locator('#battle-target option').nth(1).getAttribute('value');
   const [tx,ty]=targetValue!.split(',').map(Number);
@@ -102,7 +163,8 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   for(let y=actor.cell.y;y!==ty;y+=y<ty?1:-1)await page.keyboard.press(y<ty?'ArrowDown':'ArrowUp');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button',{name:'Review action'})).toBeEnabled();
-  expect((await session(page)).replay.commands.length).toBeGreaterThan(0);
+  expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await page.getByRole('button',{name:'Move',exact:true}).click();await page.locator('#battle-target').selectOption({index:1});
   await page.getByRole('button',{name:'Review action'}).click();
   await page.keyboard.press('Tab');expect(await page.evaluate(()=>document.activeElement?.closest('dialog')!==null)).toBe(true);
@@ -113,6 +175,7 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
   await page.locator('#dialog-confirm').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   await expect(page.getByRole('button',{name:'Basic attack',exact:true})).toBeDisabled();
+  await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#fit-restart')).toBeFocused();
   expect((await session(page)).replay.commands).toHaveLength(initial.replay.commands.length+1);
   await expect(page.getByRole('button',{name:'Restart battle',exact:true})).toBeVisible();
@@ -148,7 +211,7 @@ test('battle HUD targets fit portrait and short landscape with a bounded readabl
 
 test('real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once',async({page})=>{
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await page.getByRole('button',{name:'Move',exact:true}).click();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   const {projectTile}=await import('../src/geometry/iso');
   const {pickTile}=await import('../src/geometry/picking');
   const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);

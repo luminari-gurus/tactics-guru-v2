@@ -103,6 +103,7 @@ export class BattleHud {
   }
   render(action:Action|null, selected:CellPosition|null, message:string) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
+    const movement=enabled?previewMovement(s.state,actor.id,s.catalog):null;
     const info=unitFeedback(s,actor);
     this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
@@ -116,9 +117,9 @@ export class BattleHud {
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
       const signature=b.dataset.action==='signature'?Object.values(s.catalog.abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(actor.defId)):null;
-      b.disabled=!enabled || spent || (b.dataset.action==='signature' && !signature);
+      b.disabled=!enabled || spent || (b.dataset.action==='move' && !movement?.ok) || (b.dataset.action==='signature' && !signature);
       b.setAttribute('aria-pressed',String(b.dataset.action===action));
-      b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.dataset.action==='move'?'Uses movement':'Uses action';
+      b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.disabled?'Unavailable':b.dataset.action==='move'?'Uses movement':'Uses action';
       if(b.dataset.action==='signature'){const label=signature?displayName(signature.id):'No signature';b.querySelector('strong')!.textContent=label;b.setAttribute('aria-label',label);}
     });
     this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait ends the turn immediately.`;
@@ -135,7 +136,7 @@ export class BattleHud {
       ? 'Gold: active · ✓ valid target · × unavailable · Double outline: selected'
       : 'Gold: active · White: selected · Teal: reachable') + ' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin';
     const options: {cell:CellPosition;label:string}[]=[];
-    if(enabled && action==='move') {const reach=previewMovement(s.state,actor.id,s.catalog);if(reach.ok) for(const c of reach.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
+    if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of s.state.units.filter(u=>u.side!==actor.side && u.hp>0)) options.push({cell:u.cell,label:unitLabel(s,u)});
     this.target.replaceChildren(new Option('Choose target',''),...options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`)));
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;

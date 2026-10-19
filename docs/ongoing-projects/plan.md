@@ -1,6 +1,14 @@
 # Issue #145 — default to Move once per player turn
 
-Updated 2026-10-19 (Asia/Jerusalem). Status: **implementation plan; application code is unchanged**.
+Updated 2026-10-19 (Asia/Jerusalem). Status: **implementation in progress in the dedicated issue-145 worktree**.
+
+## Active handoff
+
+- Worktree: `C:/Users/apexw/.codex/worktrees/issue-145-default-move/Tactics-Guru`; branch and remote both began at `b1bd7e7`. Refreshed `origin/main` remains `41ca782`.
+- Caller authorized implementation, validation and focused PR publication. No merge/deployment is requested.
+- OpenSpec change: `issue-145-default-move` (spec-driven). Its concise artifacts now track this implementation; this supersedes the planning-only suggestion below to omit change artifacts.
+- Next: add failing browser proof, implement the scene-local marker, finish acceptance/regressions, retain QA screenshots and publish a review-ready PR.
+- Windows runtime has Node but no npm on PATH. Use Node with `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`; a local ignored `tmp/bin/npm.cmd` wrapper supplies npm to build/Playwright subprocesses. OpenSpec and gh are available in WSL. Dependencies installed with npm ci (44 packages, zero audit findings).
 
 - Work item: [#145 — Default to Move at the start of each player turn](https://github.com/luminari-gurus/tactics-guru-v2/issues/145).
 - Implementation branch: [`branch/issue-145-default-move`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-145-default-move), created through GitHub's native linked-branch mutation and attached to #145's Development relationship.

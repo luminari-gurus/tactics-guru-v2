@@ -83,7 +83,7 @@ test('repeated map selection reaches a legal ground destination behind the same 
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await occlusionBoundary(page,9);
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption('3,5');
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');await page.locator('#battle-target').selectOption('3,5');
   const expected=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   expect(expected.pending).toMatchObject({type:'move',to:{x:3,y:5}});
   const preview=await page.locator('#battle-preview').textContent(),saved=await page.evaluate(()=>JSON.stringify(localStorage));
