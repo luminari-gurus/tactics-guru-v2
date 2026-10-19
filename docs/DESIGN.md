@@ -203,6 +203,11 @@ The [board renderer](../src/phaser/BoardRenderer.ts) currently distinguishes rea
 cells with teal `#46d7c7`, the actor with gold `#ffd36a`, and selection with an inset
 white outline. Player/enemy rings use cyan `#6ddbf5` and coral `#f17a73` when not
 overridden by the actor marker. Keep these roles and supporting shapes distinct.
+During attack targeting, reach is replaced by green `#63eba0` check-mark diamonds
+for valid targets and coral `#ff867c` X-mark diamonds for unavailable targets.
+A white inner diamond plus a heavier outer border marks the selected target;
+the board caption explains these shapes. See the [legacy review and preview
+contract](target-preview-overlays.md).
 
 [Unit health arcs](../src/phaser/healthBar.ts) have their own functional palette:
 green `#3bc761` above 50%, amber `#e0992e` above 25% through 50%, red `#db2e29` at or

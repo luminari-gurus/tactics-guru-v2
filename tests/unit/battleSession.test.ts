@@ -6,6 +6,7 @@ import { replayBattle } from '../../src/domain/turns';
 import { assert } from 'vitest';
 import { saveFixtures } from '../helpers/saveFixtures';
 import { nextUint32 } from '../../src/domain/rng';
+import { targetOverlays } from '../../src/ui/targetPreview';
 
 const make = (seed = 1) => new BattleSession(catalog, 'map:forest_ruins', seed);
 const finishEnemies = (s: BattleSession) => {
@@ -15,6 +16,31 @@ const finishEnemies = (s: BattleSession) => {
   }
 };
 describe('battle session', () => {
+  it('target overlays retain domain rejection reasons and never prepare, resolve or consume RNG', () => {
+    const initial = make(2).state;
+    const ranger = initial.units.find(u=>u.defId==='ranger')!;
+    const enemy = initial.units.find(u=>u.side==='enemy')!;
+    // A validated snapshot on the authored map with a forest cell between ranger and enemy.
+    const state = {...initial,activeIndex:initial.initiative.indexOf(ranger.id),units:initial.units.map(u=>
+      u.id===ranger.id?{...u,cell:{x:0,y:3}}:u.id===enemy.id?{...u,cell:{x:2,y:3}}:u)};
+    const s = new BattleSession(catalog,state,state.seed);
+    expect(s.phase).toBe('player');
+    const before=s.state;
+    expect(targetOverlays(s,'signature',{x:2,y:3}).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'blockedLos'});
+    expect(targetOverlays(s,'basic',null).find(t=>t.cell.x===2&&t.cell.y===3))
+      .toMatchObject({valid:false,reason:'outOfRange'});
+    expect(targetOverlays(s,'signature',s.active.cell).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'sameSide'});
+    expect(targetOverlays(s,'signature',{x:0,y:0}).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'missingTarget'});
+    expect(targetOverlays(s,'move',null)).toEqual([]);
+    expect(targetOverlays(s,null,null)).toEqual([]);
+    expect(s.pending).toBeNull();expect(s.state).toBe(before);expect(s.events).toEqual([]);
+    s.prepare({type:'endTurn',unitId:s.active.id});const step=s.confirm()!;
+    expect(targetOverlays(s,'signature',null)).toEqual([]);
+    s.finishPresentation(step.token);s.dispose();expect(targetOverlays(s,'signature',null)).toEqual([]);
+  });
   it('automatically exposes enemy-first turns, locks player commands, records accepted commands and replays', () => {
     const s = make();
     expect(s.phase).toBe('enemy');

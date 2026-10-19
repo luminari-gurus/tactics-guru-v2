@@ -88,14 +88,55 @@ async function review(page:Page,fixture:Boundary,keyboard=false) {
     for(let y=cursor.y;y!==target.cell.y;y+=y<target.cell.y?1:-1)await page.keyboard.press(y<target.cell.y?'ArrowDown':'ArrowUp');
     await page.keyboard.press('Enter');
   }else await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  const targeting=await report(page);
+  expect(targeting.reachable).toEqual([]);
+  expect(targeting.targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
+  await page.clock.runFor(48);
+  await page.screenshot({path:test.info().outputPath(`${view.kind}-target-preview.png`)});
   await press(page,'#battle-review',keyboard);
   await expect(page.getByRole('dialog')).toBeVisible();
+  expect((await report(page)).targets).toEqual(targeting.targets);
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
   await page.locator('#dialog-confirm').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  expect((await report(page)).targets).toEqual([]);
 }
+
+test('target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands',async({page},info)=>{
+  const fixture=boundary('high_shot','any',true);await boot(page,fixture);
+  const saved=await stored(page),initial=(await readSession(page)).state;
+  await press(page,'[data-action="signature"]');
+  const actor=fixture.before.units.find(u=>u.id===fixture.command.unitId)!;
+  await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:actor.cell,valid:false,selected:true,reason:'sameSide'});
+  await expect(page.locator('#battle-preview')).toContainText('Unavailable: Same Side');
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  await page.clock.runFor(48);
+  await page.screenshot({path:info.outputPath('invalid-ally-target.png')});
+  await page.keyboard.press('ArrowRight');
+  const navigated=await report(page);
+  expect(navigated.targets.find((t:any)=>t.selected)?.cell).toEqual({x:Math.min(11,actor.cell.x+1),y:actor.cell.y});
+  const command=fixture.command;
+  if(command.type!=='useAbility' || !('unitId' in command.target))throw Error('Expected unit attack fixture');
+  const targetId=command.target.unitId;
+  const target=fixture.before.units.find(u=>u.id===targetId)!;
+  const current=await report(page),tile=current.tiles.find((t:any)=>t.x===target.cell.x&&t.y===target.cell.y),point=projectTile(tile);
+  const screen={x:current.transform.x+point.x*current.transform.scale,y:current.transform.y+point.y*current.transform.scale};
+  if(info.project.name.startsWith('mobile'))await page.touchscreen.tap(screen.x,screen.y);
+  else await page.mouse.click(screen.x,screen.y);
+  expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
+  await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();
+  expect((await report(page)).targets).toEqual([]);await expect(page.locator('#battle-review')).toBeDisabled();
+  await press(page,'[data-action="signature"]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await press(page,'[data-action="move"]');expect((await report(page)).targets).toEqual([]);
+  await press(page,'[data-action="basic"]');expect((await report(page)).targets.length).toBeGreaterThan(0);
+  await page.locator('#battle-cancel').click();expect((await report(page)).targets).toEqual([]);
+  expect((await readSession(page)).state).toEqual(initial);expect(await stored(page)).toEqual(saved);
+  await press(page,'[data-action="signature"]');await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
+  expect((await report(page)).targets).toEqual([]);
+});
 function aligned(r:any,fixture:Boundary) {
   const effect=r.effect;expect(effect).not.toBeNull();
   for(const [id,point] of [[effect.actorId,effect.from],[effect.targetId,effect.to]] as const){

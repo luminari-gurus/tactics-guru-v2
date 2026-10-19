@@ -6,6 +6,8 @@ Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders
 
 The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.
 
+During attack targeting, board diamonds show ✓ valid and × unavailable targets; a double outline marks the selected cell. Movement highlights return when targeting is cancelled. See the [legacy overlay review and target preview behavior](docs/target-preview-overlays.md).
+
 ## Requirements
 
 Node.js **22.12 or newer** (prefer a supported LTS release) and npm. Dependencies are pinned and `package-lock.json` is tracked.

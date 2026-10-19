@@ -9,6 +9,7 @@ import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, actionCommand, previewText, displayName, unitFeedback, unitLabel, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
+import { targetOverlays } from '../ui/targetPreview';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
@@ -62,9 +63,9 @@ export class BattleScene extends Phaser.Scene {
     const clear=()=>{session.cancel();action=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
-      const reach=session.phase==='player'?previewMovement(session.state,session.active.id,catalog):null;
+      const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
-      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[]);
+      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected));
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
@@ -116,7 +117,7 @@ export class BattleScene extends Phaser.Scene {
         : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
       const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
         :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
-      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();message='Cancelled';refresh();});
+      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{
@@ -149,7 +150,7 @@ export class BattleScene extends Phaser.Scene {
       if(['Enter',' '].includes(event.key)){event.preventDefault();select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
       if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[session.state.mapId];
-      cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};selected=cursor;session.cancel();refresh();
+      cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};select(cursor);
     };
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};

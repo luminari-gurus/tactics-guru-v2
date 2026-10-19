@@ -131,6 +131,9 @@ export class BattleHud {
     this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=!target;inspect.dataset.unitId=target?String(target.id):'';
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
+    document.querySelector('#battle-board-caption')!.textContent = enabled && action && action!=='move' && !actor.hasActed
+      ? 'Gold: active · ✓ valid target · × unavailable · Double outline: selected'
+      : 'Gold: active · White: selected · Teal: reachable';
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {const reach=previewMovement(s.state,actor.id,s.catalog);if(reach.ok) for(const c of reach.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of s.state.units.filter(u=>u.side!==actor.side && u.hp>0)) options.push({cell:u.cell,label:unitLabel(s,u)});
