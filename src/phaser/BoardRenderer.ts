@@ -4,7 +4,7 @@ import type { BattleEvent, BattleState } from '../domain/types';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
-import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
+import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
@@ -37,6 +37,7 @@ export class BoardRenderer {
   private hoverPreview: HoverPreview | null = null;
   private selected: Tile | null = null;
   private selectionEvents = 0;
+  private picking: { point: Point; keys: string; index: number } | null = null;
   private animatedSnapshot: BattleState | undefined;
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
@@ -369,6 +370,7 @@ export class BoardRenderer {
   }
 
   private applyView(view: View): void {
+    if(view.x!==this.view.x || view.y!==this.view.y || view.scale!==this.view.scale)this.resetPicking();
     this.view = constrainView(view, this.bounds, this.region, this.fitScale);
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
@@ -443,12 +445,14 @@ export class BoardRenderer {
   });}
 
   pan(dx: number, dy: number): boolean {
+    this.resetPicking();
     const before = this.view;
     this.applyView({ ...before, x: before.x + dx, y: before.y + dy });
     return this.view.x !== before.x || this.view.y !== before.y;
   }
 
   zoom(factor: number, anchor: Point): boolean {
+    this.resetPicking();
     const before = this.view;
     const point = screenToBoard(anchor, this.view);
     const scale = Math.max(this.fitScale, Math.min(this.fitScale * MAX_ZOOM, this.view.scale * factor));
@@ -457,13 +461,48 @@ export class BoardRenderer {
   }
 
   select(point: Point): void {
+    const candidates=this.pickCandidates(point),keys=candidates.map(cellKey).join('|');
+    const same=this.picking?.keys===keys && Math.hypot(point.x-this.picking.point.x,point.y-this.picking.point.y)<DRAG_THRESHOLD;
+    const index=same ? (this.picking!.index+1)%candidates.length : 0;
+    this.picking=candidates.length ? {point,keys,index} : null;
     this.selectionEvents++;
-    this.onSelect(this.cellAt(point));
+    const tile=candidates[index];
+    this.onSelect(tile ? {x:tile.x,y:tile.y} : null);
   }
 
   cellAt(point: Point): CellPosition | null {
-    const tile = pickTile(this.board.tiles, screenToBoard(point, this.view));
+    const candidates=this.pickCandidates(point),keys=candidates.map(cellKey).join('|');
+    const same=this.picking?.keys===keys && Math.hypot(point.x-this.picking.point.x,point.y-this.picking.point.y)<DRAG_THRESHOLD;
+    const tile=candidates[same ? this.picking!.index : 0];
     return tile ? { x: tile.x, y: tile.y } : null;
+  }
+
+  resetPicking(): void { this.picking=null; }
+
+  get pickingHint(): string {
+    const count=this.picking?.keys.split('|').length ?? 0;
+    return count>1 ? ` · Overlap ${this.picking!.index+1}/${count}: click or tap again to cycle tiles` : '';
+  }
+
+  private pickCandidates(point: Point): Tile[] {
+    const local=screenToBoard(point,this.view);
+    const candidates=pickTileCandidates(this.board.tiles,local);
+    const front=candidates[0];
+    // Only visible opaque living art can precede the solid terrain hit. Use the
+    // authoritative cell/anchor, independent of transient presentation offsets.
+    const units=(this.snapshot?.units ?? []).filter(unit=>unit.hp>0).map(unit=>({unit,tile:this.byCell.get(cellKey(unit.cell))!}))
+      .sort((a,b)=>b.tile.depth-a.tile.depth);
+    for(const {unit,tile} of units){
+      if(front && tile.depth+OCCUPANT_LAYER<front.depth+1)continue;
+      const image=this.images.get(unit.id)!;
+      const bounds=unitBounds(tile,{x:image.originX,y:image.originY});
+      if(local.x<bounds.left || local.x>=bounds.right || local.y<bounds.top || local.y>=bounds.bottom)continue;
+      const x=Math.floor((local.x-bounds.left)*image.frame.realWidth/UNIT_ART.width);
+      const y=Math.floor((local.y-bounds.top)*image.frame.realHeight/UNIT_ART.height);
+      if(!this.scene.textures.getPixelAlpha(x,y,image.texture.key,image.frame.name))continue;
+      return [tile,...candidates.filter(candidate=>cellKey(candidate)!==cellKey(tile))];
+    }
+    return candidates;
   }
 
   private publish(): void {

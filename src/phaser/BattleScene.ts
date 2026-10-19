@@ -61,7 +61,7 @@ export class BattleScene extends Phaser.Scene {
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
-    const clear=()=>{session.cancel();action=null;hovered=null;message='Choose an action and target';};
+    const clear=()=>{board.resetPicking();session.cancel();action=null;hovered=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
@@ -69,6 +69,7 @@ export class BattleScene extends Phaser.Scene {
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected),hover);
       hud.render(action,selected,message);
+      document.querySelector('#battle-board-caption')!.textContent+=board.pickingHint;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
@@ -96,7 +97,8 @@ export class BattleScene extends Phaser.Scene {
       hovered=cell;refresh();
     };
     const removeInput=bindBoardInput(canvas,{
-      select:(point:Point)=>board.select(point),
+      select:(point:Point)=>{if(session.phase==='player')board.select(point);},
+      resetPicking:()=>board.resetPicking(),
       hover,
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
@@ -138,8 +140,8 @@ export class BattleScene extends Phaser.Scene {
         ],()=>{});
     };
     const hud=new BattleHud(session,{
-      action:a=>{session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
-      target:cell=>{hovered=null;select(cell);},review,cancel,inspect,inspectTarget:inspect,
+      action:a=>{board.resetPicking();session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
+      target:cell=>{board.resetPicking();hovered=null;select(cell);},review,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
         const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');
@@ -155,10 +157,10 @@ export class BattleScene extends Phaser.Scene {
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
       if(event.key==='Escape'){cancel();event.preventDefault();return;}
-      if(['Enter',' '].includes(event.key)){event.preventDefault();hovered=null;select(cursor);return;}
+      if(['Enter',' '].includes(event.key)){event.preventDefault();board.resetPicking();hovered=null;select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
       if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[session.state.mapId];
-      cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};hovered=cursor;select(cursor);
+      board.resetPicking();cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};hovered=cursor;select(cursor);
     };
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};

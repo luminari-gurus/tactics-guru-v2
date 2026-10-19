@@ -103,6 +103,24 @@ it('suppresses a trailing release after wheel zoom while a pointer is held', () 
   expect(f.board.selections).toBe(1);
 });
 
+it('preserves overlap selection after completed touch taps but clears it for cancelled gestures',()=>{
+  const f=fake();let resets=0;
+  const cleanup=bindBoardInput(f.canvas,{...board(f),resetPicking:()=>resets++},()=>({width:400,height:600}));
+  const touch=(type:string)=>({...pointer(type,1,100,100),pointerType:'touch'} as unknown as Event);
+  for(let i=0;i<2;i++){
+    f.listeners.get('pointerdown')!(touch('pointerdown'));
+    f.listeners.get('pointerup')!(touch('pointerup'));
+    f.listeners.get('pointerleave')!(touch('pointerleave'));
+  }
+  expect(f.board.selections).toBe(2);expect(resets).toBe(0);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  f.listeners.get('pointercancel')!(touch('pointercancel'));
+  expect(resets).toBe(1);expect(f.board.selections).toBe(2);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  f.listeners.get('pointerleave')!(touch('pointerleave'));
+  expect(resets).toBe(2);expect(f.captured.size).toBe(0);cleanup();
+});
+
 it('drops a pointer that is down when the page is hidden so resume cannot pan without a press', () => {
   const f = fake();
   bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));

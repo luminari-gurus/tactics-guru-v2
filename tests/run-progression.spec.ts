@@ -44,6 +44,15 @@ async function prepare(page:Page){
 test('legal three encounter run, rewards, preparation, final resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){
+  // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
+  const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+  expect(board.selected).toBeNull();expect(board.selectionEvents).toBe(0);
+  const runBefore=await snapshot(page);
+  const corner=board.tiles.find((t:{x:number;y:number})=>t.x===11&&t.y===11);
+  const x=(corner.x-corner.y)*40,y=(corner.x+corner.y)*20-corner.elevation*24;
+  await page.mouse.click(board.transform.x+x*board.transform.scale,board.transform.y+y*board.transform.scale);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:11,y:11,elevation:corner.elevation});
+  expect(await snapshot(page)).toEqual(runBefore);
   await fight(page);if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(index<2){

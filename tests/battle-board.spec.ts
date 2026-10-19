@@ -6,6 +6,133 @@ import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
 import { BattleSession } from '../src/app/BattleSession';
 import { hoverPreview } from '../src/ui/targetPreview';
+import { encodeBattleSave } from '../src/domain/saveEnvelope';
+import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
+import { playerDecision } from './helpers/playerPolicy';
+import { unitBounds } from '../src/geometry/canopy';
+
+/** Real accepted seed-1 boundaries, using the same policy as battle/save coverage. */
+async function occlusionBoundary(page: Page, count: number) {
+  const session = new BattleSession(battleCatalog, 'map:forest_ruins', 1);
+  while (session.state.commandCount < count) {
+    if (session.phase === 'player') expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+    const step = session.phase === 'player' ? session.confirm() : session.nextEnemy();
+    if (!step) throw Error('Occlusion fixture failed to progress');
+    session.finishPresentation(step.token);
+  }
+  expect(session.phase).toBe('player');
+  const save = encodeBattleSave(session.state, battleCatalog);
+  if (!save.ok) throw Error(save.reason);
+  await page.addInitScript(({key, text}) => localStorage.setItem(key, text), {key:BATTLE_STORAGE_KEYS.primary, text:save.text});
+  await page.goto('/'); await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page).toHaveTitle('Tactics Guru v2');
+  await expect(page.locator('#battle-shell')).toBeVisible();
+  await expect(page.locator('vite-error-overlay')).toHaveCount(0);
+  return session.state;
+}
+
+async function boardClick(page:Page, point:Point, touch=false) {
+  const r=await settledReport(page),x=r.transform.x+point.x*r.transform.scale,y=r.transform.y+point.y*r.transform.scale;
+  if(touch) await page.touchscreen.tap(x,y); else await page.mouse.click(x,y);
+}
+
+test('occluded archer exposed art selects the same legal target as the dropdown',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  const state=await occlusionBoundary(page,28);
+  expect(state.units.find(u=>u.id===5)).toMatchObject({defId:'goblin_archer',cell:{x:3,y:2},hp:8});
+  await page.locator('[data-action=signature]').click();
+  await page.locator('#battle-target').selectOption('3,2');
+  const expected=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(expected.pending).toMatchObject({type:'useAbility',target:{unitId:5}});
+  const preview=await page.locator('#battle-preview').textContent(),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await page.screenshot({path:info.outputPath('occluded-archer-dropdown.png')});
+  // Opaque head pixel (32,18) in the canonical 64x80 sprite, anchored at (32,76).
+  // Projected ground center is (40,100); displayed sprite is 40x50.
+  await boardClick(page,{x:40,y:63.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:2,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('occluded-archer-map.png')});
+  // The body under solid foreground terrain cannot steal the first hit.
+  await boardClick(page,{x:40,y:100},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:3,elevation:2});
+  // Transparent pixels in the same sprite rectangle still reach terrain.
+  await boardClick(page,{x:21,y:54},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:2,y:1,elevation:0});
+  // A visible distant grunt remains unavailable; art picking cannot grant range.
+  await page.locator('#battle-target').selectOption('4,6');
+  const unavailable=await page.locator('#battle-preview').textContent();
+  expect(unavailable).toContain('Unavailable');
+  const invalid=await page.locator('#game').getAttribute('data-session');
+  await boardClick(page,{x:-80,y:163.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:6,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(unavailable);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(invalid);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  expect(state.units.find(u=>u.id===6)?.hp).toBe(0);
+  // The defeated grunt's former head overlaps ground (3,8), never a dead target.
+  await boardClick(page,{x:-200,y:223.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:8,elevation:0});
+  expect(errors).toEqual([]);
+});
+
+test('repeated map selection reaches a legal ground destination behind the same platform',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await occlusionBoundary(page,9);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption('3,5');
+  const expected=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(expected.pending).toMatchObject({type:'move',to:{x:3,y:5}});
+  const preview=await page.locator('#battle-preview').textContent(),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const p={x:-77,y:160}; // Inside ground (3,5), clear of touch-rounded diamond edges.
+  await boardClick(page,p,!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await boardClick(page,p,!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('occluded-ground-map.png')});
+  await expect(page.locator('#battle-board-caption')).toContainText('Overlap 2/2');
+  const select=()=>boardClick(page,p,!!info.project.use.hasTouch);
+  // Hover never advances the explicitly selected alternate cell.
+  const r=await settledReport(page);
+  await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await page.locator('#battle-target').selectOption('3,5'); // Native control clears overlap history.
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();
+  await page.locator('#battle-review').click();
+  const locked=await report(page);await select();expect((await report(page)).selectionEvents).toBe(locked.selectionEvents);
+  await page.locator('#dialog-cancel').click();
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  // Action changes reset the sequence, and a fresh transformed-camera hit still cycles.
+  await page.locator('[data-action=basic]').click();await page.locator('#battle-move').click();
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();
+  const before=await settledReport(page);
+  await page.mouse.move(before.transform.x+p.x*before.transform.scale,before.transform.y+p.y*before.transform.scale);
+  await page.mouse.wheel(0,-100);await settledReport(page);
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  // Only explicit confirmation commits the selected legal move.
+  await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
+  expect(moved.commandCount).toBe(expected.state.commandCount+1);
+  expect(moved.units.find((u:any)=>u.id===expected.pending.unitId).cell).toEqual({x:3,y:5});
+  expect(errors).toEqual([]);
+});
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -290,18 +417,22 @@ for (const failure of ['missing', 'corrupt'] as const) {
   });
 }
 
-test('picks authored elevated tops and visible side faces through unit and canopy art', async ({ page }) => {
+test('picks authored elevated tops and visible side faces outside living unit art', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const { tiles } = buildBoardPresentation(battleCatalog, 'map:forest_ruins');
+  const units=(await settledReport(page)).units.filter((unit:any)=>unit.health.hp>0);
   for (const elevation of [0, 1, 2]) {
     for (const face of ['top', 'left', 'right'] as const) {
       const tile = tiles.find(tile => {
         if (tile.elevation !== elevation) return false;
         const vertices: readonly Point[] = tileFaces(tile)[face];
         const point = { x: vertices.reduce<number>((sum, p) => sum + p.x, 0) / 4, y: vertices.reduce<number>((sum, p) => sum + p.y, 0) / 4 };
-        return pickTile(tiles, point) === tile;
+        return pickTile(tiles, point) === tile && !units.some((unit:any)=>{
+          const b=unitBounds(unit.tile,unit.origin);
+          return point.x>=b.left && point.x<b.right && point.y>=b.top && point.y<b.bottom;
+        });
       });
       expect(tile).toBeDefined();
       const vertices: readonly Point[] = tileFaces(tile!)[face];

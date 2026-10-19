@@ -1,13 +1,25 @@
 # Issue #146 — restore map selection through terrain occlusion
 
-Planning date: 2026-10-19 (Asia/Jerusalem). Status: **plan published; implementation has not started**.
+Updated: 2026-10-19 (Asia/Jerusalem). Status: **implementation in progress**.
+
+## Current implementation handoff
+
+The caller authorized implementation, autonomous repairs and focused review-ready PRs. Worktree: `C:/Users/apexw/.codex/worktrees/issue-146-map-picking/Tactics-Guru`, branch `branch/issue-146-occluded-map-picking`, initial clean head `249fa0d`. Refreshed `origin/main` is still `49af402`; no integration/rebase is required. No existing PR was found for this branch. Preserve the planning commit and publish ordinary commits; no release tag or merge is required.
+
+Outcome, non-goals, files and proof below remain the scope. Ablation retains the existing projection, sprite anchors, terrain order and session selection callback. First establish a legal authored occlusion witness; add a sprite alpha hit only for living art, and overlapping top-surface cycling only where that witness needs it. Do not change domain rules or add a separate selection service. The root plan now points here without deleting the unrelated historical handoff.
+
+Reproduction is complete on unchanged runtime `249fa0d` / main `49af402`: legal seed-1 policy boundaries at command 28 (fighter Guarded Strike vs living archer #5 at `(3,2)`) and command 9 (ranger move to `(3,5)`). The dropdown prepares both commands. At archer head board point `(40,63.75)`, the old picker selects `(2,1)`; at the hidden destination, repeated clicks keep selecting raised `(4,5)`. Both independent browser regressions failed on baseline; [raw failures and fixtures](../../qa/issue-146-occluded-map-picking/) are retained. The exact original caller screenshot/turn remains unidentified; these reproduce its failure class in the unmodified authored map.
+
+Implemented: visible opaque living sprite pixels resolve to authoritative cells; hidden bodies and transparent pixels do not override foreground terrain. Terrain candidates retain the frontmost solid, then only overlapping top surfaces; repeated click/tap cycles them, with selected feedback and the existing caption showing overlap position. Hover preserves a chosen alternate. Action/dropdown/keyboard/modal, gesture, camera, resize, turn and scene boundaries clear overlap history. A normal touch `pointerleave` after a completed tap must preserve it; this browser behavior was reproduced and repaired without weakening captured-gesture cancellation. All six initial built-browser cases now pass on Chromium desktop/Pixel 7 portrait/landscape. Extended reset/invalid-range/confirmation regressions and completion checks are running; no final acceptance or PR is claimed yet.
+
+Next: finish focused/full suites, fresh WebKit touch checks, source-bound QA and PR publication. Browser plugin not available; repository Playwright/device emulation is the accepted path. A reused dependency junction lacked Windows native Rolldown bindings; it was removed without touching its target and `npm ci` installed this worktree's locked packages (44 packages, zero audit findings). No package/lockfile change. A local external npm executable supplies the missing host command; tooling/bootstrap is not an application change.
 
 - Issue: [#146 — Occluded goblin archer and neighboring tiles cannot be targeted directly on the map](https://github.com/luminari-gurus/tactics-guru-v2/issues/146).
 - Assignee: `moshehbenavraham`, verified from the authenticated GitHub account and the issue after assignment.
 - Kickoff: [we're on this](https://github.com/luminari-gurus/tactics-guru-v2/issues/146#issuecomment-6269785949).
 - Branch: [`branch/issue-146-occluded-map-picking`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-146-occluded-map-picking), linked through GitHub's issue Development relationship.
 - Inspected base: `main` at `49af40223a8e4d19eedb7a974eca34c12c1b7c88`, including merged target-preview PR #143. Refresh the default branch and review intervening input/render changes before implementation.
-- Planning scope: this document only. Leave the incumbent `docs/ongoing-projects/plan.md` and other workstreams intact. Application edits, new regression tests, deployment and merging are subsequent work.
+- Original planning scope was this document only. The subsequent caller request authorizes application edits, regression tests and PR publication; production deployment and merging remain separate.
 
 ## Why this is the best available item
 

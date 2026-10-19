@@ -6,6 +6,7 @@ export interface BoardInputTarget {
   zoom(factor: number, anchor: Point): void;
   select(point: Point): void;
   hover?(point: Point | null): void;
+  resetPicking?(): void;
 }
 
 /** CSS coordinates are converted through the canvas rectangle, independent of DPR. */
@@ -24,7 +25,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     board.hover?.(null);
     const p = point(event);
     pointers.set(event.pointerId, { start: p, point: p });
-    if (pointers.size > 1) gesture = true;
+    if (pointers.size > 1) { gesture = true; board.resetPicking?.(); }
     canvas.setPointerCapture(event.pointerId);
   };
   const move = (event: PointerEvent): void => {
@@ -54,6 +55,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     board.hover?.(null);
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
+    if(event.type!=='pointerup')board.resetPicking?.();
     const next = point(event);
     if (event.type === 'pointerup' && !gesture && pointers.size === 1
       && Math.hypot(next.x-pointer.start.x,next.y-pointer.start.y) < DRAG_THRESHOLD) board.select(next);
@@ -69,17 +71,24 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
   const reset = (): void => {
+    board.resetPicking?.();
     for (const id of pointers.keys()) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
     pointers.clear();
     gesture = false;
     board.hover?.(null);
+  };
+  // Touch emits pointerleave after every completed tap. Preserve overlap cycling
+  // between taps; leaving during a captured gesture still cancels it.
+  const leave = (event:PointerEvent):void => {
+    if(event.pointerType==='touch' && !pointers.size)return;
+    reset();
   };
   // A finger down at an app switch may never deliver pointerup; drop it so resume cannot pan without a press.
   const owner = canvas.ownerDocument;
   const visibility = (): void => { if (owner.visibilityState === 'hidden') reset(); };
   canvas.addEventListener('pointerdown', down);
   canvas.addEventListener('pointermove', move);
-  canvas.addEventListener('pointerleave', reset);
+  canvas.addEventListener('pointerleave', leave);
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
   canvas.addEventListener('lostpointercapture', end);
@@ -89,7 +98,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     owner.removeEventListener('visibilitychange', visibility);
     canvas.removeEventListener('pointerdown', down);
     canvas.removeEventListener('pointermove', move);
-    canvas.removeEventListener('pointerleave', reset);
+    canvas.removeEventListener('pointerleave', leave);
     canvas.removeEventListener('pointerup', end);
     canvas.removeEventListener('pointercancel', end);
     canvas.removeEventListener('lostpointercapture', end);
