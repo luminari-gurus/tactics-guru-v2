@@ -24,6 +24,8 @@ Baseline runtime was 249fa0d4fb0ec407b9ffb02b09f99a33759cac31, whose only change
 
 The exact original caller screenshot/turn remains unidentified. These reproduce its failure class in the unchanged authored Forest Ruins map. The [baseline illustration](baseline.png) was captured at 1280×900; the failing desktop regressions use the configured 1280×720 profile. Their expected cells are independent of the production picker.
 
+The [raw baseline render report](receipts/baseline-report.json.gz) retains the canvas transform, terrain/unit coordinates and dropdown-selected state for that illustration. The receipt directory also preserves the original touch-history failure and the initial dead-sprite/BFCache error contexts; these are raw diagnostic data, not continuation instructions.
+
 ## Final verification
 
 - **710 unit tests in 41 files**, plus **167 content checks**, both TypeScript configurations and production build: passed.
