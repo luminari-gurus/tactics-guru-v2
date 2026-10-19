@@ -62,3 +62,10 @@ export function projectEncounterSpawns(encounterId: unknown, party: unknown):
   return { ok: true, map: { ...map, cells: map.cells.map(c => ({ ...c })),
     spawns: map.spawns.filter(s => s.side === 'enemies' || living.has(s.unitId)).map(s => ({ ...s }) as SpawnRecord) } };
 }
+
+/** Production source configuration. Authored fixtures remain available for content regression. */
+export const battlefieldEncounters: readonly import('./battlefieldTypes').BattlefieldEncounter[] = authoredEncounters.map((encounter,index) => ({
+  id: encounter.id,
+  source: index < 2 ? {kind:'generated',biome:'desert',generatorVersion:1,profileVersion:'desert-v1'} : {kind:'authored',mapId:encounter.mapId},
+  roster: runCatalog.maps[encounter.mapId].spawns.map((spawn,i) => index < 2 ? {...spawn,x:3+(i%3)*2,y:spawn.side==='heroes'?10:1} : {...spawn}),
+}));

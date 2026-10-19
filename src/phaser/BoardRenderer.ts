@@ -628,6 +628,10 @@ export class BoardRenderer {
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
       reachable: this.reachable, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
+      shapeTextures: this.scene.textures.getTextureKeys().filter(key=>key.startsWith('battle-shape-v1-')).sort().map(key=>{
+        const source=this.scene.textures.get(key).getSourceImage();
+        return {key,width:source.width,height:source.height,rgbaBytes:source.width*source.height*4};
+      }),
       effect: this.effect,
       feedbackBounds: this.feedbackBounds(),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),

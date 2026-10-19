@@ -12,7 +12,7 @@ const battleMap = {
 } as const satisfies MapRecord;
 const catalog = { ...copy(catalogFixture), maps: { [battleMap.id]: battleMap } };
 // The content validator (#28) is not required: synthetic input checked by runtime boundaries.
-const fixture = () => ({ format: 1, versions: { rules: 1, rng: 1, content: battle.contentVersion(catalog) }, seed: 1,
+const fixture = () => ({ format: 1, versions: { rules: 2, rng: 1, content: battle.contentVersion(catalog) }, seed: 1,
   rng: seedRng(1), mapId: battleMap.id, units: [{ id: 1, defId: 'fighter', side: 'player', cell: { x: 0, y: 0 }, hp: 18, hasMoved: false, hasActed: false }, {id:2,defId:'goblin_grunt',side:'enemy',cell:{x:1,y:0},hp:18,hasMoved:false,hasActed:false}],
   initiative: [1,2], activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0 });
 function freeze<T>(value: T): T {

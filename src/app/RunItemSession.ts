@@ -2,7 +2,7 @@ import { track, reportFailure, setTelemetryContext } from '../telemetry/telemetr
 import { applyItemCommand, type ItemCommand, type ItemFailure } from '../domain/items';
 import { BattleSession } from './BattleSession';
 import { completeRunBattle, freshRunSnapshot } from '../domain/runBattle';
-import { runBattleCatalog } from '../domain/runSaveEnvelope';
+import { runBattleCatalog, resolveRunBattlefield } from '../domain/runSaveEnvelope';
 import { isIntegerIn } from '../domain/rng';
 import { RULE_BOUNDS } from '../domain/constants';
 import { runBoundaryId } from '../domain/run';
@@ -41,12 +41,15 @@ export class RunItemSession {
   startEncounter(): BattleSession | null {
     if (this.disposed || this.current.items.run.phase !== 'battle') return null;
     if (this.battle && this.battle.phase !== 'disposed') return this.battle;
+    const resolved = resolveRunBattlefield(this.current.items,this.context);
+    if(!resolved?.ok) { this.report('Could not resolve this battlefield. Progress unchanged.'); return null; }
+    const battlefield = resolved.descriptor;
     let session: BattleSession;
     const entry = this.snapshot.items;
     const accepted = () => {
       if (this.disposed || this.battle !== session || session.phase === 'disposed') return;
       const next = session.state.outcome === 'ongoing'
-        ? readRunSnapshot({ ...this.current, activeBattle: session.state }, this.context)
+        ? readRunSnapshot({ ...this.current, activeBattle: session.state, battlefield:battlefield }, this.context)
         : completeRunBattle(this.current, session.state, this.context);
       if (!next.ok) { reportFailure('run_boundary', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Run boundary rejected. Progress unchanged.'); return; }
       if (session.state.outcome !== 'ongoing') this.lastRecord = { entry, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
@@ -61,12 +64,12 @@ export class RunItemSession {
     const restoring = this.current.activeBattle !== null;
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog
-      ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted)
+      ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted, battlefield)
       : BattleSession.fromRun(this.current.items, this.context, accepted);
     if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
     session = created.session; this.battle = session;
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
-    this.current = { ...this.current, activeBattle: session.state }; this.review = null;
+    this.current = { ...this.current, activeBattle: session.state, battlefield:battlefield }; this.review = null;
     if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.save(); } return session;
   }
   recoveryTexts(load: RunLoadResult) {
@@ -117,7 +120,7 @@ export class RunItemSession {
     if (!result.ok) { this.report(`${rejectionText[result.reason]}. Nothing changed.`); return result; }
     this.battle?.dispose(); this.battle = null;
     const encounter = this.current.items.run.encounterIndex;
-    this.current = { items: result.state, activeBattle: null };
+    this.current = { items: result.state, activeBattle: null, battlefield:null };
     if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward', choice: command.itemId.replace('item:', '') as 'healing_draught' | 'warding_charm' | 'aiming_charm' }, `${this.current.items.run.id}:${encounter}`);
     this.review = null;
     this.save();

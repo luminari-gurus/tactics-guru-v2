@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`resolves deterministic desert and fallback > desert generator 1 profile desert-v1 seed 123 1`] = `
+{
+  "biome": "desert",
+  "encounterId": "encounter:forest_ruins",
+  "generatorVersion": 1,
+  "kind": "generated",
+  "layoutSeed": 3813269289,
+  "mapHash": "sha256:6b5fc5e8b4169b3358f29b28ca09f24eb25ff2daa9a7348dd51edeb2228abdcd",
+  "mapId": "map:desert_forest_ruins",
+  "profileVersion": "desert-v1",
+}
+`;
