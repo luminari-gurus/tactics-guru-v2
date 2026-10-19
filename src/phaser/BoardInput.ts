@@ -51,10 +51,10 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     pointer.point = next;
   };
   const end = (event: PointerEvent): void => {
-    if (!enabled(point(event))) { reset(); return; }
-    board.hover?.(null);
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
+    if (!enabled(point(event))) { reset(); return; }
+    board.hover?.(null);
     if(event.type!=='pointerup')board.resetPicking?.();
     const next = point(event);
     if (event.type === 'pointerup' && !gesture && pointers.size === 1
@@ -70,8 +70,8 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     if (pointers.size) gesture = true;
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
-  const reset = (): void => {
-    board.resetPicking?.();
+  const reset = (preservePicking = false): void => {
+    if(!preservePicking)board.resetPicking?.();
     for (const id of pointers.keys()) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
     pointers.clear();
     gesture = false;

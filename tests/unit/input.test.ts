@@ -105,14 +105,19 @@ it('suppresses a trailing release after wheel zoom while a pointer is held', () 
 
 it('preserves overlap selection after completed touch taps but clears it for cancelled gestures',()=>{
   const f=fake();let resets=0;
-  const cleanup=bindBoardInput(f.canvas,{...board(f),resetPicking:()=>resets++},()=>({width:400,height:600}));
+  const cleanup=bindBoardInput(f.canvas,{...board(f),resetPicking:()=>resets++},()=>({width:400,height:600}),p=>p.x>10&&p.y>10);
   const touch=(type:string)=>({...pointer(type,1,100,100),pointerType:'touch'} as unknown as Event);
   for(let i=0;i<2;i++){
     f.listeners.get('pointerdown')!(touch('pointerdown'));
     f.listeners.get('pointerup')!(touch('pointerup'));
+    // WebKit sends this after pointerup with zero coordinates, outside the drawable region.
+    f.listeners.get('lostpointercapture')!({...touch('lostpointercapture'),clientX:0,clientY:0} as unknown as Event);
     f.listeners.get('pointerleave')!(touch('pointerleave'));
   }
   expect(f.board.selections).toBe(2);expect(resets).toBe(0);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  cleanup.reset(true); // Layout can cancel capture while the camera/candidates stay unchanged.
+  expect(resets).toBe(0);expect(f.captured.size).toBe(0);
   f.listeners.get('pointerdown')!(touch('pointerdown'));
   f.listeners.get('pointercancel')!(touch('pointercancel'));
   expect(resets).toBe(1);expect(f.board.selections).toBe(2);

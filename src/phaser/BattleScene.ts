@@ -69,7 +69,8 @@ export class BattleScene extends Phaser.Scene {
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected),hover);
       hud.render(action,selected,message);
-      document.querySelector('#battle-board-caption')!.textContent+=board.pickingHint;
+      const caption=document.querySelector('#battle-board-caption')!;
+      caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
@@ -173,7 +174,9 @@ export class BattleScene extends Phaser.Scene {
       const r=drawable.getBoundingClientRect(),c=canvas.getBoundingClientRect();
       const next={x:(r.left-c.left)*this.scale.width/c.width,y:(r.top-c.top)*this.scale.height/c.height,
         width:r.width*this.scale.width/c.width,height:r.height*this.scale.height/c.height};
-      if(next.x!==region.x||next.y!==region.y||next.width!==region.width||next.height!==region.height)removeInput.reset();
+      // A caption/layout reflow cancels held gestures, but may keep the same
+      // camera and hit candidates. Do not let our overlap hint reset itself.
+      if(next.x!==region.x||next.y!==region.y||next.width!==region.width||next.height!==region.height)removeInput.reset(true);
       region=next;
       canvas.style.clipPath=`inset(${r.top-c.top}px ${c.right-r.right}px ${c.bottom-r.bottom}px ${r.left-c.left}px)`;
       board.fit(this.scale.width,this.scale.height,region);

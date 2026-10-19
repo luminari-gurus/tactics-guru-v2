@@ -353,6 +353,7 @@ export class BoardRenderer {
     if (width !== window.innerWidth || height !== window.innerHeight) return;
     const layout = fitBoard(this.bounds, region);
     const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
+    if(viewportChanged)this.resetPicking();
     const zoom = this.view.scale / this.fitScale;
     this.viewport = { width, height };
     this.region = region;
@@ -481,7 +482,7 @@ export class BoardRenderer {
 
   get pickingHint(): string {
     const count=this.picking?.keys.split('|').length ?? 0;
-    return count>1 ? ` · Overlap ${this.picking!.index+1}/${count}: click or tap again to cycle tiles` : '';
+    return count>1 ? `Overlap ${this.picking!.index+1}/${count}: tap/click again for next tile · ` : '';
   }
 
   private pickCandidates(point: Point): Tile[] {

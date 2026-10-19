@@ -1,0 +1,7 @@
+import {defineConfig,devices} from '@playwright/test';
+import base from '../../playwright.config';
+export default defineConfig({...base,testDir:'../../tests',testMatch:'**/battle-board.spec.ts',
+  grep:/occluded archer exposed|repeated map selection/,
+  projects:[{name:'webkit-portrait',use:{...devices['iPhone 13'],launchOptions:{}}},
+    {name:'webkit-landscape',use:{...devices['iPhone 13 landscape'],launchOptions:{}}}],
+});

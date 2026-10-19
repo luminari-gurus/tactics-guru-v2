@@ -67,19 +67,19 @@ test('occluded archer exposed art selects the same legal target as the dropdown'
   const unavailable=await page.locator('#battle-preview').textContent();
   expect(unavailable).toContain('Unavailable');
   const invalid=await page.locator('#game').getAttribute('data-session');
-  await boardClick(page,{x:-80,y:163.75},!!info.project.use.hasTouch);
+  await boardClick(page,{x:-80,y:172.5},!!info.project.use.hasTouch);
   expect((await report(page)).selected).toEqual({x:4,y:6,elevation:0});
   expect(await page.locator('#battle-preview').textContent()).toBe(unavailable);
   expect(await page.locator('#game').getAttribute('data-session')).toBe(invalid);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   expect(state.units.find(u=>u.id===6)?.hp).toBe(0);
-  // The defeated grunt's former head overlaps ground (3,8), never a dead target.
-  await boardClick(page,{x:-200,y:223.75},!!info.project.use.hasTouch);
-  expect((await report(page)).selected).toEqual({x:3,y:8,elevation:0});
+  // Inside the former grunt's head, clear of the shared (3,8)/(3,9) side edge.
+  await boardClick(page,{x:-195,y:223.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:8,elevation:1});
   expect(errors).toEqual([]);
 });
 
-test('repeated map selection reaches a legal ground destination behind the same platform',async({page},info)=>{
+test('repeated map selection reaches a legal ground destination behind the same platform',async({page,browserName},info)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await occlusionBoundary(page,9);
@@ -97,6 +97,11 @@ test('repeated map selection reaches a legal ground destination behind the same 
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await page.screenshot({path:info.outputPath('occluded-ground-map.png')});
   await expect(page.locator('#battle-board-caption')).toContainText('Overlap 2/2');
+  expect(await page.locator('#battle-board-caption').evaluate(node=>{
+    const range=document.createRange();range.setStart(node.firstChild!,0);range.setEnd(node.firstChild!,11);
+    const text=range.getBoundingClientRect(),box=node.getBoundingClientRect();
+    return text.top>=box.top && text.bottom<=box.bottom;
+  })).toBe(true); // The cycle hint must be visible without scrolling the compact caption.
   const select=()=>boardClick(page,p,!!info.project.use.hasTouch);
   // Hover never advances the explicitly selected alternate cell.
   const r=await settledReport(page);
@@ -119,8 +124,15 @@ test('repeated map selection reaches a legal ground destination behind the same 
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   await select();
   const before=await settledReport(page);
-  await page.mouse.move(before.transform.x+p.x*before.transform.scale,before.transform.y+p.y*before.transform.scale);
-  await page.mouse.wheel(0,-100);await settledReport(page);
+  const x=before.transform.x+p.x*before.transform.scale,y=before.transform.y+p.y*before.transform.scale;
+  await page.mouse.move(x,y);
+  if(browserName==='webkit'){
+    // Mobile WebKit's driver has no wheel API; exercise a real camera drag instead.
+    await page.mouse.down();await page.mouse.move(x+16,y+10,{steps:3});await page.mouse.up();
+  }else await page.mouse.wheel(0,-100);
+  const transformed=await settledReport(page);
+  expect(transformed.transform).not.toEqual(before.transform);
+  expect(transformed.selectionEvents).toBe(before.selectionEvents);
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   await select();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
