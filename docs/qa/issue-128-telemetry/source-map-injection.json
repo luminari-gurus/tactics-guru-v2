@@ -1,0 +1,61 @@
+{
+  "mockOnly": true,
+  "exitCode": 0,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "/api/projects/1/error_tracking/releases/hash/509013d57c447962575b58c8859c1f87263d217da8d34cd32475d9e0b8eb9519835b900e0258003e5bee492739e8f36fc4dac6e538ff7abde50f46c190e129aa"
+    }
+  ],
+  "injected": [
+    {
+      "file": "battleLayout-BVayxngr.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "browser-3gemfFKn.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "index-BJvahXV_.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "preload-helper-DjzSQ1t3.js",
+      "hasChunkId": false
+    },
+    {
+      "file": "rng-BCcJOpRP.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "start-HmhvRyW1.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "start-TdQpECWs.js",
+      "hasChunkId": false
+    },
+    {
+      "file": "startBattleApp-By9SPyDW.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "startRunApp-DxyFmPcH.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "telemetry-BmHDnlTj.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "transport-Do_KnqNw.js",
+      "hasChunkId": true
+    },
+    {
+      "file": "view-CoxHzY_N.js",
+      "hasChunkId": true
+    }
+  ],
+  "output": ""
+}

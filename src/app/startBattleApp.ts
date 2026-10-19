@@ -1,3 +1,4 @@
+import { reportFailure } from '../telemetry/telemetry';
 import '../style.css';
 import { diagnosticsSnapshot, measurements } from '../diagnostics/browser';
 import { mountBattleLayout } from '../ui/battleLayout';
@@ -39,7 +40,8 @@ function setStatus(state: 'loading' | 'ready' | 'error'): void {
   document.querySelectorAll<HTMLButtonElement>('[data-fixture]').forEach(button => { button.disabled = state !== 'ready'; });
 }
 
-function showError(message: string): void {
+function showError(message: string, handled = true): void {
+  if (handled) reportFailure('scene_load', { route: 'battle' });
   setStatus('error');
   statusLabel.textContent = `Error: ${message}. Reload the page to retry.`;
   container.dataset.ready = 'false';
@@ -54,8 +56,8 @@ restartButton.addEventListener('click', () => {
 });
 snapshotButton.addEventListener('click', () => { report.textContent = JSON.stringify(diagnosticsSnapshot(), null, 2); });
 window.fitDiagnostics = diagnosticsSnapshot;
-window.addEventListener('error', () => showError('The scene encountered a runtime error'));
-window.addEventListener('unhandledrejection', () => showError('The scene encountered an asynchronous error'));
+window.addEventListener('error', () => showError('The scene encountered a runtime error', false));
+window.addEventListener('unhandledrejection', () => showError('The scene encountered an asynchronous error', false));
 
 try {
   const { startProof } = await import('../phaser/start');

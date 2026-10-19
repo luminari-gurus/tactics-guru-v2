@@ -87,6 +87,7 @@ function gamePreloads(): Plugin {
 
 export default defineConfig({
   plugins: [gamePreloads()],
+  build: { sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false },
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
   // Vite's dev dependency optimizer does not inherit the top-level define map.
   optimizeDeps: { rolldownOptions: { transform: { define: phaserDefines } } },

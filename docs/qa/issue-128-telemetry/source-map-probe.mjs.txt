@@ -1,0 +1,18 @@
+import http from 'node:http';
+import { spawn } from 'node:child_process';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+const requests=[];
+const server=http.createServer((req,res)=>{
+  requests.push({method:req.method,url:req.url});
+  res.setHeader('Content-Type','application/json');
+  res.end(JSON.stringify({id:'12345678-1234-1234-1234-123456789012', project:'tactics-guru-v2',version:'a75c056',hash_id:'test'}));
+});
+await new Promise(resolve=>server.listen(4291,'127.0.0.1',resolve));
+const child=spawn('node_modules/.bin/posthog-cli',['sourcemap','inject','--directory','tmp/issue128-perf-off/assets','--release-name','tactics-guru-v2','--release-version','a75c056','--release-mode','symbol-set'],{env:{...process.env,POSTHOG_CLI_API_KEY:'phx_test',POSTHOG_CLI_PROJECT_ID:'1',POSTHOG_CLI_HOST:'http://127.0.0.1:4291'}});
+let output='';child.stdout.on('data',chunk=>output+=chunk);child.stderr.on('data',chunk=>output+=chunk);
+const exitCode=await new Promise(resolve=>child.on('exit',resolve));
+server.close();
+const files=readdirSync('tmp/issue128-perf-off/assets').filter(f=>f.endsWith('.js'));
+const injected=files.map(file=>({file,hasChunkId:readFileSync('tmp/issue128-perf-off/assets/'+file,'utf8').includes('chunkId=')}));
+writeFileSync('docs/qa/issue-128-telemetry/source-map-injection.json',JSON.stringify({mockOnly:true,exitCode,requests,injected,output},null,2)+'\n');
+console.log(JSON.stringify({exitCode,requests,injected},null,2));

@@ -1,3 +1,4 @@
+import { reportFailure, setTelemetryContext } from '../telemetry/telemetry';
 import { createRunBattle } from '../domain/runBattle';
 import type { RunSaveContext } from '../domain/runSaveEnvelope';
 import type { ContentCatalog, MapId } from '../content/types';
@@ -36,6 +37,7 @@ export class BattleSession {
     if (!created.ok) throw new Error(`Could not create battle: ${created.reason}`);
     this.current = this.initial = freeze(created.state);
     this.phase = this.decisionPhase();
+    setTelemetryContext({ phase: this.phase });
   }
   static fromRun(entry: unknown, context: RunSaveContext, accepted?: AcceptedState) {
     const created = createRunBattle(entry, context);
@@ -91,6 +93,7 @@ export class BattleSession {
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);
     this.phase = 'presenting';
+    setTelemetryContext({ phase: 'presenting' });
     // Observers cannot undo an accepted command or prevent its presentation.
     try { this.accepted?.(this.current); } catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
@@ -98,8 +101,9 @@ export class BattleSession {
   finishPresentation(token: number) {
     if (this.phase !== 'presenting' || token !== this.generation) return;
     this.phase = this.decisionPhase();
+    setTelemetryContext({ phase: this.phase });
     if (this.phase !== 'enemy') this.enemyQueue = [];
   }
-  private fail(reason: string) { this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
+  private fail(reason: string) { reportFailure('battle_resolution', { phase: this.phase }); this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
   dispose() { this.generation++; this.phase = 'disposed'; this.intent = null; this.enemyQueue = []; }
 }
