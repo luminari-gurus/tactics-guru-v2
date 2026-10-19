@@ -65,13 +65,30 @@ it('drops captured gestures at the drawable boundary, including outside release 
 it('removes every listener and restores touch style on shutdown', () => {
   const f = fake();
   const cleanup = bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));
-  expect(f.listeners.size).toBe(6);
+  expect(f.listeners.size).toBe(7);
   expect([...f.documentListeners.keys()]).toEqual(['visibilitychange']);
   expect(f.canvas.style.touchAction).toBe('none');
   cleanup();
   expect(f.listeners.size).toBe(0);
   expect(f.documentListeners.size).toBe(0);
   expect(f.canvas.style.touchAction).toBe('auto');
+});
+
+it('reports idle mouse/pen hover separately from selection and clears it on input boundaries', () => {
+  const f=fake(),hovers:({x:number;y:number}|null)[]=[];
+  const cleanup=bindBoardInput(f.canvas,{...board(f),hover:p=>hovers.push(p)},()=>({width:400,height:600}));
+  const move=(pointerType:string,buttons=0)=>f.listeners.get('pointermove')!({...pointer('pointermove',1,100,120),pointerType,buttons} as unknown as Event);
+  move('mouse');expect(hovers.at(-1)).toEqual({x:100,y:120});
+  move('touch');expect(hovers).toHaveLength(1);
+  move('pen');expect(hovers).toHaveLength(2);expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerleave')!(new Event('pointerleave'));expect(hovers.at(-1)).toBeNull();
+  move('mouse');f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,120));expect(hovers.at(-1)).toBeNull();
+  move('mouse',1);expect(hovers.at(-1)).toBeNull();
+  cleanup.reset();move('mouse');
+  f.listeners.get('wheel')!({clientX:100,clientY:120,deltaY:-100,preventDefault(){}} as unknown as Event);
+  expect(hovers.at(-1)).toBeNull();
+  move('mouse');f.document.visibilityState='hidden';f.documentListeners.get('visibilitychange')!(new Event('visibilitychange'));
+  expect(hovers.at(-1)).toBeNull();cleanup();
 });
 
 it('suppresses a trailing release after wheel zoom while a pointer is held', () => {

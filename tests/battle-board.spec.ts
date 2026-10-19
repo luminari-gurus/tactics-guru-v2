@@ -4,6 +4,8 @@ import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
+import { BattleSession } from '../src/app/BattleSession';
+import { hoverPreview } from '../src/ui/targetPreview';
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -14,6 +16,74 @@ async function settledReport(page: Page) {
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
   return report(page);
 }
+
+test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
+  const state=JSON.parse(before!).state,origin={x:11,y:11};
+  expect(initial.reachable).not.toContainEqual(origin);
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const hover=async(cell:{x:number;y:number})=>{
+    const r=await settledReport(page),tile=r.tiles.find((t:any)=>t.x===cell.x&&t.y===cell.y),p=projectTile(tile);
+    await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
+  };
+  await hover(origin);
+  const expectedHover=hoverPreview(new BattleSession(battleCatalog,state,state.seed),origin);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(expectedHover);
+  expect(expectedHover?.cells).not.toContainEqual(origin);
+  expect((await report(page)).reachable).toEqual(initial.reachable);
+  await expect(page.locator('#battle-board-caption')).toContainText('Purple dots: ability reach');
+  await expect(page.locator('#battle-board-caption')).toContainText('Pink +: target in reach');
+  const shown=await settledReport(page);expect(shown.selected).toBeNull();expect(shown.selectionEvents).toBe(initial.selectionEvents);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('hover-movement-range.png')});
+  // Screenshot regression: occupied goblin cells must remain in the preview, including Magic Missile reach.
+  const mageOrigin={x:4,y:8};
+  if(state.units.find((u:any)=>u.id===initial.activeId).defId!=='mage')throw Error('Expected authored opening mage turn');
+  await hover(mageOrigin);
+  const magePreview=hoverPreview(new BattleSession(battleCatalog,state,state.seed),mageOrigin)!;
+  const goblin=state.units.find((u:any)=>u.side==='enemy' && magePreview.targets.some(c=>c.x===u.cell.x&&c.y===u.cell.y));
+  expect(goblin).toBeDefined();
+  await expect.poll(async()=>(await report(page)).hover?.cells).toContainEqual(goblin.cell);
+  await expect.poll(async()=>(await report(page)).hover?.targets).toContainEqual(goblin.cell);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  await settledReport(page);await page.screenshot({path:info.outputPath('hover-goblin-target.png')});
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.mouse.wheel(0,-100);
+  await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+  const prepared=await page.locator('#game').getAttribute('data-session'),destination=JSON.parse(prepared!).pending.to;
+  await hover(origin);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(origin);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(destination);
+  await page.locator('#battle-review').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#dialog-cancel').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  // Native destination controls and keyboard navigation expose the same hypothetical-origin query.
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>(await report(page)).hover).not.toBeNull();
+  const selected=(await report(page)).selected;
+  const next=[{key:'ArrowRight',x:selected.x+1,y:selected.y},{key:'ArrowDown',x:selected.x,y:selected.y+1},
+    {key:'ArrowLeft',x:selected.x-1,y:selected.y},{key:'ArrowUp',x:selected.x,y:selected.y-1}]
+    .find(c=>hoverPreview(new BattleSession(battleCatalog,state,state.seed),{x:c.x,y:c.y}))!;
+  await page.locator('canvas').focus();await page.keyboard.press(next.key);
+  const navigated=await report(page);expect(navigated.hover?.origin).toMatchObject({x:navigated.selected.x,y:navigated.selected.y});
+  // Tab to the native control without pointer movement: its destination must replace the keyboard origin.
+  for(let i=0;i<20 && !await page.locator('#battle-target').evaluate(el=>el===document.activeElement);i++)await page.keyboard.press('Tab');
+  await expect(page.locator('#battle-target')).toBeFocused();
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending?.type).toBe('move');
+  const nativeSession=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(nativeSession.pending.type).toBe('move');
+  expect(nativeSession.pending.to).not.toEqual(navigated.hover.origin);
+  await expect.poll(async()=>(await report(page)).selected).toMatchObject(nativeSession.pending.to);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(hoverPreview(new BattleSession(battleCatalog,state,state.seed),nativeSession.pending.to));
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.keyboard.press('Escape');await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.locator('#fit-restart').click();await confirmRestart(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await report(page)).hover).toBeNull();
+  expect((await report(page)).objectCount).toBe(initial.objectCount);
+});
 
 test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
   await page.goto('/');
