@@ -8,7 +8,7 @@ Plan: localized chat plan, explicitly approved by Brian with “approved” on 2
 
 ## Behavior and boundaries
 
-The living current turn actor bobs upward by 0–2 board pixels over a smooth 1800 ms cosine cycle while player controls are ready. The authoritative initiative/active-index state chooses the actor. Selecting a destination, targeting another unit, inspecting another unit or clearing a target does not transfer actor identity. Inspection/confirmation dialogs pause the cue; closing them starts a fresh cycle from the tile anchor.
+The living current turn actor bobs upward by 0–2 board pixels over a smooth 1200 ms cosine cycle while player controls are ready. The authoritative initiative/active-index state chooses the actor. Selecting a destination, targeting another unit, inspecting another unit or clearing a target does not transfer actor identity. Inspection/confirmation dialogs pause the cue; closing them starts a fresh cycle from the tile anchor.
 
 Each frame sets an absolute sprite position from its projected terrain/elevation anchor. Tile rings, selection highlights, health bars, depths, picking and combat-effect anchors stay fixed. Board fitting reserves the 2px upward extent. Canopy fading conservatively includes that extent so foliage cannot flicker with each cycle. The animation pauses during all command presentations, page hiding, dialogs, battle end and reduced motion. Actor changes reset the previous sprite to its normal anchor. Scene shutdown removes its update and media-query listeners; restart and run encounters create fresh ownership.
 
@@ -49,3 +49,7 @@ The first dependency install used the host default Node 23 and warned that Vites
 Merged main `49af402` into the PR branch. The single conflict in `BattleScene.refresh` is resolved by keeping the authoritative idle-bob update together with main's targeting overlays and hover preview. The renderer/input/test changes from main merged automatically.
 
 Validation of the combined tree: 708 unit tests passed; production build passed with 167 content checks and both TypeScript configurations. All 15 focused Playwright checks passed across desktop, mobile portrait and mobile landscape (`active bob|target overlays|hovered origins`), using installed Google Chrome. `git diff --check` passed. Existing Vite loader/chunk warnings remain. The full browser suite was not rerun for this merge; its original retained failure above is unchanged.
+
+## Faster cycle follow-up — 2026-10-19
+
+At the owner's request, shortened the cycle from 1800 to 1200 ms (1.5× speed), retaining the 0–2px height and motion/lifecycle safeguards. Adjusted peak sampling to the new cycle and made the post-presentation check observe motion across frames rather than one arbitrary phase. The initial check run passed six cases and failed three phase-dependent samples; the updated nine-case matrix passes across desktop and both mobile layouts. Production build, content validation, both typechecks and diff checks pass.

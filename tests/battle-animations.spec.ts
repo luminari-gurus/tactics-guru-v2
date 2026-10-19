@@ -426,7 +426,7 @@ test('active bob: targets, cancel, inspection, camera and live reduced motion pr
   expect((await bobFrame(page)).actor.bobOffset).toBe(0);
   await page.locator('#inspection-close').click();
   await press(page, '#battle-cancel', true);
-  await page.clock.runFor(800);
+  await page.clock.runFor(560);
   expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
   const r = (await report(page)).region;
   await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
@@ -460,8 +460,7 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   expect(during.units.every((unit: any) => unit.bobOffset === 0)).toBe(true);
   aligned(during, fixture);
   await page.clock.runFor(800); await ready(page);
-  await page.clock.runFor(800);
-  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-0.2);
+  await expect.poll(async () => { await page.clock.runFor(100); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-0.2);
   const previousId = (await report(page)).activeId;
   await press(page, '#battle-next');
   await page.clock.runFor(3000); await ready(page);
@@ -475,7 +474,7 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   expect((await bobFrame(page)).actor.bobOffset).toBe(0);
   expect((await readSession(page)).state).toEqual(state); expect(await stored(page)).toEqual(saved);
   await page.evaluate(() => { delete (document as unknown as {hidden?: boolean}).hidden; document.dispatchEvent(new Event('visibilitychange')); });
-  await page.clock.runFor(800);
+  await page.clock.runFor(560);
   expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
   for (let i = 0; i < 2; i++) {
     await page.locator('#fit-restart').click(); await confirmRestart(page, true);

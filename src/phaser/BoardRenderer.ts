@@ -13,7 +13,7 @@ const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
 const SELECTED_COLOR = 0xffffff;
 const BOB_HEIGHT = 2;
-const BOB_CYCLE_MS = 1800;
+const BOB_CYCLE_MS = 1200;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 
 /** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
