@@ -5,6 +5,8 @@ import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
 import { previewMovement } from '../src/domain/grid';
+import { BattleSession } from '../src/app/BattleSession';
+import { hoverPreview } from '../src/ui/targetPreview';
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -28,12 +30,25 @@ test('hovered origins show hypothetical movement range without changing selectio
     await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
   };
   await hover(origin);
-  await expect.poll(async()=>(await report(page)).hover).toEqual({origin,cells:expected.cells.map(c=>c.cell)});
-  await expect(page.locator('#battle-board-caption')).toContainText('Purple dots: hypothetical Move');
+  const expectedHover=hoverPreview(new BattleSession(battleCatalog,state,state.seed),origin);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(expectedHover);
+  expect(expectedHover?.cells).toEqual(expect.arrayContaining(expected.cells.map(c=>c.cell)));
+  await expect(page.locator('#battle-board-caption')).toContainText('Pink +: target in reach');
   const shown=await settledReport(page);expect(shown.selected).toBeNull();expect(shown.selectionEvents).toBe(initial.selectionEvents);
   expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await page.screenshot({path:info.outputPath('hover-movement-range.png')});
+  // Screenshot regression: occupied goblin cells must remain in the preview, including Magic Missile reach.
+  const mageOrigin={x:4,y:8};
+  if(state.units.find((u:any)=>u.id===initial.activeId).defId!=='mage')throw Error('Expected authored opening mage turn');
+  await hover(mageOrigin);
+  const magePreview=hoverPreview(new BattleSession(battleCatalog,state,state.seed),mageOrigin)!;
+  const goblin=state.units.find((u:any)=>u.side==='enemy' && magePreview.targets.some(c=>c.x===u.cell.x&&c.y===u.cell.y));
+  expect(goblin).toBeDefined();
+  await expect.poll(async()=>(await report(page)).hover?.cells).toContainEqual(goblin.cell);
+  await expect.poll(async()=>(await report(page)).hover?.targets).toContainEqual(goblin.cell);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  await settledReport(page);await page.screenshot({path:info.outputPath('hover-goblin-target.png')});
   await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover).toBeNull();
   await hover(origin);await page.mouse.wheel(0,-100);
   await expect.poll(async()=>(await report(page)).hover).toBeNull();

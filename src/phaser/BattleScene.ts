@@ -9,7 +9,7 @@ import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, actionCommand, previewText, displayName, unitFeedback, unitLabel, type Action } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
-import { targetOverlays, movementHover } from '../ui/targetPreview';
+import { targetOverlays, hoverPreview } from '../ui/targetPreview';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
@@ -66,7 +66,7 @@ export class BattleScene extends Phaser.Scene {
       if(!live)return;
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
-      const hover=!dialogs.open?movementHover(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
+      const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected),hover);
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;

@@ -39,13 +39,24 @@ it('projects movement from a hypothetical origin using the actor stats without m
   expect(reach.cells).toContainEqual({cell:{x:2,y:1},cost:2});
   expect(reach.cells.some(r=>r.cell.x===3&&r.cell.y===1)).toBe(false); // Jump blocks the rise of two.
   expect(reach.cells.some(r=>r.cell.x===2&&r.cell.y===2)).toBe(false); // Water.
-  expect(reach.cells.some(r=>r.cell.x===3&&r.cell.y===2)).toBe(false); // Living enemy.
+  expect(reach.cells.some(r=>r.cell.x===3&&r.cell.y===2)).toBe(false); // Water and excessive elevation block every route.
   expect(reach.cells).toContainEqual({cell:{x:0,y:0},cost:2}); // Actual actor cell is released for this hypothetical query.
   expect(JSON.stringify(state)).toBe(before);
   expect(previewMovement(state,1,catalog,{x:3,y:2})).toEqual({ok:false,reason:'occupied'});
   expect(previewMovement(state,1,catalog,{x:2,y:2})).toEqual({ok:false,reason:'notWalkable'});
   expect(previewMovement(state,1,catalog,{x:-1,y:1})).toEqual({ok:false,reason:'outOfBounds'});
   expect(previewMovement({...state,units:state.units.map(u=>u.id===1?{...u,hasMoved:true}:u)},1,catalog,origin)).toEqual({ok:false,reason:'alreadyMoved'});
+});
+
+it('includes occupied hypothetical endpoints without traversing through them or changing real movement',()=>{
+  const {catalog,state}=fixture(cells=>{for(let i=4;i<12;i++)cells[i].terrainId='water';});
+  const s={...state,units:state.units.map(u=>u.id===2?{...u,cell:{x:1,y:0}}:u)};
+  const hover=previewMovement(s,1,catalog,{x:0,y:0});assert(hover.ok);
+  expect(hover.cells).toContainEqual({cell:{x:1,y:0},cost:1});
+  expect(hover.cells.some(c=>c.cell.x===2&&c.cell.y===0)).toBe(false);
+  const actual=previewMovement(s,1,catalog);assert(actual.ok);
+  expect(actual.cells.some(c=>c.cell.x===1&&c.cell.y===0)).toBe(false);
+  expect(moveUnit(s,command(1,0),catalog)).toEqual({ok:false,reason:'occupied'});
 });
 it('enforces uphill Jump and cost boundaries while allowing unrestricted downhill', () => {
   const move = (edit: Parameters<typeof fixture>[0]) => { const {catalog,state}=fixture(edit); return previewMove(state,command(1,0),catalog); };

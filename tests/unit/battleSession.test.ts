@@ -6,7 +6,7 @@ import { replayBattle } from '../../src/domain/turns';
 import { assert } from 'vitest';
 import { saveFixtures } from '../helpers/saveFixtures';
 import { nextUint32 } from '../../src/domain/rng';
-import { targetOverlays } from '../../src/ui/targetPreview';
+import { targetOverlays, hoverPreview } from '../../src/ui/targetPreview';
 
 const make = (seed = 1) => new BattleSession(catalog, 'map:forest_ruins', seed);
 const finishEnemies = (s: BattleSession) => {
@@ -16,6 +16,24 @@ const finishEnemies = (s: BattleSession) => {
   }
 };
 describe('battle session', () => {
+  it('hover reach includes occupied movement endpoints and Magic Missile targets beyond Move range without mutating the session',()=>{
+    const initial=make(2).state,mage=initial.units.find(u=>u.defId==='mage')!,enemy=initial.units.find(u=>u.side==='enemy')!;
+    const state={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===enemy.id?{...u,cell:{x:7,y:6}}:u)};
+    const s=new BattleSession(catalog,state,state.seed),origin={x:4,y:8};
+    s.prepare({type:'endTurn',unitId:mage.id});const pending=s.pending,before=s.state;
+    const movement=previewMovement(s.state,mage.id,catalog,origin);assert(movement.ok);
+    expect(movement.cells.map(c=>c.cell)).not.toContainEqual({x:7,y:6});
+    const hover=hoverPreview(s,origin)!;
+    expect(hover.cells).toContainEqual({x:7,y:6});expect(hover.targets).toContainEqual({x:7,y:6});
+    expect(hover.cells).toContainEqual({x:6,y:8}); // Water is in spell reach even though it cannot be walked on.
+    expect(s.state).toBe(before);expect(s.pending).toBe(pending);expect(s.events).toEqual([]);
+    const blockedState={...state,units:state.units.map(u=>u.id===enemy.id?{...u,cell:{x:2,y:3}}:u)};
+    const blocked=new BattleSession(catalog,blockedState,state.seed);
+    expect(hoverPreview(blocked,{x:0,y:3})!.targets).not.toContainEqual({x:2,y:3});
+    const spent=new BattleSession(catalog,{...state,units:state.units.map(u=>u.id===mage.id?{...u,hasActed:true}:u)},state.seed);
+    expect(hoverPreview(spent,origin)!.targets).toEqual([]);
+    expect(hoverPreview(spent,origin)!.cells).not.toContainEqual({x:7,y:6});
+  });
   it('target overlays retain domain rejection reasons and never prepare, resolve or consume RNG', () => {
     const initial = make(2).state;
     const ranger = initial.units.find(u=>u.defId==='ranger')!;

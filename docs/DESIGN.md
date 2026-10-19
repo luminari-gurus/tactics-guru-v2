@@ -208,10 +208,13 @@ for valid targets and coral `#ff867c` X-mark diamonds for unavailable targets.
 A white inner diamond plus a heavier outer border marks the selected target;
 the board caption explains these shapes. See the [legacy review and preview
 contract](target-preview-overlays.md).
-Hypothetical movement from the hovered tile uses purple `#b48aff` fills with inset
+Hypothetical movement and ability reach from the hovered tile use purple `#b48aff` fills with inset
 lavender outlines and paired white dots. A small white ring marks the preview
 origin. These shapes remain distinct from teal actual reach, selected diamonds
 and attack check/X markers; the board caption identifies the hypothetical range.
+Occupied cells are included when reachable. Legal ability targets from the preview
+origin use pink `#ff82c4` fills and a white plus marker; direct action-target check/X
+markers retain priority while an attack is selected.
 
 [Unit health arcs](../src/phaser/healthBar.ts) have their own functional palette:
 green `#3bc761` above 50%, amber `#e0992e` above 25% through 50%, red `#db2e29` at or

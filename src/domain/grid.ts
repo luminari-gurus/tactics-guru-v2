@@ -26,19 +26,22 @@ function search(state: BattleState, unitId: number, catalog: ContentCatalog, ori
     for (const direction of MOVEMENT_DIRECTIONS) {
       const cell = { x: current.cell.x + direction.x, y: current.cell.y + direction.y };
       const tile = tiles.get(key(cell));
-      if (!tile || cell.x < 0 || cell.y < 0 || cell.x >= map.width || cell.y >= map.height || occupied.has(key(cell))) continue;
+      const occupiedCell = occupied.has(key(cell));
+      if (!tile || cell.x < 0 || cell.y < 0 || cell.x >= map.width || cell.y >= map.height || (occupiedCell && !origin)) continue;
       const terrain = catalog.terrains[tile.terrainId];
       const uphill = Math.max(0, tile.elevation - from.elevation);
       if (!terrain.walkable || uphill > stats.jump) continue;
       const cost = current.cost + terrain.moveCost + uphill;
       if (cost > stats.move || cost >= (routes.get(key(cell))?.cost ?? Infinity)) continue;
       const route = { cell, cost, path: [...current.path, cell] };
-      routes.set(key(cell), route); frontier.push(route);
+      routes.set(key(cell), route);
+      // A hypothetical range includes occupied endpoints, but never paths through units.
+      if (!occupiedCell) frontier.push(route);
     }
   }
   return routes;
 }
-/** Reachability for the active actor; an optional hypothetical origin is presentation-only and never moves the actor. */
+/** Optional hypothetical origins include occupied endpoints for planning, without moving the actor or traversing units. */
 export function previewMovement(state: unknown, unitId: number, catalog: ContentCatalog, origin?: CellPosition): { readonly ok: true; readonly cells: readonly ReachableCell[] } | Rejection {
   const intent = previewCommand(state, { type: 'endTurn', unitId }, catalog);
   if (!intent.ok) return intent;
