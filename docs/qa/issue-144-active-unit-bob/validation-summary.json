@@ -1,0 +1,43 @@
+{
+  "issue": 144,
+  "base": "2f3a30f0db9bc128f7ae299ec03c80a393363fd4",
+  "branch": "work/issue-144-active-unit-bob",
+  "approval": "Brian explicitly approved the concrete chat plan on 2026-10-19.",
+  "unit": {
+    "filesPassed": 41,
+    "testsPassed": 705
+  },
+  "contentValidation": {
+    "testsPassed": 167
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "focusedBob": {
+    "passed": 9
+  },
+  "mainSuite": {
+    "passed": 551,
+    "failed": 1,
+    "skipped": 0,
+    "retries": 0
+  },
+  "failedCaseIsolatedRerun": {
+    "passed": 3,
+    "failed": 0,
+    "trace": true,
+    "codeChanged": false
+  },
+  "posttests": {
+    "authoredEncountersPassed": 18,
+    "runItemsPassed": 21
+  },
+  "diffCheck": "passed",
+  "browser": "Chromium 139.0.7258.5",
+  "playwright": "1.63.0",
+  "node": "22.21.1",
+  "mobile": "Pixel 7 portrait/landscape emulation; no physical testing",
+  "productionSourcesSha256": {
+    "src/phaser/BoardRenderer.ts": "8aa7400dd07142900c0ed190de5e326ffec7e28608c00d7463a42571f198a2f0",
+    "src/phaser/BattleScene.ts": "546f6276c54ddc407092e445dc9a6c08fb250f4c1a70bbc5eaf4214c385bec1d"
+  }
+}

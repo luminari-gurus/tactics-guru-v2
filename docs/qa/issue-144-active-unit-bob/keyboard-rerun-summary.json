@@ -1,0 +1,12 @@
+{
+  "stats": {
+    "startTime": "2026-10-19T12:50:18.593Z",
+    "duration": 6286.146,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "traceEnabled": true,
+  "applicationChangesBetweenRuns": false
+}
