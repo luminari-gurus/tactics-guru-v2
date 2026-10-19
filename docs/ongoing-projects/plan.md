@@ -1,4 +1,4 @@
-> Active work (2026-10-19): issue #146 terrain-occluded map selection. Continue from the [current implementation handoff](issue-146-occluded-map-picking/plan.md). The older performance material below is retained as history.
+> Completed (2026-10-19): issue #146 terrain-occluded map selection is implemented and verified in [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149), ready for review. See the [current handoff](issue-146-occluded-map-picking/plan.md). The older performance material below is retained as history.
 
 > Current disposition (2026-10-18): the owner requested merging the bounded image-cache/run-initialization fix and stopping. Issue #127 stays closed; the two remaining warm-run timing misses are deferred. See [current evidence](../qa/issue-127-performance-budgets.md). Historical keep-open and continuation instructions below are superseded by that direction.
 
