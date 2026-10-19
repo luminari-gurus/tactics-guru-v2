@@ -156,6 +156,29 @@ async function settledReport(page: Page) {
   return report(page);
 }
 
+test('layout clamping resets overlap history when the actual camera changes',async({page})=>{
+  await page.setViewportSize({width:750,height:342});
+  await occlusionBoundary(page,9);await page.locator('#battle-move').click();
+  const point={x:-77,y:160};
+  await boardClick(page,point);
+  let r=await settledReport(page);
+  await page.mouse.move(r.transform.x+point.x*r.transform.scale,r.transform.y+point.y*r.transform.scale);
+  await page.mouse.wheel(0,10000);await settledReport(page); // Minimum zoom for the current caption layout.
+  await boardClick(page,point);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  const before=await settledReport(page);
+  await page.locator('#battle-board-caption').evaluate(node=>{
+    node.style.boxSizing='border-box';node.style.maxHeight=`${node.getBoundingClientRect().height-1}px`;
+  });
+  await expect.poll(async()=>(await report(page)).transform.scale).toBeGreaterThan(before.transform.scale);
+  r=await settledReport(page);
+  // This is a real camera change smaller than the repeated-click distance threshold.
+  expect(Math.hypot(r.transform.x+point.x*r.transform.scale-before.transform.x-point.x*before.transform.scale,
+    r.transform.y+point.y*r.transform.scale-before.transform.y-point.y*before.transform.scale)).toBeLessThan(6);
+  await boardClick(page,point);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+});
+
 test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');

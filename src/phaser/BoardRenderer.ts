@@ -371,8 +371,9 @@ export class BoardRenderer {
   }
 
   private applyView(view: View): void {
-    if(view.x!==this.view.x || view.y!==this.view.y || view.scale!==this.view.scale)this.resetPicking();
-    this.view = constrainView(view, this.bounds, this.region, this.fitScale);
+    const constrained=constrainView(view, this.bounds, this.region, this.fitScale);
+    if(constrained.x!==this.view.x || constrained.y!==this.view.y || constrained.scale!==this.view.scale)this.resetPicking();
+    this.view = constrained;
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
     for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
