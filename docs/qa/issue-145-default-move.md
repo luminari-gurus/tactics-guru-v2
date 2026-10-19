@@ -28,7 +28,7 @@ A second direct regression isolated a validated artificial snapshot at the exist
 - `npm run test:unit`: 712/712 tests in 41 files.
 - `npm run build`: content checks, both TypeScript configurations and Vite passed.
 - Strict OpenSpec validation: passed for this change.
-- Three-profile focused default/Continue/map/run pass: in progress; final results and retained images will be added before closeout.
+- Three-profile focused default/Continue/map/run pass: 21/21, four minutes, no retries or skips. This includes all three run encounters on every profile. Initial keyboard/touch/lock checks also passed 6/6; that preliminary batch had three fixture-assertion failures from assuming seed 2 was player-first. The fixture now derives the actual player-first seed from session rules, and the corrected cases pass on all profiles.
 - Complete `npm test`, including both configured posttest suites: pending.
 
 The environment uses bundled Windows Node 24.19.0, npm 12.0.2 and Playwright 1.63.0 with its installed Chromium. Windows npm is invoked through an ignored wrapper because npm is absent from the session PATH. OpenSpec runs via the installed WSL CLI. No browser executable override is set.

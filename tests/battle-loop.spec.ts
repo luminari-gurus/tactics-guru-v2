@@ -33,6 +33,7 @@ test('default Move initializes once per usable player turn and preserves explici
     await expect(target).toHaveValue(selected);expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
     expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets).toEqual(overlays);
   }
+  await page.locator('#battle-scroll').evaluate(e=>{e.scrollTop=0;});
   await page.screenshot({path:test.info().outputPath('explicit-override.png')});
   expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);

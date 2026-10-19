@@ -52,6 +52,7 @@ test('default Move Continue is read-only and confirmed movement keeps the remain
   expect(moved.state.units.find(u=>u.id===moved.state.initiative[moved.state.activeIndex])).toMatchObject({hasMoved:true,hasActed:false});
   await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('[data-action=basic]')).toBeEnabled();await expect(page.locator('#battle-target')).toBeDisabled();
+  await page.locator('#battle-scroll').evaluate(e=>{e.scrollTop=0;});
   await page.screenshot({path:test.info().outputPath('post-move.png')});
   const committed=await stored(page);await page.reload();await page.locator('#save-continue').click();await ready(page);
   expect((await readSession(page)).state).toEqual(moved.state);expect(await stored(page)).toEqual(committed);
