@@ -43,3 +43,9 @@ Environment: Node 22.21.1; Playwright 1.63.0 / Chromium 139.0.7258.5 using the e
 During development, the first build found an invalid test-only TypeScript access to the helper's narrower session type; the assertion now reads the exposed pending-command attribute. The initial focused browser run passed 7/9 and failed two live reduced-motion assertions because they did not wait for Chromium's native media-query event delivery while the animation clock was frozen. After synchronizing the assertion with native event delivery, all 9/9 passed. These were test corrections; no reduced-motion implementation change was needed for that timing issue.
 
 The first dependency install used the host default Node 23 and warned that Vitest does not support that odd-numbered version. All validation commands use supported Node 22.21.1. Existing Vite configuration-loader and bundle-size warnings remain.
+
+## Main merge conflict resolution — 2026-10-19
+
+Merged main `49af402` into the PR branch. The single conflict in `BattleScene.refresh` is resolved by keeping the authoritative idle-bob update together with main's targeting overlays and hover preview. The renderer/input/test changes from main merged automatically.
+
+Validation of the combined tree: 708 unit tests passed; production build passed with 167 content checks and both TypeScript configurations. All 15 focused Playwright checks passed across desktop, mobile portrait and mobile landscape (`active bob|target overlays|hovered origins`), using installed Google Chrome. `git diff --check` passed. Existing Vite loader/chunk warnings remain. The full browser suite was not rerun for this merge; its original retained failure above is unchanged.
