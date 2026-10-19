@@ -7,6 +7,7 @@ import { dispatch } from '../src/domain/turns';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
+import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
 import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
 
@@ -338,4 +339,123 @@ test('visible action feedback stays inside the drawable board at small sizes and
     expect((await readSession(page)).state).toEqual(fixture.after);
     await page.screenshot({path:info.outputPath(`feedback-${size.width}.png`)});await page.clock.runFor(700);
   }
+});
+
+// Deliberately sample rendered coordinates as well as diagnostics: the cue is visual only.
+async function bobFrame(page: Page) {
+  const frame = await report(page);
+  const actor = frame.units.find((unit: any) => unit.id === frame.activeId);
+  for (const unit of frame.units) {
+    const tile = frame.tiles.find((tile: any) => tile.x === unit.tile.x && tile.y === unit.tile.y);
+    const base = projectTile(tile);
+    expect(unit.position.x).toBeCloseTo(base.x, 5);
+    expect(unit.position.y - base.y).toBeCloseTo(unit.bobOffset, 5);
+    expect(unit.bobOffset).toBeGreaterThanOrEqual(-2);
+    expect(unit.bobOffset).toBeLessThanOrEqual(0);
+    expect(unit.anchorError).toBeLessThan(0.001);
+    expect(unit.baseAnchorError).toBeCloseTo(Math.abs(unit.bobOffset) * frame.transform.scale, 4);
+    expect(unit.health.position).toEqual({x: base.x, y: base.y + HEALTH_BAR.offsetY});
+    if (unit.id !== frame.activeId) expect(unit.bobOffset).toBe(0);
+  }
+  return {frame, actor};
+}
+
+test('active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state', async ({page}, info) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  await boot(page, boundary('magic_missile'));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  const initial = await readSession(page), saved = await stored(page);
+  const {frame: baseline} = await bobFrame(page);
+  const offsets: number[] = [];
+  for (let i = 0; i < 16; i++) {
+    await page.clock.runFor(128);
+    offsets.push((await bobFrame(page)).actor.bobOffset);
+  }
+  expect(Math.min(...offsets)).toBeLessThan(-1.9);
+  expect(Math.max(...offsets)).toBeGreaterThan(-0.1);
+  await page.screenshot({path: info.outputPath('active-bob.png')});
+  await press(page, '[data-action="signature"]', true);
+  const enemy = initial.state.units.find(unit => unit.hp > 0 && unit.side === 'enemy')!;
+  await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);
+  await page.clock.runFor(400);
+  expect((await bobFrame(page)).frame.activeId).toBe(baseline.activeId);
+  await page.locator('#battle-inspect-target').click();
+  await page.clock.runFor(400);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  await page.locator('#inspection-close').click();
+  await press(page, '#battle-cancel', true);
+  await page.clock.runFor(800);
+  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
+  const r = (await report(page)).region;
+  await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+  await page.mouse.wheel(0, -200);
+  await page.clock.runFor(64);
+  const zoomed = await bobFrame(page);
+  expect(zoomed.frame.transform.scale).toBeGreaterThan(baseline.transform.scale);
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  // Chromium delivers media-query changes on its native rendering schedule.
+  await expect.poll(async () => { await page.clock.runFor(64); return (await bobFrame(page)).actor.bobOffset; }).toBe(0);
+  await page.clock.runFor(2000);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  await page.screenshot({path: info.outputPath('active-reduced-motion.png')});
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  await expect.poll(async () => { await page.clock.runFor(200); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-1.8);
+  const after = await readSession(page);
+  expect(after.state).toEqual(initial.state);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
+  expect(await stored(page)).toEqual(saved);
+  expect((await report(page)).objectCount).toBe(baseline.objectCount);
+  expect(errors).toEqual([]);
+});
+
+test('active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops', async ({page}) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  const fixture = boundary('magic_missile'); await boot(page, fixture);
+  await review(page, fixture); await confirmFrozen(page);
+  await page.clock.runFor(288);
+  const during = await report(page);
+  expect(during.units.every((unit: any) => unit.bobOffset === 0)).toBe(true);
+  aligned(during, fixture);
+  await page.clock.runFor(800); await ready(page);
+  await page.clock.runFor(800);
+  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-0.2);
+  const previousId = (await report(page)).activeId;
+  await press(page, '#battle-next');
+  await page.clock.runFor(3000); await ready(page);
+  expect((await bobFrame(page)).frame.activeId).not.toBe(previousId);
+  const saved = await stored(page), state = (await readSession(page)).state;
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', {configurable: true, get: () => true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.clock.runFor(2000);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  expect((await readSession(page)).state).toEqual(state); expect(await stored(page)).toEqual(saved);
+  await page.evaluate(() => { delete (document as unknown as {hidden?: boolean}).hidden; document.dispatchEvent(new Event('visibilitychange')); });
+  await page.clock.runFor(800);
+  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
+  for (let i = 0; i < 2; i++) {
+    await page.locator('#fit-restart').click(); await confirmRestart(page, true);
+    await page.clock.runFor(3000); await ready(page);
+    const baseline = await report(page);
+    for (let sample = 0; sample < 5; sample++) { await page.clock.runFor(300); await bobFrame(page); }
+    expect((await report(page)).objectCount).toBe(baseline.objectCount);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('active bob: initial reduced motion keeps sprite and static actor marker anchored', async ({page}, info) => {
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  await boot(page, boundary('high_shot', 'any', true));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  const initial = await report(page), saved = await stored(page);
+  for (let i = 0; i < 4; i++) {
+    await page.clock.runFor(900);
+    const {frame, actor} = await bobFrame(page);
+    expect(actor.bobOffset).toBe(0); expect(frame.activeId).toBe(initial.activeId);
+  }
+  await page.screenshot({path: info.outputPath('initial-reduced-motion.png')});
+  expect(await stored(page)).toEqual(saved);
 });

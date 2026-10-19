@@ -303,7 +303,11 @@ test('legal player movement updates elevation, reachability and canopy occlusion
   const after = await settledReport(page);
   const moved = after.units.find((u:any)=>u.id===initial.activeId);
   expect(moved.tile).toEqual({...elevated,elevation:1});
-  expect(moved.position).toEqual(projectTile(moved.tile));
+  const anchor = projectTile(moved.tile);
+  expect(moved.position.x).toBe(anchor.x);
+  expect(moved.position.y).toBeCloseTo(anchor.y + moved.bobOffset, 5);
+  expect(moved.bobOffset).toBeGreaterThanOrEqual(-2);
+  expect(moved.bobOffset).toBeLessThanOrEqual(0);
   expect(moved.anchorError).toBeLessThan(0.001);
   expect(after.reachable).toEqual([]);
   expect(after.commandCount).toBe(initial.commandCount+1);
@@ -315,7 +319,9 @@ test('legal player movement updates elevation, reachability and canopy occlusion
     const overlaps=state.units.some((u:any)=>{
       if(u.hp<=0)return false;
       const unit=after.units.find((v:any)=>v.id===u.id);
-      return canopyOccludes(canopy.tile,unit.tile,unitBounds(unit.tile,unit.origin),catalogMapHeight);
+      const art=unitBounds(unit.tile,unit.origin);
+      // Foliage conservatively clears the complete 2px idle envelope.
+      return canopyOccludes(canopy.tile,unit.tile,{...art,top:art.top-2},catalogMapHeight);
     });
     expect(canopy.alpha).toBe(overlaps?CANOPY_ART.fadedAlpha:1);
   }

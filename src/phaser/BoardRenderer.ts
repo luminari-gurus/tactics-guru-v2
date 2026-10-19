@@ -11,6 +11,8 @@ import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
 const SELECTED_COLOR = 0xffffff;
+const BOB_HEIGHT = 2;
+const BOB_CYCLE_MS = 1800;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 
 /** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
@@ -38,6 +40,75 @@ export class BoardRenderer {
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
   private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
+
+  private idle = false;
+  private bobId: number | null = null;
+  private bobElapsed = 0;
+  private bobOffset = 0;
+  private bobBase: Point | null = null;
+  private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /** Absolute offsets from the authoritative tile anchor never accumulate across refreshes. */
+  private readonly updateBob = (_time: number, delta: number): void => {
+    if (this.bobId === null) return;
+    this.bobElapsed = (this.bobElapsed + delta) % BOB_CYCLE_MS;
+    this.bobOffset = -BOB_HEIGHT * (1 - Math.cos(2 * Math.PI * this.bobElapsed / BOB_CYCLE_MS)) / 2;
+    this.placeBob();
+    // Update only the changing sprite diagnostics, not all board geometry each frame.
+    const game = document.querySelector<HTMLElement>('#game');
+    if (!game?.dataset.battleReport) return;
+    const report = JSON.parse(game.dataset.battleReport);
+    const unit = report.units.find((u: { id: number }) => u.id === this.bobId);
+    if (unit) {
+      const image = this.images.get(this.bobId)!;
+      unit.position = { x: image.x, y: image.y };
+      unit.bobOffset = this.bobOffset;
+      const base = this.root.getWorldTransformMatrix().transformPoint(this.bobBase!.x, this.bobBase!.y);
+      const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
+      unit.baseAnchorError = Math.hypot(base.x - actual.x, base.y - actual.y);
+      unit.anchorError = Math.hypot(base.x - actual.x, base.y + this.bobOffset * this.view.scale - actual.y);
+    }
+    game.dataset.battleReport = JSON.stringify(report);
+  };
+  private readonly motionChanged = (): void => {
+    this.syncBob();
+    this.publish();
+  };
+
+  setIdle(idle: boolean): void {
+    this.idle = idle;
+    this.syncBob();
+  }
+
+  private syncBob(): void {
+    const snapshot = this.snapshot;
+    const activeId = snapshot?.initiative[snapshot.activeIndex];
+    const active = snapshot?.units.find(unit => unit.id === activeId);
+    const next = this.idle && !this.animatedSnapshot && !this.reducedMotion.matches
+      && snapshot?.outcome === 'ongoing' && active && active.hp > 0 ? active.id : null;
+    if (next !== this.bobId) {
+      if (this.bobId !== null) {
+        const unit = snapshot?.units.find(unit => unit.id === this.bobId);
+        const image = this.images.get(this.bobId);
+        if (image?.scene) {
+          const point = unit ? projectTile(this.byCell.get(cellKey(unit.cell))!) : this.bobBase;
+          if (point) image.setPosition(point.x, point.y);
+        }
+      }
+      this.bobId = next;
+      this.bobElapsed = 0;
+      this.bobOffset = 0;
+    }
+    this.placeBob();
+  }
+
+  private placeBob(): void {
+    if (this.bobId === null || !this.snapshot) return;
+    const unit = this.snapshot.units.find(unit => unit.id === this.bobId)!;
+    const point = projectTile(this.byCell.get(cellKey(unit.cell))!);
+    this.bobBase = point;
+    this.images.get(unit.id)!.setPosition(point.x, point.y + this.bobOffset);
+  }
 
   constructor(private readonly scene: Phaser.Scene, private readonly catalog: ContentCatalog, private readonly mapId: MapId,
     private readonly onSelect: (cell: CellPosition | null) => void) {
@@ -99,9 +170,18 @@ export class BoardRenderer {
         const asset = catalog.assets[occupant.assetId];
         return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
       }))];
+    this.reducedMotion.addEventListener('change', this.motionChanged);
+    scene.events.on(Phaser.Scenes.Events.UPDATE, this.updateBob);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.idle = false;
+      this.bobId = null;
+      this.bobOffset = 0;
+      scene.events.off(Phaser.Scenes.Events.UPDATE, this.updateBob);
+      this.reducedMotion.removeEventListener('change', this.motionChanged);
+    });
     this.bounds = {
       left: Math.min(...rectangles.map(r => r.left)), right: Math.max(...rectangles.map(r => r.right)),
-      top: Math.min(...rectangles.map(r => r.top)), bottom: Math.max(...rectangles.map(r => r.bottom)),
+      top: Math.min(...rectangles.map(r => r.top)) - BOB_HEIGHT, bottom: Math.max(...rectangles.map(r => r.bottom)),
     };
   }
 
@@ -172,18 +252,20 @@ export class BoardRenderer {
         if (unit.hp <= 0) return false;
         const tile = this.byCell.get(cellKey(unit.cell))!;
         const image = this.images.get(unit.id)!;
-        return canopyOccludes(canopy.tile, tile, unitBounds(tile, { x: image.originX, y: image.originY }), this.catalog.maps[this.mapId].height);
+        const art = unitBounds(tile, { x: image.originX, y: image.originY });
+        return canopyOccludes(canopy.tile, tile, { ...art, top: art.top - BOB_HEIGHT }, this.catalog.maps[this.mapId].height);
       });
       canopy.graphics.setAlpha(overlaps ? CANOPY_ART.fadedAlpha : 1);
     }
+    this.syncBob();
     this.root.sort('depth');
     this.publish();
   }
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
-    this.present(before, [], null);
     this.animatedSnapshot = before;
+    this.present(before, [], null);
     const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
     const {signature, feedback} = abilityPresentation(events);
     const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
@@ -445,7 +527,9 @@ export class BoardRenderer {
       const image = this.images.get(unit.id)!;
       const tile = this.byCell.get(cellKey(unit.cell))!;
       const projected = projectTile(tile);
-      const expected = matrix.transformPoint(projected.x, projected.y);
+      const bobOffset = unit.id === this.bobId ? this.bobOffset : 0;
+      const expected = matrix.transformPoint(projected.x, projected.y + bobOffset);
+      const base = matrix.transformPoint(projected.x, projected.y);
       const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
       return { id: unit.id, unitId: unit.defId, side: unit.side, tile: { ...unit.cell, elevation: tile.elevation },
         health: (()=>{
@@ -458,7 +542,7 @@ export class BoardRenderer {
             interactive:!!bar.input};
         })(),
         assetId: image.texture.key, origin: { x: image.originX, y: image.originY }, depth: image.depth,
-        position: { x: image.x, y: image.y }, anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
+        position: { x: image.x, y: image.y }, bobOffset, baseAnchorError: Math.hypot(base.x - actual.x, base.y - actual.y), anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
     });
     const { x, y, scale } = this.view;
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({

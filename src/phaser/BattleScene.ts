@@ -64,6 +64,7 @@ export class BattleScene extends Phaser.Scene {
       if(!live)return;
       const reach=session.phase==='player'?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
+      board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[]);
       hud.render(action,selected,message);
       game.dataset.phase=session.phase;
@@ -154,7 +155,7 @@ export class BattleScene extends Phaser.Scene {
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
     document.addEventListener('keydown',escape);
-    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();}else pump();};
+    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
     const fit=()=>{
