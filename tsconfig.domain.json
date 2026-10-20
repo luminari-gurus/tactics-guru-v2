@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": { "lib": ["ES2022"], "types": [] },
-  "include": ["src/domain", "src/content", "src/map/generate.ts"]
+  "include": ["src/domain", "src/content", "src/map/generate.ts", "src/map/state.ts"]
 }

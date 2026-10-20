@@ -2,6 +2,7 @@ import './style.css';
 import { generateMap, MAP_TYPES, type MapType } from './generate';
 import { applyBiome, BIOMES, type Biome } from './biomes';
 import { ART_STYLES, createMapArt, type ArtStyle, type ArtTreatment } from './art';
+import { createOverworld, type OverworldState } from './state';
 
 export function startMap(): void {
   document.title = 'Overworld map · Tactics Guru';
@@ -19,9 +20,11 @@ export function startMap(): void {
       </form>
       <p id="map-seed-help">Enter a whole number from 0 to 4294967295. Reuse a seed to see the same map.</p>
       <p id="map-status" role="status" aria-live="polite"></p>
-      <figure id="map-figure"><div id="map-grid" role="img"></div>
-        <figcaption><span><i class="map-floor"></i> <span id="map-open-label">Walkable</span></span><span><i class="map-wall"></i> <span id="map-blocked-label">Blocked</span></span></figcaption>
+      <figure id="map-figure"><div id="map-grid" role="img" aria-describedby="map-markers"></div>
+        <figcaption><span><i class="map-floor"></i> <span id="map-open-label">Walkable</span></span><span><i class="map-wall"></i> <span id="map-blocked-label">Blocked</span></span>
+          <span><i class="map-marker-key" data-marker-kind="player" aria-hidden="true"></i> Player · 1</span><span><i class="map-marker-key" data-marker-kind="enemy" aria-hidden="true"></i> Enemies · 3</span></figcaption>
       </figure>
+      <p id="map-markers" class="map-visually-hidden"></p>
     </main>`;
   const input = document.querySelector<HTMLInputElement>('#map-seed')!;
   const grid = document.querySelector<HTMLElement>('#map-grid')!;
@@ -30,7 +33,9 @@ export function startMap(): void {
   const biomeSelect = document.querySelector<HTMLSelectElement>('#map-biome')!;
   const artSelect = document.querySelector<HTMLSelectElement>('#map-art')!;
   const figure = document.querySelector<HTMLElement>('#map-figure')!;
-  let map = applyBiome(generateMap(1));
+  const description = document.querySelector<HTMLElement>('#map-markers')!;
+  let world: OverworldState | undefined;
+  let placementFailure = '';
   let art: ArtStyle = 'simple';
   let invalidSeed = false;
   const treatment = createMapArt(render);
@@ -39,9 +44,16 @@ export function startMap(): void {
     element.style.backgroundImage = resolved.url ? `url("${resolved.url}")` : '';
   }
   function render(): void {
-    select.value = map.type;
-    biomeSelect.value = map.biome;
-    artSelect.value = art;
+    restoreChoices();
+    const validation = invalidSeed ? 'Enter a whole number from 0 to 4294967295. The map is unchanged. ' : '';
+    if (!world) {
+      grid.replaceChildren();
+      grid.setAttribute('aria-label', 'Overworld unavailable');
+      description.textContent = 'No markers placed.';
+      status.textContent = validation + placementFailure;
+      return;
+    }
+    const { map, markers } = world;
     figure.dataset.biome = map.biome;
     const biome = BIOMES.find(entry => entry.id === map.biome)!;
     document.querySelector<HTMLElement>('#map-open-label')!.textContent = `Walkable · ${biome.open}`;
@@ -52,16 +64,27 @@ export function startMap(): void {
     decorate(document.querySelector<HTMLElement>('figcaption .map-wall')!, blocked);
     const walkable = map.cells.reduce<number>((total, cell) => total + cell, 0);
     const cells = document.createDocumentFragment();
-    for (const terrain of map.terrain) {
+    const occupants = new Map(markers.map(marker => [marker.y * map.width + marker.x, marker]));
+    for (const [index, terrain] of map.terrain.entries()) {
       const cell = document.createElement('span');
       cell.className = terrain.endsWith('-open') ? 'map-floor' : 'map-wall';
       cell.dataset.terrain = terrain;
       decorate(cell, terrain.endsWith('-open') ? open : blocked);
+      const marker = occupants.get(index);
+      if (marker) {
+        cell.dataset.markerId = marker.id;
+        cell.dataset.markerKind = marker.kind;
+        cell.dataset.markerX = String(marker.x);
+        cell.dataset.markerY = String(marker.y);
+      }
       cell.setAttribute('aria-hidden', 'true');
       cells.append(cell);
     }
     grid.replaceChildren(cells);
-    grid.setAttribute('aria-label', `20 by 20 ${biome.label} map with ${walkable} walkable and ${400 - walkable} blocked cells`);
+    grid.setAttribute('aria-label', `20 by 20 ${biome.label} map with ${walkable} walkable and ${400 - walkable} blocked cells, 1 player and 3 enemies`);
+    description.textContent = markers.map(marker =>
+      `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ');
+    grid.dataset.placementVersion = world.placementVersion;
     grid.dataset.seed = String(map.seed);
     grid.dataset.version = map.version;
     grid.dataset.type = map.type;
@@ -75,18 +98,21 @@ export function startMap(): void {
     const feedback = fallbacks.has('missing') ? ' · No legacy desert artwork; using Simple'
       : fallbacks.has('failed') ? ' · Artwork unavailable; using Simple for affected terrain'
       : fallbacks.has('loading') ? ' · Loading artwork; using Simple while loading' : '';
-    status.textContent = `${invalidSeed ? 'Enter a whole number from 0 to 4294967295. The map is unchanged. ' : ''}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;
+    status.textContent = `${validation}${placementFailure}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;
+  }
+  function restoreChoices(): void {
+    select.value = world?.map.type ?? 'rooms';
+    biomeSelect.value = world?.map.biome ?? 'grassland';
+    artSelect.value = art;
   }
   function validSeed(): number | undefined {
     const text = input.value.trim();
     const value = Number(text);
     if (!/^\d{1,10}$/.test(text) || !Number.isSafeInteger(value) || value > 0xffffffff) {
-      select.value = map.type;
-      biomeSelect.value = map.biome;
-      artSelect.value = art;
+      restoreChoices();
       invalidSeed = true;
       input.setAttribute('aria-invalid', 'true');
-      status.textContent = 'Enter a whole number from 0 to 4294967295. The map is unchanged.';
+      status.textContent = 'Enter a whole number from 0 to 4294967295. The map is unchanged. ' + placementFailure;
       input.focus();
       return undefined;
     }
@@ -94,8 +120,16 @@ export function startMap(): void {
     input.removeAttribute('aria-invalid');
     return value;
   }
-  function commit(): void {
-    input.value = String(map.seed);
+  function regenerate(seed: number, type: MapType, biome: Biome): void {
+    const result = createOverworld(applyBiome(generateMap(seed, type), biome));
+    if (!result.ok) {
+      placementFailure = `Marker placement failed. ${result.reason} ${world ? 'The previous world is unchanged.' : 'The overworld is unavailable; retry Generate.'} `;
+      render();
+      return;
+    }
+    world = result.state;
+    placementFailure = '';
+    input.value = String(world.map.seed);
     invalidSeed = false;
     input.removeAttribute('aria-invalid');
     render();
@@ -103,8 +137,7 @@ export function startMap(): void {
   function applySelection(): void {
     const value = validSeed();
     if (value === undefined) return;
-    map = applyBiome(generateMap(value, select.value as MapType), biomeSelect.value as Biome);
-    commit();
+    regenerate(value, select.value as MapType, biomeSelect.value as Biome);
   }
   document.querySelector<HTMLFormElement>('#map-controls')!.addEventListener('submit', event => {
     event.preventDefault();
@@ -119,11 +152,11 @@ export function startMap(): void {
     render();
   });
   document.querySelector<HTMLButtonElement>('#map-new-seed')!.addEventListener('click', () => {
-    let next = (map.seed + 1) >>> 0;
+    const seed = world?.map.seed ?? 1;
+    let next = (seed + 1) >>> 0;
     try { next = crypto.getRandomValues(new Uint32Array(1))[0]; } catch { /* Next seed remains usable without browser entropy. */ }
-    if (next === map.seed) next = (map.seed + 1) >>> 0;
-    map = applyBiome(generateMap(next, map.type), map.biome);
-    commit();
+    if (next === seed) next = (seed + 1) >>> 0;
+    regenerate(next, world?.map.type ?? 'rooms', world?.map.biome ?? 'grassland');
   });
-  render();
+  regenerate(1, 'rooms', 'grassland');
 }

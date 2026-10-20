@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { generateMap, validMapCells, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
 import { applyBiome, BIOMES, type Biome } from '../../src/map/biomes';
+import { createOverworld } from '../../src/map/state';
 import * as rng from '../../src/domain/rng';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog } from '../../src/content/catalog';
@@ -10,7 +11,7 @@ import { battleCatalog } from '../../src/content/catalog';
 const seeds = [...new Set([...Array.from({ length: 256 }, (_, i) => i), 12345, 424242, 2147483648, 4294967295])];
 
 // Independent flood-fill checks the output rather than trusting the generator validator.
-function inspect(cells: readonly MapCell[]): void {
+function inspect(cells: readonly MapCell[]): Set<number> {
   expect(cells).toHaveLength(400);
   expect(cells.every(c => c === 0 || c === 1)).toBe(true);
   const floors = cells.flatMap((cell, i) => cell === 1 ? [i] : []);
@@ -30,6 +31,7 @@ function inspect(cells: readonly MapCell[]): void {
     }
   }
   expect(reached.size).toBe(floors.length);
+  return reached;
 }
 
 describe('independent seeded map', () => {
@@ -90,9 +92,13 @@ describe('independent seeded map', () => {
 
 
 describe('map type contract', () => {
-  it('preserves the pre-change Rooms matrix fingerprint', () => {
-    const signature = createHash('sha256').update(seeds.map(seed => generateMap(seed, 'rooms').cells.join('')).join('\n')).digest('hex');
-    expect(signature).toBe('d7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0');
+  it.each([
+    ['rooms', 'd7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0'],
+    ['random-walker', 'dc2715ef5fc6b56526bd19300eea7157bada57f32ebdf580eff0ac70d3d3d893'],
+    ['cellular', '31583dad387235929096a42f680f782551474198495569c9e6c54710f23dc88e'],
+  ] as const)('preserves the pre-marker %s matrix fingerprint', (type, expected) => {
+    const signature = createHash('sha256').update(seeds.map(seed => generateMap(seed, type).cells.join('')).join('\n')).digest('hex');
+    expect(signature).toBe(expected);
   });
   it.each(MAP_TYPES)('$id is valid, deterministic and diverse', ({ id, version }) => {
     const layouts = new Set<string>();
@@ -115,6 +121,103 @@ describe('map type contract', () => {
     for (const seed of [1, 12345, 424242]) {
       expect(new Set(MAP_TYPES.map(({ id }) => generateMap(seed, id).cells.join(''))).size).toBe(3);
     }
+  });
+});
+
+describe('authoritative overworld markers', () => {
+  it.each([
+    ['rooms', 0, [[7, 8], [14, 3], [4, 15], [5, 15]]],
+    ['rooms', 1, [[5, 11], [12, 8], [12, 9], [6, 10]]],
+    ['rooms', 4294967295, [[4, 5], [4, 12], [2, 13], [11, 10]]],
+    ['random-walker', 0, [[1, 15], [11, 12], [7, 18], [7, 11]]],
+    ['random-walker', 1, [[5, 13], [9, 5], [10, 8], [11, 6]]],
+    ['random-walker', 4294967295, [[5, 14], [9, 18], [1, 14], [12, 13]]],
+    ['cellular', 0, [[13, 11], [17, 5], [6, 17], [5, 5]]],
+    ['cellular', 1, [[2, 5], [1, 12], [4, 7], [3, 11]]],
+    ['cellular', 4294967295, [[15, 11], [13, 3], [11, 7], [7, 10]]],
+  ] as const)('pins markers-v1 for %s seed %s', (type, seed, positions) => {
+    const result = createOverworld(applyBiome(generateMap(seed, type)));
+    if (!result.ok) throw Error(result.reason);
+    expect(result.state.markers.map(({ x, y }) => [x, y])).toEqual(positions);
+  });
+
+  it.each(MAP_TYPES)('$id populates every seed/biome with reproducible distinct reachable markers', ({ id }) => {
+    for (const seed of seeds) {
+      const layout = generateMap(seed, id);
+      const reached = inspect(layout.cells);
+      const baseline = createOverworld(applyBiome(layout));
+      expect(baseline.ok).toBe(true);
+      if (!baseline.ok) throw Error(baseline.reason);
+      for (const { id: biome } of BIOMES) {
+        const map = applyBiome(layout, biome);
+        const before = structuredClone(map);
+        Object.freeze(map.cells); Object.freeze(map.terrain); Object.freeze(map);
+        const result = createOverworld(map);
+        expect(result.ok).toBe(true);
+        if (!result.ok) throw Error(result.reason);
+        expect(result.state.map).toBe(map);
+        expect(result.state.placementVersion).toBe('markers-v1');
+        expect(result.state.markers.map(({ id, kind }) => [id, kind])).toEqual([
+          ['player', 'player'], ['enemy-1', 'enemy'], ['enemy-2', 'enemy'], ['enemy-3', 'enemy'],
+        ]);
+        const positions = result.state.markers.map(({ x, y }) => {
+          expect(Number.isInteger(x) && Number.isInteger(y) && x >= 0 && x < 20 && y >= 0 && y < 20).toBe(true);
+          expect(reached.has(y * 20 + x)).toBe(true);
+          return y * 20 + x;
+        });
+        expect(new Set(positions).size).toBe(4);
+        expect(result.state.markers).toEqual(baseline.state.markers);
+        expect(createOverworld(map)).toEqual(result);
+        expect(map).toEqual(before);
+      }
+    }
+  });
+
+  it.each(MAP_TYPES)('populates the real generator fallback with unmocked placement ($id)', ({ id }) => {
+    const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
+    let layout;
+    try { layout = generateMap(1, id); } finally { draw.mockRestore(); }
+    expect(layout.fallback).toBe(true);
+    const reached = inspect(layout.cells);
+    const result = createOverworld(applyBiome(layout));
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw Error(result.reason);
+    expect(new Set(result.state.markers.map(({ x, y }) => y * 20 + x)).size).toBe(4);
+    expect(result.state.markers.every(({ x, y }) => reached.has(y * 20 + x))).toBe(true);
+  });
+
+  it('fails explicitly without partial state for malformed or unusable layouts', () => {
+    const map = applyBiome(generateMap(1));
+    const disconnected: MapCell[] = Array<MapCell>(400).fill(0);
+    for (let y = 2; y < 10; y++) for (let x = 2; x < 10; x++) disconnected[y * 20 + x] = 1;
+    disconnected[357] = 1;
+    const sparse = [...map.cells]; delete sparse[0];
+    for (const invalid of [
+      { ...map, cells: [] }, { ...map, cells: Array<MapCell>(400).fill(0) },
+      { ...map, cells: Array.from({ length: 400 }, (_, i): MapCell => i >= 21 && i < 24 ? 1 : 0) },
+      { ...map, cells: disconnected }, { ...map, cells: sparse },
+      { ...map, cells: map.cells.map((cell, i) => i === 21 ? 2 as MapCell : cell) },
+      { ...map, width: 19 }, { ...map, height: 21 }, { ...map, seed: -1 },
+      { ...map, terrain: [] }, { ...map, terrain: map.terrain.map(() => 'forest-open' as const) },
+    ]) {
+      expect(createOverworld(invalid)).toEqual({ ok: false, reason: expect.any(String) });
+    }
+  });
+
+  it('uses exactly four local selection draws without entropy, time or battle changes', () => {
+    const map = applyBiome(generateMap(0xffffffff));
+    const battle = new BattleSession(battleCatalog, 'map:forest_ruins', 42);
+    const before = structuredClone(battle.state);
+    const expected = createOverworld(map);
+    const draw = vi.spyOn(rng, 'nextUint32');
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock accessed'); });
+    const entropy = vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('entropy accessed'); });
+    try {
+      expect(createOverworld(map)).toEqual(expected);
+      expect(draw.mock.calls.map(([state]) => state.cursor)).toEqual([0, 1, 2, 3]);
+      expect(battle.state).toEqual(before);
+    } finally { draw.mockRestore(); clock.mockRestore(); entropy.mockRestore(); }
+    expect(rng.nextUint32(battle.state.rng)).toEqual(rng.nextUint32(before.rng));
   });
 });
 
