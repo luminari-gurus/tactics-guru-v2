@@ -3,6 +3,7 @@ import { build } from 'vite';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
+import { desertAssets } from '../../src/content/desertAssets';
 
 for (const base of ['/', '/tactics/']) {
   test(`built cache rules cover only versioned code and unchanged battle images at ${base}`, async () => {
@@ -20,7 +21,7 @@ for (const base of ['/', '/tactics/']) {
     });
     const code = result.output.filter(file => /\.(js|css)$/.test(file.fileName));
     expect(code.length).toBeGreaterThan(0);
-    const images = Object.values(battleAssets).map(asset => {
+    const images = Object.values({...battleAssets,...desertAssets}).map(asset => {
       const bytes = readFileSync(`public${asset.runtimePath}`);
       const hash = createHash('sha256').update(bytes).digest('hex').slice(0,16);
       const path = `assets/${hash}${asset.runtimePath}`;

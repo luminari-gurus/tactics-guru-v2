@@ -29,8 +29,25 @@ outside this change.
   commands/RNG without past events; independent battle recovery remains isolated.
 - `performance-dirty.json` retains the first diagnostic capture. The existing
   collector rejected its dirty build identity. It is not acceptance evidence.
-  Clean-build performance and browser receipts are recorded alongside this report
-  after verification.
+  `performance-pre-cache.json` and its evaluation retain an intermediate clean
+  capture at 438fc16: all 18 samples passed. The final asset pipeline additionally
+  versions the new images and preloads them only for the run.
+- `browser/final-browser.txt`: 30/30 final production asset, camera/highlight,
+  movement/resume, authored final, cache stability and controlled-error cases.
+  `browser/fixtures.txt`: 24/24 authored, invalid-source/asset, forced fallback and
+  representative-layout cases. Functional captures use runtime 0a56090; their
+  dirty build marker reflects staged QA receipts, not uncommitted runtime edits.
+- `browser/unit.txt`: 759/759 unit tests. Header tests verify byte-identical
+  content-hashed images and immutable rules at both `/` and `/tactics/`.
+- `browser/broad-browser.txt`: 125/126 broad run/persistence/content cases passed.
+  One desktop reload received HTTP 404 while this task rebuilt `dist` under the
+  running preview. `browser/rebuild-race-404.md` retains the failure. The same
+  accepted-player case then passed all three profiles in the final 30-case run,
+  with builds and browser runs serialized.
+- Static texture receipts cover run seeds 13–16: each restart kept five cached
+  shapes, 3,299,328 raw RGBA bytes and 595 objects. Representative seed 0/1/2 and
+  forced-fallback captures preserve readable open sand and distinct rock surfaces.
+  The quality captures were visually reviewed.
 
 ## Reproduction
 

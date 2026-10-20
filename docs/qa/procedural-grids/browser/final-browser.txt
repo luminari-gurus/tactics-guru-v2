@@ -1,0 +1,54 @@
+[WebServer] (node:96433) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 30 tests using 1 worker
+
+(node:96462) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (2.0s)
+  ✓   2 [desktop] › tests/procedural-grids.spec.ts:43:1 › authored final entry preserves carried heroes and equipped projection (1.3s)
+  ✓   3 [desktop] › tests/procedural-grids.spec.ts:57:1 › repeated generated restarts keep the static shape cache bounded (2.5s)
+  ✓   4 [desktop] › tests/procedural-grids.spec.ts:76:1 › missing desert surface fails through the controlled asset error (289ms)
+  ✓   5 [desktop] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm battle uses real controls and isolates only v2 saves (2.1s)
+  ✓   6 [desktop] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm run uses real controls and isolates only v2 saves (2.5s)
+  ✓   7 [desktop] › tests/public-asset-base.spec.ts:36:3 › battle direct entry and refresh resolve public assets (1.4s)
+  ✓   8 [desktop] › tests/public-asset-base.spec.ts:36:3 › proof direct entry and refresh resolve public assets (981ms)
+  ✓   9 [desktop] › tests/public-asset-base.spec.ts:36:3 › content-smoke direct entry and refresh resolve public assets (294ms)
+(node:96507) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [desktop] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (1.8s)
+(node:96615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 [mobile-portrait] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (1.9s)
+  ✓  12 [mobile-portrait] › tests/procedural-grids.spec.ts:43:1 › authored final entry preserves carried heroes and equipped projection (1.2s)
+  ✓  13 [mobile-portrait] › tests/procedural-grids.spec.ts:57:1 › repeated generated restarts keep the static shape cache bounded (2.3s)
+  ✓  14 [mobile-portrait] › tests/procedural-grids.spec.ts:76:1 › missing desert surface fails through the controlled asset error (308ms)
+  ✓  15 [mobile-portrait] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm battle uses real controls and isolates only v2 saves (2.1s)
+  ✓  16 [mobile-portrait] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm run uses real controls and isolates only v2 saves (2.4s)
+  ✓  17 [mobile-portrait] › tests/public-asset-base.spec.ts:36:3 › battle direct entry and refresh resolve public assets (1.5s)
+  ✓  18 [mobile-portrait] › tests/public-asset-base.spec.ts:36:3 › proof direct entry and refresh resolve public assets (1.2s)
+  ✓  19 [mobile-portrait] › tests/public-asset-base.spec.ts:36:3 › content-smoke direct entry and refresh resolve public assets (426ms)
+(node:96665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  20 [mobile-portrait] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (1.6s)
+(node:96680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  21 [mobile-landscape] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (1.9s)
+  ✓  22 [mobile-landscape] › tests/procedural-grids.spec.ts:43:1 › authored final entry preserves carried heroes and equipped projection (1.2s)
+  ✓  23 [mobile-landscape] › tests/procedural-grids.spec.ts:57:1 › repeated generated restarts keep the static shape cache bounded (2.4s)
+  ✓  24 [mobile-landscape] › tests/procedural-grids.spec.ts:76:1 › missing desert surface fails through the controlled asset error (303ms)
+  ✓  25 [mobile-landscape] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm battle uses real controls and isolates only v2 saves (2.1s)
+  ✓  26 [mobile-landscape] › tests/public-asset-base.spec.ts:10:34 › collector cold/warm run uses real controls and isolates only v2 saves (2.4s)
+  ✓  27 [mobile-landscape] › tests/public-asset-base.spec.ts:36:3 › battle direct entry and refresh resolve public assets (1.5s)
+  ✓  28 [mobile-landscape] › tests/public-asset-base.spec.ts:36:3 › proof direct entry and refresh resolve public assets (1.2s)
+  ✓  29 [mobile-landscape] › tests/public-asset-base.spec.ts:36:3 › content-smoke direct entry and refresh resolve public assets (429ms)
+(node:96721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  30 [mobile-landscape] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (1.6s)
+
+  30 passed (49.1s)

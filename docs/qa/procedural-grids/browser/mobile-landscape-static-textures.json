@@ -1,0 +1,206 @@
+[
+  {
+    "restart": 0,
+    "seed": 13,
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:desert_forest_ruins",
+      "mapHash": "sha256:7163549e196369e0d4a0c8f1fcec8a8d55a2bc5162f8f137d8ad004c8f7837f9",
+      "kind": "generated",
+      "biome": "desert",
+      "generatorVersion": 1,
+      "profileVersion": "desert-v1",
+      "layoutSeed": 1067947623
+    },
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "textures": [
+      {
+        "key": "battle-shape-v1-column-0",
+        "width": 480,
+        "height": 312,
+        "rgbaBytes": 599040
+      },
+      {
+        "key": "battle-shape-v1-column-1",
+        "width": 480,
+        "height": 456,
+        "rgbaBytes": 875520
+      },
+      {
+        "key": "battle-shape-v1-highlight-0",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-1",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-2",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      }
+    ],
+    "objectCount": 595
+  },
+  {
+    "restart": 1,
+    "seed": 14,
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:desert_forest_ruins",
+      "mapHash": "sha256:b65856817bcc64c7d1073f3e2165d88c44b076630d9654bf70acb59a0440ccb0",
+      "kind": "generated",
+      "biome": "desert",
+      "generatorVersion": 1,
+      "profileVersion": "desert-v1",
+      "layoutSeed": 2559509097
+    },
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "textures": [
+      {
+        "key": "battle-shape-v1-column-0",
+        "width": 480,
+        "height": 312,
+        "rgbaBytes": 599040
+      },
+      {
+        "key": "battle-shape-v1-column-1",
+        "width": 480,
+        "height": 456,
+        "rgbaBytes": 875520
+      },
+      {
+        "key": "battle-shape-v1-highlight-0",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-1",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-2",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      }
+    ],
+    "objectCount": 595
+  },
+  {
+    "restart": 2,
+    "seed": 15,
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:desert_forest_ruins",
+      "mapHash": "sha256:b7a3b63c4f46f5cb86d4d3a388a1a3a0d8c7409c0bb7be2f394a9737ce4d0382",
+      "kind": "generated",
+      "biome": "desert",
+      "generatorVersion": 1,
+      "profileVersion": "desert-v1",
+      "layoutSeed": 2534476531
+    },
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "textures": [
+      {
+        "key": "battle-shape-v1-column-0",
+        "width": 480,
+        "height": 312,
+        "rgbaBytes": 599040
+      },
+      {
+        "key": "battle-shape-v1-column-1",
+        "width": 480,
+        "height": 456,
+        "rgbaBytes": 875520
+      },
+      {
+        "key": "battle-shape-v1-highlight-0",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-1",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-2",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      }
+    ],
+    "objectCount": 595
+  },
+  {
+    "restart": 3,
+    "seed": 16,
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:desert_forest_ruins",
+      "mapHash": "sha256:2aba49571a6a8ba011e63714f1f9409d03d3c6a34d10f807e5ce9287acde7b4c",
+      "kind": "generated",
+      "biome": "desert",
+      "generatorVersion": 1,
+      "profileVersion": "desert-v1",
+      "layoutSeed": 363796875
+    },
+    "viewport": {
+      "width": 915,
+      "height": 412
+    },
+    "textures": [
+      {
+        "key": "battle-shape-v1-column-0",
+        "width": 480,
+        "height": 312,
+        "rgbaBytes": 599040
+      },
+      {
+        "key": "battle-shape-v1-column-1",
+        "width": 480,
+        "height": 456,
+        "rgbaBytes": 875520
+      },
+      {
+        "key": "battle-shape-v1-highlight-0",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-1",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      },
+      {
+        "key": "battle-shape-v1-highlight-2",
+        "width": 528,
+        "height": 288,
+        "rgbaBytes": 608256
+      }
+    ],
+    "objectCount": 595
+  }
+]

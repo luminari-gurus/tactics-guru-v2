@@ -1,0 +1,178 @@
+[WebServer] (node:94452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 126 tests using 1 worker
+
+(node:94481) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [desktop] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.8s)
+  ✓    2 [desktop] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+  ✓    3 [desktop] › tests/battle-persistence.spec.ts:82:47 › reload during legal player presentation matches an uninterrupted browser (5.3s)
+  ✓    4 [desktop] › tests/battle-persistence.spec.ts:82:47 › reload during legal enemy presentation matches an uninterrupted browser (4.9s)
+  ✓    5 [desktop] › tests/battle-persistence.spec.ts:123:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.3s)
+  ✓    6 [desktop] › tests/battle-persistence.spec.ts:144:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.1s)
+  ✓    7 [desktop] › tests/battle-persistence.spec.ts:162:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.4s)
+  ✓    8 [desktop] › tests/battle-persistence.spec.ts:180:1 › changed saved data refuses an old confirmation and requires fresh review (2.1s)
+  ✓    9 [desktop] › tests/battle-persistence.spec.ts:189:1 › successful reset with failed fresh save cannot recover an old battle on reload (2.9s)
+  ✓   10 [desktop] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓   11 [desktop] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+  ✓   12 [desktop] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement (2.2s)
+  ✓   13 [desktop] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement (2.3s)
+  ✓   14 [desktop] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary (2.2s)
+  ✓   15 [desktop] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary (2.2s)
+(node:94601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   16 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: success (583ms)
+  ✓   17 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (254ms)
+  ✓   18 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (240ms)
+  ✓   19 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: missing (275ms)
+  ✓   20 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (263ms)
+  ✓   21 [desktop] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓   22 [desktop] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (1.7s)
+  ✓   23 [desktop] › tests/procedural-grids.spec.ts:42:1 › authored final entry preserves carried heroes and equipped projection (1.3s)
+  ✓   24 [desktop] › tests/procedural-grids.spec.ts:56:1 › repeated generated restarts keep the static shape cache bounded (2.5s)
+(node:94646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   25 [desktop] › tests/run-progression.spec.ts:44:1 › legal run outcomes, earned rewards, terminal resume and fresh restart (56.2s)
+  ✓   26 [desktop] › tests/run-progression.spec.ts:85:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.2s)
+  ✘   27 [desktop] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (2.3s)
+(node:94898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   28 [desktop] › tests/run-progression.spec.ts:100:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.6s)
+  ✓   29 [desktop] › tests/run-progression.spec.ts:122:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.4s)
+  ✓   30 [desktop] › tests/run-progression.spec.ts:140:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.5s)
+  ✓   31 [desktop] › tests/run-progression.spec.ts:155:1 › cached run return cannot overwrite either slot of a newer replacement (1.6s)
+  ✓   32 [desktop] › tests/run-progression.spec.ts:167:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (13.7s)
+  ✓   33 [desktop] › tests/run-progression.spec.ts:184:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.0s)
+  ✓   34 [desktop] › tests/run-progression.spec.ts:200:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (13.3s)
+  ✓   35 [desktop] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓   36 [desktop] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+  ✓   37 [desktop] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Cancel (344ms)
+  ✓   38 [desktop] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Escape (308ms)
+  ✓   39 [desktop] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Export (350ms)
+  ✓   40 [desktop] › tests/run-progression.spec.ts:252:1 › review repair: deleting both loaded slots starts a fresh playable run (1.7s)
+  ✓   41 [desktop] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit continue (3.0s)
+  ✓   42 [desktop] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit replace (2.5s)
+(node:95048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   43 [mobile-portrait] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.6s)
+  ✓   44 [mobile-portrait] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+  ✓   45 [mobile-portrait] › tests/battle-persistence.spec.ts:82:47 › reload during legal player presentation matches an uninterrupted browser (5.3s)
+  ✓   46 [mobile-portrait] › tests/battle-persistence.spec.ts:82:47 › reload during legal enemy presentation matches an uninterrupted browser (4.9s)
+  ✓   47 [mobile-portrait] › tests/battle-persistence.spec.ts:123:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.2s)
+  ✓   48 [mobile-portrait] › tests/battle-persistence.spec.ts:144:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.1s)
+  ✓   49 [mobile-portrait] › tests/battle-persistence.spec.ts:162:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.3s)
+  ✓   50 [mobile-portrait] › tests/battle-persistence.spec.ts:180:1 › changed saved data refuses an old confirmation and requires fresh review (2.0s)
+  ✓   51 [mobile-portrait] › tests/battle-persistence.spec.ts:189:1 › successful reset with failed fresh save cannot recover an old battle on reload (2.9s)
+  ✓   52 [mobile-portrait] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓   53 [mobile-portrait] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+  ✓   54 [mobile-portrait] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement (2.2s)
+  ✓   55 [mobile-portrait] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement (2.4s)
+  ✓   56 [mobile-portrait] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary (2.2s)
+  ✓   57 [mobile-portrait] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary (2.2s)
+(node:95146) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   58 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: success (587ms)
+  ✓   59 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (270ms)
+  ✓   60 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (274ms)
+  ✓   61 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: missing (253ms)
+  ✓   62 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (251ms)
+  ✓   63 [mobile-portrait] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓   64 [mobile-portrait] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (1.9s)
+  ✓   65 [mobile-portrait] › tests/procedural-grids.spec.ts:42:1 › authored final entry preserves carried heroes and equipped projection (1.2s)
+  ✓   66 [mobile-portrait] › tests/procedural-grids.spec.ts:56:1 › repeated generated restarts keep the static shape cache bounded (2.4s)
+(node:95200) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   67 [mobile-portrait] › tests/run-progression.spec.ts:44:1 › legal run outcomes, earned rewards, terminal resume and fresh restart (56.5s)
+  ✓   68 [mobile-portrait] › tests/run-progression.spec.ts:85:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.3s)
+  ✓   69 [mobile-portrait] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (1.5s)
+  ✓   70 [mobile-portrait] › tests/run-progression.spec.ts:100:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.3s)
+  ✓   71 [mobile-portrait] › tests/run-progression.spec.ts:122:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.4s)
+  ✓   72 [mobile-portrait] › tests/run-progression.spec.ts:140:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.4s)
+  ✓   73 [mobile-portrait] › tests/run-progression.spec.ts:155:1 › cached run return cannot overwrite either slot of a newer replacement (1.5s)
+  ✓   74 [mobile-portrait] › tests/run-progression.spec.ts:167:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.8s)
+  ✓   75 [mobile-portrait] › tests/run-progression.spec.ts:184:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.5s)
+  ✓   76 [mobile-portrait] › tests/run-progression.spec.ts:200:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.3s)
+  ✓   77 [mobile-portrait] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓   78 [mobile-portrait] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+  ✓   79 [mobile-portrait] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Cancel (341ms)
+  ✓   80 [mobile-portrait] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Escape (301ms)
+  ✓   81 [mobile-portrait] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Export (335ms)
+  ✓   82 [mobile-portrait] › tests/run-progression.spec.ts:252:1 › review repair: deleting both loaded slots starts a fresh playable run (1.7s)
+  ✓   83 [mobile-portrait] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit continue (2.9s)
+  ✓   84 [mobile-portrait] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit replace (2.5s)
+(node:95346) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   85 [mobile-landscape] › tests/battle-persistence.spec.ts:28:1 › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus (3.8s)
+  ✓   86 [mobile-landscape] › tests/battle-persistence.spec.ts:57:1 › held confirmation Enter cannot flow through Restart and replace either saved slot (2.5s)
+  ✓   87 [mobile-landscape] › tests/battle-persistence.spec.ts:82:47 › reload during legal player presentation matches an uninterrupted browser (5.3s)
+  ✓   88 [mobile-landscape] › tests/battle-persistence.spec.ts:82:47 › reload during legal enemy presentation matches an uninterrupted browser (4.9s)
+  ✓   89 [mobile-landscape] › tests/battle-persistence.spec.ts:123:1 › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving (3.2s)
+  ✓   90 [mobile-landscape] › tests/battle-persistence.spec.ts:144:1 › unknown storage blocks startup until retry; writes remain nonfatal during play (2.1s)
+  ✓   91 [mobile-landscape] › tests/battle-persistence.spec.ts:162:1 › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once (2.3s)
+  ✓   92 [mobile-landscape] › tests/battle-persistence.spec.ts:180:1 › changed saved data refuses an old confirmation and requires fresh review (2.0s)
+  ✓   93 [mobile-landscape] › tests/battle-persistence.spec.ts:189:1 › successful reset with failed fresh save cannot recover an old battle on reload (2.9s)
+  ✓   94 [mobile-landscape] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {broken (1.2s)
+  ✓   95 [mobile-landscape] › tests/battle-persistence.spec.ts:199:141 › invalid startup requires explicit reset: {"kind":"tac (1.2s)
+  ✓   96 [mobile-landscape] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement (2.3s)
+  ✓   97 [mobile-landscape] › tests/battle-persistence.spec.ts:218:52 › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement (2.3s)
+  ✓   98 [mobile-landscape] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary (2.2s)
+  ✓   99 [mobile-landscape] › tests/battle-persistence.spec.ts:247:52 › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary (2.2s)
+(node:95431) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  100 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: success (673ms)
+  ✓  101 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: malformed (270ms)
+  ✓  102 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: unknown (272ms)
+  ✓  103 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: missing (251ms)
+  ✓  104 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: corrupt (253ms)
+  ✓  105 [mobile-landscape] › tests/content-loading.spec.ts:5:3 › content smoke: stalled (10.6s)
+  ✓  106 [mobile-landscape] › tests/procedural-grids.spec.ts:9:1 › generated production board picks, moves and resumes the same desert after camera changes (1.8s)
+  ✓  107 [mobile-landscape] › tests/procedural-grids.spec.ts:42:1 › authored final entry preserves carried heroes and equipped projection (1.2s)
+  ✓  108 [mobile-landscape] › tests/procedural-grids.spec.ts:56:1 › repeated generated restarts keep the static shape cache bounded (2.4s)
+(node:95482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  109 [mobile-landscape] › tests/run-progression.spec.ts:44:1 › legal run outcomes, earned rewards, terminal resume and fresh restart (56.4s)
+  ✓  110 [mobile-landscape] › tests/run-progression.spec.ts:85:1 › legal defeat reload, native keyboard restart and isolated single-battle save (15.3s)
+  ✓  111 [mobile-landscape] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues (1.4s)
+  ✓  112 [mobile-landscape] › tests/run-progression.spec.ts:100:1 › enemy presentation reload resumes the same commands and RNG as an uninterrupted run (5.2s)
+  ✓  113 [mobile-landscape] › tests/run-progression.spec.ts:122:1 › run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play (1.4s)
+  ✓  114 [mobile-landscape] › tests/run-progression.spec.ts:140:1 › run preparation and dialogs retain 44px controls, native touch and narrow layout (1.4s)
+  ✓  115 [mobile-landscape] › tests/run-progression.spec.ts:155:1 › cached run return cannot overwrite either slot of a newer replacement (1.5s)
+  ✓  116 [mobile-landscape] › tests/run-progression.spec.ts:167:1 › review: in-flow Continue resumes an ongoing backup battle after legal defeat (14.7s)
+  ✓  117 [mobile-landscape] › tests/run-progression.spec.ts:184:1 › review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes (2.5s)
+  ✓  118 [mobile-landscape] › tests/run-progression.spec.ts:200:1 › review: reopened outcome recovery exports the exact retained backup after partial reset (14.4s)
+  ✓  119 [mobile-landscape] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Escape retains connected visible keyboard focus (1.3s)
+  ✓  120 [mobile-landscape] › tests/run-progression.spec.ts:212:50 › review: recovery dismissal via Close retains connected visible keyboard focus (1.3s)
+  ✓  121 [mobile-landscape] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Cancel (335ms)
+  ✓  122 [mobile-landscape] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Escape (306ms)
+  ✓  123 [mobile-landscape] › tests/run-progression.spec.ts:233:57 › review repair: startup Continue survives Export (335ms)
+  ✓  124 [mobile-landscape] › tests/run-progression.spec.ts:252:1 › review repair: deleting both loaded slots starts a fresh playable run (1.7s)
+  ✓  125 [mobile-landscape] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit continue (2.4s)
+  ✓  126 [mobile-landscape] › tests/run-progression.spec.ts:265:53 › review repair: recovered storage preserves unsaved bytes until explicit replace (3.0s)
+
+
+  1) [desktop] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues
+
+    Error: page.reload: net::ERR_HTTP_RESPONSE_CODE_FAILURE
+    Call log:
+      - waiting for navigation until "load"
+
+
+       95 |  await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#dialog-confirm').click({force:true});
+       96 |  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');const committed=await snapshot(page);
+    >  97 |  await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+          |             ^
+       98 |  expect((await readSession(page)).state).toEqual(committed.activeBattle);expect((await readSession(page)).events).toEqual([]);expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
+       99 | });
+      100 | test('enemy presentation reload resumes the same commands and RNG as an uninterrupted run',async({page,browser,baseURL})=>{
+        at /private/tmp/tactics-guru-procedural/tests/run-progression.spec.ts:97:13
+
+    Error Context: test-results/run-progression-accepted-p-eba47-t-boundary-without-old-cues-desktop/error-context.md
+
+  1 failed
+    [desktop] › tests/run-progression.spec.ts:93:1 › accepted player presentation reload preserves exact boundary without old cues
+  125 passed (9.2m)
