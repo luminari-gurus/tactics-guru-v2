@@ -1,4 +1,32 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+import { createOverworld } from '../src/map/state';
+import { generateMap, type MapType } from '../src/map/generate';
+import { applyBiome, type Biome } from '../src/map/biomes';
+
+async function expectMarkers(page: Page) {
+  const grid = page.locator('#map-grid');
+  const seed = Number(await grid.getAttribute('data-seed'));
+  const type = await grid.getAttribute('data-type') as MapType;
+  const biome = await grid.getAttribute('data-biome') as Biome;
+  const expected = createOverworld(applyBiome(generateMap(seed, type), biome));
+  if (!expected.ok) throw Error(expected.reason);
+  const markers = await grid.evaluate(element => [...element.querySelectorAll('[data-marker-id]')].map(cell => {
+    const { markerId: id, markerKind: kind, markerX: x, markerY: y } = (cell as HTMLElement).dataset;
+    return { id, kind, x: Number(x), y: Number(y), index: [...element.children].indexOf(cell), floor: cell.className };
+  }));
+  expect(markers).toHaveLength(4);
+  for (const marker of expected.state.markers) {
+    expect(markers.find(({ id }) => id === marker.id)).toEqual({
+      ...marker, index: marker.y * 20 + marker.x, floor: 'map-floor',
+    });
+  }
+  await expect(grid).toHaveAttribute('data-placement-version', 'markers-v1');
+  await expect(grid).toHaveAccessibleName(/1 player and 3 enemies/);
+  await expect(grid).toHaveAccessibleDescription(expected.state.markers.map(marker =>
+    `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' '));
+  await expect(grid.locator('[tabindex], button, a')).toHaveCount(0);
+  return markers;
+}
 
 for (const { path, chunk, otherChunk } of [
   { path: '/map', chunk: 'view-', otherChunk: 'startBattleApp-' },
@@ -38,8 +66,10 @@ test('map direct entry, refresh, seeds and responsive inspection', async ({ page
   const grid = page.locator('#map-grid');
   await expect(grid.locator('span')).toHaveCount(400);
   await expect(grid).toHaveAttribute('data-seed', '1');
+  await expectMarkers(page);
   await page.reload();
   await expect(grid.locator('span')).toHaveCount(400);
+  await expectMarkers(page);
   const signature = () => grid.locator('span').evaluateAll(cells => cells.map(c => c.className).join(','));
   await page.getByLabel('Seed', { exact: true }).fill('12345');
   await page.getByLabel('Seed', { exact: true }).press('Enter');
@@ -127,9 +157,11 @@ test('new seed still works when browser entropy fails or returns the current see
   await expect(page.getByLabel('Biome', { exact: true })).toHaveValue('desert');
   await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('cellular');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '2');
+  await expectMarkers(page);
   await page.evaluate(() => { crypto.getRandomValues = ((values: Uint32Array) => { values[0] = 2; return values; }) as typeof crypto.getRandomValues; });
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '3');
+  await expectMarkers(page);
 });
 
 
@@ -313,7 +345,10 @@ test('art styles preserve map data across all combinations and match legends', a
   const art = page.getByLabel('Art style', { exact: true });
   await expect(art).toHaveValue('simple');
   const signature = () => grid.evaluate(element => ({
-    cells: [...element.children].map(cell => [cell.className, (cell as HTMLElement).dataset.terrain]),
+    cells: [...element.children].map(cell => {
+      const d = (cell as HTMLElement).dataset;
+      return [cell.className, d.terrain, d.markerId, d.markerKind, d.markerX, d.markerY];
+    }),
     metadata: ['seed', 'version', 'type', 'biome', 'biomeVersion', 'fallback'].map(key => (element as HTMLElement).dataset[key]),
   }));
   for (const type of ['rooms', 'random-walker', 'cellular']) {
@@ -330,6 +365,7 @@ test('art styles preserve map data across all combinations and match legends', a
           await expect(grid.locator('[data-art="simple"]')).toHaveCount(400);
         }
         expect(await signature()).toEqual(original);
+        await expectMarkers(page);
         const legends = await page.evaluate(() => {
           const read = (selector: string) => { const s = getComputedStyle(document.querySelector(selector)!); return [s.backgroundImage, s.backgroundColor, s.boxShadow]; };
           return { floor: read('#map-grid .map-floor'), wall: read('#map-grid .map-wall'), open: read('figcaption .map-floor'), blocked: read('figcaption .map-wall') };
@@ -342,6 +378,7 @@ test('art styles preserve map data across all combinations and match legends', a
         expect(rect!.width).toBeGreaterThanOrEqual(44);
         expect(rect!.height).toBeGreaterThanOrEqual(44);
         await page.screenshot({ path: testInfo.outputPath(`art-${type}-${biome}-${style}.png`), fullPage: true });
+        await page.locator('#map-figure').screenshot({ path: testInfo.outputPath(`figure-${type}-${biome}-${style}.png`) });
       }
     }
   }
@@ -432,6 +469,188 @@ test('art late loads preserve newer selections and seed validation', async ({ pa
   await expect(page.getByLabel('Seed', { exact: true })).toHaveValue('abc');
   await expect(page.locator('#map-seed')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+  await expectMarkers(page);
+});
+
+test('markers follow committed controls and preserve pending edits', async ({ page }) => {
+  await page.goto('map');
+  const grid = page.locator('#map-grid');
+  const seed = page.getByLabel('Seed', { exact: true });
+  const type = page.getByLabel('Map type', { exact: true });
+  const biome = page.getByLabel('Biome', { exact: true });
+  const art = page.getByLabel('Art style', { exact: true });
+  const initial = await expectMarkers(page);
+  await seed.fill('12345');
+  await art.selectOption('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art-fallback', 'false');
+  expect(await expectMarkers(page)).toEqual(initial);
+  await expect(seed).toHaveValue('12345');
+  // Enter is the real form submission path.
+  await seed.press('Enter');
+  await expect(grid).toHaveAttribute('data-seed', '12345');
+  const committed = await expectMarkers(page);
+  await page.getByRole('button', { name: 'Generate', exact: true }).click();
+  expect(await expectMarkers(page)).toEqual(committed);
+  await biome.selectOption('forest');
+  expect(await expectMarkers(page)).toEqual(committed);
+  await seed.fill('0');
+  await type.selectOption('cellular');
+  await expect(grid).toHaveAttribute('data-seed', '0');
+  await expectMarkers(page);
+  await seed.fill('4294967295');
+  await biome.selectOption('desert');
+  await expectMarkers(page);
+  const previous = await grid.innerHTML();
+  for (const invalid of ['', '-1', '1.5', '4294967296', 'abc']) {
+    await seed.fill(invalid);
+    for (const [control, option] of [[type, 'rooms'], [biome, 'grassland'], [art, 'simple']] as const) {
+      await control.selectOption(option);
+      await expect(type).toHaveValue('cellular');
+      await expect(biome).toHaveValue('desert');
+      await expect(art).toHaveValue('legacy-8bit');
+      expect(await grid.innerHTML()).toBe(previous);
+      await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+    }
+  }
+  await seed.fill('12345');
+  await type.selectOption('rooms');
+  expect(await expectMarkers(page)).toEqual(committed);
+  await page.getByRole('button', { name: 'New seed', exact: true }).click();
+  await expectMarkers(page);
+  await page.reload();
+  expect(await expectMarkers(page)).toEqual(initial);
+});
+
+for (const outcome of ['success', 'network', 'decode'] as const) {
+  test(`markers survive delayed artwork ${outcome} after a newer world`, async ({ page }) => {
+    await page.addInitScript(() => {
+      const decode = HTMLImageElement.prototype.decode;
+      Object.assign(window, { markerArtDecodes: 0 });
+      HTMLImageElement.prototype.decode = async function () {
+        try { return await decode.call(this); }
+        finally { (window as unknown as { markerArtDecodes: number }).markerArtDecodes++; }
+      };
+    });
+    let release!: () => void;
+    const held = new Promise<void>(resolve => { release = resolve; });
+    await page.route('**/map-art/**', async route => {
+      await held;
+      if (outcome === 'network') await route.abort();
+      else if (outcome === 'decode') await route.fulfill({ contentType: 'image/png', body: 'invalid image' });
+      else await route.continue();
+    });
+    await page.goto('map');
+    const art = page.getByLabel('Art style', { exact: true });
+    await art.selectOption('legacy-8bit');
+    await expect(page.locator('#map-status')).toContainText('Loading artwork');
+    await page.getByLabel('Seed', { exact: true }).fill('424242');
+    await page.getByLabel('Map type', { exact: true }).selectOption('random-walker');
+    await page.getByLabel('Biome', { exact: true }).selectOption('forest');
+    const latest = await expectMarkers(page);
+    await art.selectOption('simple');
+    await page.getByLabel('Seed', { exact: true }).fill('12345');
+    release();
+    await expect.poll(() => page.evaluate(() =>
+      (window as unknown as { markerArtDecodes: number }).markerArtDecodes)).toBe(3);
+    expect(await expectMarkers(page)).toEqual(latest);
+    await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '424242');
+    await expect(page.getByLabel('Seed', { exact: true })).toHaveValue('12345');
+    await expect(art).toHaveValue('simple');
+    await art.selectOption('legacy-8bit');
+    if (outcome === 'success') await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+    else await expect(page.locator('#map-status')).toContainText('Artwork unavailable');
+    expect(await expectMarkers(page)).toEqual(latest);
+  });
+}
+
+test('markers remain readable at 320px with usable native controls', async ({ page, isMobile }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('map');
+  const seed = page.getByLabel('Seed', { exact: true });
+  await seed.fill('12345');
+  const generate = page.getByRole('button', { name: 'Generate', exact: true });
+  if (isMobile) await generate.tap();
+  else { await generate.focus(); await generate.press('Enter'); }
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '12345');
+  await expectMarkers(page);
+  for (const biome of ['grassland', 'forest', 'desert']) {
+    await page.getByLabel('Biome', { exact: true }).selectOption(biome);
+    for (const art of ['simple', 'legacy-8bit']) {
+      await page.getByLabel('Art style', { exact: true }).selectOption(art);
+      if (art === 'legacy-8bit' && biome !== 'desert') await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+      await expectMarkers(page);
+      const shapes = await page.locator('#map-grid').evaluate(grid => [...grid.querySelectorAll('[data-marker-id]')].map(cell => {
+        const s = getComputedStyle(cell, '::after'), box = cell.getBoundingClientRect();
+        return { kind: (cell as HTMLElement).dataset.markerKind, content: s.content, color: s.backgroundColor,
+          radius: s.borderRadius, transform: s.transform, width: parseFloat(s.width), cell: box.width };
+      }));
+      expect(new Set(shapes.map(shape => shape.color)).size).toBe(2);
+      for (const shape of shapes) {
+        expect(shape.content).toBe('""');
+        expect(shape.width).toBeGreaterThan(5);
+        // Rotated diamond and its highlight must fit within the cell.
+        expect((shape.width + 2) * (shape.kind === 'enemy' ? Math.SQRT2 : 1)).toBeLessThanOrEqual(shape.cell);
+        expect(shape.radius).toBe(shape.kind === 'player' ? '50%' : '0px');
+        expect(shape.transform === 'none').toBe(shape.kind === 'player');
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.screenshot({ path: testInfo.outputPath(`narrow-${biome}-${art}.png`), fullPage: true });
+    }
+  }
+  for (const control of await page.locator('#map-controls input, #map-controls select, #map-controls button').all()) {
+    await control.scrollIntoViewIfNeeded();
+    const box = await control.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+});
+
+test('controlled placement failure preserves complete state and supports retry', async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SERVER_MODE !== 'dev', 'Intercepts the source module only on the development server.');
+  await page.route(/\/src\/map\/state\.ts(?:\?|$)/, route => {
+    if (route.request().url().includes('?actual')) return route.continue();
+    return route.fulfill({ contentType: 'application/javascript', body: `
+      import { createOverworld as actual } from '/src/map/state.ts?actual';
+      let calls = 0;
+      export function createOverworld(map) {
+        calls++;
+        return calls === 1 || map.seed === 99
+          ? { ok: false, reason: 'Controlled placement failure.' } : actual(map);
+      }
+    ` });
+  });
+  await page.goto('map');
+  const grid = page.locator('#map-grid');
+  const status = page.locator('#map-status');
+  await expect(grid).toHaveAccessibleName('Overworld unavailable');
+  await expect(grid.locator('span')).toHaveCount(0);
+  await expect(status).toContainText('Marker placement failed');
+  await expect(status).toContainText('retry Generate');
+  await page.getByRole('button', { name: 'Generate', exact: true }).click();
+  const original = await expectMarkers(page);
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/map-art/**', async route => { await held; await route.continue(); });
+  await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
+  await expect(status).toContainText('Loading artwork');
+  await page.getByLabel('Seed', { exact: true }).fill('99');
+  for (const [label, value] of [['Map type', 'cellular'], ['Biome', 'forest']]) {
+    await page.getByLabel(label, { exact: true }).selectOption(value);
+    await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('rooms');
+    await expect(page.getByLabel('Biome', { exact: true })).toHaveValue('grassland');
+    await expect(status).toContainText('The previous world is unchanged');
+    expect(await expectMarkers(page)).toEqual(original);
+  }
+  release();
+  await expect(grid).toHaveAttribute('data-art-fallback', 'false');
+  await expect(status).toContainText('Controlled placement failure');
+  expect(await expectMarkers(page)).toEqual(original);
+  await page.getByLabel('Art style', { exact: true }).selectOption('simple');
+  await expect(status).toContainText('The previous world is unchanged');
+  await page.getByLabel('Seed', { exact: true }).fill('2');
+  await page.getByRole('button', { name: 'Generate', exact: true }).click();
+  await expectMarkers(page);
+  await expect(status).not.toContainText('Marker placement failed');
 });
 
 test('art uses configured base, bounded transfers and no battle requests', async ({ page }, testInfo) => {

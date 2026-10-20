@@ -4,7 +4,7 @@ Planning date: 2026-10-20 (Asia/Jerusalem).
 Source baseline: `main` at `1fee092d184fd99998f8e5e2766d45c216c6d5d8`.
 Work item: [#154 — Spawn one player marker and three enemy markers](https://github.com/luminari-gurus/tactics-guru-v2/issues/154).
 Delivery branch: `branch/issue-154-overworld-markers`.
-Status: implementation in progress; pure marker model implemented and verified, route integration next.
+Status: implementation and focused route checks complete; finishing visual matrix, base-path proof and review delivery.
 
 ## Implementation handoff (2026-10-20)
 
@@ -23,8 +23,23 @@ Status: implementation in progress; pure marker model implemented and verified, 
   Cellular `31583dad387235929096a42f680f782551474198495569c9e6c54710f23dc88e`.
 - Commands run through WSL Node 24/npm because Windows PATH has no npm/OpenSpec. `npm ci --no-audit --no-fund`
   completed; unrelated PostHog CLI postinstall was blocked by npm policy and is not needed for this work.
-- Next: controls/presentation, browser matrix and failure injection, final documentation and PR readiness.
-  No browser acceptance claimed yet.
+- Published model checkpoint: `6a43bf3`, draft [PR #156](https://github.com/luminari-gurus/tactics-guru-v2/pull/156).
+- Route/CSS integration is implemented. Desktop marker tests pass (5); the first full preview matrix passed
+  56 cases but exposed one test-helper race when an art redraw detached cells. The helper now reads all
+  projections atomically from the retained grid. The final full matrix passes 57 cases (3 intentional
+  dev-only skips), including all desktop/portrait/landscape marker and existing map regressions.
+- Inspected all 54 art/type/biome figures via nine contact sheets, plus the 320px full-page capture.
+  Shapes, edging, terrain, wrapping legends and scrollable controls are readable without overlap.
+- Controlled dev placement failure passes (1): initial unavailability, successful retry, rollback on type/biome
+  regeneration, feedback surviving old artwork completion and final recovery.
+- `npm run build` passes (190 content tests, both typechecks, Vite). WSL needs explicit `GIT_DIR` pointing at
+  `/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/.git/worktrees/Tactics-Guru12`
+  and `GIT_WORK_TREE=$PWD` because this Windows-created worktree's `.git` file uses a Windows path.
+  For line-ending/mode parity also set `GIT_CONFIG_COUNT=2`, `GIT_CONFIG_KEY_0=core.autocrlf`,
+  `GIT_CONFIG_VALUE_0=true`, `GIT_CONFIG_KEY_1=core.filemode`, `GIT_CONFIG_VALUE_1=false`.
+  These are command-local environment settings; repository configuration is unchanged.
+- Next: finish screenshot review and configured `/prototype/` checks, retain selected QA evidence, update
+  final documentation, commit/push UI work and mark PR #156 ready. No deployment or hardware claims.
 
 The previous [issue #145 / PR #150 handoff](plan-before-issue-154.md) is preserved byte-for-byte. It is historical: PR #150 is already merged in this baseline, despite its handoff's pre-merge wording.
 

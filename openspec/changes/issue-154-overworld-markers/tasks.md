@@ -7,9 +7,9 @@
 
 ## 2. Route and presentation
 
-- [ ] 2.1 Retain and commit complete worlds through existing controls, preserving pending/invalid seeds and asynchronous art state; verify real-route model parity, resets, entropy fallback and delayed success/network/decode checks in the existing browser suite.
-- [ ] 2.2 Add compact circle/diamond overlays, wrapping legend and accessible descriptions; verify the 3 types × 3 biomes × 2 art matrix on desktop/portrait/landscape, 320px screenshots, keyboard and touch controls; update the README and map guide.
-- [ ] 2.3 Implement explicit initial/regeneration placement failure and recovery; verify a dev-server module-interception test preserves prior state, committed controls and failure feedback through art completion without a production fault switch.
+- [x] 2.1 Retain and commit complete worlds through existing controls, preserving pending/invalid seeds and asynchronous art state; verify real-route model parity, resets, entropy fallback and delayed success/network/decode checks in the existing browser suite.
+- [x] 2.2 Add compact circle/diamond overlays, wrapping legend and accessible descriptions; verify the 3 types × 3 biomes × 2 art matrix on desktop/portrait/landscape, 320px screenshots, keyboard and touch controls; update the README and map guide.
+- [x] 2.3 Implement explicit initial/regeneration placement failure and recovery; verify a dev-server module-interception test preserves prior state, committed controls and failure feedback through art completion without a production fault switch.
 
 ## 3. Integration and delivery
 
