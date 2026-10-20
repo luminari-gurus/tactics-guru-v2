@@ -4,13 +4,13 @@ Planning date: 2026-10-20 (Asia/Jerusalem).
 Source baseline: `main` at `1fee092d184fd99998f8e5e2766d45c216c6d5d8`.
 Work item: [#154 — Spawn one player marker and three enemy markers](https://github.com/luminari-gurus/tactics-guru-v2/issues/154).
 Delivery branch: `branch/issue-154-overworld-markers`.
-Status: implementation and focused route checks complete; finishing visual matrix, base-path proof and review delivery.
+Status: implementation and acceptance complete; final review publication in progress.
 
 ## Implementation handoff (2026-10-20)
 
 - Worktree: `C:/Users/apexw/.codex/worktrees/issue-154-overworld-markers/Tactics-Guru`.
 - Refreshed `origin/main` remains `1fee092`; the branch starts with planning commit `1e4a06c`.
-- Live #154 matches this plan. No existing PR for the branch.
+- Live #154 matches this plan; [PR #156](https://github.com/luminari-gurus/tactics-guru-v2/pull/156) contains the delivery.
 - Using OpenSpec change `issue-154-overworld-markers` (spec-driven), as explicitly requested for implementation.
 - Ablation retains the pure model, complete-state commits, CSS markers and existing test suites.
   Phaser/sprite/image generation is unnecessary for the DOM route.
@@ -23,7 +23,7 @@ Status: implementation and focused route checks complete; finishing visual matri
   Cellular `31583dad387235929096a42f680f782551474198495569c9e6c54710f23dc88e`.
 - Commands run through WSL Node 24/npm because Windows PATH has no npm/OpenSpec. `npm ci --no-audit --no-fund`
   completed; unrelated PostHog CLI postinstall was blocked by npm policy and is not needed for this work.
-- Published model checkpoint: `6a43bf3`, draft [PR #156](https://github.com/luminari-gurus/tactics-guru-v2/pull/156).
+- Published checkpoints: model `6a43bf3`, complete runtime/browser integration `30cf201`.
 - Route/CSS integration is implemented. Desktop marker tests pass (5); the first full preview matrix passed
   56 cases but exposed one test-helper race when an art redraw detached cells. The helper now reads all
   projections atomically from the retained grid. The final full matrix passes 57 cases (3 intentional
@@ -38,8 +38,13 @@ Status: implementation and focused route checks complete; finishing visual matri
   For line-ending/mode parity also set `GIT_CONFIG_COUNT=2`, `GIT_CONFIG_KEY_0=core.autocrlf`,
   `GIT_CONFIG_VALUE_0=true`, `GIT_CONFIG_KEY_1=core.filemode`, `GIT_CONFIG_VALUE_1=false`.
   These are command-local environment settings; repository configuration is unchanged.
-- Next: finish screenshot review and configured `/prototype/` checks, retain selected QA evidence, update
-  final documentation, commit/push UI work and mark PR #156 ready. No deployment or hardware claims.
+- Configured `/prototype/` build and all 18 selected browser cases pass. Total final browser proof:
+  57 root-preview cases + 1 dev failure case + 18 prefix cases. The 3 root-preview skips deliberately
+  exclude the dev-only fixture, which was run separately.
+- [Acceptance record](../qa/issue-154-overworld-markers.md) retains source commits, exact commands,
+  results, initial failures and repairs, browser/viewport details and selected screenshots.
+- Next: final publication/readback, then review. No implementation remains for #154; #155 is separate.
+  OpenSpec stays active until review/merge. No release tag is needed for this feature PR.
 
 The previous [issue #145 / PR #150 handoff](plan-before-issue-154.md) is preserved byte-for-byte. It is historical: PR #150 is already merged in this baseline, despite its handoff's pre-merge wording.
 
@@ -49,7 +54,7 @@ Every successfully committed `/map` world contains exactly one player and three 
 
 The existing prototype remains an inspection screen: generate or inspect a map, choose its type/biome/art, and identify its occupants. There is no movement or encounter loop in this change.
 
-## What the current code actually establishes
+## Source baseline findings (before implementation)
 
 - [Route entry](../../src/main.ts) dynamically imports `startMap` for `/map` beneath the configured base. This route uses a DOM/CSS grid, not a Phaser scene. The shared entry now initializes optional telemetry and mounts its privacy control; the older documentation's storage-isolation wording must be read alongside the current test allowing the privacy opt-out read.
 - [generate.ts](../../src/map/generate.ts), particularly `generateMap` and `validMapCells`, already provides three versioned 20×20 algorithms, 400 row-major binary cells, a blocked perimeter, 60–320 walkable cells and cardinal connectivity. Each algorithm has bounded attempts and a validated 80-cell fallback. Placement does not need to repair terrain, carve corridors or discover a new playable component.
@@ -178,6 +183,7 @@ Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). At pl
 
 ## Completion boundary
 
-This planning delivery consists of this plan, the preserved prior handoff, a published branch and native issue linkage. It does not implement or close #154.
-
-Implementation is complete only when every proof item above has evidence, existing map contracts still hold, documentation describes the final policy, and the focused PR covers all seven acceptance bullets in #154. #155 remains a separate dependent issue and should reference the exported model after #154 lands; this branch must not claim to resolve enemy movement.
+The implementation now covers all seven #154 acceptance bullets with evidence in the QA record.
+The focused PR is the review boundary; the issue remains open until merge. #155 remains a separate
+dependent issue and should use the exported model after #154 lands. No enemy movement, deployment,
+physical-hardware testing or screen-reader certification is included.

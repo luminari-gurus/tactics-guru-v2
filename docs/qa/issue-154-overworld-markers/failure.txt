@@ -1,0 +1,15 @@
+npm notice run tactics-guru-v2@0.0.0 npx
+npm notice run 'playwright' test tests/overworld-map.spec.ts --project=desktop --grep controlled placement --output=tmp/issue-154-failure-results
+[WebServer] npm notice run tactics-guru-v2@0.0.0 dev
+[WebServer] npm notice run vite --host 127.0.0.1 --base=/ --port 4173 --strictPort
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 1 test using 1 worker
+
+  ✓  1 [desktop] › tests/overworld-map.spec.ts:607:1 › controlled placement failure preserves complete state and supports retry (506ms)
+
+  1 passed (14.1s)

@@ -38,6 +38,8 @@ The view retains this complete state. A cyan circle marks the player; coral diam
 enemies, with dark borders and light edging above the existing terrain. The matching legend
 wraps on narrow displays. The grid's accessible name includes occupant counts and its associated
 description lists IDs at one-based row/column. Markers are noninteractive and add no tab stops.
+See [issue #154 acceptance evidence](qa/issue-154-overworld-markers.md) for placement,
+failure/recovery, browser matrices and screenshots.
 
 ## Controls and reproducibility
 

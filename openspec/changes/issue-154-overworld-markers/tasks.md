@@ -13,7 +13,7 @@
 
 ## 3. Integration and delivery
 
-- [ ] 3.1 Run production build, focused full browser suite, controlled dev failure and configured-base checks; inspect screenshots, resolve findings and record commands, source, results and limitations in the QA record and handoff.
+- [x] 3.1 Run production build, focused full browser suite, controlled dev failure and configured-base checks; inspect screenshots, resolve findings and record commands, source, results and limitations in the QA record and handoff.
 - [ ] 3.2 Validate OpenSpec, document links and diff; commit/push reviewable chunks and open a focused PR for #154 with #155 model handoff; verify remote head/base and clean branch parity.
 
 ## Workflow follow-up
