@@ -63,6 +63,68 @@ test('default Move initializes once per usable player turn and preserves explici
   await expect(move).toHaveAttribute('aria-pressed','true');
 });
 
+test('clearing the native movement destination clears intent and preview without changing saves',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const target=page.locator('#battle-target'),review=page.locator('#battle-review');
+  const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await target.focus();await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');
+  await expect(review).toBeEnabled();
+  const pending=(await session(page)).pending;expect(pending?.type).toBe('move');
+  await target.focus();await page.keyboard.press('Home');
+  await expect(target).toHaveValue('');
+  expect((await session(page)).pending).toBeNull();await expect(review).toBeDisabled();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#battle-selection')).toHaveText('Select a tile');
+  await expect(page.locator('#battle-preview')).toHaveText('Select a destination');
+  const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+  expect(report.selected).toBeNull();expect(report.hover).toBeNull();
+  expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await review.scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('destination-cleared.png')});
+  // A real new choice remains usable and still requires deliberate confirmation.
+  await target.focus();await page.keyboard.press('ArrowDown');await expect(review).toBeEnabled();
+  expect((await session(page)).pending).toEqual(pending);
+  await review.click();await page.locator('#dialog-confirm').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await session(page)).state.commandCount).toBe(initial.state.commandCount+1);
+  expect(errors).toEqual([]);
+});
+
+for(const dismissal of ['Cancel','Escape'] as const){
+  test(`movement confirmation ${dismissal} resets destination and permits native same-destination retry`,async({page})=>{
+    const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+    await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const target=page.locator('#battle-target'),review=page.locator('#battle-review');
+    const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+    await target.focus();await page.keyboard.press('Space');await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+    await expect(review).toBeEnabled();
+    const destination=await target.inputValue(),pending=(await session(page)).pending;
+    expect(pending?.type).toBe('move');
+    await review.click();await expect(page.getByRole('dialog')).toBeVisible();
+    if(dismissal==='Cancel')await page.locator('#dialog-cancel').click();else await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    // Re-select using the native popup: selectOption dispatches change for unchanged values.
+    await target.focus();await page.keyboard.press('Space');await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+    await expect(target).toHaveValue(destination);await expect(review).toBeEnabled();
+    expect((await session(page)).pending).toEqual(pending);
+    expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
+    expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+    // Dismiss a second time to inspect the cleared UI before confirming the retry.
+    await review.click();if(dismissal==='Cancel')await page.locator('#dialog-cancel').click();else await page.keyboard.press('Escape');
+    await expect(target).toHaveValue('');await expect(review).toBeDisabled();expect((await session(page)).pending).toBeNull();
+    await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+    const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+    expect(report.selected).toBeNull();expect(report.hover).toBeNull();
+    await review.scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('movement-cancelled.png')});
+    await target.focus();await page.keyboard.press('ArrowDown');await expect(review).toBeEnabled();
+    await review.click();await page.locator('#dialog-confirm').click();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const confirmed=await session(page);expect(confirmed.state.commandCount).toBe(initial.state.commandCount+1);
+    expect(confirmed.replay.commands.at(-1)).toEqual(pending);expect(errors).toEqual([]);
+  });
+}
+
 test('player HUD and preview cancellation preserve state and modal capture', async ({page})=>{
   await page.goto('/');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

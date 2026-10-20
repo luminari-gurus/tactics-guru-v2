@@ -94,6 +94,7 @@ export class BattleScene extends Phaser.Scene {
       const changed=selected?.x!==cell?.x || selected?.y!==cell?.y;
       selected=cell;if(cell)cursor=cell;session.cancel();
       if(action && cell){const command=actionCommand(session,action,cell);message=command?describe(command):'Unavailable: choose a living target';}
+      else if(!cell){hovered=null;message=action==='move'?'Select a destination':action?'Select a target':'Choose an action and target';}
       refresh();
       if(changed)measurements.interaction('selection',inputMs);
     };
@@ -135,7 +136,7 @@ export class BattleScene extends Phaser.Scene {
         : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
       const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
         :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
-      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
+      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='move'){selected=null;hovered=null;}if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{

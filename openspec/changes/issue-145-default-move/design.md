@@ -8,6 +8,8 @@ See proposal.md and docs/ongoing-projects/plan.md. The existing scene refresh al
 - Use existing movement preview eligibility and HUD selection rendering. Set only action and prompt; never invoke the action callback against a previously selected tile.
 - Share the existing standalone/run scene. Scene reconstruction resets the marker without storing UI state in saves.
 - Extend existing browser suites and reuse legal session/save fixtures. No new test harness or dependencies.
+- Pass the destination placeholder as null through existing scene selection. Reset its prompt along with pending intent and selection; no second cancellation path or HUD-local state.
+- When movement confirmation is cancelled, clear selected/hovered destination and retain Move. Keep full action cancellation and attack cancellation semantics intact. Verify Cancel and Escape followed by native keyboard selection of the original destination; synthetic selectOption would conceal unchanged-value failures.
 
 ## Risks / Trade-offs
 

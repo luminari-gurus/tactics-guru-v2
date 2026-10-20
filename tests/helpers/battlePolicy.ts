@@ -3,7 +3,7 @@ import type { BattleState, Command, Replay, BattleEvent } from '../../src/domain
 
 export { playerDecision } from './playerPolicy';
 
-export async function readSession(page:Page):Promise<{state:BattleState;replay:Replay|null;continuation:{snapshot:BattleState;commands:Command[];events:BattleEvent[]}|null;events:BattleEvent[];phase:string}> {
+export async function readSession(page:Page):Promise<{state:BattleState;replay:Replay|null;continuation:{snapshot:BattleState;commands:Command[];events:BattleEvent[]}|null;events:BattleEvent[];pending:Command|null;phase:string}> {
   return JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
 }
 /** Existing replay checks require a fresh seed-origin session explicitly. */

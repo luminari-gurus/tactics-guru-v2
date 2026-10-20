@@ -12,4 +12,10 @@
 
 ## Workflow follow-up
 
+## 3. PR #150 review repair
+
+- [x] 3.1 Reproduce the stale move after clearing the native destination selector; route the placeholder through scene selection and clear destination, intent and preview without changing state or save bytes.
+- [x] 3.2 Reproduce the same-destination retry failure after Cancel/Escape; reset movement destination and hover while retaining Move, and prove native keyboard re-selection prepares one fresh intent.
+- [ ] 3.3 Validate the rebased integration with local unit/build/browser/posttest checks and strict OpenSpec; update QA/handoff, publish with an exact lease, address the review and verify merge readiness and remote parity.
+
 - Leave the active change for review and later sync/archive. No merge, release tag or deployment is requested.

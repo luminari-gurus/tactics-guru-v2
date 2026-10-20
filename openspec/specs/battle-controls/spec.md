@@ -33,6 +33,14 @@ Each new player-controlled turn SHALL select Move once when existing movement ru
 - **WHEN** mouse, touch or keyboard chooses a destination under the default action
 - **THEN** the existing preview, confirmation and cancellation flow applies and only deliberate confirmation accepts movement
 
+#### Scenario: Clear a movement destination
+- **WHEN** a player returns the native destination selector to Choose target after preparing a move
+- **THEN** destination, pending intent and preview are cleared together, Review is disabled, Move remains selected and battle state, replay and save bytes stay unchanged
+
+#### Scenario: Retry a cancelled movement destination
+- **WHEN** a player dismisses movement confirmation with Cancel or Escape
+- **THEN** the destination selector returns to Choose target and selection, intent and hover preview clear while Move remains selected, allowing native re-selection of the same destination to prepare one fresh intent without accepting a command until confirmation
+
 ### Requirement: Responsive battle feedback
 The HUD SHALL show hero portraits, HP, active side/unit, round, spent move/action budgets, Guarded status, selected target, bounded event log and victory/defeat feedback. Interactive targets SHALL be at least 44 CSS pixels in both dimensions, respect safe areas and remain reachable in portrait and landscape.
 
