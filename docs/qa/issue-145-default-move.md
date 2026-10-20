@@ -1,6 +1,29 @@
 # Issue #145 acceptance evidence
 
-Updated 2026-10-19 (Asia/Jerusalem). Implementation and acceptance evidence are complete in [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150). See the [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md). All 588 configured browser cases have passing evidence across the runs below, plus all 39 configured posttests; the initial full command was not entirely green.
+Updated 2026-10-20 (Asia/Jerusalem). See [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150), the [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md). The review repair below supersedes the original acceptance record for current integration readiness.
+
+## PR #150 review repair
+
+Rebased all seven PR commits without conflicts onto `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99` (13 new integration commits). Reviewed original head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased baseline: `b4e9de9`. Repair commit: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`.
+
+Both findings in review `5583848401` reproduced with real native input against the rebased baseline. The three new desktop regressions failed: clearing Choose target retained pending move `(0, 9)`; Cancel and Escape each left Review disabled after the native popup re-selected the same destination. Baseline log: ignored `tmp/pr150-baseline.log`.
+
+The minimal repair uses the existing scene selection callback for the empty option and clears selected/hovered destination when movement confirmation is dismissed. Move stays selected. Tests assert cleared board selection/hover and intent, disabled Review, unchanged battle/replay/save bytes, a usable native retry and exactly one command after confirmation. No selectOption call synthesizes the same-value retry.
+
+Current local evidence:
+
+- `npm ci`: 48 packages; zero audit findings. npm blocked the inherited optional PostHog CLI install script; it is not needed by these checks.
+- New Vite-dev regressions on installed Edge: 9/9 passed across desktop, Pixel 7 portrait and landscape, no retries/skips/page errors (`tmp/pr150-repaired.log`).
+- `npm run test:unit -- --maxWorkers=1`: 762/762 tests, 47 files, 55.50 seconds (`tmp/pr150-unit-final.log`). Two earlier default parallel runs were 761 pass / one five-second timeout in unchanged full-battle `runBattle.test.ts`; its isolated file passed 8/8. Serial execution passes the original assertions/timeouts without a source workaround.
+- `npm run build`: 190 content checks, both TypeScript configurations and Vite passed (`tmp/pr150-build.log`).
+- `openspec validate issue-145-default-move --strict` and `openspec validate battle-controls --type spec --strict`: passed.
+- Final production matrix, configured posttests and telemetry checks are pending; use the handoff for the current delivery state.
+
+Browser plugin unavailable; the repository Playwright workflow is used. The flow is fresh battle → native destination → clear or Cancel/Escape → cleared preview and same-destination retry → one explicit confirmation. Screenshots and console/state assertions cover real rendered interactions. Playwright emulation satisfies the caller's acceptance instruction; physical hardware and production deployment are not claimed.
+
+## Original acceptance record (2026-10-19)
+
+The original pre-rebase implementation had passing evidence for all 588 configured cases plus 39 posttests across the runs below. Its first full browser command was not entirely green. These historical results do not substitute for the current integration run.
 
 ## Candidate and reproduction
 
