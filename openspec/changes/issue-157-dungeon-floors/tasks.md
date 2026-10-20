@@ -11,7 +11,7 @@
 - [x] 2.1 Extract shared bounded ownership/projection/reward primitives and add dungeon encounter identities; verify existing short-run rejection corpus plus multi-digit depth, capacity, owned-instance and no-duplicate grant tests. Document identity formats.
 - [x] 2.2 Add dungeon battle adapter/session using existing BattleSession and host lifecycle; test carried survivor HP, equipment applied once, battle-local reset, stale completion, replay and next-command RNG equality. Document adapter boundary.
 
-- [ ] 2.3 Obtain the caller’s inventory-full policy choice, revise the behavior artifacts, implement the selected confirmed disposal or explicit reward skip, and verify capacity recovery, cancellation, stale commands and save/resume through unit/browser tests.
+- [x] 2.3 Record the caller’s confirmed-disposal choice, revise the behavior artifacts, implement confirmed owned-charm disposal, and verify capacity recovery, cancellation, stale commands and save/resume through unit/browser tests.
 
 ## 3. Save and resource handling
 

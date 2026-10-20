@@ -1,6 +1,5 @@
 import { BattleSession } from './BattleSession';
-import { acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState } from '../domain/dungeon';
-import type { ItemCommand } from '../domain/items';
+import { acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
 import { createDungeonStorage, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 export class DungeonSession {
@@ -62,7 +61,7 @@ export class DungeonSession {
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     this.save(); return session;
   }
-  dispatch(command: ItemCommand) {
+  dispatch(command: DungeonItemCommand) {
     if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;
     const next = dungeonItem(this.current, command);
     if (!next.ok) { this.report(`Choice refused: ${next.reason}. Nothing changed.`); return false; }

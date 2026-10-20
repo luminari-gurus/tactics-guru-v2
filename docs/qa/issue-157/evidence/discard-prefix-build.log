@@ -1,0 +1,61 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 1835 modules transformed.
+
+(!) outDir /tmp/tg157-prefix-dist is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../../tmp/tg157-prefix-dist/_headers                                                            3.90 kB
+../../../../../../tmp/tg157-prefix-dist/index.html                                                          7.04 kB │ gzip:   2.24 kB
+../../../../../../tmp/tg157-prefix-dist/assets/b5b947941d91b972/proof/fighter.png                           8.84 kB
+../../../../../../tmp/tg157-prefix-dist/assets/7203e2b3a992c9c8/battle/source/ranger_sprite.png             9.09 kB
+../../../../../../tmp/tg157-prefix-dist/assets/57972fe37b1c0579/battle/source/goblin_grunt_sprite.png       9.30 kB
+../../../../../../tmp/tg157-prefix-dist/assets/37fcb2969f129de5/battle/source/mage_sprite.png               9.56 kB
+../../../../../../tmp/tg157-prefix-dist/assets/070fb462027ed7a5/battle/source/goblin_archer_sprite.png     10.21 kB
+../../../../../../tmp/tg157-prefix-dist/assets/72b7f789a242de12/battle/portraits/ranger.png                19.88 kB
+../../../../../../tmp/tg157-prefix-dist/assets/70f30350ea20aac9/battle/portraits/goblin_archer.png         20.41 kB
+../../../../../../tmp/tg157-prefix-dist/assets/cc6494048e8cd6a8/battle/portraits/goblin_grunt.png          20.55 kB
+../../../../../../tmp/tg157-prefix-dist/assets/da44b5706aaadefb/battle/portraits/mage.png                  20.67 kB
+../../../../../../tmp/tg157-prefix-dist/assets/f0c4ab9c2859f59e/battle/portraits/fighter.png               20.75 kB
+../../../../../../tmp/tg157-prefix-dist/assets/0bf5465d7ad8396a/battle/terrain/sand.png                   107.93 kB
+../../../../../../tmp/tg157-prefix-dist/assets/74e8838120256800/battle/terrain/rock.png                   116.20 kB
+../../../../../../tmp/tg157-prefix-dist/assets/b47c382b0be6e6fe/battle/terrain/water.png                  118.20 kB
+../../../../../../tmp/tg157-prefix-dist/assets/9f88a273b676fa0e/battle/terrain/forest.png                 139.18 kB
+../../../../../../tmp/tg157-prefix-dist/assets/be249ec3f8849929/battle/terrain/grass_path.png             139.39 kB
+../../../../../../tmp/tg157-prefix-dist/assets/58625a5a9febe514/battle/terrain/grass.png                  140.32 kB
+../../../../../../tmp/tg157-prefix-dist/assets/f8322179450af915/battle/terrain/stone.png                  142.88 kB
+../../../../../../tmp/tg157-prefix-dist/assets/preferences-D1bXSLXU.css                                     0.71 kB │ gzip:   0.35 kB
+../../../../../../tmp/tg157-prefix-dist/assets/startDungeonApp-Lf8BDkX1.css                                 1.43 kB │ gzip:   0.63 kB
+../../../../../../tmp/tg157-prefix-dist/assets/startRunApp-y3YtRGS5.css                                     2.13 kB │ gzip:   0.80 kB
+../../../../../../tmp/tg157-prefix-dist/assets/view-BJiQju0W.css                                            3.41 kB │ gzip:   1.29 kB
+../../../../../../tmp/tg157-prefix-dist/assets/battleLayout-C6wfuIJB.css                                   10.75 kB │ gzip:   2.68 kB
+../../../../../../tmp/tg157-prefix-dist/assets/start-BnjyRWo5.js                                            0.06 kB │ gzip:   0.07 kB
+../../../../../../tmp/tg157-prefix-dist/assets/telemetry-DUsjSLnt.js                                        0.45 kB │ gzip:   0.24 kB
+../../../../../../tmp/tg157-prefix-dist/assets/battleLayout-BVayxngr.js                                     0.55 kB │ gzip:   0.31 kB
+../../../../../../tmp/tg157-prefix-dist/assets/preload-helper-3gX2X29a.js                                   1.39 kB │ gzip:   0.75 kB
+../../../../../../tmp/tg157-prefix-dist/assets/rng-BCcJOpRP.js                                              1.65 kB │ gzip:   0.81 kB
+../../../../../../tmp/tg157-prefix-dist/assets/index-Njdkpau8.js                                            2.40 kB │ gzip:   1.11 kB
+../../../../../../tmp/tg157-prefix-dist/assets/startBattleApp-Bc2TFN_3.js                                   2.93 kB │ gzip:   1.22 kB
+../../../../../../tmp/tg157-prefix-dist/assets/generate-CM4xYTdC.js                                         3.04 kB │ gzip:   1.36 kB
+../../../../../../tmp/tg157-prefix-dist/assets/browser-UNno9Gf8.js                                          3.26 kB │ gzip:   1.37 kB
+../../../../../../tmp/tg157-prefix-dist/assets/preferences-CUgYfFiK.js                                      5.46 kB │ gzip:   2.46 kB
+../../../../../../tmp/tg157-prefix-dist/assets/view-CNN8-sMx.js                                             7.76 kB │ gzip:   3.14 kB
+../../../../../../tmp/tg157-prefix-dist/assets/items-DtF_179R.js                                            8.33 kB │ gzip:   3.09 kB
+../../../../../../tmp/tg157-prefix-dist/assets/transport-CPtkaPOU.js                                       11.43 kB │ gzip:   4.98 kB
+../../../../../../tmp/tg157-prefix-dist/assets/startRunApp-DXIXBRju.js                                     23.64 kB │ gzip:   7.85 kB
+../../../../../../tmp/tg157-prefix-dist/assets/startDungeonApp-rjcjY6-X.js                                 25.75 kB │ gzip:   8.92 kB
+../../../../../../tmp/tg157-prefix-dist/assets/start-NkZnCspe.js                                        1,427.15 kB │ gzip: 370.95 kB
+
+✓ built in 170ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

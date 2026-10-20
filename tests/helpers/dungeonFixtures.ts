@@ -1,4 +1,4 @@
-import { freshDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
@@ -33,4 +33,17 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
     }
   }
   return null;
+}
+
+/** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
+export function dungeonCapacityFixture(): DungeonState {
+  for(let seed=1;seed<=100;seed++){
+    const base=freshDungeon('dungeon-capacity-fixture',seed);
+    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3};});
+    const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
+    const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
+    const offer=dungeonOffer(candidate);
+    if(offer.options.every(o=>o.itemId!=='item:healing_draught'))return checkedDungeon(readDungeon({...candidate,offer}));
+  }
+  throw Error('No two-charm capacity fixture');
 }

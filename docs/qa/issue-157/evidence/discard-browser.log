@@ -1,0 +1,42 @@
+[WebServer] (node:19022) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 24 tests using 1 worker
+
+(node:19063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/dungeon-lifecycle.spec.ts:10:1 › restart during accepted presentation discards old callbacks and history (1.2s)
+  ✓   2 [desktop] › tests/dungeon-lifecycle.spec.ts:22:1 › legal enemy defeat boundary resumes once and a confirmed new dungeon resets it (1.1s)
+  ✓   3 [desktop] › tests/dungeon-lifecycle.spec.ts:34:1 › run navigation reaches the base-aware dungeon entry and returns to existing modes (331ms)
+  ✓   4 [desktop] › tests/dungeon-lifecycle.spec.ts:40:1 › visibility interruption finishes an accepted terminal presentation exactly once (913ms)
+  ✓   5 [desktop] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (2.9s)
+  ✓   6 [desktop] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.1s)
+  ✓   7 [desktop] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (4.6s)
+  ✓   8 [desktop] › tests/dungeon.spec.ts:69:1 › confirmed charm discard frees full capacity without cancelling or duplicating the pending reward (2.2s)
+(node:19128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [mobile-portrait] › tests/dungeon-lifecycle.spec.ts:10:1 › restart during accepted presentation discards old callbacks and history (1.2s)
+  ✓  10 [mobile-portrait] › tests/dungeon-lifecycle.spec.ts:22:1 › legal enemy defeat boundary resumes once and a confirmed new dungeon resets it (1.0s)
+  ✓  11 [mobile-portrait] › tests/dungeon-lifecycle.spec.ts:34:1 › run navigation reaches the base-aware dungeon entry and returns to existing modes (338ms)
+  ✓  12 [mobile-portrait] › tests/dungeon-lifecycle.spec.ts:40:1 › visibility interruption finishes an accepted terminal presentation exactly once (966ms)
+  ✓  13 [mobile-portrait] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (3.0s)
+  ✓  14 [mobile-portrait] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.3s)
+  ✓  15 [mobile-portrait] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (4.6s)
+  ✓  16 [mobile-portrait] › tests/dungeon.spec.ts:69:1 › confirmed charm discard frees full capacity without cancelling or duplicating the pending reward (2.3s)
+(node:19228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [mobile-landscape] › tests/dungeon-lifecycle.spec.ts:10:1 › restart during accepted presentation discards old callbacks and history (1.3s)
+  ✓  18 [mobile-landscape] › tests/dungeon-lifecycle.spec.ts:22:1 › legal enemy defeat boundary resumes once and a confirmed new dungeon resets it (1.0s)
+  ✓  19 [mobile-landscape] › tests/dungeon-lifecycle.spec.ts:34:1 › run navigation reaches the base-aware dungeon entry and returns to existing modes (309ms)
+  ✓  20 [mobile-landscape] › tests/dungeon-lifecycle.spec.ts:40:1 › visibility interruption finishes an accepted terminal presentation exactly once (966ms)
+  ✓  21 [mobile-landscape] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (3.1s)
+  ✓  22 [mobile-landscape] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.4s)
+  ✓  23 [mobile-landscape] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (4.6s)
+  ✓  24 [mobile-landscape] › tests/dungeon.spec.ts:69:1 › confirmed charm discard frees full capacity without cancelling or duplicating the pending reward (2.3s)
+
+  24 passed (1.2m)

@@ -167,12 +167,21 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
   const next = { ...s, floors };
   return advance(s, { floors, party, phase: f.completed === 2 ? 'ready' : 'reward', offer: f.completed === 2 ? null : dungeonOffer(next), activeBattle: null, battlefield: null });
 }
-export function dungeonItem(s: DungeonState, command: ItemCommand): DungeonResult {
+export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & { readonly type: 'discardEquipment'; readonly instanceId: string });
+export function dungeonItem(s: DungeonState, command: DungeonItemCommand): DungeonResult {
   const keys = ['type','runId','revision','itemRevision','encounterId','boundaryId'];
-  if (!hasShape(command, [...keys,'offerId','itemId']) && !hasShape(command, [...keys,'itemId','heroId']) && !hasShape(command, [...keys,'instanceId','heroId','slot'])) return fail('invalidCommand');
+  if (!hasShape(command, [...keys,'instanceId']) && !hasShape(command, [...keys,'offerId','itemId']) && !hasShape(command, [...keys,'itemId','heroId']) && !hasShape(command, [...keys,'instanceId','heroId','slot'])) return fail('invalidCommand');
   const b = dungeonBoundary(s);
-  if (Object.entries(b).some(([key, value]) => command[key as keyof ItemCommand] !== value)) return fail('staleBoundary');
+  if (Object.entries(b).some(([key, value]) => command[key as keyof typeof b] !== value)) return fail('staleBoundary');
   if (s.phase !== 'ready' && s.phase !== 'reward') return fail('wrongContext');
+  if (command.type === 'discardEquipment') {
+    if (!hasShape(command, [...keys,'instanceId'])) return fail('invalidCommand');
+    if (!s.ownership.equipment.some(item => item.instanceId === command.instanceId)) return fail('notOwned');
+    return advance(s, { ownership: { ...s.ownership,
+      equipment: s.ownership.equipment.filter(item => item.instanceId !== command.instanceId),
+      assignments: s.ownership.assignments.filter(assignment => assignment.instanceId !== command.instanceId),
+    } });
+  }
   if (command.type === 'claimReward') {
     if (!s.offer || command.offerId !== s.offer.id) return fail('invalidOffer');
     const ordinal = s.offer.options.findIndex(o => o.itemId === command.itemId);

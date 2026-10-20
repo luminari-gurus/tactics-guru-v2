@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -147,4 +148,43 @@ describe('dungeon recovery limits',()=>{
     expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(4000);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
   },60000);
+});
+
+describe('confirmed dungeon charm disposal',()=>{
+  it('frees equipped capacity once, preserves the offer/RNG and persists the separate reward claim',()=>{
+    const original=dungeonCapacityFixture(),instanceId=original.ownership.equipment[0].instanceId;
+    const command={...dungeonBoundary(original),type:'discardEquipment' as const,instanceId};
+    const previousBattle=dungeonBattle(original)!;
+    const discarded=good(dungeonItem(original,command));
+    expect(discarded.ownership.equipment).toHaveLength(5);expect(discarded.ownership.assignments).toEqual([]);
+    expect(discarded.ownership.equipment.some(e=>e.instanceId===instanceId)).toBe(false);
+    expect(discarded.offer).toEqual(original.offer);expect(discarded.party).toEqual(original.party);expect(discarded.floors).toEqual(original.floors);
+    expect(discarded.phase).toBe('reward');expect(discarded.revision).toBe(original.revision+1);
+    const afterBattle=dungeonBattle(discarded)!;
+    expect(afterBattle.state.rng).toEqual(previousBattle.state.rng);
+    expect(afterBattle.catalog.heroes.fighter.stats.armorClass).toBe(dungeonContent.catalog.heroes.fighter.stats.armorClass);
+    expect(dungeonItem(discarded,command)).toEqual({ok:false,reason:'staleBoundary'});
+    const encoded=encodeDungeon(discarded);if(!encoded.ok)throw Error(encoded.reason);expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:discarded});
+    const claimed=good(dungeonItem(discarded,{...dungeonBoundary(discarded),type:'claimReward',offerId:discarded.offer!.id,itemId:discarded.offer!.options[0].itemId}));
+    expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();expect(claimed.ownership.equipment.some(e=>e.instanceId===instanceId)).toBe(false);
+  });
+  it('rejects unowned/malformed/battle/defeat commands without mutation',()=>{
+    const original=dungeonCapacityFixture(),instanceId=original.ownership.equipment[0].instanceId,command={...dungeonBoundary(original),type:'discardEquipment' as const,instanceId};
+    const before=JSON.stringify(original);
+    expect(dungeonItem(original,{...command,instanceId:'unowned'})).toEqual({ok:false,reason:'notOwned'});
+    expect(dungeonItem(original,{...command,heroId:'fighter'} as unknown as typeof command)).toEqual({ok:false,reason:'invalidCommand'});
+    expect(JSON.stringify(original)).toBe(before);
+    const battle=good(startDungeonBattle({...original,phase:'ready',offer:null}));
+    expect(dungeonItem(battle,{...command,...dungeonBoundary(battle)})).toEqual({ok:false,reason:'wrongContext'});
+    const state=battle.activeBattle!,defeated=good(acceptDungeonBattle(battle,{...state,outcome:'playerLoss',units:state.units.map(u=>u.side==='player'?{...u,hp:0}:u)}));
+    expect(dungeonItem(defeated,{...command,...dungeonBoundary(defeated)})).toEqual({ok:false,reason:'wrongContext'});
+  });
+  it('saves confirmed disposal through the existing session and reports failed saving honestly',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m),initial=dungeonCapacityFixture();store.save(initial);
+    const session=new DungeonSession(initial,store),command={...dungeonBoundary(initial),type:'discardEquipment' as const,instanceId:initial.ownership.equipment[0].instanceId};
+    expect(session.dispatch(command)).toBe(true);const primary=store.inspect().primary;if(primary.status!=='valid')throw Error('Save invalid');expect(primary.state).toEqual(session.snapshot);
+    m.setItem=()=>{throw Object.assign(Error('full'),{name:'QuotaExceededError'});};
+    const current=session.snapshot;expect(session.dispatch({...dungeonBoundary(current),type:'discardEquipment',instanceId:current.ownership.equipment[0].instanceId})).toBe(true);
+    expect(session.snapshot.ownership.equipment).toHaveLength(4);expect(session.status).toContain('unsaved');
+  });
 });

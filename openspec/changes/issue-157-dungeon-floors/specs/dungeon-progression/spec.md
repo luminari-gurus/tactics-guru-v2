@@ -59,3 +59,22 @@ The dungeon SHALL display floor depth, encounter progress, guardian completion a
 #### Scenario: Locked or unavailable stairs
 - **WHEN** the guardian is not defeated, a reward is pending or battle presentation is active
 - **THEN** descent cannot commit and the interface explains its unavailable state
+
+### Requirement: Confirmed owned charm disposal
+During dungeon preparation or pending rewards, the system SHALL allow explicitly confirmed disposal of an owned charm, including equipped charms. Disposal SHALL remove that instance and its assignment once, preserving HP, RNG, pending offers and completion. Cancelled, stale, unowned, active-battle and defeat requests MUST change nothing.
+
+#### Scenario: Free full equipment capacity
+- **WHEN** the player confirms disposal of an owned charm at six equipment instances
+- **THEN** the instance and any assignment are removed, the pending reward remains unchanged, and a new deliberate reward claim can fill the freed slot
+
+#### Scenario: Cancel disposal
+- **WHEN** the player cancels the disposal confirmation
+- **THEN** ownership, assignment, revision and saved bytes remain unchanged
+
+#### Scenario: Restore after disposal
+- **WHEN** a saved dungeon is resumed after confirmed disposal
+- **THEN** the removed instance and assignment remain absent and the pending reward retains its identity and options
+
+#### Scenario: Reject unavailable disposal
+- **WHEN** disposal names an unowned instance, uses a stale boundary or occurs during battle or defeat
+- **THEN** no inventory, party, RNG or reward mutation occurs

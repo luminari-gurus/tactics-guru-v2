@@ -1,6 +1,6 @@
 import { expect,test,type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
-import { dungeonVictoryBoundary } from './helpers/dungeonFixtures';
+import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -64,4 +64,29 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-remove-primary').click();await page.locator('#dungeon-remove-cancel').click();
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
+});
+
+test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
+ const initial=dungeonCapacityFixture();await seed(page,initial);
+ const target=initial.ownership.equipment[0].instanceId;
+ const discard=()=>page.locator(`[data-instance-id="${target}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
+ const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ for(const cancellation of ['Cancel','Escape']){
+  if(isMobile)await discard().tap();else await discard().click();
+  await expect(page.getByRole('dialog')).toContainText('unequip it from fighter');await expect(page.locator('#dungeon-discard-cancel')).toBeFocused();
+  if(cancellation==='Cancel'){await page.screenshot({path:test.info().outputPath('discard-confirmation.png')});await page.locator('#dungeon-discard-cancel').click();}else await page.keyboard.press('Escape');
+  expect(await snapshot(page)).toEqual(initial);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+ }
+ await discard().click();await page.locator('#dungeon-discard-confirm').click();
+ const disposed=await snapshot(page);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
+ await expect(page.locator('#dungeon-descend')).toBeDisabled();
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(disposed);
+ await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();
+ const claimed=await snapshot(page);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
+ await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(claimed);
+ await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
+ const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
+ await page.locator('#dungeon-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
 });
