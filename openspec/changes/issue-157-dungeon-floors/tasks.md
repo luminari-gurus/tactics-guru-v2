@@ -27,7 +27,7 @@
 ## 5. Integration acceptance
 
 - [x] 5.1 Run full unit/content/typecheck/build and configured browser suites including posttest matrices; run focused dungeon tests and compare every issue criterion to evidence. Retain commands/results and actual limitations; verify strict OpenSpec and git diff checks.
-- [ ] 5.2 Measure new lazy-route code and save growth, retain current performance failures, and audit documentation against source; commit/push only approved issue changes and create/attach PR with verified acceptance coverage.
+- [x] 5.2 Measure new lazy-route code and save growth, retain current performance failures, and audit documentation against source; commit/push only approved issue changes and create/attach PR with verified acceptance coverage.
 
 ## Workflow follow-up
 

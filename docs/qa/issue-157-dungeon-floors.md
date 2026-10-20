@@ -2,7 +2,7 @@
 
 Status: independent implementation/verification complete; inventory-capacity policy clarification pending. The PR remains draft and does not close #157.
 
-Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/157. Branch: `work/issue-157-dungeon-floors`. Base: `6bfe127dd3228392ebda6cbee5344afafa84ca48`. Caller approved the published plan `e5b844e` on 2026-10-20. Runtime source hashes are retained in [source-hashes.json](issue-157/evidence/source-hashes.json); the final commit/validation receipts will be added after checks finish.
+Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/157. Branch: `work/issue-157-dungeon-floors`. Base: `6bfe127dd3228392ebda6cbee5344afafa84ca48`. Caller approved the published plan `e5b844e` on 2026-10-20. Runtime source hashes are retained in [source-hashes.json](issue-157/evidence/source-hashes.json); runtime source commit is `dc4bb86e6b3a4a92086916777d81503cbc2cb9e0`, published in draft PR [#186](https://github.com/luminari-gurus/tactics-guru-v2/pull/186). Tested builds were created before that commit and report planning commit `e5b844e` with a dirty working tree; source hashes bind the runtime bytes rather than claiming a clean-commit build. Later commits update documentation/progress only.
 
 ## Delivered behavior
 
