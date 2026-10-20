@@ -41,3 +41,7 @@ Run `npm run test:unit`, `npm run validate:content`, `npm run typecheck`, `npm r
 ## Migration Plan
 
 New mode/namespace only; no old-save rewrite or importer. Document new route and limitations. Removing the dungeon entry rolls back availability without deleting its saves. No production activation or main merge is authorized. Approval of this plan selects the temporary three-encounter floor template and summary stair controls explicitly.
+
+## Implementation discovery awaiting caller choice
+
+The six-equipment capacity can block a continuing run when both offer choices are equipment. Unequipping does not free owned-instance capacity. The original plan did not choose disposal or skipping; the caller has been asked to select confirmed charm disposal during preparation or an explicit no-item reward skip. Existing capacity rejection remains atomic. Neither new behavior is implemented or treated as approved while that answer is pending.

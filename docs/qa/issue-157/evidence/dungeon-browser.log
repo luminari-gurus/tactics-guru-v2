@@ -1,0 +1,27 @@
+[WebServer] (node:12068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 9 tests using 1 worker
+
+(node:12109) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (2.5s)
+  ✓  2 [desktop] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.1s)
+  ✓  3 [desktop] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (4.6s)
+(node:12178) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [mobile-portrait] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (3.2s)
+  ✓  5 [mobile-portrait] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.3s)
+  ✓  6 [mobile-portrait] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (4.6s)
+(node:12250) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [mobile-landscape] › tests/dungeon.spec.ts:13:1 › read-only entry, keyboard new dungeon, real action and active resume (3.2s)
+  ✓  8 [mobile-landscape] › tests/dungeon.spec.ts:29:1 › legal reward and guardian boundaries, travel reload, backtracking and isolated saves (9.4s)
+  ✓  9 [mobile-landscape] › tests/dungeon.spec.ts:55:1 › corrupt bytes stay exportable and uncertain travel requires explicit recovery (5.7s)
+
+  9 passed (53.8s)

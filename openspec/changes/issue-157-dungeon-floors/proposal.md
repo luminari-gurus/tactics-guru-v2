@@ -4,7 +4,7 @@
 
 [#157](https://github.com/luminari-gurus/tactics-guru-v2/issues/157) replaces the fixed three-battle production concept with continuing dungeon floors, unlocking #158 exploration and #159 encounter selection. The existing short run remains a testing proof of concept.
 
-Caller: `dubstylee`. Branch: `work/issue-157-dungeon-floors`. Base: `origin/main` at `6bfe127dd3228392ebda6cbee5344afafa84ca48`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-157-dungeon-floors`. Base: `origin/main` at `6bfe127dd3228392ebda6cbee5344afafa84ca48`. Implementation approval: caller said “Approved” on 2026-10-20 for published plan `e5b844e`, including the route, temporary floor template, summary stair controls and resource/recovery decisions.
 
 ## What Changes
 

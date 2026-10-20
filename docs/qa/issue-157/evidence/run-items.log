@@ -1,0 +1,39 @@
+[WebServer] (node:16669) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 21 tests using 1 worker
+
+(node:16710) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (317ms)
+  ✓   2 [desktop] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (455ms)
+  ✓   3 [desktop] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (479ms)
+  ✓   4 [desktop] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (497ms)
+  ✓   5 [desktop] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (225ms)
+  ✓   6 [desktop] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (280ms)
+  ✓   7 [desktop] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (328ms)
+(node:16745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [mobile-portrait] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (311ms)
+  ✓   9 [mobile-portrait] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (496ms)
+  ✓  10 [mobile-portrait] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (451ms)
+  ✓  11 [mobile-portrait] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (495ms)
+  ✓  12 [mobile-portrait] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (225ms)
+  ✓  13 [mobile-portrait] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (276ms)
+  ✓  14 [mobile-portrait] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (324ms)
+(node:16777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [mobile-landscape] › tests/run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload (301ms)
+  ✓  16 [mobile-landscape] › tests/run-items.spec.ts:33:1 › real item use, equip and unequip preserve ownership/stats across reload (488ms)
+  ✓  17 [mobile-landscape] › tests/run-items.spec.ts:56:1 › keyboard cancel, held activation, native modal capture and layout (461ms)
+  ✓  18 [mobile-landscape] › tests/run-items.spec.ts:93:1 › corruption preserves bytes, exports raw data and requires reviewed removal before saving (492ms)
+  ✓  19 [mobile-landscape] › tests/run-items.spec.ts:116:1 › stale recovery review refuses changed bytes (237ms)
+  ✓  20 [mobile-landscape] › tests/run-items.spec.ts:127:1 › unavailable storage is nonfatal and active battle prevents item controls (276ms)
+  ✓  21 [mobile-landscape] › tests/run-items.spec.ts:142:2 › rejected reward capacity and active snapshot reload leave state and RNG intact (327ms)
+
+  21 passed (9.8s)

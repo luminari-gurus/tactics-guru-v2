@@ -1,0 +1,2 @@
+import config from '/Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2/playwright.config.ts';
+export default {...config,testDir:'/Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2/tests',outputDir:'/tmp/tg157-baseline-results',use:{...config.use,baseURL:'http://127.0.0.1:4176/'},webServer:{cwd:'/Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2',command:'npm run preview -- --port 4176 --strictPort',url:'http://127.0.0.1:4176/',reuseExistingServer:false}};
