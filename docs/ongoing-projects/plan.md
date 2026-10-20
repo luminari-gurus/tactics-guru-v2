@@ -4,7 +4,27 @@ Planning date: 2026-10-20 (Asia/Jerusalem).
 Source baseline: `main` at `1fee092d184fd99998f8e5e2766d45c216c6d5d8`.
 Work item: [#154 — Spawn one player marker and three enemy markers](https://github.com/luminari-gurus/tactics-guru-v2/issues/154).
 Delivery branch: `branch/issue-154-overworld-markers`.
-Status: implementation plan; application changes and marker acceptance tests have not started.
+Status: implementation in progress; pure marker model implemented and verified, route integration next.
+
+## Implementation handoff (2026-10-20)
+
+- Worktree: `C:/Users/apexw/.codex/worktrees/issue-154-overworld-markers/Tactics-Guru`.
+- Refreshed `origin/main` remains `1fee092`; the branch starts with planning commit `1e4a06c`.
+- Live #154 matches this plan. No existing PR for the branch.
+- Using OpenSpec change `issue-154-overworld-markers` (spec-driven), as explicitly requested for implementation.
+- Ablation retains the pure model, complete-state commits, CSS markers and existing test suites.
+  Phaser/sprite/image generation is unnecessary for the DOM route.
+- Model checkpoint: `src/map/state.ts` and non-DOM inclusion implemented. All 46 focused unit tests pass,
+  including 2,340 seed/type/biome placements, nine pinned position cases, immutable inputs, four selection
+  draws, malformed layout failure and unmocked placement on all three forced generator fallbacks.
+- `npm run typecheck` passes. Before-edit terrain SHA-256 values are pinned in the suite:
+  Rooms `d7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0`,
+  Walker `dc2715ef5fc6b56526bd19300eea7157bada57f32ebdf580eff0ac70d3d3d893`,
+  Cellular `31583dad387235929096a42f680f782551474198495569c9e6c54710f23dc88e`.
+- Commands run through WSL Node 24/npm because Windows PATH has no npm/OpenSpec. `npm ci --no-audit --no-fund`
+  completed; unrelated PostHog CLI postinstall was blocked by npm policy and is not needed for this work.
+- Next: controls/presentation, browser matrix and failure injection, final documentation and PR readiness.
+  No browser acceptance claimed yet.
 
 The previous [issue #145 / PR #150 handoff](plan-before-issue-154.md) is preserved byte-for-byte. It is historical: PR #150 is already merged in this baseline, despite its handoff's pre-merge wording.
 
@@ -139,7 +159,7 @@ Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). At pl
 - **Simplify rendering to CSS overlays on existing cells:** a new Phaser scene, canvas renderer, entity component system or SVG overlay grid supplies no required behavior.
 - **Drop generated artwork and sprite production:** stable geometric markers meet the requested identity/readability goal without new assets or licensing/loading work. Game Studio foundations/UI/playtest guidance applies; Phaser and sprite/image generation are unnecessary for this DOM route.
 - **Drop movement, pathfinding, detection, timers, player controls, encounters/combat, persistence, telemetry events, route redesign and procedural terrain changes:** these are excluded by #154 or belong to #155/other work. No speculative movement settings or save schema are introduced.
-- **Drop additional planning machinery:** this requested plan is sufficient; no new OpenSpec change set, backlog sweep, framework or approval stage is needed for publication.
+- **Keep requested OpenSpec tracking:** the implementation request explicitly adds OpenSpec; the change mirrors this plan without another approval stage. Drop backlog sweeps and extra frameworks.
 
 ## Completion boundary
 

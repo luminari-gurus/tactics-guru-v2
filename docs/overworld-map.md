@@ -1,6 +1,6 @@
 # Overworld map contract
 
-Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls; it does not initialize a battle, audio or storage.
+Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
 
 ## Layout and biome
 
@@ -15,6 +15,24 @@ Biome treatment follows layout generation and preserves every cell's walkability
 | `desert` / `desert-v1` | `desert-open`: sand, `#e5c581` | `desert-blocked`: rock, `#6b4c38` | Pale sand, dark diagonal rock motif on blocked cells |
 
 The six stable terrain IDs identify environmental treatment, not art style. `applyBiome` in [biomes.ts](../src/map/biomes.ts) returns layout fields plus biome ID/version and a separate readonly per-cell `terrain` layer. Treatment is a pure 400-cell mapping and consumes **no RNG**. Seed + map type/version + biome/version reproduce identical data; changes to treatment behavior require a biome version change. Rendering reads the retained treated map and does not generate terrain or consume generation/battle entropy.
+
+## Marker model
+
+[state.ts](../src/map/state.ts) exports readonly `OverworldMarker` and `OverworldState` types
+and `createOverworld(map: BiomeMap)`. The result is `{ ok: true, state }` or
+`{ ok: false, reason }`, with no partial world on failure. A complete state retains the map,
+`placementVersion: 'markers-v1'` and four ordered markers: `player`, `enemy-1`, `enemy-2`,
+`enemy-3`. Each has a `player`/`enemy` kind and zero-based integer `x`/`y`.
+Issue #155 can transform this model directly; DOM attributes are only its projection.
+
+Placement validates the existing connected 20×20 layout and matching terrain, then samples
+four distinct row-major walkable indices without replacement. A fresh local RNG is seeded
+with `(map.seed ^ 0x4d41524b) >>> 0`; the first four partial Fisher–Yates steps each use
+`i + nextUint32(rng).value % (count - i)`. There are exactly four selection draws after
+the existing RNG warmup, no retries, terrain regeneration, clock or browser entropy.
+The same layout and seed reproduce positions. Biome and artwork never affect them.
+All terrain versions and outputs are preserved; placement changes require their own version.
+Modulo bias is accepted for these prototype spawns, with no distance or center-spawn rule.
 
 ## Controls and reproducibility
 
