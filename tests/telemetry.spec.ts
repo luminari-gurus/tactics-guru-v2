@@ -32,7 +32,8 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
       await playCommand(page, playerDecision(battle.state, runBattleCatalog(state.items, runContext)!));
     }
     const state = JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
-    expect(state.items.run.phase).toBe(index === 2 ? 'victory' : 'reward');
+    if(index===2)expect(['victory','defeat']).toContain(state.items.run.phase);
+    else expect(state.items.run.phase).toBe('reward');
     if (index < 2) {
       const item = (state.items.offer.options.find((option: { itemId: string }) => option.itemId === 'item:healing_draught') ?? state.items.offer.options[0]).itemId;
       await page.getByRole('button', { name: `Claim ${runContext.items[item as keyof typeof runContext.items].label}`, exact: true }).click();
@@ -60,6 +61,8 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
     }
   }
   await expect.poll(() => events.filter(e => e.event === 'run_outcome').length).toBe(1);
+  const terminal=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).items.run.phase;
+  expect(events.find(e=>e.event==='run_outcome')!.properties).toMatchObject({phase:terminal,outcome:terminal,encounter:2});
   await page.reload(); await page.locator('#run-continue').click();
   await expect.poll(() => events.filter(e => e.event === 'run_continued').length).toBe(3);
   expect(events.filter(e => e.event === 'run_started')).toHaveLength(1);

@@ -55,6 +55,7 @@ export class BattleScene extends Phaser.Scene {
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false;
+    let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
@@ -64,6 +65,10 @@ export class BattleScene extends Phaser.Scene {
     const clear=()=>{board.resetPicking();session.cancel();action=null;hovered=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
+      if(ready && session.phase==='player' && (initializedTurn?.round!==session.state.round || initializedTurn.unitId!==session.active.id)){
+        initializedTurn={round:session.state.round,unitId:session.active.id};
+        if(previewMovement(session.state,session.active.id,catalog).ok){action='move';message='Select a destination';}
+      }
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
       const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
@@ -89,6 +94,7 @@ export class BattleScene extends Phaser.Scene {
       const changed=selected?.x!==cell?.x || selected?.y!==cell?.y;
       selected=cell;if(cell)cursor=cell;session.cancel();
       if(action && cell){const command=actionCommand(session,action,cell);message=command?describe(command):'Unavailable: choose a living target';}
+      else if(!cell){hovered=null;message=action==='move'?'Select a destination':action?'Select a target':'Choose an action and target';}
       refresh();
       if(changed)measurements.interaction('selection',inputMs);
     };
@@ -130,7 +136,7 @@ export class BattleScene extends Phaser.Scene {
         : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
       const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
         :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
-      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
+      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='move'){selected=null;hovered=null;}if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{

@@ -47,6 +47,8 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
   const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
   expect(board.selected).toBeNull();expect(board.selectionEvents).toBe(0);
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#battle-target')).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
   const runBefore=await snapshot(page);
   const corner=board.tiles.find((t:{x:number;y:number})=>t.x===11&&t.y===11);
   const x=(corner.x-corner.y)*40,y=(corner.x+corner.y)*20-corner.elevation*24;
@@ -96,6 +98,7 @@ test('accepted player presentation reload preserves exact boundary without old c
  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');const committed=await snapshot(page);
  await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(committed.activeBattle);expect((await readSession(page)).events).toEqual([]);expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
+ await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
 });
 test('enemy presentation reload resumes the same commands and RNG as an uninterrupted run',async({page,browser,baseURL})=>{
  const other=await browser.newContext({viewport:page.viewportSize(),baseURL});const control=await other.newPage();

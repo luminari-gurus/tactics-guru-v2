@@ -1,9 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
-import { decodeBattleSave } from '../src/domain/saveEnvelope';
+import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
 import { battleCatalog as catalog } from '../src/content/catalog';
 import { confirmRestart, playCommand, playerDecision, readSession } from './helpers/battlePolicy';
+import { BattleSession } from '../src/app/BattleSession';
+import { previewMovement } from '../src/domain/grid';
+import { RULE_BOUNDS } from '../src/domain/constants';
+import type { BattleState } from '../src/domain/types';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
 test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
@@ -24,6 +28,80 @@ async function touch(page:Page,selector:string) {
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2,id:1}]});
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
 }
+
+async function continueSnapshot(page:Page,state:BattleState){
+  const save=encodeBattleSave(state,catalog);if(!save.ok)throw Error(save.reason);
+  await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:keys.primary,text:save.text});
+  await page.goto('/');await page.locator('#save-continue').click();await ready(page);
+  expect((await readSession(page)).state).toEqual(state);
+  return save.text;
+}
+
+test('default Move Continue is read-only and confirmed movement keeps the remaining-action flow',async({page})=>{
+  await page.goto('/');await ready(page);const before=await readSession(page),saved=await stored(page);
+  await page.reload();await page.locator('#save-continue').click();await ready(page);
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#fit-restart')).toBeFocused();
+  expect((await readSession(page)).state).toEqual(before.state);expect(await stored(page)).toEqual(saved);
+  await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#battle-review')).toBeDisabled();expect(await stored(page)).toEqual(saved);
+  await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();await ready(page);
+  const moved=await readSession(page);expect(moved.state.commandCount).toBe(before.state.commandCount+1);
+  expect(moved.continuation!.commands).toHaveLength(1);expect(moved.continuation!.commands[0].type).toBe('move');
+  expect(moved.state.units.find(u=>u.id===moved.state.initiative[moved.state.activeIndex])).toMatchObject({hasMoved:true,hasActed:false});
+  await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('[data-action=basic]')).toBeEnabled();await expect(page.locator('#battle-target')).toBeDisabled();
+  await page.locator('#battle-scroll').evaluate(e=>{e.scrollTop=0;});
+  await page.screenshot({path:test.info().outputPath('post-move.png')});
+  const committed=await stored(page);await page.reload();await page.locator('#save-continue').click();await ready(page);
+  expect((await readSession(page)).state).toEqual(moved.state);expect(await stored(page)).toEqual(committed);
+  await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#battle-target')).toBeDisabled();await expect(page.locator('#battle-review')).toBeDisabled();
+});
+
+test('default Move does not return after a legally reached attack before movement',async({page})=>{
+  const fixture=new BattleSession(catalog,'map:forest_ruins',2);
+  for(let i=0;i<200;i++){
+    const command=fixture.phase==='player'?playerDecision(fixture.state):null;
+    if(command?.type==='useAbility' && !fixture.active.hasMoved && !fixture.active.hasActed)break;
+    if(command)expect(fixture.prepare(command).ok).toBe(true);
+    const step=command?fixture.confirm():fixture.nextEnemy();if(!step)throw Error('Missing legal attack boundary');fixture.finishPresentation(step.token);
+  }
+  const command=playerDecision(fixture.state);expect(command.type).toBe('useAbility');expect(fixture.active.hasMoved).toBe(false);
+  await continueSnapshot(page,fixture.state);await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await playCommand(page,command);await ready(page);
+  const after=await readSession(page);expect(after.state.round).toBe(fixture.state.round);expect(after.state.activeIndex).toBe(fixture.state.activeIndex);
+  expect(after.state.units.find(u=>u.id===fixture.active.id)).toMatchObject({hasMoved:false,hasActed:true});
+  await expect(page.locator('#battle-move')).toBeEnabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#battle-target')).toBeDisabled();await expect(page.locator('#battle-review')).toBeDisabled();
+  await page.locator('#battle-log-open').click();await page.locator('#log-close').click();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await page.locator('#battle-move').click();await expect(page.locator('#battle-target')).toBeEnabled();
+  expect(fixture.prepare(command).ok).toBe(true);const step=fixture.confirm()!;fixture.finishPresentation(step.token);expect(after.state).toEqual(fixture.state);
+});
+
+for(const boundary of ['command limit','origin only'] as const)test(`default Move respects ${boundary} without an intent or save mutation`,async({page})=>{
+  // Validated artificial snapshots isolate domain boundaries; they are not legal-play claims.
+  const fixture=new BattleSession(catalog,'map:forest_ruins',2);
+  while(fixture.phase==='enemy'){const step=fixture.nextEnemy()!;fixture.finishPresentation(step.token);}
+  const actor=fixture.active;
+  let state:BattleState;
+  if(boundary==='command limit')state={...fixture.state,commandCount:RULE_BOUNDS.commandCount.max};
+  else {
+    const blockers=fixture.state.units.filter(u=>u.id!==actor.id).slice(0,2);
+    state={...fixture.state,units:fixture.state.units.map(u=>({...u,cell:u.id===actor.id?{x:0,y:0}:u.id===blockers[0].id?{x:1,y:0}:u.id===blockers[1].id?{x:0,y:1}:u.cell}))};
+  }
+  const reach=previewMovement(state,actor.id,catalog);
+  if(boundary==='origin only'){expect(reach).toEqual({ok:true,cells:[{cell:{x:0,y:0},cost:0}]});}
+  else expect(reach).toEqual({ok:false,reason:'commandLimit'});
+  const text=await continueSnapshot(page,state);
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed',boundary==='origin only'?'true':'false');
+  if(boundary==='command limit')await expect(page.locator('#battle-move')).toBeDisabled();
+  else {await expect(page.locator('#battle-move')).toBeEnabled();await expect(page.locator('#battle-target option')).toHaveCount(1);}
+  await expect(page.locator('#battle-target')).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
+  expect((await stored(page)).primary).toBe(text);expect((await readSession(page)).state).toEqual(state);
+});
 
 test('startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus',async({page})=>{
   await seedTwo(page);await playCommand(page,playerDecision((await readSession(page)).state));await ready(page);
