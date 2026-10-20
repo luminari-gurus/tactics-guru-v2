@@ -4,7 +4,7 @@ Planning date: 2026-10-20 (Asia/Jerusalem).
 Source baseline: `main` at `1fee092d184fd99998f8e5e2766d45c216c6d5d8`.
 Work item: [#154 — Spawn one player marker and three enemy markers](https://github.com/luminari-gurus/tactics-guru-v2/issues/154).
 Delivery branch: `branch/issue-154-overworld-markers`.
-Status: implementation and acceptance complete; final review publication in progress.
+Status: implemented, tested and published; PR #156 is ready for review.
 
 ## Implementation handoff (2026-10-20)
 
@@ -43,8 +43,16 @@ Status: implementation and acceptance complete; final review publication in prog
   exclude the dev-only fixture, which was run separately.
 - [Acceptance record](../qa/issue-154-overworld-markers.md) retains source commits, exact commands,
   results, initial failures and repairs, browser/viewport details and selected screenshots.
-- Next: final publication/readback, then review. No implementation remains for #154; #155 is separate.
-  OpenSpec stays active until review/merge. No release tag is needed for this feature PR.
+- Delivery verified: PR #156 is open, non-draft and mergeable into `main`; the published branch has clean
+  tracked status and local/remote parity. OpenSpec is 7/7 complete and remains active for review.
+  Cloudflare Pages is an automatic external PR check; its latest publication check was still running
+  at handoff. Local acceptance does not depend on a claim of deployed testing.
+- Next session: review PR #156. No implementation remains for #154; #155 is separate and should consume
+  `OverworldState` from `src/map/state.ts`. No merge, archive or release tag was performed.
+- The last local `dist/` is a `/prototype/` build. Run `npm run build` before rerunning the default-root
+  preview suite; use the command-local WSL Git settings above. Selected evidence is committed in the QA folder.
+- Automatic approval review rejected removal of task-created `tmp/issue-154-*` verification files
+  with “blocked by policy.” They remain ignored locally; no cleanup bypass was attempted.
 
 The previous [issue #145 / PR #150 handoff](plan-before-issue-154.md) is preserved byte-for-byte. It is historical: PR #150 is already merged in this baseline, despite its handoff's pre-merge wording.
 
