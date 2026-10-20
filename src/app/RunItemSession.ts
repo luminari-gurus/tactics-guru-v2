@@ -41,7 +41,19 @@ export class RunItemSession {
   startEncounter(): BattleSession | null {
     if (this.disposed || this.current.items.run.phase !== 'battle') return null;
     if (this.battle && this.battle.phase !== 'disposed') return this.battle;
+    const restoring = this.current.activeBattle !== null;
+    const source = this.context.encounters.find(e => e.id === this.current.items.run.encounters[this.current.items.run.encounterIndex])?.source;
+    const began = source?.kind === 'generated' ? performance.now() : null;
     const resolved = resolveRunBattlefield(this.current.items,this.context);
+    // One foreground resolution sample per entry/resume, not repeated save validation.
+    if (began !== null && source?.kind === 'generated') track('battlefield_generation_measured', {
+      route: 'run', encounter: this.current.items.run.encounterIndex,
+      generation_context: restoring ? 'resume' : 'entry',
+      generation_duration_ms: Math.round(Math.max(0, performance.now() - began) * 100) / 100,
+      generation_status: resolved?.ok ? resolved.diagnostics.fallback ? 'fallback' : 'generated' : 'failed',
+      ...(resolved?.ok ? { generation_attempts: resolved.diagnostics.fallback ? 4 : resolved.diagnostics.attempt! + 1 } : {}),
+      biome: source.biome, generator_version: source.generatorVersion, profile_version: source.profileVersion,
+    });
     if(!resolved?.ok) { this.report('Could not resolve this battlefield. Progress unchanged.'); return null; }
     const battlefield = resolved.descriptor;
     let session: BattleSession;
@@ -61,7 +73,6 @@ export class RunItemSession {
       }
       this.save();
     };
-    const restoring = this.current.activeBattle !== null;
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog
       ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted, battlefield)

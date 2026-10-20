@@ -27,7 +27,7 @@
     "vite.config.ts": "28c3edf81c4ea0cfbceb21aac04749246388ae5ebf16badf49838f5664468097"
   },
   "evidenceSha256": {
-    "docs/qa/procedural-grids/README.md": "2cf8782e50989893ee8da0e08c41dc649daaa4d96752ddf34c6021a67c0d07a6",
+    "docs/qa/procedural-grids/README.md": "2be84e212681e1c5425df2c6475907636058983a32e7debfa0b1a3d917267db3",
     "docs/qa/procedural-grids/browser/broad-browser.txt": "1c92267538f6eb4e3ab732c7745d5bc0759c032bae6c9257abbe721a78183686",
     "docs/qa/procedural-grids/browser/build.txt": "64a05c47dea57bcdf802fa093e53760955f21a86bd3f0cbf1c65f14b68140aa8",
     "docs/qa/procedural-grids/browser/desktop-authored-final.png": "04c916b89775849ad356585e7b822ea367cbad313690e47eadfc1bc84bd78065",
@@ -39,6 +39,8 @@
     "docs/qa/procedural-grids/browser/desktop-static-textures.json": "9dc61b0fb6f2745a09af4449a9003d60ec2e94cf972b4177f5e790d19d917a87",
     "docs/qa/procedural-grids/browser/final-browser.txt": "b122ff48b839b07219bca7355008348fb2b37c9826d46a54a379d41404504f5c",
     "docs/qa/procedural-grids/browser/fixtures.txt": "6ba9d5710f803121215080e4d6993f888ad7192eec8a097fe2bed777bbed01f1",
+    "docs/qa/procedural-grids/browser/generation-browser.txt": "15050fcd81a0af98839116ac382cba335160f91320b37a09eb996aa4905aa3cd",
+    "docs/qa/procedural-grids/browser/generation-unit.txt": "84c85d29628d20ec1ed6b69ca7148275678d6ee962462d6bf2b96e06f9db359a",
     "docs/qa/procedural-grids/browser/mobile-landscape-authored-final.png": "5143a7e02e34d9dc5e13a6003d70e0393cc66360140fd19053f817abc10d3b6c",
     "docs/qa/procedural-grids/browser/mobile-landscape-desert-fallback.png": "686b7cb598e167cb6c67b9d4206a8115de8c44c6ebdd7843da6254a6afea3f92",
     "docs/qa/procedural-grids/browser/mobile-landscape-desert-grid.png": "6634ad2f395d11947acf8d5e61d9aff0ed947cef05e429e25ff660903004e918",
@@ -62,5 +64,15 @@
     "docs/qa/procedural-grids/performance-pre-cache.json": "ea3176b73d2e354452a4ccb0357b20e2c870b08c872a781487201d1613b2754d",
     "docs/qa/procedural-grids/performance.json": "22651e30cf436f68b675179779adc916dd11e8c6d36f2256913c60632a96542c",
     "docs/qa/procedural-grids/simulations.json": "7627324f45fce0832a0950817badb10f0d8177280c973787d45706c0e9e5f0f7"
+  },
+  "productionTelemetryFollowUp": {
+    "baseCommit": "b816728c26e63578a224b3fd0f03274641da5d7d",
+    "sourceSha256": {
+      "src/app/RunItemSession.ts": "d8317296529877221680547b523e2262cf0ef283aa1b82c07a23a1300c3978a3",
+      "src/telemetry/privacy.ts": "4e7240b2909616ed79ce21b0eb3093d383d7a19c48da810a7ff7bc691e6ff8d9",
+      "src/telemetry/telemetry.ts": "d7577cb162ca00324216b85ab85f4f6415b94eb095e93c17e6e20ba2db015f8f"
+    },
+    "unitTests": 762,
+    "productionBrowserCases": 18
   }
 }

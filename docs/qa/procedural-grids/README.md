@@ -91,5 +91,24 @@ versioned descriptor/layout seed is the seed-13 entry in each static-texture
 receipt. Those receipts also retain the viewport and the next three restart
 seeds; corpus seeds and fixture screenshot names refer to encounter seeds.
 All device profiles are emulation. No deployed or physical-device performance
-claim is made. The only post-certification changes are QA records and checklist
-completion; runtime source hashes are recorded in `manifest.json`.
+claim is made. At initial delivery, post-certification changes were QA records and checklist
+completion; the measured runtime hashes remain recorded in `manifest.json`.
+The subsequent production-instrumentation follow-up is documented below.
+
+
+## Production generation telemetry follow-up
+
+`battlefield_generation_measured` now reports full foreground resolution duration,
+retry/fallback outcome and source versions at generated entry/resume through the
+existing opt-out-aware PostHog adapter. See `docs/telemetry.md` for exact fields,
+measurement boundaries and percentile analysis. This is additional runtime
+instrumentation after the baseline performance capture above; that historical
+capture is not relabeled as a measurement of this follow-up.
+
+Verification: 762/762 unit tests; both typechecks and strict OpenSpec validation;
+18/18 production-build mocked-ingestion cases across the three emulated profiles.
+Receipts are `browser/generation-unit.txt` and `browser/generation-browser.txt`.
+Tests cover measured entry/resume, unchanged state, duplicate live-session reuse,
+controlled rejection, bounded privacy fields, failed reporting and opt-out/DNT/GPC.
+The production browser configuration builds and validates content before testing;
+all ingestion is intercepted with a fake project token.

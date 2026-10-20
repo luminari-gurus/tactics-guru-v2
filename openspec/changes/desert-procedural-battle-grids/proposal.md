@@ -11,6 +11,7 @@ Ordinary battles currently depend on fixed authored maps. Seeded battlefields ca
 - Bound generation attempts and use a validated desert fallback when candidates fail.
 - Extend encounter definitions to select generated battlefields or fixed authored maps, including boss slots. Reuse current enemies; new boss units and mechanics are outside this change.
 - Replace Manhattan-only enemy pursuit with deterministic paths to legal attack positions, including detours, while retaining existing attack preferences and command budgets.
+- Measure generated encounter entry/resume resolution in configured production telemetry, with bounded duration, attempt/outcome and version fields under existing collection preferences.
 - Reconstruct identical terrain, spawns and continuation decisions for saves and replays using versioned encounter descriptors, isolated generation RNG and map hashes.
 - Proposed rollout: use desert generation for the first two encounters of the existing three-encounter run and retain a fixed authored final encounter as the boss-grid integration example. Keep the independent authored single battle.
 - **BREAKING**: generated run descriptors require a new run-save format and encounter identity. Preserve incompatible saves for recovery/export; do not silently regenerate them under new rules. No legacy run migration is included.

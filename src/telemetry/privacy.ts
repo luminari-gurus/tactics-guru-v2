@@ -17,6 +17,14 @@ export function sanitizeEvent(event: CaptureResult, origin: string, release: str
     release, build_dirty: dirty,
   };
   for (const [key, values] of Object.entries(allowed)) if (values.includes(input[key])) properties[key] = input[key];
+  if (event.event === 'battlefield_generation_measured') {
+    const dimensions = { generation_status: ['generated','fallback','failed'], generation_context: ['entry','resume'],
+      biome: ['desert'], generator_version: [1], profile_version: ['desert-v1'] };
+    for (const [key, values] of Object.entries(dimensions)) if ((values as readonly unknown[]).includes(input[key])) properties[key] = input[key];
+    const duration = input.generation_duration_ms, attempts = input.generation_attempts;
+    if (typeof duration === 'number' && Number.isFinite(duration) && duration >= 0 && duration <= 600_000) properties.generation_duration_ms = duration;
+    if (typeof attempts === 'number' && Number.isInteger(attempts) && attempts >= 1 && attempts <= 4) properties.generation_attempts = attempts;
+  }
   if (event.event === '$exception') {
     const exception = (input.$exception_list as Exception[] | undefined)?.[0];
     const frames = (exception?.stacktrace?.frames ?? []).slice(-20).flatMap(frame => {

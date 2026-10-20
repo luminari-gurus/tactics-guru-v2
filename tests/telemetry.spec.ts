@@ -159,3 +159,29 @@ test('privacy opt-out applies to another open tab without touching saves', async
   await expect(otherPrivacy.getByRole('checkbox')).not.toBeChecked(); await expect(otherPrivacy.getByRole('status')).toContainText('off');
   expect(await page.locator('#game').getAttribute('data-run-snapshot')).toBe(snapshot); await other.close();
 });
+
+
+test('production ingestion receives generation latency and resume metrics without layout identifiers',async({page})=>{
+  const events=await ingest(page);
+  await page.goto('/run?private=seed#private');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const samples=()=>events.filter(e=>e.event==='battlefield_generation_measured');
+  await expect.poll(()=>samples().length).toBe(1);
+  const first=samples()[0].properties;
+  expect(first).toMatchObject({route:'run',encounter:0,generation_context:'entry',generation_status:'generated',biome:'desert',generator_version:1,profile_version:'desert-v1'});
+  expect(first.generation_duration_ms).toBeGreaterThanOrEqual(0);expect(first.generation_duration_ms).toBeLessThan(600000);
+  expect([1,2,3,4]).toContain(first.generation_attempts);expect(typeof first.release).toBe('string');
+  for(const key of ['seed','layoutSeed','mapHash','runId','cells','spawns'])expect(first).not.toHaveProperty(key);
+  const snapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
+  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect.poll(()=>samples().length).toBe(2);expect(samples()[1].properties.generation_context).toBe('resume');
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toEqual(snapshot.activeBattle);
+  expect(JSON.stringify(samples())).not.toContain('private');
+});
+
+test('generated encounters still start with collection opted out',async({page})=>{
+  const events=await ingest(page);
+  await page.addInitScript(()=>localStorage.setItem('tactics-guru:telemetry-opt-out','true'));
+  await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(events).toEqual([]);
+});

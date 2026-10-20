@@ -42,3 +42,9 @@
 - [x] 6.3 Add independent route-aware test pursuit where the existing test-only player policy stalls; exercise representative generated battles with multiple player policies and wounded-party victory/defeat cases, verifying legal commands and reproducible records without using win rate as a playability gate.
 - [x] 6.4 Measure generation/validation and cold/warm battle entry, static terrain variant memory and repeated restart stability against existing performance contracts; deliver build/seed/viewport-identified evidence with accurate emulation limitations.
 - [x] 6.5 Run strict OpenSpec validation, content validation, typecheck/build, affected unit suites and relevant battle/run/persistence Playwright suites; verify all required checks pass and record any genuine limitations before declaring implementation complete.
+
+
+## 7. Production generation instrumentation
+
+- [x] 7.1 Measure generated encounter entry/resume resolution and emit bounded duration, attempt, outcome and version metrics through the existing consent-aware production telemetry path, preserving deterministic state and domain purity.
+- [x] 7.2 Verify privacy bounds, successful/failed resolution, resumed samples and telemetry failure isolation with unit and production-build mocked-ingestion tests; document measurement scope and analysis fields.
