@@ -24,7 +24,7 @@ export interface MagicMissileAbility {
   readonly casterLevel: number; readonly rangeMin: number; readonly rangeMax: number;
 }
 export type Ability = AttackAbility | MagicMissileAbility;
-export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number];
+export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock';
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */
 export interface UnitStats {
@@ -105,6 +105,6 @@ export interface ContentCatalog {
   readonly maps: Readonly<Record<MapId, MapRecord>>;
   readonly heroes: Readonly<Record<HeroId, HeroRecord>>;
   readonly enemies: Readonly<Record<EnemyId, EnemyRecord>>;
-  readonly terrains: Readonly<Record<TerrainId, TerrainRecord>>;
+  readonly terrains: Readonly<Record<string, TerrainRecord>>;
   readonly assets: Readonly<Record<AssetId, AssetRecord>>;
 }

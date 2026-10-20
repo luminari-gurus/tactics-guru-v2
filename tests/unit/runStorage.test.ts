@@ -1,5 +1,5 @@
 import { assert, expect, it } from 'vitest';
-import { preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
+import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRunStorage, RUN_STORAGE_KEYS as keys } from '../../src/persistence/runStorage';
 import { BATTLE_STORAGE_KEYS } from '../../src/persistence/battleStorage';
 import { encodeRunSave } from '../../src/domain/runSaveEnvelope';
@@ -53,4 +53,17 @@ it('keeps sole valid backup when saving after explicit bad-primary removal', () 
   const f = fixture(); const encoded = encodeRunSave(rewardSnapshot(), runContext); assert(encoded.ok);
   f.data.set(keys.backup, encoded.text); f.storage.save(preparedSnapshot());
   expect(f.data.get(keys.backup)).toBe(encoded.text);
+});
+
+it('retains original legacy and unsupported-generator bytes for recovery',()=>{
+ for(const unsupported of ['format','generator']){
+  const f=fixture();
+  const snapshot=activeSnapshot();const encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);
+  const envelope=JSON.parse(encoded.text);
+  if(unsupported==='format')envelope.format=1;else envelope.payload.battlefield.generatorVersion=2;
+  const original=JSON.stringify(envelope);f.data.set(keys.primary,original);
+  const read=f.storage.load();assert(read.ok);
+  expect(read.selected).toBeNull();expect(read.inspection.primary).toMatchObject({status:'invalid',reason:'incompatible',text:original});
+  expect(f.data.get(keys.primary)).toBe(original);
+ }
 });

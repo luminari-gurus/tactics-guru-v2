@@ -1,0 +1,64 @@
+[WebServer] (node:97597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97603) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:97637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:97699) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 18 tests using 1 worker
+
+(node:97740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/telemetry.spec.ts:74:1 › blocked ingestion leaves battle continue and save working (2.1s)
+  ✓   2 [desktop] › tests/telemetry.spec.ts:82:56 › opt-out prevents parser loading and all collection (928ms)
+  ✓   3 [desktop] › tests/telemetry.spec.ts:82:56 › DNT prevents parser loading and all collection (932ms)
+  ✓   4 [desktop] › tests/telemetry.spec.ts:82:56 › GPC prevents parser loading and all collection (928ms)
+  ✓   5 [desktop] › tests/telemetry.spec.ts:164:1 › production ingestion receives generation latency and resume metrics without layout identifiers (1.4s)
+  ✓   6 [desktop] › tests/telemetry.spec.ts:182:1 › generated encounters still start with collection opted out (1.2s)
+(node:97775) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [mobile-portrait] › tests/telemetry.spec.ts:74:1 › blocked ingestion leaves battle continue and save working (2.1s)
+  ✓   8 [mobile-portrait] › tests/telemetry.spec.ts:82:56 › opt-out prevents parser loading and all collection (935ms)
+  ✓   9 [mobile-portrait] › tests/telemetry.spec.ts:82:56 › DNT prevents parser loading and all collection (933ms)
+  ✓  10 [mobile-portrait] › tests/telemetry.spec.ts:82:56 › GPC prevents parser loading and all collection (934ms)
+  ✓  11 [mobile-portrait] › tests/telemetry.spec.ts:164:1 › production ingestion receives generation latency and resume metrics without layout identifiers (1.3s)
+  ✓  12 [mobile-portrait] › tests/telemetry.spec.ts:182:1 › generated encounters still start with collection opted out (1.1s)
+(node:97806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [mobile-landscape] › tests/telemetry.spec.ts:74:1 › blocked ingestion leaves battle continue and save working (2.1s)
+  ✓  14 [mobile-landscape] › tests/telemetry.spec.ts:82:56 › opt-out prevents parser loading and all collection (933ms)
+  ✓  15 [mobile-landscape] › tests/telemetry.spec.ts:82:56 › DNT prevents parser loading and all collection (928ms)
+  ✓  16 [mobile-landscape] › tests/telemetry.spec.ts:82:56 › GPC prevents parser loading and all collection (930ms)
+  ✓  17 [mobile-landscape] › tests/telemetry.spec.ts:164:1 › production ingestion receives generation latency and resume metrics without layout identifiers (1.3s)
+  ✓  18 [mobile-landscape] › tests/telemetry.spec.ts:182:1 › generated encounters still start with collection opted out (1.1s)
+
+  18 passed (29.8s)

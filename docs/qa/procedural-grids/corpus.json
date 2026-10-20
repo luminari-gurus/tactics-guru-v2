@@ -1,0 +1,201 @@
+{
+  "generatorVersion": 1,
+  "profileVersion": "desert-v1",
+  "seeds": "0..9999, 4294967294, 4294967295",
+  "survivorSubsets": 7,
+  "admission": "Every resolver candidate checks all seven subsets",
+  "count": 10002,
+  "unique": 10002,
+  "fallbacks": 0,
+  "attempts": [
+    9425,
+    538,
+    38,
+    1
+  ],
+  "timingMs": {
+    "min": 4.231542000001355,
+    "median": 4.947000000000116,
+    "p95": 9.016292000000249,
+    "max": 20.53637499999968
+  },
+  "examples": [
+    {
+      "seed": 0,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:ad23d285cde7e6cf65916430d5961ff571c1501d770ae274b38eb28fe24bf51b",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 922283398
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 127,
+      "rock": 13
+    },
+    {
+      "seed": 1,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:eb3bd8bc12209cd157770e33393387983bfe7376516bc553bafa1336310d1b8f",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1026041915
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 129,
+      "rock": 11
+    },
+    {
+      "seed": 2,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:002d52073656dc1fe5fe237ffccb69130d7c87c327ccadc0b9ae0c0154bda971",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 3030809520
+      },
+      "diagnostics": {
+        "attempt": 1,
+        "fallback": false,
+        "failures": [
+          {
+            "code": "movementComponent",
+            "detail": "Cell is not mutually reachable",
+            "cell": {
+              "x": 1,
+              "y": 4
+            }
+          },
+          {
+            "code": "movementComponent",
+            "detail": "Cell is not mutually reachable",
+            "cell": {
+              "x": 2,
+              "y": 4
+            }
+          }
+        ]
+      },
+      "flatSand": 134,
+      "rock": 6
+    },
+    {
+      "seed": 3,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:d37935d6c15cac0d9b504dc89c1b180da82e71f12883f5c74243757bb5430426",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 415163607
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 134,
+      "rock": 6
+    },
+    {
+      "seed": 4,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:73dd186d2d376efc2f88ad1041af955b9493ad38cbdcb2ad6a0939e279afe170",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 952385144
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 127,
+      "rock": 13
+    },
+    {
+      "seed": 5,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:a55ceed945d3574b968033d28ffa140e92049afc08e88ed953b9fd15469e3d99",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1437938478
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 132,
+      "rock": 8
+    },
+    {
+      "seed": 6,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:f30bff7c8a94f04cf38c475c0ce2f7bd549acee1cf7152304249777455cb3cf3",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 604230696
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 134,
+      "rock": 6
+    },
+    {
+      "seed": 7,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:6eb90ab168ad265ccb6e28812b775c7a79553bc59020a0c00c6187021ca3f5a5",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 4031362787
+      },
+      "diagnostics": {
+        "attempt": 0,
+        "fallback": false,
+        "failures": []
+      },
+      "flatSand": 135,
+      "rock": 5
+    }
+  ]
+}

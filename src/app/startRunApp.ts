@@ -2,7 +2,8 @@ import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { reportFailure } from '../telemetry/telemetry';
 import '../style.css';
 import '../ui/runFlow.css';
-import { authoredRun, authoredEncounters, runCatalog } from '../content/encounters';
+import { authoredRun, battlefieldEncounters } from '../content/encounters';
+import { desertRunCatalog } from '../content/desertCatalog';
 import { itemCatalog } from '../content/items';
 import { freshRunSnapshot } from '../domain/runBattle';
 import { type RunSaveContext } from '../domain/runSaveEnvelope';
@@ -15,7 +16,7 @@ import { diagnosticsSnapshot } from '../diagnostics/browser';
 import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
 
-const context: RunSaveContext = { definition: authoredRun, encounters: authoredEncounters, catalog: runCatalog, items: itemCatalog };
+const context: RunSaveContext = { definition: authoredRun, encounters: battlefieldEncounters, catalog: desertRunCatalog, items: itemCatalog };
 const storage=createRunStorage(context),initial=storage.load();
 const controller = new RunItemSession(initial.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage);
 const container = document.querySelector<HTMLElement>('#game')!;

@@ -75,3 +75,16 @@ Battlefield admission SHALL establish terrain movement and engagement opportunit
 #### Scenario: Wounded party defeat
 - **WHEN** a playable generated encounter defeats a wounded party through legal combat
 - **THEN** normal defeat and run progression rules apply and the loss alone does not invalidate the grid
+
+
+### Requirement: Production generation measurements
+Configured production telemetry SHALL measure foreground generated encounter resolution at entry and resume, including generation, admission, retry/fallback and map identity work. Measurements SHALL include bounded duration, available attempt count, outcome and generator/profile versions without changing deterministic state. Authored sources and reuse of an existing live session SHALL NOT emit generation samples.
+
+#### Scenario: Generated entry and resume
+- **WHEN** collection is permitted and a generated encounter is entered or reconstructed for a resumed scene
+- **THEN** the application emits a resolution measurement identifying entry/resume, duration, generated/fallback/failed outcome and supported source versions
+- **AND** no seed, run ID, map hash, geometry or raw failure details are included
+
+#### Scenario: Collection disabled or unavailable
+- **WHEN** collection is disabled by configuration or player/browser preferences, or telemetry transport fails
+- **THEN** encounter construction and continuation remain unchanged and disallowed telemetry is not transmitted

@@ -80,6 +80,8 @@ Use the real enemy policy against deterministic stationary targets to prove obst
 
 Browser acceptance uses the production board and Playwright desktop plus portrait/landscape emulation: generated picking/movement after pan/zoom, reload at accepted player/enemy presentation boundaries, fallback, controlled invalid-content errors and the authored final slot. Record emulation accurately. Measure generator cost and cold/warm entry, tile variant counts and restart stability against existing performance requirements; avoid increasing grid size.
 
+Production instrumentation measures one foreground resolver call at generated encounter entry or resume with the application monotonic clock. The existing telemetry adapter emits bounded duration, attempt count, generated/fallback/failed outcome and generator/profile versions. It excludes repeated internal save-validation resolutions, authored sources, assets and rendering; the pure domain receives no clock or telemetry dependency. Collection preferences, privacy allowlists and failure isolation remain authoritative. No seed, run ID, map hash, geometry or raw rejection details are reported.
+
 ## Risks / Trade-offs
 
 - Conservative connectivity excludes isolated tactical islands → Keep v1 reversible; introduce capability-specific terrain only through a later contract.

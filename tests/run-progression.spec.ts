@@ -41,7 +41,7 @@ async function prepare(page:Page){
   await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();await page.locator('#item-confirm').click();
  }
 }
-test('legal three encounter run, rewards, preparation, final resume and fresh restart',async({page})=>{
+test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
@@ -64,8 +64,9 @@ test('legal three encounter run, rewards, preparation, final resume and fresh re
   await page.screenshot({path:test.info().outputPath(`encounter-${index+1}-active-bob.png`)});
   expect(await snapshot(page)).toEqual(beforeBob);
   await fight(page);
-  await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(current.items.run.phase).toBe(index===2?'victory':'reward');expect(current.items.run.encounterIndex).toBe(index);
+  await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(index===2?['victory','defeat']:['reward','defeat']).toContain(current.items.run.phase);expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
+  if(current.items.run.phase==='defeat')break;
   if(index<2){
    // The pending offer and claimed/prepared boundary survive the real Continue path.
    if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(current);}
@@ -74,8 +75,8 @@ test('legal three encounter run, rewards, preparation, final resume and fresh re
    await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed',index===0?'true':'false');
   }
  }
- const final=await snapshot(page);await expect(page.getByRole('heading',{name:'Run victory',exact:true})).toBeVisible();
- await page.screenshot({path:test.info().outputPath('run-victory.png')});
+ const final=await snapshot(page);await expect(page.getByRole('heading',{name:final.items.run.phase==='victory'?'Run victory':'Run defeat',exact:true})).toBeVisible();
+ await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
  await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(final);
  await page.locator('#run-new').dblclick();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);

@@ -3,7 +3,8 @@ import { previewCommand, readBattleState } from './battle';
 import { previewAttack, type AttackPreview } from './combat';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from './constants';
 import { moveUnit, previewMovement } from './grid';
-import { manhattanDistance } from './targeting';
+import { lineOfSightBlocked, manhattanDistance } from './targeting';
+import { cellKey, routeDistances } from './routes';
 import { dispatch } from './turns';
 import type { BattleEvent, BattleState, Command, Rejection } from './types';
 import { isDenseArray, isPlainRecord } from './validation';
@@ -76,13 +77,26 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   }
   const best = attacks.sort(attackOrder)[0];
   if (best) return { ok: true, commands: [...(best.move ? [best.move] : []), best.command, wait] };
-  const nearest = (cell: CellPosition) => targets.map(target => ({ distance: manhattanDistance(cell, target.cell), targetId: target.id }))
-    .sort((a, b) => a.distance - b.distance || a.targetId - b.targetId)[0];
-  const originDistance = nearest(actor.cell).distance;
-  const closer = positions.filter(p => p.move).map(p => ({ ...p, ...nearest(p.cell) }))
-    .filter(p => p.distance < originDistance)
-    .sort((a, b) => a.distance - b.distance || a.cost - b.cost || a.targetId - b.targetId || cellOrder(a, b))[0];
-  if (closer) return { ok: true, commands: [closer.move!, wait] };
+  const map = catalog.maps[state.mapId];
+  const occupied = new Set(state.units.filter(u => u.hp > 0 && u.id !== actor.id).map(u => cellKey(u.cell)));
+  const stats = catalog.enemies[actor.defId].stats;
+  const fromOrigin = routeDistances(map, catalog, stats, actor.cell, occupied);
+  const goals = [];
+  for (const target of targets) for (const ability of abilities) for (const cell of map.cells) {
+    const distance = manhattanDistance(cell, target.cell);
+    if (occupied.has(cellKey(cell)) || !catalog.terrains[cell.terrainId].walkable || distance < ability.rangeMin ||
+      distance > ability.rangeMax || lineOfSightBlocked(catalog, map.id, cell, target.cell)) continue;
+    const cost = fromOrigin.get(cellKey(cell));
+    if (cost !== undefined) goals.push({cell, cost, targetId: target.id, abilityId: ability.id});
+  }
+  goals.sort((a,b) => a.cost-b.cost || a.targetId-b.targetId || lexical(a.abilityId,b.abilityId) || a.cell.y-b.cell.y || a.cell.x-b.cell.x);
+  const goal = goals[0];
+  if (goal) {
+    const remaining = routeDistances(map, catalog, stats, goal.cell, occupied, true);
+    const closer = positions.filter(p => p.move && (remaining.get(cellKey(p.cell)) ?? Infinity) < goal.cost)
+      .sort((a,b) => remaining.get(cellKey(a.cell))! - remaining.get(cellKey(b.cell))! || a.cost-b.cost || cellOrder(a,b))[0];
+    if (closer) return { ok: true, commands: [closer.move!, wait] };
+  }
   return { ok: true, commands: [wait] };
 }
 

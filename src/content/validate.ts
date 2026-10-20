@@ -42,7 +42,7 @@ export function validateContent(input: unknown): ContentValidation {
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
       const path = `${group}.${key}`;
-      if (fixed ? !fixed.some(id => id === key) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
+      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock'].includes(key)) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
       if (!isPlainRecord(record) || !hasShape(record, Object.keys(record))) { fail('shape', path, 'Expected a plain definition without accessors or hidden fields.'); continue; }
       if (record.id !== key) fail('id', `${path}.id`, 'Record ID must equal its catalog key.');
       if (typeof record.id === 'string') {

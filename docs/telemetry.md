@@ -72,3 +72,33 @@ In PostHog's activity/events view, filter on `release` and event name, then `rou
 - `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry -- --grep 'blocked ingestion|uncaught|recovery inspections|failed parser|prevents parser'` verifies explicit development opt-in with the same fake token/mocked ingestion, separately from the built preview. Development source paths are deliberately excluded from outgoing stack frames.
 - The regular `npm test` uses the normal default-off build; it excludes the explicit opt-in suite.
 - Uploads require separate authorization and CI credentials. CLI dry-run skips processing as well as uploading and therefore cannot establish symbolication.
+
+
+## Procedural battlefield performance
+
+Production builds emit `battlefield_generation_measured` through the existing
+PostHog transport when collection is configured and permitted. DNT/GPC, opt-out,
+local/automated-run gates and transport failure isolation still apply.
+
+Each generated encounter entry or resumed scene measures one synchronous
+`resolveRunBattlefield` call with the monotonic browser clock. The duration includes
+candidate generation, admission validation, retries/fallback, canonical hashing
+and immutable map construction. It excludes equipment projection, other internal
+save-validation resolutions, asset loading and rendering. Reusing a live session
+emits no duplicate; a new resumed scene emits a new sample. Authored maps are
+excluded. No domain clock, RNG change or persisted timing is introduced.
+
+Properties: `generation_duration_ms` (rounded to 0.01 ms, finite 0–600,000),
+`generation_attempts` (1–4 for successful resolutions; fallback means four failed
+candidates), `generation_status` (`generated`, `fallback`, `failed`),
+`generation_context` (`entry`, `resume`), `biome`, `generator_version`,
+`profile_version`, encounter index, route and the existing release/build identity.
+Failed admission has no successful-attempt count. The privacy boundary permits
+only these bounded metrics and approved dimensions; seeds, run IDs, map hashes,
+geometry and failure details are not collected.
+
+In PostHog, filter to this event and production `build_dirty = false`, then chart
+p50/p95/p99 of `generation_duration_ms` by release/profile and generation context.
+Break down counts by `generation_status` and `generation_attempts` to monitor
+fallback/retry rates. These are best-effort foreground-resolution samples, not a
+count of every internal resolver invocation or total battle-entry latency.

@@ -3,7 +3,7 @@ import { bindTelemetry, reportFailure, track } from '../../src/telemetry/telemet
 import { sanitizeEvent } from '../../src/telemetry/privacy';
 import { collectionAllowed } from '../../src/telemetry/browser';
 import { RunItemSession } from '../../src/app/RunItemSession';
-import { rewardSnapshot, runContext } from '../helpers/runItemFixtures';
+import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRunStorage } from '../../src/persistence/runStorage';
 import { BattlePersistence } from '../../src/app/BattlePersistence';
 import { battleCatalog } from '../../src/content/catalog';
@@ -117,4 +117,49 @@ it('local previews require explicit development opt-in or isolated automated-tes
   expect(collectionAllowed({ ...env, VITE_POSTHOG_DEV_OPT_IN: 'true' }, signals)).toBe(true);
   expect(collectionAllowed({ ...env, VITE_POSTHOG_TEST_OPT_IN: 'true' }, signals)).toBe(false);
   expect(collectionAllowed({ ...env, VITE_POSTHOG_TEST_OPT_IN: 'true' }, { ...signals, automated: true })).toBe(true);
+});
+
+
+it('measures generated entry/resume once per live session, without changing battle state', async () => {
+  const { freshRunSnapshot, createRunBattle } = await import('../../src/domain/runBattle');
+  const event = vi.fn(); bindTelemetry({event,error() {}});
+  const initial = freshRunSnapshot('generation-metric',13,runContext);
+  const expected = createRunBattle(initial.items,runContext); expect(expected.ok).toBe(true);
+  const clock = vi.spyOn(performance,'now').mockReturnValueOnce(100).mockReturnValueOnce(112.345);
+  try {
+    const run = new RunItemSession(initial,runContext,createRunStorage(runContext,()=>null));
+    const battle = run.startEncounter()!; expect(battle.state).toEqual(expected.ok ? expected.state : null);
+    expect(run.startEncounter()).toBe(battle);
+  } finally { clock.mockRestore(); }
+  const samples = () => event.mock.calls.filter(([name])=>name==='battlefield_generation_measured');
+  expect(samples()).toHaveLength(1);
+  expect(samples()[0][1]).toMatchObject({generation_duration_ms:12.35,generation_context:'entry',generation_status:'generated',generation_attempts:expect.any(Number),biome:'desert',generator_version:1,profile_version:'desert-v1'});
+  const resumed = new RunItemSession(activeSnapshot(),runContext,createRunStorage(runContext,()=>null));
+  expect(resumed.startEncounter()).not.toBeNull(); expect(samples()).toHaveLength(2);
+  expect(samples()[1][1]).toMatchObject({generation_context:'resume',generation_status:'generated'});
+  const final=preparedSnapshot();const authored={...final,items:{...final.items,run:{...final.items.run,encounterIndex:2,revision:4}}};
+  expect(new RunItemSession(authored,runContext,createRunStorage(runContext,()=>null)).startEncounter()).not.toBeNull();
+  expect(samples()).toHaveLength(2);
+});
+it('reports rejected generation and isolates a throwing metrics sink', async () => {
+  const { freshRunSnapshot } = await import('../../src/domain/runBattle');
+  const context={...runContext,encounters:runContext.encounters.map(e=>({...e,roster:e.roster.map(s=>({...s,x:0,y:0}))}))};
+  const event=vi.fn();bindTelemetry({event,error(){}});
+  const initial=freshRunSnapshot('generation-failed',13,context);
+  const run=new RunItemSession(initial,context,createRunStorage(context,()=>null));
+  expect(run.startEncounter()).toBeNull();expect(run.snapshot).toEqual(initial);
+  expect(event.mock.calls.find(([name])=>name==='battlefield_generation_measured')?.[1]).toMatchObject({generation_status:'failed',generation_context:'entry'});
+  bindTelemetry({event(){throw Error('blocked');},error(){throw Error('blocked');}});
+  const healthy=new RunItemSession(freshRunSnapshot('generation-blocked',13,runContext),runContext,createRunStorage(runContext,()=>null));
+  expect(healthy.startEncounter()).not.toBeNull();
+});
+it('allows only bounded generation metrics and approved dimensions on the measurement event', () => {
+  const clean=(properties:Record<string,unknown>,event='battlefield_generation_measured')=>sanitizeEvent({uuid:'metric',event,properties},'https://game.invalid','release',false)!.properties;
+  const valid={generation_duration_ms:12.35,generation_attempts:4,generation_status:'fallback',generation_context:'resume',biome:'desert',generator_version:1,profile_version:'desert-v1'};
+  expect(clean({...valid,seed:123,mapHash:'private',runId:'private',cells:'private'})).toMatchObject(valid);
+  expect(JSON.stringify(clean({...valid,seed:123,mapHash:'private',runId:'private'}))).not.toContain('private');
+  for(const duration of [-1,NaN,Infinity,600001,'12'])expect(clean({generation_duration_ms:duration})).not.toHaveProperty('generation_duration_ms');
+  for(const attempts of [0,5,1.5,'1'])expect(clean({generation_attempts:attempts})).not.toHaveProperty('generation_attempts');
+  expect(clean({generation_status:'arbitrary',profile_version:'private'})).not.toHaveProperty('generation_status');
+  expect(clean(valid,'app_entered')).not.toHaveProperty('generation_duration_ms');
 });

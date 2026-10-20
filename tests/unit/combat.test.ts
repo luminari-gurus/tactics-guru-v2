@@ -42,7 +42,7 @@ function setup(o: Setup = {}): { catalog: ContentCatalog; state: BattleState } {
   const seed = seedFor(o.natural ?? 10);
   const units = [unit(1, 'player', 'fighter', 1, 1), unit(2, 'player', 'ranger', 0, 0), unit(3, 'enemy', 'goblin_grunt', 2, 1), unit(4, 'enemy', 'goblin_archer', 4, 1)];
   const livingPlayer = units.some(u => u.side === 'player' && u.hp > 0), livingEnemy = units.some(u => u.side === 'enemy' && u.hp > 0);
-  const state: BattleState = { format: 1, versions: { rules: 1, rng: 1, content: contentVersion(catalog) }, seed, rng: seedRng(seed), mapId: map.id,
+  const state: BattleState = { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed, rng: seedRng(seed), mapId: map.id,
     units, initiative: [1, 2, 3, 4], activeIndex: o.activeIndex ?? 0, round: 1,
     outcome: !livingPlayer ? 'playerLoss' : !livingEnemy ? 'playerWin' : 'ongoing', commandCount: 0 };
   return { catalog, state };

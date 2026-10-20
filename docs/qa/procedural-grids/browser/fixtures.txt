@@ -1,0 +1,42 @@
+[WebServer] (node:96885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 24 tests using 1 worker
+
+(node:96914) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/authored-encounters.spec.ts:34:36 › encounter:forest_ruins: render, resize and transformed picking (1.4s)
+  ✓   2 [desktop] › tests/authored-encounters.spec.ts:34:36 › encounter:woodland_crossing: render, resize and transformed picking (1.2s)
+  ✓   3 [desktop] › tests/authored-encounters.spec.ts:34:36 › encounter:ruined_approach: render, resize and transformed picking (1.2s)
+  ✓   4 [desktop] › tests/authored-encounters.spec.ts:67:1 › unknown encounter fails before board construction (226ms)
+  ✓   5 [desktop] › tests/authored-encounters.spec.ts:72:43 › required asset missing produces controlled error (233ms)
+  ✓   6 [desktop] › tests/authored-encounters.spec.ts:72:43 › required asset decode produces controlled error (242ms)
+  ✓   7 [desktop] › tests/authored-encounters.spec.ts:80:1 › forced desert fallback uses production assets and pointer picking (355ms)
+  ✓   8 [desktop] › tests/authored-encounters.spec.ts:93:1 › representative generated layouts retain readable open desert terrain (688ms)
+(node:96952) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [mobile-portrait] › tests/authored-encounters.spec.ts:34:36 › encounter:forest_ruins: render, resize and transformed picking (1.7s)
+  ✓  10 [mobile-portrait] › tests/authored-encounters.spec.ts:34:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓  11 [mobile-portrait] › tests/authored-encounters.spec.ts:34:36 › encounter:ruined_approach: render, resize and transformed picking (1.6s)
+  ✓  12 [mobile-portrait] › tests/authored-encounters.spec.ts:67:1 › unknown encounter fails before board construction (227ms)
+  ✓  13 [mobile-portrait] › tests/authored-encounters.spec.ts:72:43 › required asset missing produces controlled error (234ms)
+  ✓  14 [mobile-portrait] › tests/authored-encounters.spec.ts:72:43 › required asset decode produces controlled error (238ms)
+  ✓  15 [mobile-portrait] › tests/authored-encounters.spec.ts:80:1 › forced desert fallback uses production assets and pointer picking (382ms)
+  ✓  16 [mobile-portrait] › tests/authored-encounters.spec.ts:93:1 › representative generated layouts retain readable open desert terrain (764ms)
+(node:96997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [mobile-landscape] › tests/authored-encounters.spec.ts:34:36 › encounter:forest_ruins: render, resize and transformed picking (1.6s)
+  ✓  18 [mobile-landscape] › tests/authored-encounters.spec.ts:34:36 › encounter:woodland_crossing: render, resize and transformed picking (1.6s)
+  ✓  19 [mobile-landscape] › tests/authored-encounters.spec.ts:34:36 › encounter:ruined_approach: render, resize and transformed picking (1.4s)
+  ✓  20 [mobile-landscape] › tests/authored-encounters.spec.ts:67:1 › unknown encounter fails before board construction (224ms)
+  ✓  21 [mobile-landscape] › tests/authored-encounters.spec.ts:72:43 › required asset missing produces controlled error (234ms)
+  ✓  22 [mobile-landscape] › tests/authored-encounters.spec.ts:72:43 › required asset decode produces controlled error (232ms)
+  ✓  23 [mobile-landscape] › tests/authored-encounters.spec.ts:80:1 › forced desert fallback uses production assets and pointer picking (437ms)
+  ✓  24 [mobile-landscape] › tests/authored-encounters.spec.ts:93:1 › representative generated layouts retain readable open desert terrain (898ms)
+
+  24 passed (21.0s)

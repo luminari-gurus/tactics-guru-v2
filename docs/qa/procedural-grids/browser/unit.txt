@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /private/tmp/tactics-guru-procedural
+
+
+ Test Files  47 passed (47)
+      Tests  759 passed (759)
+   Start at  21:18:22
+   Duration  10.98s (tests 91%, transform 5%, import 3%)

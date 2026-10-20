@@ -169,7 +169,7 @@ describe('untrusted serialized input', () => {
     for (const format of [0, 2, '1']) invalid(JSON.stringify({ ...envelope, format }), 'incompatible');
     invalid(JSON.stringify({ ...envelope, kind: 'tactics-guru:battle-replay' }), 'incompatible');
     invalid(wrap({ ...envelope.payload, format: 2 }), 'incompatible');
-    for (const [key, value] of [['rules', 2], ['rng', 2], ['content', 'sha256:' + '0'.repeat(64)]]) {
+    for (const [key, value] of [['rules', 1], ['rng', 2], ['content', 'sha256:' + '0'.repeat(64)]]) {
       invalid(wrap({ ...envelope.payload, versions: { ...envelope.payload.versions, [key]: value } }), 'incompatible');
     }
     const changed: ContentCatalog = { ...battleCatalog, heroes: { ...battleCatalog.heroes,
