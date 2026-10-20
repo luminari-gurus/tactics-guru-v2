@@ -1,6 +1,6 @@
 # Issue #145 and PR #150 review handoff
 
-Updated 2026-10-20 (Asia/Jerusalem). Both P2 review findings are reproduced, repaired and locally validated. Final evidence publication and review response are in progress.
+Updated 2026-10-20 (Asia/Jerusalem). Both P2 review findings are reproduced, repaired, locally validated and published. PR #150 is ready to merge, subject to caller review.
 
 ## Current state
 
@@ -9,7 +9,7 @@ Updated 2026-10-20 (Asia/Jerusalem). Both P2 review findings are reproduced, rep
 - All seven original commits rebased without conflicts onto `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99`, carrying 13 integration commits. Range-diff preserves the original changes; the one contextual difference follows the renamed upstream run test. No dependent branch contains the old head.
 - Original reviewed head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased baseline: `b4e9de9`; movement repair: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`; default production test candidate: `c394ee5d650d816d7e9ccbdf649e74886cd3f0b5`; initial integration-test alignment: `1231a8703ba2ee3b22c455a11e0430de49812493`.
 - The rebased repair was published with an exact lease against the reviewed head, with matching local/remote SHA, 0/0 divergence and clean status. Local `main` was fast-forwarded too. Remaining delivery commits use a normal fast-forward push. Keep the useful review history; squash merge is suitable when accepted. No new stack or release tag is needed.
-- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 6/7 tasks complete; only final publication/readback remains in task 3.3. Keep the change active for later merge/archive.
+- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 7/7 tasks complete. Published repair/evidence `89fcd024220fbaf72389cdf7ff38bdae688c6a38` was verified at exact remote parity and mergeable against current main. This final documentation commit seals tracking; inspect the current PR for its publication head. Keep the change active for later merge/archive.
 - The [prior shared plan](plan-before-issue-145.md) is preserved. The [QA record](../qa/issue-145-default-move.md) contains exact results, source identity, commands and original acceptance history.
 
 ## Outcome and minimal repair
@@ -32,9 +32,9 @@ Ablation keeps the existing scene/HUD path, native controls, fixtures and suites
 
 Application/dependency/build inputs have not changed since production candidate `c394ee5`. Only the four affected browser expectations and documentation change afterward; all other passing tests are unchanged. This is combined coverage, not a claim of one clean full rerun. The QA record explains the generated line-ending dirty marker and identifies exact source blobs.
 
-## Remaining closeout
+## Remaining workflow
 
-Publish the final evidence/test changes, update the PR description, respond to review 5583848401, verify exact remote parity and mergeability, then seal task 3.3. Leave the PR open/non-draft for merge and issue #145 open until then. No new implementation, release tag, deployment or OpenSpec archive is requested.
+The PR title/description were updated and the [response to both findings](https://github.com/luminari-gurus/tactics-guru-v2/pull/150#issuecomment-6289845095) was published and read back. No implementation or validation remains. PR #150 stays open/non-draft for merge; issue #145 remains open until merge. The next action is reviewer/caller merge assessment and later OpenSpec archive. No release tag, deployment or new stack is needed.
 
 Windows npm uses ignored `tmp/bin/npm.cmd`; prepend it to PATH. OpenSpec and gh are installed in WSL; run gh from `/tmp` with `-R luminari-gurus/tactics-guru-v2` because Linux Git cannot resolve this Windows worktree's .git path. Windows Git owns commits/pushes. Use the existing Edge executable override, keep browser matrices serialized and retain logs under ignored `tmp/pr150-*`.
 

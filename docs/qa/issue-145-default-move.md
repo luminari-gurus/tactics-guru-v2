@@ -1,6 +1,6 @@
 # Issue #145 acceptance evidence
 
-Updated 2026-10-20 (Asia/Jerusalem). Both review findings are repaired in [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150). The [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md) track final publication. This review record supersedes the original acceptance record below for current integration readiness.
+Updated 2026-10-20 (Asia/Jerusalem). Both review findings are repaired and published in [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150), with a [verified review response](https://github.com/luminari-gurus/tactics-guru-v2/pull/150#issuecomment-6289845095). The [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md) record completed delivery. This review record supersedes the original acceptance record below for current integration readiness.
 
 ## PR #150 review repair
 
