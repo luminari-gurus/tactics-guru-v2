@@ -44,7 +44,7 @@ The caller selected “Discard with confirmation”. Disposal is available only 
 
 ## Size and resource observations
 
-[Route-size receipt](issue-157/evidence/dungeon-route-size.json): the JSON records the final dungeon JS/CSS raw and gzip byte counts. These exclude shared engine and shared application modules; they are not total route transfer or loading-budget acceptance. The existing large-chunk warning remains.
+[Foundation route-size receipt](issue-157/evidence/dungeon-route-size.json) retains the earlier stage; [confirmed-disposal route sizes](issue-157/evidence/discard-route-size.json) record the latest JS/CSS raw and gzip byte counts. These exclude shared engine and shared application modules; they are not total route transfer or loading-budget acceptance. The existing large-chunk warning remains.
 
 Floor history is retained until an explicit encoded-byte or storage failure; resolved UI geometry is limited to three cached maps. A 4,000-floor valid state exceeds the 1 MiB encoding budget and is refused without pruning. No browser storage is promised unlimited. Save/travel failure tests preserve prior durable recovery and keep the current in-memory floor unmodified until successful candidate publication. Uncertain writes require an explicit Continue or retry choice.
 
