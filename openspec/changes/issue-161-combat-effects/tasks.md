@@ -22,10 +22,12 @@ Caller explicitly approved this published staged plan in chat on 2026-10-20. The
 ## 4. Integration acceptance
 
 - [x] 4.1 Run focused suites, full configured unit/content/type/build/browser checks listed in design (including npm posttest and separately configured telemetry tests), strict OpenSpec validation and diff checks; retain exact commands/results and any real failures in `docs/qa/issue-161-combat-effects.md` without claiming physical hardware testing.
-- [ ] 4.2 Reconcile every #161 criterion against the approved increment and downstream gates; verify final diff contains only required files, commit/push and create an attached draft PR using `Refs #161`, explicitly retaining unimplemented consumer-dependent acceptance rather than closing the issue.
+- [x] 4.2 Reconcile every #161 criterion against the approved increment and downstream gates; verify final diff contains only required files, commit/push and create an attached draft PR using `Refs #161`, explicitly retaining unimplemented consumer-dependent acceptance rather than closing the issue.
 
 ## Workflow follow-up
 
 - Activate further effect cases only with the approved real content consumers in #163–#169/#171/#172/#173. Their plans must settle profile-specific DC/duration/adoption/resource and migration details before implementation.
 - Keep #161 open until its remaining effect/resource/typed-damage/save/immunity acceptance has real production consumers and verification; this increment cannot certify that work.
 - Do not merge or archive automatically; archive only after merge and a separate caller request.
+
+Delivery: draft PR https://github.com/luminari-gurus/tactics-guru-v2/pull/188. All tracked tasks for the approved increment are complete; #161 remains open for the consumer gates above.
