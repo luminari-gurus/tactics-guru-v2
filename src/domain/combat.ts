@@ -1,5 +1,6 @@
+import { clearDefeatedGuard, combatStats, grantGuard } from './effects';
 import type { ContentCatalog } from '../content/types';
-import { GUARDED_STRIKE_TRADEOFF, MAGIC_MISSILE } from '../content/constants';
+import { MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
 import { CRITICAL_DAMAGE_MULTIPLIER, D20_SIDES, HEIGHT_ATTACK_MODIFIER, MIN_HIT_DAMAGE, NATURAL_AUTO_MISS, NATURAL_CRITICAL, RULE_BOUNDS } from './constants';
 import { rollDie } from './rng';
@@ -35,9 +36,8 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   const rise = elevation(catalog, snapshot, actor) - elevation(catalog, snapshot, target);
   const height = rise > 0 ? HEIGHT_ATTACK_MODIFIER : rise < 0 ? -HEIGHT_ATTACK_MODIFIER : 0;
   const damage = Math.max(MIN_HIT_DAMAGE, profile.baseDamage + stats(catalog, actor).power + (rise > 0 ? profile.uphillDamage : 0));
-  const penalty = profile.kind === 'guardedAttack' || actor.guarded ? GUARDED_STRIKE_TRADEOFF.attackPenalty : 0;
-  return { ok: true, command, targetId, bonus: stats(catalog, actor).accuracy + height - penalty,
-    armorClass: stats(catalog, target).armorClass + (target.guarded ? GUARDED_STRIKE_TRADEOFF.armorClassBonus : 0),
+  return { ok: true, command, targetId, bonus: combatStats(actor, catalog, profile.kind === 'guardedAttack').accuracy + height,
+    armorClass: combatStats(target, catalog).armorClass,
     damage, criticalDamage: damage * CRITICAL_DAMAGE_MULTIPLIER };
 }
 /** One d20 from the snapshot RNG; acting never ends the turn. The target was living, so HP 0 here is its one defeat. */
@@ -57,7 +57,9 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   const damage = result === 'critical' ? preview.criticalDamage : result === 'hit' ? preview.damage : 0;
   const hp = Math.max(RULE_BOUNDS.hp.min, snapshot.units.find(u => u.id === targetId)!.hp - damage);
   const grantsGuard = catalog.abilities[command.abilityId].kind === 'guardedAttack';
-  const units = snapshot.units.map(u => u.id === command.unitId ? { ...u, hasActed: true, ...(grantsGuard ? { guarded: true as const } : {}) } : u.id === targetId ? { ...u, hp } : u);
+  const units = snapshot.units.map(u => clearDefeatedGuard(u.id === command.unitId
+    ? (grantsGuard ? grantGuard({ ...u, hasActed: true }) : { ...u, hasActed: true })
+    : u.id === targetId ? { ...u, hp } : u));
   const outcome = !units.some(u => u.side === 'player' && u.hp > 0) ? 'playerLoss' : !units.some(u => u.side === 'enemy' && u.hp > 0) ? 'playerWin' : 'ongoing';
   const events: BattleEvent[] = [{ type: 'abilityUsed', unitId: command.unitId, abilityId: command.abilityId, target: command.target },
     { type: 'attackRolled', unitId: command.unitId, targetId, natural: roll.value, bonus: preview.bonus, total, armorClass: preview.armorClass, result }];
@@ -111,7 +113,7 @@ export function resolveMagicMissile(state: unknown, input: unknown, catalog: Con
   // Draw all dice locally first: cursor exhaustion rejects the entire cast without partial damage.
   try { for (let i = 0; i < preview.missileCount; i++) { const roll = rollDie(rng, MAGIC_MISSILE.damageDie); rolls.push(roll); rng = roll.rng; } }
   catch { return { ok: false, reason: 'invalidState' }; }
-  let units = snapshot.units.map(u => u.id === preview.command.unitId ? { ...u, hasActed: true } : u);
+  let units = snapshot.units.map(u => clearDefeatedGuard(u.id === preview.command.unitId ? { ...u, hasActed: true } : u));
   const events: BattleEvent[] = [{ type: 'abilityUsed', unitId: preview.command.unitId,
     abilityId: preview.command.abilityId, target: preview.command.target }];
   rolls.forEach((roll, i) => {
@@ -119,7 +121,7 @@ export function resolveMagicMissile(state: unknown, input: unknown, catalog: Con
     const damage = roll.value + MAGIC_MISSILE.damageBonus, hp = Math.max(0, target.hp - damage);
     events.push({ type: 'missileRolled', unitId: preview.command.unitId, targetId, missile: i + 1, natural: roll.value, damage });
     if (target.hp > 0) {
-      units = units.map(u => u.id === targetId ? { ...u, hp } : u);
+      units = units.map(u => u.id === targetId ? clearDefeatedGuard({ ...u, hp }) : u);
       events.push({ type: 'damaged', unitId: targetId, damage, hp });
       if (hp === 0) events.push({ type: 'defeated', unitId: targetId });
     }

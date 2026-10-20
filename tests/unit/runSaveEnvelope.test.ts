@@ -1,3 +1,4 @@
+import { combatStats } from '../../src/domain/effects';
 import { assert, expect, it } from 'vitest';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { decodeRunSave, encodeRunSave, readRunSnapshot, runBattleCatalog, resolveRunBattlefield, RUN_SAVE_MAX_CODE_UNITS } from '../../src/domain/runSaveEnvelope';
@@ -97,4 +98,35 @@ it.each(['seed','hash','source','encounter','version','extra','long','missing'])
  if(problem==='long')snapshot.battlefield.mapId='map:'+'a'.repeat(1000);
  if(problem==='missing')delete snapshot.battlefield;
  expect(readRunSnapshot(snapshot,runContext).ok).toBe(false);
+});
+
+it('preserves equipped Guarded and historical defeated guard bytes, rejecting unsupported effect resources', () => {
+  const original: any = activeSnapshot();
+  original.items.ownership.assignments = [{ instanceId: original.items.ownership.equipment[0].instanceId, heroId: 'fighter', slot: 'charm' }];
+  const catalog = runBattleCatalog(original.items, runContext)!;
+  original.activeBattle = { ...original.activeBattle, versions: { ...original.activeBattle.versions, content: contentVersion(catalog) },
+    units: original.activeBattle.units.map((u: any) => u.defId === 'fighter' ? { ...u, guarded: true } : u) };
+  for (const defeated of [false, true]) {
+    const snapshot = structuredClone(original);
+    if (defeated) {
+      snapshot.activeBattle.units[0].hp = 0;
+      snapshot.activeBattle.activeIndex = snapshot.activeBattle.initiative.findIndex((id: number) => id !== 1);
+    }
+    const saved = encodeRunSave(snapshot, runContext); assert(saved.ok);
+    const read = decodeRunSave(saved.text, runContext); assert(read.ok && read.state.activeBattle);
+    expect(read.state).toEqual(snapshot); expect(encodeRunSave(read.state, runContext)).toEqual(saved);
+    const fighter = read.state.activeBattle.units.find(u => u.defId === 'fighter')!;
+    expect(combatStats(fighter, catalog).armorClass).toBe(catalog.heroes.fighter.stats.armorClass + (defeated ? 0 : 2));
+    let live = snapshot.activeBattle, resumed = read.state.activeBattle;
+    for (let i = 0; i < live.units.length; i++) {
+      const command = { type: 'endTurn', unitId: live.initiative[live.activeIndex] };
+      const a = dispatch(live, command, catalog), b = dispatch(resumed, command, catalog); expect(a).toEqual(b); assert(a.ok && b.ok);
+      live = a.state; resumed = b.state;
+    }
+    expect(live.units.find((u: any) => u.defId === 'fighter').guarded).toBeUndefined();
+    for (const field of ['statuses', 'resources']) {
+      const bad = structuredClone(snapshot); bad.activeBattle.units[0][field] = [];
+      expect(readRunSnapshot(bad, runContext).ok).toBe(false);
+    }
+  }
 });

@@ -342,3 +342,12 @@ it('takes a Manhattan-increasing detour and replans identical accepted suffixes 
   }
   expect(attacked).toBe(true);
 });
+
+it('uses shared Guarded AC when choosing between otherwise tied targets', () => {
+  const { state, catalog } = setup(true);
+  const tied = changeUnit(state, 2, { cell: { x: 1, y: 2 } });
+  expect(commands(tied, catalog)).toEqual([attack(1, true), wait]);
+  const guarded = changeUnit(tied, 1, { guarded: true });
+  expect(previewAttack(guarded, attack(1, true), catalog)).toMatchObject({ ok: true, armorClass: 16 });
+  expect(commands(guarded, catalog)).toEqual([attack(2, true), wait]);
+});

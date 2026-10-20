@@ -37,7 +37,9 @@ next-turn expiry is a game adaptation, not exact tabletop duration parity.
 The mapped slice uses the flat +2 rule: no Tumble-rank adjustment, distinct-source stacking,
 full attacks, or generic effects engine. Preview, resolution and attack events share the AC
 and accuracy calculation. Snapshots record only an active `guarded: true` on the Fighter;
-turn transitions remove it and emit expiry before `turnStarted`. UI and AI remain later work.
+turn transitions remove it and emit expiry before `turnStarted`. Shared effect projection now
+supplies HUD/inspection and the attack previews used by AI. Defeat removes guard; historical
+saves with inert defeated-unit guard remain readable. See [combat effects](combat-effects.md).
 
 ## Magic Missile replaces Ember Burst
 
