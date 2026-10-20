@@ -75,7 +75,7 @@ test('map direct entry, refresh, seeds and responsive inspection', async ({ page
   expect(errors).toEqual([]);
 });
 
-test('map never initializes battle, audio, diagnostics or storage', async ({ page }) => {
+test('map isolates battle storage and never initializes battle, audio or diagnostics', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('tg:phaser:battle:primary', 'preserve-phaser');
     localStorage.setItem('godot-save', 'preserve-legacy');
@@ -102,7 +102,9 @@ test('map never initializes battle, audio, diagnostics or storage', async ({ pag
     }
   }
   await page.getByRole('button', { name: 'New seed', exact: true }).click();
-  expect(await page.evaluate(() => (window as unknown as { mapStorageCalls: string[] }).mapStorageCalls)).toEqual([]);
+  const calls=await page.evaluate(() => (window as unknown as { mapStorageCalls: string[] }).mapStorageCalls);
+  // The shared privacy control may read opt-out. All other reads and every write remain forbidden.
+  expect(calls.filter(call=>call!=='getItem:tactics-guru:telemetry-opt-out')).toEqual([]);
   expect(await page.evaluate(() => ({ primary: localStorage.getItem('tg:phaser:battle:primary'), legacy: localStorage.getItem('godot-save') }))).toEqual({ primary: 'preserve-phaser', legacy: 'preserve-legacy' });
   expect(scripts.some(url => /startBattleApp|\/start-|\/browser-/.test(url))).toBe(false);
   await expect(page.locator('canvas, audio, #fit-panel')).toHaveCount(0);

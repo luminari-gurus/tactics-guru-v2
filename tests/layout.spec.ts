@@ -53,11 +53,11 @@ for (const viewport of VIEWPORTS) {
       const rect = summary.getBoundingClientRect();
       return { text: summary.textContent!.trim(), height: rect.height, inside: rect.top >= 0 && rect.bottom <= innerHeight };
     }));
-    expect(summaries.map(summary => summary.text)).toEqual(['Board controls', 'Measurements']);
+    expect(summaries.map(summary => summary.text)).toEqual(['Board controls', 'Measurements', 'Privacy & analytics']);
     for (const summary of summaries) { expect(summary.height).toBeGreaterThanOrEqual(44); expect(summary.inside, `${summary.text} summary`).toBe(true); }
     const boxes = await controlBoxes(page);
     const ids = boxes.map(box => box.id);
-    for (const id of ['fit-restart', 'move-start', 'audio-play', 'move-destination', 'tree-opacity', 'fit-snapshot', 'Board controls', 'Measurements']) expect(ids).toContain(id);
+    for (const id of ['fit-restart', 'move-start', 'audio-play', 'move-destination', 'tree-opacity', 'fit-snapshot', 'Board controls', 'Measurements', 'Privacy & analytics']) expect(ids).toContain(id);
     for (const box of boxes) {
       expect(box.height, `${box.id} height`).toBeGreaterThanOrEqual(44);
       if (box.id !== 'tree-opacity') expect(box.width, `${box.id} width`).toBeGreaterThanOrEqual(44);
