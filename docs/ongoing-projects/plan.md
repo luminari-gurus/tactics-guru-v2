@@ -1,37 +1,41 @@
 # Issue #145 and PR #150 review handoff
 
-Updated 2026-10-20 (Asia/Jerusalem). The two PR review findings are reproduced and repaired. Final integrated validation and publication are in progress.
+Updated 2026-10-20 (Asia/Jerusalem). Both P2 review findings are reproduced, repaired and locally validated. Final evidence publication and review response are in progress.
 
 ## Current state
 
 - [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150) targets `main` from `branch/issue-145-default-move`; [issue #145](https://github.com/luminari-gurus/tactics-guru-v2/issues/145) remains open until merge.
-- Worktree: `C:/Users/apexw/.codex/worktrees/issue-145-default-move/Tactics-Guru`. The caller's root checkout and other worktrees are preserved.
-- The branch was 13 commits behind current `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99`; all seven PR commits rebased without conflicts. No dependent branch contains the old PR head. Original reviewed head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased pre-repair candidate: `b4e9de9`.
-- Repair candidate: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`. Keep the existing PR and useful review history; publish the rebase with a lease pinned to the old remote head. A release tag or a new stack is unnecessary. Leave merge to the caller; squash merge is suitable when accepted.
-- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 6/7 tasks complete. Task 3.3 owns the remaining local integration checks, evidence, publication and review response. Keep the change active until merge and later archive.
-- The [prior shared plan](plan-before-issue-145.md) is preserved. Original implementation and acceptance history remain in the [QA record](../qa/issue-145-default-move.md).
+- Worktree: `C:/Users/apexw/.codex/worktrees/issue-145-default-move/Tactics-Guru`. The caller's root checkout and unrelated worktrees are preserved.
+- All seven original commits rebased without conflicts onto `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99`, carrying 13 integration commits. Range-diff preserves the original changes; the one contextual difference follows the renamed upstream run test. No dependent branch contains the old head.
+- Original reviewed head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased baseline: `b4e9de9`; movement repair: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`; default production test candidate: `c394ee5d650d816d7e9ccbdf649e74886cd3f0b5`; initial integration-test alignment: `1231a8703ba2ee3b22c455a11e0430de49812493`.
+- The rebased repair was published with an exact lease against the reviewed head, with matching local/remote SHA, 0/0 divergence and clean status. Local `main` was fast-forwarded too. Remaining delivery commits use a normal fast-forward push. Keep the useful review history; squash merge is suitable when accepted. No new stack or release tag is needed.
+- OpenSpec [issue-145-default-move](../../openspec/changes/issue-145-default-move/tasks.md), spec-driven: 6/7 tasks complete; only final publication/readback remains in task 3.3. Keep the change active for later merge/archive.
+- The [prior shared plan](plan-before-issue-145.md) is preserved. The [QA record](../qa/issue-145-default-move.md) contains exact results, source identity, commands and original acceptance history.
 
-## Outcome, files and proof
+## Outcome and minimal repair
 
-The default Move behavior stays once per usable player turn. PR review also found that clearing the native selector retained a stale command, and cancelling confirmation retained a destination that could not be re-selected through native input. Both failures reproduced against the rebased integration: placeholder clearing retained the move to `(0, 9)`; Cancel and Escape each left Review disabled after native same-destination retry.
+The shared scene still selects Move once per usable player turn. The HUD's empty option now passes null through existing scene selection, clearing destination, pending intent, hover and stale preview together. Cancel/Escape on movement confirmation clears selected/hovered destination while retaining Move, so native same-destination retry works. Full action and attack-confirmation cancellation semantics remain.
 
-`src/ui/hud.ts` now passes the empty option as null through the existing scene selection callback. `src/phaser/BattleScene.ts` resets the prompt, pending intent, selected destination and hover preview together. Movement-confirmation dismissal resets selected/hovered destination while retaining Move. Full action cancellation and attack-confirmation semantics remain intact. There are no new dependencies, domain rules, save fields, configuration, services or separate selection paths.
+All three new desktop regressions failed before repair; all nine desktop/portrait/landscape cases passed afterward, including in the production broad run. They assert cleared intent/selection/hover, disabled Review, retained Move, unchanged state/replay/save bytes, native popup retry and exactly one accepted command after explicit confirmation. The existing session helper type describes its already-present pending field.
 
-The existing `tests/battle-loop.spec.ts` has three native keyboard regressions, run across desktop and Pixel 7 portrait/landscape. They verify pending/selection/hover cleanup, disabled Review, retained Move, unchanged battle/replay/save bytes, native same-destination retry and exactly one accepted command after explicit confirmation. The existing session helper's return type now describes its already-present pending field.
+Ablation keeps the existing scene/HUD path, native controls, fixtures and suites. There are no new dependencies, services, configuration, domain rules, save fields, assets or alternate selection paths.
 
-## Verification so far
+## Local validation
 
-- Rebased baseline: 3/3 new desktop regressions failed at the reported stale-pending/disabled-Review assertions.
-- Repaired Vite dev: 9/9 new cases passed on installed Edge, all three profiles, no retries/skips/page errors.
-- Production build: 190 content checks, both TypeScript configurations and Vite passed.
-- Strict OpenSpec validation passed for the change and battle-controls spec.
-- Full serial-worker unit run: 762/762 tests passed in 47 files (55.50 seconds). Earlier parallel runs had 761 passes and one five-second timeout in unchanged `runBattle.test.ts`; its isolated file also passed 8/8. No assertions or timeouts changed.
-- Final production browser matrix, configured posttests and telemetry suite are pending. Do not treat original pre-rebase coverage as current integration proof.
+- 762/762 unit tests in 47 files with one worker. Earlier parallel runs hit one unchanged five-second simulation timeout; isolated and serial runs pass original assertions/timeouts.
+- Production build with 190 content checks, both TypeScript configurations and Vite passed. Typechecks passed again after test repairs.
+- Every one of 609 configured browser cases has passing evidence: 588 broad-run passes plus 21/21 focused rechecks. The original 34.2-minute command was 588 pass / 21 fail, not entirely green. All nine movement regressions passed there.
+- Configured posttests: 24/24 encounter and 21/21 run-item cases passed separately.
+- All 36 telemetry cases have passing evidence: 33 full-run passes plus 3/3 complete-run rechecks. The original telemetry command was 33 pass / 3 fail.
+- Four stale test expectations inherited from main were aligned with traced contracts: privacy disclosure, read-only opt-out access, generated desert map identity and legitimate terminal outcomes. Size/reachability, storage-write isolation, health projections, all three encounters, two rewards, exact event counts and privacy checks remain; telemetry additionally checks emitted outcome against actual state.
+- Strict change/main-spec validation, relative links and whitespace passed; repeat non-runtime checks at final publication.
 
-## Local commands and remaining workflow
+Application/dependency/build inputs have not changed since production candidate `c394ee5`. Only the four affected browser expectations and documentation change afterward; all other passing tests are unchanged. This is combined coverage, not a claim of one clean full rerun. The QA record explains the generated line-ending dirty marker and identifies exact source blobs.
 
-Windows Node is available. Prepend ignored `tmp/bin` to PATH for the installed npm CLI. OpenSpec/gh run via WSL; run gh from `/tmp` with `-R luminari-gurus/tactics-guru-v2` because Linux Git cannot resolve the Windows worktree's `.git` path. Windows Git owns commits and publication.
+## Remaining closeout
 
-Use `npm run test:unit -- --maxWorkers=1`, `npm run build`, `npm test -- --reporter=line`, `npm run test:telemetry`, and strict OpenSpec validation. Use the existing `PLAYWRIGHT_CHROMIUM_EXECUTABLE` override for installed Edge: the prior headless-shell delegate lacked BFCache. Keep browser matrices serialized on the host GPU. The repository has no GitHub Actions workflow; Cloudflare's build is covered by the local production build. Remote CI completion is not a gate for this request.
+Publish the final evidence/test changes, update the PR description, respond to review 5583848401, verify exact remote parity and mergeability, then seal task 3.3. Leave the PR open/non-draft for merge and issue #145 open until then. No new implementation, release tag, deployment or OpenSpec archive is requested.
 
-Finish task 3.3, update this handoff and QA with actual results, publish/read back repairs and the response to review `5583848401`, and verify exact remote parity and mergeability. Playwright emulation provides device acceptance under AGENTS.md. Physical hardware, screen-reader behavior and production deployment are outside this request.
+Windows npm uses ignored `tmp/bin/npm.cmd`; prepend it to PATH. OpenSpec and gh are installed in WSL; run gh from `/tmp` with `-R luminari-gurus/tactics-guru-v2` because Linux Git cannot resolve this Windows worktree's .git path. Windows Git owns commits/pushes. Use the existing Edge executable override, keep browser matrices serialized and retain logs under ignored `tmp/pr150-*`.
+
+The repository has no GitHub Actions workflow; Cloudflare's build is covered by the local production build. Hosted CI completion is not a gate. Playwright emulation supplies acceptance under AGENTS.md. Physical hardware, screen-reader behavior, live telemetry ingestion and production deployment are not claimed.

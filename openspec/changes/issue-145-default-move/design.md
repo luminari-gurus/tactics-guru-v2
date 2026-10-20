@@ -11,6 +11,7 @@ See proposal.md and docs/ongoing-projects/plan.md. The existing scene refresh al
 - Pass the destination placeholder as null through existing scene selection. Reset its prompt along with pending intent and selection; no second cancellation path or HUD-local state.
 - When movement confirmation is cancelled, clear selected/hovered destination and retain Move. Keep full action cancellation and attack cancellation semantics intact. Verify Cancel and Escape followed by native keyboard selection of the original destination; synthetic selectOption would conceal unchanged-value failures.
 - Integrated `main` adds a privacy disclosure, read-only opt-out preference access on map entry, and generated desert run maps. If full browser validation exposes the old exact test expectations, update only those expectations to these traced contracts; retain control dimensions/reachability, rejection of all other storage access/writes, encounter labels, health projections and legal progression. Recheck affected cases after the broad run without changing tested application inputs.
+- The telemetry complete-run fixture must still play three encounters, earn two rewards and report exactly one terminal outcome after Continue. Generated-grid admission does not guarantee victory: accept either terminal result at encounter three and assert the emitted outcome/phase matches the real terminal state, preserving every event-count and privacy assertion.
 
 ## Risks / Trade-offs
 

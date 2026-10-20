@@ -1,25 +1,58 @@
 # Issue #145 acceptance evidence
 
-Updated 2026-10-20 (Asia/Jerusalem). See [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150), the [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md). The review repair below supersedes the original acceptance record for current integration readiness.
+Updated 2026-10-20 (Asia/Jerusalem). Both review findings are repaired in [PR #150](https://github.com/luminari-gurus/tactics-guru-v2/pull/150). The [handoff](../ongoing-projects/plan.md) and [OpenSpec tasks](../../openspec/changes/issue-145-default-move/tasks.md) track final publication. This review record supersedes the original acceptance record below for current integration readiness.
 
 ## PR #150 review repair
 
-Rebased all seven PR commits without conflicts onto `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99` (13 new integration commits). Reviewed original head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased baseline: `b4e9de9`. Repair commit: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`.
+All seven original PR commits rebased without conflicts onto `main` `6758d0f9a28575713b523689a5d8fb7636bfbc99` (13 integration commits). Original reviewed head: `f625686332ed462d788f410ea7911c3c98ad398d`; rebased pre-repair baseline: `b4e9de9`. Repair commit: `1082658920e4e3fcc6b3f9c99bab127c6e551fdb`.
 
-Both findings in review `5583848401` reproduced with real native input against the rebased baseline. The three new desktop regressions failed: clearing Choose target retained pending move `(0, 9)`; Cancel and Escape each left Review disabled after the native popup re-selected the same destination. Baseline log: ignored `tmp/pr150-baseline.log`.
+Both findings in review `5583848401` reproduced using native input against the rebased baseline. All three new desktop regressions failed: clearing Choose target retained pending move `(0, 9)`; Cancel and Escape each left Review disabled after the native popup re-selected the same destination. Baseline: ignored `tmp/pr150-baseline.log`.
 
-The minimal repair uses the existing scene selection callback for the empty option and clears selected/hovered destination when movement confirmation is dismissed. Move stays selected. Tests assert cleared board selection/hover and intent, disabled Review, unchanged battle/replay/save bytes, a usable native retry and exactly one command after confirmation. No selectOption call synthesizes the same-value retry.
+The repair passes the empty option as null through existing scene selection and clears selected/hovered destination on movement-confirmation dismissal. Move remains selected. Existing `battle-loop.spec.ts` cases assert cleared selection/hover/intent, disabled Review, unchanged state/replay/save bytes, native retry and exactly one accepted command after confirmation. Native Space/Home/ArrowDown/Enter re-selection exposes the real unchanged-value defect; selectOption does not synthesize that retry.
 
-Current local evidence:
+## Current local results
 
-- `npm ci`: 48 packages; zero audit findings. npm blocked the inherited optional PostHog CLI install script; it is not needed by these checks.
-- New Vite-dev regressions on installed Edge: 9/9 passed across desktop, Pixel 7 portrait and landscape, no retries/skips/page errors (`tmp/pr150-repaired.log`).
-- `npm run test:unit -- --maxWorkers=1`: 762/762 tests, 47 files, 55.50 seconds (`tmp/pr150-unit-final.log`). Two earlier default parallel runs were 761 pass / one five-second timeout in unchanged full-battle `runBattle.test.ts`; its isolated file passed 8/8. Serial execution passes the original assertions/timeouts without a source workaround.
-- `npm run build`: 190 content checks, both TypeScript configurations and Vite passed (`tmp/pr150-build.log`).
-- `openspec validate issue-145-default-move --strict` and `openspec validate battle-controls --type spec --strict`: passed.
-- Final production matrix, configured posttests and telemetry checks are pending; use the handoff for the current delivery state.
+- `npm ci`: 48 packages, zero audit findings. npm blocked the inherited PostHog CLI install script, which these checks do not need.
+- `npm run test:unit -- --maxWorkers=1`: 762/762 tests, 47 files, 55.50 seconds (`tmp/pr150-unit-final.log`). Two earlier parallel runs had 761 passes and one five-second timeout in unchanged full-battle `runBattle.test.ts`; its isolated file passed 8/8. Serial execution passes original assertions/timeouts without a source workaround.
+- `npm run build`: 190 content checks, both TypeScript configurations and Vite passed (`tmp/pr150-build-final.log`). Both typechecks passed again after the browser-test changes (`tmp/pr150-typecheck-final.log`).
+- All 609 configured default browser cases have passing production evidence on installed Edge: 588 passed in the 34.2-minute broad run, and all 21 affected cases passed in a 1.6-minute focused recheck. No retries or skips. The initial full command was 588 pass / 21 fail, not entirely green (`tmp/pr150-full-browser.log`, `tmp/pr150-integration-recheck.log`).
+- Both configured posttests passed separately: 24/24 encounter cases (35.6 seconds) and 21/21 run-item cases (16.7 seconds), on their configured Vite dev servers (`tmp/pr150-posttests.log`). The failed broad command did not automatically invoke posttests.
+- All 36 configured telemetry cases have passing evidence on their configured production build with mocked ingestion: 33 passed in the 4.2-minute full run; the three affected complete-run cases passed in a 3.3-minute focused recheck (`tmp/pr150-telemetry.log`, `tmp/pr150-telemetry-recheck.log`). The first telemetry command was 33 pass / 3 fail.
+- All nine new native-input regressions passed in the production broad run, plus the earlier 9/9 Vite-dev repair pass (`tmp/pr150-repaired.log`).
+- Strict OpenSpec change/main-spec validation, document links and whitespace passed; final publication repeats these non-runtime checks.
 
-Browser plugin unavailable; the repository Playwright workflow is used. The flow is fresh battle → native destination → clear or Cancel/Escape → cleared preview and same-destination retry → one explicit confirmation. Screenshots and console/state assertions cover real rendered interactions. Playwright emulation satisfies the caller's acceptance instruction; physical hardware and production deployment are not claimed.
+The 21 broad failures came from three exact expectations unchanged on `main`: the layout list omitted the new Privacy & analytics disclosure; map isolation rejected read-only opt-out preference reads; and health-bar progression expected the former authored map ID instead of `map:desert_woodland_crossing`. Commit `1231a8703ba2ee3b22c455a11e0430de49812493` aligns those expectations. All size/reachability, forbidden storage reads/writes, health projections, encounter labels and legal progression assertions remain. The map test permits only `getItem:tactics-guru:telemetry-opt-out`; every write and other storage access still fails it.
+
+The telemetry fixture reached a legitimate defeat at encounter three but required victory. The current procedural-grid contract explicitly does not guarantee victory. Its repaired test still requires all three encounters, two earned rewards, terminal Continue, exact event counts and privacy assertions. It now accepts either terminal result at encounter three and additionally verifies that the reported outcome/phase matches actual state. This does not accept early defeat as coverage of the complete-run fixture.
+
+## Source and browser identity
+
+Default production artifact: `c394ee5d650d816d7e9ccbdf649e74886cd3f0b5`. Source blobs: BattleScene `936106fe8769e37451177fafe127f0040105bc1c`; HUD `416f7443e8031c1e27599ca608f3b861a2cddbad`; native regression file `53b82252625781f410fb0ddf053db18e286a753f`. Build metadata reports dirty=true because content checks rewrote tracked snapshot line endings without a canonical Git content change. Those generated rewrites were restored and are excluded from publication.
+
+Application, dependency and build inputs have not changed after that artifact. Subsequent changes only align the four failing browser expectations and update documentation/OpenSpec. All other passing test inputs are unchanged, so their evidence is reused under ablation; this is combined coverage, not a claimed single clean full rerun.
+
+Environment: Windows Node 24.19.0, npm 12.0.2, Playwright 1.63.0 and installed Edge 155.0.4283.62. Projects: desktop 1280x720, Pixel 7 portrait 412x839 and landscape 915x412. Browser plugin unavailable; the repository's Playwright workflow was used. The flow is fresh battle → native destination → clear or Cancel/Escape → cleared preview and same-destination retry → one explicit confirmation. New regression cases reported no page errors. Desktop and portrait production screenshots were visually inspected: no stale board selection/hover, a neutral destination prompt and disabled Review; the nested scroller keeps controls reachable without covering the board. Local screenshots remain in `tmp/pr150-full-browser`.
+
+Playwright emulation supplies device acceptance under AGENTS.md. This does not claim physical hardware, screen-reader behavior, live PostHog ingestion or production deployment. The Edge override avoids the previously diagnosed headless-shell BFCache limitation; all original BFCache assertions passed in this broad run. Existing Vite chunk/native-loader and Node color warnings remain non-failing.
+
+## Exact review validation commands
+
+Windows npm uses the existing ignored `tmp/bin/npm.cmd` wrapper; OpenSpec runs through the installed WSL CLI.
+
+```powershell
+$env:PATH="$((Get-Location).Path)\tmp\bin;$env:PATH"
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+npm run test:unit -- --maxWorkers=1
+npm run build
+npm test -- --output tmp/pr150-full-browser --reporter=line
+node node_modules/@playwright/test/cli.js test tests/layout.spec.ts tests/overworld-map.spec.ts tests/unit-health-bars.spec.ts --grep 'controls stay at least 44 px|map isolates battle storage|real run reward healing' --output tmp/pr150-integration-recheck --reporter=line
+npm run posttest
+npm run test:telemetry -- --output tmp/pr150-telemetry --reporter=line
+npm run test:telemetry -- --grep 'mocked ingestion sees accepted run' --output tmp/pr150-telemetry-recheck --reporter=line
+npm run typecheck
+wsl bash -lc 'openspec validate issue-145-default-move --strict; openspec validate battle-controls --type spec --strict'
+git diff --check
+```
 
 ## Original acceptance record (2026-10-19)
 
