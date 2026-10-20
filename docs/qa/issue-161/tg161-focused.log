@@ -1,0 +1,52 @@
+
+ RUN  v5.0.3 /Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2
+
+ ❯ tests/unit/abilities.test.ts (19 tests | 1 failed) 118ms
+   × removes guard on lethal ordinary or missile damage without emitting a turn-expiry event 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/abilities.test.ts > removes guard on lethal ordinary or missile damage without emitting a turn-expiry event
+{
+  message: '',
+  actual: null,
+  expected: undefined,
+  showDiff: false,
+  name: 'AssertionError',
+  ok: false,
+  stack: 'AssertionError: \n' +
+    '    at /Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/tests/unit/abilities.test.ts:366:66\n' +
+    '    at file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:1628:35\n' +
+    '    at file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:2783:26\n' +
+    '    at file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:3321:20\n' +
+    '    at new Promise (<anonymous>)\n' +
+    '    at runWithCancel (file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:3316:10)\n' +
+    '    at file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:3301:20\n' +
+    '    at new Promise (<anonymous>)\n' +
+    '    at runWithTimeout (file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:3259:10)\n' +
+    '    at file:///Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/vitest/dist/chunks/run.BTlFXlnv.js:3882:64',
+  stacks: [
+    {
+      method: '',
+      file: '/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/tests/unit/abilities.test.ts',
+      line: 366,
+      column: 66
+    }
+  ]
+}
+ ❯ tests/unit/abilities.test.ts:366:66
+    364|     const command = { type: 'useAbility', unitId: actor,
+    365|       abilityId: missileAttack ? 'ability:magic_missile' : 'ability:ba…
+    366|     const result = dispatch(freeze(snapshot), command, catalog); asser…
+       |                                                                  ^
+    367|     expect(result.state.units.find(u => u.id === 1)).toMatchObject({ h…
+    368|     expect(result.state.units.find(u => u.id === 1)?.guarded).toBeUnde…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 119 passed (120)
+   Start at  14:52:48
+   Duration  9.13s (tests 94%, transform 4%, import 2%)
+

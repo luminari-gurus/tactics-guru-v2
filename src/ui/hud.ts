@@ -1,3 +1,4 @@
+import { combatStats, guardedEffect } from '../domain/effects';
 import type { CellPosition } from '../content/types';
 import type { BattleEvent, Command, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
@@ -49,9 +50,8 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
 const LOG_LIMIT=40;
 export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
-  const guard=unit.guarded?GUARDED_STRIKE_TRADEOFF:null;
-  return {def,name:displayName(unit.defId),armorClass:def.stats.armorClass+(guard?.armorClassBonus??0),
-    accuracy:def.stats.accuracy-(guard?.attackPenalty??0),
+  const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
+  return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
     status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC)`:'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {

@@ -1,0 +1,235 @@
+{
+  "rulesVersion": 2,
+  "generatorVersion": 1,
+  "profileVersion": "desert-v1",
+  "results": [
+    {
+      "seed": 0,
+      "policy": "pursue",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:19751b183ac9ce1e142245b32d69cfa664d36f5770a2dd3aa02655629d5215e3",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 195131597
+      },
+      "outcome": "playerWin",
+      "commands": 36,
+      "stateHash": "sha256:b845edd447d1f14ab74cac1cb3eab3c1462cd64f747aa0712511f45b5838c354",
+      "eventsHash": "sha256:68b95a02c7d9dc013d62f47e83108d325701976ba3dcb06dafc960ba652ad064"
+    },
+    {
+      "seed": 0,
+      "policy": "pursue",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:56ed50972a771310eab8a53b644b8e4184316ceb43256c0bb3c92148ebdb5c03",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 4198132744
+      },
+      "outcome": "playerLoss",
+      "commands": 37,
+      "stateHash": "sha256:b4b8871208e1be32c86477b4c3be076b551b41c29050f3e5930e7ab05326f0d2",
+      "eventsHash": "sha256:ca4a753c2a2a84c5b6ff7f2b117cdcabb8e259cb71a4c7dc192064381c96a64c"
+    },
+    {
+      "seed": 0,
+      "policy": "wait",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:19751b183ac9ce1e142245b32d69cfa664d36f5770a2dd3aa02655629d5215e3",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 195131597
+      },
+      "outcome": "playerLoss",
+      "commands": 60,
+      "stateHash": "sha256:44f6adcee564beb29cbb593a8cb20c0f292d3506a2f9517c3fef889d84c6288a",
+      "eventsHash": "sha256:d1efbb75fb9a40c6bb6805c3513c1570ecb742c9dda6924d0ffc0c57b4475d9b"
+    },
+    {
+      "seed": 0,
+      "policy": "wait",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:56ed50972a771310eab8a53b644b8e4184316ceb43256c0bb3c92148ebdb5c03",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 4198132744
+      },
+      "outcome": "playerLoss",
+      "commands": 34,
+      "stateHash": "sha256:8973e57dc669bdadbc6f803cc4a6a7443135c9bf59976995b2fa2e982dbfd5ee",
+      "eventsHash": "sha256:85eed2d16ca0a090473fee6e77f9f1f3fa5dd6356ab3d319f6621edd694e0bef"
+    },
+    {
+      "seed": 1,
+      "policy": "pursue",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:6b0c8ecff8d32be060e9fedb6363b8421b801e8b946172514720ddc6f6c05b2b",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1901019356
+      },
+      "outcome": "playerWin",
+      "commands": 48,
+      "stateHash": "sha256:8c4942a8fd6050e1758a86d659dd48afe25ab987cd29a23dafe0ebf0a2e12899",
+      "eventsHash": "sha256:2ab86c9145d17c5f4768d561134043b3d2a3dca376cc4676235ec9a55d3d8869"
+    },
+    {
+      "seed": 1,
+      "policy": "pursue",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:fafe449cd7041b654e616e0efa99f6f3605766f3283273e897890aeb6672c96f",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 2201544531
+      },
+      "outcome": "playerLoss",
+      "commands": 18,
+      "stateHash": "sha256:79730421ef722d0bdaffd702e43bdb6b7e50128074e38118c160b5132c182cb2",
+      "eventsHash": "sha256:677ff2278c2604a0f94a82363acfaaa42a37db7c22416aad7a050a7139324365"
+    },
+    {
+      "seed": 1,
+      "policy": "wait",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:6b0c8ecff8d32be060e9fedb6363b8421b801e8b946172514720ddc6f6c05b2b",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1901019356
+      },
+      "outcome": "playerLoss",
+      "commands": 66,
+      "stateHash": "sha256:e8980b1d1b5c58de4e4d75ef0d28e4975d28c265f80f6bc7f37b96e8c1f32d72",
+      "eventsHash": "sha256:d15e3e2fead4dbb463a7b441250db7ec929ab773887f3d752ca711d76b5179d9"
+    },
+    {
+      "seed": 1,
+      "policy": "wait",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:fafe449cd7041b654e616e0efa99f6f3605766f3283273e897890aeb6672c96f",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 2201544531
+      },
+      "outcome": "playerLoss",
+      "commands": 25,
+      "stateHash": "sha256:3a6d45990a1cf4578ec4c1e9bca77aae48abfef8a2796d7d6ad80ac41bd0bbb7",
+      "eventsHash": "sha256:2ea7d65b72a26d5755599faa4d20d740923e1ccef9861c9abb85c30aecf3811d"
+    },
+    {
+      "seed": 13,
+      "policy": "pursue",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:7163549e196369e0d4a0c8f1fcec8a8d55a2bc5162f8f137d8ad004c8f7837f9",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1067947623
+      },
+      "outcome": "playerWin",
+      "commands": 47,
+      "stateHash": "sha256:ac40fa91e610b7afc44a4741697d0df4c84f9a83eff6b51253beeeedce6e0164",
+      "eventsHash": "sha256:dacadd1f0ff5cee0ed8fa7f9b30c947ad474f961b6f50ccad627fd87db8a4692"
+    },
+    {
+      "seed": 13,
+      "policy": "pursue",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:fa4002ab8821f6a87d939f61efccbe7fdcd3998af8bb07dbf37754ab6e0c058e",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 216873994
+      },
+      "outcome": "playerLoss",
+      "commands": 36,
+      "stateHash": "sha256:ac96c609c5a2d30d0d5619a530523f17ffd81db8a4a1e02cda9e903ebb40335b",
+      "eventsHash": "sha256:789fc6e3caf7dde3593f004e8de5d2c7e73776397c9c71142e5b26fa54f90d75"
+    },
+    {
+      "seed": 13,
+      "policy": "wait",
+      "wounded": false,
+      "descriptor": {
+        "encounterId": "encounter:forest_ruins",
+        "mapId": "map:desert_forest_ruins",
+        "mapHash": "sha256:7163549e196369e0d4a0c8f1fcec8a8d55a2bc5162f8f137d8ad004c8f7837f9",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 1067947623
+      },
+      "outcome": "playerLoss",
+      "commands": 51,
+      "stateHash": "sha256:00d75342e1e58f453499f1d2b5768c66fc23e134c507fd3f39b1e45568ce8214",
+      "eventsHash": "sha256:504bfc282ab819a5cf10f8d3bfc2f69a7cdfadadb8c57f467abc67cfe51964f2"
+    },
+    {
+      "seed": 13,
+      "policy": "wait",
+      "wounded": true,
+      "descriptor": {
+        "encounterId": "encounter:woodland_crossing",
+        "mapId": "map:desert_woodland_crossing",
+        "mapHash": "sha256:fa4002ab8821f6a87d939f61efccbe7fdcd3998af8bb07dbf37754ab6e0c058e",
+        "kind": "generated",
+        "biome": "desert",
+        "generatorVersion": 1,
+        "profileVersion": "desert-v1",
+        "layoutSeed": 216873994
+      },
+      "outcome": "playerLoss",
+      "commands": 35,
+      "stateHash": "sha256:db5e8722c805d5d77104284a8f9624d332c4851a2d26d695be74fbf36c013a3a",
+      "eventsHash": "sha256:144c1f87c7e57c08381dddf1f42ad1644bdf2e158127ad9e2702d5cb0e701fb2"
+    }
+  ]
+}

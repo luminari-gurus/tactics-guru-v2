@@ -1,3 +1,4 @@
+import { combatStats } from '../../src/domain/effects';
 import { createHash } from 'node:crypto';
 import { assert, beforeAll, describe, expect, it } from 'vitest';
 import { BattleSession } from '../../src/app/BattleSession';
@@ -232,4 +233,19 @@ it('supports the documented 64-unit/128-ID/numeric limits within the cap', () =>
   const longerState = { ...state, mapId: longerMap.id, versions: { ...state.versions, content: contentVersion(longerCatalog) } };
   expect(encodeBattleSave(longerState, longerCatalog)).toEqual({ ok: false, reason: 'invalidState' });
   expect(decodeBattleSave(wrap(longerState), longerCatalog)).toEqual({ ok: false, reason: 'invalidState' });
+});
+
+it('verifies historic defeated Guarded digest without normalizing input and cleans only accepted turns', () => {
+  const created = createBattle('map:forest_ruins', 2, battleCatalog); assert(created.ok);
+  const state = { ...created.state, activeIndex: created.state.initiative.findIndex(id => id !== 1),
+    units: created.state.units.map(u => u.id === 1 ? { ...u, hp: 0, guarded: true as const } : u) };
+  const text = encoded(state, battleCatalog), read = decodeBattleSave(text, battleCatalog); assert(read.ok);
+  expect(read.state).toEqual(state); expect(encodeBattleSave(read.state, battleCatalog)).toEqual({ ok: true, text });
+  expect(combatStats(read.state.units[0], battleCatalog)).toEqual({ accuracy: 4, armorClass: 14 });
+  const result = dispatch(read.state, { type: 'endTurn', unitId: read.state.initiative[read.state.activeIndex] }, battleCatalog); assert(result.ok);
+  expect(result.state.units[0].guarded).toBeUndefined(); expect(read.state.units[0].guarded).toBe(true);
+  for (const field of ['statuses', 'resources']) {
+    const invalid = { ...state, units: state.units.map((u, i) => i ? u : { ...u, [field]: [] }) };
+    expect(decodeBattleSave(wrap(invalid), battleCatalog)).toEqual({ ok: false, reason: 'invalidState' });
+  }
 });

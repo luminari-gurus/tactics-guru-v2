@@ -1,3 +1,6 @@
+import { freshDungeon, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
+import { guardedBoundary } from '../helpers/guardedBoundary';
+import { combatStats } from '../../src/domain/effects';
 import { expect,it } from 'vitest';
 import { dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
@@ -34,3 +37,32 @@ it('retains the accepted-command history through every legal encounter',()=>{
     expect(state.outcome).toBe('playerWin');
   }
 },120000);
+
+it('continues a legally reached Guarded dungeon boundary through exact save/resume and expiry', () => {
+  let reached = false;
+  for (let seed = 1; seed <= 10 && !reached; seed++) {
+    const started = startDungeonBattle(freshDungeon('guarded-save', seed)); if (!started.ok) throw Error(started.reason);
+    const built = dungeonBattle(started.state)!;
+    let fixture; try { fixture = guardedBoundary(built.catalog, started.state.activeBattle!); } catch { continue; }
+    const cast = dispatch(fixture.before, fixture.command, built.catalog); if (!cast.ok) throw Error(cast.reason);
+    const snapshot = { ...started.state, activeBattle: cast.state };
+    const encoded = encodeDungeon(snapshot); if (!encoded.ok) throw Error(encoded.reason);
+    const decoded = decodeDungeon(encoded.text); if (!decoded.ok) throw Error(decoded.reason);
+    expect(decoded.state).toEqual(snapshot); expect(encodeDungeon(decoded.state)).toEqual(encoded);
+    const fighter = decoded.state.activeBattle!.units.find(u => u.defId === 'fighter')!;
+    expect(combatStats(fighter, built.catalog).armorClass).toBe(built.catalog.heroes.fighter.stats.armorClass + 2);
+    let live = cast.state, resumed = decoded.state.activeBattle!;
+    for (let i = 0; i < live.units.length; i++) {
+      const command = { type: 'endTurn', unitId: live.initiative[live.activeIndex] };
+      const a = dispatch(live, command, built.catalog), b = dispatch(resumed, command, built.catalog); expect(a).toEqual(b);
+      if (!a.ok || !b.ok) throw Error('Wait rejected'); live = a.state; resumed = b.state;
+    }
+    expect(live.units.find(u => u.defId === 'fighter')!.guarded).toBeUndefined();
+    for (const field of ['statuses', 'resources']) {
+      const bad = { ...snapshot, activeBattle: { ...cast.state, units: cast.state.units.map((u, i) => i ? u : { ...u, [field]: [] }) } };
+      expect(readDungeon(bad).ok).toBe(false);
+    }
+    reached = true;
+  }
+  expect(reached).toBe(true);
+});

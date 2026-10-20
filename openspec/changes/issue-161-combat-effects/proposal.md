@@ -4,7 +4,7 @@
 
 Issue [#161](https://github.com/luminari-gurus/tactics-guru-v2/issues/161) needs a bounded combat-effect contract so the nine dependent ability, enemy and hazard issues can share legality, timing and persistence. Current runtime duplicates Guarded calculations across combat and HUD, has no general status reader, and declares save events without implementing saving throws.
 
-Caller: `dubstylee`. Branch: `work/issue-161-combat-effects`. Base: `origin/main` at `2b5a063f4a7e8f4a6329eaf1f80630133754012a`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-161-combat-effects`. Base: `origin/main` at `2b5a063f4a7e8f4a6329eaf1f80630133754012a`. Implementation approval: caller explicitly approved this staged plan in chat on 2026-10-20.
 
 ## What Changes
 

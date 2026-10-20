@@ -1,3 +1,6 @@
+import { guardedEffect, combatStats } from '../../src/domain/effects';
+import { unitFeedback } from '../../src/ui/hud';
+import { BattleSession } from '../../src/app/BattleSession';
 import { assert, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
@@ -333,4 +336,38 @@ it('Guarded Strike tradeoff changes content identity and rejects old snapshots/r
   const old = { ...created.state, versions: { ...created.state.versions, content: contentVersion(legacy) } };
   expect(readBattleState(old, battleCatalog)).toEqual({ ok: false, reason: 'invalidState' });
   expect(replayBattle({ format: 1, versions: old.versions, initial: old, commands: [] }, battleCatalog).ok).toBe(false);
+});
+
+it('shares Guarded projection with inspection on an already projected equipment catalog', () => {
+  const base = guardSetup(12);
+  // Equipment has already been projected; the evaluator must not project it again.
+  const catalog = { ...base.catalog, heroes: { ...base.catalog.heroes, fighter: { ...base.catalog.heroes.fighter,
+    stats: { ...base.catalog.heroes.fighter.stats, armorClass: 15, accuracy: 5 } } } };
+  const state = { ...base.state, versions: { ...base.state.versions, content: contentVersion(catalog) },
+    units: base.state.units.map(u => u.id === 1 ? { ...u, guarded: true as const } : u) };
+  const fighter = state.units.find(u => u.id === 1)!;
+  const session = new BattleSession(catalog, state, state.seed);
+  expect(guardedEffect(fighter)).toEqual({ kind: 'guarded', sourceId: 1, targetId: 1 });
+  expect(unitFeedback(session, fighter)).toMatchObject({ accuracy: 3, armorClass: 17, status: 'Guarded (+2 AC)' });
+  for (const abilityId of ['ability:basic_attack', 'ability:guarded_strike'] as const)
+    expect(previewAttack(state, { ...guardedStrike, abilityId }, catalog)).toMatchObject({ ok: true, bonus: 3 });
+  const before = structuredClone(state);
+  for (let i = 0; i < 3; i++) { expect(session.prepare(guardedStrike).ok).toBe(true); session.cancel(); }
+  expect(session.state).toEqual(before); expect(session.events).toEqual([]); expect(session.continuation!.commands).toEqual([]);
+});
+it('removes guard on lethal ordinary or missile damage without emitting a turn-expiry event', () => {
+  for (const missileAttack of [false, true]) {
+    const { catalog, state } = guardSetup(20);
+    const actor = missileAttack ? 3 : 4;
+    const snapshot = { ...state, activeIndex: state.initiative.indexOf(actor), units: state.units.map(u =>
+      u.id === 1 ? { ...u, hp: 1, guarded: true as const } : missileAttack && u.id === 3 ? { ...u, cell: { x: 1, y: 0 } } : u) };
+    const command = { type: 'useAbility', unitId: actor,
+      abilityId: missileAttack ? 'ability:magic_missile' : 'ability:basic_attack', target: { unitId: 1 } } as const;
+    const result = dispatch(freeze(snapshot), command, catalog); assert(result.ok);
+    expect(result.state.units.find(u => u.id === 1)).toMatchObject({ hp: 0 });
+    expect(result.state.units.find(u => u.id === 1)?.guarded).toBeUndefined();
+    expect(result.events.filter(e => e.type === 'defeated')).toEqual([{ type: 'defeated', unitId: 1 }]);
+    expect(result.events.some(e => e.type === 'guardExpired')).toBe(false);
+    expect(combatStats(result.state.units[0], catalog)).toEqual({ accuracy: 4, armorClass: 14 });
+  }
 });

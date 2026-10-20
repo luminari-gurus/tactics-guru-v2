@@ -1,0 +1,1047 @@
+{
+  "initial": {
+    "format": 1,
+    "versions": {
+      "rules": 2,
+      "rng": 1,
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+    },
+    "seed": 2,
+    "rng": {
+      "words": [
+        2744299216,
+        2772463645,
+        391717936,
+        19
+      ],
+      "cursor": 6
+    },
+    "mapId": "map:forest_ruins",
+    "units": [
+      {
+        "id": 1,
+        "cell": {
+          "x": 1,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "player",
+        "defId": "fighter",
+        "hp": 18
+      },
+      {
+        "id": 2,
+        "cell": {
+          "x": 2,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "player",
+        "defId": "ranger",
+        "hp": 12
+      },
+      {
+        "id": 3,
+        "cell": {
+          "x": 1,
+          "y": 9
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "player",
+        "defId": "mage",
+        "hp": 11
+      },
+      {
+        "id": 4,
+        "cell": {
+          "x": 8,
+          "y": 4
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 9
+      },
+      {
+        "id": 5,
+        "cell": {
+          "x": 9,
+          "y": 2
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_archer",
+        "hp": 8
+      },
+      {
+        "id": 6,
+        "cell": {
+          "x": 8,
+          "y": 5
+        },
+        "hasMoved": false,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 9
+      }
+    ],
+    "initiative": [
+      5,
+      6,
+      2,
+      1,
+      4,
+      3
+    ],
+    "activeIndex": 0,
+    "round": 1,
+    "outcome": "ongoing",
+    "commandCount": 0
+  },
+  "boundaryCommands": [
+    {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 5,
+        "y": 2
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "move",
+      "unitId": 6,
+      "to": {
+        "x": 5,
+        "y": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 6
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 3,
+        "y": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 1
+    },
+    {
+      "type": "move",
+      "unitId": 4,
+      "to": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 4
+    },
+    {
+      "type": "move",
+      "unitId": 3,
+      "to": {
+        "x": 1,
+        "y": 6
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "missileTargets": [
+          4
+        ]
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 3
+    },
+    {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 3,
+        "y": 4
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "move",
+      "unitId": 6,
+      "to": {
+        "x": 4,
+        "y": 6
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 6,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 1
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 6
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 5,
+        "y": 6
+      }
+    }
+  ],
+  "before": {
+    "format": 1,
+    "versions": {
+      "rules": 2,
+      "rng": 1,
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"
+    },
+    "seed": 2,
+    "rng": {
+      "words": [
+        2520334637,
+        3784724622,
+        2755719422,
+        24
+      ],
+      "cursor": 11
+    },
+    "mapId": "map:forest_ruins",
+    "units": [
+      {
+        "id": 1,
+        "cell": {
+          "x": 5,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": false,
+        "side": "player",
+        "defId": "fighter",
+        "hp": 14
+      },
+      {
+        "id": 2,
+        "cell": {
+          "x": 2,
+          "y": 8
+        },
+        "hasMoved": false,
+        "hasActed": true,
+        "side": "player",
+        "defId": "ranger",
+        "hp": 12
+      },
+      {
+        "id": 3,
+        "cell": {
+          "x": 1,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": true,
+        "side": "player",
+        "defId": "mage",
+        "hp": 7
+      },
+      {
+        "id": 4,
+        "cell": {
+          "x": 6,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": false,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 6
+      },
+      {
+        "id": 5,
+        "cell": {
+          "x": 3,
+          "y": 4
+        },
+        "hasMoved": true,
+        "hasActed": true,
+        "side": "enemy",
+        "defId": "goblin_archer",
+        "hp": 2
+      },
+      {
+        "id": 6,
+        "cell": {
+          "x": 4,
+          "y": 6
+        },
+        "hasMoved": true,
+        "hasActed": true,
+        "side": "enemy",
+        "defId": "goblin_grunt",
+        "hp": 3
+      }
+    ],
+    "initiative": [
+      5,
+      6,
+      2,
+      1,
+      4,
+      3
+    ],
+    "activeIndex": 3,
+    "round": 2,
+    "outcome": "ongoing",
+    "commandCount": 22
+  },
+  "cast": {
+    "activeIndex": 3,
+    "commandCount": 23,
+    "format": 1,
+    "initiative": [
+      5,
+      6,
+      2,
+      1,
+      4,
+      3
+    ],
+    "mapId": "map:forest_ruins",
+    "outcome": "ongoing",
+    "rng": {
+      "words": [
+        3789986726,
+        3326638318,
+        2544114161,
+        25
+      ],
+      "cursor": 12
+    },
+    "round": 2,
+    "seed": 2,
+    "units": [
+      {
+        "cell": {
+          "x": 5,
+          "y": 6
+        },
+        "defId": "fighter",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 14,
+        "id": 1,
+        "side": "player",
+        "guarded": true
+      },
+      {
+        "cell": {
+          "x": 2,
+          "y": 8
+        },
+        "defId": "ranger",
+        "hasActed": true,
+        "hasMoved": false,
+        "hp": 12,
+        "id": 2,
+        "side": "player"
+      },
+      {
+        "cell": {
+          "x": 1,
+          "y": 6
+        },
+        "defId": "mage",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 7,
+        "id": 3,
+        "side": "player"
+      },
+      {
+        "cell": {
+          "x": 6,
+          "y": 6
+        },
+        "defId": "goblin_grunt",
+        "hasActed": false,
+        "hasMoved": true,
+        "hp": 6,
+        "id": 4,
+        "side": "enemy"
+      },
+      {
+        "cell": {
+          "x": 3,
+          "y": 4
+        },
+        "defId": "goblin_archer",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 2,
+        "id": 5,
+        "side": "enemy"
+      },
+      {
+        "cell": {
+          "x": 4,
+          "y": 6
+        },
+        "defId": "goblin_grunt",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 3,
+        "id": 6,
+        "side": "enemy"
+      }
+    ],
+    "versions": {
+      "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+      "rng": 1,
+      "rules": 2
+    }
+  },
+  "after": {
+    "state": {
+      "activeIndex": 3,
+      "commandCount": 33,
+      "format": 1,
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "mapId": "map:forest_ruins",
+      "outcome": "ongoing",
+      "rng": {
+        "words": [
+          427748249,
+          1232447446,
+          3274243962,
+          28
+        ],
+        "cursor": 15
+      },
+      "round": 3,
+      "seed": 2,
+      "units": [
+        {
+          "cell": {
+            "x": 5,
+            "y": 6
+          },
+          "defId": "fighter",
+          "hasActed": false,
+          "hasMoved": false,
+          "hp": 10,
+          "id": 1,
+          "side": "player"
+        },
+        {
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "defId": "ranger",
+          "hasActed": false,
+          "hasMoved": false,
+          "hp": 12,
+          "id": 2,
+          "side": "player"
+        },
+        {
+          "cell": {
+            "x": 1,
+            "y": 6
+          },
+          "defId": "mage",
+          "hasActed": false,
+          "hasMoved": false,
+          "hp": 0,
+          "id": 3,
+          "side": "player"
+        },
+        {
+          "cell": {
+            "x": 6,
+            "y": 6
+          },
+          "defId": "goblin_grunt",
+          "hasActed": true,
+          "hasMoved": false,
+          "hp": 6,
+          "id": 4,
+          "side": "enemy"
+        },
+        {
+          "cell": {
+            "x": 3,
+            "y": 4
+          },
+          "defId": "goblin_archer",
+          "hasActed": true,
+          "hasMoved": false,
+          "hp": 2,
+          "id": 5,
+          "side": "enemy"
+        },
+        {
+          "cell": {
+            "x": 2,
+            "y": 6
+          },
+          "defId": "goblin_grunt",
+          "hasActed": true,
+          "hasMoved": true,
+          "hp": 3,
+          "id": 6,
+          "side": "enemy"
+        }
+      ],
+      "versions": {
+        "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+        "rng": 1,
+        "rules": 2
+      }
+    },
+    "replay": null,
+    "continuation": {
+      "snapshot": {
+        "activeIndex": 3,
+        "commandCount": 23,
+        "format": 1,
+        "initiative": [
+          5,
+          6,
+          2,
+          1,
+          4,
+          3
+        ],
+        "mapId": "map:forest_ruins",
+        "outcome": "ongoing",
+        "rng": {
+          "cursor": 12,
+          "words": [
+            3789986726,
+            3326638318,
+            2544114161,
+            25
+          ]
+        },
+        "round": 2,
+        "seed": 2,
+        "units": [
+          {
+            "cell": {
+              "x": 5,
+              "y": 6
+            },
+            "defId": "fighter",
+            "guarded": true,
+            "hasActed": true,
+            "hasMoved": true,
+            "hp": 14,
+            "id": 1,
+            "side": "player"
+          },
+          {
+            "cell": {
+              "x": 2,
+              "y": 8
+            },
+            "defId": "ranger",
+            "hasActed": true,
+            "hasMoved": false,
+            "hp": 12,
+            "id": 2,
+            "side": "player"
+          },
+          {
+            "cell": {
+              "x": 1,
+              "y": 6
+            },
+            "defId": "mage",
+            "hasActed": true,
+            "hasMoved": true,
+            "hp": 7,
+            "id": 3,
+            "side": "player"
+          },
+          {
+            "cell": {
+              "x": 6,
+              "y": 6
+            },
+            "defId": "goblin_grunt",
+            "hasActed": false,
+            "hasMoved": true,
+            "hp": 6,
+            "id": 4,
+            "side": "enemy"
+          },
+          {
+            "cell": {
+              "x": 3,
+              "y": 4
+            },
+            "defId": "goblin_archer",
+            "hasActed": true,
+            "hasMoved": true,
+            "hp": 2,
+            "id": 5,
+            "side": "enemy"
+          },
+          {
+            "cell": {
+              "x": 4,
+              "y": 6
+            },
+            "defId": "goblin_grunt",
+            "hasActed": true,
+            "hasMoved": true,
+            "hp": 3,
+            "id": 6,
+            "side": "enemy"
+          }
+        ],
+        "versions": {
+          "content": "sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450",
+          "rng": 1,
+          "rules": 2
+        }
+      },
+      "commands": [
+        {
+          "type": "endTurn",
+          "unitId": 1
+        },
+        {
+          "type": "useAbility",
+          "unitId": 4,
+          "abilityId": "ability:basic_attack",
+          "target": {
+            "unitId": 1
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 4
+        },
+        {
+          "type": "endTurn",
+          "unitId": 3
+        },
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        },
+        {
+          "type": "move",
+          "unitId": 6,
+          "to": {
+            "x": 2,
+            "y": 6
+          }
+        },
+        {
+          "type": "useAbility",
+          "unitId": 6,
+          "abilityId": "ability:basic_attack",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 6
+        },
+        {
+          "type": "endTurn",
+          "unitId": 2
+        }
+      ],
+      "events": [
+        {
+          "type": "turnEnded",
+          "unitId": 1
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 4,
+          "round": 2
+        },
+        {
+          "type": "abilityUsed",
+          "unitId": 4,
+          "abilityId": "ability:basic_attack",
+          "target": {
+            "unitId": 1
+          }
+        },
+        {
+          "type": "attackRolled",
+          "unitId": 4,
+          "targetId": 1,
+          "natural": 14,
+          "bonus": 4,
+          "total": 18,
+          "armorClass": 16,
+          "result": "hit"
+        },
+        {
+          "type": "damaged",
+          "unitId": 1,
+          "damage": 4,
+          "hp": 10
+        },
+        {
+          "type": "turnEnded",
+          "unitId": 4
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 3,
+          "round": 2
+        },
+        {
+          "type": "turnEnded",
+          "unitId": 3
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 5,
+          "round": 3
+        },
+        {
+          "type": "abilityUsed",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "attackRolled",
+          "unitId": 5,
+          "targetId": 3,
+          "natural": 18,
+          "bonus": 4,
+          "total": 22,
+          "armorClass": 11,
+          "result": "hit"
+        },
+        {
+          "type": "damaged",
+          "unitId": 3,
+          "damage": 4,
+          "hp": 3
+        },
+        {
+          "type": "turnEnded",
+          "unitId": 5
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 6,
+          "round": 3
+        },
+        {
+          "type": "moved",
+          "unitId": 6,
+          "path": [
+            {
+              "x": 4,
+              "y": 6
+            },
+            {
+              "x": 3,
+              "y": 6
+            },
+            {
+              "x": 2,
+              "y": 6
+            }
+          ]
+        },
+        {
+          "type": "abilityUsed",
+          "unitId": 6,
+          "abilityId": "ability:basic_attack",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "attackRolled",
+          "unitId": 6,
+          "targetId": 3,
+          "natural": 9,
+          "bonus": 4,
+          "total": 13,
+          "armorClass": 11,
+          "result": "hit"
+        },
+        {
+          "type": "damaged",
+          "unitId": 3,
+          "damage": 4,
+          "hp": 0
+        },
+        {
+          "type": "defeated",
+          "unitId": 3
+        },
+        {
+          "type": "turnEnded",
+          "unitId": 6
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 2,
+          "round": 3
+        },
+        {
+          "type": "turnEnded",
+          "unitId": 2
+        },
+        {
+          "type": "guardExpired",
+          "unitId": 1
+        },
+        {
+          "type": "turnStarted",
+          "unitId": 1,
+          "round": 3
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "turnEnded",
+        "unitId": 1
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 4,
+        "round": 2
+      },
+      {
+        "type": "abilityUsed",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 1
+        }
+      },
+      {
+        "type": "attackRolled",
+        "unitId": 4,
+        "targetId": 1,
+        "natural": 14,
+        "bonus": 4,
+        "total": 18,
+        "armorClass": 16,
+        "result": "hit"
+      },
+      {
+        "type": "damaged",
+        "unitId": 1,
+        "damage": 4,
+        "hp": 10
+      },
+      {
+        "type": "turnEnded",
+        "unitId": 4
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 3,
+        "round": 2
+      },
+      {
+        "type": "turnEnded",
+        "unitId": 3
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 5,
+        "round": 3
+      },
+      {
+        "type": "abilityUsed",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "attackRolled",
+        "unitId": 5,
+        "targetId": 3,
+        "natural": 18,
+        "bonus": 4,
+        "total": 22,
+        "armorClass": 11,
+        "result": "hit"
+      },
+      {
+        "type": "damaged",
+        "unitId": 3,
+        "damage": 4,
+        "hp": 3
+      },
+      {
+        "type": "turnEnded",
+        "unitId": 5
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 6,
+        "round": 3
+      },
+      {
+        "type": "moved",
+        "unitId": 6,
+        "path": [
+          {
+            "x": 4,
+            "y": 6
+          },
+          {
+            "x": 3,
+            "y": 6
+          },
+          {
+            "x": 2,
+            "y": 6
+          }
+        ]
+      },
+      {
+        "type": "abilityUsed",
+        "unitId": 6,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "attackRolled",
+        "unitId": 6,
+        "targetId": 3,
+        "natural": 9,
+        "bonus": 4,
+        "total": 13,
+        "armorClass": 11,
+        "result": "hit"
+      },
+      {
+        "type": "damaged",
+        "unitId": 3,
+        "damage": 4,
+        "hp": 0
+      },
+      {
+        "type": "defeated",
+        "unitId": 3
+      },
+      {
+        "type": "turnEnded",
+        "unitId": 6
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 2,
+        "round": 3
+      },
+      {
+        "type": "turnEnded",
+        "unitId": 2
+      },
+      {
+        "type": "guardExpired",
+        "unitId": 1
+      },
+      {
+        "type": "turnStarted",
+        "unitId": 1,
+        "round": 3
+      }
+    ],
+    "pending": null,
+    "phase": "player"
+  },
+  "incomingAttacks": 1
+}
