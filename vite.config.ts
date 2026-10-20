@@ -5,6 +5,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
+import { desertAssets } from './src/content/desertAssets.ts';
 
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
@@ -30,7 +31,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values(battleAssets)) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;
@@ -75,11 +76,12 @@ function gamePreloads(): Plugin {
         base,
         battle: dependencies([entry('src/app/startBattleApp.ts'), entry('src/phaser/start.ts')]),
         run: dependencies([entry('src/app/startRunApp.ts')]),
-        images: Object.values(imageUrls).map(path => path.slice(1)),
+        images: Object.values(battleAssets).map(asset => imageUrls[asset.runtimePath].slice(1)),
+        runImages: Object.values(imageUrls).map(path => path.slice(1)),
       };
       // JSON is embedded as script text, never as executable content from a path.
       const data = JSON.stringify(plan).replaceAll('<', '\\u003c');
-      const script = `(()=>{const p=${data},root=new URL(p.base,location.origin).pathname.replace(/\\/$/,""),path=location.pathname.replace(/\\/$/,"");if(path===root+"/map")return;const run=path===root+"/run",route=run?p.run:p.battle,nonce=document.currentScript?.nonce;const add=(file,rel,as)=>{const link=document.createElement("link");link.rel=rel;link.href=p.base+file;if(as!=="image")link.crossOrigin="";if(as)link.as=as;if(nonce)link.nonce=nonce;document.head.appendChild(link)};route.js.forEach(file=>add(file,"modulepreload"));route.css.forEach(file=>add(file,"preload","style"));const scene=new URLSearchParams(location.search).get("scene");if(run||(scene!=="proof"&&scene!=="content-smoke"))p.images.forEach(file=>add(file,"preload","image"))})();`;
+      const script = `(()=>{const p=${data},root=new URL(p.base,location.origin).pathname.replace(/\\/$/,""),path=location.pathname.replace(/\\/$/,"");if(path===root+"/map")return;const run=path===root+"/run",route=run?p.run:p.battle,nonce=document.currentScript?.nonce;const add=(file,rel,as)=>{const link=document.createElement("link");link.rel=rel;link.href=p.base+file;if(as!=="image")link.crossOrigin="";if(as)link.as=as;if(nonce)link.nonce=nonce;document.head.appendChild(link)};route.js.forEach(file=>add(file,"modulepreload"));route.css.forEach(file=>add(file,"preload","style"));const scene=new URLSearchParams(location.search).get("scene");if(run||(scene!=="proof"&&scene!=="content-smoke"))(run?p.runImages:p.images).forEach(file=>add(file,"preload","image"))})();`;
       return [{tag: 'script', attrs: {'data-game-preloads': true, ...(nonce === undefined ? {} : {nonce})}, children: script, injectTo: 'head-prepend'}];
     }},
   };

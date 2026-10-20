@@ -1,6 +1,7 @@
 import { assert, expect, it } from 'vitest';
 import { runCatalog, authoredEncounters, battlefieldEncounters } from '../../src/content/encounters';
 import { validateBattlefield } from '../../src/domain/battlefieldValidation';
+import { createBattle } from '../../src/domain/turns';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 const desertCatalog={...runCatalog,terrains:{...runCatalog.terrains,
  sand:{id:'sand' as const,surfaceAssetId:'asset:terrain_grass' as const,moveCost:1,walkable:true,blocksLineOfSight:false},
@@ -31,4 +32,11 @@ it.each(['cells','plateau','pit','budget','spawn','noAttack','density','raised',
  if(problem==='gateway')map.cells=map.cells.map((c:any)=>c.y===5&&c.x!==5?{...c,terrainId:'rock'}:c);
  const result=validateBattlefield(map,catalog,true);expect(result.ok).toBe(false);
  if(!result.ok){expect(result.errors.length).toBeGreaterThan(0);expect(result.errors.every(e=>typeof e.code==='string'&&typeof e.detail==='string')).toBe(true);}
+});
+
+it('keeps initiative and combat RNG identical to the same seeded authored roster',()=>{
+ const resolved=resolveBattlefield(battlefieldEncounters[0],123,desertCatalog);assert(resolved.ok);
+ const generated=createBattle(resolved.map.id,123,{...desertCatalog,maps:{...desertCatalog.maps,[resolved.map.id]:resolved.map}});
+ const authored=createBattle(authoredEncounters[0].mapId,123,runCatalog);assert(generated.ok);assert(authored.ok);
+ expect(generated.state.rng).toEqual(authored.state.rng);expect(generated.state.initiative).toEqual(authored.state.initiative);
 });

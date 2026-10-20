@@ -27,6 +27,7 @@ test('generated production board picks, moves and resumes the same desert after 
  const session=await readSession(page),actor=session.state.initiative[session.state.activeIndex];
  const reach=previewMovement(session.state,actor,catalog);expect(reach.ok).toBe(true);
  if(!reach.ok)throw Error('Movement unavailable');
+ expect(report.reachable).toEqual(reach.cells.map(c=>c.cell));
  const destination=reach.cells.find(c=>c.cost>0)!;
  await playCommand(page,{type:'move',unitId:actor,to:destination.cell});
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -69,4 +70,14 @@ test('repeated generated restarts keep the static shape cache bounded',async({pa
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  }
  writeFileSync(test.info().outputPath('static-textures.json'),JSON.stringify(captures,null,2));
+});
+
+
+test('missing desert surface fails through the controlled asset error',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/battle/terrain/sand.png',route=>route.abort());
+ await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+ await expect(page.locator('#fit-status')).toContainText('Error: Asset load failed');
+ await expect(page.locator('#game')).toHaveAttribute('data-ready','false');
+ expect(errors).toEqual([]);
 });
