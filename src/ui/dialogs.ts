@@ -6,7 +6,7 @@ export class BattleDialogs {
   private prior:HTMLElement|null=null;
   private choices:readonly DialogChoice[]=[];
   private cancel:(()=>void)|null=null;
-  constructor(private readonly transition:()=>void, private readonly restart:()=>void) {
+  constructor(private readonly transition:()=>void, private readonly restart:()=>void, private readonly fallbackFocus?:()=>void) {
     this.element.id='battle-dialog';this.element.setAttribute('aria-labelledby','battle-dialog-title');
     this.element.setAttribute('aria-describedby','battle-dialog-message');
     this.element.innerHTML='<h2 id="battle-dialog-title"></h2><div id="battle-dialog-message"></div><div class="fit-controls"></div>';
@@ -67,7 +67,8 @@ export class BattleDialogs {
         return;
       }
     }
-    document.querySelector<HTMLElement>('#fit-restart')?.focus();
+    if(this.fallbackFocus)this.fallbackFocus();
+    else document.querySelector<HTMLElement>('#fit-restart')?.focus();
   }
   dispose(){this.abort.abort();this.element.close();this.element.remove();this.choices=[];this.cancel=null;}
 }

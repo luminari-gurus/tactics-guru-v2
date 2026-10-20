@@ -1,5 +1,7 @@
 # Tactics Guru v2
 
+The continuing [dungeon floor mode](docs/dungeon.md) opens at `/dungeon`, also linked from `/run`. It reuses the current three-encounter content per floor, designates the last encounter as the stair guardian, and carries party/items across saved floors and backtracking. The floor summary uses explicit encounter/stair controls; spatial exploration and biome/depth scaling remain later work. `/run` retains the terminal three-battle proof of concept and its existing saves.
+
 The standalone [overworld map prototype](docs/overworld-map.md) opens at `/map` under the configured base path. Choose Rooms (default), Random walker or Cellular caves, and Grassland (default), Forest or Desert. Enter a seed from 0 to 4294967295 and press Generate to reproduce the map; either dropdown applies the displayed valid seed, and New seed retains selections. Each complete world has one cyan player circle and three coral enemy diamonds on distinct walkable cells, with a matching legend and accessible coordinates. Marker positions reproduce from the same layout and seed and survive art switching or late image loads. Invalid seeds or failed placement preserve the previous complete world with explicit feedback. Simple art supports all nine combinations; [terrain, marker and art contracts](docs/overworld-map.md) document the controls and fallback behavior. This inspection prototype uses no movement, battle state or persistence; the normal entry path still opens the battle.
 
 Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Start with the [visual design guide](docs/DESIGN.md) for typography, colors, logo/title-screen direction, and links to the detailed art and interface documents.
@@ -39,7 +41,7 @@ npm run build -- --base=/prototype/
 npm run preview -- --base=/prototype/
 ```
 
-Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` or `/prototype/map` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
+Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` `/prototype/map`, `/prototype/run` or `/prototype/dungeon` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
 
 After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/prototype/ npm test -- tests/public-asset-base.spec.ts`; add `PLAYWRIGHT_SERVER_MODE=dev` to check development instead. Use `/` for root checks. These are shell environment assignments (in PowerShell, set `$env:PLAYWRIGHT_BASE_PATH='/prototype/'` and `$env:PLAYWRIGHT_SERVER_MODE='dev'` before `npm test`). Clear both variables and rebuild at root before running the complete default suite. See [review repair evidence](docs/qa/issue-92-public-asset-base.md).
 

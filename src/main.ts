@@ -1,11 +1,14 @@
 import { mountTelemetryPreferences } from './telemetry/preferences';
 import { startTelemetry } from './telemetry/browser';
 import { reportFailure } from './telemetry/telemetry';
-startTelemetry();
 const basePath = new URL(import.meta.env.BASE_URL, location.origin).pathname.replace(/\/$/, '');
 const path = location.pathname.replace(/\/$/, '');
+// The dungeon has no approved telemetry taxonomy yet; keep collection off on this route.
+if (path !== `${basePath}/dungeon`) startTelemetry();
 try {
-  if (path === `${basePath}/run`) {
+  if (path === `${basePath}/dungeon`) {
+    await import('./app/startDungeonApp');
+  } else if (path === `${basePath}/run`) {
     await import('./app/startRunApp');
   } else if (path === `${basePath}/map`) {
     const { startMap } = await import('./map/view');

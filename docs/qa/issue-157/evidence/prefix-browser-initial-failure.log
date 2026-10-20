@@ -1,0 +1,9 @@
+[WebServer] npm error code ENOENT
+[WebServer] npm error syscall open
+[WebServer] npm error path /private/tmp/package.json
+[WebServer] npm error errno -2
+[WebServer] npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/private/tmp/package.json'
+[WebServer] npm error enoent This is related to npm not being able to find a file.
+[WebServer] npm error enoent
+[WebServer] npm error A complete log of this run can be found in: /Users/brian/.npm/_logs/2026-10-20T17_18_23_177Z-debug-0.log
+Error: Process from config.webServer was not able to start. Exit code: 254

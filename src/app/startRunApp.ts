@@ -30,7 +30,8 @@ const items = document.createElement('div');
 const actions = document.createElement('div');actions.className='run-actions';
 const nav = document.createElement('a');nav.href=import.meta.env.BASE_URL;nav.textContent='Single battle';nav.className='run-entry-link';
 const progress=document.createElement('p');progress.id='run-progress';panel.prepend(progress);
-panel.append(nav);
+const dungeonNav = document.createElement('a'); dungeonNav.href=`${import.meta.env.BASE_URL}dungeon`; dungeonNav.textContent='Dungeon floors'; dungeonNav.className='run-entry-link';
+panel.append(nav, dungeonNav);
 document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
@@ -145,7 +146,7 @@ function render() {
   if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
-  items.replaceChildren(title);actions.append(nav.cloneNode(true));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
+  items.replaceChildren(title);actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
  } else renderActions();
  const title=items.querySelector('h1');if(title)title.setAttribute('tabindex','-1');
 }
@@ -157,7 +158,7 @@ function renderActions() {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
   actions.append(button('Start new run',()=>replace(controller.inspect()),'run-new'));
  }
- actions.append(nav.cloneNode(true));mountTelemetryPreferences(actions);
+ actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true));mountTelemetryPreferences(actions);
 }
 restart.addEventListener('click',requestNew);
 // Repeated activation must not cross replaced controls or trigger another destructive intent.

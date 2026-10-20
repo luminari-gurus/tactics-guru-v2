@@ -1,0 +1,14 @@
+#dungeon-screen { position: fixed; inset: 0; z-index: 2; width: 100%; height: 100dvh; overflow-y: auto; background: #101827; box-sizing: border-box; max-width: 800px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); color: #e6eadc; }
+#dungeon-screen h1 { font-size: clamp(1.4rem, 5vw, 2rem); }
+#dungeon-screen h2 { font-size: 1.15rem; color: #d2c193; }
+#dungeon-screen button, #dungeon-screen select, #dungeon-screen a { min-height: 44px; box-sizing: border-box; }
+#dungeon-screen button { margin: 4px 8px 4px 0; padding: 10px 14px; border: 1px solid #81917d; border-radius: 6px; background: #26382f; color: #fff; font: inherit; cursor: pointer; }
+#dungeon-screen button:disabled { opacity: .5; cursor: default; }
+#dungeon-screen :focus-visible { outline: 3px solid #f4cf70; outline-offset: 3px; }
+#dungeon-screen a { display: inline-flex; align-items: center; margin-right: 18px; color: #d5e7bd; }
+#dungeon-screen svg { display: block; width: min(100%, 320px); height: auto; border: 1px solid #687565; border-radius: 8px; background: #131e1c; }
+#dungeon-screen .dungeon-status { border-left: 3px solid #b2a070; padding: 10px; background: #202b25; overflow-wrap: anywhere; }
+#dungeon-screen section { margin: 18px 0; }
+#dungeon-screen select { max-width: 100%; padding: 8px; margin-right: 8px; background: #1b2823; color: #fff; border: 1px solid #81917d; }
+#dungeon-screen ol { padding-left: 24px; }
+body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
