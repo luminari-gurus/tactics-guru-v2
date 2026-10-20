@@ -74,3 +74,22 @@ original bytes through existing recovery/export controls. No legacy migration,
 map embedding or generator-version retention was added. See
 `docs/battle-save-format.md`, `docs/first-battle-content.md` and
 `docs/grid-movement.md` for the contracts and rollback procedure.
+
+
+## Final performance certification
+
+`performance.json` and `performance-evaluation.json` certify clean runtime
+`6d925b9595888d117ebe4be57df7996a41e0009d`, installed Chrome 155 on the recorded
+Apple M5 Pro host. The collector ran alone after functional testing. All 18
+samples (three repetitions × cold/warm × desktop/portrait/landscape) passed with
+zero capture failures, warnings or budget violations. Maximum cold usable time
+was 729.4 ms; warm 656.8 ms. Maximum cold compressed code was 394,545 bytes and
+cold assets 1,072,666 bytes. The existing frame gates also passed every sample.
+
+Fresh-run measurements use run seed 13 and encounter index 0. The corresponding
+versioned descriptor/layout seed is the seed-13 entry in each static-texture
+receipt. Those receipts also retain the viewport and the next three restart
+seeds; corpus seeds and fixture screenshot names refer to encounter seeds.
+All device profiles are emulation. No deployed or physical-device performance
+claim is made. The only post-certification changes are QA records and checklist
+completion; runtime source hashes are recorded in `manifest.json`.
