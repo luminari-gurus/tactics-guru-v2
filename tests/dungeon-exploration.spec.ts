@@ -112,22 +112,23 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
  }
 });
 
-test('legal guardian journey, next biome, ascent and revisit preserve selected facts and carried party',async({page,isMobile})=>{
- test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const initial=freshDungeon('biome-journey',43),encoded=encodeDungeon(initial);if(!encoded.ok)throw Error(encoded.reason);
+test('legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume',async({page,isMobile})=>{
+ test.setTimeout(600000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ const initial=freshDungeon('biome-journey',198),encoded=encodeDungeon(initial);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
- const receipts:unknown[]=[];
+ const receipts:{depth:number;selection:{biome:string;kind:string}}[]=[];
+ const playFloor=async(depth:number)=>{
  for(let slot=0;slot<3;slot++){
-  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+  if((await dungeonSnapshot(page)).phase==='ready')await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   for(let turn=0;turn<200;turn++){
    await expect.poll(async()=>{const s=await dungeonSnapshot(page);return s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
    const s=await dungeonSnapshot(page);if(s.phase!=='battle')break;
-   const live=await readSession(page),command=playerDecision(live.state,dungeonBattle(s)!.catalog);
+   const live=await readSession(page),command=playerDecision(live.state,dungeonBattle(s)!.catalog,true);
    await playCommand(page,command);
   }
   await expect(page.locator('#dungeon-screen')).toBeVisible();const won=await dungeonSnapshot(page);
-  expect(won.phase).toBe(slot===2?'ready':'reward');expect(won.floors[0].completed).toBe(slot+1);
-  receipts.push(JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!));
+  expect(won.phase).toBe(slot===2?'ready':'reward');expect(won.floors[depth-1].completed).toBe(slot+1);
+  receipts.push({depth,...JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!)});
   // Every choice below is made through the existing confirmed DOM controls.
   for(let i=0;i<20;i++){
    const before=await dungeonSnapshot(page),choice=journeyPreparation(before);if(!choice)break;
@@ -140,23 +141,36 @@ test('legal guardian journey, next biome, ascent and revisit preserve selected f
    await page.locator('#dungeon-item-confirm').click();expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   }
  }
- const clear=await dungeonSnapshot(page),expected=dungeonJourney(43);expect(clear.party).toEqual(expected.state.party);
+ };
+ await playFloor(1);
+ const clear=await dungeonSnapshot(page),expected=dungeonJourney(initial.seed,1,true);expect(clear.party).toEqual(expected.state.party);
  await expect(page.getByText('Guardian defeated. Descent is unlocked.',{exact:true})).toBeVisible();
  await page.screenshot({path:test.info().outputPath('legal-guardian-cleared.png'),fullPage:true});
  await walkDungeon(page,clear.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');const departed=await dungeonSnapshot(page);
- await page.locator('#dungeon-descend').click();const second=await dungeonSnapshot(page);expect(second.depth).toBe(2);expect(second.floors[1].descriptor.biome).toBe('forest-v1');expect(second.party).toEqual(clear.party);expect(second.ownership).toEqual(clear.ownership);
- await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome','forest');await page.locator('#dungeon-screen').evaluate(n=>n.scrollTop=0);await page.screenshot({path:test.info().outputPath('legal-next-biome.png'),fullPage:true});
+ await page.locator('#dungeon-descend').click();const second=await dungeonSnapshot(page);expect(second.depth).toBe(2);expect(second.floors[1].descriptor.biome).toBe('desert-v1');expect(second.party).toEqual(clear.party);expect(second.ownership).toEqual(clear.ownership);
+ await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome','desert');await page.locator('#dungeon-screen').evaluate(n=>n.scrollTop=0);await page.screenshot({path:test.info().outputPath('legal-next-biome.png'),fullPage:true});
  const f=second.floors[1],map=generateMap(f.descriptor.seed,'rooms'),adjacent=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await walkDungeon(page,f.descriptor.upstairs,isMobile?'touch':'keyboard');const explored=await dungeonSnapshot(page);
  await page.locator('#dungeon-ascend').click();const back=await dungeonSnapshot(page);expect(back.floors[0]).toEqual(departed.floors[0]);expect(back.floors[0].completed).toBe(3);expect(back.ownership).toEqual(clear.ownership);
  await page.locator('#dungeon-descend').click();expect((await dungeonSnapshot(page)).floors).toEqual(explored.floors);
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect((await dungeonSnapshot(page)).floors).toEqual(explored.floors);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const entry=await dungeonSnapshot(page),live=await readSession(page);expect(live.state.units.some(u=>u.defId==='mage')).toBe(false);
- await expect(page.locator('#battle-heading h1')).toContainText('Forest · Normal encounter 1');
- await playCommand(page,playerDecision(live.state,dungeonBattle(entry)!.catalog));await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=await dungeonSnapshot(page);
+ const entry=await dungeonSnapshot(page),live=await readSession(page);
+ expect(live.state.units.filter(u=>u.side==='player').map(u=>u.defId).sort()).toEqual(entry.party.filter(h=>h.hp>0).map(h=>h.heroId).sort());
+ await expect(page.locator('#battle-heading h1')).toContainText('Desert · Normal encounter 1');
+ await playCommand(page,playerDecision(live.state,dungeonBattle(entry)!.catalog,true));await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=await dungeonSnapshot(page);
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(await dungeonSnapshot(page)).toEqual(saved);
- writeFileSync(test.info().outputPath('legal-multi-floor-journey.json'),JSON.stringify({initial,receipts,clear,departed,second,explored,back,saved},null,2));expect(errors).toEqual([]);
+ await playFloor(2);
+ const final=await dungeonSnapshot(page),twoFloors=dungeonJourney(initial.seed,2,true);expect(twoFloors.won).toBe(true);
+ expect(final.party).toEqual(twoFloors.state.party);expect(final.ownership).toEqual(twoFloors.state.ownership);
+ expect(final.floors.map(f=>f.completed)).toEqual([3,3]);expect(receipts).toHaveLength(6);
+ expect([...new Set(receipts.map(r=>r.selection.biome))].sort()).toEqual(['desert','forest']);
+ expect([...new Set(receipts.map(r=>r.selection.kind))].sort()).toEqual(['boss','elite','normal','vault']);
+ await expect(page.getByText('Guardian defeated. Descent is unlocked.',{exact:true})).toBeVisible();
+ await page.locator('#dungeon-screen').evaluate(n=>n.scrollTop=0);
+ await page.screenshot({path:test.info().outputPath('legal-second-guardian-cleared.png'),fullPage:true});
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await dungeonSnapshot(page)).toEqual(final);
+ writeFileSync(test.info().outputPath('legal-multi-floor-journey.json'),JSON.stringify({initial,receipts,clear,departed,second,explored,back,saved,final},null,2));expect(errors).toEqual([]);
 });
 
  test('exploration cells stay square across viewport sizes and art styles',async({page})=>{
