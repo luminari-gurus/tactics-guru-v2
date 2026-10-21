@@ -49,6 +49,22 @@ test('v1 Continue preserves raw bytes until a format-3 spatial save',async({page
  const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);expect(JSON.parse(saved!).format).toBe(3);
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect((await dungeonSnapshot(page)).floors[0].position).toBe(n);
 });
+test('cold format-3 Continue retains a long saved history within the startup budget',async({page})=>{
+ const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
+  const descriptor=floorDescriptor(base.seed,i+1);
+  return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
+ });
+ const encoded=encodeDungeon({...base,depth:250,floors});if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const begin=Date.now();await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();const coldUsableMs=Date.now()-begin;
+ expect(coldUsableMs).toBeLessThanOrEqual(2500);
+ const state=await dungeonSnapshot(page);expect(state.depth).toBe(250);expect(state.floors).toHaveLength(250);
+ expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(encoded.text);
+ writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(encoded.text),coldUsableMs,budgetMs:2500,rawRetained:true}));
+ await page.screenshot({path:test.info().outputPath('cold-current-history.png')});
+});
+
 test('map input stays inert while hidden and retains discovery through resize and failed art',async({page})=>{
  await page.route('**/map-art/**',route=>route.abort());await page.goto('dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
  const before=await dungeonSnapshot(page);await page.locator('#dungeon-art').selectOption('legacy-8bit');await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');expect(await dungeonSnapshot(page)).toEqual(before);
