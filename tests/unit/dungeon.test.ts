@@ -1,6 +1,6 @@
 import { atEncounter, atDownstairs } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
@@ -13,6 +13,7 @@ import { dispatch } from '../../src/domain/turns';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import { dungeonEncounterCatalog, dungeonBattleCatalog } from '../../src/content/dungeonEncounters';
 import { resolveBattlefield } from '../../src/domain/battlefield';
+import * as battlefields from '../../src/domain/battlefield';
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
 function win(s: DungeonState) {
@@ -159,6 +160,17 @@ describe('dungeon recovery limits',()=>{
 });
 
 describe('durable encounter policies', () => {
+  it('reuses admitted facts across a long retained floor history', () => {
+    const base=fresh(),floors=Array.from({length:44},(_,i)=>{
+      const descriptor=floorDescriptor(base.seed,i+1);
+      return {descriptor,completed:3,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs)};
+    });
+    const state={...base,depth:44,floors};
+    good(readDungeon(state));
+    const resolver=vi.spyOn(battlefields,'resolveBattlefield');
+    try {good(readDungeon(state));expect(resolver.mock.calls.length).toBeLessThan(10);}
+    finally {resolver.mockRestore();}
+  },15000);
   it('resolves saved admitted definitions without selecting a map again', () => {
     let base = freshDungeon('saved-choice', 0);
     for (let seed = 1; base.floors[0].descriptor.biome !== 'forest-v1'; seed++) base = freshDungeon('saved-choice', seed);
