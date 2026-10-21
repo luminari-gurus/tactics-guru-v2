@@ -11,8 +11,8 @@ if (forwarded.some(arg => /^--(output|reporter|trace|retries)(=|$)/.test(arg))) 
   console.error('This wrapper owns output/reporter/trace/retries. Use --diagnostics for failure traces, or the Playwright CLI directly.');
   process.exit(2);
 }
-mkdirSync('test-results/browser-runs', { recursive: true });
-const directory = resolve(mkdtempSync('test-results/browser-runs/run-'));
+mkdirSync('verification-receipts/browser-runs', { recursive: true });
+const directory = resolve(mkdtempSync('verification-receipts/browser-runs/run-'));
 console.log(`Browser receipts: ${directory}`);
 const require = createRequire(import.meta.url);
 const result = spawnSync(process.execPath, [require.resolve('@playwright/test/cli'), 'test', ...forwarded,

@@ -22,7 +22,7 @@ do not disable package-manager security or treat missing libraries as test skips
 See [Playwright browsers](https://playwright.dev/docs/browsers).
 
 `check:browsers` independently launches Chromium and WebKit, renders a page, and
-writes a unique ignored `test-results/browser-environment/run-*/environment.json`.
+writes a unique ignored `verification-receipts/browser-environment/run-*/environment.json`.
 It records the commit, Node/Playwright/OS versions, resolved executable paths,
 actual launched browser versions and launch failures. A failed engine makes the
 command fail. This is only environment qualification; the two-engine smoke test
@@ -46,9 +46,12 @@ npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser 
 npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
 ```
 
-Each invocation gets a unique directory under `test-results/browser-runs/` with
+Each invocation gets a unique directory under `verification-receipts/browser-runs/` with
 `results.json` and per-test `artifacts/`. A subsequent run cannot erase those
-receipts. The wrapper preserves failure exit codes, forces zero retries, and
+receipts. This root is outside Playwright's disposable `test-results/`, so ordinary
+`npm test` and direct Playwright runs do not clear it. Retain or prune receipts
+explicitly after review; unique paths do not protect them from checkout cleanup
+or manual deletion on persistent runners. The wrapper preserves failure exit codes, forces zero retries, and
 leaves tracing off by default. `--diagnostics` enables `retain-on-failure` for
 that focused run: successful traces are discarded, failed traces remain.
 Trace collection still adds overhead while the test runs; traced runs are not
@@ -71,7 +74,7 @@ CLI for other custom reporting workflows. Existing `npm test` behavior is unchan
    paths, for example:
 
    ```sh
-   PLAYWRIGHT_JSON_OUTPUT_FILE=test-results/base-case/results.json npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=test-results/base-case/artifacts
+   PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/base-case/results.json npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=verification-receipts/base-case/artifacts
    ```
 
 4. Keep the original failure. If needed, repeat only that case with

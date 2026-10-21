@@ -6,8 +6,8 @@ import { platform, release, arch } from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
-await mkdir('test-results/browser-environment', { recursive: true });
-const directory = await mkdtemp('test-results/browser-environment/run-');
+await mkdir('verification-receipts/browser-environment', { recursive: true });
+const directory = await mkdtemp('verification-receipts/browser-environment/run-');
 const report = {
   createdAt: new Date().toISOString(),
   commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),

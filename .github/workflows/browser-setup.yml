@@ -29,6 +29,8 @@ jobs:
         if: always()
         with:
           name: browser-setup-${{ github.run_id }}-${{ github.run_attempt }}
-          path: test-results/
+          path: |
+            verification-receipts/
+            test-results/
           retention-days: 7
           if-no-files-found: ignore
