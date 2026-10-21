@@ -58,3 +58,11 @@ Every #162 criterion is mapped in the approved design and covered by the impleme
 Delivery remains a draft PR with `Refs #162`: the full configured browser gate retains the three #190 desktop failures. Their tests are unchanged and require separate repair/qualification. The issue is not auto-closed. No new failures from this implementation remain after the targeted rerun. Existing build warnings are retained. No merge, production activation or OpenSpec archive is performed.
 
 Published draft PR: https://github.com/luminari-gurus/tactics-guru-v2/pull/211. Runtime/test delivery revision: `b5e80c2f2e7f3e8f5407a0ca11f7c7df0313dbbe`; subsequent closeout changes only documentation/task state. Runtime receipt verification matches all 103 retained source files.
+
+## Merge resolution against main 5704e76
+
+Merged current main into the PR branch. The only textual conflict was package.json: retained both main’s dungeon encounter validation and this PR’s ability-picker posttest. Automatic merges retain main’s Chromium channel setting and restart-wait repairs alongside this PR’s explicit command fixture. Added the ability-picker suite to the newly merged verification inventory. The six feature runtime files are byte-identical to the pre-merge PR head.
+
+Fresh bounded merge verification: 93 focused units passed; build passed 221 content checks, both TypeScript scopes and Vite; 27 production browser cases passed across desktop/portrait/landscape (all three signatures, restart/cancellation, and standalone/run/dungeon Guarded); all 12 ability-picker browser cases passed. Discovery confirms all three fixture configs remain selectable (24 encounter, 21 item and 12 ability cases). Strict OpenSpec and whitespace checks pass. Raw logs, host/config inputs and source hashes are in merge-main-receipt.json and merge-main-*.log.gz.
+
+These checks ran on the dirty merged source before the merge commit; the prior complete browser run and its #190 disposition are historical evidence, not a fresh full-suite result. No full matrix, WebKit rerun or physical-device test is claimed for this package-script merge. PR #211 remains ready for review under the caller’s instruction; it is not merged or deployed.
