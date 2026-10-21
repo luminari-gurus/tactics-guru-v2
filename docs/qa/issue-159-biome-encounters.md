@@ -1,6 +1,6 @@
 # Issue #159 biome encounter acceptance
 
-Date: 2026-10-21, Asia/Jerusalem. Status: Chromium desktop/portrait/landscape acceptance complete; WebKit/full-suite checks in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
+Date: 2026-10-21, Asia/Jerusalem. Status: Chromium and WebKit desktop/portrait/landscape matrices complete; narrow rechecks and full application suite in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
 
 ## Implementation and source
 
@@ -44,6 +44,8 @@ No new production asset or library is loaded by this feature. Existing standalon
 
 [Chromium portrait](issue-159-biome-encounters/chromium-portrait-performance.json) and [landscape](issue-159-biome-encounters/chromium-landscape-performance.json) retain exact build, viewport and browser metadata. All byte/latency/frame flags pass: 398,317 code bytes, 4.0/5.8 ms p95 saved steps, 37.1/41.1 ms floor creation, 3,525-byte descriptors and 4,472-byte saves. These receipts identify runtime `ac7fc9d` and its dirty flag; subsequent changes affect tests/docs only. The build's dirty state is disclosed, not presented as a clean exact-head certification.
 
+The focused WebKit configuration passed **45/45**, including the legal journey on desktop, iPhone portrait and landscape. [Desktop](issue-159-biome-encounters/webkit-desktop-performance.json), [portrait](issue-159-biome-encounters/webkit-portrait-performance.json) and [landscape](issue-159-biome-encounters/webkit-landscape-performance.json) performance receipts all pass their unchanged flags: 334–355 ms cold usable, 9–10 ms p95 saved step, 33–37 ms floor creation and 398,330 code bytes. The historical WebKit idle observation did not reproduce on this host across this matrix. The [portrait next-floor view](issue-159-biome-encounters/portrait-next-biome.png) was inspected with heading/map framing corrected; no game state changed to capture it.
+
 ## Remaining qualification
 
-Complete the focused WebKit configuration, the full `npm test` with encounter/item posttests, the final unit/build/spec checks and final receipt/screenshot retention. Record actual failures and their repairs here; do not turn the earlier #158 WebKit idle observation or #190 macOS native-select report into unverified current-host baselines. No merge or production deployment is part of this delivery.
+Complete explicit narrow/short kind rechecks, the full `npm test` with encounter/item posttests and final spec/receipt/publication checks. The 879-unit/content/type/build checks are already green and remain reusable while runtime code is unchanged. Record actual failures and their repairs here; do not turn #190's macOS native-select report into an unverified current-host baseline. No merge or production deployment is part of this delivery.
