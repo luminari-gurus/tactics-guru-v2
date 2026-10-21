@@ -8,7 +8,7 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
-  // Encounter and run-item fixtures are Vite source entries, verified by dev-only posttests.
+  // Source-entry fixtures run under the explicit test:fixtures dev-server command.
   testIgnore: ['**/telemetry.spec.ts', '**/ability-picker.spec.ts', '**/authored-encounters.spec.ts', '**/run-items.spec.ts'],
   // Phaser renderers share the host GPU; serialize to avoid headless boot contention.
   workers: 1,

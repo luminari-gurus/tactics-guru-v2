@@ -1,6 +1,7 @@
 # Verification tiers and evidence reuse
 
-This is the selection contract for #201. Select checks by the behavior and
+This is the selection contract from #201, with explicit commands added by #202.
+Select checks by the behavior and
 consumers affected, not by a dependency version, lockfile edit or merge step alone.
 The inventory below does not change scripts, assertions, retries, timeouts or
 performance limits. Re-inventory when tests/configurations change.
@@ -104,9 +105,9 @@ PR readiness selects the applicable rows under the change matrix.
 | App and domain type boundaries | `npm run typecheck` | Both tsconfig scopes; also part of standalone build. |
 | Production build | `npm run build` | Content validation, both typechecks, Vite. #206 owns removing duplicate work; do not bypass checks ad hoc. |
 | Default Chromium | `npx --no-install playwright test` | All default files listed below, desktop + mobile portrait/landscape. The dev-only placement case skips in preview and must run separately. |
-| Authored encounter fixtures | `npx --no-install playwright test -c playwright.encounters.config.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
-| Ability-picker fixtures | `npx --no-install playwright test -c playwright.abilities.config.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
-| Run-item fixtures | `npx --no-install playwright test -c playwright.run-items.config.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
+| Authored encounter fixtures | `npm run test:fixtures -- authored-encounters.spec.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
+| Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
+| Run-item fixtures | `npm run test:fixtures -- run-items.spec.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
 | Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
 | WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression and audio cases, iPhone portrait/landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
@@ -145,14 +146,42 @@ npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots 
 npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --list
 ```
 
-`npm test -- <filters>` currently runs implicit `posttest` after a successful main
-command; those fixtures do not inherit the focused filters. Use direct Playwright
-for isolated feedback until #202 replaces that lifecycle. `npm test` alone is not
-full regression: WebKit, dev placement and telemetry are separate. For a full
-verification, run each required suite even if an earlier suite fails, record each
-exit code, and return nonzero if any required suite fails. Do not use an `&&` chain
-to claim complete suite accounting. An invalid/missing production build blocks
-its dependent suites explicitly; it must not be replaced by stale output.
+`npm test -- <filters>` forwards file, project and grep filters directly to
+Playwright with no lifecycle posttests. `npm run test:fixtures -- <filters>` does
+the same for the dev fixtures. Without filters, `test:fixtures` runs authored
+encounters, run items and ability-picker fixtures under one dev-server lifecycle, preserving all three
+projects and assertions. The old individual config entry points remain supported.
+`npm test` alone is still not full regression.
+
+### Explicit full verification
+
+`npm run verify:full` executes the complete inventory sequentially: tooling,
+units, safe standalone root build (content plus both typechecks), default Chromium,
+combined fixtures, dev placement, both WebKit configs, health bars, production and
+dev telemetry, root dev assets, isolated performance capture, prefix build/assets
+in preview and dev, then root-build restoration. Root preview assets already run
+in the default Chromium suite. Duplicate validation remains until #206.
+`npm run verify:full -- --list` displays the stage plan without executing it.
+Aggregate filters are rejected; use the focused commands instead.
+
+Each stage gets its own log, browser JSON report and artifact directory under
+`tmp/verification/full-<timestamp>-<pid>/`. `summary.json` is updated after every
+stage with commands, exit status, failures or blocked prerequisites. The runner
+continues independent suites after failure and exits nonzero for any failed or
+blocked stage. A failed build blocks its preview/performance consumers instead
+of testing stale output; dev fixtures and independent telemetry builds still run.
+A shared fixture invocation has no fail-fast limit, so an encounter assertion
+failure does not suppress run-item or ability-picker execution. A server/engine startup failure
+can still prevent cases from executing and must be reported as incomplete.
+
+The full command clears inherited server/base/telemetry mode flags and isolates
+report output while retaining explicit browser executable selection. Run it via
+npm on qualified, otherwise idle self-hosted capacity; it does not provision a
+browser, dispatch CI or use GitHub-hosted capacity. See #207 for qualification.
+Do not invoke it for ordinary focused edits solely to exercise the orchestrator;
+use `npm run test:verification`, discovery comparisons and affected browser suites.
+It is an execution command, not automatic acceptance of its reports: retain all
+skips, engine/mode limits and performance findings under the policy above.
 
 Root preview uses the ordinary build. For prefix checks:
 
@@ -224,8 +253,11 @@ unaffected passing suites. Keep failures and incomplete runs explicit.
 
 ## Execution capacity and follow-up work
 
-Browser CI uses Brian's self-hosted runner, with no automatic GitHub-hosted
-fallback. Qualify the actual host under #207 before #200's baseline. Start with
+Browser CI targets Brian's self-hosted runner, with no automatic GitHub-hosted
+fallback. On 2026-10-21 the caller explicitly authorized temporary GitHub-hosted
+execution for PR #214. `issue-202-verification.yml` is scoped to that PR, uses one
+Ubuntu job and retains browser reports; migrate to qualified self-hosted capacity
+later. This exception does not reroute #200/#207 or enable general hosted CI. Qualify the actual host under #207 before #200's baseline. Start with
 one browser job at a time, `workers: 1`, and idle unrelated host workloads for
 performance captures. Use the shared `tactics-browser-exclusive` concurrency group
 when adding workflows on that runner; other repositories/host workloads require
@@ -233,7 +265,7 @@ separate coordination. Multiple agents/containers sharing one GPU are not isolat
 capacity. #208 sizes shards from measured available hosts and reports queue/setup
 as well as execution time. No hosted workflow is introduced by this policy.
 
-#200 supplies timing/provenance tooling; #202 implements explicit fixture/full
-commands; #203 changes the matrix; #204/#205 reduce repeated setup; #206 removes
+#202 supplies explicit fixture/full commands. #200 supplies timing/provenance
+tooling; #203 changes the matrix; #204/#205 reduce repeated setup; #206 removes
 duplicate build validation. Until merged, those proposed commands/optimizations
 are not available and their benefits must not be claimed.
