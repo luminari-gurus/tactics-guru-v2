@@ -141,7 +141,7 @@ test('legal guardian journey, next biome, ascent and revisit preserve selected f
  await page.screenshot({path:test.info().outputPath('legal-guardian-cleared.png'),fullPage:true});
  await walkDungeon(page,clear.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');const departed=await dungeonSnapshot(page);
  await page.locator('#dungeon-descend').click();const second=await dungeonSnapshot(page);expect(second.depth).toBe(2);expect(second.floors[1].descriptor.biome).toBe('forest-v1');expect(second.party).toEqual(clear.party);expect(second.ownership).toEqual(clear.ownership);
- await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome','forest');await page.screenshot({path:test.info().outputPath('legal-next-biome.png'),fullPage:true});
+ await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome','forest');await page.locator('#dungeon-screen').evaluate(n=>n.scrollTop=0);await page.screenshot({path:test.info().outputPath('legal-next-biome.png'),fullPage:true});
  const f=second.floors[1],map=generateMap(f.descriptor.seed,'rooms'),adjacent=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await walkDungeon(page,f.descriptor.upstairs,isMobile?'touch':'keyboard');const explored=await dungeonSnapshot(page);
  await page.locator('#dungeon-ascend').click();const back=await dungeonSnapshot(page);expect(back.floors[0]).toEqual(departed.floors[0]);expect(back.floors[0].completed).toBe(3);expect(back.ownership).toEqual(clear.ownership);
