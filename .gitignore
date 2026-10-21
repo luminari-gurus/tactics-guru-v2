@@ -6,6 +6,7 @@ coverage/
 *.tsbuildinfo
 playwright-report/
 test-results/
+test-results-webkit/
 
 # Local environment (examples may be committed)
 .env

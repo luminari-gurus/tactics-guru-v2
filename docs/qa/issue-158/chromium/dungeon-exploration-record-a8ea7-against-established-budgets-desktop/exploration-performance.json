@@ -1,0 +1,268 @@
+{
+  "frames": {
+    "idle": [
+      16.599999999999994,
+      16.80000000000001,
+      16.599999999999966,
+      16.700000000000045,
+      16.599999999999966,
+      16.69999999999999,
+      16.600000000000023,
+      16.69999999999999,
+      16.69999999999999,
+      16.700000000000045,
+      16.599999999999966,
+      16.600000000000023,
+      16.80000000000001,
+      16.599999999999966,
+      16.69999999999999,
+      16.700000000000045,
+      16.599999999999966,
+      16.69999999999999,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932,
+      16.600000000000023,
+      16.799999999999955,
+      16.600000000000023,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932
+    ],
+    "steps": [
+      16.600000000000023,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932,
+      16.700000000000045,
+      16.600000000000023,
+      16.699999999999932,
+      16.699999999999932,
+      16.600000000000136,
+      16.700000000000045,
+      16.699999999999818,
+      16.600000000000136,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045
+    ],
+    "idleP50": 16.699999999999932,
+    "idleP95": 16.80000000000001,
+    "stepP95": 16.700000000000045
+  },
+  "frameBudgets": {
+    "idleP50": 16.7,
+    "idleP95": 20,
+    "stepP95": 33.4
+  },
+  "framePasses": {
+    "idleP50": true,
+    "idleP95": true,
+    "stepP95": true
+  },
+  "commit": null,
+  "coldUsableMs": 83,
+  "stepP95Ms": 1.7999999523162842,
+  "codeGzipBytes": 394035,
+  "observedAssetBytes": 683,
+  "budgets": {
+    "coldUsableMs": 2500,
+    "stepP95Ms": 33.4,
+    "codeGzipBytes": 400000,
+    "assetBytes": 1500000
+  },
+  "passes": {
+    "cold": true,
+    "step": true,
+    "code": true,
+    "assets": true
+  },
+  "code": [
+    {
+      "url": "/assets/telemetry-DUsjSLnt.js",
+      "raw": 454,
+      "gzip": 243
+    },
+    {
+      "url": "/assets/index-zuvg3fiB.js",
+      "raw": 2392,
+      "gzip": 1113
+    },
+    {
+      "url": "/assets/preferences-D1bXSLXU.css",
+      "raw": 719,
+      "gzip": 355
+    },
+    {
+      "url": "/assets/preload-helper-DjzSQ1t3.js",
+      "raw": 1383,
+      "gzip": 751
+    },
+    {
+      "url": "/assets/preferences-tBHppMR4.js",
+      "raw": 5454,
+      "gzip": 2464
+    },
+    {
+      "url": "/assets/startDungeonApp-DkfWCiku.js",
+      "raw": 33599,
+      "gzip": 11303
+    },
+    {
+      "url": "/assets/browser-DgZMJAiq.js",
+      "raw": 3264,
+      "gzip": 1375
+    },
+    {
+      "url": "/assets/rng-CkITdvgm.js",
+      "raw": 1651,
+      "gzip": 789
+    },
+    {
+      "url": "/assets/start-Uhd1A-ze.js",
+      "raw": 1427482,
+      "gzip": 367023
+    },
+    {
+      "url": "/assets/battleLayout-BVayxngr.js",
+      "raw": 559,
+      "gzip": 313
+    },
+    {
+      "url": "/assets/battleLayout-C6wfuIJB.css",
+      "raw": 10757,
+      "gzip": 2692
+    },
+    {
+      "url": "/assets/startDungeonApp-DS_JL_Ho.css",
+      "raw": 2229,
+      "gzip": 891
+    },
+    {
+      "url": "/assets/art-C-F7b4t2.js",
+      "raw": 3667,
+      "gzip": 1647
+    },
+    {
+      "url": "/assets/items-O_3uO4Gv.js",
+      "raw": 8321,
+      "gzip": 3076
+    }
+  ],
+  "timings": [
+    1,
+    1,
+    1,
+    1.0999999046325684,
+    1.100000023841858,
+    1.100000023841858,
+    1.100000023841858,
+    1.1999999284744263,
+    1.2000000476837158,
+    1.2000000476837158,
+    1.2000000476837158,
+    1.2999999523162842,
+    1.2999999523162842,
+    1.2999999523162842,
+    1.3000000715255737,
+    1.399999976158142,
+    1.600000023841858,
+    1.600000023841858,
+    1.7999999523162842,
+    2.0999999046325684
+  ],
+  "resources": [
+    {
+      "name": "http://127.0.0.1:4173/assets/telemetry-DUsjSLnt.js",
+      "encodedBodySize": 454
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/index-zuvg3fiB.js",
+      "encodedBodySize": 1113
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-D1bXSLXU.css",
+      "encodedBodySize": 719
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preload-helper-DjzSQ1t3.js",
+      "encodedBodySize": 751
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-tBHppMR4.js",
+      "encodedBodySize": 2464
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-DkfWCiku.js",
+      "encodedBodySize": 11303
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/browser-DgZMJAiq.js",
+      "encodedBodySize": 1375
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/rng-CkITdvgm.js",
+      "encodedBodySize": 789
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/start-Uhd1A-ze.js",
+      "encodedBodySize": 367023
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-BVayxngr.js",
+      "encodedBodySize": 559
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-C6wfuIJB.css",
+      "encodedBodySize": 2692
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-DS_JL_Ho.css",
+      "encodedBodySize": 891
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/art-C-F7b4t2.js",
+      "encodedBodySize": 1647
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/items-O_3uO4Gv.js",
+      "encodedBodySize": 3076
+    },
+    {
+      "name": "http://127.0.0.1:4173/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+      "encodedBodySize": 406
+    },
+    {
+      "name": "http://127.0.0.1:4173/map-art/legacy-8bit/00_terrain_grass_plains.png",
+      "encodedBodySize": 277
+    }
+  ]
+}

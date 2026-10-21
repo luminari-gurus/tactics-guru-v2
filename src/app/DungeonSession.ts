@@ -1,5 +1,5 @@
 import { BattleSession } from './BattleSession';
-import { acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
+import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
 import { createDungeonStorage, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 export class DungeonSession {
@@ -36,12 +36,25 @@ export class DungeonSession {
     this.battle?.dispose(); this.battle = null; this.current = candidate.state; this.review = null;
     this.report('Travel saved on this device'); return true;
   }
+  private publishSpatial(candidate: ReturnType<typeof stepDungeon>) {
+    if (!candidate.ok) { this.report(`Movement refused: ${{blockedStep:'Choose an adjacent walkable cell',staleBoundary:'The floor changed; choose again',wrongPhase:'Finish the current encounter or reward first',remoteEncounter:'Walk onto the available encounter marker',resourceLimit:'Progress has reached a storage or counter limit'}[candidate.reason] ?? 'This step is unavailable'}. Nothing changed.`); return false; }
+    if (!this.unsaved) {
+      const saved = this.storage.save(candidate.state);
+      if (!saved.ok) { this.report(`Movement not published: ${saved.reason}. Open Save recovery to retry or export.`); return false; }
+    }
+    this.battle?.dispose(); this.battle = null; this.current = candidate.state; this.review = null;
+    this.report(this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' : 'Exploration saved on this device');
+    return true;
+  }
+  step(command: ExplorationCommand) {
+    if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;
+    return this.publishSpatial(stepDungeon(this.current, command));
+  }
   startEncounter() {
     if (this.disposed) return null;
     if (this.battle && !['ended','disposed'].includes(this.battle.phase)) return this.battle;
     if (this.current.phase === 'ready') {
-      const next = startDungeonBattle(this.current); if (!next.ok) { this.report(next.reason); return null; }
-      this.current = next.state;
+      if (!this.publishSpatial(startDungeonBattle(this.current))) return null;
     }
     if (this.current.phase !== 'battle' || !this.current.activeBattle) return null;
     const entry = this.snapshot, source = dungeonBattle(entry); if (!source) return null;
@@ -59,7 +72,7 @@ export class DungeonSession {
       entry.activeBattle!.commandCount === 0, source.battlefield);
     this.battle = session;
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
-    this.save(); return session;
+    return session;
   }
   dispatch(command: DungeonItemCommand) {
     if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;

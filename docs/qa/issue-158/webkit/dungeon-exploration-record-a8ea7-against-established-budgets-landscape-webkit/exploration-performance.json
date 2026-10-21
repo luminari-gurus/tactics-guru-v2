@@ -1,0 +1,268 @@
+{
+  "frames": {
+    "idle": [
+      17,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      15,
+      18,
+      15,
+      18,
+      17,
+      17,
+      23,
+      9,
+      18,
+      16,
+      17,
+      16,
+      17,
+      17,
+      17
+    ],
+    "steps": [
+      17,
+      16,
+      17,
+      17,
+      18,
+      15,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      16,
+      17,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      16,
+      17,
+      17,
+      15,
+      18
+    ],
+    "idleP50": 17,
+    "idleP95": 18,
+    "stepP95": 17
+  },
+  "frameBudgets": {
+    "idleP50": 16.7,
+    "idleP95": 20,
+    "stepP95": 33.4
+  },
+  "framePasses": {
+    "idleP50": false,
+    "idleP95": true,
+    "stepP95": true
+  },
+  "commit": null,
+  "coldUsableMs": 86,
+  "stepP95Ms": 2,
+  "codeGzipBytes": 394035,
+  "observedAssetBytes": 683,
+  "budgets": {
+    "coldUsableMs": 2500,
+    "stepP95Ms": 33.4,
+    "codeGzipBytes": 400000,
+    "assetBytes": 1500000
+  },
+  "passes": {
+    "cold": true,
+    "step": true,
+    "code": true,
+    "assets": true
+  },
+  "code": [
+    {
+      "url": "/assets/index-zuvg3fiB.js",
+      "raw": 2392,
+      "gzip": 1113
+    },
+    {
+      "url": "/assets/telemetry-DUsjSLnt.js",
+      "raw": 454,
+      "gzip": 243
+    },
+    {
+      "url": "/assets/preferences-D1bXSLXU.css",
+      "raw": 719,
+      "gzip": 355
+    },
+    {
+      "url": "/assets/preload-helper-DjzSQ1t3.js",
+      "raw": 1383,
+      "gzip": 751
+    },
+    {
+      "url": "/assets/preferences-tBHppMR4.js",
+      "raw": 5454,
+      "gzip": 2464
+    },
+    {
+      "url": "/assets/startDungeonApp-DkfWCiku.js",
+      "raw": 33599,
+      "gzip": 11303
+    },
+    {
+      "url": "/assets/browser-DgZMJAiq.js",
+      "raw": 3264,
+      "gzip": 1375
+    },
+    {
+      "url": "/assets/rng-CkITdvgm.js",
+      "raw": 1651,
+      "gzip": 789
+    },
+    {
+      "url": "/assets/battleLayout-BVayxngr.js",
+      "raw": 559,
+      "gzip": 313
+    },
+    {
+      "url": "/assets/art-C-F7b4t2.js",
+      "raw": 3667,
+      "gzip": 1647
+    },
+    {
+      "url": "/assets/items-O_3uO4Gv.js",
+      "raw": 8321,
+      "gzip": 3076
+    },
+    {
+      "url": "/assets/startDungeonApp-DS_JL_Ho.css",
+      "raw": 2229,
+      "gzip": 891
+    },
+    {
+      "url": "/assets/battleLayout-C6wfuIJB.css",
+      "raw": 10757,
+      "gzip": 2692
+    },
+    {
+      "url": "/assets/start-Uhd1A-ze.js",
+      "raw": 1427482,
+      "gzip": 367023
+    }
+  ],
+  "timings": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "resources": [
+    {
+      "name": "http://127.0.0.1:4173/assets/index-zuvg3fiB.js",
+      "encodedBodySize": 1130
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/telemetry-DUsjSLnt.js",
+      "encodedBodySize": 454
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-D1bXSLXU.css",
+      "encodedBodySize": 719
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preload-helper-DjzSQ1t3.js",
+      "encodedBodySize": 768
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-tBHppMR4.js",
+      "encodedBodySize": 2481
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-DkfWCiku.js",
+      "encodedBodySize": 11321
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/browser-DgZMJAiq.js",
+      "encodedBodySize": 1392
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/rng-CkITdvgm.js",
+      "encodedBodySize": 806
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-BVayxngr.js",
+      "encodedBodySize": 559
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/art-C-F7b4t2.js",
+      "encodedBodySize": 1664
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/items-O_3uO4Gv.js",
+      "encodedBodySize": 3093
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-DS_JL_Ho.css",
+      "encodedBodySize": 908
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-C6wfuIJB.css",
+      "encodedBodySize": 2709
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/start-Uhd1A-ze.js",
+      "encodedBodySize": 367313
+    },
+    {
+      "name": "http://127.0.0.1:4173/map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+      "encodedBodySize": 406
+    },
+    {
+      "name": "http://127.0.0.1:4173/map-art/legacy-8bit/00_terrain_grass_plains.png",
+      "encodedBodySize": 277
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { atEncounter } from './helpers/dungeonFixtures';
 import {expect,test,type Page} from '@playwright/test';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,type DungeonState} from '../src/domain/dungeon';
@@ -20,7 +21,7 @@ test('restart during accepted presentation discards old callbacks and history',a
  await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(fresh);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(fresh);
 });
 test('legal enemy defeat boundary resumes once and a confirmed new dungeon resets it',async({page})=>{
- const made=startDungeonBattle(freshDungeon('dungeon-defeat-fixture',1));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
+ const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
  const session=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);let before=entry.activeBattle!;
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){
   before=session.state;const p=session.phase==='enemy'?session.nextEnemy():(session.prepare({type:'endTurn',unitId:session.active.id}),session.confirm());if(!p)throw Error('fixture stalled');session.finishPresentation(p.token);

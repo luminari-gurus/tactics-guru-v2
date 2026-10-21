@@ -1,5 +1,7 @@
+import { DungeonMap } from './dungeonMap';
+import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, FloorCache, dungeonSlot, type DungeonItemCommand } from '../domain/dungeon';
+import { dungeonBoundary, currentFloor, FloorCache, type DungeonItemCommand } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -8,7 +10,8 @@ import { BattleDialogs } from './dialogs';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
 export function renderDungeon(root: HTMLElement, session: DungeonSession, dialogs: BattleDialogs,
-  actions: { start: () => void; recover: () => void; restart: () => void }, cache: FloorCache) {
+  actions: { start: () => void; recover: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
+  const focusId=(document.activeElement as HTMLElement|null)?.id;
   const el = dungeonElement, s = session.snapshot, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? 'Dungeon defeat' : `Dungeon · Floor ${s.depth}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
@@ -20,21 +23,14 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     {id:'dungeon-item-confirm',label:'Confirm',run:()=>{session.dispatch(command);root.querySelector<HTMLElement>('h1')?.focus();}},
     {id:'dungeon-item-cancel',label:'Cancel',run:()=>root.querySelector<HTMLElement>('h1')?.focus()},
   ]);
-  const board=el('section');board.setAttribute('aria-label','Floor summary');
-  const cells=cache.resolve(floor.descriptor.seed).cells;
-  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 200 200');svg.setAttribute('role','img');svg.setAttribute('aria-label',`Floor ${s.depth}: Rooms, Grassland. Player at cell ${floor.position}. Upstairs ${floor.descriptor.upstairs}, downstairs ${floor.descriptor.downstairs}.`);
-  for(let i=0;i<400;i++)if(cells[i]){const r=document.createElementNS(svg.namespaceURI,'rect');r.setAttribute('x',String(i%20*10));r.setAttribute('y',String(Math.floor(i/20)*10));r.setAttribute('width','9');r.setAttribute('height','9');r.setAttribute('fill','#526348');svg.append(r);}
-  for(const [cell,label,color] of [[floor.descriptor.upstairs,'↑','#dae4c9'],[floor.descriptor.downstairs,'↓','#e1b96a'],[floor.position,'●','#8cd7ed']] as const){const t=document.createElementNS(svg.namespaceURI,'text');t.setAttribute('x',String(cell%20*10+5));t.setAttribute('y',String(Math.floor(cell/20)*10+8));t.setAttribute('text-anchor','middle');t.setAttribute('font-size','9');t.setAttribute('fill',color);t.textContent=label;svg.append(t);}
-  board.append(svg,el('p',`Player cell ${floor.position} · Upstairs ${floor.descriptor.upstairs} · Downstairs ${floor.descriptor.downstairs}`),el('p','Floor summary: use the encounter and stair controls below. Spatial exploration is not yet available.'));
-  const list=el('ol');
-  dungeonContent.encounters.forEach((e,i)=>list.append(el('li',`${i===2?'Guardian · ':''}${e.id.replace('encounter:','').replaceAll('_',' ')} · ${i<floor.completed?'Cleared':i===dungeonSlot(s)?s.phase==='reward'?'Reward pending':'Next':'Locked'}`)));
-  board.append(list);root.append(board);
-  const battleLabel=s.activeBattle?'Continue encounter':floor.completed===2?'Challenge guardian':'Start encounter';
-  root.append(button(battleLabel,actions.start,s.phase==='defeat'||s.phase==='reward'||floor.completed===3,'dungeon-start-encounter'));
+
+  mapView.render(s,cache.resolve(floor.descriptor.seed));root.append(mapView.root);
+  const canEnter=s.phase==='ready'&&floor.completed<3&&floor.position===poiCell(floor.exploration.pois[floor.completed]);
+  if(canEnter)root.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=el('section');travel.setAttribute('aria-label','Stairs');
-  travel.append(el('h2','Stairs'),el('p',floor.completed===3?'Guardian defeated. Descent is unlocked.':'Defeat the guardian and claim pending rewards to unlock descent.'),
-    button('Ascend',()=>session.travel('ascend',s.revision),s.depth===1||s.phase!=='ready','dungeon-ascend'),
-    button('Descend',()=>session.travel('descend',s.revision),floor.completed!==3||s.phase!=='ready','dungeon-descend'));root.append(travel);
+  travel.append(el('h2','Stairs'),el('p','Walk onto the matching stair to use it. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'Guardian defeated. Descent is unlocked.':'Defeat the guardian and claim pending rewards to unlock descent.'),
+    button('Ascend',()=>session.travel('ascend',s.revision),s.depth===1||s.phase!=='ready'||floor.position!==floor.descriptor.upstairs,'dungeon-ascend'),
+    button('Descend',()=>session.travel('descend',s.revision),floor.completed!==3||s.phase!=='ready'||floor.position!==floor.descriptor.downstairs,'dungeon-descend'));root.append(travel);
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
   for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}root.append(party);
@@ -62,4 +58,5 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     inventory.append(row);
   }root.append(inventory,button('Save recovery',actions.recover),button('Start new dungeon',actions.restart));
   const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}root.append(nav);
+  if(focusId)root.querySelector<HTMLElement>(`#${focusId}`)?.focus({preventScroll:true});
 }

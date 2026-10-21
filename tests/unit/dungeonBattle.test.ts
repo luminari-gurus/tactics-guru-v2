@@ -1,3 +1,4 @@
+import { atEncounter } from '../helpers/dungeonFixtures';
 import { freshDungeon, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -41,7 +42,7 @@ it('retains the accepted-command history through every legal encounter',()=>{
 it('continues a legally reached Guarded dungeon boundary through exact save/resume and expiry', () => {
   let reached = false;
   for (let seed = 1; seed <= 10 && !reached; seed++) {
-    const started = startDungeonBattle(freshDungeon('guarded-save', seed)); if (!started.ok) throw Error(started.reason);
+    const started = startDungeonBattle(atEncounter(freshDungeon('guarded-save', seed))); if (!started.ok) throw Error(started.reason);
     const built = dungeonBattle(started.state)!;
     let fixture; try { fixture = guardedBoundary(built.catalog, started.state.activeBattle!); } catch { continue; }
     const cast = dispatch(fixture.before, fixture.command, built.catalog); if (!cast.ok) throw Error(cast.reason);
