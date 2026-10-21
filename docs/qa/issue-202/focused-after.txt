@@ -1,0 +1,7 @@
+
+> tactics-guru-v2@0.0.0 test
+> playwright test tests/boot.spec.ts --project=desktop -g boots a Phaser scene --list
+
+Listing tests:
+  [desktop] › boot.spec.ts:29:1 › boots a Phaser scene and fits the viewport after resize
+Total: 1 test in 1 file

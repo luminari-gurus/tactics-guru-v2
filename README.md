@@ -47,7 +47,7 @@ After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/proto
 
 ## Verification policy
 
-Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. For focused browser work use the direct Playwright CLI: `npm test` currently invokes additional fixture posttests after success. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
+Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. Use `npm test -- <filters>` for focused browser work, `npm run test:fixtures` for both dev fixture suites, and `npm run verify:full` for explicit full verification. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
 
 ## Browser smoke tests
 

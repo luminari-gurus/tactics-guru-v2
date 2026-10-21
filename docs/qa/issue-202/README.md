@@ -1,0 +1,60 @@
+# Issue 202 — explicit fixture verification
+
+Base: `5704e765d6feb26b396852c7f5c68dc06011fdad` (includes #201).
+Branch: `work/issue-202-explicit-fixtures`. Caller: `dubstylee`.
+The caller approved the concrete chat plan and branch publication on 2026-10-21.
+This is the bounded tooling path; no OpenSpec artifacts are required.
+
+## Results
+
+- Seven orchestration tests pass, including real child exit codes, continuation
+  after failure, blocked build consumers, independent dev/telemetry execution,
+  signal/spawn-error accounting, mode isolation and rejection of aggregate filters.
+- Both application and domain TypeScript checks pass; `git diff --check` passes.
+- Discovery before/after preserves exactly 45 fixture executions: 24 authored
+  encounter and 21 run-item cases across desktop, portrait and landscape.
+  Comparison uses project, file and full test title; no assertions were edited.
+- `npm test -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --list`
+  selects exactly one test and exits without invoking fixtures. Equivalent
+  fixture file/project/grep filtering selects one mobile-portrait reward case.
+- `npm run verify:full -- --list` accounts for the policy's complete suite/mode
+  inventory. Its 17 stages are sequential, with unique logs/artifacts and a
+  checkpointed summary. Root-preview asset checks belong to default Chromium.
+- The previous npm lifecycle was reproduced before the change: the same focused
+  `--list` invocation launched 24 encounter tests after discovery, all of which
+  failed at missing Chromium startup; the `&&` chain then omitted run items.
+  That is retained as an environmental failure, not gameplay evidence.
+
+The runtime was Node 24.19.0 / pinned Playwright 1.63.0 on Linux. Existing installed
+lockfile dependencies were reused via a local, uncommitted node_modules symlink.
+`source-hashes.json` binds the relevant final tooling/config bytes to these checks.
+Captured command outputs are adjacent. No speedup measurement is claimed.
+
+## Outstanding acceptance
+
+Chromium is absent at the lockfile-selected executable path
+`/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`.
+Consequently the new combined fixture suite has not passed in a real browser;
+shared dev-server execution and isolation still require qualification on Brian's
+self-hosted runner under #207. This remains a draft, referring to #202 rather than
+closing it. No physical-device access is configured or required; emulation suffices.
+
+On the qualified runner, use:
+
+```sh
+npm ci
+npm run test:verification
+npm run typecheck
+npm run test:fixtures
+# After a successful root build, one real focused browser invocation:
+npm run build
+npm test -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
+```
+
+Confirm all 45 fixtures pass with one dev-server lifecycle and the focused command
+runs only the selected case. Retain logs, browser/host receipts and actual failures.
+The full browser matrix was deliberately not rerun for this bounded command/config
+change; full runner behavior is covered by injected outcomes and real process
+contracts, not claimed as a complete gameplay acceptance run. No GitHub-hosted
+fallback, CI dispatch, merge or deployment occurred. Coordinate #200/#207 tooling
+and any new fixture suite from PR #211 when those branches merge.

@@ -1,0 +1,7 @@
+
+> tactics-guru-v2@0.0.0 test:fixtures
+> playwright test -c playwright.fixtures.config.ts run-items.spec.ts --project=mobile-portrait -g reward claim --list
+
+Listing tests:
+  [mobile-portrait] › run-items.spec.ts:14:1 › reward claim advances exactly once and survives pending/claimed reload
+Total: 1 test in 1 file
