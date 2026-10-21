@@ -23,7 +23,7 @@
 ## 4. Integration qualification and delivery
 
 - [x] 4.1 Run focused tests, full unit/content checks, both TypeScript scopes, production build and full configured npm browser suite including posttests; reproduce/disposition #190 baseline failures without skips or weakened assertions, record all actual results and remaining acceptance gaps in the QA report.
-- [ ] 4.2 Compare delivered behavior with every issue criterion and spec scenario; verify strict OpenSpec and git diff checks, commit only approved issue work and push. Open/reuse and attach a PR; use Closes only for fully verified acceptance, otherwise a draft with Refs and explicit gaps.
+- [x] 4.2 Compare delivered behavior with every issue criterion and spec scenario; verify strict OpenSpec and git diff checks, commit only approved issue work and push. Open/reuse and attach a PR; use Closes only for fully verified acceptance, otherwise a draft with Refs and explicit gaps.
 
 ## Workflow follow-up
 
