@@ -1,5 +1,5 @@
 import { atEncounter } from '../helpers/dungeonFixtures';
-import { freshDungeon, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { expect,it } from 'vitest';
@@ -9,6 +9,12 @@ import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelop
 import { dungeonContent } from '../../src/content/dungeon';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 import { dispatch } from '../../src/domain/turns';
+import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
+import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
+import { freshExploration } from '../../src/domain/exploration';
+import { previewAttack } from '../../src/domain/combat';
+import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
+import { rollDie, seedRng } from '../../src/domain/rng';
 it('legally reaches guardian victory with next-command/RNG equivalence after save/resume',()=>{
   let fixture:ReturnType<typeof dungeonVictoryBoundary>=null,seed=0;
   for(seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
@@ -27,12 +33,8 @@ it('retains the accepted-command history through every legal encounter',()=>{
   for(let seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
   expect(fixture).not.toBeNull();if(!fixture)return;
   for(const value of fixture.histories){
-    const record=value as import('../../src/domain/types').Replay & {battlefield:import('../../src/domain/battlefield').BattlefieldDescriptor};
-    const encounter=dungeonContent.encounters.find(e=>e.id===record.battlefield.encounterId)!;
-    const resolved=resolveBattlefield(encounter,record.initial.seed,dungeonContent.catalog);expect(resolved.ok).toBe(true);if(!resolved.ok)continue;
-    const living=new Set(record.initial.units.filter(u=>u.side==='player').map(u=>u.defId));
-    const map={...resolved.map,spawns:resolved.map.spawns.filter(s=>s.side==='enemies'||living.has(s.unitId))};
-    const catalog={...dungeonContent.catalog,maps:{...dungeonContent.catalog.maps,[map.id]:map}};
+    const {replay:record,entry}=value as {replay:import('../../src/domain/types').Replay;entry:import('../../src/domain/dungeon').DungeonState};
+    const catalog=dungeonBattle(entry)!.catalog;
     let state=record.initial;
     for(const command of record.commands){const next=dispatch(state,command,catalog);expect(next.ok).toBe(true);if(!next.ok)throw Error(next.reason);state=next.state;}
     expect(state.outcome).toBe('playerWin');
@@ -66,4 +68,40 @@ it('continues a legally reached Guarded dungeon boundary through exact save/resu
     reached = true;
   }
   expect(reached).toBe(true);
+});
+
+it.each([1, 2] as const)('preserves legal Guarded battle and next command from format %i', format => {
+  const started = startDungeonBattle(atEncounter(freshDungeon('prior-guard', 13, LEGACY_ENCOUNTER_POLICY)));
+  if (!started.ok) throw Error(started.reason);
+  const built = dungeonBattle(started.state)!, fixture = guardedBoundary(built.catalog, started.state.activeBattle!);
+  const cast = dispatch(fixture.before, fixture.command, built.catalog); if (!cast.ok) throw Error(cast.reason);
+  const original = { ...started.state, activeBattle: cast.state }, decoded = decodeDungeon(priorDungeonEnvelope(original, format));
+  if (!decoded.ok) throw Error(decoded.reason);
+  expect(decoded.state.activeBattle).toEqual(cast.state);
+  const command = { type: 'endTurn' as const, unitId: cast.state.initiative[cast.state.activeIndex] };
+  expect(dispatch(decoded.state.activeBattle!, command, dungeonBattle(decoded.state)!.catalog)).toEqual(dispatch(cast.state, command, built.catalog));
+});
+
+it('uses the same scaled catalog for inspection, attack preview, AI, actual damage and replay', () => {
+  const base = freshDungeon('scaled-consumers', 1);
+  // Structural depth fixture isolates combat consumers; legal multi-floor play is covered separately.
+  const floors = Array.from({length:10}, (_, i) => {
+    const descriptor = floorDescriptor(base.seed, i + 1);
+    return { descriptor, completed: i === 9 ? 0 : 3, position: descriptor.upstairs, exploration: freshExploration(descriptor.seed, descriptor.upstairs) };
+  });
+  const built = dungeonBattle({...base, depth:10, floors})!, enemy = built.state.units.find(u=>u.side==='enemy'&&u.defId==='goblin_grunt')!, hero = built.state.units.find(u=>u.defId==='fighter')!;
+  let hitSeed = 0; while (rollDie(seedRng(hitSeed),20).value !== 10) hitSeed++;
+  const state: import('../../src/domain/types').BattleState = { ...built.state, rng:seedRng(hitSeed), activeIndex:built.state.initiative.indexOf(enemy.id), units:built.state.units.map(u=>u.id===enemy.id?{...u,cell:{x:4,y:0}}:u.id===hero.id?{...u,cell:{x:3,y:0}}:{...u,hp:0}) };
+  const command = { type:'useAbility' as const, unitId:enemy.id, abilityId:'ability:basic_attack' as const, target:{unitId:hero.id} };
+  const preview = previewAttack(state, command, built.catalog); if(!preview.ok)throw Error(preview.reason);
+  expect(preview.bonus).toBe(8); expect(combatStats(enemy,built.catalog).accuracy).toBe(preview.bonus);
+  expect(preview.damage).toBe((built.catalog.abilities['ability:basic_attack'] as {baseDamage:number}).baseDamage+4);
+  const plan = planEnemyTurn(state,enemy.id,built.catalog); if(!plan.ok)throw Error(plan.reason);
+  expect(plan.commands).toContainEqual(command);
+  const result = runEnemyTurn(state,enemy.id,built.catalog); if(!result.ok)throw Error(result.reason);
+  expect(result.events.find(e=>e.type==='attackRolled')).toMatchObject({bonus:preview.bonus,armorClass:preview.armorClass});
+  expect(result.events.find(e=>e.type==='damaged')).toMatchObject({unitId:hero.id,damage:preview.damage,hp:hero.hp-preview.damage});
+  let replay = state;
+  for(const c of result.commands){const next=dispatch(replay,c,built.catalog);if(!next.ok)throw Error(next.reason);replay=next.state;}
+  expect(replay).toEqual(result.state);
 });

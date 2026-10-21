@@ -40,7 +40,11 @@ Each new floor SHALL retain policy/catalog identity, biome, three kind/source/ma
 
 #### Scenario: Tampered or unsupported selection
 - **WHEN** a descriptor disagrees with its definitions, depth, policy, roster or resolved geometry
-- **THEN** the snapshot is rejected through recoverable validation with original raw bytes retained
+- **THEN** shape/definition/source mismatches reject on read, and geometry-hash mismatches reject before the corresponding floor can become current, through recoverable validation with original raw bytes retained
+
+#### Scenario: Cold current-format history
+- **WHEN** a format-3 save resumes a long retained history
+- **THEN** every selection and battlefield source identity validates immediately, while full geometry validation resolves only the current floor; historical saved hashes remain unchanged and are verified before travel to that floor can be saved or published
 
 ### Requirement: Compatible bounded saves
 Format 3 SHALL retain current storage keys, atomic recovery and the 1 MiB limit. Formats 1/2 MUST pass their original validation before normalization to fixed/unscaled legacy encounters, including unvisited floors. Inspection SHALL never rewrite storage. Candidate size/write/readback failure SHALL preserve current floor/history and offer recovery/export.
@@ -48,6 +52,10 @@ Format 3 SHALL retain current storage keys, atomic recovery and the 1 MiB limit.
 #### Scenario: Continue prior gameplay
 - **WHEN** a valid prior ready, active/Guarded, reward, defeated or backtracked dungeon is resumed
 - **THEN** party, items, battle/RNG, offers, completion and exploration retain their meaning and subsequent unvisited floors keep legacy opponents
+
+#### Scenario: Bounded legacy normalization work
+- **WHEN** a prior-format save has a long retained floor history
+- **THEN** normalization defers derived fixed-policy battlefield geometry until battle entry, without resolving three graphs per historical floor; active battles still validate exact geometry/RNG, existing full format-3 legacy descriptors remain supported, and new-policy descriptors cannot omit battlefield facts
 
 #### Scenario: No destructive migration
 - **WHEN** old data is inspected or a format-3 candidate fails

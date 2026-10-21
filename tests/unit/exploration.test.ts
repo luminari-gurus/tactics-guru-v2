@@ -5,12 +5,13 @@ import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { legacyDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { atEncounter, atCell, dungeonCapacityFixture } from '../helpers/dungeonFixtures';
+import { atEncounter, atCell, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
+import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 const fresh=()=>freshDungeon('exploration-test',13);
 const command=(s:ReturnType<typeof fresh>,destination:number)=>({id:s.id,depth:s.depth,revision:s.revision,destination});
-const legacy=(s:ReturnType<typeof fresh>)=>({...s,floors:s.floors.map(f=>({descriptor:f.descriptor,position:f.descriptor.upstairs,completed:f.completed}))});
+const legacy=(s:ReturnType<typeof fresh>)=>priorDungeonPayload(s, 1);
 const envelope=(payload:unknown)=>{const body={kind:'tactics-guru:dungeon',format:1,identity:legacyDungeonIdentity,payload};return canonical({...body,digest:hashJson(body)});};
 describe('exploration placement and validation',()=>{
  it('reproduces connected distinct markers without changing terrain for 100 seeds',()=>{
@@ -56,18 +57,19 @@ describe('accepted steps and battle ownership',()=>{
  });
  it('permits explicit unsaved entry and disposes stale movement',()=>{const s=atEncounter(fresh()),session=new DungeonSession(s,createDungeonStorage(()=>null));session.playUnsaved();expect(session.startEncounter()).not.toBeNull();session.dispose();expect(session.step(command(s,0))).toBe(false);});
 });
-describe('v1 migration and v2 recovery',()=>{
+describe('v1 migration and format-3 recovery',()=>{
+ const fresh=()=>freshDungeon('exploration-test',13,LEGACY_ENCOUNTER_POLICY);
  it('converts ready/reward/active/defeat with exact party, ownership and battle RNG',()=>{
   const s=fresh(),b=startDungeonBattle(atEncounter(s));if(!b.ok)throw Error(b.reason);
   const dead={...b.state.activeBattle!,outcome:'playerLoss' as const,units:b.state.activeBattle!.units.map(u=>u.side==='player'?{...u,hp:0}:u)};
   const loss=acceptDungeonBattle(b.state,dead);if(!loss.ok)throw Error(loss.reason);
-  for(const original of [s,b.state,dungeonCapacityFixture(),loss.state]){
+  for(const original of [s,b.state,dungeonCapacityFixture(LEGACY_ENCOUNTER_POLICY),loss.state]){
    const raw=envelope(legacy(original)),decoded=decodeDungeon(raw);expect(decoded.ok).toBe(true);if(!decoded.ok)throw Error(decoded.reason);
    expect(decoded.state.party).toEqual(original.party);expect(decoded.state.ownership).toEqual(original.ownership);expect(decoded.state.activeBattle).toEqual(original.activeBattle);expect(decoded.state.offer).toEqual(original.offer);expect(decoded.state.revision).toBe(original.revision);
-   const encoded=encodeDungeon(decoded.state);expect(encoded.ok).toBe(true);if(encoded.ok){expect(JSON.parse(encoded.text).format).toBe(2);expect(decodeDungeon(encoded.text)).toEqual(decoded);}
+   const encoded=encodeDungeon(decoded.state);expect(encoded.ok).toBe(true);if(encoded.ok){expect(JSON.parse(encoded.text).format).toBe(3);expect(decodeDungeon(encoded.text)).toEqual(decoded);}
   }
  });
- it('preserves exact legacy primary in backup on first v2 write and rejects foreign/tampered legacy',()=>{
+ it('preserves exact legacy primary in backup on first format-3 write and rejects foreign/tampered legacy',()=>{
   const raw=envelope(legacy(fresh())),values=new Map([[DUNGEON_KEYS.primary,raw]]),provider=()=>({getItem:(k:string)=>values.get(k as typeof DUNGEON_KEYS.primary)??null,setItem:(k:string,v:string)=>values.set(k as typeof DUNGEON_KEYS.primary,v),removeItem:(k:string)=>values.delete(k as typeof DUNGEON_KEYS.primary)});
   const store=createDungeonStorage(provider),read=store.inspect().primary;if(read.status!=='valid')throw Error('legacy invalid');expect(values.get(DUNGEON_KEYS.primary)).toBe(raw);expect(store.save(read.state).ok).toBe(true);expect(values.get(DUNGEON_KEYS.backup as typeof DUNGEON_KEYS.primary)).toBe(raw);
   expect(decodeDungeon(raw.replace(legacyDungeonIdentity,'foreign')).ok).toBe(false);expect(readLegacyDungeon({...legacy(fresh()),floors:[{...legacy(fresh()).floors[0],position:200}]}).ok).toBe(false);
