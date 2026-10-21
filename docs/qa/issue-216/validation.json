@@ -1,0 +1,68 @@
+{
+  "base": "3510d1e3db8814b9111b76676e8413c90dedb8a5",
+  "node": "v24.19.0",
+  "profile": {
+    "total": 9008.227167000001,
+    "timings": {
+      "save": {
+        "calls": 68,
+        "ms": 6294.395646
+      },
+      "startEncounter": {
+        "calls": 3,
+        "ms": 132.19222800000057
+      },
+      "prepare": {
+        "calls": 14,
+        "ms": 2.9211990000011383
+      },
+      "confirm": {
+        "calls": 14,
+        "ms": 1844.915703999999
+      },
+      "nextEnemy": {
+        "calls": 53,
+        "ms": 6934.823444999999
+      },
+      "inspect": {
+        "calls": 2,
+        "ms": 72.4909690000004
+      },
+      "continue": {
+        "calls": 1,
+        "ms": 0.14781199999924866
+      },
+      "replace": {
+        "calls": 2,
+        "ms": 0.9209639999990031
+      }
+    }
+  },
+  "local_file": {
+    "passed": 8,
+    "failed": 0,
+    "repaired_case_ms": 1555.47
+  },
+  "final_focused": {
+    "passed": 1,
+    "failed": 0,
+    "case_ms": 1641.7653420000001
+  },
+  "test_sha256": "a7da2bf210c2565ed7c9f199a7ba6fd827b80f2049b35d66f455edd736e0f731",
+  "hosted_integration": "Pending; latest PR evidence will identify tested commit and artifact.",
+  "integration_attempt": {
+    "source": "72f9bcc810a7a9093552f1f844e8c1ea9ddaf2b1",
+    "run": 39685408364,
+    "passed": 908,
+    "failed": 1,
+    "pending": 0,
+    "repaired_case_ms": 1326.771633,
+    "telemetry_timeout_ms": 5022.03868
+  },
+  "telemetry_local": {
+    "passed": 11,
+    "failed": 0,
+    "repaired_case_ms": 828.863914
+  },
+  "telemetry_sha256": "bfc1ac4c87ac08179421c96b5771160d4c5cd40e89784fd9b5f17ad21b6d67b2"
+}
