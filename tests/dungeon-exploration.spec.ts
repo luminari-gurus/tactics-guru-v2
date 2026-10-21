@@ -70,3 +70,18 @@ test('records route transfer and map responsiveness against established budgets'
  const receipt={frames,frameBudgets:{idleP50:16.7,idleP95:20,stepP95:33.4},framePasses:{idleP50:frames.idleP50<=16.7,idleP95:frames.idleP95<=20,stepP95:frames.stepP95<=33.4},commit:await page.locator('#game').getAttribute('data-commit'),coldUsableMs,stepP95Ms:p95,codeGzipBytes:gzip,observedAssetBytes:assets,budgets:{coldUsableMs:2500,stepP95Ms:33.4,codeGzipBytes:400000,assetBytes:1500000},passes:{cold:coldUsableMs<=2500,step:p95<=33.4,code:gzip<=400000,assets:assets<=1500000},code,timings,resources};
  writeFileSync(test.info().outputPath('exploration-performance.json'),JSON.stringify(receipt,null,2));expect(timings).toHaveLength(20);expect((await dungeonSnapshot(page)).floors[0].position).toBe(f.position);
 });
+
+ test('exploration cells stay square across viewport sizes and art styles',async({page})=>{
+ await page.goto('dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ for(const viewport of [{width:320,height:740},{width:393,height:852},{width:915,height:412},{width:1280,height:800}]){
+  await page.setViewportSize(viewport);
+  for(const art of ['simple','legacy-8bit']){
+   await page.locator('#dungeon-art').selectOption(art);
+   const sizes=await page.locator('#dungeon-map span').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {width:r.width,height:r.height};}));
+   expect(sizes).toHaveLength(400);
+   for(const size of sizes){expect(size.width).toBeGreaterThan(0);expect(Math.abs(size.width-size.height)).toBeLessThan(0.1);expect(Math.abs(size.height-sizes[0].height)).toBeLessThan(0.1);}
+  }
+ }
+ await page.setViewportSize({width:393,height:852});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
+ await page.screenshot({path:test.info().outputPath('square-overworld-mobile.png')});
+});
