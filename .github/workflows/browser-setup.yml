@@ -9,6 +9,7 @@ on:
       - 'playwright*.config.ts'
       - 'scripts/browser-*.mjs'
       - 'tests/boot.spec.ts'
+      - 'tests/tooling/browser-diagnostics.test.mjs'
 permissions:
   contents: read
 jobs:
@@ -24,6 +25,7 @@ jobs:
       - run: npm ci
       - run: npm run setup:browsers:linux
       - run: npm run check:browsers
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
       - run: npm run build
       - run: npm run test:browser-smoke -- --diagnostics
       - uses: actions/upload-artifact@v4
