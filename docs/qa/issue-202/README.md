@@ -30,7 +30,7 @@ lockfile dependencies were reused via a local, uncommitted node_modules symlink.
 `source-hashes.json` binds the relevant final tooling/config bytes to these checks.
 Captured command outputs are adjacent. No speedup measurement is claimed.
 
-## Outstanding acceptance
+## Initial acceptance limitation (retained history)
 
 Chromium is absent at the lockfile-selected executable path
 `/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`.
@@ -58,3 +58,13 @@ change; full runner behavior is covered by injected outcomes and real process
 contracts, not claimed as a complete gameplay acceptance run. No GitHub-hosted
 fallback, CI dispatch, merge or deployment occurred. Coordinate #200/#207 tooling
 and any new fixture suite from PR #211 when those branches merge.
+
+## Hosted unblock authorized 2026-10-21
+
+The caller authorized GitHub-hosted execution for PR #214, with migration to
+self-hosted capacity later. The PR-scoped workflow installs locked Chromium and
+its OS dependencies, runs orchestration contracts, all 45 fixtures, the safe
+production build and one focused boot case. It requires exact passing counts and
+zero failures, flaky results or skips, and retains separate JSON/artifacts.
+Runtime results will be recorded after the workflow completes. This authorization
+supersedes the self-hosted-only gate for this PR, not the wider epic.
