@@ -27,7 +27,7 @@ jobs:
           mkdir -p verification-receipts
           npm audit --json > verification-receipts/audit.json
       - name: Verify root and prefix production builds
-        run: npx --no-install vitest run tests/unit/buildHeaders.test.ts --reporter=json --outputFile=verification-receipts/build-headers.json
+        run: npm run test:build -- --reporter=json --outputFile=verification-receipts/build-headers.json
       - run: npx --no-install playwright install --with-deps chromium
       - name: Record source and browser
         run: |

@@ -43,6 +43,41 @@ test('all successful stages pass and fixture selection is combined exactly once'
   assert.ok(stages.find(s => s.id === 'fixtures').args.includes('playwright.fixtures.config.ts'));
 });
 
+test('ordinary bundles reuse one unit/content pass and both type scopes', () => {
+  const commands = id => stages.filter(stage => stage.id === id);
+  assert.equal(commands('units').length, 1);
+  assert.equal(commands('typecheck').length, 1);
+  assert.equal(commands('build-integration').length, 1);
+  for (const id of ['build-root', 'build-prefix', 'restore-root']) {
+    const stage = commands(id)[0];
+    assert.deepEqual(stage.args.slice(0, 2), ['run', 'build:bundle']);
+    assert.deepEqual(stage.needs, ['units', 'typecheck']);
+    for (const prerequisite of stage.needs) {
+      assert.ok(stages.indexOf(commands(prerequisite)[0]) < stages.indexOf(stage));
+    }
+  }
+  assert.ok(commands('build-prefix')[0].args.includes('--base=/prototype/'));
+  assert.equal(stages.some(stage => stage.args[1] === 'validate:content'), false);
+});
+
+test('failed units or types block unchecked bundles while independent coverage continues', () => {
+  for (const failed of ['units', 'typecheck']) {
+    const visited = [];
+    const result = runStages(stages, stage => {
+      visited.push(stage.id);
+      return { exitCode: stage.id === failed ? 1 : 0 };
+    });
+    for (const id of ['build-root', 'build-prefix', 'restore-root', 'chromium',
+      'webkit-acceptance', 'webkit-exploration', 'health-bars', 'performance', 'assets-prefix-preview']) {
+      assert.equal(result.results.find(stage => stage.id === id).status, 'blocked', `${failed}: ${id}`);
+      assert.ok(!visited.includes(id));
+    }
+    for (const id of ['build-integration', 'fixtures', 'placement-dev', 'telemetry-production',
+      'telemetry-development', 'assets-root-dev', 'assets-prefix-dev']) assert.ok(visited.includes(id));
+    assert.equal(result.exitCode, 1);
+  }
+});
+
 test('explicit modes isolate inherited build/report flags but preserve browser selection', () => {
   const env = stageEnvironment(stages.find(s => s.id === 'telemetry-development'), '/reports', {
     PLAYWRIGHT_BASE_PATH: '/wrong/', PLAYWRIGHT_SERVER_MODE: 'dev',
