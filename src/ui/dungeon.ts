@@ -16,7 +16,7 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
   const knownNext = floor.completed < 3 && floor.exploration.revealed.includes(poiCell(floor.exploration.pois[floor.completed]));
-  root.replaceChildren(title,el('p',`Three encounters per floor. ${floor.completed === 3 ? 'Guardian defeated.' : knownNext ? `Next: ${dungeonEncounterLabel(s,floor.completed)}.` : 'Explore to find the next encounter.'} Defeat the goblin guardian to unlock the stairs.`),status);
+  root.replaceChildren(title,el('p',floor.completed === 3 ? 'Guardian defeated. Walk to the stairs to continue.' : `Three encounters per floor. ${knownNext ? `Next: ${dungeonEncounterLabel(s,floor.completed)}.` : 'Explore to find the next encounter.'} Defeat the goblin guardian to unlock the stairs.`),status);
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
   };

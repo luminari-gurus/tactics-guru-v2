@@ -11,7 +11,7 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { priorDungeonEnvelope, journeyPreparation } from './helpers/dungeonFixtures';
+import { priorDungeonEnvelope, journeyPreparation, dungeonJourney } from './helpers/dungeonFixtures';
 import { dungeonContent } from '../src/content/dungeon';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration } from '../src/domain/exploration';
@@ -134,7 +134,7 @@ test('legal guardian journey, next biome, ascent and revisit preserve selected f
    await page.locator('#dungeon-item-confirm').click();expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   }
  }
- const clear=await dungeonSnapshot(page);expect(clear.party).toEqual([{heroId:'fighter',hp:18},{heroId:'ranger',hp:8},{heroId:'mage',hp:0}]);
+ const clear=await dungeonSnapshot(page),expected=dungeonJourney(43);expect(clear.party).toEqual(expected.state.party);
  await expect(page.getByText('Guardian defeated. Descent is unlocked.',{exact:true})).toBeVisible();
  await page.screenshot({path:test.info().outputPath('legal-guardian-cleared.png'),fullPage:true});
  await walkDungeon(page,clear.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');const departed=await dungeonSnapshot(page);
