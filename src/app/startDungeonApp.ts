@@ -1,4 +1,4 @@
-import { DungeonMap } from '../ui/dungeonMap';
+import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dungeonMap';
 import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
@@ -63,7 +63,7 @@ function recovery(){
 function start(){
  if(!live||playing)return;const battle=session.startEncounter();if(!battle){render();return;}
  playing=true;screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
- const title=`Dungeon · Floor ${session.snapshot.depth} · Encounter ${session.snapshot.floors[session.snapshot.depth-1].completed+1}`;
+ const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].completed)}`;
  document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
  document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
  restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(button('Save recovery',recovery),el('span',session.status));

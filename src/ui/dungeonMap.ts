@@ -3,6 +3,15 @@ import { currentFloor } from '../domain/dungeon';
 import { neighbors, poiCell } from '../domain/exploration';
 import type { GeneratedMap } from '../map/generate';
 import { createMapArt, ART_STYLES, type ArtStyle } from '../map/art';
+import { BIOMES, applyBiome, type Terrain } from '../map/biomes';
+
+export function dungeonBiomeLabel(s: DungeonState): string {
+  return BIOMES.find(b => b.version === currentFloor(s).descriptor.biome)!.label;
+}
+export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
+  const kind = currentFloor(s).descriptor.encounters[slot].selection.kind;
+  return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
+}
 
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
@@ -34,19 +43,20 @@ export class DungeonMap {
     if (!this.live || !this.state || !this.map) return;
     const focused = this.root.contains(document.activeElement) ? (document.activeElement as HTMLElement).id : '';
     const s = this.state, f = currentFloor(s), map = this.map;
+    const biome = BIOMES.find(b => b.version === f.descriptor.biome)!, treated = applyBiome(map, biome.id);
     const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
-    const heading = el('h2','Explore floor');
+    const heading = el('h2',`Explore ${biome.label} · Floor ${s.depth}`);
     const label = el('label','Map art '), select=el('select');select.id='dungeon-art';select.setAttribute('aria-label','Map art');
     for (const style of ART_STYLES) { const o=el('option',style.label);o.value=style.id;select.append(o); } select.value=this.art;
     select.onchange=()=>{this.art=select.value as ArtStyle;this.paintArt();};label.append(select);
     const grid=el('div');grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/20)+1}, column ${f.position%20+1}. Arrow or WASD keys move one cell.`);
-    grid.dataset.position=String(f.position);grid.dataset.art=this.art;
+    grid.dataset.position=String(f.position);grid.dataset.art=this.art;grid.dataset.biome=biome.id;
     const pois=new Map(f.exploration.pois.map(p=>[poiCell(p),p]));
     for(let i=0;i<400;i++) {
       const cell=el('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');
       const visible=f.exploration.revealed.includes(i), open=map.cells[i]===1;
       cell.className=visible?open?'explore-open':'explore-wall':'explore-hidden';
-      if(visible){cell.dataset.terrain=open?'grassland-open':'grassland-blocked';
+      if(visible){cell.dataset.terrain=treated.terrain[i];
         if(i===f.descriptor.upstairs)cell.textContent='↑';
         if(i===f.descriptor.downstairs)cell.textContent='↓';
         const p=pois.get(i);if(p){cell.textContent=p.encounterSlot<f.completed?'✓':String(p.encounterSlot+1);cell.dataset.poi=p.id;}
@@ -59,7 +69,7 @@ export class DungeonMap {
     const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
     for(const [name,delta] of [['North',-20],['East',1],['South',20],['West',-1]] as const){const b=el('button',name);b.id=`dungeon-step-${name.toLowerCase()}`;b.type='button';b.disabled=s.phase!=='ready';b.onclick=()=>this.step(delta);directions.append(b);}
     const list=el('ul');list.setAttribute('aria-label','Discovered places');
-    const entries=[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:s.depth===1?'Exit unavailable':'Available'},...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:p.encounterSlot===2?'Guardian':`Encounter ${p.encounterSlot+1}`,status:p.encounterSlot<f.completed?'Cleared':p.encounterSlot===f.completed?(s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'):'Locked'})),{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:f.completed===3?'Unlocked':'Guardian locked'}];
+    const entries=[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:s.depth===1?'Exit unavailable':'Available'},...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:p.encounterSlot<f.completed?'Cleared':p.encounterSlot===f.completed?(s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'):'Locked'})),{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:f.completed===3?'Unlocked':'Guardian locked'}];
     for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/20)+1}, column ${p.cell%20+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
     this.root.replaceChildren(heading,label,el('p','● Player · 1/2 encounters · 3 guardian · ✓ cleared · ↑/↓ stairs. Reveal reaches two cells, including through walls. Tap adjacent cells or use direction controls.'),grid,directions,feedback,list);
     this.paintArt();
@@ -70,7 +80,7 @@ export class DungeonMap {
     if (!this.live || !this.state) return;
     let fallback = false;
     for (const cell of this.root.querySelectorAll<HTMLElement>('[data-terrain]')) {
-      const art = this.treatment(cell.dataset.terrain as 'grassland-open' | 'grassland-blocked', this.art);
+      const art = this.treatment(cell.dataset.terrain as Terrain, this.art);
       cell.style.backgroundImage = art.url ? `url("${art.url}")` : '';
       fallback ||= Boolean(art.fallback);
     }

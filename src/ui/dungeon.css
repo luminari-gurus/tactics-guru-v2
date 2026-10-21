@@ -17,6 +17,11 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map span { display: flex; align-items: center; justify-content: center; min-width: 0; font-size: clamp(10px, 2.8vw, 18px); background-size: cover; color: #ffe9a7; line-height: 1; }
 #dungeon-map .explore-open { background-color: #49624a; }
 #dungeon-map .explore-wall { background-color: #28352f; }
+#dungeon-map { --forest-open: #426348; --forest-blocked: #203c2c; --desert-open: #a28a50; --desert-blocked: #584c36; }
+#dungeon-map [data-terrain="forest-open"] { background-color: var(--forest-open); }
+#dungeon-map [data-terrain="forest-blocked"] { background-color: var(--forest-blocked); }
+#dungeon-map [data-terrain="desert-open"] { background-color: var(--desert-open); }
+#dungeon-map [data-terrain="desert-blocked"] { background-color: var(--desert-blocked); }
 #dungeon-map .explore-hidden { background-color: #111a24; }
 #dungeon-map [data-player] { color: #8ce6ff; outline: 2px solid #8ce6ff; outline-offset: -2px; }
 #dungeon-map [data-poi] { font-weight: bold; }

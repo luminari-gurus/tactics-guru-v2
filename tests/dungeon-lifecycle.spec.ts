@@ -26,7 +26,7 @@ test('legal enemy defeat boundary resumes once and a confirmed new dungeon reset
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){
   before=session.state;const p=session.phase==='enemy'?session.nextEnemy():(session.prepare({type:'endTurn',unitId:session.active.id}),session.confirm());if(!p)throw Error('fixture stalled');session.finishPresentation(p.token);
  }
- expect(session.state.outcome).toBe('playerLoss');await load(page,{...entry,activeBattle:before});await expect(page.getByRole('heading',{name:'Dungeon defeat',exact:true})).toBeVisible();
+ expect(session.state.outcome).toBe('playerLoss');await load(page,{...entry,activeBattle:before});await expect(page.getByRole('heading',{name:/^Dungeon defeat/})).toBeVisible();
  const defeat=await snapshot(page);await expect(page.locator('#dungeon-descend')).toBeDisabled();await expect(page.locator('#dungeon-ascend')).toBeDisabled();
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(defeat);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-cancel-new').click();expect(await snapshot(page)).toEqual(defeat);

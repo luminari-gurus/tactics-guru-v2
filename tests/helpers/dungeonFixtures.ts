@@ -1,11 +1,12 @@
 import { freshExploration, poiCell, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounterPolicy } from '../../src/domain/dungeonEncounters';
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
+import { dungeonContent } from '../../src/content/dungeon';
 /** Exact previous wire shapes, only from the fixed/unscaled policy they actually supported. */
 export function priorDungeonPayload(s: DungeonState, format: 1 | 2) {
   if (s.encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw Error('Prior fixtures must use legacy opponents');
@@ -75,3 +76,36 @@ export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].complete
   return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot]));
 }
 export const atDownstairs = (s: DungeonState) => atCell(s,s.floors[s.depth-1].descriptor.downstairs);
+
+/** Deliberate existing reward/equipment/healing choices, shared by pure witness search and UI play. */
+export function journeyPreparation(s: DungeonState): DungeonItemCommand | null {
+  const boundary = dungeonBoundary(s);
+  if (s.offer) return { ...boundary, type:'claimReward', offerId:s.offer.id,
+    itemId:s.offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??s.offer.options[0].itemId };
+  if (s.phase !== 'ready') return null;
+  const hero = s.party.find(h=>h.hp>0&&!s.ownership.assignments.some(a=>a.heroId===h.heroId));
+  const item = s.ownership.equipment.find(e=>!s.ownership.assignments.some(a=>a.instanceId===e.instanceId));
+  if (hero && item) return {...boundary,type:'equipItem',instanceId:item.instanceId,heroId:hero.heroId,slot:'charm'};
+  const hurt = [...s.party].filter(h=>h.hp>0&&h.hp<dungeonContent.catalog.heroes[h.heroId].stats.maxHp)
+    .sort((a,b)=>a.hp/dungeonContent.catalog.heroes[a.heroId].stats.maxHp-b.hp/dungeonContent.catalog.heroes[b.heroId].stats.maxHp)[0];
+  return hurt&&s.ownership.consumables.some(c=>c.itemId==='item:healing_draught')?{...boundary,type:'useItem',itemId:'item:healing_draught',heroId:hurt.heroId}:null;
+}
+
+/** Legal domain witness search; browser acceptance enacts every turn and spatial step independently. */
+export function dungeonJourney(seed: number) {
+  let state = freshDungeon('biome-journey',seed);
+  const battles: {selection: NonNullable<ReturnType<typeof dungeonBattle>>['selection']; commands:number; party: DungeonState['party']}[] = [];
+    for(let slot=0;slot<3;slot++) {
+      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      const built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
+      for(let i=0;i<500&&battle.state.outcome==='ongoing';i++) {
+        const p=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,built.catalog)),battle.confirm());
+        if(!p)throw Error('Journey policy stalled');battle.finishPresentation(p.token);
+      }
+      state=checkedDungeon(acceptDungeonBattle(state,battle.state));
+      battles.push({selection:built.selection,commands:battle.state.commandCount,party:state.party});
+      if(battle.state.outcome!=='playerWin')return {seed,battles,state,won:false};
+      for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
+    }
+  return {seed,battles,state,won:true};
+}
