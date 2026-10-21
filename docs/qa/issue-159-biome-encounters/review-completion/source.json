@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "462af95b7931c03221763482bbdc79b9ee7bdc8f",
+  "runtimeTree": "4668b5a159c37f71d75ad3da506f057f452116db",
+  "testsTree": "37b1a14bd31e7e52d2632f90fcc3a7dbf8e6c0b2",
+  "qualifiedParent": "95909244ca33d702fc5a357a199dcf4830b250c1",
+  "unitTests": 887,
+  "initialLandscapeIdleP50": 16.700000000000045,
+  "landscapeRecheckIdleP50": 16.699999999999932,
+  "notes": "All current receipts report dirty=true. Their commit field alone is not exclusive bundle provenance; committed source/tree identity and inspected runtime/build diff record what was tested. Original dirty cache receipts remain historical. Clock/config files equal qualified 18d2572; 24+21 posttest source/paths are unchanged since qualified 96b13ed and those results are reused explicitly. Five initial profiles pass every flag; the retained raw floating-boundary landscape flag is followed by one unchanged-budget passing recheck."
+}
