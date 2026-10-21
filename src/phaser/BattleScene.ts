@@ -6,7 +6,8 @@ import { BattlePersistence } from '../app/BattlePersistence';
 import { previewMove, previewMovement } from '../domain/grid';
 import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import type { Point, BoardRegion } from '../geometry/iso';
-import { BattleHud, actionCommand, previewText, displayName, unitFeedback, unitLabel, type Action } from '../ui/hud';
+import { friendlyFire, actionCommand, type Action } from '../ui/battleActions';
+import { BattleHud, previewText, displayName, unitFeedback, unitLabel } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
 import { targetOverlays, hoverPreview } from '../ui/targetPreview';
@@ -86,7 +87,7 @@ export class BattleScene extends Phaser.Scene {
       if(command.type!=='useAbility')return text;
       const ability=catalog.abilities[command.abilityId];
       const effect=ability.kind==='guardedAttack'?` · −${ability.attackPenalty} attack / +${ability.armorClassBonus} AC until your next turn`:'';
-      return `${text} · range ${ability.rangeMin}–${ability.rangeMax}${effect}`;
+      return `${friendlyFire(session,command)}${text} · range ${ability.rangeMin}–${ability.rangeMax}${effect}`;
     };
     const select=(cell:CellPosition|null)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
@@ -136,7 +137,7 @@ export class BattleScene extends Phaser.Scene {
         : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
       const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
         :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
-      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='move'){selected=null;hovered=null;}if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
+      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${friendlyFire(session,command)}${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='move'){selected=null;hovered=null;}if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{

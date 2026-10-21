@@ -64,6 +64,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Production build | `npm run build` | Content validation, both typechecks, Vite. #206 owns removing duplicate work; do not bypass checks ad hoc. |
 | Default Chromium | `npx --no-install playwright test` | All default files listed below, desktop + mobile portrait/landscape. The dev-only placement case skips in preview and must run separately. |
 | Authored encounter fixtures | `npx --no-install playwright test -c playwright.encounters.config.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
+| Ability-picker fixtures | `npx --no-install playwright test -c playwright.abilities.config.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
 | Run-item fixtures | `npx --no-install playwright test -c playwright.run-items.config.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
 | Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
 | WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression and audio cases, iPhone portrait/landscape. |
@@ -88,8 +89,9 @@ so every browser file has an owner in the inventory:
 - Run/dungeon/map: `run-progression.spec.ts`, `dungeon.spec.ts`,
   `dungeon-exploration.spec.ts`, `dungeon-lifecycle.spec.ts`, `overworld-map.spec.ts`.
 
-The other three files are explicitly assigned above: authored encounters, run
-items and telemetry. New suites must be assigned before their change is accepted.
+The other four files are explicitly assigned above: authored encounters, run
+items, ability picker and telemetry. New suites must be assigned before their
+change is accepted.
 Honor meaningful engine/mode skips (for example Chromium CDP-only input checks
 and production-only resource hints); record reasons, and run the owning mode.
 
