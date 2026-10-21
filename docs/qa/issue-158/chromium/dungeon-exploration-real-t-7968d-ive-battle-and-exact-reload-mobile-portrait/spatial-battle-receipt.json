@@ -1,0 +1,484 @@
+{
+  "initial": {
+    "id": "ebeb26d2-55ca-4b1b-bd8e-6808102485d1",
+    "seed": 14,
+    "revision": 0,
+    "depth": 1,
+    "floors": [
+      {
+        "descriptor": {
+          "depth": 1,
+          "seed": 681720124,
+          "template": "three-encounters-v1",
+          "generator": "rooms-v1",
+          "biome": "grassland-v1",
+          "mapHash": "sha256:c37ac668e6de49f0d84ad7dc9344bbb044560e69bacaadd948794f4572140411",
+          "upstairs": 53,
+          "downstairs": 305
+        },
+        "position": 53,
+        "completed": 0,
+        "exploration": {
+          "version": "exploration-v1",
+          "pois": [
+            {
+              "id": "enemy-1",
+              "kind": "enemy",
+              "x": 7,
+              "y": 9,
+              "encounterSlot": 0
+            },
+            {
+              "id": "enemy-2",
+              "kind": "enemy",
+              "x": 10,
+              "y": 10,
+              "encounterSlot": 1
+            },
+            {
+              "id": "enemy-3",
+              "kind": "enemy",
+              "x": 15,
+              "y": 3,
+              "encounterSlot": 2
+            }
+          ],
+          "revealed": [
+            13,
+            32,
+            33,
+            34,
+            51,
+            52,
+            53,
+            54,
+            55,
+            72,
+            73,
+            74,
+            93
+          ],
+          "visited": [
+            53
+          ]
+        }
+      }
+    ],
+    "party": [
+      {
+        "heroId": "fighter",
+        "hp": 18
+      },
+      {
+        "heroId": "ranger",
+        "hp": 12
+      },
+      {
+        "heroId": "mage",
+        "hp": 11
+      }
+    ],
+    "ownership": {
+      "consumables": [],
+      "equipment": [],
+      "assignments": []
+    },
+    "phase": "ready",
+    "offer": null,
+    "activeBattle": null,
+    "battlefield": null
+  },
+  "stepped": {
+    "id": "ebeb26d2-55ca-4b1b-bd8e-6808102485d1",
+    "seed": 14,
+    "revision": 1,
+    "depth": 1,
+    "floors": [
+      {
+        "descriptor": {
+          "depth": 1,
+          "seed": 681720124,
+          "template": "three-encounters-v1",
+          "generator": "rooms-v1",
+          "biome": "grassland-v1",
+          "mapHash": "sha256:c37ac668e6de49f0d84ad7dc9344bbb044560e69bacaadd948794f4572140411",
+          "upstairs": 53,
+          "downstairs": 305
+        },
+        "position": 54,
+        "completed": 0,
+        "exploration": {
+          "version": "exploration-v1",
+          "pois": [
+            {
+              "id": "enemy-1",
+              "kind": "enemy",
+              "x": 7,
+              "y": 9,
+              "encounterSlot": 0
+            },
+            {
+              "id": "enemy-2",
+              "kind": "enemy",
+              "x": 10,
+              "y": 10,
+              "encounterSlot": 1
+            },
+            {
+              "id": "enemy-3",
+              "kind": "enemy",
+              "x": 15,
+              "y": 3,
+              "encounterSlot": 2
+            }
+          ],
+          "revealed": [
+            13,
+            14,
+            32,
+            33,
+            34,
+            35,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            72,
+            73,
+            74,
+            75,
+            93,
+            94
+          ],
+          "visited": [
+            53,
+            54
+          ]
+        }
+      }
+    ],
+    "party": [
+      {
+        "heroId": "fighter",
+        "hp": 18
+      },
+      {
+        "heroId": "ranger",
+        "hp": 12
+      },
+      {
+        "heroId": "mage",
+        "hp": 11
+      }
+    ],
+    "ownership": {
+      "consumables": [],
+      "equipment": [],
+      "assignments": []
+    },
+    "phase": "ready",
+    "offer": null,
+    "activeBattle": null,
+    "battlefield": null
+  },
+  "saved": {
+    "id": "ebeb26d2-55ca-4b1b-bd8e-6808102485d1",
+    "seed": 14,
+    "revision": 22,
+    "depth": 1,
+    "floors": [
+      {
+        "descriptor": {
+          "depth": 1,
+          "seed": 681720124,
+          "template": "three-encounters-v1",
+          "generator": "rooms-v1",
+          "biome": "grassland-v1",
+          "mapHash": "sha256:c37ac668e6de49f0d84ad7dc9344bbb044560e69bacaadd948794f4572140411",
+          "upstairs": 53,
+          "downstairs": 305
+        },
+        "position": 187,
+        "completed": 0,
+        "exploration": {
+          "version": "exploration-v1",
+          "pois": [
+            {
+              "id": "enemy-1",
+              "kind": "enemy",
+              "x": 7,
+              "y": 9,
+              "encounterSlot": 0
+            },
+            {
+              "id": "enemy-2",
+              "kind": "enemy",
+              "x": 10,
+              "y": 10,
+              "encounterSlot": 1
+            },
+            {
+              "id": "enemy-3",
+              "kind": "enemy",
+              "x": 15,
+              "y": 3,
+              "encounterSlot": 2
+            }
+          ],
+          "revealed": [
+            13,
+            14,
+            15,
+            32,
+            33,
+            34,
+            35,
+            36,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            93,
+            94,
+            95,
+            96,
+            97,
+            113,
+            114,
+            115,
+            116,
+            117,
+            133,
+            134,
+            135,
+            136,
+            137,
+            147,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            166,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            185,
+            186,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197,
+            206,
+            207,
+            208,
+            209,
+            210,
+            211,
+            212,
+            213,
+            214,
+            215,
+            216,
+            227,
+            228,
+            229,
+            230,
+            231,
+            232,
+            233,
+            234,
+            235
+          ],
+          "visited": [
+            53,
+            54,
+            55,
+            75,
+            95,
+            115,
+            135,
+            155,
+            175,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195
+          ]
+        }
+      }
+    ],
+    "party": [
+      {
+        "heroId": "fighter",
+        "hp": 18
+      },
+      {
+        "heroId": "ranger",
+        "hp": 12
+      },
+      {
+        "heroId": "mage",
+        "hp": 11
+      }
+    ],
+    "ownership": {
+      "consumables": [],
+      "equipment": [],
+      "assignments": []
+    },
+    "phase": "battle",
+    "offer": null,
+    "activeBattle": {
+      "format": 1,
+      "versions": {
+        "rules": 2,
+        "rng": 1,
+        "content": "sha256:9b58063a086771d68ff1f7a7c8cddcb8674c480fd1a3103b6c4d1abd2b1ec762"
+      },
+      "seed": 3557257607,
+      "rng": {
+        "words": [
+          2338594459,
+          1174948936,
+          1839139002,
+          20
+        ],
+        "cursor": 7
+      },
+      "mapId": "map:desert_forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 3,
+            "y": 10
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 5,
+            "y": 10
+          },
+          "hasMoved": false,
+          "hasActed": true,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 7,
+            "y": 10
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 3,
+            "y": 1
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 5,
+            "y": 5
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 4
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 7,
+            "y": 5
+          },
+          "hasMoved": true,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        }
+      ],
+      "initiative": [
+        5,
+        6,
+        2,
+        1,
+        4,
+        3
+      ],
+      "activeIndex": 2,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 5
+    },
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:desert_forest_ruins",
+      "mapHash": "sha256:32d68a2dc17062e72066318cd659d30091479c0716be2cdae63b193624f4521d",
+      "kind": "generated",
+      "biome": "desert",
+      "generatorVersion": 1,
+      "profileVersion": "desert-v1",
+      "layoutSeed": 704176255
+    }
+  }
+}
