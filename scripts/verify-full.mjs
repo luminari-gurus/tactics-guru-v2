@@ -7,13 +7,19 @@ const npm = (id, args, extra = {}) => ({ id, args, ...extra });
 const browser = (id, args = [], extra = {}) => npm(id,
   ['exec', '--no', '--', 'playwright', 'test', ...args], { browser: true, ...extra });
 const preview = (id, args = [], extra = {}) => browser(id, args, { needs: ['build-root'], ...extra });
+// The units include content validation. Reuse that result and both type scopes
+// before every ordinary bundle; standalone `npm run build` stays self-validating.
+const bundle = (id, args = []) => npm(id, ['run', 'build:bundle', ...args],
+  { needs: ['units', 'typecheck'] });
 
 // Sequential: browser processes share a GPU and most suites own port 4173.
 // Keep independent suites running after failures; failed builds block only consumers.
 export const stages = [
   npm('tooling', ['run', 'test:verification']),
   npm('units', ['run', 'test:unit']),
-  npm('build-root', ['run', 'build']),
+  npm('typecheck', ['run', 'typecheck']),
+  npm('build-integration', ['run', 'test:build']),
+  bundle('build-root'),
   preview('chromium'),
   browser('fixtures', ['-c', 'playwright.fixtures.config.ts']),
   browser('placement-dev', ['tests/overworld-map.spec.ts', '-g',
@@ -28,13 +34,13 @@ export const stages = [
   browser('assets-root-dev', ['tests/public-asset-base.spec.ts'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   npm('performance', ['run', 'measure:fit'], { needs: ['build-root'] }),
-  npm('build-prefix', ['run', 'build', '--', '--base=/prototype/']),
+  bundle('build-prefix', ['--', '--base=/prototype/']),
   browser('assets-prefix-preview', ['tests/public-asset-base.spec.ts'],
     { needs: ['build-prefix'], env: { PLAYWRIGHT_BASE_PATH: '/prototype/' } }),
   browser('assets-prefix-dev', ['tests/public-asset-base.spec.ts'],
     { env: { PLAYWRIGHT_BASE_PATH: '/prototype/', PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   // Restore even after prefix failures; never leave an accidentally prefixed dist.
-  npm('restore-root', ['run', 'build']),
+  bundle('restore-root'),
 ];
 
 export function runStages(plan, execute, record = () => {}) {

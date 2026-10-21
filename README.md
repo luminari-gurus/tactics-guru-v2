@@ -49,6 +49,12 @@ After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/proto
 
 Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. Use `npm test -- <filters>` for focused browser work, `npm run test:fixtures` for all three dev fixture suites, and `npm run verify:full` for explicit full verification. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
 
+Fast unit checks, including content, use `npm run test:unit`. The two real root/prefix
+build checks use `npm run test:build`; `npm run test:unit:all` runs their complete
+union. Standalone `npm run build` still validates content and both type scopes.
+Full verification reuses its successful unit/content and type stages for ordinary
+root/prefix/restored bundles; configured telemetry builds remain separate.
+
 ## Browser smoke tests
 
 ```sh

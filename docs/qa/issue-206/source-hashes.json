@@ -1,0 +1,11 @@
+{
+  "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+  "vitest.config.ts": "ae595ef107988de95cabdae1cd1040de4a2f59269ba6434c2cc07e34ee28107b",
+  "vitest.build.config.ts": "b874f8b9e7549994a20d9c9cf8fe9c6e1f11ee214ab5f22fd5d8d9b82f67e5f0",
+  "vitest.all.config.ts": "8647842ff0d0441127845e4ce0e767697f6e996cc179faa1309751dfacc85c28",
+  "scripts/verify-full.mjs": "15e2b9420393f71038434c73a0786bca3c952642ec09152da60838241e2cd027",
+  "tests/tooling/verify-full.test.mjs": "c5a4103cce8312a45b1860dc22309f622a9c000870c675abf2549bcf30a41caa",
+  "tests/integration/buildHeaders.test.ts": "d88c193d9e0167387c872713dc8b33a29c98c028a0cf31802d8e47ba2123e37e",
+  "tsconfig.json": "af3a3ca7f675c1ebf91d14de7ee2729894f9e83413362e3028352d3022894067",
+  ".github/workflows/issue-206-verification.yml": "d1861a190bea07f7bf75644d3a8476c771a774475957660451af783ddb82b665"
+}

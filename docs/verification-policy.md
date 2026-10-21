@@ -100,10 +100,13 @@ PR readiness selects the applicable rows under the change matrix.
 
 | Coverage | Current command | Mode and selection |
 | --- | --- | --- |
-| All units, including content and two real build integrations | `npm run test:unit` | `tests/unit/**/*.test.ts`; includes `buildHeaders.test.ts`. Iteration can append explicit unit paths. |
+| Fast units, including content | `npm run test:unit` | All `tests/unit/**/*.test.ts`; no real Vite builds. Iteration can append explicit unit paths. |
+| Root/prefix build integrations | `npm run test:build` | `tests/integration/**/*.test.ts`; retains both real `buildHeaders.test.ts` builds and all asset/header assertions. |
+| All units and build integrations | `npm run test:unit:all` | Union of both selections, in one Vitest run; deliberate equivalent of the previous all-unit command. |
 | Standalone content validation | `npm run validate:content` | Eight content test files from package.json. Already included in all units and standalone build; retain that fact in timing receipts. |
 | App and domain type boundaries | `npm run typecheck` | Both tsconfig scopes; also part of standalone build. |
-| Production build | `npm run build` | Content validation, both typechecks, Vite. #206 owns removing duplicate work; do not bypass checks ad hoc. |
+| Standalone production build | `npm run build` | Content validation, both typechecks and Vite; remains safe when run on its own, including prefix builds. |
+| Aggregate bundle step | `npm run build:bundle` | Internal to full verification after successful units/content and both type scopes. Creates the root, prefix or restored-root bundle without revalidating unchanged prerequisites. Use `npm run build` directly outside that guarded sequence. |
 | Default Chromium | `npx --no-install playwright test` | All default files listed below, desktop + mobile portrait/landscape. The dev-only placement case skips in preview and must run separately. |
 | Authored encounter fixtures | `npm run test:fixtures -- authored-encounters.spec.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
 | Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
@@ -156,11 +159,16 @@ projects and assertions. The old individual config entry points remain supported
 ### Explicit full verification
 
 `npm run verify:full` executes the complete inventory sequentially: tooling,
-units, safe standalone root build (content plus both typechecks), default Chromium,
+all fast units (including content), both type scopes, root/prefix build integrations,
+then the root bundle and default Chromium,
 combined fixtures, dev placement, both WebKit configs, health bars, production and
 dev telemetry, root dev assets, isolated performance capture, prefix build/assets
 in preview and dev, then root-build restoration. Root preview assets already run
-in the default Chromium suite. Duplicate validation remains until #206.
+in the default Chromium suite. The 19 stages validate ordinary content and both
+type scopes once before any ordinary bundle. Prefix and restored-root bundles
+reuse those successful prerequisites; neither is executed after unit/content or
+type failure. Independent dev suites and build integrations continue. Configured
+telemetry retains its separate build and validation because its flags differ.
 `npm run verify:full -- --list` displays the stage plan without executing it.
 Aggregate filters are rejected; use the focused commands instead.
 
@@ -265,7 +273,7 @@ separate coordination. Multiple agents/containers sharing one GPU are not isolat
 capacity. #208 sizes shards from measured available hosts and reports queue/setup
 as well as execution time. No hosted workflow is introduced by this policy.
 
-#202 supplies explicit fixture/full commands. #200 supplies timing/provenance
-tooling; #203 changes the matrix; #204/#205 reduce repeated setup; #206 removes
-duplicate build validation. Until merged, those proposed commands/optimizations
+#202 supplies explicit fixture/full commands; #206 separates unit/build checks
+and removes repeated ordinary aggregate validation. #200 supplies timing/provenance
+tooling; #203 changes the matrix; #204/#205 reduce repeated setup. Until merged, those proposed commands/optimizations
 are not available and their benefits must not be claimed.
