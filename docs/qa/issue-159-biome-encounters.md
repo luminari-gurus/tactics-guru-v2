@@ -1,6 +1,6 @@
 # Issue #159 biome encounter acceptance
 
-Date: 2026-10-21, Asia/Jerusalem. Status: Chromium and WebKit desktop/portrait/landscape matrices and narrow rechecks complete; full application suite in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
+Date: 2026-10-21, Asia/Jerusalem. Status: focused matrices complete; full-suite failures are being repaired and a long-history cache regression has been reproduced/fixed. Full-suite acceptance is pending. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
 
 ## Implementation and source
 
@@ -50,6 +50,10 @@ Six additional WebKit kind/inspection rechecks pass with explicit [320×568 vaul
 
 ## Remaining qualification
 
+The [first full run](issue-159-biome-encounters/initial-full-suite.txt.gz) was stopped after 223 passes and eight failures, with one existing skip, one interrupted case and 448 not run; posttests did not execute. Seven failures required a real BFCache return that the default headless-shell launch did not provide. The same cases pass unchanged with the installed full Chromium binary ([7-pass / 1-failure probe](issue-159-biome-encounters/full-chromium-probe.txt.gz)). The eighth timeout also reproduces there: the restarted-scene test waits for boot while its fake clock remains paused. These results are retained and are not reclassified as application regressions or accepted baselines without evidence. A test-host/clock repair and clean full rerun remain required.
+
+The historical cache checkpoint addressed a 44-floor scan that repeated 132 graph resolutions by enlarging a SHA-256 admission cache. It reported **880/880** units, 221 content checks, typechecks/build and three performance cases. Its [desktop](issue-159-biome-encounters/cache-desktop-performance.json), [portrait](issue-159-biome-encounters/cache-portrait-performance.json) and [landscape](issue-159-biome-encounters/cache-landscape-performance.json) receipts all record `dirty: true`: `ab4c521` identifies HEAD, not an exclusively bound measured bundle. Their passing values (398,321 code bytes; 5.0–9.4 ms p95 steps) are dirty historical observations. The current parent instead validates geometry at floor activation and uses a 128-entry working set; its qualification/source bindings are separate. No earlier full run is reclassified as green.
+
 Complete the full `npm test -- --output=tmp/issue-159-full-results` (681 main cases, then automatic encounter/item posttests) and final spec/receipt/publication checks. The 879-unit/content/type/build checks are already green and remain reusable while runtime code is unchanged. Record actual failures and their repairs here; do not turn #190's macOS native-select report into an unverified current-host baseline. No merge or production deployment is part of this delivery.
 
 ## PR #194 review repair
@@ -61,3 +65,9 @@ The test-only player helper has one optional preference for finishing wounded en
 Local full units pass **881/881**, including the new two-floor domain witness and the admission-cache regression moved into #192. Content validation (**221** checks), both TypeScript scopes, build and strict OpenSpec pass. The desktop Chromium browser route passes in **3.7 minutes**; WebKit portrait and landscape pass in **2.3/2.4 minutes**. All three independently walk and play the complete route. The complete-route deadline is ten minutes because it now plays six full encounters; individual assertions and product/performance budgets remain unchanged.
 
 [Review receipts and screenshots](issue-159-biome-encounters/review-194/) retain the six battle records and final state, unit/build/browser logs, and [source/test tree bindings](issue-159-biome-encounters/review-194/source.json). Earlier seed-43 receipts remain historical. The initial desktop run used the same six-encounter assertions before the final aggregate-deadline and screenshot-scroll adjustments; the WebKit run uses the committed repair exactly. Build dirtiness from the local dependency symlink is disclosed in the source binding.
+
+## Historical cache receipt provenance
+
+Historical cache-specific receipts `cache-desktop-performance.json`, `cache-portrait-performance.json` and `cache-landscape-performance.json` all record `dirty: true`. Their `commit` field names HEAD `ab4c521`; it does not bind the measured bundle exclusively to that commit. Their passing values are dirty historical observations, not clean exact-commit certification. Current parent qualification and its source bindings are separate evidence.
+
+**Current parent reference (2026-10-21):** #194 at `95909244ca33d702fc5a357a199dcf4830b250c1` contains the legacy/cold-start repairs and legal two-floor/all-kind proof. This #197 tree has identical runtime, tests, dependencies and build configuration to that specific updated parent, verified by direct diff. Earlier `c9fa877` describes a previous checkpoint and does not establish equality for the later legacy repair. The current admission strategy validates historical identities immediately and geometry before floor activation, using a bounded 128-entry working set; the original enlarged-cache receipts are historical.
