@@ -160,6 +160,40 @@ describe('dungeon recovery limits',()=>{
 });
 
 describe('durable encounter policies', () => {
+  it('cold-decodes a bounded format-3 history by resolving only the current floor', async () => {
+    const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
+      const descriptor=floorDescriptor(base.seed,i+1);
+      return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
+    });
+    const state={...base,depth:250,floors},encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+    expect(utf8Bytes(encoded.text)).toBeLessThan(1024*1024);
+    vi.resetModules();
+    const coldFields=await import('../../src/domain/battlefield'),coldEnvelope=await import('../../src/domain/dungeonSaveEnvelope');
+    const resolver=vi.spyOn(coldFields,'resolveBattlefield');
+    try {
+      const begin=performance.now(),decoded=coldEnvelope.decodeDungeon(encoded.text);
+      console.info(JSON.stringify({format:3,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
+      expect(decoded).toEqual({ok:true,state});expect(resolver).toHaveBeenCalledTimes(3);
+      expect(encodeDungeon(decoded.ok?decoded.state:null)).toEqual(encoded);
+    } finally {resolver.mockRestore();}
+  },60000);
+  it('rejects historical source mismatches immediately and geometry tampering before travel is published', () => {
+    const base=freshDungeon('lazy-history',43),first=base.floors[0],descriptor=floorDescriptor(base.seed,2);
+    const state={...base,depth:2,floors:[{...first,completed:3},{descriptor,completed:0,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)}]};
+    for(const field of ['encounterId','mapId','layoutSeed']) {
+      const bad=JSON.parse(JSON.stringify(state)),battlefield=bad.floors[0].descriptor.encounters[0].battlefield;
+      expect(battlefield.kind).toBe('generated');
+      if(field==='layoutSeed')battlefield.layoutSeed=(battlefield.layoutSeed+1)>>>0;
+      else battlefield[field]=field==='mapId'?'map:unknown':'encounter:unknown';
+      expect(readDungeon(bad).ok).toBe(false);
+    }
+    const historical=JSON.parse(JSON.stringify(state));historical.floors[0].descriptor.encounters[0].battlefield.mapHash='sha256:'+'0'.repeat(64);
+    const checked=good(readDungeon(historical)),encoded=encodeDungeon(checked);if(!encoded.ok)throw Error(encoded.reason);
+    const m=memory();m.setItem(DUNGEON_KEYS.primary,encoded.text);
+    const session=new DungeonSession(checked,createDungeonStorage(()=>m)),before=session.snapshot;
+    expect(session.travel('ascend',before.revision)).toBe(false);expect(session.snapshot).toEqual(before);
+    expect(m.getItem(DUNGEON_KEYS.primary)).toBe(encoded.text);
+  });
   it.each([1,2] as const)('normalizes a long format-%i history without resolving inactive legacy battlefields', format => {
     const base=freshDungeon('long-prior',13,LEGACY_ENCOUNTER_POLICY);
     const floors=Array.from({length:300},(_,i)=>{
