@@ -43,13 +43,14 @@ export function dungeonSeed(seed: number, depth: number, purpose: 'floor' | 'bat
 }
 // Saved movement validates the whole snapshot repeatedly. Cache only proven immutable
 // encounter facts, never floor progress or geometry; the complete key changes on tampering.
+const MAX_DUNGEON_FLOORS = 8192;
 const admittedEncounters = new Map<string, true>();
 function admissionKey(seed: number, selection: EncounterSelection, battlefield: BattlefieldDescriptor) {
-  return canonical({ seed, selection, battlefield });
+  return hashJson({ seed, selection, battlefield });
 }
 function rememberAdmission(key: string) {
   admittedEncounters.delete(key); admittedEncounters.set(key, true);
-  if (admittedEncounters.size > 128) admittedEncounters.delete(admittedEncounters.keys().next().value!);
+  if (admittedEncounters.size > MAX_DUNGEON_FLOORS * 3) admittedEncounters.delete(admittedEncounters.keys().next().value!);
 }
 /** Only resolved geometry is evicted. Durable descriptors/completion never enter this cache. */
 export class FloorCache {
@@ -125,7 +126,7 @@ function readDungeonValue(input: unknown, format: 1 | 2 | 3 = 3): DungeonResult 
   const legacy = format === 1, prior = format !== 3;
   if (!hasShape(input, ['id','seed','revision','depth','floors','party','ownership','phase','offer','activeBattle','battlefield', ...(prior ? [] : ['encounterPolicy'])]) ||
     typeof input.id !== 'string' || !/^[A-Za-z0-9-]{1,64}$/.test(input.id) || !seedOk(input.seed) || !safeCount(input.revision) || !safeCount(input.depth, 1) ||
-    !isDenseArray(input.floors, 8192) || !input.floors.length || input.depth > input.floors.length || !isDenseArray(input.party, 3) || input.party.length !== 3) return fail('invalidState');
+    !isDenseArray(input.floors, MAX_DUNGEON_FLOORS) || !input.floors.length || input.depth > input.floors.length || !isDenseArray(input.party, 3) || input.party.length !== 3) return fail('invalidState');
   const policy = prior ? LEGACY_ENCOUNTER_POLICY : input.encounterPolicy;
   if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY) return fail('invalidPolicy');
   const floors: DungeonFloor[] = [];
