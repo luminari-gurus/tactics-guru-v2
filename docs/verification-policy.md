@@ -1,13 +1,15 @@
 # Verification tiers and evidence reuse
 
-This is the selection contract for #201. It describes the commands available on
-main at `35afc77`; it does not change test selection, scripts, assertions, retries,
-timeouts or performance limits. Re-inventory after new tests/configurations merge.
+This is the selection contract for #201. Select checks by the behavior and
+consumers affected, not by a dependency version, lockfile edit or merge step alone.
+The inventory below does not change scripts, assertions, retries, timeouts or
+performance limits. Re-inventory when tests/configurations change.
 An issue's explicit acceptance criteria remain required; this policy does not
 silently waive them. Browser/device emulation satisfies device acceptance under
 AGENTS.md unless the caller explicitly requests physical devices for that task.
 
 Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-change),
+[small dependency patches](#small-dependency-patches), [merge checks](#merge-checks),
 [suites and commands](#current-suite-inventory-and-commands),
 [evidence reuse](#evidence-reuse-and-final-source-identity),
 [self-hosted execution](#execution-capacity-and-follow-up-work).
@@ -18,12 +20,15 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 | --- | --- | --- |
 | Iteration | While changing one behavior | Run the smallest affected unit/test file and relevant browser case; use file/project/title filters. Record failures. This is feedback, not PR acceptance. |
 | PR readiness | Final affected inputs are frozen | Apply the change matrix below, include transitive consumers and meaningful negative cases, verify the final build identity, and account for reused evidence. Include required device/engine cases. |
-| Full regression | Broad/uncertain impact, shared test harness or selection changes, dependency/browser upgrades, cross-cutting runtime changes, release qualification, or explicit issue/caller requirement | Account for every suite in the inventory, including dev-only checks and distinct telemetry builds. Reuse only qualifying unchanged evidence; run invalidated coverage. |
+| Full regression | Cross-cutting runtime/save/input changes, broad shared harness changes, major engine/compiler/browser compatibility changes with broad impact, affected consumers that remain unbounded after focused inspection, release qualification, or explicit issue/caller requirement | Account for every suite in the inventory, including dev-only checks and distinct telemetry builds. Reuse qualifying existing evidence; run invalidated coverage. |
 
-Choose the union for mixed changes. Expand to full regression when affected
-consumers cannot be bounded convincingly. A small diff is not proof of small
-impact. Isolated test repairs require the repaired case, relevant consumers and
-an exact-base comparison when attributing a failure; they do not automatically
+Choose the union of affected checks for mixed changes. A dependency or browser
+upgrade does not automatically select full regression; inspect its actual changes
+and consumers first. Expand only for a concrete broad impact or unresolved reach,
+and record that reason before starting the larger run. A small diff or patch
+version alone is not proof of small impact. Isolated test repairs require the
+repaired case, relevant consumers and an exact-base comparison when attributing
+a failure; they do not automatically
 require another full matrix. Preserve the original full-run failure even when a
 focused repair passes. Never label that combination a clean full-suite run.
 
@@ -34,19 +39,55 @@ Check imports, callers, fixtures and config before choosing exact tests.
 
 | Change | Required checks and browser scope |
 | --- | --- |
-| Docs / agent instructions only | Check links, paths, command syntax and consistency with configs. If commands or selection guidance change, use test discovery to verify them. No app build/browser execution solely for prose changes. Changes to actual test/config code use the applicable rows below. |
+| Docs / agent instructions only | Check links, paths, command syntax and consistency with configs. Use test discovery for changed commands, filters or suite membership; prose-only policy changes need no application execution. Changes to actual test/config code use the applicable rows below. |
 | UI / layout / input | Affected UI/geometry units; both TypeScript scopes and production build; affected browser files with desktop keyboard/focus and portrait/landscape native touch. Include narrow layouts and relevant health-bar/WebKit configs. Preserve preparation, modal, resize and input-lock boundaries. Shared HUD/scene changes include standalone, run and dungeon consumers. |
 | Domain / combat / content rules | Affected domain/session/content units, both TypeScript scopes and build. Exercise affected abilities/commands through the real HUD and a complete legal battle or run journey; include save/replay consequences. Shared turn/RNG/command contracts require full unit and browser regression. Add dev encounter/item suites when their consumers change. |
 | Persistence / lifecycle | Relevant storage/envelope/session units, both TypeScript scopes and build; affected battle/run/dungeon reload, corruption, backup, stale-write, focus and actual BFCache cases. Include WebKit acceptance/exploration and legal complete journeys for affected routes. Shared save formats/admission or cross-route lifecycle changes require full regression. |
-| Assets / build / loading | Affected content/inventory/export units and `buildHeaders.test.ts` (both root/prefix builds), both TypeScript scopes and production build; asset/base-path, loading/failure and boot tests at root/prefix and relevant dev/preview modes. Include visual desktop/mobile checks for changed art and audio delivery/unlock for audio changes. Run isolated performance captures when bytes/startup/rendering can change. Toolchain/lockfile upgrades require full regression. |
+| Dependency / security patch | Use the [small dependency patch](#small-dependency-patches) checks when impact is bounded. Runtime, browser and engine changes also select the rows for their affected behavior. A lockfile edit is not a blanket full-regression trigger. |
+| Assets / build / loading | Affected content/inventory/export units and `buildHeaders.test.ts` (both root/prefix builds), both TypeScript scopes and production build; affected asset/base-path, loading/failure and boot cases in relevant modes. Include visual desktop/mobile checks for changed art and audio delivery/unlock for audio changes. Inspect build-size deltas; collect performance captures for changed performance behavior, a material delta that threatens a documented budget, or explicit release/performance qualification. Bounded toolchain patches use the dependency row. |
 | Telemetry | Telemetry units, both TypeScript scopes, ordinary unconfigured build behavior and dedicated configured production + development telemetry suites. Retain opt-out, disabled/failure behavior, error mapping and gameplay-independence assertions. Shared bootstrap/transport consumers expand selection. Never reuse an ordinary build as proof of the instrumented build. |
 | Test tooling / CI / selection | Relevant tooling contracts, config discovery and exact before/after selected test IDs; execute affected modes/engines on the qualified runner. Changed shared harness/project/selection behavior requires full regression of affected coverage, with explicit coverage mapping for any removed execution. A test-only edit can invalidate acceptance evidence. |
 
 Use complete legal journeys, not mocked unit tests, as browser interaction proof.
 Retain touch/pointer, orientation, keyboard/focus, audio unlock and engine-specific
 lifecycle checks on their actual profiles. Viewport resizing does not substitute
-for touch-device or WebKit coverage. Do not reduce current matrices in this task;
-#203 owns measured matrix changes and #204/#205 own fixture/audio refactors.
+for touch-device or WebKit coverage when those behaviors are affected. Selecting
+focused checks under this policy does not remove tests from the configured full
+matrices. #203 owns measured matrix changes and #204/#205 own fixture/audio refactors.
+
+### Small dependency patches
+
+For a patch whose impact can be bounded from its advisory/changelog, dependency
+diff and actual consumers, use PR readiness rather than full regression:
+
+- Inspect the direct and transitive lockfile changes; verify installation and the
+  applicable dependency audit. A patch version alone does not establish scope.
+- Run the affected consumer checks. For a build-tool patch, the ordinary build
+  already covers content validation and both TypeScript scopes; add the existing
+  build integration tests and a focused boot/dev-server smoke as relevant.
+- Reuse valid unaffected unit/gameplay/device evidence under the rules below.
+  Add engine, lifecycle, telemetry or performance runs only when the changed
+  behavior, a failure or an explicit acceptance gate requires them.
+
+For example, a same-minor Vite editor-security patch normally needs audit,
+build/type/content checks, root/prefix build-header tests and focused boot or
+dev-server checks. It does not require replaying the complete battle/dungeon,
+audio, telemetry and device matrices solely because Vite and its lockfile changed.
+Broaden if inspection or those focused checks expose a wider regression risk.
+
+### Merge checks
+
+Use the qualification already attached to the PR and current main. A merge is not
+a new release qualification.
+Refresh the exact head/current base, reviews, required CI, branch rules and merge
+tree. Review the retained evidence and run only missing or invalidated checks for
+the affected scope. A new merge SHA, documentation edit or advance of main does
+not by itself invalidate earlier results. Compare relevant inputs and the combined
+tree first; conflicts require checking the resolved behavior and its consumers.
+
+Once applicable checks and repository merge gates are satisfied, merge, verify
+the published tree/parents and remote parity, and stop. Do not repeat passing
+suites or add release/performance qualification merely to finish a merge.
 
 ## Current suite inventory and commands
 
@@ -133,8 +174,14 @@ Use the #207 receipt wrapper only once it is available on the tested branch.
 
 ## Evidence reuse and final-source identity
 
-Evidence can be reused for a particular coverage obligation only when all inputs
-that affect it are unchanged and the original result and artifacts are available.
+Start with the PR's existing CI/local results and retained artifacts. Evidence can
+be reused for a coverage obligation when the inputs and behavior relevant to that
+obligation are unchanged, or their equivalence is demonstrated. A lockfile change
+does not invalidate every suite: identify which changed dependencies and behavior
+each check actually relies on. For a bounded patch, focused fresh compatibility
+checks can accompany reused evidence for unaffected behavior; they do not become
+a claim that the entire suite ran on the new dependency version.
+The original result and supporting artifacts must be available.
 A matching commit message, successful rerun of a different test, or a clean git
 status alone is insufficient. Record in the PR:
 
@@ -145,15 +192,20 @@ status alone is insufficient. Record in the PR:
   conditions. Capture allowlisted settings, not secrets or the whole environment.
 - Results and retained report paths/hashes, including failures, skips, retries,
   interruptions and cases not run; identify each reused coverage obligation.
-- Final commit and a dependency-aware comparison explaining why the relevant
-  source, test, helper, config, dependency, asset and build inputs are unchanged.
+- Final commit and a dependency-aware comparison identifying the source, tests,
+  helpers, configs, dependencies, assets and build inputs relevant to each reused
+  check, and why its covered behavior is unchanged or equivalent.
 
-Changes to any of those relevant inputs invalidate the affected evidence. Shared
-helpers/configuration invalidate all their consumers; unknown reach requires
-broader verification. A different host/browser/cache can invalidate performance
-comparisons even if source is identical. A new build must be identified separately;
-reuse only with demonstrated relevant artifact/input equivalence, including build
-metadata where behavior reads it. Build/server-mode differences are not equivalent.
+Changes to relevant behavior invalidate the affected evidence. Shared helper or
+configuration changes require tracing their consumers; rerun the affected checks
+and reuse demonstrably unchanged coverage. Unknown reach requires broader
+verification, not an automatic restart of every suite. A different host, browser
+or cache can invalidate performance comparisons even if source is identical.
+Identify a new build separately. Claims about exact bytes, caching, provenance or
+performance require relevant artifact/input equivalence, including build metadata
+where it matters. Unaffected functional coverage follows the behavior-based reuse
+rules above; a routine toolchain patch does not require comparing every emitted
+byte. Build/server modes are not interchangeable for assertions that depend on them.
 
 Run affected checks after the last relevant edit and tie them to the final served
 build. Documentation-only follow-ups may reference earlier runtime evidence after
@@ -162,10 +214,13 @@ Never say an old run executed the final commit. Failed or incomplete runs remain
 failed/incomplete; focused repair evidence does not erase them. Missing artifacts
 or uncertain provenance cannot support acceptance reuse.
 
-When a failure is isolated, reproduce that exact case on a worktree at the literal
-base SHA with the same dependencies, browser, mode and build conditions. Retain
-both outputs and compare the assertion. A matching base failure can establish a
-pre-existing limitation; it does not authorize weakening, hiding or skipping it.
+To attribute a failure to the change or establish that it is pre-existing, compare
+that case with the literal base SHA under matching relevant conditions; reuse a
+valid existing base result when available. Retain both outputs and compare the
+assertion. Do not rerun the entire base suite for a focused comparison. A matching
+base failure does not authorize weakening, hiding or skipping it. Setup failures
+require fixing the environment and repeating blocked checks, not restarting
+unaffected passing suites. Keep failures and incomplete runs explicit.
 
 ## Execution capacity and follow-up work
 
