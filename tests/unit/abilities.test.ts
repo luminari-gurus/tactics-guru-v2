@@ -213,7 +213,7 @@ it('validates attack profiles and includes their numbers in the content identity
     expect(validateContent({ ...copy, abilities: { ...copy.abilities,
       'ability:high_shot': { ...copy.abilities['ability:high_shot'], ...patch } } }).ok).toBe(false);
   }
-  for (const id of ['ability:unknown', '__proto__', 'constructor']) {
+  for (const id of ['ability:Bad', '__proto__', 'constructor']) {
     const abilities = Object.fromEntries([...Object.entries(copy.abilities), [id, { ...copy.abilities['ability:high_shot'], id }]]);
     expect(validateContent({ ...copy, abilities }).ok).toBe(false);
   }

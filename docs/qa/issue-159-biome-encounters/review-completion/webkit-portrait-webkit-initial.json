@@ -1,0 +1,270 @@
+{
+  "frames": {
+    "idle": [
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16
+    ],
+    "steps": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      17
+    ],
+    "idleP50": 16,
+    "idleP95": 17,
+    "stepP95": 17
+  },
+  "frameBudgets": {
+    "idleP50": 16.7,
+    "idleP95": 20,
+    "stepP95": 33.4
+  },
+  "framePasses": {
+    "idleP50": true,
+    "idleP95": true,
+    "stepP95": true
+  },
+  "commit": "462af95b7931c03221763482bbdc79b9ee7bdc8f",
+  "dirty": true,
+  "viewport": {
+    "width": 390,
+    "height": 664,
+    "dpr": 3
+  },
+  "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1",
+  "floorCreationMs": 39,
+  "descriptorBytes": 3525,
+  "saveBytes": 4472,
+  "coldUsableMs": 333,
+  "stepP95Ms": 11,
+  "codeGzipBytes": 398451,
+  "observedAssetBytes": 0,
+  "budgets": {
+    "coldUsableMs": 2500,
+    "stepP95Ms": 33.4,
+    "codeGzipBytes": 400000,
+    "assetBytes": 1500000
+  },
+  "passes": {
+    "cold": true,
+    "step": true,
+    "code": true,
+    "assets": true
+  },
+  "code": [
+    {
+      "url": "/assets/telemetry-DUsjSLnt.js",
+      "raw": 454,
+      "gzip": 243
+    },
+    {
+      "url": "/assets/index-DMTxwUeY.js",
+      "raw": 2395,
+      "gzip": 1105
+    },
+    {
+      "url": "/assets/preload-helper-DjzSQ1t3.js",
+      "raw": 1383,
+      "gzip": 749
+    },
+    {
+      "url": "/assets/preferences-eSYjo6Li.js",
+      "raw": 5454,
+      "gzip": 2459
+    },
+    {
+      "url": "/assets/preferences-D1bXSLXU.css",
+      "raw": 719,
+      "gzip": 359
+    },
+    {
+      "url": "/assets/startDungeonApp-DM-8XWYN.js",
+      "raw": 41900,
+      "gzip": 13877
+    },
+    {
+      "url": "/assets/start-Cd_qQgP1.js",
+      "raw": 1427668,
+      "gzip": 368579
+    },
+    {
+      "url": "/assets/battleLayout-BVayxngr.js",
+      "raw": 559,
+      "gzip": 311
+    },
+    {
+      "url": "/assets/browser-C2_n4pWP.js",
+      "raw": 3264,
+      "gzip": 1369
+    },
+    {
+      "url": "/assets/rng-CkITdvgm.js",
+      "raw": 1651,
+      "gzip": 801
+    },
+    {
+      "url": "/assets/battleLayout-C6wfuIJB.css",
+      "raw": 10757,
+      "gzip": 2691
+    },
+    {
+      "url": "/assets/biomes-DV9OYEZi.js",
+      "raw": 4138,
+      "gzip": 1821
+    },
+    {
+      "url": "/assets/items-Dv7XYjyK.js",
+      "raw": 8335,
+      "gzip": 3086
+    },
+    {
+      "url": "/assets/startDungeonApp-BlfelHn9.css",
+      "raw": 2719,
+      "gzip": 1001
+    }
+  ],
+  "timings": [
+    4,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11
+  ],
+  "resources": [
+    {
+      "name": "http://127.0.0.1:4173/assets/telemetry-DUsjSLnt.js",
+      "encodedBodySize": 454
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/index-DMTxwUeY.js",
+      "encodedBodySize": 1122
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preload-helper-DjzSQ1t3.js",
+      "encodedBodySize": 766
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-eSYjo6Li.js",
+      "encodedBodySize": 2476
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-D1bXSLXU.css",
+      "encodedBodySize": 719
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-DM-8XWYN.js",
+      "encodedBodySize": 13895
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/start-Cd_qQgP1.js",
+      "encodedBodySize": 368885
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-BVayxngr.js",
+      "encodedBodySize": 559
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/browser-C2_n4pWP.js",
+      "encodedBodySize": 1386
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/rng-CkITdvgm.js",
+      "encodedBodySize": 818
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-C6wfuIJB.css",
+      "encodedBodySize": 2708
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/biomes-DV9OYEZi.js",
+      "encodedBodySize": 1838
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/items-Dv7XYjyK.js",
+      "encodedBodySize": 3103
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-BlfelHn9.css",
+      "encodedBodySize": 1018
+    }
+  ]
+}

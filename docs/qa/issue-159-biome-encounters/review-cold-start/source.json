@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "86781a3e2dfc7bc370dbd022c798c0c6c0eb9c82",
+  "runtimeTree": "d5b10baff284197407d8bd82bb79ed263f737b4d",
+  "testsTree": "e2120418f94f5d46e5db057b7092d0685dcc87a8",
+  "before": {
+    "floors": 250,
+    "bytes": 924599,
+    "resolutions": 750,
+    "decodeMs": 4211.1
+  },
+  "after": {
+    "resolutions": 3,
+    "decodeMs": 158.9
+  },
+  "browsers": [
+    {
+      "floors": 250,
+      "bytes": 924599,
+      "coldUsableMs": 807,
+      "budgetMs": 2500,
+      "rawRetained": true,
+      "profile": "browser"
+    },
+    {
+      "floors": 250,
+      "bytes": 924599,
+      "coldUsableMs": 1121,
+      "budgetMs": 2500,
+      "rawRetained": true,
+      "profile": "webkit"
+    }
+  ],
+  "proof": "885 units; cold module decode verifies current geometry only, every selection/source identity immediately, failed historical geometry travel cannot publish/save; legacy full format-3 still supported. Three browser checks include long cold Continue on desktop Chromium and portrait WebKit under the existing 2500-ms budget. Historical hashes stay unchanged. No new cache; bounded 128-entry working set replaces the earlier enlarged history cache."
+}

@@ -17,7 +17,8 @@ Do not install an unrelated latest global CLI. Repeat installation after lockfil
 updates. Linux setup uses Playwright's `--with-deps` installer; it needs package
 manager privileges and access to OS package repositories and Playwright download
 hosts. Invalid/truncated ZIP downloads are setup failures, not test failures.
-An unprivileged runner should use the CI job or a pre-provisioned environment;
+An unprivileged runner needs a pre-provisioned environment; the CI job installs
+browser binaries but does not install privileged OS packages;
 do not disable package-manager security or treat missing libraries as test skips.
 See [Playwright browsers](https://playwright.dev/docs/browsers).
 
@@ -40,7 +41,7 @@ native-select tests are unchanged; native-select repair belongs to #190.
 ## Bounded diagnostics
 
 ```sh
-# Isolate one test without npm test's implicit encounter/item posttests:
+# Run one focused test with durable receipts:
 npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
 # Only for a focused failure reproduction:
 npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
@@ -58,7 +59,7 @@ Trace collection still adds overhead while the test runs; traced runs are not
 performance baselines. Open a retained trace with `npx --no-install playwright
 show-trace <trace.zip>`. Do not publish raw traces without inspecting their contents.
 The wrapper owns output/reporter/trace/retry CLI flags; use the direct Playwright
-CLI for other custom reporting workflows. Existing `npm test` behavior is unchanged.
+CLI for other custom reporting workflows. `npm test` now runs only its selected cases; use `npm run test:fixtures` for the explicit dev fixtures from #202.
 
 ## Compare an isolated failure against the exact base
 
@@ -104,6 +105,27 @@ exists on the default branch). Dispatch only a reviewed, trusted ref: this is a
 public repository and automatic fork PR execution must not reach the persistent
 self-hosted machine. Automatic PR routing and isolated workers belong to #208.
 Checkout does not persist repository credentials.
+
+Before the workflow reaches main, qualify the reviewed PR revision directly on
+the provisioned host under the runner service account. Use a separate clean
+worktree at the literal reviewed SHA, then run the same steps as the workflow:
+
+```sh
+npm ci
+npm run setup:browsers
+npm run check:browsers
+node --test tests/tooling/browser-diagnostics.test.mjs
+npm run build
+npm run test:browser-smoke -- --diagnostics
+```
+
+Stop and fix a failed prerequisite before running its dependent checks. Retain
+command logs and `verification-receipts/`, including any failed preflight. The
+diagnostics contract must verify that ordinary Playwright cleanup removes its
+sentinel while preserving the environment/JSON/failure-trace hashes. A successful
+smoke report must contain both setup projects with zero retries or skips. This
+direct qualification does not require merging the PR or adding an automatic
+trigger to the persistent runner.
 
 The `tactics-browser-exclusive` concurrency group serializes browser jobs across
 refs. Reuse that exact group in future timing workflows on this repository, and

@@ -2,7 +2,7 @@
 
 ## Context
 
-See [proposal](proposal.md) for motivation and [implementation plan](../../../docs/ongoing-projects/plan.md)
+See [proposal](proposal.md) for motivation and [implementation plan](../../../docs/ongoing-projects/issue-154-overworld-markers-plan.md)
 for the source-grounded control contracts and full acceptance matrix. `/map` is a DOM grid;
 its artwork loader already redraws current state after decoding.
 

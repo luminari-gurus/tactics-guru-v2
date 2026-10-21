@@ -21,7 +21,10 @@ function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false,firstS
   for(let seed=firstSeed;seed<80;seed++){
     const session=new BattleSession(catalog,'map:forest_ruins',seed);
     for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
-      const command=session.phase==='player'?playerDecision(session.state):null;
+      let command=session.phase==='player'?playerDecision(session.state):null;
+      // The picker uses the domain's same-target shorthand, including for one missile.
+      if(command?.type==='useAbility' && command.abilityId==='ability:magic_missile' && 'missileTargets' in command.target && command.target.missileTargets.length===1)
+        command={...command,target:{unitId:command.target.missileTargets[0]}};
       if(command)session.prepare(command);
       const step=command?session.confirm():session.nextEnemy();
       if(!step)throw Error('Policy failed to make progress');
@@ -287,7 +290,10 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
     await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
     await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
     await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
-    await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();await ready(page);
+    const replacementSeed=((await readSession(page)).state.seed+1)>>>0;
+    await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
+    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
+    await ready(page);
     expect((await readSession(page)).state.seed).toBe(fixture.before.seed+1);expect((await report(page)).effect).toBeNull();
     await expect(page.locator('canvas')).toHaveCount(1);
   }
@@ -477,8 +483,13 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   await page.clock.runFor(560);
   expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
   for (let i = 0; i < 2; i++) {
+    const replacementSeed = ((await readSession(page)).state.seed + 1) >>> 0;
     await page.locator('#fit-restart').click(); await confirmRestart(page, true);
-    await page.clock.runFor(3000); await ready(page);
+    // Async scene/asset startup needs live frames before controlled bob sampling resumes.
+    await page.clock.resume();
+    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
+    await ready(page);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
     const baseline = await report(page);
     for (let sample = 0; sample < 5; sample++) { await page.clock.runFor(300); await bobFrame(page); }
     expect((await report(page)).objectCount).toBe(baseline.objectCount);

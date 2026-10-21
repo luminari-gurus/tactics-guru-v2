@@ -1,0 +1,14 @@
+import {chromium,expect} from '@playwright/test';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+const page=await browser.newPage();await page.goto('http://127.0.0.1:4174');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+await page.evaluate(()=>{window.events=[];for(const type of ['keydown','input','change'])document.querySelector('#battle-target').addEventListener(type,e=>window.events.push({type,key:e.key,value:e.target.value,trusted:e.isTrusted}));});
+const target=page.locator('#battle-target');const label=await target.locator('option').nth(1).textContent();console.log({label});
+for(const action of ['select','clear','select','cancel','select','confirm']){
+ await target.press('Tab');await target.focus();
+ if(action==='select')await target.pressSequentially(label);
+ if(action==='clear')await target.pressSequentially('Choose target');
+ if(action==='cancel'){await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();}
+ if(action==='confirm'){await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();}
+ console.log({action,value:await target.inputValue(),enabled:await page.locator('#battle-review').isEnabled(),events:await page.evaluate(()=>window.events.splice(0))});
+}
+await browser.close();

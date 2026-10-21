@@ -14,15 +14,17 @@
     "test": "playwright test",
     "test:unit": "vitest run",
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
-    "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts",
-    "posttest": "playwright test -c playwright.encounters.config.ts && playwright test -c playwright.run-items.config.ts",
+    "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts tests/unit/dungeonEncounters.test.ts",
     "telemetry:release": "node scripts/posthog-release.mjs",
     "test:telemetry": "playwright test -c playwright.telemetry.config.ts",
     "setup:browsers": "playwright install chromium webkit",
     "setup:browsers:linux": "playwright install --with-deps chromium webkit",
     "check:browsers": "node scripts/browser-check.mjs",
     "test:browser": "node scripts/browser-test.mjs",
-    "test:browser-smoke": "node scripts/browser-test.mjs -c playwright.setup-smoke.config.ts"
+    "test:browser-smoke": "node scripts/browser-test.mjs -c playwright.setup-smoke.config.ts",
+    "test:fixtures": "playwright test -c playwright.fixtures.config.ts",
+    "verify:full": "node scripts/verify-full.mjs",
+    "test:verification": "node --test tests/tooling/verify-full.test.mjs"
   },
   "dependencies": {
     "@posthog/core": "1.59.1",
@@ -33,7 +35,7 @@
     "@posthog/cli": "0.18.10",
     "@types/node": "26.6.4",
     "typescript": "7.0.2",
-    "vite": "8.3.2",
+    "vite": "8.3.5",
     "vitest": "5.0.3"
   }
 }

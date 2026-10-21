@@ -34,6 +34,15 @@ specifications, and skills; historical wording alone does not reinstate them.
 Retain actual test failures and limitations, and describe emulation accurately
 without claiming that physical hardware was tested.
 
+## Verification scope
+
+Follow [docs/verification-policy.md](docs/verification-policy.md) for proportional
+iteration, PR-readiness and full-regression checks. Map all affected consumers and
+retain explicit issue acceptance gates. Reuse evidence only with unchanged relevant
+inputs and recorded source/build identity; preserve failures and incomplete runs.
+Documentation-only changes do not require app/browser reruns. Browser CI uses the
+self-hosted runner with no automatic GitHub-hosted fallback.
+
 ## `/work-work-work`
 
 When the user submits `/work-work-work`, read and follow

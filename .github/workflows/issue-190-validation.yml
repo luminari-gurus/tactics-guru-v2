@@ -1,0 +1,94 @@
+name: Issue 190 native selection validation
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/issue-190-validation.yml'
+      - 'tests/battle-loop.spec.ts'
+permissions:
+  contents: read
+jobs:
+  battle-loop:
+    if: github.event.pull_request.number == 213 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Audit dependency security
+        run: |
+          mkdir -p verification-receipts
+          npm audit --json > verification-receipts/audit.json
+      - name: Verify root and prefix production builds
+        run: npx --no-install vitest run tests/unit/buildHeaders.test.ts --reporter=json --outputFile=verification-receipts/build-headers.json
+      - run: npx --no-install playwright install --with-deps chromium
+      - name: Record source and browser
+        run: |
+          mkdir -p verification-receipts
+          node --input-type=module <<'JS'
+          import { chromium } from '@playwright/test';
+          import { execFileSync } from 'node:child_process';
+          import { writeFileSync } from 'node:fs';
+          const browser = await chromium.launch({ channel: 'chromium' });
+          const receipt = { commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), node: process.version, chromium: browser.version(), executable: chromium.executablePath(), platform: process.platform, arch: process.arch };
+          writeFileSync('verification-receipts/environment.json', JSON.stringify(receipt, null, 2));
+          await browser.close();
+          JS
+      - name: Build production bundle
+        id: build
+        run: npm run build
+      - name: Record toolchain and build identity
+        run: |
+          node --input-type=module <<'JS'
+          import { createHash } from 'node:crypto';
+          import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex');
+          const versions = Object.fromEntries(['vite', 'rolldown', 'postcss', '@playwright/test'].map(name => [name, JSON.parse(readFileSync(`node_modules/${name}/package.json`, 'utf8')).version]));
+          const files = ['package.json', 'package-lock.json', 'vite.config.ts', 'playwright.config.ts', 'tests/battle-loop.spec.ts', 'tests/boot.spec.ts'];
+          const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]);
+          writeFileSync('verification-receipts/build-identity.json', JSON.stringify({ versions, hashes: Object.fromEntries([...files, ...walk('dist')].map(path => [path, hash(path)])) }, null, 2));
+          JS
+      - name: Run the 12 affected movement cases
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/battle-loop.json
+        run: npx --no-install playwright test tests/battle-loop.spec.ts --grep "default Move initializes|clearing the native movement destination|movement confirmation (Cancel|Escape)" --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/artifacts
+      - name: Verify production boot and chunk failure behavior
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/boot-preview.json
+        run: npx --no-install playwright test tests/boot.spec.ts --project=desktop --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/boot-preview
+      - name: Verify development server boot
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_SERVER_MODE: dev
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/boot-dev.json
+        run: npx --no-install playwright test tests/boot.spec.ts --project=desktop --grep "boots a Phaser scene" --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/boot-dev
+      - name: Verify exact coverage and results
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          for (const [report, expected] of [['battle-loop', 12], ['boot-preview', 6], ['boot-dev', 1]]) {
+            const { stats } = JSON.parse(readFileSync(`verification-receipts/${report}.json`, 'utf8'));
+            assert.equal(stats.expected, expected, report);
+            for (const key of ['unexpected', 'flaky', 'skipped']) assert.equal(stats[key], 0, `${report}: ${key}`);
+          }
+          console.log('19 passed; zero failures, skips or flaky cases.');
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-190-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: ignore

@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
 
-// An explicit wrapper avoids npm test's implicit posttest suites for focused triage.
+// Focused triage adds durable receipts and optional failure traces to the npm test selection.
 const args = process.argv.slice(2);
 const diagnostic = args.includes('--diagnostics');
 const forwarded = args.filter(arg => arg !== '--diagnostics');

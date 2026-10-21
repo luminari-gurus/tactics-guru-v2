@@ -1,4 +1,4 @@
-import { DungeonMap } from './dungeonMap';
+import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
 import { dungeonBoundary, currentFloor, FloorCache, type DungeonItemCommand } from '../domain/dungeon';
@@ -13,9 +13,10 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   actions: { start: () => void; recover: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
   const focusId=(document.activeElement as HTMLElement|null)?.id;
   const el = dungeonElement, s = session.snapshot, floor = currentFloor(s);
-  const title = el('h1', s.phase === 'defeat' ? 'Dungeon defeat' : `Dungeon · Floor ${s.depth}`); title.tabIndex = -1;
+  const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
-  root.replaceChildren(title,el('p','Continuing floors · Current encounter template: three battles; the third guards the stairs.'),status);
+  const knownNext = floor.completed < 3 && floor.exploration.revealed.includes(poiCell(floor.exploration.pois[floor.completed]));
+  root.replaceChildren(title,el('p',floor.completed === 3 ? 'Guardian defeated. Walk to the stairs to continue.' : `Three encounters per floor. ${knownNext ? `Next: ${dungeonEncounterLabel(s,floor.completed)}.` : 'Explore to find the next encounter.'} Defeat the goblin guardian to unlock the stairs.`),status);
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
   };
