@@ -8,6 +8,7 @@ The full #159 qualification run exposed seven cached-history assertions that did
 
 - Select full Chromium for the three Chromium projects and document the standard browser installation; preserve explicit executable overrides and WebKit configuration.
 - Resume the clock until restarted scenes become observably ready, then pause again for controlled visual sampling.
+- Bound individual actions in the compound three-actor inspection case to five seconds and give its complete workflow 90 seconds; retain its full cumulative coverage and existing assertion/product limits.
 - Retain every assertion and real cached-document/keyboard/modal coverage. Add no skips, retries or arbitrary waits.
 
 ## Capabilities
@@ -16,4 +17,4 @@ No application requirement changes (`skip_specs: true`). This repairs the test r
 
 ## Impact
 
-Playwright project configuration, one animation test and browser-test documentation. No game code, saves, assets or production actions.
+Playwright project configuration, animation/compound-workflow tests and browser-test documentation. No game code, saves, assets or production actions.
