@@ -53,7 +53,7 @@ npm run build
 npm test
 ```
 
-Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Chromium projects select the full Chromium headless channel so cached-history tests exercise real BFCache returns; use the standard installation above rather than a shell-only installation. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 

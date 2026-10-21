@@ -18,7 +18,7 @@
 
 ## 4. Completion evidence
 
-- [ ] 4.1 Run unit/content/typecheck/build, affected Chromium/WebKit suites, full npm test with encounter/item posttests and strict OpenSpec; measure dungeon transfer, creation/movement and descriptor growth against unchanged budgets; resolve failures, update plan/QA/README/dungeon docs, and publish review-ready PRs with verified remote parity.
+- [x] 4.1 Run unit/content/typecheck/build, affected Chromium/WebKit suites, full npm test with encounter/item posttests and strict OpenSpec; measure dungeon transfer, creation/movement and descriptor growth against unchanged budgets; resolve failures, update plan/QA/README/dungeon docs, and publish review-ready PRs with verified remote parity.
 
 ## Workflow follow-up
 

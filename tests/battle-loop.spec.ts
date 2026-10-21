@@ -401,6 +401,8 @@ test('battle diagnostics record real selection, gestures and movement and reset 
 });
 
 test('live actor, inspection and cancellation remain independent of pending intent',async({page},info)=>{
+  // Three actors inspect every unit and both cancellation routes in one cumulative workflow.
+  test.setTimeout(90000);page.setDefaultTimeout(5000);
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const seen=new Set<string>();
   for(let turn=0;turn<12 && seen.size<3;turn++){
