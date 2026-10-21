@@ -4,6 +4,8 @@ Date: 2026-10-21 (Asia/Jerusalem). Status: implementation authorized and in prog
 
 ## Continuation status
 
+**Review stack update (2026-10-21):** the cache repair and its 44-floor regression were promoted into #192 (`d7fea21`) to close the finding at its introducing PR. #194 (`c9fa877`) carries that repair plus legal two-floor/all-kind browser proof. After merging that updated parent, #197 retains its original cache-performance receipts, documentation and full-suite failure audit only; runtime, tests and build configuration equal #194 exactly. Its existing failure records remain historical and final whole-stack qualification remains in #198.
+
 **Current correction / active work:** the initial full-suite run is stopped, not green. It recorded 223 passes, eight failures (seven actual-BFCache assertions and one active-bob timeout), one existing skip, one interrupted case and 448 not run. Preserve WSL `/tmp/tactics-159-full.log` and ignored `tmp/issue-159-full-results/`. Earlier progress updates checked only the tail and missed the failures; the complete audit supersedes those updates.
 
 - Current branch: `branch/issue-159-long-history`, based on PR #194 head `2ae9c50`. A 44-floor regression reproduced 132 graph resolutions per repeated read because the 128-encounter cache churned beyond 42 floors. Fixed SHA-256 keys and the existing allocation-bound-sized metadata cache remove the cliff without changing saves, stats, geometry or floor limits. The new regression passes; qualify and publish this small repair as a dependent PR. OpenSpec task 2.3 is added, making progress 6/8 until its delivery.
