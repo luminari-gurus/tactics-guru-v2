@@ -49,6 +49,10 @@ Format 3 SHALL retain current storage keys, atomic recovery and the 1 MiB limit.
 - **WHEN** a valid prior ready, active/Guarded, reward, defeated or backtracked dungeon is resumed
 - **THEN** party, items, battle/RNG, offers, completion and exploration retain their meaning and subsequent unvisited floors keep legacy opponents
 
+#### Scenario: Bounded legacy normalization work
+- **WHEN** a prior-format save has a long retained floor history
+- **THEN** normalization defers derived fixed-policy battlefield geometry until battle entry, without resolving three graphs per historical floor; active battles still validate exact geometry/RNG, existing full format-3 legacy descriptors remain supported, and new-policy descriptors cannot omit battlefield facts
+
 #### Scenario: No destructive migration
 - **WHEN** old data is inspected or a format-3 candidate fails
 - **THEN** no save is deleted, floor evicted, player moved, reward granted, unit healed or encounter rerolled
