@@ -12,7 +12,7 @@ export class DungeonMap {
   private state: DungeonState | null = null;
   private map: GeneratedMap | null = null;
   private readonly abort = new AbortController();
-  private readonly treatment = createMapArt(() => { if (this.live) this.draw(); });
+  private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
     this.root.setAttribute('aria-label','Floor exploration');
     this.root.addEventListener('keydown',e => {
@@ -38,16 +38,15 @@ export class DungeonMap {
     const heading = el('h2','Explore floor');
     const label = el('label','Map art '), select=el('select');select.id='dungeon-art';select.setAttribute('aria-label','Map art');
     for (const style of ART_STYLES) { const o=el('option',style.label);o.value=style.id;select.append(o); } select.value=this.art;
-    select.onchange=()=>{this.art=select.value as ArtStyle;this.draw();};label.append(select);
+    select.onchange=()=>{this.art=select.value as ArtStyle;this.paintArt();};label.append(select);
     const grid=el('div');grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/20)+1}, column ${f.position%20+1}. Arrow or WASD keys move one cell.`);
     grid.dataset.position=String(f.position);grid.dataset.art=this.art;
     const pois=new Map(f.exploration.pois.map(p=>[poiCell(p),p]));
-    let fallback=false;
     for(let i=0;i<400;i++) {
       const cell=el('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');
       const visible=f.exploration.revealed.includes(i), open=map.cells[i]===1;
       cell.className=visible?open?'explore-open':'explore-wall':'explore-hidden';
-      if(visible){const art=this.treatment(open?'grassland-open':'grassland-blocked',this.art);if(art.url)cell.style.backgroundImage=`url("${art.url}")`;fallback ||= Boolean(art.fallback);
+      if(visible){cell.dataset.terrain=open?'grassland-open':'grassland-blocked';
         if(i===f.descriptor.upstairs)cell.textContent='↑';
         if(i===f.descriptor.downstairs)cell.textContent='↓';
         const p=pois.get(i);if(p){cell.textContent=p.encounterSlot<f.completed?'✓':String(p.encounterSlot+1);cell.dataset.poi=p.id;}
@@ -56,13 +55,27 @@ export class DungeonMap {
       grid.append(cell);
     }
     grid.onclick=e=>{if(this.locked()||document.hidden)return;const cell=(e.target as HTMLElement).closest<HTMLElement>('[data-cell]');if(!cell)return;const destination=Number(cell.dataset.cell);if(neighbors(f.position).includes(destination)){this.move(destination);}else {feedback.textContent='Choose an adjacent cell or use the direction controls.';}};
-    const feedback=el('p',`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/400 · Visited ${f.exploration.visited.length}. ${fallback?'Artwork loading or unavailable; Simple fallback.':''}`);feedback.id='dungeon-map-feedback';feedback.setAttribute('role','status');
+    const feedback=el('p',`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/400 · Visited ${f.exploration.visited.length}. `);feedback.id='dungeon-map-feedback';feedback.setAttribute('role','status');
     const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
     for(const [name,delta] of [['North',-20],['East',1],['South',20],['West',-1]] as const){const b=el('button',name);b.id=`dungeon-step-${name.toLowerCase()}`;b.type='button';b.disabled=s.phase!=='ready';b.onclick=()=>this.step(delta);directions.append(b);}
     const list=el('ul');list.setAttribute('aria-label','Discovered places');
     const entries=[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:s.depth===1?'Exit unavailable':'Available'},...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:p.encounterSlot===2?'Guardian':`Encounter ${p.encounterSlot+1}`,status:p.encounterSlot<f.completed?'Cleared':p.encounterSlot===f.completed?(s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'):'Locked'})),{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:f.completed===3?'Unlocked':'Guardian locked'}];
     for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/20)+1}, column ${p.cell%20+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
     this.root.replaceChildren(heading,label,el('p','● Player · 1/2 encounters · 3 guardian · ✓ cleared · ↑/↓ stairs. Reveal reaches two cells, including through walls. Tap adjacent cells or use direction controls.'),grid,directions,feedback,list);
+    this.paintArt();
     if(focused)this.root.querySelector<HTMLElement>(`#${focused}`)?.focus({preventScroll:true});
+  }
+  /** Image completion changes pixels only; never detach active input or scroll targets. */
+  private paintArt() {
+    if (!this.live || !this.state) return;
+    let fallback = false;
+    for (const cell of this.root.querySelectorAll<HTMLElement>('[data-terrain]')) {
+      const art = this.treatment(cell.dataset.terrain as 'grassland-open' | 'grassland-blocked', this.art);
+      cell.style.backgroundImage = art.url ? `url("${art.url}")` : '';
+      fallback ||= Boolean(art.fallback);
+    }
+    const grid = this.root.querySelector<HTMLElement>('#dungeon-map'); if (grid) grid.dataset.art = this.art;
+    const feedback = this.root.querySelector<HTMLElement>('#dungeon-map-feedback'), f = currentFloor(this.state);
+    if (feedback) feedback.textContent = `Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/400 · Visited ${f.exploration.visited.length}. ${fallback ? 'Artwork loading or unavailable; Simple fallback.' : ''}`;
   }
 }
