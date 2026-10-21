@@ -20,9 +20,19 @@ export function readBattlefieldEncounters(input:unknown,catalog:import('./types'
   if(!isDenseArray(input,3)||input.length!==3)return {ok:false,reason:'Expected three encounters'};
   const seen=new Set<string>();
   for(const e of input) {
-    if(!hasShape(e,['id','source','roster'])||typeof e.id!=='string'||!/^encounter:[a-z][a-z0-9_]{0,63}$/.test(e.id)||seen.has(e.id)||!isBattlefieldSource(e.source))return {ok:false,reason:'Invalid encounter source or ID'};
+    const checked = readBattlefieldEncounter(e, catalog);
+    if (!checked.ok) return checked;
+    if (seen.has(checked.encounter.id)) return {ok:false,reason:'Invalid encounter source or ID'};
+    seen.add(checked.encounter.id);
+  }
+  return {ok:true,encounters:input as BattlefieldEncounter[]};
+}
+
+/** The same admission rules also apply to a dungeon pool's individual pairing. */
+export function readBattlefieldEncounter(e: unknown, catalog: import('./types').ContentCatalog):
+  {ok:true;encounter:BattlefieldEncounter}|{ok:false;reason:string} {
+    if(!hasShape(e,['id','source','roster'])||typeof e.id!=='string'||!/^encounter:[a-z][a-z0-9_]{0,63}$/.test(e.id)||!isBattlefieldSource(e.source))return {ok:false,reason:'Invalid encounter source or ID'};
     if(e.source.kind==='generated'&&e.id.length>67)return {ok:false,reason:'Generated encounter ID exceeds descriptor map limit'};
-    seen.add(e.id);
     if(e.source.kind==='authored'&&!Object.hasOwn(catalog.maps,e.source.mapId))return {ok:false,reason:'Unknown authored map'};
     if(!isDenseArray(e.roster,64)||e.roster.length<4)return {ok:false,reason:'Invalid roster'};
     const roster=e.roster;
@@ -34,6 +44,5 @@ export function readBattlefieldEncounters(input:unknown,catalog:import('./types'
       ids.add(s.id);positions.add(`${s.x},${s.y}`);
     }
     if(['fighter','ranger','mage'].some(id=>roster.filter((s:unknown)=>hasShape(s,['id','side','unitId','x','y'])&&s.side==='heroes'&&s.unitId===id).length!==1)||!roster.some((s:unknown)=>hasShape(s,['id','side','unitId','x','y'])&&s.side==='enemies'))return {ok:false,reason:'Incomplete roster'};
-  }
-  return {ok:true,encounters:input as BattlefieldEncounter[]};
+    return {ok:true,encounter:e as unknown as BattlefieldEncounter};
 }

@@ -1,197 +1,156 @@
-# Issue #154: deterministic overworld markers
+# Issue #159: biome encounters and bounded depth scaling
 
-Planning date: 2026-10-20 (Asia/Jerusalem).
-Source baseline: `main` at `1fee092d184fd99998f8e5e2766d45c216c6d5d8`.
-Work item: [#154 — Spawn one player marker and three enemy markers](https://github.com/luminari-gurus/tactics-guru-v2/issues/154).
-Delivery branch: `branch/issue-154-overworld-markers`.
-Status: implemented, tested and published; PR #156 is ready for review.
+Date: 2026-10-21 (Asia/Jerusalem). Status: implementation authorized and in progress; no runtime acceptance claimed yet.
 
-## Implementation handoff (2026-10-20)
+## Continuation status
 
-- Worktree: `C:/Users/apexw/.codex/worktrees/issue-154-overworld-markers/Tactics-Guru`.
-- Refreshed `origin/main` remains `1fee092`; the branch starts with planning commit `1e4a06c`.
-- Live #154 matches this plan; [PR #156](https://github.com/luminari-gurus/tactics-guru-v2/pull/156) contains the delivery.
-- Using OpenSpec change `issue-154-overworld-markers` (spec-driven), as explicitly requested for implementation.
-- Ablation retains the pure model, complete-state commits, CSS markers and existing test suites.
-  Phaser/sprite/image generation is unnecessary for the DOM route.
-- Model checkpoint: `src/map/state.ts` and non-DOM inclusion implemented. All 46 focused unit tests pass,
-  including 2,340 seed/type/biome placements, nine pinned position cases, immutable inputs, four selection
-  draws, malformed layout failure and unmocked placement on all three forced generator fallbacks.
-- `npm run typecheck` passes. Before-edit terrain SHA-256 values are pinned in the suite:
-  Rooms `d7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0`,
-  Walker `dc2715ef5fc6b56526bd19300eea7157bada57f32ebdf580eff0ac70d3d3d893`,
-  Cellular `31583dad387235929096a42f680f782551474198495569c9e6c54710f23dc88e`.
-- Commands run through WSL Node 24/npm because Windows PATH has no npm/OpenSpec. `npm ci --no-audit --no-fund`
-  completed; unrelated PostHog CLI postinstall was blocked by npm policy and is not needed for this work.
-- Published checkpoints: model `6a43bf3`, complete runtime/browser integration `30cf201`.
-- Route/CSS integration is implemented. Desktop marker tests pass (5); the first full preview matrix passed
-  56 cases but exposed one test-helper race when an art redraw detached cells. The helper now reads all
-  projections atomically from the retained grid. The final full matrix passes 57 cases (3 intentional
-  dev-only skips), including all desktop/portrait/landscape marker and existing map regressions.
-- Inspected all 54 art/type/biome figures via nine contact sheets, plus the 320px full-page capture.
-  Shapes, edging, terrain, wrapping legends and scrollable controls are readable without overlap.
-- Controlled dev placement failure passes (1): initial unavailability, successful retry, rollback on type/biome
-  regeneration, feedback surviving old artwork completion and final recovery.
-- `npm run build` passes (190 content tests, both typechecks, Vite). WSL needs explicit `GIT_DIR` pointing at
-  `/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/.git/worktrees/Tactics-Guru12`
-  and `GIT_WORK_TREE=$PWD` because this Windows-created worktree's `.git` file uses a Windows path.
-  For line-ending/mode parity also set `GIT_CONFIG_COUNT=2`, `GIT_CONFIG_KEY_0=core.autocrlf`,
-  `GIT_CONFIG_VALUE_0=true`, `GIT_CONFIG_KEY_1=core.filemode`, `GIT_CONFIG_VALUE_1=false`.
-  These are command-local environment settings; repository configuration is unchanged.
-- Configured `/prototype/` build and all 18 selected browser cases pass. Total final browser proof:
-  57 root-preview cases + 1 dev failure case + 18 prefix cases. The 3 root-preview skips deliberately
-  exclude the dev-only fixture, which was run separately.
-- [Acceptance record](../qa/issue-154-overworld-markers.md) retains source commits, exact commands,
-  results, initial failures and repairs, browser/viewport details and selected screenshots.
-- Delivery verified: PR #156 is open, non-draft and mergeable into `main`; the published branch has clean
-  tracked status and local/remote parity. OpenSpec is 7/7 complete and remains active for review.
-  Cloudflare Pages is an automatic external PR check; its latest publication check was still running
-  at handoff. Local acceptance does not depend on a claim of deployed testing.
-- Next session: review PR #156. No implementation remains for #154; #155 is separate and should consume
-  `OverworldState` from `src/map/state.ts`. No merge, archive or release tag was performed.
-- The last local `dist/` is a `/prototype/` build. Run `npm run build` before rerunning the default-root
-  preview suite; use the command-local WSL Git settings above. Selected evidence is committed in the QA folder.
-- Automatic approval review rejected removal of task-created `tmp/issue-154-*` verification files
-  with “blocked by policy.” They remain ignored locally; no cleanup bypass was attempted.
+- The caller authorized implementation, autonomous repairs and focused PR delivery on 2026-10-21. Use OpenSpec change [`issue-159-biome-encounters`](../../openspec/changes/issue-159-biome-encounters/tasks.md); its tasks are the completion ledger. The prior planning-only boundary below is superseded by this request.
+- Worktree: `C:/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`; clean starting head `85fd609`. Refreshed `origin/main` remains `5a1857f`; the branch is one planning commit ahead. No implementation PR existed at start.
+- Outcome/non-goals/files/proof remain the sections below. Ablation retains two pure modules and existing battle/storage/UI boundaries; no new asset, dependency, generic registry, controller or storage adapter. The initial policy below is the implementation target authorized by the continuation request; playtests must still assess its difficulty honestly.
+- Delivery checkpoint 1: catalog/admission, pure selection and scaling, focused tests and policy documentation; publish on the requested branch. Checkpoint 2: stack durable floors/save compatibility on that PR. Checkpoint 3: reachable presentation and route/browser acceptance, separately reviewable if its size warrants it.
+- Runtime: WSL Node/npm/OpenSpec are available; dependencies installed with `npm ci` (lockfile unchanged). Run from `/mnt/c/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`. No release tag is appropriate for unmerged review work.
+- Checkpoint 1 implementation is qualified: 41 focused tests, 221 content checks, both TypeScript scopes and production build pass. Full units pass **859/859** using `npm run test:unit -- --maxWorkers=2`. Strict OpenSpec passes. The first unconstrained run had two WSL/Windows Git-path failures and one 5-second busy-host timeout; the explicit-path/two-worker rerun passes all three without changing tests.
+- For WSL builds/tests in this Windows-managed worktree, set `GIT_DIR=/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/.git/worktrees/Tactics-Guru13` and `GIT_WORK_TREE=$PWD`. This avoids misreading the Windows `.git` pointer; no repository configuration was altered. Full unit tests regenerate unrelated simulation evidence/line endings; restore those generated changes before committing.
+- Delivered checkpoint 1: [PR #191](https://github.com/luminari-gurus/tactics-guru-v2/pull/191), open and ready for review, implementation commit `1eae449`. Local/remote parity is `0 0`. OpenSpec tasks 1.1/1.2 are complete (2/7); no browser/route/compatibility acceptance is claimed for this first pure-policy checkpoint.
+- Next: stack `branch/issue-159-durable-encounters` on PR #191 for saved floor selections, old-format migration and application integration. Continue without waiting for review; keep the parent PR's branch unchanged except for its delivery ledger.
+- Admission correction: original Forest Ruins fails existing mutual reachability for nine height-2 ruin tiles. A dungeon-only catalog projection adds one height-1 stone step at (4,2), connecting the ruin for jump-1 actors. Other modes and all rosters remain unchanged; the validator stays strict. Woodland Crossing, Ruined Approach and the generated guardian already pass. This necessary map correction replaces the plan's unverified assumption that every existing authored map was admissible unchanged.
+- Separate discovered work: `npm audit` reports Vite 8.3.2 development-server advisories with a patch available at 8.3.5. Deliver a separate dependency-fix PR after the encounter chunk; do not fold it into #159.
 
-The previous [issue #145 / PR #150 handoff](plan-before-issue-154.md) is preserved byte-for-byte. It is historical: PR #150 is already merged in this baseline, despite its handoff's pre-merge wording.
+- Issue: [#159 — Add biome encounter selection and depth scaling](https://github.com/luminari-gurus/tactics-guru-v2/issues/159).
+- Owner: `moshehbenavraham` (authenticated GitHub caller); assigned and [kickoff posted](https://github.com/luminari-gurus/tactics-guru-v2/issues/159#issuecomment-6316639043).
+- Delivery branch: [`branch/issue-159-biome-encounters`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-159-biome-encounters), natively linked to #159 in GitHub Development.
+- Audited base: `main` at `5a1857f0ae9b69780e17d911501fa255fe1f8b68`, including #157 / PR #186, #158 / PR #189, and the first #161 increment / PR #188.
+- The previous root plan is preserved at [issue-154-overworld-markers-plan.md](issue-154-overworld-markers-plan.md), with its historical status unchanged. Its linked OpenSpec design now points to that retained file.
 
 ## Outcome
 
-Every successfully committed `/map` world contains exactly one player and three enemies, with stable IDs and distinct walkable positions in its connected playable area. Placement is reproducible, bounded and independent of terrain generation and artwork. The existing controls reset or preserve this state according to the rules below. Markers remain readable and described on desktop and mobile.
+New `/dungeon` games choose playable encounters from the existing Forest and Desert content, distinguish normal/elite/vault/boss encounters, and scale enemies by depth within current content bounds. Each floor retains its chosen biome, sources, rosters, scaling and battlefield identities. Reload, backtracking, art completion and repeated battle construction cannot reroll or compound them. A boss encounter unlocks descent once through the existing authoritative victory boundary.
 
-The existing prototype remains an inspection screen: generate or inspect a map, choose its type/biome/art, and identify its occupants. There is no movement or encounter loop in this change.
+This is the encounter foundation explicitly allowed to land before #170's content packs. The continuation request authorizes implementation of the concrete initial rules below. Keep #159 open through implementation/review and retain truthful limits on balance acceptance.
 
-## Source baseline findings (before implementation)
+## Why this work was selected
 
-- [Route entry](../../src/main.ts) dynamically imports `startMap` for `/map` beneath the configured base. This route uses a DOM/CSS grid, not a Phaser scene. The shared entry now initializes optional telemetry and mounts its privacy control; the older documentation's storage-isolation wording must be read alongside the current test allowing the privacy opt-out read.
-- [generate.ts](../../src/map/generate.ts), particularly `generateMap` and `validMapCells`, already provides three versioned 20×20 algorithms, 400 row-major binary cells, a blocked perimeter, 60–320 walkable cells and cardinal connectivity. Each algorithm has bounded attempts and a validated 80-cell fallback. Placement does not need to repair terrain, carve corridors or discover a new playable component.
-- [biomes.ts](../../src/map/biomes.ts) maps layout to a separate terrain layer without changing walkability or consuming RNG. Consequently a biome-only change at the same seed/type has identical legal spawn cells.
-- [view.ts](../../src/map/view.ts) currently retains only a `BiomeMap`. Initial entry, `applySelection` and New seed generate it. Art selection only calls `render`. `render` replaces all 400 cell elements, and [art.ts](../../src/map/art.ts) invokes that same render after asynchronous image decode succeeds or fails. Storing markers solely in those elements would lose them; placing inside render would reset them.
-- Current seed semantics are more specific than "reset on change": type/biome changes apply a valid pending seed; art changes preserve a valid pending seed without applying it; invalid seed edits reject type/biome/art changes and retain committed choices. New seed retains committed type/biome/art and has a deterministic increment fallback when browser entropy fails or repeats the current seed.
-- [style.css](../../src/map/style.css) fits 20 columns into a responsive square with 1px gaps. Small mobile cells cannot carry detailed characters or substantial text. The current legend does not wrap, so adding two marker keys requires wrapping.
-- [overworldMap.test.ts](../../tests/unit/overworldMap.test.ts) already covers deterministic generation, independent connectivity, fallbacks, biome invariance and a pinned Rooms fingerprint. [overworld-map.spec.ts](../../tests/overworld-map.spec.ts) already exercises controls, late artwork, failure fallback, route isolation, asset base paths and screenshots in the three [configured projects](../../playwright.config.ts). Extend these files.
-- #87 and #96–#99 are closed, and their functionality is present on this baseline. [#155 — enemy movement](https://github.com/luminari-gurus/tactics-guru-v2/issues/155) is open and explicitly depends on #154. It needs authoritative IDs/positions, not movement scaffolding in this issue. No existing linked branch for #154 was present at planning time.
+Reviewed all **34 open issues**, their full bodies/ownership/labels, both open PRs, remote branches, native dependency and linked-branch relationships, and current `main`. The repository and organization Projects V2 inventories were empty; the open issues had no project memberships. The initial scan was not restricted to `ready for work`.
 
-### Planning evidence
+- **#159 is the best next planning item:** #157 and #158 are closed with their work merged, #159 has no other assignee/branch/PR, and the encounter contract is a stated dependency for #160's dungeon awards, #166–#170's enemy/content work, and #174's reward identities. #176 also needs its dungeon counter semantics. This removes a broader shared dependency than an isolated convenience feature. It does not by itself unblock every consumer: their effect, progression and design prerequisites still apply.
+- **Available alternatives:** #153 main menu and #155 prototype enemy movement have completed foundations; #160 can start against the short scenario; #162 can develop an ability picker against existing content. #172, #176, #177, #179, #181, #183 and #184 have independent or bounded starting paths. Their respective supply, record, undo, history, presentation or generator choices need plans. #187 is a particularly small concrete UX improvement; #190 is a concrete native-select investigation without a readiness label. Both are useful, but neither supplies the encounter foundation needed by the larger high-priority group.
+- **Owned work:** #85 release operations, #123 / PR #139 mobile HUD, #128 telemetry and #161 effects remain assigned to `dubstylee`. PR #188 delivered only a Guarded-effects increment; the remaining #161 mechanics must not be treated as complete. PR #12 is the separately held SSH deployment alternative. None was claimed or relabeled.
+- **Remaining prerequisite/design work:** #163–#169 need their stated effect/unlock/encounter contracts; #170 is an epic requiring bounded content packs; #171 needs effect/damage semantics; #173 needs progression/effect decisions; #174 needs encounter/reward and functioning upgrade consumers; #175 still needs #174 despite #158 merging. #180 depends on Settings/audio choices, #178 and #182 require explicit adoption decisions, and #185 still lacks an approved class/rules mapping.
 
-A dependency-free Node 24 source probe executed the actual `generateMap` and `applyBiome` exports for the existing 260-seed corpus (`0..255`, `12345`, `424242`, `2147483648`, `4294967295`):
+Only #159 is claimed. No other issue is closed, assigned, promoted or linked as though this branch implements it. Browser/device emulation satisfies acceptance under [AGENTS.md](../../AGENTS.md); the caller's configured Android access is not evidence of physical testing and is not an eligibility gate.
 
-- 780 layouts passed independent cardinal flood-fill, size/open-count and repeated-generation equality checks.
-- 2,340 biome treatments preserved layout cells; generation inputs remained unchanged.
-- Observed open-cell counts were 65–270, comfortably above four.
-- The Rooms matrix SHA-256 matched the existing test: `d7dbea289cd9cdec54837ad1b0367a41a894b1503c5b9f862a4d54da5da6c8b0`.
+## Current source contracts
 
-This is current-source baseline evidence, not a run of Vitest, not exhaustive coverage of all uint32 seeds, and not marker/browser acceptance. The probe used Node's TypeScript support and a `node:module` resolve hook for the source's extensionless relative imports; it added no application dependency or file.
+- [content/dungeon.ts](../../src/content/dungeon.ts) reuses the three fixed `battlefieldEncounters` and hashes those definitions into dungeon identity. [content/encounters.ts](../../src/content/encounters.ts) retains three authored maps and a production configuration whose first two encounters use generated Desert geometry; the last uses authored Ruined Approach.
+- [domain/dungeon.ts](../../src/domain/dungeon.ts) stores Rooms/Grassland floor descriptors, sequential slots 0–2, party HP, ownership and one active battle. `dungeonBattle` always resolves the fixed slot, projects owned items, filters defeated heroes, then builds the battle. `acceptDungeonBattle` advances completion, creates the first two rewards, and returns to ready after slot 2. Floor travel already persists its candidate before publishing it.
+- [domain/exploration.ts](../../src/domain/exploration.ts) owns three stable spatial POIs, reveal/visited state and a separate placement seed. #159 does not need a new movement graph, POI count or encounter-order mechanism.
+- [domain/battlefield.ts](../../src/domain/battlefield.ts) separates layout randomness, freezes resolved maps, tries four Desert candidates and then a deterministic fallback, and retains a geometry hash. Authored sources require their roster to equal the map's fixed spawns. [battlefieldValidation.ts](../../src/domain/battlefieldValidation.ts) already checks structural admission and all seven nonempty hero subsets.
+- [CONTENT_BOUNDS](../../src/content/constants.ts) cap max HP at 100, power/accuracy at 20 and armor class at 30. [effects.ts](../../src/domain/effects.ts) and the battle/session paths consume the supplied catalog; scaling must project that same catalog for previews, AI, resolution and inspection.
+- [dungeonSaveEnvelope.ts](../../src/domain/dungeonSaveEnvelope.ts) reads formats 1/2 with exact identities and a 1 MiB UTF-8 limit. [dungeonStorage.ts](../../src/persistence/dungeonStorage.ts) preserves invalid raw slots, uses primary/backup readback and blocks uncertain writes. Compatibility cannot be obtained by replacing an identity hash or silently regenerating new opponents for an old save.
+- [DungeonSession.ts](../../src/app/DungeonSession.ts), [startDungeonApp.ts](../../src/app/startDungeonApp.ts) and [ui/dungeon.ts](../../src/ui/dungeon.ts) already host real encounters, recovery and transitions. [DungeonMap](../../src/ui/dungeonMap.ts) currently labels the third POI Guardian and paints Grassland; [map/biomes.ts](../../src/map/biomes.ts) already supplies Forest/Desert treatment without changing topology.
 
-## Implementation decisions
+Legacy evidence was read at `e9433f6b608ae6b2d95418615cce9cf17dadcf74`: [EncounterCatalog](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/EncounterCatalog.gd#L102-L123) selects a seeded starting biome and has explicit [map/boss pools](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/EncounterCatalog.gd#L240-L363). Its [scaler](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/ForestRuinsMvpBuilder.gd#L1472-L1501) multiplies enemy HP/power/accuracy/AC by `1 + (depth - 1) / 10`, rounds, then applies a separate 1.20 vault pass. These are reference rules, not live balance proof. The issue records legacy later-floor Graveyard/then Winter routing; the proposed two-biome v2 rule below is an explicit adaptation, not a claim of a legacy ten-biome cycle.
 
-### 1. One small model owns map and marker state
+## Proposed decisions
 
-Add `src/map/state.ts` with exported readonly `OverworldMarker` and `OverworldState` types and a pure `createOverworld(map: BiomeMap)` factory. A state contains the committed map, placement version `markers-v1`, and four markers in fixed order. Each marker has a stable ID (`player`, `enemy-1`, `enemy-2`, `enemy-3`), a `player`/`enemy` kind, and integer `{ x, y }` coordinates. Derive row-major indices when needed rather than storing competing coordinate representations.
+### 1. A small playable catalog, with all four encounter kinds
 
-The factory returns an explicit success/state or failure/reason result. It has no DOM, time, browser entropy, storage or renderer dependency. The view retains this state; render reads it and projects IDs/positions into data attributes for inspection. No window singleton, entity registry, event bus or new session class is needed. #155 can later transform this same state without reading coordinates back from DOM elements.
+Keep three sequential POIs and two reward boundaries per floor:
 
-### 2. Bounded placement with separate deterministic entropy
+1. Slot 0: normal.
+2. Slot 1: elite or vault, selected with equal weight by its own seeded kind selection.
+3. Slot 2: boss/guardian. Defeat the entire encounter to unlock the stairs; killing one marked enemy alone is insufficient.
 
-1. Validate the expected dimensions and existing layout contract using `validMapCells`; reject invalid/disconnected/undersized input explicitly. Reuse this fixed-size validator rather than introducing another flood-fill implementation.
-2. Collect walkable indices in row-major order from the already generated layout.
-3. Initialize a fresh local RNG with `seedRng((map.seed ^ 0x4d41524b) >>> 0)` using the existing [pure RNG functions](../../src/domain/rng.ts). The fixed `MARK` salt and policy are owned by `markers-v1`; no terrain RNG instance is shared.
-4. Select four cells without replacement using the first four steps of a Fisher–Yates shuffle on the candidate copy. At step `i`, choose `i + nextUint32(localRng).value % (count - i)` and swap it into slot `i`. Assign the fixed IDs in that order. This takes four selection draws after the existing RNG warmup, without retries or rejection sampling.
-5. Convert the four indices to coordinates and return the complete state. Do not mutate input cells/terrain or call terrain generation again.
+Enable **Forest** and **Desert** only. Select the first biome from the stable ordered list `[forest, desert]` using the dungeon seed and the biome-selection policy; alternate the two on subsequent newly created floors. Persist each choice. There is no Graveyard/Winter substitution, empty placeholder biome, or automatic adoption of new packs into old saves. #170 will add actual content and a new reviewed catalog policy later.
 
-The placement key is layout seed/type/version plus `markers-v1`; the layout itself supplies the candidate set. Biome and art are deliberately excluded. Same seed/type/layout/version yields the same IDs and positions across all biomes and art states. Changing seed/type can reproduce some positions by coincidence; tests must verify the policy, not require every marker to move. Modulo selection is sufficient for these noncompetitive spawn markers; uniform statistical sampling is not an acceptance requirement.
+Forest uses the existing Forest Ruins and Woodland Crossing authored maps for non-boss pools, and Ruined Approach for its guardian. Each authored map retains its exact roster. Desert uses the existing generated source/profile and the first two existing production deployment rosters for non-boss composition choices. Its guardian uses the existing third encounter's enemy mix, placed in the same protected generated deployment bands as the other Desert rosters. Validate that one new source/roster pairing before admitting it; do not weaken the Desert validator if it fails.
 
-Do not impose minimum distances, reserved start zones, enemy behavior assignments or a center-spawn rule. None is required by #154. A future placement behavior change must bump its own version without changing terrain versions.
+Store explicit kind, biome, map-pool, composition and boss definitions, with known IDs and bounded references. Map pools contain compatible composition IDs; select a map then a composition from its admitted set. A Forest pool may have one compatible composition per map; independence does not require inventing additional rosters. The boss definition identifies its encounter roster and full-battle victory gate. These are reused goblin guardian encounters, not restored named bosses or new enemy abilities. Elite uses catalog composition selection and the ordinary depth scaler; **no extra elite multiplier**. Vault uses the same legal pools plus its explicit multiplier. Loot remains the existing two item-choice boundaries, including for a vault; #174 owns expanded vault loot.
 
-### 3. Commit complete worlds; render never spawns
+### 2. Pure selection and a saved encounter plan
 
-Replace the retained map in `startMap` with the retained overworld state and a single small regeneration path: existing generation → existing biome treatment → marker factory → commit complete state. Use it for initial entry, Generate, map-type change, biome change and New seed.
+Add one dungeon-specific catalog module and one pure selection/projection module. Use the existing hash/RNG utilities and validators; no registry service, plug-in API or generic encounter language.
 
-- **Initial entry/reload:** seed 1, Rooms, Grassland, Simple, deterministic four-marker state; no persistence.
-- **Generate:** apply valid displayed seed/current selections and replace the whole state. Repeating the same inputs reproduces the same marker positions.
-- **New seed:** retain existing entropy/fallback policy and committed choices, then create a new whole state.
-- **Type/biome change:** apply the valid displayed seed and regenerate/reset the whole state. A biome-only reset intentionally reproduces positions because its topology is unchanged; returning to a previous seed/type reproduces its original positions.
-- **Art change or late decode success/failure:** render the retained state, with no placement/generation call or marker mutation. Retain pending seed edits, validation feedback and the currently committed controls.
-- **Invalid input:** preserve the entire previous state and existing validation behavior.
-- **Placement failure:** never commit a partial/unpopulated world or silently regenerate terrain. Retain the last complete world when available, restore committed control choices and show a specific message in the existing live status explaining that marker placement failed and the previous world is unchanged. On initial failure, show an unavailable/empty grid with that message and usable retry controls. Store failure feedback so a later art callback cannot overwrite it. Clear it after a successful regeneration.
+- A new policy ID, `dungeon-encounters-v1`, owns stable sorted catalog ordering and domain-separated seeds for biome, kind, map and composition. Derive them from run seed, floor depth, slot where applicable, purpose and version. Preserve the existing `dungeon-seeds-v1` floor, battle and reward seed derivations and `exploration-v1` POI stream.
+- Generate all three selections when constructing a new floor candidate. Save the selection policy/catalog identity, biome, kind, source/map ID, composition/roster, boss ID when applicable, scaling-policy/depth and resolved battlefield descriptor/hash. Use bounded descriptors and references; do not store full geometry or arbitrary executable rules.
+- Resolve/validate selected source and roster together before publishing the candidate. Preserve generated-map retry/fallback behavior. An invalid catalog or authored pairing fails explicitly; it must not silently change biome, choose another content pack or reroll until something passes.
+- Reload and revisit use the saved selections and the matching versioned definitions. Recompute geometry/projection for validation and compare their hashes; do not rerun selection against the latest catalog. Reject mismatched, unsupported or tampered descriptors through recovery while retaining raw bytes.
+- Keep the durable encounter identity `${runId}:floor:${depth}:encounter:${slot}` and existing reward IDs. Do not put random selections in identity strings or create new rewards on rebuild. Future #160/#174 consumers can read `kind`, depth and that identity from the selected encounter.
 
-Keep the existing artwork loader/cache unless integration reveals a concrete defect; its callback already reads current state. Do not add a second loading lifecycle or image-request coordinator.
+### 3. Bounded, nonaccumulating enemy scaling
 
-### 4. Compact, independent marker presentation
+Propose policy `enemy-depth-v1`, using the legacy slope and vault ordering with v2's existing bounds:
 
-Keep terrain as the existing 400 direct grid children with unchanged `.map-floor`/`.map-wall` class meaning and terrain/background data. Add marker ID/kind/coordinate data to occupied cells and draw a positioned CSS pseudo-element above their terrain background. This avoids changing grid geometry, obscuring terrain identity, adding marker image requests, or breaking the existing tests that count `span` descendants and compare terrain class names.
+1. For each baseline enemy's `maxHp`, `power`, `accuracy` and `armorClass`, calculate `round(base * (depth + 9) / 10)` for positive integer depth, then clamp to that field's current `CONTENT_BOUNDS`.
+2. For vaults only, calculate `round(depthScaled * 6 / 5)`, then clamp again. Normal, elite and boss add no kind multiplier.
+3. Use positive half-up integer rounding for the current positive baseline values. Validate field domains and handle zero/signed bounded values explicitly; preserve zero power. Implement saturating arithmetic before multiplication for extreme safe-integer depth, so overflow or floating-point loss cannot occur before clamping. Test the exact point each field saturates.
+4. Movement, jump, Dexterity, Will, attack base damage, ability formulas, resources and hero stats are unchanged. A fresh enemy starts at its projected maximum HP; a resumed enemy keeps its saved current HP.
+5. Project from immutable baseline definitions once, then apply existing hero equipment projection without altering enemies again. Feed one projected catalog to battle construction, saved-state validation, preview, AI, inspection and replay. Never scale mutated units, saved damage, a previously projected catalog, or animation state.
 
-Use a cyan circle for the player and coral diamond for enemies, following the established player/enemy roles in [DESIGN.md](../DESIGN.md#world-and-tactical-colors). Use map-scoped CSS variables and dark/light edging so shape and boundary remain visible over grass, forest, sand and Legacy 8-bit art. Both shape and color distinguish the roles. Fit markers within their cells at the narrowest supported viewport; do not add animation, sprite assets, fonts or interactive hit targets.
+For the current Grunt, listed as HP/power/accuracy/AC: depth 1 gives `9/2/4/12`; depth 2 gives `10/2/4/13`, or vault `12/2/5/16`; depth 10 gives `17/4/8/23`, or vault `20/5/10/28`. Very deep floors saturate at `100/20/20/30`. Depth itself remains nonterminal; storage/resource limits remain explicit failures. These examples make the proposal reviewable, not balanced by assertion. Do not widen global bounds to support this feature. If representative legal runs reveal unacceptable difficulty, revise the proposed table with evidence before claiming balance acceptance.
 
-Extend the existing legend with matching Player and Enemy shapes/counts and let it wrap on narrow screens. Retain walkable/blocked keys and their actual fallback presentation. Update the grid's accessible summary with the marker counts and associate a concise text description outside the `role="img"` subtree listing each marker ID and its coordinates. Internal coordinates are zero-based; human labels use one-based row/column. Hidden terrain cells alone cannot provide accessible marker descriptions.
+### 4. Save compatibility that preserves existing opponents
 
-Markers remain noninteractive and outside the tab order. Existing controls retain their keyboard, focus and 44px touch-target behavior. Preserve the current page layout and keep the grid unobstructed.
+Introduce dungeon envelope format 3, retaining the current storage keys and recovery protocol. Keep the exact prior format-1/2 identities and their validated readers. Normalize accepted old payloads into the new representation with a **legacy fixed/unscaled encounter policy**, preserving all visited floor selections, active battle, RNG, HP, items, offers, completion and exploration. Keep that legacy policy for newly visited floors of the same old dungeon, so continuing an old game does not unexpectedly change its difficulty. Fresh dungeons use `dungeon-encounters-v1`.
 
-## Files and delivery sequence
+The legacy/new distinction belongs in compact versioned selection data and the source builder; it does not justify a second session, battle engine or storage adapter. Formats 1 and 2 must pass their original validation before conversion, including the existing format-1 exploration adaptation. Reading/inspection alone never rewrites storage. Write format 3 only through an existing explicit accepted transition/recovery choice; retain the original valid primary as backup through normal storage behavior.
 
-1. **Pure state and focused proof (2–3 hours):** add `src/map/state.ts`; extend [overworldMap.test.ts](../../tests/unit/overworldMap.test.ts); include the new pure module in [tsconfig.domain.json](../../tsconfig.domain.json)'s non-DOM check. Leave generator/RNG algorithms and versions unchanged.
-2. **Controls and presentation (2–3 hours):** change [view.ts](../../src/map/view.ts) and [style.css](../../src/map/style.css) for retained state, complete commits, failure feedback, shapes, legend and accessible descriptions.
-3. **Browser acceptance and repair (3–4 hours):** extend [overworld-map.spec.ts](../../tests/overworld-map.spec.ts), run the focused matrices below, inspect screenshots and fix any marker/readability/reset regressions. Reuse existing tooling/configuration.
-4. **Document and deliver (1–2 hours):** update [overworld-map.md](../overworld-map.md), its short [README entry](../../README.md), and this plan with actual results. Add `docs/qa/issue-154-overworld-markers.md` and selected evidence images only when there are real results to retain. Publish a focused implementation PR referencing #154 and the model handoff to #155.
+No migration may delete raw saves, reset a dungeon, heal units, grant a reward, move the player, reroll a map or unlock a stair. Old builds will not understand format 3: document that downgrade limitation and recovery/export path rather than claiming bidirectional compatibility. Budget descriptor growth against the existing 1 MiB limit and bounded floor collection; if a candidate exceeds it, preserve the current floor and offer recovery, never evict history.
 
-These are checkpoints for one focused feature branch, not a mandatory PR stack. Recheck current `main` and any concurrent `/map` changes before implementation.
+### 5. Reachable UI and existing completion authority
 
-**Estimate: 8–12 focused engineering hours (about 1–1.5 working days), including tests, screenshot review, documentation and PR preparation.** Allow up to a second working day if device/layout or delayed-art regressions need iteration. Review queue time, unrelated failing suites, deployment, #155 movement and new artwork are excluded.
+Show the saved biome, depth and encounter kind in the dungeon summary, discovered-place labels and battle heading. Reuse Forest/Desert map treatment and its existing Simple fallback without changing Rooms geometry, fog, POI positions or movement. Retain Grassland presentation for legacy-policy games. Rendering, art switches and delayed/failed image completion cannot select encounters or change state. Keep undiscovered POIs hidden and existing keyboard/touch/focus behavior intact.
 
-## Proof and acceptance coverage
+Retain `DungeonSession` and its accepted-command callback as the owner of battle completion. Verify duplicate/stale callbacks cannot increment completion twice, create a second reward or unlock descent after the wrong encounter. Keep the current persisted-candidate travel gate, defeated-hero filtering, owned-item behavior, active battle resume and scene-disposal rules. The new labels must describe actual selected definitions, including reused guardians, without implying unimplemented enemies or special elite rewards.
 
-Extend the existing suites rather than introducing a second harness.
+## Non-goals and ablation decisions
 
-### Pure/model checks
+- Keep source/roster admission, saved identity and compatibility: removing any one can reroll or invalidate existing play. Reuse the present validators and storage transactions instead of creating parallel frameworks.
+- Keep all four kinds, two reachable biomes, bounds and real-route proof: catalog-only fixtures would not establish #159's behavior. One compatible roster in an authored pool is sufficient; avoid new enemy art and unrelated roster expansion.
+- Keep the old selection policy only for actual save compatibility. Do not duplicate controllers or create a user-facing compatibility toggle.
+- Drop bulk #170 packs, specialized enemies (#166–#169), XP/unlocks (#160), new effects (#161), currency/reward rebalance (#174), class-stat progression (#185), alternate map generators (#184), wandering (#155), main-menu work (#153) and HUD changes (#123/#187). Each has separate ownership or requirements.
+- Drop new assets, dependencies, production flags, general content editors, telemetry events, shops, extra POIs, arbitrary seed controls and a new pathfinding system. None is required for this outcome.
+- Keep this requested `plan.md` as the review artifact. Existing OpenSpec dungeon contracts should be reconciled with the approved decisions when implementation is requested; this planning publication does not duplicate them or mark their work complete.
 
-- Across the current seed corpus, all three types and all three biomes: exactly four unique IDs, one player/three enemies, integer in-bounds coordinates, distinct walkable cells and shared cardinal connectivity using the existing independent test flood-fill.
-- Equal input produces equal state; fixed representative marker snapshots pin `markers-v1`. Biome-only changes preserve marker IDs/positions, while new seeds/types match fresh factory results. Check normalized zero/max uint32 seeds.
-- Frozen input remains unchanged; placement and rerendering cannot affect terrain or an existing battle RNG state. Preserve the Rooms fingerprint and capture comparable Walker/Cellular baseline fingerprints before implementation so all three layout streams stay unchanged.
-- The existing forced generator fallback produces four valid placements. Mock only generation during that fixture, then restore the RNG mock before evaluating the real marker policy.
-- Empty, fewer-than-four, disconnected and malformed/dimension-mismatched layouts return explicit failure with no partial state. Confirm bounded draw count and no `Math.random`, time or browser entropy dependence.
+## Files and implementation sequence
 
-### Real route and browser checks
+1. **Catalog, selection and arithmetic.** Add `src/content/dungeonEncounters.ts` for bounded definitions/validation and `src/domain/dungeonEncounters.ts` for pure selection and projection. Integrate [content/dungeon.ts](../../src/content/dungeon.ts) without changing the existing authored/short-run catalogs. Reuse `BattlefieldEncounter`, source resolution, validation and RNG utilities. Add a focused `tests/unit/dungeonEncounters.test.ts` because this introduces a distinct pure policy; extend existing battlefield tests only for the new pairing.
+2. **Durable floor facts and migration.** Change [domain/dungeon.ts](../../src/domain/dungeon.ts) and [dungeonSaveEnvelope.ts](../../src/domain/dungeonSaveEnvelope.ts). Update [dungeon.test.ts](../../tests/unit/dungeon.test.ts), [dungeonBattle.test.ts](../../tests/unit/dungeonBattle.test.ts) and [dungeonFixtures.ts](../../tests/helpers/dungeonFixtures.ts) to carry real selected descriptors and prior-format fixtures. Keep the storage adapter unchanged unless a demonstrated integration defect requires a focused repair. Extend replay receipts to carry the selection/projection context required to reconstruct their actual catalog.
+3. **Application and presentation.** Integrate [DungeonSession.ts](../../src/app/DungeonSession.ts), [startDungeonApp.ts](../../src/app/startDungeonApp.ts), [ui/dungeon.ts](../../src/ui/dungeon.ts), [dungeonMap.ts](../../src/ui/dungeonMap.ts) and its existing stylesheet for labels/treatment. Do not change `BattleSession` or `BattleScene` unless the shared-catalog path proves insufficient; both already accept the host's catalog.
+4. **Acceptance and documentation.** Extend existing dungeon/exploration browser suites and [traversal helpers](../../tests/helpers/dungeonTraversal.ts); retain a new `docs/qa/issue-159-biome-encounters.md` only when results exist. Update [docs/dungeon.md](../dungeon.md), the relevant README entry and approved OpenSpec dungeon/encounter deltas with exact policy, compatibility and evidence. Add the new catalog validation to the existing content-validation script and pure TypeScript scope where needed.
 
-- Direct `/map` entry/reload shows exactly four matching marker projections. Compare their IDs/coordinates to the pure model, not just counts. Exercise Generate (including same-seed repeat), New seed and its entropy fallbacks, valid pending edits, type/biome changes and return-to-seed replay.
-- Invalid seeds preserve IDs, coordinates, terrain, committed controls and error feedback. Art changes with an unapplied valid seed preserve the committed world.
-- Extend the existing 3 types × 3 biomes × 2 art styles loop with placement and accessible-description assertions. Keep all terrain/legend/fallback assertions.
-- Hold image requests, regenerate/change type and biome, switch art, then release old requests. Verify the latest state survives success, network failure and corrupt-image decode. Also retain the existing late-load/invalid-input regression.
-- Exercise explicit placement failure on initial entry and regeneration, then retry successfully. Use one focused development-server Playwright case that intercepts the state module to return a controlled failure; add no production fault-injection flag. Prove prior complete state and failure feedback survive art completion.
-- Capture and inspect screenshots in `desktop`, `mobile-portrait` and `mobile-landscape`, covering all combinations through the existing art matrix and a narrow 320px viewport spot check. Inspect marker shapes/edging at actual cell size, legend wrapping, overlap/clipping, scrolling, focus and usable controls. Screenshots must show the markers, not merely prove that DOM attributes exist.
-- Run accessible-name/description assertions and native keyboard/touch control interactions. Do not claim screen-reader or physical-hardware testing from these checks.
-- Preserve existing route/load-failure tests, configured-base asset behavior, no map assets on the battle route and no battle/audio initialization on `/map`. Preserve the currently allowed privacy opt-out read; marker logic adds no storage access.
+These are checkpoints for one coherent issue, not a mandatory PR stack. Recheck the exact main tip, #161's shared-effect changes, and #187/#190's interaction contract before implementation. The two new pure modules separate content data/validation from selection/projection; do not split them into extra abstractions without a traced need.
 
-### Commands and evidence
+## Proof and acceptance mapping
 
-After dependency setup, use the existing scripts and installed Playwright browser (or the documented `PLAYWRIGHT_CHROMIUM_EXECUTABLE` override):
+**AC1 — validated catalogs, separate streams and stable identity:** malformed/unknown/duplicate IDs, empty pools, unsupported versions, incompatible authored rosters and illegal spawns reject. A fixed seed corpus spanning both biomes and every kind reproduces identical descriptors. Pin representative snapshots and prove selection cannot change battle/reward/terrain/POI RNG. Validate each enabled tuple and every nonempty survivor subset using existing admission rules.
+
+**AC2 — all kinds and reviewed scaling:** cover every kind in pure tests and actual `/dungeon` play. Test depths 1/2/10, rounding boundaries, each stat's saturation point, maximum safe depth, invalid depth, vault second-pass rounding and absence of an elite multiplier. Repeated projection/construction must equal one projection and leave baseline catalogs untouched. Compare displayed/previewed stats, AI decisions, actual damage/hit resolution and deterministic command replay using the same catalog; preserve current signatures and equipment effects.
+
+**AC3 — intentional biome progression:** new seeds can select either first biome, successive floors alternate according to the saved policy, and returning/reloading retains their choices. Every advertised biome has actual admitted maps/rosters and a reachable guardian. No unsupported biome is silently mapped to another pack. Legacy games retain the fixed rule and Grassland map treatment.
+
+**AC4 — descriptors and compatibility:** format-1/2 fixtures at ready, active battle (including Guarded), pending reward, defeat and backtracked floors preserve their meaningful state and next-command/events/RNG results after normalization. Verify their unvisited next floor also retains legacy behavior. Format 3 roundtrips selected identity and damaged enemy HP, rejects mismatched descriptors/content, and retains invalid/incompatible raw bytes. Exercise primary/backup, quota/security/uncertain-readback, explicit recovery and maximum-size candidate failure. Preserve standalone and short-run save bytes and acceptance corpora.
+
+**AC5 — legal encounters and exactly-once progression:** validate deterministic generated fallback, all seven survivor subsets, occupied/blocked/out-of-bounds spawns and reachable combat. Legally complete a guardian, attempt duplicate/stale completion and travel, descend, ascend and revisit without new encounters/rewards. Confirm defeating only one boss-roster unit does not unlock stairs. At least one legal multi-floor browser journey proves the actual route; synthetic completion fixtures may isolate edge cases but cannot replace that journey.
+
+Use desktop, mobile portrait and mobile landscape Playwright interactions/screenshots; include narrow/short layouts, keyboard and touch traversal, reload during combat, art switching/loading failure, focus and old-save recovery. Capture both biomes and all four kinds across the matrix, with Guardian labels and actual scaled inspection values visible. Use the existing focused WebKit exploration configuration for affected lifecycle/controls. No physical-device claim is needed or made.
+
+Suggested implementation checks, adapted only to actual touched files and existing configuration:
 
 ```text
-npm run test:unit -- tests/unit/overworldMap.test.ts --maxWorkers=1
+npm run test:unit -- tests/unit/dungeonEncounters.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts tests/unit/exploration.test.ts tests/unit/battlefield.test.ts tests/unit/battlefieldSources.test.ts
+npm run test:unit
 npm run build
-npx playwright test tests/overworld-map.spec.ts
+npx playwright test tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts
+npx playwright test -c playwright.exploration.config.ts
+npm test
+git diff --check
 ```
 
-Run the controlled failure case separately with `PLAYWRIGHT_SERVER_MODE=dev`, targeting its name and the desktop project; production chunk-load-failure tests require preview mode and should not be included in that dev invocation. Use the existing configuration's `PLAYWRIGHT_BASE_PATH=/prototype/` with a matching `npm run build -- --base=/prototype/` for relative-navigation marker/art checks; do not include older tests that intentionally navigate to absolute `/map` in the prefixed run. In PowerShell, set these values using `$env:NAME = 'value'`, then remove/restore them after each command group.
+`npm run build` includes content validation and both TypeScript checks. `npm test` includes the configured encounter/item posttest suites. Validate any approved OpenSpec change strictly when it is created/updated. Preserve existing failed results: [#190](https://github.com/luminari-gurus/tactics-guru-v2/issues/190) tracks three native-select failures reported on macOS Chrome at the earlier exact base, and [#158's QA report](../qa/issue-158-overworld-traversal.md) retains a WebKit idle-budget observation. Reproduce on the current host before calling something a baseline; do not skip, weaken or silently repair unrelated cases in this branch.
 
-Record actual commands, source commit, browser/viewport, pass/fail counts and screenshot paths in the QA record. `npm run build` already validates content and both TypeScript configurations. The normal `npm test` has unrelated posttest suites; invoke the focused Playwright file directly here. Broaden testing only if changes touch shared routes, domain/RNG code or reveal a concrete cross-feature risk. Finish with document-link and `git diff --check` validation.
-
-Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). At planning completion no marker acceptance or browser execution is claimed.
-
-## Ablation: what survives and what is removed
-
-- **Keep the pure state boundary:** omitting it makes redraws authoritative and leaves #155 without stable marker state.
-- **Keep deterministic sampling and explicit failure:** omitting them leaves reproducibility, unique placement and failure acceptance unmet. Reuse the validator/RNG instead of building a spawn framework.
-- **Keep complete state commits and pending-input behavior:** omitting them can mix old markers with a regenerated map or unexpectedly apply an edited seed during art loading.
-- **Keep shape/contrast, descriptions and screenshot review:** color or DOM counts alone cannot establish visibility across the supported art/viewport matrix.
-- **Simplify rendering to CSS overlays on existing cells:** a new Phaser scene, canvas renderer, entity component system or SVG overlay grid supplies no required behavior.
-- **Drop generated artwork and sprite production:** stable geometric markers meet the requested identity/readability goal without new assets or licensing/loading work. Game Studio foundations/UI/playtest guidance applies; Phaser and sprite/image generation are unnecessary for this DOM route.
-- **Drop movement, pathfinding, detection, timers, player controls, encounters/combat, persistence, telemetry events, route redesign and procedural terrain changes:** these are excluded by #154 or belong to #155/other work. No speculative movement settings or save schema are introduced.
-- **Keep requested OpenSpec tracking:** the implementation request explicitly adds OpenSpec; the change mirrors this plan without another approval stage. Drop backlog sweeps and extra frameworks.
+Measure added `/dungeon` code transfer, floor creation, saved movement and descriptor growth using the existing exploration/performance checks. #158's recorded 394,035 gzip-normalized JS/CSS bytes was near the 400,000-byte budget; it is historical evidence, not a fresh result. Lazy-load no new content on the standalone/short-run routes, add no assets, and do not relax budgets. Record exact source revision, browser/viewport, commands, failures, screenshots and route-based evidence. Passing structural or unit checks alone does not prove playable balance or browser acceptance.
 
 ## Completion boundary
 
-The implementation now covers all seven #154 acceptance bullets with evidence in the QA record.
-The focused PR is the review boundary; the issue remains open until merge. #155 remains a separate
-dependent issue and should use the exported model after #154 lands. No enemy movement, deployment,
-physical-hardware testing or screen-reader certification is included.
+Deliver all five acceptance areas with implementation and evidence, current OpenSpec/continuation documents, tested commits pushed with exact parity, and focused review-ready PRs (stacking dependent work). Keep #159 open for review. No merge, deployment or production acceptance is authorized; do not create a release tag for unmerged changes.
