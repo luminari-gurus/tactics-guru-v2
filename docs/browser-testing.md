@@ -82,12 +82,38 @@ CLI for other custom reporting workflows. Existing `npm test` behavior is unchan
 
 ## CI and resuming #200
 
-`.github/workflows/browser-setup.yml` uses Ubuntu 24.04, Node 24 and `npm ci`,
-installs both browsers with OS dependencies, checks launch metadata, builds, then
-runs the two-engine smoke test. It runs on PR changes to setup/configuration and
-can be dispatched manually once present on the default branch. Receipts are
-retained for seven days with unique run/attempt names. This small qualification
-job is separate from the full-suite sharding work in #208.
+Brian provisions the self-hosted runner. Register it with the default `self-hosted`
+label and the custom `tactics-browser` label. OS/architecture are intentionally
+not fixed until the host is selected; use a Playwright-supported platform.
+Provide Node 24 and install OS browser libraries during provisioning (Linux:
+`npm ci && npm run setup:browsers:linux`). Install browser binaries as the runner
+service account so its browser cache is accessible.
+
+`.github/workflows/browser-setup.yml` targets `[self-hosted, tactics-browser]`
+with no GitHub-hosted fallback. Each run uses `npm ci` and installs the
+lockfile-matching browser binaries, reusing the persistent download cache.
+The workflow does not invoke privileged OS package installation per job.
+It checks launch metadata, diagnostics, builds, then runs both engine smoke cases.
+Receipts are retained for seven days with unique run/attempt names.
+
+Initially the workflow is manual (`workflow_dispatch`, available after the workflow
+exists on the default branch). Dispatch only a reviewed, trusted ref: this is a
+public repository and automatic fork PR execution must not reach the persistent
+self-hosted machine. Automatic PR routing and isolated workers belong to #208.
+Checkout does not persist repository credentials.
+
+The `tactics-browser-exclusive` concurrency group serializes browser jobs across
+refs. Reuse that exact group in future timing workflows on this repository, and
+keep unrelated host workloads idle during measurement. A single host starts with
+one browser job; extra runner registrations on it do not create independent GPUs.
+Do not assume 3–4 shards until #208 establishes actual isolated capacity.
+
+Re-run qualification on the self-hosted machine before collecting #200's baseline.
+The previous hosted CI smoke results remain historical setup evidence; they do
+not qualify the new host. Record host CPU/RAM, OS/architecture, Node/browser
+versions, cache state and background load with the new baseline. Keep queue and
+setup duration separate from test execution. Establish workspace/cache cleanup
+and disk limits as part of runner provisioning.
 
 After setup smoke passes on the runner that will measure #200, apply these setup
 changes to the #200 branch and run its timing command on that same runner. Its
