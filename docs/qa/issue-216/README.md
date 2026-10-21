@@ -1,7 +1,7 @@
 # Legal-defeat lifecycle test repair (#216)
 
 Base: `3510d1e3db8814b9111b76676e8413c90dedb8a5` (current main).
-Only the targeted unit scenario changes; application code, dependencies, helper
+Only two defeat lifecycle/telemetry unit scenarios change; application code, dependencies, helper
 implementations, retries and the existing five-second timeout remain unchanged.
 
 ## Failure and profile
@@ -58,3 +58,25 @@ qualification and root/prefix/restoration builds are recorded on the PR at the
 exact tested integration SHA. Local profile and candidate timings have different
 instrumentation and fixture work, so no overall build/test speedup is claimed.
 Browser/performance-matrix qualification remains separate; no browser code changes.
+
+## Integration finding and bounded follow-up
+
+[Run 39685408364](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39685408364)
+at `72f9bcc810a7a9093552f1f844e8c1ea9ddaf2b1` executed all 909 cases: 908 passed,
+zero pending. The repaired lifecycle case passed in 1326.77 ms. The sole remaining
+failure was telemetry's `accepted defeat emits encounter and run outcomes once,
+including after retries` (5022.04 ms against its unchanged 5000 ms limit).
+Orchestration contracts and safe standalone build passed; prefix/restoration
+remained blocked. This is retained as a failed full run, not a clean qualification.
+
+The telemetry case repeated the same full-health defeat pattern. Apply the same
+explicit prepared one-HP survivor boundary locally in that case. Exact expected
+encounter/run events and deduplication keys now reference the prepared second
+encounter (`item-fixture:1` and `item-fixture`); exact event counts, real acceptance,
+failed-storage save retries and ended-session rejection remain asserted. The other
+ten telemetry cases are unchanged. `npm run test:unit -- tests/unit/telemetry.test.ts
+--maxWorkers=1 --reporter=json --outputFile=...` passed 11/11, repaired case 828.86 ms.
+
+This follow-up addresses an observed integration blocker without expanding into
+runtime changes or changing a shared helper. All 909 original case names remain;
+the final complete CPU run is linked from both PR #217 and PR #215.
