@@ -53,3 +53,18 @@ Ability selection SHALL support native keyboard operation, mouse and touch with 
 #### Scenario: Narrow screen selection
 - **WHEN** the player opens the ability choice, selects an entry and confirms or cancels using keyboard or touch
 - **THEN** controls remain reachable without horizontal overflow or board click-through and use the same preview and intent path as desktop
+
+### Requirement: Validated additional ability definitions
+Additional ability definitions SHALL use well-formed IDs, existing implemented profiles with exact fields and bounded values, and nonempty distinct existing owners. Canonical ability definitions SHALL remain required with their original kinds and ordered owners. Guarded attacks SHALL retain the Fighter-only effect lifecycle.
+
+#### Scenario: Admit a second ability
+- **WHEN** a catalog adds a distinct valid ability using an implemented profile and eligible existing owners
+- **THEN** content loading accepts it and owned ability controls expose its exact identity
+
+#### Scenario: Reject malformed or incompatible definitions
+- **WHEN** additional content has malformed IDs, unknown profiles, extra fields, invalid numeric bounds, duplicate or missing owners, or non-Fighter guarded owners
+- **THEN** content validation rejects it before a battle loads
+
+#### Scenario: Retain canonical constraints
+- **WHEN** a catalog removes a canonical ability or changes its required kind or ordered owners
+- **THEN** content validation rejects it despite permitting additional definitions

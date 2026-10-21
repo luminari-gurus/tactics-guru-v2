@@ -21,7 +21,10 @@ function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false,firstS
   for(let seed=firstSeed;seed<80;seed++){
     const session=new BattleSession(catalog,'map:forest_ruins',seed);
     for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
-      const command=session.phase==='player'?playerDecision(session.state):null;
+      let command=session.phase==='player'?playerDecision(session.state):null;
+      // The picker uses the domain's same-target shorthand, including for one missile.
+      if(command?.type==='useAbility' && command.abilityId==='ability:magic_missile' && 'missileTargets' in command.target && command.target.missileTargets.length===1)
+        command={...command,target:{unitId:command.target.missileTargets[0]}};
       if(command)session.prepare(command);
       const step=command?session.confirm():session.nextEnemy();
       if(!step)throw Error('Policy failed to make progress');

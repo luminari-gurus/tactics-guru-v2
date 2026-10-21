@@ -43,3 +43,9 @@ Run focused pure/session and Playwright cases, then `npm run test:unit`, `npm ru
 ## Migration Plan
 
 No persisted schema or content identity changes are planned. Selection remains transient. Existing saves resume under the same catalog and rules. Reverting this UI change restores prior controls without data migration. No production deployment or merge is authorized by this plan.
+
+## Approved validator extension
+
+The fixed-ID validator rejected the planned test catalogs. The caller explicitly approved extending it on 2026-10-21. Canonical IDs remain required with their original kind and ordered owners. Additional IDs must satisfy ability ID syntax, an existing discriminated profile and its exact fields/bounds, and a nonempty unique owner list drawn from existing unit IDs. Guarded tradeoff constants remain enforced. Tests cover malformed IDs, unknown kinds, extra fields, range/number bounds, invalid/empty/duplicate owners and canonical mutation. This extension admits content, not new mechanics.
+
+Additional guardedAttack profiles retain the domain’s Fighter-only guarded-effect lifecycle; the validator rejects other owners for that profile.
