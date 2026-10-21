@@ -63,10 +63,10 @@ export function runStages(plan, execute, record = () => {}) {
 
 export function stageEnvironment(stage, directory, inherited = process.env) {
   const env = { ...inherited };
-  // Explicit modes must not inherit a previous developer invocation.
+  // Explicit modes and local performance provenance must not inherit a prior invocation.
   for (const key of Object.keys(env)) {
     if (key.startsWith('VITE_POSTHOG_') || key.startsWith('PLAYWRIGHT_JSON_') ||
-        ['POSTHOG_SOURCEMAPS', 'PLAYWRIGHT_BASE_PATH', 'PLAYWRIGHT_SERVER_MODE',
+        ['FIT_URL', 'POSTHOG_SOURCEMAPS', 'PLAYWRIGHT_BASE_PATH', 'PLAYWRIGHT_SERVER_MODE',
           'PLAYWRIGHT_TELEMETRY_DEV'].includes(key)) delete env[key];
   }
   return { ...env, ...stage.env,

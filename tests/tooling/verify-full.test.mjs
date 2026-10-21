@@ -63,6 +63,27 @@ test('aggregate refuses filters that could silently narrow required coverage', (
   assert.throws(() => main(['--project=desktop']), /filters belong/);
 });
 
+test('full verification captures the local build despite an inherited remote FIT_URL', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const inherited = { FIT_URL: 'https://previous-deployment.example/game/' };
+  const env = stageEnvironment(stages.find(s => s.id === 'performance'), '/reports', inherited);
+  // Use the collector's real parser; the flag also supports Node 22.12's TS loader.
+  const parser = new URL('../../scripts/measure-fit-options.ts', import.meta.url).href;
+  const parsed = JSON.parse(execFileSync(process.execPath, [
+    '--experimental-strip-types', '--input-type=module', '-e',
+    `import { parseMeasureArgs } from ${JSON.stringify(parser)};
+     console.log(JSON.stringify(JSON.parse(process.argv[1]).map(env =>
+       parseMeasureArgs(['/reports/performance.json'], env))));`,
+    JSON.stringify([env, inherited]),
+  ], { encoding: 'utf8' }));
+  assert.deepEqual(parsed[0], {
+    output: '/reports/performance.json', url: 'http://127.0.0.1:4174', remote: false, scene: 'proof',
+  });
+  assert.deepEqual(parsed[1], {
+    output: '/reports/performance.json', url: inherited.FIT_URL, remote: true, scene: 'proof',
+  });
+});
+
 test('actual child process exit codes preserve later execution and separate logs', async () => {
   const { spawnSync } = await import('node:child_process');
   const { mkdtempSync, writeFileSync, readFileSync, rmSync } = await import('node:fs');
