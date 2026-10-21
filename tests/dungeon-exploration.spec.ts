@@ -158,3 +158,18 @@ test('legal guardian journey, next biome, ascent and revisit preserve selected f
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(await dungeonSnapshot(page)).toEqual(saved);
  writeFileSync(test.info().outputPath('legal-multi-floor-journey.json'),JSON.stringify({initial,receipts,clear,departed,second,explored,back,saved},null,2));expect(errors).toEqual([]);
 });
+
+ test('exploration cells stay square across viewport sizes and art styles',async({page})=>{
+ await page.goto('dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ for(const viewport of [{width:320,height:740},{width:393,height:852},{width:915,height:412},{width:1280,height:800}]){
+  await page.setViewportSize(viewport);
+  for(const art of ['simple','legacy-8bit']){
+   await page.locator('#dungeon-art').selectOption(art);
+   const sizes=await page.locator('#dungeon-map span').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {width:r.width,height:r.height};}));
+   expect(sizes).toHaveLength(400);
+   for(const size of sizes){expect(size.width).toBeGreaterThan(0);expect(Math.abs(size.width-size.height)).toBeLessThan(0.1);expect(Math.abs(size.height-sizes[0].height)).toBeLessThan(0.1);}
+  }
+ }
+ await page.setViewportSize({width:393,height:852});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
+ await page.screenshot({path:test.info().outputPath('square-overworld-mobile.png')});
+});
