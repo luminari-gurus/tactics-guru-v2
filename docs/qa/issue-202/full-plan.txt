@@ -1,0 +1,223 @@
+
+> tactics-guru-v2@0.0.0 verify:full
+> node scripts/verify-full.mjs --list
+
+[
+  {
+    "id": "tooling",
+    "args": [
+      "run",
+      "test:verification"
+    ]
+  },
+  {
+    "id": "units",
+    "args": [
+      "run",
+      "test:unit"
+    ]
+  },
+  {
+    "id": "build-root",
+    "args": [
+      "run",
+      "build"
+    ]
+  },
+  {
+    "id": "chromium",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test"
+    ],
+    "browser": true,
+    "needs": [
+      "build-root"
+    ]
+  },
+  {
+    "id": "fixtures",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.fixtures.config.ts"
+    ],
+    "browser": true
+  },
+  {
+    "id": "placement-dev",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "tests/overworld-map.spec.ts",
+      "-g",
+      "controlled placement failure preserves complete state and supports retry"
+    ],
+    "browser": true,
+    "env": {
+      "PLAYWRIGHT_SERVER_MODE": "dev"
+    }
+  },
+  {
+    "id": "webkit-acceptance",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.device-acceptance.config.ts"
+    ],
+    "browser": true,
+    "needs": [
+      "build-root"
+    ]
+  },
+  {
+    "id": "webkit-exploration",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.exploration.config.ts"
+    ],
+    "browser": true,
+    "needs": [
+      "build-root"
+    ]
+  },
+  {
+    "id": "health-bars",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.health-bars.config.ts"
+    ],
+    "browser": true,
+    "needs": [
+      "build-root"
+    ]
+  },
+  {
+    "id": "telemetry-production",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.telemetry.config.ts"
+    ],
+    "browser": true
+  },
+  {
+    "id": "telemetry-development",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "-c",
+      "playwright.telemetry.config.ts"
+    ],
+    "browser": true,
+    "env": {
+      "PLAYWRIGHT_TELEMETRY_DEV": "true"
+    }
+  },
+  {
+    "id": "assets-root-dev",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "tests/public-asset-base.spec.ts"
+    ],
+    "browser": true,
+    "env": {
+      "PLAYWRIGHT_SERVER_MODE": "dev"
+    }
+  },
+  {
+    "id": "performance",
+    "args": [
+      "run",
+      "measure:fit"
+    ],
+    "needs": [
+      "build-root"
+    ]
+  },
+  {
+    "id": "build-prefix",
+    "args": [
+      "run",
+      "build",
+      "--",
+      "--base=/prototype/"
+    ]
+  },
+  {
+    "id": "assets-prefix-preview",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "tests/public-asset-base.spec.ts"
+    ],
+    "browser": true,
+    "needs": [
+      "build-prefix"
+    ],
+    "env": {
+      "PLAYWRIGHT_BASE_PATH": "/prototype/"
+    }
+  },
+  {
+    "id": "assets-prefix-dev",
+    "args": [
+      "exec",
+      "--no",
+      "--",
+      "playwright",
+      "test",
+      "tests/public-asset-base.spec.ts"
+    ],
+    "browser": true,
+    "env": {
+      "PLAYWRIGHT_BASE_PATH": "/prototype/",
+      "PLAYWRIGHT_SERVER_MODE": "dev"
+    }
+  },
+  {
+    "id": "restore-root",
+    "args": [
+      "run",
+      "build"
+    ]
+  }
+]

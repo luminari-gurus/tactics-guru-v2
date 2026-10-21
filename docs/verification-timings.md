@@ -1,125 +1,142 @@
 # Verification timing baselines
 
-Issue #200, part of epic #199. This is measurement tooling, not a new test-selection
-policy. Existing build/test commands, assertions, projects, workers and retries are
-unchanged. The caller approved this implementation plan on 2026-10-21.
+Issue #200, part of epic #199. This tooling measures the existing verification
+plan; it does not change gameplay tests, suite selection, workers, retries or
+performance limits. PR #209 remains draft until the authoritative baseline is
+collected on the qualified self-hosted runner.
 
-## Capture
+## Capture on the qualified host
 
-Install locked dependencies with `npm ci` and compatible browsers with
-`npx playwright install chromium webkit` (plus the platform's browser libraries).
-Run from a Git checkout with Node >=22.12. Stop other browser tests, profiling and
-game-performance captures first. This runner prevents another timing capture in
-the same checkout; it cannot detect workloads in other checkouts or applications.
-
-```sh
-npm run measure:verification -- --conditions "idle host; dependencies installed; first run after checkout"
-```
-
-The default capture runs these stages sequentially:
-
-| Stage | Existing work measured |
-| --- | --- |
-| `content` | The seven `validate:content` Vitest files |
-| `typecheck-app` | `tsc --noEmit` |
-| `typecheck-domain` | `tsc --noEmit -p tsconfig.domain.json` |
-| `bundle` | `vite build`, after all three build prerequisites pass |
-| `unit` | Complete configured Vitest suite, including its build-output checks |
-| `chromium` | Default Playwright production-preview matrix |
-| `encounters` | Encounter dev fixture matrix |
-| `items` | Run-item dev fixture matrix |
-| `webkit` | `playwright.device-acceptance.config.ts` |
-| `telemetry` | Configured telemetry matrix, including its separate instrumented build |
-
-The first four stages represent the existing build chain, with separate process
-timings. They omit npm wrapper overhead, so their sum is not a direct measurement
-of `npm run build`. Browser suites are invoked directly to avoid accidentally
-executing npm's posttest twice. Unlike the existing lifecycle hook, independent
-stages still run after a test failure so the report exposes all stage results.
-Preview stages are blocked when their build prerequisites fail; stale dist output
-is never counted as a valid baseline. Telemetry owns its separate configured build.
-
-The baseline is specifically this named matrix, not every possible acceptance
-configuration: exploration/health-bar WebKit matrices, dev-only placement probes,
-prefixed builds and game-performance collectors are not silently added. Record
-additional task-specific checks separately. `--stages` selects a subset and
-automatically includes build prerequisites for preview suites:
-
-```sh
-npm run measure:verification -- --stages content,typecheck-app,typecheck-domain,bundle,unit --out test-results/timings/build-unit --conditions "idle host; warm dependency cache"
-```
-
-Use a **new** output directory under `test-results/timings/`. Existing directories
-are refused. A stage timeout defaults to one hour; `--timeout-ms` overrides it.
-Interrupts terminate the active process group and retain an incomplete receipt.
-On Windows termination is best-effort for descendants: check for surviving Vite
-servers before a later capture. If forcibly killed, inspect the PID in
-`test-results/timings/.capture.lock` before removing a stale lock.
-
-Unset `PLAYWRIGHT_BASE_PATH`, `PLAYWRIGHT_SERVER_MODE` and
-`PLAYWRIGHT_TELEMETRY_DEV` for the root production baseline. A compatible installed
-Chromium can still be selected with `PLAYWRIGHT_CHROMIUM_EXECUTABLE`. The runner
-records its actual version through a separate preflight, outside stage timings.
-Preflight warms browser launch caches; do not call this a cold OS/browser-launch
-benchmark. If a browser cannot launch, its stages are blocked rather than emitting
-hundreds of meaningless launch failures.
-
-## Reports and interpretation
-
-Each capture saves `report.json`, `summary.md`, individual raw JSON reports/logs,
-and isolated Playwright output directories. Receipt fields include source commit,
-dirty state, SHA-256 hashes of tracked and nonignored new verification inputs,
-Node/OS/CPU/memory, actual browser versions, exact commands, configured workers,
-counts, failures/skips/retries and slowest tests/files. Vitest's sidecar also
-retains module setup/import/collection diagnostics, distinct observed worker IDs
-and peak simultaneous test modules (not a measurement of peak CPU utilization).
-An unset configured worker limit remains null. Fields unavailable from a
-runner are null, never invented zero values. No `.env` or arbitrary untracked
-files are read. The source hash is checked again at completion to detect edits
-during a capture; no pass is claimed if inputs changed.
-
-Stage wall time includes process/server startup and teardown. Reporter duration
-and summed test durations are separately identified: parallel test duration sums
-are work, not elapsed time. Local queue time is null; CI queue time would require
-external scheduler data. Dependency/browser installation is a prerequisite and
-excluded from these stages. Record it separately when comparing fresh CI hosts.
-The telemetry stage includes its internal build/startup; it is not pure browser
-test time. Preserve condition notes for filesystem caches, host load and external
-browser overrides; the runner does not clear caches or change concurrency.
-
-Exit status is nonzero for any failed/blocked stage, missing/malformed test report,
-zero selected tests, timeout, interrupt or changed inputs. Expected failures,
-unexpected failures, skips and flaky retry outcomes remain distinct in JSON.
-`complete` means all selected stages executed, not that they passed; `passed` is
-the separate gate. Partial captures are useful diagnostics, not a full baseline.
-
-## Compare
-
-```sh
-npm run measure:verification -- compare test-results/timings/before/report.json test-results/timings/after/report.json
-```
-
-Comparison prints per-stage milliseconds/percentage changes and warns on changed
-environments, browser versions, source inputs, conditions, counts, selection or
-worker settings. Missing/failed/blocked stages do not get a passing speedup.
-Changed source is expected for an optimization, but inspect coverage and host
-differences before attributing a delta. This command is descriptive, not a
-statistical performance gate. Do not repeatedly run the full matrix solely to
-obtain a nicer result.
-
-Retain raw logs and JSON with the associated PR/CI artifact for 30 days and
-through review, whichever is longer. Keep a compact source-bound summary in
-`docs/qa/` for accepted baselines. Large raw artifacts remain in ignored
-`test-results/`; archive them to the PR's artifact store before cleaning the
-checkout. No upload or retention service is configured by this task.
-
-## Tooling validation
+Brian provisions the runner. First qualify its actual runner service account with
+#207 / PR #210, including browser launches, retained diagnostics and Phaser smoke
+checks. Install the locked dependencies, supported Node 24, lockfile-compatible
+Chromium/WebKit and required OS libraries using that setup. Do not launch the full
+baseline on GitHub-hosted capacity or silently fall back to it. Use an idle host
+and serialize browser/game-performance work across checkouts and workflows.
 
 ```sh
 npm run test:verification-tooling
+npm run measure:verification -- --list
+npm run measure:verification -- --out verification-receipts/timings/provisioned-baseline --conditions "qualified host; idle; describe dependency/build/browser cache state"
 ```
 
-Tests cover nonzero child exits, timeout termination, missing executables,
-malformed reports, retries/flaky results, dependency expansion and comparisons
-that must not present a failed run as an improvement. The reporting sidecar is
-also exercised by real content/unit captures.
+The timing manifest derives from `scripts/verify-full.mjs`, the same maintained
+coverage plan as `npm run verify:full`. Every full stage is represented, in the
+same order and mode. Only `typecheck` is split into two process timings, so the
+19-stage full plan currently produces 20 timing rows:
+
+| Timing stages | Existing work measured |
+| --- | --- |
+| `tooling` | Existing verification orchestration contracts |
+| `units` | Fast unit suite, including all content validation |
+| `typecheck-app`, `typecheck-domain` | Both `tsc --noEmit` boundaries |
+| `build-integration` | The two real root/prefix Vite build tests |
+| `build-root` | Ordinary bundle after successful units/content and both type scopes |
+| `chromium` | Default production-preview matrix |
+| `fixtures` | Combined authored-encounter, ability-picker and run-item dev fixtures |
+| `placement-dev` | The explicit dev-only failure/retry case |
+| `webkit-acceptance`, `webkit-exploration`, `health-bars` | Required engine/device matrices, including mixed Chromium/WebKit health-bar coverage |
+| `telemetry-production`, `telemetry-development` | Separate configured telemetry modes and their own server/build behavior |
+| `assets-root-dev` | Root asset behavior in development |
+| `performance` | Isolated local production collector, after the root build |
+| `build-prefix`, `assets-prefix-preview`, `assets-prefix-dev` | Prefixed bundle and asset behavior at `/prototype/` |
+| `restore-root` | Final root bundle restoration, including after a prefix consumer fails |
+
+Ordinary bundles reuse successful unit/content and type prerequisites exactly as
+#206 specifies. The timing runner does not reintroduce a standalone content pass.
+Content case counts and summed assertion durations are reported as a subset of
+`units`, derived from the current `validate:content` command. That duration is
+work already included in units, **not separate elapsed wall time**. Both compiler
+scopes execute once. Their direct process timings omit the single `npm run
+typecheck` wrapper overhead; the other rows retain their canonical npm commands.
+The configured telemetry production build remains separate and self-validating.
+
+Independent stages continue after failures; only consumers of failed prerequisites
+are blocked. A failed unit/type gate therefore cannot qualify stale build output.
+The last root restoration still runs after a failed prefixed build or browser
+consumer when its unit/type prerequisites passed. Interrupts stop the capture and
+retain partial evidence. Individual stages default to a one-hour timeout;
+`--timeout-ms` changes the capture process limit, not test timeouts.
+
+## Focused preparation
+
+`--stages` selects timing rows and expands their prerequisites once. A CPU-only
+reporting check that does not launch browsers or claim a full baseline is:
+
+```sh
+npm run measure:verification -- --stages tooling,typecheck-app,typecheck-domain --out verification-receipts/timings/cpu-check --conditions "CPU-only preparation; not a baseline"
+```
+
+Use current IDs from `--list`. The old `content`, `unit`, `bundle`, `encounters`,
+`items`, `webkit` and `telemetry` stage names belonged to the historical ten-stage
+capture and are no longer accepted. Schema-one reports remain readable by the
+comparison command; changed schema/coverage produces a warning, not a claim that
+an old partial matrix qualified the new plan.
+
+Stage environments reuse `verify:full` isolation: inherited remote `FIT_URL`,
+telemetry and prior base/server/report settings are cleared, then the stage's
+explicit root/prefix/dev/telemetry mode is applied. The local collector cannot
+silently measure a prior deployment. `PLAYWRIGHT_CHROMIUM_EXECUTABLE` remains an
+explicit supported override. No caller environment values are dumped in reports.
+
+## Preflight and receipt retention
+
+Browser preflight runs outside stage timings. It distinguishes full Chromium
+(`channel: chromium`), the default headless Chromium launch used by health/performance
+checks, and WebKit. A mixed-engine stage requires both of its engines. Failed
+launches block their stages and remain visible. Launch preflight warms browser
+caches, so do not describe this as cold OS/browser-startup timing.
+
+Metadata records version, channel, executable override and executable path when
+known. The default headless-shell executable path is null because Playwright's
+Chromium `executablePath()` is not proof of the actual shell path. This limitation
+is explicit; an installation path is not fabricated as an observed executable.
+Actual runner qualification and installation receipts remain required under #207.
+
+Use a **new** directory beneath `verification-receipts/timings/`. Logs, JSON,
+sidecars and isolated Playwright output directories are saved there, outside
+ordinary `test-results/` cleanup. Existing capture directories are refused.
+The per-checkout `.capture.lock` prevents overlapping timing captures in this
+checkout; it does not detect workloads in other checkouts or applications. If
+forcibly killed, inspect its PID before removing a stale lock. Windows process
+termination remains best-effort for descendants; inspect for surviving servers.
+
+## Reports and comparison
+
+Schema two records full/partial scope, requested/expanded stages and coverage-plan
+provenance, source commit/dirty state/input hashes, Node/OS/CPU/memory, browser
+metadata, exact commands, per-stage wall times, counts/results/retries, workers
+and slow tests/files. Vitest's sidecar retains module/setup/import diagnostics,
+observed worker IDs and peak concurrent modules. Unknown fields remain null.
+No `.env` or arbitrary untracked files are read. Relevant source hashes are checked
+at completion; changed inputs prevent a passing receipt.
+
+`complete` means every selected stage executed, not that it passed. `passed` is a
+separate gate; a passing `scope: partial` capture is **not** the full baseline.
+Any failed/blocked stage, missing/malformed report, zero selected tests, timeout,
+interrupt or changed input produces a nonzero result. Expected/unexpected
+failures, retries, flaky outcomes and skips remain distinct.
+
+Stage wall time includes process/server startup and teardown. Parallel assertion
+duration sums are work, not elapsed time. Queue time is null without scheduler
+data. Dependency/browser installation is outside these stages; record it separately
+when comparing fresh hosts. Telemetry includes its configured build/server work.
+
+```sh
+npm run measure:verification -- compare verification-receipts/timings/before/report.json verification-receipts/timings/after/report.json
+```
+
+Comparison warns about changed coverage plans/scopes, environments, source,
+conditions, counts, selected IDs and workers. Missing/failed/blocked stages do not
+get a passing speedup. Deltas are descriptive, not statistical acceptance or proof
+of causality. Do not rerun the full matrix just to obtain a nicer measurement.
+
+Retain raw logs/JSON in PR or CI artifacts for 30 days and through review, whichever
+is longer; keep a compact source-bound summary in `docs/qa/`. This task configures
+no uploader or retention service. Archive receipts before cleaning the checkout.
+
+`npm run test:verification-tooling` checks canonical coverage, dependencies,
+continuation/restoration after failures, mode isolation, comparison compatibility,
+subprocess failure/timeout handling and real synthetic Vitest/Playwright reporting.
+The reporter fixtures intentionally contain failures, retries and skips; they use
+no browser fixture or server and do not alter production retry configuration.

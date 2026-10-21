@@ -48,20 +48,20 @@ describe('battle session', () => {
     const s = new BattleSession(catalog,state,state.seed);
     expect(s.phase).toBe('player');
     const before=s.state;
-    expect(targetOverlays(s,'signature',{x:2,y:3}).find(t=>t.selected))
+    expect(targetOverlays(s,'ability:high_shot',{x:2,y:3}).find(t=>t.selected))
       .toMatchObject({valid:false,reason:'blockedLos'});
     expect(targetOverlays(s,'basic',null).find(t=>t.cell.x===2&&t.cell.y===3))
       .toMatchObject({valid:false,reason:'outOfRange'});
-    expect(targetOverlays(s,'signature',s.active.cell).find(t=>t.selected))
+    expect(targetOverlays(s,'ability:high_shot',s.active.cell).find(t=>t.selected))
       .toMatchObject({valid:false,reason:'sameSide'});
-    expect(targetOverlays(s,'signature',{x:0,y:0}).find(t=>t.selected))
+    expect(targetOverlays(s,'ability:high_shot',{x:0,y:0}).find(t=>t.selected))
       .toMatchObject({valid:false,reason:'missingTarget'});
     expect(targetOverlays(s,'move',null)).toEqual([]);
     expect(targetOverlays(s,null,null)).toEqual([]);
     expect(s.pending).toBeNull();expect(s.state).toBe(before);expect(s.events).toEqual([]);
     s.prepare({type:'endTurn',unitId:s.active.id});const step=s.confirm()!;
-    expect(targetOverlays(s,'signature',null)).toEqual([]);
-    s.finishPresentation(step.token);s.dispose();expect(targetOverlays(s,'signature',null)).toEqual([]);
+    expect(targetOverlays(s,'ability:high_shot',null)).toEqual([]);
+    s.finishPresentation(step.token);s.dispose();expect(targetOverlays(s,'ability:high_shot',null)).toEqual([]);
   });
   it('automatically exposes enemy-first turns, locks player commands, records accepted commands and replays', () => {
     const s = make();

@@ -79,10 +79,16 @@ it('records uncaught/rejection error payloads without messages, and stops in-fli
   } finally { vi.unstubAllGlobals(); }
 });
 it('accepted defeat emits encounter and run outcomes once, including after retries', async () => {
-  const { freshRunSnapshot } = await import('../../src/domain/runBattle');
   const event = vi.fn(); bindTelemetry({ event, error() {} });
-  const run = new RunItemSession(freshRunSnapshot('telemetry-defeat', 13, runContext), runContext, createRunStorage(runContext, () => null));
+  // Explicit prepared boundary; full-health legal journeys live in runBattle.test.ts.
+  // Keep real defeat acceptance and save retries, without repeating a whole battle.
+  const prepared = preparedSnapshot();
+  const injured = { ...prepared, items: { ...prepared.items, run: { ...prepared.items.run,
+    party: prepared.items.run.party.map(hero => ({ ...hero, hp: hero.heroId === 'fighter' ? 1 : 0 })),
+  } } };
+  const run = new RunItemSession(injured, runContext, createRunStorage(runContext, () => null));
   run.startNew(); const battle = run.startEncounter()!;
+  expect(battle.state.units.filter(unit => unit.side === 'player').map(unit => unit.hp)).toEqual([1]);
   for (let step = 0; step < 1000 && battle.state.outcome === 'ongoing'; step++) {
     const presentation = battle.phase === 'enemy' ? battle.nextEnemy()
       : (battle.prepare({ type: 'endTurn', unitId: battle.active.id }), battle.confirm());
@@ -91,10 +97,10 @@ it('accepted defeat emits encounter and run outcomes once, including after retri
   expect(run.snapshot.items.run.phase).toBe('defeat');
   run.save(); expect(run.startEncounter()).toBeNull();
   expect(event.mock.calls.filter(([name]) => name === 'encounter_outcome')).toEqual([
-    ['encounter_outcome', { route: 'run', encounter: 0, outcome: 'defeat' }, 'telemetry-defeat:0'],
+    ['encounter_outcome', { route: 'run', encounter: 1, outcome: 'defeat' }, 'item-fixture:1'],
   ]);
   expect(event.mock.calls.filter(([name]) => name === 'run_outcome')).toEqual([
-    ['run_outcome', { route: 'run', phase: 'defeat', encounter: 0, outcome: 'defeat' }, 'telemetry-defeat'],
+    ['run_outcome', { route: 'run', phase: 'defeat', encounter: 1, outcome: 'defeat' }, 'item-fixture'],
   ]);
 });
 it('single-battle outcomes occur at acceptance and never repeat on save retries', () => {

@@ -1,4 +1,4 @@
-import { assert, expect, it } from 'vitest';
+import { assert, expect, it, vi } from 'vitest';
 import { createRunBattle, freshRunSnapshot, replayRunBattle } from '../../src/domain/runBattle';
 import { BattleSession } from '../../src/app/BattleSession';
 import { RunItemSession } from '../../src/app/RunItemSession';
@@ -43,10 +43,21 @@ it('run-specific replay rejects altered HP/initiative/seed and preserves exact c
  expect(dispatch(session.state,command.commands[0],session.catalog)).toEqual(dispatch(restored.session.state,command.commands[0],restored.session.catalog));
 });
 it('owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely',()=>{
- const {storage,data}=memory();const controller=new RunItemSession(freshRunSnapshot('legal',1,runContext),runContext,storage);
+ // Explicit near-defeat entry boundary: this case tests ownership/save lifecycle,
+ // not a full-health playthrough (covered by the representative-run case below).
+ // All defeat commands still pass through the real battle/session/storage code.
+ const prepared=preparedSnapshot();
+ const injured={...prepared,items:{...prepared.items,run:{...prepared.items.run,
+  party:prepared.items.run.party.map(hero=>({...hero,hp:hero.heroId==='fighter'?1:0})),
+ }}};
+ const {storage,data}=memory();const saves=vi.spyOn(storage,'save');
+ const controller=new RunItemSession(injured,runContext,storage);
  const battle=controller.startEncounter()!;expect(controller.startEncounter()).toBe(battle);
+ expect(battle.state.units.filter(unit=>unit.side==='player').map(unit=>unit.hp)).toEqual([1]);
  fight(battle,true);expect(controller.snapshot.items.run.phase).toBe('defeat');expect(controller.snapshot.activeBattle).toBeNull();
- const ended=controller.snapshot;expect(battle.nextEnemy()).toBeNull();expect(controller.snapshot).toEqual(ended);
+ const ended=controller.snapshot;const saveCount=saves.mock.calls.length;
+ expect(ended.items.run.revision).toBe(injured.items.run.revision+1);
+ expect(battle.nextEnemy()).toBeNull();expect(controller.snapshot).toEqual(ended);expect(saves).toHaveBeenCalledTimes(saveCount);
  const restored=new RunItemSession(freshRunSnapshot('placeholder',2,runContext),runContext,storage);const load=restored.inspect();assert(load.ok);expect(restored.continue(load)).toBe(true);expect(restored.snapshot).toEqual(ended);
  const review=controller.inspect();expect(controller.replace(review,'new-legal',2)).toBe(true);expect(controller.snapshot.items.run.encounterIndex).toBe(0);expect(controller.snapshot.items.ownership.equipment).toEqual([]);
  expect(controller.replace(review,'another',3)).toBe(false);expect(controller.snapshot.items.run.seed).toBe(2);expect(battle.phase).toBe('disposed');

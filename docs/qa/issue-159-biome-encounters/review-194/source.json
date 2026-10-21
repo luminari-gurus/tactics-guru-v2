@@ -1,0 +1,7 @@
+{
+  "review": 194,
+  "sourceCommit": "15151a029a21765b9c3cdac597bcf4c0dbdf6426",
+  "runtimeTree": "415ded07a988aaafd6c1bd321a76c5653843ed6c",
+  "testsTree": "a324a9e80d7a22d7f90165513b73936fa571a748",
+  "notes": "Desktop ran the same six-encounter assertions before the final aggregate deadline and screenshot scroll changes. WebKit uses sourceCommit exactly. Untracked dependency symlink affects build dirty metadata only. Original corpus and earlier results remain historical."
+}

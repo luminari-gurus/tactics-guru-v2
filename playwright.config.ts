@@ -8,8 +8,8 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
-  // Encounter and run-item fixtures are Vite source entries, verified by dev-only posttests.
-  testIgnore: ['**/telemetry.spec.ts', '**/authored-encounters.spec.ts', '**/run-items.spec.ts'],
+  // Source-entry fixtures run under the explicit test:fixtures dev-server command.
+  testIgnore: ['**/telemetry.spec.ts', '**/ability-picker.spec.ts', '**/authored-encounters.spec.ts', '**/run-items.spec.ts'],
   // Phaser renderers share the host GPU; serialize to avoid headless boot contention.
   workers: 1,
   use: {
@@ -22,8 +22,8 @@ export default defineConfig({
     reuseExistingServer: false,
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-portrait', use: { ...devices['Pixel 7'] } },
-    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], viewport: { width: 915, height: 412 } } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
+    { name: 'mobile-portrait', use: { ...devices['Pixel 7'], channel: 'chromium' } },
+    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], channel: 'chromium', viewport: { width: 915, height: 412 } } },
   ],
 });

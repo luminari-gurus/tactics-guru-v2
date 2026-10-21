@@ -1,24 +1,66 @@
 import { spawn } from 'node:child_process';
-import { createWriteStream, mkdirSync, writeFileSync, openSync, closeSync, unlinkSync } from 'node:fs';
+import { createWriteStream, mkdirSync, writeFileSync, readFileSync, openSync, closeSync, unlinkSync } from 'node:fs';
 import { resolve, relative, isAbsolute, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { sourceIdentity, summarizePlaywright, summarizeVitest, slowest, compareReports, readReport } from './verification-report.mjs';
+import { stages as fullStages, stageEnvironment } from './verify-full.mjs';
+import { sourceIdentity, summarizePlaywright, summarizeVitest, summarizeContent, slowest, compareReports, readReport } from './verification-report.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const contentTests = ['content','authoredContent','authoredEncounters','items','rewards','battlefieldSources','battlefield'];
-export const stages = [
-  { id: 'content', bin: 'vitest/vitest.mjs', args: ['run', ...contentTests.map(n=>`tests/unit/${n}.test.ts`)], kind: 'vitest' },
-  { id: 'typecheck-app', bin: 'typescript/bin/tsc', args: ['--noEmit'] },
-  { id: 'typecheck-domain', bin: 'typescript/bin/tsc', args: ['--noEmit','-p','tsconfig.domain.json'] },
-  { id: 'bundle', bin: 'vite/bin/vite.js', args: ['build'], needs: ['content','typecheck-app','typecheck-domain'] },
-  { id: 'unit', bin: 'vitest/vitest.mjs', args: ['run'], kind: 'vitest' },
-  { id: 'chromium', config: 'playwright.config.ts', needs: ['bundle'] },
-  { id: 'encounters', config: 'playwright.encounters.config.ts' },
-  { id: 'items', config: 'playwright.run-items.config.ts' },
-  { id: 'webkit', config: 'playwright.device-acceptance.config.ts', needs: ['bundle'] },
-  { id: 'telemetry', config: 'playwright.telemetry.config.ts' },
-];
+// Derive coverage and ordering from the maintained full-verification manifest.
+// Split only its typecheck stage so both compiler scopes retain distinct timings.
+export const stages = fullStages.flatMap(stage => stage.id === 'typecheck'
+  ? [{ id: 'typecheck-app', bin: 'typescript/bin/tsc', args: ['--noEmit'], sourceStage: stage.id },
+     { id: 'typecheck-domain', bin: 'typescript/bin/tsc', args: ['--noEmit', '-p', 'tsconfig.domain.json'], sourceStage: stage.id }]
+  : [{ ...stage, sourceStage: stage.id,
+      needs: stage.needs?.flatMap(id => id === 'typecheck' ? ['typecheck-app', 'typecheck-domain'] : [id]) }]);
+
+export function enginesFor(stage) {
+  if (stage.id === 'performance') return ['chromium-headless'];
+  if (!stage.browser) return [];
+  const config = stage.args[stage.args.indexOf('-c') + 1];
+  if (config === 'playwright.health-bars.config.ts') return ['chromium-headless', 'webkit'];
+  if (['playwright.device-acceptance.config.ts', 'playwright.exploration.config.ts'].includes(config)) return ['webkit'];
+  return ['chromium'];
+}
+
+// The asynchronous counterpart of full verification's failure-preserving scheduler.
+export async function runTimingStages(plan, execute, record = () => {}, signal) {
+  const results = [];
+  for (const stage of plan) {
+    if (signal?.aborted) break;
+    const blockedBy = (stage.needs ?? []).filter(id => results.find(s => s.id === id)?.status !== 'passed');
+    let result;
+    if (blockedBy.length) result = { id: stage.id, status: 'blocked', blockedBy, wallMs: 0 };
+    else {
+      try { result = { id: stage.id, ...await execute(stage) }; }
+      catch (error) { result = { id: stage.id, status: 'failed', error: String(error) }; }
+    }
+    results.push(result);
+    record(results);
+  }
+  return results;
+}
+
+export function stageCommand(stage, directory, inherited = process.env, npmPath = process.env.npm_execpath) {
+  const env = stageEnvironment(stage, directory, inherited);
+  const rawPath = resolve(directory, stage.id + '.json');
+  let args;
+  if (stage.bin) args = [resolve(root, 'node_modules', stage.bin), ...stage.args];
+  else {
+    if (!npmPath) throw Error('Run via npm run measure:verification so npm_execpath is available');
+    args = [npmPath, ...stage.args];
+  }
+  const kind = stage.browser ? 'playwright' : ['units', 'build-integration'].includes(stage.id) ? 'vitest'
+    : stage.id === 'performance' ? 'performance' : null;
+  if (kind === 'playwright') args.push('--reporter=line,json', '--output', resolve(directory, stage.id + '-artifacts'));
+  if (kind === 'vitest') {
+    args.push('--', '--reporter=default', '--reporter=json', '--reporter=./scripts/verification-vitest-reporter.mjs', `--outputFile.json=${rawPath}`);
+    env.VERIFICATION_VITEST_METADATA = resolve(directory, stage.id + '-metadata.json');
+  }
+  if (kind === 'performance') args.push('--', rawPath);
+  return { command: process.execPath, args, env, kind, rawPath };
+}
 
 export function selectStages(names) {
   const selected = new Set(names);
@@ -71,41 +113,42 @@ function summaryText(report) {
   const lines = ['# Verification timing report', '', `Source: ${report.source.commit} (dirty: ${report.source.dirty})`,
     `Conditions: ${report.conditions}`, `Complete: ${report.complete}; passed: ${report.passed}`, '',
     '| Stage | Result | Wall seconds | Counts |', '| --- | --- | ---: | --- |'];
-  for (const s of report.stages) lines.push(`| ${s.id} | ${s.status} | ${((s.wallMs??0)/1000).toFixed(2)} | ${JSON.stringify(s.summary?.counts??{})} |`);
+  for (const s of report.stages) lines.push(`| ${s.id} | ${s.status} | ${((s.wallMs??0)/1000).toFixed(2)} | ${JSON.stringify(s.summary?.counts??(s.performance?{samples:s.performance.samples}:{}))} |`);
   lines.push('', 'Wall time includes process startup, server startup and teardown. Summed test durations are work, not wall time.',
     'Queue time is unavailable for this local runner. Raw reports/logs retain failures and skips.', '');
   for (const s of report.stages.filter(s=>s.summary)) {
+    if (s.contentValidation) lines.push(`Content subset: ${JSON.stringify(s.contentValidation.counts)}; summed test work ${(s.contentValidation.summedTestDurationMs/1000).toFixed(2)}s (included in units, not a separate wall-time phase).`, '');
     lines.push(`## ${s.id}: slowest files`, '', ...slowest(s.summary.tests).files.map(f=>`- ${f.file}: ${(f.durationMs/1000).toFixed(2)}s`), '');
   }
   return lines.join('\n');
 }
 
 async function browserMetadata(selected) {
-  if (!selected.some(s=>s.config)) return {};
+  const engines = [...new Set(selected.flatMap(enginesFor))];
+  if (!engines.length) return {};
   const { chromium, webkit } = await import('playwright');
   const browsers = {};
-  for (const [name, type] of Object.entries({chromium,webkit})) {
-    if (name==='webkit' && !selected.some(s=>s.id==='webkit')) continue;
-    if (name==='chromium' && !selected.some(s=>s.config && s.id!=='webkit')) continue;
-    const executablePath = name==='chromium' ? process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE : undefined;
+  for (const name of engines) {
+    const type = name === 'webkit' ? webkit : chromium;
+    const executablePath = name === 'webkit' ? undefined : process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+    const launchOptions = { ...(name === 'chromium' ? { channel: 'chromium' } : {}), executablePath, timeout: 15000 };
+    const metadata = { channel: launchOptions.channel ?? null, executableOverride: executablePath ?? null,
+      // Playwright's default Chromium API path is not proof of the headless-shell path.
+      executablePath: executablePath ?? (name === 'chromium-headless' ? null : type.executablePath()) };
     try {
-      const browser=await type.launch({executablePath,timeout:15000});
-      try { browsers[name]={version:browser.version(), executableOverride:executablePath??null}; }
+      const browser = await type.launch(launchOptions);
+      try { browsers[name] = { ...metadata, version: browser.version() }; }
       finally { await browser.close(); }
-    } catch(error) { browsers[name]={version:null,error:error.message}; }
+    } catch (error) { browsers[name] = { ...metadata, version: null, error: error.message }; }
   }
   return browsers;
 }
 
 async function capture(args) {
   const opts=options(args), selected=selectStages(opts.stages);
-  // Base changes need their own build identity; do not silently measure a dev or prefixed matrix here.
-  for (const key of ['PLAYWRIGHT_BASE_PATH','PLAYWRIGHT_SERVER_MODE','PLAYWRIGHT_TELEMETRY_DEV']) {
-    if (process.env[key]) throw Error(`Unset ${key}: baseline uses the configured root production matrix`);
-  }
-  const out=resolve(root,opts.out??`test-results/timings/${new Date().toISOString().replaceAll(':','-')}`);
-  const allowedRoot=resolve(root,'test-results/timings');
-  if (!out.startsWith(allowedRoot+'/') && !out.startsWith(allowedRoot+'\\')) throw Error('--out must be a new directory beneath test-results/timings/');
+  const out=resolve(root,opts.out??`verification-receipts/timings/${new Date().toISOString().replaceAll(':','-')}`);
+  const allowedRoot=resolve(root,'verification-receipts/timings');
+  if (!out.startsWith(allowedRoot+'/') && !out.startsWith(allowedRoot+'\\')) throw Error('--out must be a new directory beneath verification-receipts/timings/');
   mkdirSync(allowedRoot,{recursive:true});
   const lock=resolve(allowedRoot,'.capture.lock');
   let fd;
@@ -117,7 +160,7 @@ async function capture(args) {
     writeFileSync(fd,JSON.stringify({pid:process.pid,out}));
     mkdirSync(out); // Refuse to overwrite prior receipts.
     const started=performance.now();
-    const report={schemaVersion:1,startedAt:new Date().toISOString(),complete:false,passed:false,
+    const report={schemaVersion:2,scope:selected.length===stages.length?'full':'partial',selectedStages:selected.map(s=>s.id),coveragePlan:stages.map(s=>({id:s.id,sourceStage:s.sourceStage,args:s.args,needs:s.needs??[],env:s.env??{}})),startedAt:new Date().toISOString(),complete:false,passed:false,
       requestedStages:opts.stages,conditions:opts.conditions,queueMs:null,
       environment:{node:process.version,platform:process.platform,arch:process.arch,osRelease:os.release(),
         cpus:os.cpus().length,cpuModel:os.cpus()[0]?.model,memoryBytes:os.totalmem(),CI:process.env.CI??null},
@@ -125,42 +168,42 @@ async function capture(args) {
     const save=()=>{writeFileSync(resolve(out,'report.json'),JSON.stringify(report,null,2)+'\n');writeFileSync(resolve(out,'summary.md'),summaryText(report));};
     save();
     const preflight=performance.now();report.browsers=await browserMetadata(selected);report.browserPreflightMs=performance.now()-preflight;
-    for (const stage of selected) {
-      if (abort.signal.aborted) break;
-      if (stage.config && report.browsers[stage.id==='webkit'?'webkit':'chromium']?.error) {
-        report.stages.push({id:stage.id,status:'blocked',reason:'Browser preflight failed; see browsers metadata',wallMs:0});save();continue;
-      }
-      const failedDependencies=(stage.needs??[]).filter(id=>report.stages.find(s=>s.id===id)?.status!=='passed');
-      if (failedDependencies.length) {report.stages.push({id:stage.id,status:'blocked',failedDependencies,wallMs:0});save();continue;}
-      const rawPath=resolve(out,stage.id+'.json');
-      const env={...process.env};
-      const kind=stage.config?'playwright':stage.kind;
-      const commandArgs=[resolve(root,'node_modules',stage.config?'playwright/cli.js':stage.bin),...(stage.args??[])];
-      if (stage.config) {
-        commandArgs.push('test','-c',stage.config,'--reporter=line,json','--output',resolve(out,stage.id+'-artifacts'));
-        env.PLAYWRIGHT_JSON_OUTPUT_FILE=rawPath;
-      } else if (kind==='vitest') {
-        commandArgs.push('--reporter=default','--reporter=json','--reporter=./scripts/verification-vitest-reporter.mjs',`--outputFile.json=${rawPath}`);
-        env.VERIFICATION_VITEST_METADATA=resolve(out,stage.id+'-metadata.json');
-      }
+    await runTimingStages(selected, async stage => {
+      const failedEngines = enginesFor(stage).filter(name => report.browsers[name]?.error);
+      if (failedEngines.length) return { status: 'blocked', reason: 'Browser preflight failed', failedEngines, wallMs: 0 };
+      const { command, args, env, kind, rawPath } = stageCommand(stage, out);
       console.log(`[timings] ${stage.id}: starting; log ${relative(root,resolve(out,stage.id+'.log'))}`);
-      const result=await runCommand(process.execPath,commandArgs,{cwd:root,env,logPath:resolve(out,stage.id+'.log'),timeoutMs:opts.timeoutMs,signal:abort.signal});
-      const entry={id:stage.id,command:[process.execPath,...commandArgs],...result,
-        status:result.exitCode===0&&!result.timedOut&&!result.interrupted&&!result.error?'passed':'failed'};
+      const result = await runCommand(command, args, { cwd: root, env,
+        logPath: resolve(out, stage.id + '.log'), timeoutMs: opts.timeoutMs, signal: abort.signal });
+      const entry = { command: [command, ...args], ...result,
+        status: result.exitCode === 0 && !result.signal && !result.timedOut && !result.interrupted && !result.error ? 'passed' : 'failed' };
       if (kind) {
         try {
-          entry.summary=(kind==='playwright'?summarizePlaywright:summarizeVitest)(readReport(rawPath));
-          if (kind==='vitest') {
-            Object.assign(entry.summary,readReport(env.VERIFICATION_VITEST_METADATA));
-            delete entry.summary.notes;
+          const raw = readReport(rawPath);
+          if (kind === 'performance') {
+            if (!Array.isArray(raw.samples) || !raw.samples.length || !Array.isArray(raw.failures)) throw Error('Invalid performance capture');
+            entry.performance = { samples: raw.samples.length, failures: raw.failures, measuredBuild: raw.measuredBuild };
+            if (raw.failures.length) entry.status = 'failed';
+          } else {
+            entry.summary = (kind === 'playwright' ? summarizePlaywright : summarizeVitest)(raw);
+            if (kind === 'vitest') {
+              Object.assign(entry.summary, readReport(env.VERIFICATION_VITEST_METADATA));
+              delete entry.summary.notes;
+            }
+            for (const test of entry.summary.tests) if (isAbsolute(test.file)) test.file = relative(root, test.file).replaceAll('\\', '/');
+            entry.slowest = slowest(entry.summary.tests);
+            if (stage.id === 'units') entry.contentValidation = summarizeContent(entry.summary, JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).scripts['validate:content']);
+            if (entry.summary.counts.total === 0 || entry.summary.success === false || entry.summary.counts.unexpected > 0 || entry.summary.globalErrors?.length) entry.status = 'failed';
           }
-          for (const test of entry.summary.tests) if (isAbsolute(test.file)) test.file=relative(root,test.file).replaceAll('\\','/');
-          entry.slowest=slowest(entry.summary.tests);
-          if (entry.summary.counts.total===0 || entry.summary.success===false || entry.summary.counts.unexpected>0 || entry.summary.globalErrors?.length) entry.status='failed';
-        } catch(error) {entry.reportError=error.message;entry.status='failed';}
+        } catch (error) { entry.reportError = error.message; entry.status = 'failed'; }
       }
-      report.stages.push(entry);save();console.log(`[timings] ${stage.id}: ${entry.status} (${(entry.wallMs/1000).toFixed(1)}s)`);
-    }
+      return entry;
+    }, results => {
+      report.stages = results;
+      save();
+      const latest = results.at(-1);
+      console.log(`[timings] ${latest.id}: ${latest.status} (${((latest.wallMs ?? 0)/1000).toFixed(1)}s)`);
+    }, abort.signal);
     report.finishedAt=new Date().toISOString();report.wallMs=performance.now()-started;
     report.sourceAfter=sourceIdentity(root);
     report.inputsUnchanged=report.source.inputHash===report.sourceAfter.inputHash;
@@ -176,8 +219,9 @@ export async function main(args) {
     if (args.length!==3) throw Error('Usage: compare <before-report.json> <after-report.json>');
     console.log(JSON.stringify(compareReports(readReport(args[1]),readReport(args[2])),null,2));return 0;
   }
+  if (args[0] === '--list') { console.log(JSON.stringify(stages, null, 2)); return 0; }
   if (args[0]==='--help') {
-    console.log('npm run measure:verification -- [--stages '+stages.map(s=>s.id).join(',')+'] [--conditions "host/cache notes"] [--out test-results/timings/new-name] [--timeout-ms 3600000]\nCompare: npm run measure:verification -- compare before/report.json after/report.json');return 0;
+    console.log('npm run measure:verification -- [--stages '+stages.map(s=>s.id).join(',')+'] [--conditions "host/cache notes"] [--out verification-receipts/timings/new-name] [--timeout-ms 3600000]\nCompare: npm run measure:verification -- compare before/report.json after/report.json');return 0;
   }
   return capture(args);
 }

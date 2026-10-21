@@ -1,5 +1,45 @@
 # Issue #200: verification timing tooling
 
+## Current preparation refresh
+
+Integrated main `251db945569e3f1ac957caa091e9fa9eec11a034` (#215 / #217), retaining
+all merged verification policy, explicit fixtures, build deduplication and bounded
+unit-fixture repairs. The authoritative self-hosted baseline remains **pending**.
+No browser or full baseline was launched for this preparation update.
+
+The timing manifest now derives from the canonical full plan: all 19 stages are
+represented, with 20 timing rows because the two TypeScript scopes are timed
+separately. Units contain content validation without a duplicate pass; real build
+integration, combined fixtures, both telemetry modes, WebKit/exploration/health,
+root/prefix assets, isolated performance and root restoration are included.
+Stage environments reuse canonical mode isolation, including clearing remote
+`FIT_URL`. Receipts move outside disposable Playwright output into
+`verification-receipts/timings/`. Historical schema-one comparisons remain readable
+and warn about the changed coverage plan.
+
+Preparation validation:
+
+- 14 Node contracts passed, including real synthetic Vitest and browser-free
+  Playwright runs preserving intentional failure, retry and skip outcomes.
+- A real CPU-only partial capture executed the 10 existing orchestration checks
+  and both TypeScript scopes. All passed; no browser preflight was selected.
+- That report is preparation evidence with dirty integration inputs, **not** a
+  clean authoritative timing baseline or an overall speedup measurement.
+- `--list` maps the canonical plan without changing test selection; application,
+  browser configuration, assertions, worker limits and retries are unchanged.
+
+See `preparation-validation.json` for this check's input identity and results and
+[the current capture guide](../../verification-timings.md) for updated commands.
+The PR stays draft until #207 qualifies the actual runner and #200 records the
+current matrix there, retaining all failures and receipts. No automatic hosted
+fallback is introduced.
+
+## Historical initial implementation and capture
+
+The following records the earlier ten-stage implementation and its incomplete
+capture. Its failures and counts are retained as historical evidence, not current
+code qualification. The current manifest and command map above supersede it.
+
 Implementation: `b992b4be85a4beb8f375cd1a048ae28d5782bbbf`, based on main `162034997ed5fd0f3788531a4217b1b010b4dd27`.
 Caller approved the concrete plan and publication of this validation summary on 2026-10-21. Parent epic: #199.
 
@@ -49,7 +89,7 @@ On a supported host with the locked dependencies and Chromium/WebKit plus OS lib
 
 ```sh
 npm run test:verification-tooling
-npm run measure:verification -- --out test-results/timings/provisioned-baseline --conditions "describe host load and cache state"
+npm run measure:verification -- --out verification-receipts/timings/provisioned-baseline --conditions "describe host load and cache state"
 ```
 
 Retain failures rather than weakening tests. The implementation's [capture guide](../../verification-timings.md) describes reproduction, comparison, partial results and artifact retention. Refs #200; no issue closure or deployment.

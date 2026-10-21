@@ -62,6 +62,17 @@ export function summarizeVitest(report) {
     tests };
 }
 
+/** Content validation already executes inside units; do not run a duplicate pass to time it. */
+export function summarizeContent(summary, command) {
+  const files = [...new Set(command.match(/tests\/unit\/[\w.-]+\.test\.ts/g) ?? [])];
+  const tests = summary.tests.filter(test => files.includes(test.file));
+  return { files, counts: { total: tests.length, passed: tests.filter(t => t.outcome === 'passed').length,
+    failed: tests.filter(t => t.outcome === 'failed').length,
+    pending: tests.filter(t => ['pending','skipped','todo'].includes(t.outcome)).length },
+    summedTestDurationMs: tests.reduce((n, t) => n + t.durationMs, 0),
+    wallMs: null, note: 'Included in units; summed assertion durations are work, not separate wall time.' };
+}
+
 export function slowest(tests, limit = 10) {
   const files = new Map();
   for (const t of tests) files.set(t.file, (files.get(t.file) ?? 0) + t.durationMs);
@@ -70,8 +81,10 @@ export function slowest(tests, limit = 10) {
 }
 
 export function compareReports(before, after) {
-  if (before.schemaVersion !== 1 || after.schemaVersion !== 1) throw Error('Unsupported report schema');
+  if (![1, 2].includes(before.schemaVersion) || ![1, 2].includes(after.schemaVersion)) throw Error('Unsupported report schema');
   const warnings = [];
+  if (before.schemaVersion !== after.schemaVersion || JSON.stringify(before.coveragePlan) !== JSON.stringify(after.coveragePlan)) warnings.push('Coverage plan/schema differs; historical partial matrices are not current full baselines');
+  if (before.scope !== after.scope) warnings.push('Capture scope differs');
   for (const key of ['node','platform','arch','cpus','cpuModel','memoryBytes']) {
     if (before.environment[key] !== after.environment[key]) warnings.push(`Environment differs: ${key}`);
   }

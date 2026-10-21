@@ -24,6 +24,8 @@
     "vitest.config.ts",
     "vite.config.ts",
     "scripts",
-    "playwright.encounters.config.ts"
+    "playwright.encounters.config.ts",
+    "vitest.build.config.ts",
+    "vitest.all.config.ts"
   ]
 }

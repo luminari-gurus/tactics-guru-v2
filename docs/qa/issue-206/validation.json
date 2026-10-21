@@ -1,0 +1,220 @@
+{
+  "base": "3510d1e3db8814b9111b76676e8413c90dedb8a5",
+  "environment": {
+    "node": "v24.19.0",
+    "vite": "8.3.5",
+    "vitest": "5.0.3",
+    "platform": "linux",
+    "arch": "x64",
+    "availableParallelism": 8,
+    "unitMaxWorkers": 2,
+    "retries": 0,
+    "unitTimeoutMs": 5000,
+    "cache": "installed locked dependencies and warm tool caches; shared container, not an isolated performance host"
+  },
+  "before": [
+    {
+      "stage": "units",
+      "command": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "--maxWorkers=2",
+        "--reporter=json",
+        "--outputFile=/tmp/pr206-before-units.json"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 130.087
+    },
+    {
+      "stage": "build-root",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 22.993
+    },
+    {
+      "stage": "build-prefix",
+      "command": [
+        "npm",
+        "run",
+        "build",
+        "--",
+        "--base=/prototype/"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 24.387
+    },
+    {
+      "stage": "restore-root",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 23.571
+    }
+  ],
+  "after": [
+    {
+      "id": "units",
+      "exitCode": 1,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "--maxWorkers=2",
+        "--reporter=json",
+        "--outputFile=/tmp/pr206-after-units.json"
+      ],
+      "status": "failed",
+      "durationMs": 124562
+    },
+    {
+      "id": "typecheck",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "durationMs": 1918
+    },
+    {
+      "id": "build-integration",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "test:build",
+        "--",
+        "--maxWorkers=2",
+        "--reporter=json",
+        "--outputFile=/tmp/pr206-after-build-integration.json"
+      ],
+      "status": "passed",
+      "durationMs": 9368
+    },
+    {
+      "id": "build-root",
+      "status": "blocked",
+      "blockedBy": [
+        "units"
+      ]
+    },
+    {
+      "id": "build-prefix",
+      "status": "blocked",
+      "blockedBy": [
+        "units"
+      ]
+    },
+    {
+      "id": "restore-root",
+      "status": "blocked",
+      "blockedBy": [
+        "units"
+      ]
+    }
+  ],
+  "beforeUnits": {
+    "numTotalTests": 909,
+    "numPassedTests": 908,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "success": false,
+    "failures": [
+      {
+        "file": "unit/runBattle.test.ts",
+        "title": "owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely",
+        "status": "failed",
+        "message": "Error: Test timed out in 5000ms."
+      }
+    ]
+  },
+  "afterUnits": {
+    "numTotalTests": 907,
+    "numPassedTests": 905,
+    "numFailedTests": 2,
+    "numPendingTests": 0,
+    "success": false,
+    "failures": [
+      {
+        "file": "unit/runBattle.test.ts",
+        "title": "owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely",
+        "status": "failed",
+        "message": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "unit/telemetry.test.ts",
+        "title": "accepted defeat emits encounter and run outcomes once, including after retries",
+        "status": "failed",
+        "message": "Error: Test timed out in 5000ms."
+      }
+    ]
+  },
+  "buildIntegration": {
+    "numTotalTests": 2,
+    "numPassedTests": 2,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "success": true,
+    "failures": []
+  },
+  "exactBaseFocused": {
+    "numTotalTests": 19,
+    "numPassedTests": 1,
+    "numFailedTests": 1,
+    "numPendingTests": 17,
+    "success": false,
+    "failures": [
+      {
+        "file": "unit/runBattle.test.ts",
+        "title": "owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely",
+        "status": "failed",
+        "message": "Error: Test timed out in 5000ms."
+      }
+    ]
+  },
+  "candidateFocusedOneWorker": {
+    "numTotalTests": 19,
+    "numPassedTests": 1,
+    "numFailedTests": 1,
+    "numPendingTests": 17,
+    "success": false,
+    "failures": [
+      {
+        "file": "unit/runBattle.test.ts",
+        "title": "owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely",
+        "status": "failed",
+        "message": "Error: Test timed out in 5000ms."
+      }
+    ]
+  },
+  "selection": {
+    "originalRuntimeCases": 909,
+    "fastUnits": 907,
+    "buildIntegrationCases": 2,
+    "runtimeIDsPreserved": true,
+    "allCommandStaticDeclarationsPreserved": 455,
+    "runtimeSelectionSHA256": "be7a41c1af319ee6da13d56cff3c7335e100251b8530f4af3784e9f5ee047f82",
+    "movedBuildTestSHA256": "d88c193d9e0167387c872713dc8b33a29c98c028a0cf31802d8e47ba2123e37e"
+  },
+  "removedOrdinaryAggregateWork": {
+    "duplicateContentCaseExecutions": 663,
+    "duplicateTypeScriptInvocations": 4,
+    "realBuildIntegrationCasesRemoved": 0
+  },
+  "comparisonAccepted": false,
+  "reason": "Base and candidate full unit runs failed; new guarded bundles were correctly blocked. These durations do not establish an aggregate speedup."
+}

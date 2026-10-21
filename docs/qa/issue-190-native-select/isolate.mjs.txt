@@ -1,0 +1,12 @@
+import {chromium,expect} from '@playwright/test';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+for(const fixture of ['minimal','production'])for(const keys of [['ArrowDown','Enter'],['End','Enter'],['b','Enter'],['Alt+ArrowDown','ArrowDown','Enter'],['click','ArrowDown','Enter'],['Space','ArrowDown','ArrowDown','Enter']]){
+ const page=await browser.newPage();
+ if(fixture==='minimal')await page.setContent('<select id="battle-target"><option value="">Choose target</option><option value="b">Beta</option><option value="c">Charlie</option></select>');
+ else {await page.goto('http://127.0.0.1:4174');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+ await page.evaluate(()=>{window.events=[];for(const type of ['input','change'])document.querySelector('#battle-target').addEventListener(type,e=>window.events.push({type,value:e.target.value,trusted:e.isTrusted}));});
+ const target=page.locator('#battle-target');await target.focus();
+ for(const key of keys){if(key==='click')await target.click();else await page.keyboard.press(key);}
+ console.log(JSON.stringify({fixture,keys,value:await target.inputValue(),events:await page.evaluate(()=>window.events)}));await page.close();
+}
+await browser.close();
