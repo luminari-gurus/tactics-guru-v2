@@ -45,6 +45,10 @@ Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke`
 
 After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/prototype/ npm test -- tests/public-asset-base.spec.ts`; add `PLAYWRIGHT_SERVER_MODE=dev` to check development instead. Use `/` for root checks. These are shell environment assignments (in PowerShell, set `$env:PLAYWRIGHT_BASE_PATH='/prototype/'` and `$env:PLAYWRIGHT_SERVER_MODE='dev'` before `npm test`). Clear both variables and rebuild at root before running the complete default suite. See [review repair evidence](docs/qa/issue-92-public-asset-base.md).
 
+## Verification policy
+
+Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. For focused browser work use the direct Playwright CLI: `npm test` currently invokes additional fixture posttests after success. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
+
 ## Browser smoke tests
 
 ```sh
