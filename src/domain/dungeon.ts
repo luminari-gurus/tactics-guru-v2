@@ -8,7 +8,7 @@ import { hasShape, isDenseArray } from './validation';
 import { emptyItemOwnership, readItemOwnership, changePreparation, projectOwnedCatalog, grantOwnedItem, type ItemCommand } from './items';
 import { rewardOffer, type RewardOffer } from './rewards';
 import type { RunHero } from './run';
-import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
+import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescriptor } from './battlefield';
 import { createBattle } from './turns';
 import { readBattleState } from './battle';
 import type { BattleState } from './types';
@@ -50,7 +50,7 @@ function admissionKey(seed: number, selection: EncounterSelection, battlefield: 
 }
 function rememberAdmission(key: string) {
   admittedEncounters.delete(key); admittedEncounters.set(key, true);
-  if (admittedEncounters.size > MAX_DUNGEON_FLOORS * 3) admittedEncounters.delete(admittedEncounters.keys().next().value!);
+  if (admittedEncounters.size > 128) admittedEncounters.delete(admittedEncounters.keys().next().value!);
 }
 /** Only resolved geometry is evicted. Durable descriptors/completion never enter this cache. */
 export class FloorCache {
@@ -156,12 +156,22 @@ function readDungeonValue(input: unknown, format: 1 | 2 | 3 = 3): DungeonResult 
           encounters.push({selection,battlefield:null});
         } else {
           if (!readBattlefieldDescriptor(plan.battlefield)) return fail('invalidSelection');
-          const seed = dungeonSeed(input.seed, i + 1, 'battle', slot), key = admissionKey(seed, selection, plan.battlefield);
-          if (!admittedEncounters.has(key)) {
-            const resolved = resolveBattlefield(selection.encounter, seed, policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : dungeonBattleCatalog);
-            if (!resolved.ok || !sameBattlefield(plan.battlefield, resolved.descriptor)) return fail('invalidSelection');
+          const seed = dungeonSeed(input.seed, i + 1, 'battle', slot), source=selection.encounter.source;
+          if(plan.battlefield.encounterId!==selection.encounter.id || plan.battlefield.kind!==source.kind) return fail('invalidSelection');
+          if(source.kind==='authored') {
+            if(plan.battlefield.mapId!==source.mapId)return fail('invalidSelection');
+          } else if(plan.battlefield.kind!=='generated' || plan.battlefield.layoutSeed!==layoutSeed(seed,selection.encounter.id) ||
+            plan.battlefield.mapId!==`map:desert_${selection.encounter.id.slice(10)}`) return fail('invalidSelection');
+          // Historical facts keep their saved hash. Resolve graph geometry when that floor
+          // becomes current, including candidate travel before it can be saved/published.
+          if(i+1===input.depth) {
+            const key=admissionKey(seed,selection,plan.battlefield);
+            if (!admittedEncounters.has(key)) {
+              const resolved = resolveBattlefield(selection.encounter, seed, policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : dungeonBattleCatalog);
+              if (!resolved.ok || !sameBattlefield(plan.battlefield, resolved.descriptor)) return fail('invalidSelection');
+            }
+            rememberAdmission(key);
           }
-          rememberAdmission(key);
           encounters.push({ selection, battlefield: { ...plan.battlefield } });
         }
       }
