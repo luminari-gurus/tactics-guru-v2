@@ -1,6 +1,6 @@
 import { combatStats, guardedEffect } from '../domain/effects';
 import type { CellPosition } from '../content/types';
-import type { BattleEvent, Command, UnitState } from '../domain/types';
+import type { BattleEvent, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
@@ -8,19 +8,8 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-export type Action = 'move' | 'basic' | 'signature';
+import { ownedAbilities, actionTargets, type Action } from './battleActions';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
-export function actionCommand(session: BattleSession, action: Action, cell: CellPosition): Command | null {
-  const actor = session.active;
-  if (action === 'move') return {type:'move',unitId:actor.id,to:cell};
-  const target = session.state.units.find(u=>u.hp>0 && u.cell.x===cell.x && u.cell.y===cell.y);
-  if (!target) return null;
-  const ability = action==='basic' ? session.catalog.abilities['ability:basic_attack']
-    : Object.values(session.catalog.abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(actor.defId));
-  if (!ability) return null;
-  return {type:'useAbility',unitId:actor.id,abilityId:ability.id,
-    target: ability.kind==='magicMissile' ? {missileTargets:[target.id]} : {unitId:target.id}};
-}
 export function previewText(preview: ActionPreview): string {
   if (!preview.ok) return `Unavailable: ${displayName(preview.reason.replace(/([A-Z])/g,' $1'))}`;
   if ('path' in preview) return `Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`;
@@ -28,7 +17,7 @@ export function previewText(preview: ActionPreview): string {
     const hits = Array.from({length:D20_SIDES},(_,i)=>i+1).filter(n=>n===NATURAL_CRITICAL || n!==NATURAL_AUTO_MISS && n+preview.bonus>=preview.armorClass).length;
     return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
   }
-  if ('missileCount' in preview) return `Automatic hit · ${preview.minDamage}–${preview.maxDamage} force damage · uses action`;
+  if ('missileCount' in preview) return `Automatic hit · ${preview.missileCount} ${preview.missileCount===1?'missile':'missiles'} · ${preview.minDamage}–${preview.maxDamage} force damage each · uses action`;
   return 'End this turn';
 }
 export function eventText(event: BattleEvent, name: (id:number)=>string): string {
@@ -61,6 +50,8 @@ export function unitLabel(session:BattleSession, unit:UnitState) {
 export class BattleHud {
   readonly root=document.querySelector<HTMLElement>('#battle-controls')!;
   readonly target: HTMLSelectElement;
+  readonly ability: HTMLSelectElement;
+  private abilityKey="";
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
@@ -78,7 +69,7 @@ export class BattleHud {
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
-      <p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
+      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
@@ -86,7 +77,12 @@ export class BattleHud {
     this.root.querySelector('#battle-party')!.addEventListener('click',()=>callbacks.inspect(),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
     this.root.querySelector('#battle-log-open')!.addEventListener('click',()=>callbacks.log(this.log),{signal});
-    this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>b.addEventListener('click',()=>callbacks.action(b.dataset.action as Action),{signal}));
+    this.ability=this.root.querySelector('#battle-ability')!;
+    this.ability.addEventListener('change',()=>{if(this.ability.value)callbacks.action(this.ability.value as Action);},{signal});
+    this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>b.addEventListener('click',()=>{
+      const action=b.dataset.action==='signature'?this.ability.value:b.dataset.action;
+      if(action)callbacks.action(action as Action);
+    },{signal}));
     this.target=this.root.querySelector('#battle-target')!;
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}else callbacks.target(null);},{signal});
     this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.review,{signal});
@@ -114,11 +110,19 @@ export class BattleHud {
     this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
     this.actorRoot.querySelector('#battle-budgets')!.textContent=`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
     const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
+    const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
+    if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
+    if(action?.startsWith('ability:'))this.ability.value=action;
+    this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
+    const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
+    this.root.querySelector('#battle-ability-info')!.textContent=chosen
+      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'} · uses action`
+      : 'No owned abilities';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
-      const signature=b.dataset.action==='signature'?Object.values(s.catalog.abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(actor.defId)):null;
+      const signature=b.dataset.action==='signature'?chosen:null;
       b.disabled=!enabled || spent || (b.dataset.action==='move' && !movement?.ok) || (b.dataset.action==='signature' && !signature);
-      b.setAttribute('aria-pressed',String(b.dataset.action===action));
+      b.setAttribute('aria-pressed',String(b.dataset.action==='signature'?action===chosen?.id:b.dataset.action===action));
       b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.disabled?'Unavailable':b.dataset.action==='move'?'Uses movement':'Uses action';
       if(b.dataset.action==='signature'){const label=signature?displayName(signature.id):'No signature';b.querySelector('strong')!.textContent=label;b.setAttribute('aria-label',label);}
     });
@@ -137,7 +141,7 @@ export class BattleHud {
       : 'Gold: active · White: selected · Teal: reachable') + ' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin';
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
-    else if(enabled && action) for(const u of s.state.units.filter(u=>u.side!==actor.side && u.hp>0)) options.push({cell:u.cell,label:unitLabel(s,u)});
+    else if(enabled && action) for(const u of actionTargets(s,action)) options.push({cell:u.cell,label:unitLabel(s,u)});
     this.target.replaceChildren(new Option('Choose target',''),...options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`)));
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }

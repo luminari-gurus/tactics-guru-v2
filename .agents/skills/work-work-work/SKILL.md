@@ -54,16 +54,12 @@ discussing it does not invoke the workflow.
    work on the default branch. Exclude blocked issues, unresolved prerequisites,
    issues assigned to other people, and work already covered by an active
    branch/PR or this caller's ongoing task.
-   Also exclude issues whose acceptance requires a physical mobile platform
-   absent from `CAN_TEST_MOBILE`. Require every requested platform, not merely
-   one overlap: `android` excludes an iPhone Safari investigation and any task
-   requiring both iOS and Android. Work without physical-mobile acceptance stays
-   eligible. Browser/device requirements within an available platform still need
-   checking; `all` does not prove access to every model/browser. Do not claim an
-   issue on the basis that coding can start while its required device testing is
-   unavailable, and do not substitute emulation for physical acceptance. Report
-   the mismatch and consider the next candidate. This is caller eligibility,
-   not global readiness: do not remove readiness labels for a local device limit.
+   Apply AGENTS.md's standing device instruction: browser/device emulation is
+   sufficient unless the caller explicitly requests physical devices for this
+   task. Legacy hardware-only issue wording does not create an eligibility gate.
+   Only for an explicit physical-device request, require the corresponding
+   `CAN_TEST_MOBILE` platforms; report missing access without relabeling global
+   readiness. Available hardware is not proof of completed testing.
 4. Prefer issues that unblock the most actionable downstream work, then critical
    path/release priority, then a clearly scoped and verifiable implementation.
    Use transitive dependencies when evidenced; do not invent links. Break equal
@@ -151,13 +147,27 @@ follow the approved chat plan without adding planning files. Implement
 autonomously within approved scope. For material scope changes, reassess whether
 OpenSpec is needed, update the plan and obtain approval before that work.
 
-Follow the issue's delivery guardrails and repository checks. For this repository,
-inspect the current package scripts and run relevant focused tests, full configured
-unit/browser tests, strict type checking, production build and `git diff --check`
-as required by the issue. Record actual results and unverified acceptance criteria;
-never claim emulated browser checks prove physical-device acceptance. Compare
-the final implementation against every acceptance criterion and approved plan,
-including OpenSpec tasks when present.
+Follow the issue's delivery guardrails and
+[verification policy](../../../docs/verification-policy.md). Inspect current
+scripts/configs, choose iteration/PR/full coverage by affected behavior and
+transitive consumers, and record the selection rationale. Explicit issue gates
+remain required. Use test discovery to check filters and account for every
+required suite/mode, including dev fixtures, placement, WebKit and telemetry.
+Do not assume `npm test` is focused or covers full regression.
+
+Run final affected checks against the final relevant source/build inputs. Reuse
+prior evidence only under the policy's input/provenance rules, stating its original
+tested commit and remaining failures. Do not rerun the full matrix merely because
+prose or unrelated inputs changed, and do not claim focused repairs make an earlier
+failed full run green. Documentation-only work needs link/command/config checks,
+not application execution. Retain strict typechecks/build and browser journeys
+where the selected change scope requires them. Run `git diff --check`.
+
+Use self-hosted browser capacity with no automatic GitHub-hosted fallback. Keep
+performance captures exclusive. Report actual results and unverified acceptance
+criteria; describe emulation accurately without claiming physical-device proof.
+Compare the final implementation against every acceptance criterion and approved
+plan, including OpenSpec tasks when present.
 
 ## Open the PR
 
