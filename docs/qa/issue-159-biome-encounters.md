@@ -1,6 +1,6 @@
 # Issue #159 biome encounter acceptance
 
-Date: 2026-10-21, Asia/Jerusalem. Status: Chromium and WebKit desktop/portrait/landscape matrices complete; narrow rechecks and full application suite in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
+Date: 2026-10-21, Asia/Jerusalem. Status: Chromium and WebKit desktop/portrait/landscape matrices and narrow rechecks complete; full application suite in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
 
 ## Implementation and source
 
@@ -46,6 +46,8 @@ No new production asset or library is loaded by this feature. Existing standalon
 
 The focused WebKit configuration passed **45/45**, including the legal journey on desktop, iPhone portrait and landscape. [Desktop](issue-159-biome-encounters/webkit-desktop-performance.json), [portrait](issue-159-biome-encounters/webkit-portrait-performance.json) and [landscape](issue-159-biome-encounters/webkit-landscape-performance.json) performance receipts all pass their unchanged flags: 334–355 ms cold usable, 9–10 ms p95 saved step, 33–37 ms floor creation and 398,330 code bytes. The historical WebKit idle observation did not reproduce on this host across this matrix. The [portrait next-floor view](issue-159-biome-encounters/portrait-next-biome.png) was inspected with heading/map framing corrected; no game state changed to capture it.
 
+Six additional WebKit kind/inspection rechecks pass with explicit [320×568 vault](issue-159-biome-encounters/narrow-forest-vault.png) and [568×320 guardian](issue-159-biome-encounters/short-desert-guardian.png) sizes across all three projects. Both exploration and battle shells remain within their viewport; scaled inspection is readable and scrollable, and close/reload preserves state. These screenshots were inspected. The same expanded cases are included in the full Chromium run.
+
 ## Remaining qualification
 
-Complete explicit narrow/short kind rechecks, the full `npm test` with encounter/item posttests and final spec/receipt/publication checks. The 879-unit/content/type/build checks are already green and remain reusable while runtime code is unchanged. Record actual failures and their repairs here; do not turn #190's macOS native-select report into an unverified current-host baseline. No merge or production deployment is part of this delivery.
+Complete the full `npm test -- --output=tmp/issue-159-full-results` (681 main cases, then automatic encounter/item posttests) and final spec/receipt/publication checks. The 879-unit/content/type/build checks are already green and remain reusable while runtime code is unchanged. Record actual failures and their repairs here; do not turn #190's macOS native-select report into an unverified current-host baseline. No merge or production deployment is part of this delivery.
