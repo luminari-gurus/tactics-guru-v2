@@ -22,8 +22,8 @@ export default defineConfig({
     reuseExistingServer: false,
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-portrait', use: { ...devices['Pixel 7'] } },
-    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], viewport: { width: 915, height: 412 } } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
+    { name: 'mobile-portrait', use: { ...devices['Pixel 7'], channel: 'chromium' } },
+    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], channel: 'chromium', viewport: { width: 915, height: 412 } } },
   ],
 });
