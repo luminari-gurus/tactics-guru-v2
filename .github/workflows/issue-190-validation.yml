@@ -1,0 +1,59 @@
+name: Issue 190 native selection validation
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/issue-190-validation.yml'
+      - 'tests/battle-loop.spec.ts'
+permissions:
+  contents: read
+jobs:
+  battle-loop:
+    if: github.event.pull_request.number == 213 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx --no-install playwright install --with-deps chromium
+      - name: Record source and browser
+        run: |
+          mkdir -p verification-receipts
+          node --input-type=module <<'JS'
+          import { chromium } from '@playwright/test';
+          import { execFileSync } from 'node:child_process';
+          import { writeFileSync } from 'node:fs';
+          const browser = await chromium.launch({ channel: 'chromium' });
+          const receipt = { commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), node: process.version, chromium: browser.version(), executable: chromium.executablePath(), platform: process.platform, arch: process.arch };
+          writeFileSync('verification-receipts/environment.json', JSON.stringify(receipt, null, 2));
+          await browser.close();
+          JS
+      - run: npm run build
+      - name: Run all 45 battle-loop cases
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/battle-loop.json
+        run: npx --no-install playwright test tests/battle-loop.spec.ts --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/artifacts
+      - name: Verify exact coverage and results
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const { stats } = JSON.parse(readFileSync('verification-receipts/battle-loop.json', 'utf8'));
+          assert.equal(stats.expected, 45);
+          for (const key of ['unexpected', 'flaky', 'skipped']) assert.equal(stats[key], 0, key);
+          console.log('45 passed; zero failures, skips or flaky cases.');
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-190-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: ignore
