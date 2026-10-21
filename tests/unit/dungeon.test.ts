@@ -160,6 +160,26 @@ describe('dungeon recovery limits',()=>{
 });
 
 describe('durable encounter policies', () => {
+  it.each([1,2] as const)('normalizes a long format-%i history without resolving inactive legacy battlefields', format => {
+    const base=freshDungeon('long-prior',13,LEGACY_ENCOUNTER_POLICY);
+    const floors=Array.from({length:300},(_,i)=>{
+      const descriptor=floorDescriptor(base.seed,i+1,undefined,LEGACY_ENCOUNTER_POLICY);
+      return {descriptor,completed:i===299?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
+    });
+    const raw=priorDungeonEnvelope({...base,depth:300,floors},format),resolver=vi.spyOn(battlefields,'resolveBattlefield');
+    try {
+      const begin=performance.now(),decoded=good(decodeDungeon(raw));
+      console.info(JSON.stringify({format,bytes:utf8Bytes(raw),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
+      expect(resolver).not.toHaveBeenCalled();
+      expect(decoded.floors).toHaveLength(300);expect(decoded.party).toEqual(base.party);
+      expect(decoded.floors.every(f=>f.descriptor.encounters.every(p=>p.battlefield===null))).toBe(true);
+      const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
+      expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('valid');expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
+      expect(resolver).not.toHaveBeenCalled();
+      const built=dungeonBattle(decoded)!;expect(built.catalog.enemies).toEqual(dungeonContent.catalog.enemies);
+      expect(built.state.seed).toBe(dungeonSeed(base.seed,300,'battle',0));expect(resolver).toHaveBeenCalledTimes(1);
+    } finally {resolver.mockRestore();}
+  },60000);
   it('reuses admitted facts across a long retained floor history', () => {
     const base=fresh(),floors=Array.from({length:44},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
@@ -184,7 +204,20 @@ describe('durable encounter policies', () => {
     const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
     expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);
   });
-  it.each(['policy', 'catalog', 'kind', 'depth', 'pool', 'composition', 'boss', 'roster', 'source', 'hash', 'version'])('rejects tampered %s facts and retains raw recovery bytes', field => {
+  it('keeps fully resolved legacy format-3 descriptors compatible with deferred legacy entry', () => {
+    const base=freshDungeon('resolved-legacy',13,LEGACY_ENCOUNTER_POLICY),floor=base.floors[0];
+    const encounters=floor.descriptor.encounters.map((plan,slot)=>{
+      const resolved=resolveBattlefield(plan.selection.encounter,dungeonSeed(base.seed,1,'battle',slot),dungeonContent.catalog);
+      if(!resolved.ok)throw Error('Invalid legacy pairing');return {...plan,battlefield:resolved.descriptor};
+    });
+    const state={...base,floors:[{...floor,descriptor:{...floor.descriptor,encounters}}]};
+    const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+    const decoded=good(decodeDungeon(encoded.text));expect(decoded).toEqual(state);
+    expect(dungeonBattle(decoded)).toEqual(dungeonBattle(base));
+    const corrupted=JSON.parse(JSON.stringify(state));corrupted.floors[0].descriptor.encounters[0].battlefield.mapHash='sha256:'+'0'.repeat(64);
+    expect(readDungeon(corrupted).ok).toBe(false);
+  });
+  it.each(['policy', 'catalog', 'kind', 'depth', 'pool', 'composition', 'boss', 'roster', 'source', 'hash', 'version', 'deferred'])('rejects tampered %s facts and retains raw recovery bytes', field => {
     const encoded = encodeDungeon(fresh()); if (!encoded.ok) throw Error(encoded.reason);
     const envelope = JSON.parse(encoded.text), plan = envelope.payload.floors[0].descriptor.encounters[field === 'boss' ? 2 : 0], selection = plan.selection;
     if (field === 'policy') envelope.payload.encounterPolicy = 'future';
@@ -197,6 +230,7 @@ describe('durable encounter policies', () => {
     if (field === 'roster') selection.encounter.roster[0].x++;
     if (field === 'source') selection.encounter.source = { kind: 'authored', mapId: 'map:unknown' };
     if (field === 'hash') plan.battlefield.mapHash = 'sha256:' + '0'.repeat(64);
+    if (field === 'deferred') plan.battlefield = null;
     if (field === 'version') selection.scalingPolicy = 'enemy-depth-v2';
     const { digest, ...body } = envelope, raw = canonical({ ...body, digest: hashJson(body) });
     const m = memory(); m.setItem(DUNGEON_KEYS.primary, raw);
