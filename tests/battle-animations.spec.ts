@@ -478,7 +478,9 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
   for (let i = 0; i < 2; i++) {
     await page.locator('#fit-restart').click(); await confirmRestart(page, true);
-    await page.clock.runFor(3000); await ready(page);
+    // Async scene/asset startup needs live frames before controlled bob sampling resumes.
+    await page.clock.resume(); await ready(page);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
     const baseline = await report(page);
     for (let sample = 0; sample < 5; sample++) { await page.clock.runFor(300); await bobFrame(page); }
     expect((await report(page)).objectCount).toBe(baseline.objectCount);
