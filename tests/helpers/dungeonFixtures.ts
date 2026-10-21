@@ -1,5 +1,5 @@
 import { freshExploration, poiCell, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
@@ -92,14 +92,15 @@ export function journeyPreparation(s: DungeonState): DungeonItemCommand | null {
 }
 
 /** Legal domain witness search; browser acceptance enacts every turn and spatial step independently. */
-export function dungeonJourney(seed: number) {
+export function dungeonJourney(seed: number, floorCount = 1, finishTargets = false) {
   let state = freshDungeon('biome-journey',seed);
   const battles: {selection: NonNullable<ReturnType<typeof dungeonBattle>>['selection']; commands:number; party: DungeonState['party']}[] = [];
+  for(let depth=1;depth<=floorCount;depth++) {
     for(let slot=0;slot<3;slot++) {
       state=checkedDungeon(startDungeonBattle(atEncounter(state)));
       const built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let i=0;i<500&&battle.state.outcome==='ongoing';i++) {
-        const p=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,built.catalog)),battle.confirm());
+        const p=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,built.catalog,finishTargets)),battle.confirm());
         if(!p)throw Error('Journey policy stalled');battle.finishPresentation(p.token);
       }
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
@@ -107,5 +108,7 @@ export function dungeonJourney(seed: number) {
       if(battle.state.outcome!=='playerWin')return {seed,battles,state,won:false};
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
     }
+    if(depth<floorCount)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
+  }
   return {seed,battles,state,won:true};
 }

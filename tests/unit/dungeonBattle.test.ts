@@ -111,3 +111,12 @@ it('plays a legal full-floor witness with existing rewards and carried party HP'
   console.info(JSON.stringify({seed:witness.seed,battles:witness.battles.map(b=>({biome:b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome,kind:b.selection.kind,commands:b.commands,party:b.party}))}));
   expect(witness.state.depth).toBe(1);expect(witness.state.floors.every(f=>f.completed===3)).toBe(true);
 },120000);
+
+it('legally clears both biome guardians and every encounter kind with carried rewards', () => {
+  const witness=dungeonJourney(198,2,true);expect(witness.won).toBe(true);
+  expect(witness.state.floors.map(f=>f.completed)).toEqual([3,3]);
+  expect(witness.battles).toHaveLength(6);
+  expect([...new Set(witness.battles.map(b=>b.selection.kind))].sort()).toEqual(['boss','elite','normal','vault']);
+  expect([...new Set(witness.battles.map(b=>b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome))].sort()).toEqual(['desert','forest']);
+  expect(witness.state.party).toEqual([{heroId:'fighter',hp:2},{heroId:'ranger',hp:0},{heroId:'mage',hp:0}]);
+},120000);
