@@ -5,6 +5,9 @@ import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
 
 test('default Move initializes once per usable player turn and preserves explicit choices',async({page})=>{
+  // Overrides, a full actor cycle and seeded restarts share one cumulative budget.
+  // Keep individual actions bounded while allowing software-rendered desktop CI.
+  test.setTimeout(90000);page.setDefaultTimeout(5000);
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const move=page.locator('#battle-move'),target=page.locator('#battle-target');
   await expect(move).toHaveAttribute('aria-pressed','true');await expect(move).toBeEnabled();

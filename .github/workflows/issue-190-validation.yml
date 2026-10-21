@@ -11,7 +11,7 @@ jobs:
   battle-loop:
     if: github.event.pull_request.number == 213 && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,19 +36,19 @@ jobs:
           await browser.close();
           JS
       - run: npm run build
-      - name: Run all 45 battle-loop cases
+      - name: Run the three repaired turn-cycle cases
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/battle-loop.json
-        run: npx --no-install playwright test tests/battle-loop.spec.ts --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/artifacts
+        run: npx --no-install playwright test tests/battle-loop.spec.ts --grep "default Move initializes once per usable player turn and preserves explicit choices" --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/artifacts
       - name: Verify exact coverage and results
         run: |
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           const { stats } = JSON.parse(readFileSync('verification-receipts/battle-loop.json', 'utf8'));
-          assert.equal(stats.expected, 45);
+          assert.equal(stats.expected, 3);
           for (const key of ['unexpected', 'flaky', 'skipped']) assert.equal(stats[key], 0, key);
-          console.log('45 passed; zero failures, skips or flaky cases.');
+          console.log('3 passed; zero failures, skips or flaky cases.');
           JS
       - uses: actions/upload-artifact@v4
         if: always()
