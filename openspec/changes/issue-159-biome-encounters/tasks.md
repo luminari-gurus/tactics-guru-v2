@@ -3,7 +3,7 @@
 ## 1. Catalog and pure policy
 
 - [x] 1.1 Implement bounded catalog admission and existing Forest/Desert map/composition/guardian definitions; verify malformed/reference/spawn failures, all admitted pairings, seven survivor subsets and fallback in focused unit/content tests.
-- [ ] 1.2 Implement independent versioned selection and baseline depth/vault projection; verify deterministic snapshots, stream isolation, kinds/biomes, rounding/saturation/signed/zero/invalid inputs and immutable repeated construction in unit tests; document the policy and publish the first focused PR.
+- [x] 1.2 Implement independent versioned selection and baseline depth/vault projection; verify deterministic snapshots, stream isolation, kinds/biomes, rounding/saturation/signed/zero/invalid inputs and immutable repeated construction in unit tests; document the policy and publish the first focused PR.
 
 ## 2. Durable floors and compatibility
 
