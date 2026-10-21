@@ -1,0 +1,29 @@
+{
+  "sourceCommit": "804e50dea57b7a5a5e8415729a042be19826e723",
+  "runtimeTree": "962bfb9bdd50fa685cd7cf778dfbe96bb47967cd",
+  "testsTree": "86ddf201ea27aeeb29fcef2c710bdcdef7a34878",
+  "before": {
+    "format1": {
+      "bytes": 81125,
+      "resolutions": 900,
+      "decodeMs": 4831.6
+    },
+    "format2": {
+      "bytes": 173858,
+      "resolutions": 900,
+      "decodeMs": 5052.4
+    }
+  },
+  "after": {
+    "format1": {
+      "resolutions": 0,
+      "decodeMs": 43.8
+    },
+    "format2": {
+      "resolutions": 0,
+      "decodeMs": 45.6
+    }
+  },
+  "proof": "300 retained floors, both old formats; zero graph resolutions during decode/inspection, one on actual battle construction. Full legacy format-3 descriptors remain supported and tamper-checked; new policy rejects null. Existing phase/RNG/backup/size tests pass.",
+  "validation": "883 units, 221 content checks, both TypeScript scopes, build, strict OpenSpec and three desktop integration checks pass. Timings are local observations; call counts are the regression assertion. Build source was tested before committing; historical snapshot line-ending churn and dependency-symlink dirtiness are disclosed."
+}
