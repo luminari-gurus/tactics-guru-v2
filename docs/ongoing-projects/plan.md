@@ -1,30 +1,32 @@
 # Issue #159: biome encounters and bounded depth scaling
 
-Date: 2026-10-21 (Asia/Jerusalem). Status: implementation published; comprehensive browser qualification remains in progress. No full-suite acceptance is claimed yet.
+Date: 2026-10-21 (Asia/Jerusalem). Status: implementation and required qualification complete; published for review, with failed initial results and focused repairs retained explicitly.
 
 ## Continuation status
 
-The caller authorized implementation, autonomous repairs and focused PR delivery using ablation and OpenSpec. Use change `issue-159-biome-encounters` (7/8 tasks complete) and test-tooling follow-up `repair-bfcache-test-runtime` (2/4). Their tasks remain the completion ledger. The earlier planning-only wording below is historical and superseded by this request.
+The caller authorized implementation, autonomous repairs and focused PR delivery using ablation and OpenSpec. Use change `issue-159-biome-encounters` (8/8 tasks complete) and test-tooling follow-up `repair-bfcache-test-runtime` (4/4). Their tasks remain the completion ledger. The earlier planning-only wording below is historical and superseded by this request.
 
-**Current checkout:** `C:/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`, branch `branch/issue-159-browser-qualification`, published head `5bb6c17cfd5f670de3bd214f2395bd387aa59d4e`. The primary checkout remains untouched. Last refreshed `origin/main`: `5a1857f0ae9b69780e17d911501fa255fe1f8b68`.
+**Current checkout:** `C:/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`, branch `branch/issue-159-browser-qualification`, qualified runtime/test source `df03f4c693645883a90f676ed891fee17bd9c611` (later closeout commits contain only docs/evidence). The primary checkout remains untouched. Last refreshed `origin/main`: `162034997ed5fd0f3788531a4217b1b010b4dd27`.
 
-**Active process:** tool session `33058` rebuilt `5bb6c17`, then started the full default 681-case suite without an executable override. WSL log: `/tmp/tactics-159-full-fixed.log`; artifacts: ignored `tmp/issue-159-full-chromium-results/`. At the last audit, 216 cases passed, one failed and one existing dev-only case skipped. Count the entire log, not just its tail. Do not start a duplicate server or modify registered `.spec.ts` cases during this active multi-project run.
+**Qualification complete; no test process remains active.** Final integration source `df03f4c` passed a fresh 221-content/type/production build, **21/21** focused Chromium checks, **18/18** corresponding WebKit checks, **24 encounter + 21 item** npm posttests and **3/3** development-server placement probes. The existing full **880/880** unit result remains valid: subsequent application changes are only main's square-grid CSS, covered by this final matrix. Both OpenSpec ledgers are complete and strictly validated. See the [QA report](../qa/issue-159-biome-encounters.md) for commands and retained raw results. Closeout commits following this source change only documents, checkboxes and receipts.
 
-The failure is the 30-second whole-case limit in `battle-loop.spec.ts:403`, the compound live-actor/inspection/cancellation scenario. It reached the third actor's valid movement preparation at the deadline. The same unchanged scenario took 29.1 seconds in the first run. After the suite finishes, diagnose the complete case with a diagnostic budget/trace, retain all three actors, native actions, unit inspections, modal/cancellation/state/focus assertions and per-action/product limits, then qualify the three affected projects. Tooling task 1.3 tracks this. Do not merely retry or weaken assertions.
+The full default run at build `5bb6c17` finished **677 passes, one failure and three expected dev-only skips** (681 cases). The failed desktop case exhausted its 30-second aggregate actor/inspection workflow limit; both mobile versions passed. A traced diagnostic completed all three scenarios, with individual desktop actions/assertions at most ~1.2 seconds. The scoped repair retains every actor/inspection/cancellation/state/focus check, gives the full workflow 90 seconds and caps each action at five seconds. Untraced repaired variants pass in **27.6 / 20.7 / 21.8 seconds**; assertion/product budgets remain unchanged. The three production-skipped dev probes all pass separately. Reuse the 677 unaffected results and focused repaired coverage; do not describe this as a single clean 681-case run.
 
-A failed main suite prevents npm's automatic encounter/item posttests and the chained dev probes. If this run exits nonzero, run both posttest configurations and the three dev-only `controlled placement failure` probes explicitly after the targeted repair. Finish primary task 4.1/tooling task 2.1 only when every required check has actual results. Reuse valid green results for unaffected code and describe any aggregate coverage honestly; never call a repaired combination a single clean run.
+Main advanced through #196 to `162034997ed5fd0f3788531a4217b1b010b4dd27`. Forward merges updated #191 and propagated each parent through the stack without rewriting history. The sole textual conflict in #194 retains both complete exploration additions; the final diff against the prior feature test file adds only the 15-line square-grid case. Main's square rows/columns and this feature's biome variables both survive. The combined Chromium/WebKit matrix and all six performance receipts pass; main/HEAD merge-tree is clean.
 
-### Published review stack
+**Next action is review and authorized integration, in stack order.** No implementation or required qualification task remains. Keep #159 open for review; preserve the recorded automated-balance limitation. Do not archive OpenSpec, merge review PRs, create release tags or deploy production without that subsequent authorization.
 
-| PR | Branch and published head | Delivered scope |
+### Review stack and qualified references
+
+| PR | Branch and qualified reference | Delivered scope |
 | --- | --- | --- |
-| [#191](https://github.com/luminari-gurus/tactics-guru-v2/pull/191) | `branch/issue-159-biome-encounters` / `e688fdc47e1ed1606fbacc32892f29732d454049` | Bounded content/admission, deterministic independent selection and depth/vault scaling. |
-| [#192](https://github.com/luminari-gurus/tactics-guru-v2/pull/192) | `branch/issue-159-durable-encounters` / `ad9a354eb209112a67d4b924d9df4dc683a82c3a` | Durable selections, shared projected catalogs, format 3 and exact prior-format compatibility. |
-| [#194](https://github.com/luminari-gurus/tactics-guru-v2/pull/194) | `branch/issue-159-encounter-presentation` / `2ae9c50e02e1e360a23138dffd3832e253b6e0ea` | Saved labels/art treatment and legal multi-floor browser proof. |
-| [#197](https://github.com/luminari-gurus/tactics-guru-v2/pull/197) | `branch/issue-159-long-history` / `63206a7025d9afabb9c7e1ac02c87ebb85f8f698` | Reproduced 44-floor admission-cache cliff, bounded SHA-256 fact cache and regression. |
-| [#198](https://github.com/luminari-gurus/tactics-guru-v2/pull/198) | `branch/issue-159-browser-qualification` / `5bb6c17cfd5f670de3bd214f2395bd387aa59d4e` | Full Chromium for actual BFCache testing; asynchronous restarted-scene clock coordination; final qualification. |
+| [#191](https://github.com/luminari-gurus/tactics-guru-v2/pull/191) | `branch/issue-159-biome-encounters` / `0aaad9586ae85de1c55ffdccb309226f379eedb4` | Bounded content/admission, deterministic independent selection and depth/vault scaling. |
+| [#192](https://github.com/luminari-gurus/tactics-guru-v2/pull/192) | `branch/issue-159-durable-encounters` / `f11758dbec845da31b3c68b2e3c382501bc23858` | Durable selections, shared projected catalogs, format 3 and exact prior-format compatibility. |
+| [#194](https://github.com/luminari-gurus/tactics-guru-v2/pull/194) | `branch/issue-159-encounter-presentation` / `01ac4fbb89d0ccac5cd5d3d013390537a2101f08` | Saved labels/art treatment and legal multi-floor browser proof. |
+| [#197](https://github.com/luminari-gurus/tactics-guru-v2/pull/197) | `branch/issue-159-long-history` / `138e0cb229dfb3d2cb09caf8be2fb95efe096236` | Reproduced 44-floor admission-cache cliff, bounded SHA-256 fact cache and regression. |
+| [#198](https://github.com/luminari-gurus/tactics-guru-v2/pull/198) | `branch/issue-159-browser-qualification` / `df03f4c693645883a90f676ed891fee17bd9c611` | Full Chromium for actual BFCache testing; asynchronous restarted-scene clock coordination; final qualification. |
 
-These depend in the listed order and are open for review. Independent [#193](https://github.com/luminari-gurus/tactics-guru-v2/pull/193), branch `branch/fix-vite-editor-advisories`, head `c0ab8390652a39da51c21e4c482824e7d065c138`, patches Vite 8.3.2 to 8.3.5: zero audit vulnerabilities, 190 content checks, both typechecks/build, two build-header cases and strict OpenSpec pass. It is not a dependency of the encounter stack. No merge, release tag or deployment was performed or authorized.
+These depend in the listed order and are open for review. Independent [#193](https://github.com/luminari-gurus/tactics-guru-v2/pull/193), branch `branch/fix-vite-editor-advisories`, head `c0ab8390652a39da51c21e4c482824e7d065c138`, patches Vite 8.3.2 to 8.3.5: zero audit vulnerabilities, 190 content checks, both typechecks/build, two build-header cases and strict OpenSpec pass. It is not a dependency of the encounter stack. No review PR merge, release tag or production deployment was performed by this task.
 
 ### Completed evidence and necessary corrections
 
@@ -34,7 +36,7 @@ The [QA report](../qa/issue-159-biome-encounters.md) and its evidence directory 
 - Format-1/2 identity/read shapes and exploration adaptation remain exact. Legacy games retain fixed unscaled content on future floors; read-only inspection/Continue do not rewrite saves. First accepted format-3 write preserves original raw primary as backup. Tampering and quota/security/uncertain-readback/size rejection retain recovery and history.
 - The focused dungeon matrix passed **45 Chromium + 45 WebKit** cases, plus **six narrow/short WebKit** rechecks. Each browser/project legally clears seed 43's Desert normal/elite/full guardian, descends to Forest, ascends/revisits, returns, starts an actual next-floor battle and reloads its exact state. Fighter ends at 18 HP, Ranger at 12 after the remaining potion, Mage at 0. Structural depth/kind fixtures isolate presentation and do not claim earlier victories.
 - The 256-seed automated policy corpus achieved 27 first-floor clears and zero two-full-floor clears. Preserve this attrition limitation; no human/high-depth balance certification or second-floor guardian clear is claimed. New hero/reward systems remain outside scope.
-- Current cache receipts pass every unchanged transfer/latency/frame budget: **398,321** gzip-normalized code bytes, Chromium saved-step p95 **5.0–9.4 ms**, WebKit **9–10 ms**. Save limits remain 1 MiB/8,192 floors. Earlier receipt dirty/null build metadata is disclosed in QA.
+- Final integration receipts pass every unchanged transfer/latency/frame budget: **398,337** gzip-normalized code bytes, Chromium saved-step p95 **4.9–5.3 ms**, WebKit **10 ms**. Save limits remain 1 MiB/8,192 floors. Earlier receipt dirty/null build metadata is disclosed in QA.
 - The first full run was stopped with **223 passes, eight failures, one existing skip, one interrupted and 448 not run**. Preserve `initial-full-suite.txt.gz`, WSL `/tmp/tactics-159-full.log` and ignored `tmp/issue-159-full-results/`. Seven real-BFCache assertions failed because the default headless shell never returned from BFCache; the full binary passed them unchanged. The eighth failed while scene boot waited on a paused fake clock.
 - The test-host/clock repair passes **11 desktop** cases (seven BFCache, bob restart and three native selects), **two mobile bob** cases and **six WebKit migration/performance** cases. Chromium projects individually select `channel: 'chromium'`; WebKit replacement projects remain WebKit. Time runs during asynchronous scene boot, then pauses for deterministic bob sampling. Assertions/timeouts for these cases are unchanged.
 
@@ -42,9 +44,9 @@ The [QA report](../qa/issue-159-biome-encounters.md) and its evidence directory 
 
 Use WSL Node/npm/OpenSpec from `/mnt/c/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru` with explicit `GIT_DIR=/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/.git/worktrees/Tactics-Guru13` and `GIT_WORK_TREE=/mnt/c/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`. This avoids Windows worktree pointer errors. Dependencies are installed. Use Windows Git for publication. Restore only task-generated unrelated simulation/snapshot churn before committing (`docs/qa/procedural-grids/simulations.json`, the authoredEncounters/battlefield unit snapshots), after inspecting the diff.
 
-When qualification is complete: retain exact full/targeted/posttest/dev results, update QA and this continuation, mark/verify OpenSpec tasks and strict validation, commit/push, verify clean tree and remote parity `0 0`, then refresh each PR's actual head/base/mergeability/checks and update its review description. Keep #159 open for review. Do not archive OpenSpec or create release tags before authorized integration.
+Closeout retains full/targeted/posttest/dev results, completed OpenSpec ledgers and strict validation. Verify clean tree and remote parity `0 0` after publication, and refresh actual PR heads/bases/mergeability/checks before any later integration. Local browser qualification and hosted Cloudflare build status are distinct evidence. Keep #159 open for review; OpenSpec archival and release tags belong to authorized integration.
 
-#187 remains unmerged, so the existing Review/Confirm contract is retained. #190's macOS Chrome native-select failures remain separate; the three corresponding tests pass on this Linux host, which does not establish a macOS fix. Concurrent [#196](https://github.com/luminari-gurus/tactics-guru-v2/pull/196) owns square overworld map cells and is not duplicated here. Device/browser emulation is sufficient under the caller's standing instruction; no physical testing is claimed.
+#187 remains unmerged, so the existing Review/Confirm contract is retained. #190's macOS Chrome native-select failures remain separate; the three corresponding tests pass on this Linux host, which does not establish a macOS fix. Independent [#196](https://github.com/luminari-gurus/tactics-guru-v2/pull/196) is merged in main; its square-cell fix and test are preserved throughout this stack. Device/browser emulation is sufficient under the caller's standing instruction; no physical testing is claimed.
 
 Issue [#159](https://github.com/luminari-gurus/tactics-guru-v2/issues/159) is assigned to `moshehbenavraham`; the requested branch is natively linked in Development. The previous root plan is preserved at [issue-154-overworld-markers-plan.md](issue-154-overworld-markers-plan.md), with historical status unchanged.
 
@@ -54,7 +56,7 @@ New `/dungeon` games choose playable encounters from the existing Forest and Des
 
 This is the encounter foundation explicitly allowed to land before #170's content packs. The continuation request authorizes implementation of the concrete initial rules below. Keep #159 open through implementation/review and retain truthful limits on balance acceptance.
 
-## Why this work was selected
+## Initial planning selection
 
 Reviewed all **34 open issues**, their full bodies/ownership/labels, both open PRs, remote branches, native dependency and linked-branch relationships, and current `main`. The repository and organization Projects V2 inventories were empty; the open issues had no project memberships. The initial scan was not restricted to `ready for work`.
 
@@ -65,7 +67,9 @@ Reviewed all **34 open issues**, their full bodies/ownership/labels, both open P
 
 Only #159 is claimed. No other issue is closed, assigned, promoted or linked as though this branch implements it. Browser/device emulation satisfies acceptance under [AGENTS.md](../../AGENTS.md); the caller's configured Android access is not evidence of physical testing and is not an eligibility gate.
 
-## Current source contracts
+## Audited source contracts before implementation
+
+This baseline audit describes `main` at `5a1857f0ae9b69780e17d911501fa255fe1f8b68`, before the implementation above. The continuation status, OpenSpec tasks and QA report describe the delivered behavior.
 
 - [content/dungeon.ts](../../src/content/dungeon.ts) reuses the three fixed `battlefieldEncounters` and hashes those definitions into dungeon identity. [content/encounters.ts](../../src/content/encounters.ts) retains three authored maps and a production configuration whose first two encounters use generated Desert geometry; the last uses authored Ruined Approach.
 - [domain/dungeon.ts](../../src/domain/dungeon.ts) stores Rooms/Grassland floor descriptors, sequential slots 0–2, party HP, ownership and one active battle. `dungeonBattle` always resolves the fixed slot, projects owned items, filters defeated heroes, then builds the battle. `acceptDungeonBattle` advances completion, creates the first two rewards, and returns to ready after slot 2. Floor travel already persists its candidate before publishing it.
@@ -77,7 +81,7 @@ Only #159 is claimed. No other issue is closed, assigned, promoted or linked as 
 
 Legacy evidence was read at `e9433f6b608ae6b2d95418615cce9cf17dadcf74`: [EncounterCatalog](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/EncounterCatalog.gd#L102-L123) selects a seeded starting biome and has explicit [map/boss pools](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/EncounterCatalog.gd#L240-L363). Its [scaler](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/ForestRuinsMvpBuilder.gd#L1472-L1501) multiplies enemy HP/power/accuracy/AC by `1 + (depth - 1) / 10`, rounds, then applies a separate 1.20 vault pass. These are reference rules, not live balance proof. The issue records legacy later-floor Graveyard/then Winter routing; the proposed two-biome v2 rule below is an explicit adaptation, not a claim of a legacy ten-biome cycle.
 
-## Proposed decisions
+## Implemented decisions for review
 
 ### 1. A small playable catalog, with all four encounter kinds
 
@@ -105,7 +109,7 @@ Add one dungeon-specific catalog module and one pure selection/projection module
 
 ### 3. Bounded, nonaccumulating enemy scaling
 
-Propose policy `enemy-depth-v1`, using the legacy slope and vault ordering with v2's existing bounds:
+Policy `enemy-depth-v1` uses the legacy slope and vault ordering with v2's existing bounds:
 
 1. For each baseline enemy's `maxHp`, `power`, `accuracy` and `armorClass`, calculate `round(base * (depth + 9) / 10)` for positive integer depth, then clamp to that field's current `CONTENT_BOUNDS`.
 2. For vaults only, calculate `round(depthScaled * 6 / 5)`, then clamp again. Normal, elite and boss add no kind multiplier.
@@ -136,7 +140,7 @@ Retain `DungeonSession` and its accepted-command callback as the owner of battle
 - Keep the old selection policy only for actual save compatibility. Do not duplicate controllers or create a user-facing compatibility toggle.
 - Drop bulk #170 packs, specialized enemies (#166–#169), XP/unlocks (#160), new effects (#161), currency/reward rebalance (#174), class-stat progression (#185), alternate map generators (#184), wandering (#155), main-menu work (#153) and HUD changes (#123/#187). Each has separate ownership or requirements.
 - Drop new assets, dependencies, production flags, general content editors, telemetry events, shops, extra POIs, arbitrary seed controls and a new pathfinding system. None is required for this outcome.
-- Keep this requested `plan.md` as the review artifact. Existing OpenSpec dungeon contracts should be reconciled with the approved decisions when implementation is requested; this planning publication does not duplicate them or mark their work complete.
+- Keep this requested `plan.md` as the continuation and review artifact. OpenSpec change `issue-159-biome-encounters` records the implemented policy and its acceptance ledger; archival follows authorized review/integration.
 
 ## Files and implementation sequence
 
