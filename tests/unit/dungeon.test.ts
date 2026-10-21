@@ -7,6 +7,12 @@ import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeo
 import { dungeonContent } from '../../src/content/dungeon';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
+import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
+import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
+import { dispatch } from '../../src/domain/turns';
+import { canonical, hashJson } from '../../src/domain/contentIdentity';
+import { dungeonEncounterCatalog, dungeonBattleCatalog } from '../../src/content/dungeonEncounters';
+import { resolveBattlefield } from '../../src/domain/battlefield';
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
 function win(s: DungeonState) {
@@ -145,11 +151,100 @@ describe('dungeon recovery limits',()=>{
     expect(decodeDungeon(JSON.stringify({...value,digest:'sha256:'+'0'.repeat(64)}))).toEqual({ok:false,reason:'digest'});
   });
   it('preserves every visited floor until the byte budget explicitly refuses the candidate',()=>{
-    const base=fresh(),floors=Array.from({length:4000},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
-    const s={...base,depth:4000,floors,revision:40000};expect(readDungeon(s).ok).toBe(true);
-    expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(4000);
+    const base=fresh(),floors=Array.from({length:400},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
+    const s={...base,depth:400,floors,revision:4000};expect(readDungeon(s).ok).toBe(true);
+    expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(400);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
   },60000);
+});
+
+describe('durable encounter policies', () => {
+  it('resolves saved admitted definitions without selecting a map again', () => {
+    let base = freshDungeon('saved-choice', 0);
+    for (let seed = 1; base.floors[0].descriptor.biome !== 'forest-v1'; seed++) base = freshDungeon('saved-choice', seed);
+    const descriptor = base.floors[0].descriptor, original = descriptor.encounters[0].selection;
+    if (original.policy === LEGACY_ENCOUNTER_POLICY) throw Error('Expected new policy');
+    const map = dungeonEncounterCatalog.pools.find(p => p.id === 'forest')!.maps.find(m => m.id !== original.mapId)!;
+    const composition = dungeonEncounterCatalog.compositions.find(c => c.id === map.compositionIds[0])!;
+    const selection = { ...original, mapId: map.id, compositionId: composition.id, encounter: { id:`encounter:${map.id}` as const,source:map.source,roster:composition.roster } };
+    const resolved = resolveBattlefield(selection.encounter,dungeonSeed(base.seed,1,'battle',0),dungeonBattleCatalog);if(!resolved.ok)throw Error('Pairing invalid');
+    const saved = { ...base, floors:[{...base.floors[0],descriptor:{...descriptor,encounters:[{selection,battlefield:resolved.descriptor},...descriptor.encounters.slice(1)]}}] };
+    const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
+    expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);
+  });
+  it.each(['policy', 'catalog', 'kind', 'depth', 'pool', 'composition', 'boss', 'roster', 'source', 'hash', 'version'])('rejects tampered %s facts and retains raw recovery bytes', field => {
+    const encoded = encodeDungeon(fresh()); if (!encoded.ok) throw Error(encoded.reason);
+    const envelope = JSON.parse(encoded.text), plan = envelope.payload.floors[0].descriptor.encounters[field === 'boss' ? 2 : 0], selection = plan.selection;
+    if (field === 'policy') envelope.payload.encounterPolicy = 'future';
+    if (field === 'catalog') selection.catalogIdentity = 'sha256:' + '0'.repeat(64);
+    if (field === 'kind') selection.kind = 'vault';
+    if (field === 'depth') selection.depth++;
+    if (field === 'pool') selection.poolId = 'unknown';
+    if (field === 'composition') selection.compositionId = 'unknown';
+    if (field === 'boss') selection.bossId = null;
+    if (field === 'roster') selection.encounter.roster[0].x++;
+    if (field === 'source') selection.encounter.source = { kind: 'authored', mapId: 'map:unknown' };
+    if (field === 'hash') plan.battlefield.mapHash = 'sha256:' + '0'.repeat(64);
+    if (field === 'version') selection.scalingPolicy = 'enemy-depth-v2';
+    const { digest, ...body } = envelope, raw = canonical({ ...body, digest: hashJson(body) });
+    const m = memory(); m.setItem(DUNGEON_KEYS.primary, raw);
+    const inspected = createDungeonStorage(() => m).inspect().primary;
+    expect(inspected.status).toBe('invalid'); expect(inspected.text).toBe(raw); expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
+  });
+
+  it.each([1, 2] as const)('normalizes format %i across prior phases and keeps later floors fixed/unscaled', format => {
+    const base = freshDungeon('prior-policy', 13, LEGACY_ENCOUNTER_POLICY), active = good(startDungeonBattle(atEncounter(base))), reward = win(base);
+    const dead = good(acceptDungeonBattle(active, { ...active.activeBattle!, outcome: 'playerLoss', units: active.activeBattle!.units.map(u => u.side === 'player' ? { ...u, hp: 0 } : u) }));
+    const cleared = clearFloor(base), second = good(travelDungeon(cleared, 'descend', cleared.revision));
+    const backtracked = good(travelDungeon(second, 'ascend', second.revision));
+    for (const original of [base, active, reward, dead, second, backtracked]) {
+      const raw = priorDungeonEnvelope(original, format), decoded = good(decodeDungeon(raw));
+      expect(decoded.encounterPolicy).toBe(LEGACY_ENCOUNTER_POLICY);
+      for (const field of ['party', 'ownership', 'activeBattle', 'offer', 'revision', 'phase', 'depth'] as const) expect(decoded[field]).toEqual(original[field]);
+      expect(decoded.floors.map(f => f.completed)).toEqual(original.floors.map(f => f.completed));
+      if (format === 2) expect(decoded).toEqual(original);
+      if (original.activeBattle) {
+        const command = { type: 'endTurn' as const, unitId: original.activeBattle.initiative[original.activeBattle.activeIndex] };
+        expect(dispatch(decoded.activeBattle!, command, dungeonBattle(decoded)!.catalog)).toEqual(dispatch(original.activeBattle, command, dungeonBattle(original)!.catalog));
+      }
+      const values = memory(); values.setItem(DUNGEON_KEYS.primary, raw); const store = createDungeonStorage(() => values);
+      expect(store.inspect().primary.status).toBe('valid'); expect(values.getItem(DUNGEON_KEYS.primary)).toBe(raw);
+      expect(store.save(decoded).ok).toBe(true); expect(values.getItem(DUNGEON_KEYS.backup)).toBe(raw);
+      expect(JSON.parse(values.getItem(DUNGEON_KEYS.primary)!).format).toBe(3);
+    }
+    const decoded = good(decodeDungeon(priorDungeonEnvelope(cleared, format))), next = good(travelDungeon(decoded, 'descend', decoded.revision));
+    expect(next.floors[1].descriptor.biome).toBe('grassland-v1');
+    const built = dungeonBattle(next)!;
+    expect(built.catalog.enemies).toEqual(dungeonContent.catalog.enemies);
+    expect(built.selection.policy).toBe(LEGACY_ENCOUNTER_POLICY);
+  });
+
+  it('retains all floor choices through travel, revisit and damage without compounding', () => {
+    const first = clearFloor(fresh()), next = good(travelDungeon(first, 'descend', first.revision));
+    expect(next.floors[1].descriptor.biome).not.toBe(first.floors[0].descriptor.biome);
+    const started = good(startDungeonBattle(atEncounter(next))), built = dungeonBattle(started)!;
+    expect(dungeonBattle(started)).toEqual(built);
+    const enemy = built.state.units.find(u => u.side === 'enemy')!;
+    const damaged = { ...started, activeBattle: { ...started.activeBattle!, units: started.activeBattle!.units.map(u => u.id === enemy.id ? { ...u, hp: u.hp - 1 } : u) } };
+    const encoded = encodeDungeon(damaged); if (!encoded.ok) throw Error(encoded.reason);
+    const resumed = good(decodeDungeon(encoded.text)); expect(resumed).toEqual(damaged);
+    expect(dungeonBattle(resumed)!.catalog).toEqual(built.catalog);
+    expect(resumed.activeBattle!.units.find(u => u.id === enemy.id)!.hp).toBe(enemy.hp - 1);
+    const back = good(travelDungeon(next, 'ascend', next.revision)), revisit = good(travelDungeon(back, 'descend', back.revision));
+    expect(revisit.floors).toEqual(next.floors); expect(revisit.ownership).toEqual(next.ownership);
+  });
+
+  it('requires the entire guardian roster, then completes exactly once', () => {
+    let state = fresh();
+    for (let slot = 0; slot < 2; slot++) { state = win(state); state = good(dungeonItem(state, { ...dungeonBoundary(state), type: 'claimReward', offerId: state.offer!.id, itemId: state.offer!.options[0].itemId })); }
+    state = good(startDungeonBattle(atEncounter(state)));
+    const battle = state.activeBattle!, firstEnemy = battle.units.find(u => u.side === 'enemy')!;
+    const partial = good(acceptDungeonBattle(state, { ...battle, units: battle.units.map(u => u.id === firstEnemy.id ? { ...u, hp: 0 } : u) }));
+    expect(partial.floors[0].completed).toBe(2); expect(travelDungeon(partial, 'descend', partial.revision).ok).toBe(false);
+    const victory = good(acceptDungeonBattle(partial, { ...partial.activeBattle!, outcome: 'playerWin', units: partial.activeBattle!.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
+    expect(victory.floors[0].completed).toBe(3); expect(victory.offer).toBeNull();
+    expect(acceptDungeonBattle(victory, battle)).toEqual({ ok: false, reason: 'staleBoundary' });
+  });
 });
 
 describe('confirmed dungeon charm disposal',()=>{

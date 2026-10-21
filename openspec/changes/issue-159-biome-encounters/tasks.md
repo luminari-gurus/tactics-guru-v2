@@ -7,7 +7,7 @@
 
 ## 2. Durable floors and compatibility
 
-- [ ] 2.1 Integrate saved floor selections and shared projected battle catalogs; verify descriptor tampering, living subsets, equipment, damage, preview/AI/resolution/replay and duplicate/stale guardian boundaries with domain/session tests.
+- [x] 2.1 Integrate saved floor selections and shared projected battle catalogs; verify descriptor tampering, living subsets, equipment, damage, preview/AI/resolution/replay and duplicate/stale guardian boundaries with domain/session tests.
 - [ ] 2.2 Add format 3 and validated prior-format normalization with continuing legacy policy; verify ready/Guarded/reward/defeat/backtrack fixtures, next commands/RNG, backup/recovery/quota/security/readback and resource-size rejection; document downgrade/export and publish the dependent PR when ready.
 
 ## 3. Reachable presentation and play

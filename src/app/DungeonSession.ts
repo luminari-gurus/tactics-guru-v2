@@ -64,7 +64,7 @@ export class DungeonSession {
       const next = acceptDungeonBattle(this.current, session.state);
       if (!next.ok) { this.report(`Dungeon boundary rejected: ${next.reason}`); return; }
       this.current = next.state; this.review = null;
-      if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
+      if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
       this.save();
     };
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.

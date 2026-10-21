@@ -3,6 +3,22 @@ import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonB
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
+import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounterPolicy } from '../../src/domain/dungeonEncounters';
+import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
+import { canonical, hashJson } from '../../src/domain/contentIdentity';
+/** Exact previous wire shapes, only from the fixed/unscaled policy they actually supported. */
+export function priorDungeonPayload(s: DungeonState, format: 1 | 2) {
+  if (s.encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw Error('Prior fixtures must use legacy opponents');
+  const { encounterPolicy, ...state } = s;
+  return { ...state, floors: s.floors.map(f => {
+    const { encounters, ...descriptor } = f.descriptor;
+    return format === 1 ? { descriptor, position: f.position === descriptor.downstairs ? f.position : descriptor.upstairs, completed: f.completed } : { ...f, descriptor };
+  }) };
+}
+export function priorDungeonEnvelope(s: DungeonState, format: 1 | 2) {
+  const body = { kind: 'tactics-guru:dungeon', format, identity: format === 1 ? legacyDungeonIdentity : priorDungeonIdentity, payload: priorDungeonPayload(s, format) };
+  return canonical({ ...body, digest: hashJson(body) });
+}
 export const checkedDungeon = (r: DungeonResult) => { if(!r.ok)throw Error(r.reason);return r.state; };
 /** Legal pure-domain play fixture, not a claim that all preceding turns used browser input. */
 export function dungeonVictoryBoundary(seed: number, slot = 0) {
@@ -23,7 +39,7 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
       battle.finishPresentation(p.token);
     }
     if(battle.state.outcome!=='playerWin'||!last)return null;
-    histories.push(battle.replay);
+    histories.push({ replay: battle.replay, entry: dungeon });
     if(index===slot)return {...last,histories};
     dungeon=checkedDungeon(acceptDungeonBattle(dungeon,battle.state));
     const offer=dungeon.offer!;
@@ -37,10 +53,10 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
 }
 
 /** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
-export function dungeonCapacityFixture(): DungeonState {
+export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   for(let seed=1;seed<=100;seed++){
-    const base=freshDungeon('dungeon-capacity-fixture',seed);
-    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};});
+    const base=freshDungeon('dungeon-capacity-fixture',seed,policy);
+    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1,undefined,policy);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};});
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
     const offer=dungeonOffer(candidate);
