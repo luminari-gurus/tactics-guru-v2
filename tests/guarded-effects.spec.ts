@@ -1,3 +1,4 @@
+import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
@@ -23,7 +24,7 @@ function boundary(mode: 'standalone' | 'run' | 'dungeon') {
     const run = createRun('guarded-browser', seed, runContext.definition, runContext.catalog); if (!run.ok) throw Error(run.reason);
     const items = { run: run.state, ownership: emptyItemOwnership(), offer: null, itemRevision: 0 };
     const runBuilt = createRunBattle(items, runContext); if (!runBuilt.ok) throw Error(runBuilt.reason);
-    const dungeon = startDungeonBattle(freshDungeon('guarded-browser', seed)); if (!dungeon.ok) throw Error(dungeon.reason);
+    const dungeon = startDungeonBattle(atEncounter(freshDungeon('guarded-browser', seed))); if (!dungeon.ok) throw Error(dungeon.reason);
     const dungeonBuilt = dungeonBattle(dungeon.state)!;
     const standalone = createBattle('map:forest_ruins', seed, battleCatalog); if (!standalone.ok) throw Error(standalone.reason);
     const catalog = mode === 'standalone' ? battleCatalog : mode === 'run' ? runBuilt.catalog : dungeonBuilt.catalog;

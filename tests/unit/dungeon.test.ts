@@ -1,3 +1,5 @@
+import { atEncounter, atDownstairs } from '../helpers/dungeonFixtures';
+import { freshExploration } from '../../src/domain/exploration';
 import { describe, expect, it } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
@@ -8,7 +10,7 @@ import { DungeonSession } from '../../src/app/DungeonSession';
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
 function win(s: DungeonState) {
-  s = good(startDungeonBattle(s));
+  s = good(startDungeonBattle(atEncounter(s)));
   const b = s.activeBattle!;
   return good(acceptDungeonBattle(s, { ...b, outcome: 'playerWin', units: b.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
 }
@@ -17,7 +19,7 @@ export function clearFloor(s: DungeonState) {
     s = win(s);
     if (s.offer) s = good(dungeonItem(s, { ...dungeonBoundary(s), type: 'claimReward', offerId: s.offer.id, itemId: s.offer.options[0].itemId }));
   }
-  return s;
+  return atDownstairs(s);
 }
 function memory() {
   const values = new Map<string,string>();
@@ -45,15 +47,15 @@ describe('dungeon floors', () => {
     s = good(dungeonItem(s,command)); expect(dungeonItem(s,command).ok).toBe(false);
     for (let i=0;i<2;i++) { s=win(s); if(s.offer)s=good(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:s.offer.options[0].itemId})); }
     const carried = s.party, owned = s.ownership;
-    const oldRevision=s.revision;s=good(travelDungeon(s,'descend',s.revision)); expect(travelDungeon(s,'descend',oldRevision)).toEqual({ok:false,reason:'staleBoundary'}); expect(s.depth).toBe(2); expect(s.phase).toBe('ready'); expect(s.party).toEqual(carried);
+    s=atDownstairs(s);const oldRevision=s.revision;s=good(travelDungeon(s,'descend',s.revision)); expect(travelDungeon(s,'descend',oldRevision)).toEqual({ok:false,reason:'staleBoundary'}); expect(s.depth).toBe(2); expect(s.phase).toBe('ready'); expect(s.party).toEqual(carried);
     const secondPosition=s.floors[1].position;
     s=good(travelDungeon(s,'ascend',s.revision)); expect(s.floors[0].position).toBe(s.floors[0].descriptor.downstairs); expect(s.floors[0].completed).toBe(3); expect(s.ownership).toEqual(owned);
-    expect(startDungeonBattle(s).ok).toBe(false);
+    expect(startDungeonBattle(atEncounter(s)).ok).toBe(false);
     s=good(travelDungeon(s,'descend',s.revision)); expect(s.floors[1].position).toBe(secondPosition); expect(s.ownership).toEqual(owned);
   });
   it('continues at multi-digit depth with checked resource bounds and no fixed victory', () => {
     const base=fresh();
-    const floors=Array.from({length:10},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,completed:3};});
+    const floors=Array.from({length:10},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
     const s=good(readDungeon({...base,depth:10,floors,revision:100}));
     const next=good(travelDungeon(s,'descend',s.revision));expect(next.depth).toBe(11);expect(next.phase).toBe('ready');expect(next.floors).toHaveLength(11);
     expect(travelDungeon({...s,revision:Number.MAX_SAFE_INTEGER},'descend',Number.MAX_SAFE_INTEGER)).toEqual({ok:false,reason:'resourceLimit'});
@@ -62,7 +64,7 @@ describe('dungeon floors', () => {
     expect(withItem.ownership.equipment[0].instanceId).toBe(id);
   });
   it('roundtrips battle, reward and travel boundaries and rejects malformed descriptors', () => {
-    for (const s of [fresh(),good(startDungeonBattle(fresh())),win(fresh()),(()=>{const s=clearFloor(fresh());return good(travelDungeon(s,'descend',s.revision));})()]) {
+    for (const s of [fresh(),good(startDungeonBattle(atEncounter(fresh()))),win(fresh()),(()=>{const s=clearFloor(fresh());return good(travelDungeon(s,'descend',s.revision));})()]) {
       const encoded=encodeDungeon(s); expect(encoded.ok).toBe(true); if(encoded.ok)expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:s});
     }
     const s=fresh(); expect(readDungeon({...s,floors:[{...s.floors[0],descriptor:{...s.floors[0].descriptor,mapHash:'sha256:'+'0'.repeat(64)}}]}).ok).toBe(false);
@@ -70,10 +72,10 @@ describe('dungeon floors', () => {
     expect(decodeDungeon('bad').ok).toBe(false); expect(decodeDungeon('x'.repeat(1024*1024+1)).ok).toBe(false); expect(utf8Bytes('aé🧙')).toBe(7);
   });
   it('atomically refuses a full six-charm reward without losing the pending offer', () => {
-    const base=fresh(),floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3};});
+    const base=fresh(),floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs),completed:i===3?1:3};});
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate={...base,depth:4,floors,phase:'reward' as const,ownership:{consumables:[],equipment,assignments:[]}};
-    const s=good(readDungeon({...candidate,offer:dungeonOffer(candidate)}));
+    const s=good(readDungeon({...atEncounter(candidate,0),offer:dungeonOffer(candidate)}));
     const itemId=s.offer!.options.find(o=>dungeonContent.items[o.itemId].kind==='equipment')!.itemId;
     const before=JSON.stringify(s);expect(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer!.id,itemId})).toEqual({ok:false,reason:'capacity'});expect(JSON.stringify(s)).toBe(before);
   });
@@ -89,7 +91,7 @@ describe('dungeon floors', () => {
     const instance=s.ownership.equipment[0], def=dungeonContent.items[instance.itemId];
     if(def.kind!=='equipment')throw Error('equipment expected'); const heroId=def.eligibleHeroes[0];
     s=good(dungeonItem(s,{...dungeonBoundary(s),type:'equipItem',instanceId:instance.instanceId,heroId,slot:'charm'}));
-    const b=good(startDungeonBattle(s)); expect(b.activeBattle!.units.filter(u=>u.side==='player')).toHaveLength(2);
+    const b=good(startDungeonBattle(atEncounter(s))); expect(b.activeBattle!.units.filter(u=>u.side==='player')).toHaveLength(2);
     expect(dungeonBattle(b)!.catalog.heroes[heroId].stats[def.effect.stat]).toBe(dungeonContent.catalog.heroes[heroId].stats[def.effect.stat]+def.effect.amount);
     expect(dungeonBattle(b)!.catalog.heroes[heroId].stats[def.effect.stat]).toBe(dungeonContent.catalog.heroes[heroId].stats[def.effect.stat]+def.effect.amount);
     expect(b.activeBattle!.units.filter(u=>u.side==='player').every(u=>u.hp===s.party.find(h=>h.heroId===u.defId)!.hp)).toBe(true);
@@ -123,7 +125,7 @@ describe('dungeon persistence',()=>{
   it('allows explicit unsaved battles but blocks travel and disposes stale sessions',()=>{
     const session=new DungeonSession(clearFloor(fresh()),createDungeonStorage(()=>null));session.playUnsaved();
     expect(session.travel('descend',session.snapshot.revision)).toBe(false);
-    const playing=new DungeonSession(fresh(),createDungeonStorage(()=>memory())),battle=playing.startEncounter()!;playing.dispose();
+    const playing=new DungeonSession(atEncounter(fresh()),createDungeonStorage(()=>memory())),battle=playing.startEncounter()!;playing.dispose();
     expect(battle.phase).toBe('disposed');expect(playing.startEncounter()).toBe(null);
   });
 });
@@ -139,11 +141,11 @@ describe('dungeon recovery limits',()=>{
   });
   it('rejects incompatible and tampered envelopes without replacing raw bytes',()=>{
     const encoded=encodeDungeon(fresh());if(!encoded.ok)throw Error(encoded.reason);
-    const value=JSON.parse(encoded.text);expect(decodeDungeon(JSON.stringify({...value,format:2}))).toEqual({ok:false,reason:'incompatible'});
+    const value=JSON.parse(encoded.text);expect(decodeDungeon(JSON.stringify({...value,format:99}))).toEqual({ok:false,reason:'incompatible'});
     expect(decodeDungeon(JSON.stringify({...value,digest:'sha256:'+'0'.repeat(64)}))).toEqual({ok:false,reason:'digest'});
   });
   it('preserves every visited floor until the byte budget explicitly refuses the candidate',()=>{
-    const base=fresh(),floors=Array.from({length:4000},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,completed:3};});
+    const base=fresh(),floors=Array.from({length:4000},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
     const s={...base,depth:4000,floors,revision:40000};expect(readDungeon(s).ok).toBe(true);
     expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(4000);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
@@ -174,7 +176,7 @@ describe('confirmed dungeon charm disposal',()=>{
     expect(dungeonItem(original,{...command,instanceId:'unowned'})).toEqual({ok:false,reason:'notOwned'});
     expect(dungeonItem(original,{...command,heroId:'fighter'} as unknown as typeof command)).toEqual({ok:false,reason:'invalidCommand'});
     expect(JSON.stringify(original)).toBe(before);
-    const battle=good(startDungeonBattle({...original,phase:'ready',offer:null}));
+    const battle=good(startDungeonBattle(atEncounter({...original,phase:'ready',offer:null})));
     expect(dungeonItem(battle,{...command,...dungeonBoundary(battle)})).toEqual({ok:false,reason:'wrongContext'});
     const state=battle.activeBattle!,defeated=good(acceptDungeonBattle(battle,{...state,outcome:'playerLoss',units:state.units.map(u=>u.side==='player'?{...u,hp:0}:u)}));
     expect(dungeonItem(defeated,{...command,...dungeonBoundary(defeated)})).toEqual({ok:false,reason:'wrongContext'});

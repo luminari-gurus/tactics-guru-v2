@@ -1,3 +1,4 @@
+import { DungeonMap } from '../ui/dungeonMap';
 import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
@@ -17,6 +18,7 @@ const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>host?.modalTransition(),()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
 const engine=createGame([],true);
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
+const mapView=new DungeonMap(destination=>{if(!live||playing||dialogs.open)return;const s=session.snapshot;if(session.step({id:s.id,depth:s.depth,revision:s.revision,destination})&&session.snapshot.phase==='battle')start();},()=>!live||playing||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
 function evidence(){container.dataset.dungeonSnapshot=JSON.stringify(session.snapshot);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){playing=false;host=null;engine.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';}
@@ -33,7 +35,7 @@ function render(){
   const unsaved=button('Play unsaved dungeon',()=>{startup=false;session.playUnsaved();render();});
   screen.append(el('p','Unsaved play permits battles; floor travel is blocked until progress can be saved.'),unsaved);
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
- }else renderDungeon(screen,session,dialogs,{start,recover:recovery,restart:requestNew},cache);
+ }else renderDungeon(screen,session,dialogs,{start,recover:recovery,restart:requestNew},cache,mapView);
  mountTelemetryPreferences(screen);
 }
 function requestNew(){
@@ -72,6 +74,6 @@ function start(){
 }
 session.onChange=()=>render();restart.addEventListener('click',requestNew);
 document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
-window.addEventListener('pagehide',()=>{live=false;session.dispose();stop();dialogs.dispose();},{once:true});
+window.addEventListener('pagehide',()=>{live=false;session.dispose();mapView.dispose();stop();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 render();

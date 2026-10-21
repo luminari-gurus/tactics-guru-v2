@@ -1,3 +1,4 @@
+import { freshExploration, poiCell, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
@@ -8,7 +9,7 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
   let dungeon=freshDungeon('dungeon-browser-fixture',seed);
   const histories: unknown[]=[];
   for(let index=0;index<=slot;index++) {
-    dungeon=checkedDungeon(startDungeonBattle(dungeon));
+    dungeon=checkedDungeon(startDungeonBattle(atEncounter(dungeon)));
     const built=dungeonBattle(dungeon)!;
     const battle=new BattleSession(built.catalog,dungeon.activeBattle!,dungeon.activeBattle!.seed,undefined,true,built.battlefield);
     let last: { snapshot: DungeonState; command: Command }|null=null;
@@ -39,11 +40,22 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
 export function dungeonCapacityFixture(): DungeonState {
   for(let seed=1;seed<=100;seed++){
     const base=freshDungeon('dungeon-capacity-fixture',seed);
-    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3};});
+    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};});
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
     const offer=dungeonOffer(candidate);
-    if(offer.options.every(o=>o.itemId!=='item:healing_draught'))return checkedDungeon(readDungeon({...candidate,offer}));
+    if(offer.options.every(o=>o.itemId!=='item:healing_draught'))return checkedDungeon(readDungeon({...atEncounter(candidate,0),offer}));
   }
   throw Error('No two-charm capacity fixture');
 }
+
+/** Structural position fixture, not evidence of UI traversal. */
+export function atCell(s: DungeonState, position: number): DungeonState {
+  const floors = [...s.floors], f = floors[s.depth-1];
+  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position) };
+  return { ...s, floors };
+}
+export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
+  return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot]));
+}
+export const atDownstairs = (s: DungeonState) => atCell(s,s.floors[s.depth-1].descriptor.downstairs);

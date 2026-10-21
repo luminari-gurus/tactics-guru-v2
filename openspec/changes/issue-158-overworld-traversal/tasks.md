@@ -1,24 +1,24 @@
 # Tasks
 
-Implementation approval is pending. Do not edit runtime code or tests until the caller approves this published plan. Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/158. Caller: `dubstylee`. Branch: `work/issue-158-overworld-traversal`. Base: `38474f210da723c7d66cf323a19236de85cb5e57`.
+Caller approved published plan e115ea2 with “Approved” on 2026-10-20. Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/158. Caller: `dubstylee`. Branch: `work/issue-158-overworld-traversal`. Base: `38474f210da723c7d66cf323a19236de85cb5e57`.
 
 ## 1. Floor exploration model
 
-- [ ] 1.1 Record explicit caller approval in proposal.md; confirm the same branch/base and review current #155 integration state. Verify approval refers to this plan before implementation.
-- [ ] 1.2 Add deterministic exploration placement/discovery primitives using existing marker IDs and generated geometry; extend floor validation with legal positions, stable encounter/stair POIs, sorted revealed/visited sets and bounds. Verify seed-corpus reproducibility, no overlap with stairs, connected reachability, allocation failures and malformed-state rejection in focused unit tests.
-- [ ] 1.3 Add one-step cardinal commands with dungeon/floor/revision guards, phase locks and pure reveal; verify blocked/edge/diagonal/stale/repeated inputs leave state and RNG unchanged. Document movement, reveal radius/no-occlusion and POI ordering in docs/dungeon.md alongside implementation.
+- [x] 1.1 Record explicit caller approval in proposal.md; confirm the same branch/base and review current #155 integration state. Verify approval refers to this plan before implementation.
+- [x] 1.2 Add deterministic exploration placement/discovery primitives using existing marker IDs and generated geometry; extend floor validation with legal positions, stable encounter/stair POIs, sorted revealed/visited sets and bounds. Verify seed-corpus reproducibility, no overlap with stairs, connected reachability, allocation failures and malformed-state rejection in focused unit tests.
+- [x] 1.3 Add one-step cardinal commands with dungeon/floor/revision guards, phase locks and pure reveal; verify blocked/edge/diagonal/stale/repeated inputs leave state and RNG unchanged. Document movement, reveal radius/no-occlusion and POI ordering in docs/dungeon.md alongside implementation.
 
 ## 2. Versioned unified saves
 
-- [ ] 2.1 Add dungeon v2 identity/envelope and explicit legacy v1 decoding/conversion with retained original bytes. Verify ready/reward/active/defeat, multiple retained floors, inventory and exact active-battle/RNG preservation; reject foreign identity and malformed discovery without overwriting saves.
-- [ ] 2.2 Apply candidate-save/readback to movement and encounter entry, reuse existing recovery and explicit unsaved mode, and retain no-unsaved-travel behavior. Verify quota/security/unavailable/write-after-throw/readback-mismatch cases keep previous in-memory exploration, launch no uncommitted battle and expose exact durable/current exports.
-- [ ] 2.3 Document v1 conversion, v2 bounds, uncertain-write recovery, best-effort multi-tab limits and older-build rollback limitations in docs/dungeon.md. Verify documented storage keys and format against encoder/reader tests.
+- [x] 2.1 Add dungeon v2 identity/envelope and explicit legacy v1 decoding/conversion with retained original bytes. Verify ready/reward/active/defeat, multiple retained floors, inventory and exact active-battle/RNG preservation; reject foreign identity and malformed discovery without overwriting saves.
+- [x] 2.2 Apply candidate-save/readback to movement and encounter entry, reuse existing recovery and explicit unsaved mode, and retain no-unsaved-travel behavior. Verify quota/security/unavailable/write-after-throw/readback-mismatch cases keep previous in-memory exploration, launch no uncommitted battle and expose exact durable/current exports.
+- [x] 2.3 Document v1 conversion, v2 bounds, uncertain-write recovery, best-effort multi-tab limits and older-build rollback limitations in docs/dungeon.md. Verify documented storage keys and format against encoder/reader tests.
 
 ## 3. Spatial battle and stairs
 
-- [ ] 3.1 Bind next-POI entry to existing battle construction/session ownership, validating floor/slot/entry association in one snapshot. Verify exact active resume, duplicate entry/callback rejection and no new battle/RNG after stale inputs in dungeon battle/session tests.
-- [ ] 3.2 Return victories to the entry cell, complete/reward exactly once, retain defeat and item carryover, and allow re-entry only for the available next encounter. Verify legal final-command victory/defeat fixtures, pending reward cancellation/claim/reload, capacity recovery and equipment projection; update existing fixtures to canonical POI associations.
-- [ ] 3.3 Gate travel on matching stair position, preserve guardian/phase locks and retained discovery on backtracking. Verify remote stairs reject, legal travel persists before publication, cached geometry eviction/regeneration matches identity and revisits never regrant rewards. Document spatial encounter and stair rules with these changes.
+- [x] 3.1 Bind next-POI entry to existing battle construction/session ownership, validating floor/slot/entry association in one snapshot. Verify exact active resume, duplicate entry/callback rejection and no new battle/RNG after stale inputs in dungeon battle/session tests.
+- [x] 3.2 Return victories to the entry cell, complete/reward exactly once, retain defeat and item carryover, and allow re-entry only for the available next encounter. Verify legal final-command victory/defeat fixtures, pending reward cancellation/claim/reload, capacity recovery and equipment projection; update existing fixtures to canonical POI associations.
+- [x] 3.3 Gate travel on matching stair position, preserve guardian/phase locks and retained discovery on backtracking. Verify remote stairs reject, legal travel persists before publication, cached geometry eviction/regeneration matches identity and revisits never regrant rewards. Document spatial encounter and stair rules with these changes.
 
 ## 4. Accessible map integration
 

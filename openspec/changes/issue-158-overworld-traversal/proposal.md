@@ -4,7 +4,7 @@
 
 Issue [#158](https://github.com/luminari-gurus/tactics-guru-v2/issues/158) connects the merged marker and continuing-floor foundations to playable exploration. Today `/dungeon` shows a floor summary with remote battle/stair buttons; players cannot traverse it or retain discovery.
 
-Caller: `dubstylee`. Branch: `work/issue-158-overworld-traversal`. Base: `origin/main` at `38474f210da723c7d66cf323a19236de85cb5e57`. Implementation approval: pending.
+Caller: `dubstylee`. Branch: `work/issue-158-overworld-traversal`. Base: `origin/main` at `38474f210da723c7d66cf323a19236de85cb5e57`. Implementation approval: caller explicitly replied “Approved” to published plan commit `e115ea28ee30ab9b922051eeaa5b799177ee41c6` on 2026-10-20.
 
 ## What Changes
 
