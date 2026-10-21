@@ -1,6 +1,6 @@
 # Issue #159 biome encounter acceptance
 
-Date: 2026-10-21, Asia/Jerusalem. Status: Chromium and WebKit desktop/portrait/landscape matrices and narrow rechecks complete; full application suite in progress. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
+Date: 2026-10-21, Asia/Jerusalem. Status: focused matrices complete; full-suite failures are being repaired and a long-history cache regression has been reproduced/fixed. Full-suite acceptance is pending. This report distinguishes executable/domain proof, structural UI fixtures and a complete legal browser journey.
 
 ## Implementation and source
 
@@ -49,5 +49,9 @@ The focused WebKit configuration passed **45/45**, including the legal journey o
 Six additional WebKit kind/inspection rechecks pass with explicit [320×568 vault](issue-159-biome-encounters/narrow-forest-vault.png) and [568×320 guardian](issue-159-biome-encounters/short-desert-guardian.png) sizes across all three projects. Both exploration and battle shells remain within their viewport; scaled inspection is readable and scrollable, and close/reload preserves state. These screenshots were inspected. The same expanded cases are included in the full Chromium run.
 
 ## Remaining qualification
+
+The [first full run](issue-159-biome-encounters/initial-full-suite.txt.gz) was stopped after 223 passes and eight failures, with one existing skip, one interrupted case and 448 not run; posttests did not execute. Seven failures required a real BFCache return that the default headless-shell launch did not provide. The same cases pass unchanged with the installed full Chromium binary ([7-pass / 1-failure probe](issue-159-biome-encounters/full-chromium-probe.txt.gz)). The eighth timeout also reproduces there: the restarted-scene test waits for boot while its fake clock remains paused. These results are retained and are not reclassified as application regressions or accepted baselines without evidence. A test-host/clock repair and clean full rerun remain required.
+
+Separately, a 44-floor regression exposed 132 repeated graph resolutions from the 128-encounter cache. SHA-256 cache keys bounded by the existing floor-allocation limit remove that eviction cliff; the regression now passes. Save identity, encoded bytes, stat policy and the 1 MiB/8,192-floor limits remain unchanged. Commit `ab4c521` passes **880/880** units, 221 content checks, both typechecks, build and three fresh route/performance checks. [Desktop](issue-159-biome-encounters/cache-desktop-performance.json), [portrait](issue-159-biome-encounters/cache-portrait-performance.json) and [landscape](issue-159-biome-encounters/cache-landscape-performance.json) receipts pass every unchanged flag: 398,321 code bytes and 5.0–9.4 ms p95 steps. No claim that the earlier full run is green accompanies this repair.
 
 Complete the full `npm test -- --output=tmp/issue-159-full-results` (681 main cases, then automatic encounter/item posttests) and final spec/receipt/publication checks. The 879-unit/content/type/build checks are already green and remain reusable while runtime code is unchanged. Record actual failures and their repairs here; do not turn #190's macOS native-select report into an unverified current-host baseline. No merge or production deployment is part of this delivery.
