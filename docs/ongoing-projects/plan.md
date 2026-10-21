@@ -1,6 +1,19 @@
 # Issue #159: biome encounters and bounded depth scaling
 
-Date: 2026-10-21 (Asia/Jerusalem). Status: implementation plan for review; no application implementation or runtime acceptance performed.
+Date: 2026-10-21 (Asia/Jerusalem). Status: implementation authorized and in progress; no runtime acceptance claimed yet.
+
+## Continuation status
+
+- The caller authorized implementation, autonomous repairs and focused PR delivery on 2026-10-21. Use OpenSpec change [`issue-159-biome-encounters`](../../openspec/changes/issue-159-biome-encounters/tasks.md); its tasks are the completion ledger. The prior planning-only boundary below is superseded by this request.
+- Worktree: `C:/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`; clean starting head `85fd609`. Refreshed `origin/main` remains `5a1857f`; the branch is one planning commit ahead. No implementation PR existed at start.
+- Outcome/non-goals/files/proof remain the sections below. Ablation retains two pure modules and existing battle/storage/UI boundaries; no new asset, dependency, generic registry, controller or storage adapter. The initial policy below is the implementation target authorized by the continuation request; playtests must still assess its difficulty honestly.
+- Delivery checkpoint 1: catalog/admission, pure selection and scaling, focused tests and policy documentation; publish on the requested branch. Checkpoint 2: stack durable floors/save compatibility on that PR. Checkpoint 3: reachable presentation and route/browser acceptance, separately reviewable if its size warrants it.
+- Runtime: WSL Node/npm/OpenSpec are available; dependencies installed with `npm ci` (lockfile unchanged). Run from `/mnt/c/Users/apexw/.codex/worktrees/backlog-plan/Tactics-Guru`. No release tag is appropriate for unmerged review work.
+- Checkpoint 1 implementation is qualified: 41 focused tests, 221 content checks, both TypeScript scopes and production build pass. Full units pass **859/859** using `npm run test:unit -- --maxWorkers=2`. Strict OpenSpec passes. The first unconstrained run had two WSL/Windows Git-path failures and one 5-second busy-host timeout; the explicit-path/two-worker rerun passes all three without changing tests.
+- For WSL builds/tests in this Windows-managed worktree, set `GIT_DIR=/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/.git/worktrees/Tactics-Guru13` and `GIT_WORK_TREE=$PWD`. This avoids misreading the Windows `.git` pointer; no repository configuration was altered. Full unit tests regenerate unrelated simulation evidence/line endings; restore those generated changes before committing.
+- Next: publish the qualified pure-policy PR, mark task 1.2 delivered, then create a dependent branch for saved floors/migration and continue without waiting for review. No browser/route/compatibility acceptance is claimed for this first pure-policy checkpoint.
+- Admission correction: original Forest Ruins fails existing mutual reachability for nine height-2 ruin tiles. A dungeon-only catalog projection adds one height-1 stone step at (4,2), connecting the ruin for jump-1 actors. Other modes and all rosters remain unchanged; the validator stays strict. Woodland Crossing, Ruined Approach and the generated guardian already pass. This necessary map correction replaces the plan's unverified assumption that every existing authored map was admissible unchanged.
+- Separate discovered work: `npm audit` reports Vite 8.3.2 development-server advisories with a patch available at 8.3.5. Deliver a separate dependency-fix PR after the encounter chunk; do not fold it into #159.
 
 - Issue: [#159 — Add biome encounter selection and depth scaling](https://github.com/luminari-gurus/tactics-guru-v2/issues/159).
 - Owner: `moshehbenavraham` (authenticated GitHub caller); assigned and [kickoff posted](https://github.com/luminari-gurus/tactics-guru-v2/issues/159#issuecomment-6316639043).
@@ -12,7 +25,7 @@ Date: 2026-10-21 (Asia/Jerusalem). Status: implementation plan for review; no ap
 
 New `/dungeon` games choose playable encounters from the existing Forest and Desert content, distinguish normal/elite/vault/boss encounters, and scale enemies by depth within current content bounds. Each floor retains its chosen biome, sources, rosters, scaling and battlefield identities. Reload, backtracking, art completion and repeated battle construction cannot reroll or compound them. A boss encounter unlocks descent once through the existing authoritative victory boundary.
 
-This is the encounter foundation explicitly allowed to land before #170's content packs. The plan proposes concrete initial rules below; publishing it does not approve those balance choices or start implementation. Keep #159 open, and leave its current readiness label state unchanged until those proposed rules have been reviewed.
+This is the encounter foundation explicitly allowed to land before #170's content packs. The continuation request authorizes implementation of the concrete initial rules below. Keep #159 open through implementation/review and retain truthful limits on balance acceptance.
 
 ## Why this work was selected
 
@@ -139,4 +152,4 @@ Measure added `/dungeon` code transfer, floor creation, saved movement and descr
 
 ## Completion boundary
 
-This goal ends with issue assignment/comment, the published and natively linked branch, and this committed plan. Implementation remains a subsequent request. #159 can close only after all five acceptance areas have implementation evidence and the proposed policy has been reviewed. No merge, deployment, unrelated issue changes or production acceptance is part of this planning publication.
+Deliver all five acceptance areas with implementation and evidence, current OpenSpec/continuation documents, tested commits pushed with exact parity, and focused review-ready PRs (stacking dependent work). Keep #159 open for review. No merge, deployment or production acceptance is authorized; do not create a release tag for unmerged changes.
