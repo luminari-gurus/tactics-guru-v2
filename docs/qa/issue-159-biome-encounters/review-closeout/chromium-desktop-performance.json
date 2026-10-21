@@ -1,0 +1,270 @@
+{
+  "frames": {
+    "idle": [
+      16.700000000000045,
+      16.600000000000023,
+      16.699999999999932,
+      16.700000000000045,
+      16.600000000000023,
+      16.799999999999955,
+      16.600000000000023,
+      16.600000000000023,
+      16.699999999999932,
+      16.700000000000045,
+      16.600000000000023,
+      16.799999999999955,
+      16.600000000000023,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.600000000000023,
+      16.799999999999955,
+      16.600000000000023,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999932,
+      16.600000000000023,
+      16.700000000000045,
+      16.600000000000023,
+      16.700000000000045,
+      16.699999999999818,
+      16.600000000000136,
+      16.700000000000045
+    ],
+    "steps": [
+      16.700000000000045,
+      16.600000000000136,
+      16.699999999999818,
+      16.700000000000045,
+      16.600000000000136,
+      16.59999999999991,
+      16.799999999999955,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.600000000000136,
+      16.699999999999818,
+      16.700000000000045,
+      16.600000000000136,
+      16.699999999999818,
+      16.700000000000045,
+      16.600000000000136,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.699999999999818,
+      16.700000000000045,
+      16.600000000000136,
+      16.699999999999818,
+      16.700000000000045,
+      16.5,
+      16.700000000000045,
+      16.700000000000045,
+      16.700000000000045,
+      16.699999999999818,
+      16.600000000000136,
+      16.700000000000045,
+      16.59999999999991,
+      16.700000000000045,
+      16.700000000000045,
+      16.699999999999818,
+      16.600000000000136,
+      16.700000000000045,
+      16.699999999999818,
+      16.600000000000136
+    ],
+    "idleP50": 16.699999999999932,
+    "idleP95": 16.799999999999955,
+    "stepP95": 16.700000000000045
+  },
+  "frameBudgets": {
+    "idleP50": 16.7,
+    "idleP95": 20,
+    "stepP95": 33.4
+  },
+  "framePasses": {
+    "idleP50": true,
+    "idleP95": true,
+    "stepP95": true
+  },
+  "commit": "96b13ed3aaec7a99d45b6a8fb94f9361078a5174",
+  "dirty": true,
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
+  "floorCreationMs": 56.5,
+  "descriptorBytes": 3525,
+  "saveBytes": 4472,
+  "coldUsableMs": 284,
+  "stepP95Ms": 5.300000071525574,
+  "codeGzipBytes": 398394,
+  "observedAssetBytes": 0,
+  "budgets": {
+    "coldUsableMs": 2500,
+    "stepP95Ms": 33.4,
+    "codeGzipBytes": 400000,
+    "assetBytes": 1500000
+  },
+  "passes": {
+    "cold": true,
+    "step": true,
+    "code": true,
+    "assets": true
+  },
+  "code": [
+    {
+      "url": "/assets/telemetry-DUsjSLnt.js",
+      "raw": 454,
+      "gzip": 243
+    },
+    {
+      "url": "/assets/index-CkaeG2R4.js",
+      "raw": 2395,
+      "gzip": 1106
+    },
+    {
+      "url": "/assets/preload-helper-DjzSQ1t3.js",
+      "raw": 1383,
+      "gzip": 749
+    },
+    {
+      "url": "/assets/preferences-CzpQWtzp.js",
+      "raw": 5454,
+      "gzip": 2459
+    },
+    {
+      "url": "/assets/preferences-D1bXSLXU.css",
+      "raw": 719,
+      "gzip": 359
+    },
+    {
+      "url": "/assets/startDungeonApp-s4d-RREE.js",
+      "raw": 41478,
+      "gzip": 13823
+    },
+    {
+      "url": "/assets/browser-B2ccYWyE.js",
+      "raw": 3264,
+      "gzip": 1368
+    },
+    {
+      "url": "/assets/start-Cby7mmmp.js",
+      "raw": 1427660,
+      "gzip": 368576
+    },
+    {
+      "url": "/assets/rng-CkITdvgm.js",
+      "raw": 1651,
+      "gzip": 801
+    },
+    {
+      "url": "/assets/battleLayout-BVayxngr.js",
+      "raw": 559,
+      "gzip": 311
+    },
+    {
+      "url": "/assets/battleLayout-C6wfuIJB.css",
+      "raw": 10757,
+      "gzip": 2691
+    },
+    {
+      "url": "/assets/startDungeonApp-BlfelHn9.css",
+      "raw": 2719,
+      "gzip": 1001
+    },
+    {
+      "url": "/assets/biomes-DV9OYEZi.js",
+      "raw": 4138,
+      "gzip": 1821
+    },
+    {
+      "url": "/assets/items-CKfwK4Ar.js",
+      "raw": 8335,
+      "gzip": 3086
+    }
+  ],
+  "timings": [
+    3.299999952316284,
+    3.399999976158142,
+    3.4000000953674316,
+    3.5,
+    3.600000023841858,
+    3.799999952316284,
+    3.899999976158142,
+    3.899999976158142,
+    4,
+    4.100000023841858,
+    4.199999928474426,
+    4.199999928474426,
+    4.200000047683716,
+    4.200000047683716,
+    4.200000047683716,
+    4.899999976158142,
+    5,
+    5.200000047683716,
+    5.300000071525574,
+    6.399999976158142
+  ],
+  "resources": [
+    {
+      "name": "http://127.0.0.1:4173/assets/telemetry-DUsjSLnt.js",
+      "encodedBodySize": 454
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/index-CkaeG2R4.js",
+      "encodedBodySize": 1106
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preload-helper-DjzSQ1t3.js",
+      "encodedBodySize": 749
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-CzpQWtzp.js",
+      "encodedBodySize": 2459
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/preferences-D1bXSLXU.css",
+      "encodedBodySize": 719
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-s4d-RREE.js",
+      "encodedBodySize": 13823
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/browser-B2ccYWyE.js",
+      "encodedBodySize": 1368
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/start-Cby7mmmp.js",
+      "encodedBodySize": 368576
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/rng-CkITdvgm.js",
+      "encodedBodySize": 801
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-BVayxngr.js",
+      "encodedBodySize": 559
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/battleLayout-C6wfuIJB.css",
+      "encodedBodySize": 2691
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/startDungeonApp-BlfelHn9.css",
+      "encodedBodySize": 1001
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/biomes-DV9OYEZi.js",
+      "encodedBodySize": 1821
+    },
+    {
+      "name": "http://127.0.0.1:4173/assets/items-CKfwK4Ar.js",
+      "encodedBodySize": 3086
+    }
+  ]
+}
