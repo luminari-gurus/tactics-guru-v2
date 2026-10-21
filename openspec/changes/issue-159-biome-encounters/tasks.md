@@ -12,8 +12,8 @@
 
 ## 3. Reachable presentation and play
 
-- [ ] 3.1 Display saved biome/depth/kind in dungeon summary, discovered places and battle headings; use existing biome/Simple styling with legacy Grassland; verify keyboard/touch/focus, hidden POIs, art/lifecycle/reload and scaled inspection with desktop/portrait/landscape screenshots.
-- [ ] 3.2 Verify a legal multi-floor route including full guardian victory, both biomes, all four kinds, descent/ascent/revisit and no duplicate rewards; extend existing browser helpers/tests and retain exact route evidence and any real difficulty limits.
+- [x] 3.1 Display saved biome/depth/kind in dungeon summary, discovered places and battle headings; use existing biome/Simple styling with legacy Grassland; verify keyboard/touch/focus, hidden POIs, art/lifecycle/reload and scaled inspection with desktop/portrait/landscape screenshots.
+- [x] 3.2 Verify a legal multi-floor route including full guardian victory, both biomes, all four kinds, descent/ascent/revisit and no duplicate rewards; extend existing browser helpers/tests and retain exact route evidence and any real difficulty limits.
 
 ## 4. Completion evidence
 

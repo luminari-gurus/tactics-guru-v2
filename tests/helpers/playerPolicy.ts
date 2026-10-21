@@ -5,8 +5,8 @@ import { previewAttack, previewMagicMissile } from '../../src/domain/combat';
 import { lineOfSightBlocked, manhattanDistance } from '../../src/domain/targeting';
 import type { BattleState, Command } from '../../src/domain/types';
 
-/** Test-only player policy. Browser tests enact its decision using real controls. */
-export function playerDecision(state:BattleState, catalog:ContentCatalog = defaultCatalog):Command {
+/** Test-only policy. Longer dungeon witnesses can prioritize finishing enemies and safer firing positions; established callers keep their policy. */
+export function playerDecision(state:BattleState, catalog:ContentCatalog = defaultCatalog, finishTargets = false):Command {
   const actor=state.units.find(u=>u.id===state.initiative[state.activeIndex])!;
   const wait:Command={type:'endTurn',unitId:actor.id};
   if(actor.hasActed)return wait;
@@ -24,7 +24,11 @@ export function playerDecision(state:BattleState, catalog:ContentCatalog = defau
     if(!preview.ok)continue;
     const score='bonus' in preview ? Array.from({length:20},(_,i)=>i+1).reduce((sum,n)=>sum+(n===20?Math.min(target.hp,preview.criticalDamage):n!==1 && n+preview.bonus>=preview.armorClass?Math.min(target.hp,preview.damage):0),0)/20
       : Math.min(target.hp,3.5);
-    candidates.push({command,move:position.move,score:score+(ability.kind==='guardedAttack'?0.7:0)+(ability.id!=='ability:basic_attack'?0.05:0),cost:position.cost});
+    const killChance=!finishTargets?0:'bonus' in preview ? Array.from({length:20},(_,i)=>i+1).filter(n=>
+      n===20?preview.criticalDamage>=target.hp:n!==1&&n+preview.bonus>=preview.armorClass&&preview.damage>=target.hp).length/20
+      : [2,3,4,5].filter(damage=>damage>=target.hp).length/4;
+    const safety=finishTargets?Math.min(...targets.map(t=>manhattanDistance(position.state.units.find(u=>u.id===actor.id)!.cell,t.cell))):0;
+    candidates.push({command,move:position.move,score:score+(finishTargets?6*killChance+0.01*safety:0)+(ability.kind==='guardedAttack'?0.7:0)+(ability.id!=='ability:basic_attack'?0.05:0),cost:position.cost});
   }
   candidates.sort((a,b)=>b.score-a.score || a.cost-b.cost);
   if(candidates.length)return candidates[0].move??candidates[0].command;

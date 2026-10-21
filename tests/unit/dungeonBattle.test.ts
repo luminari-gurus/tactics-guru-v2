@@ -3,7 +3,7 @@ import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { expect,it } from 'vitest';
-import { dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -105,3 +105,18 @@ it('uses the same scaled catalog for inspection, attack preview, AI, actual dama
   for(const c of result.commands){const next=dispatch(replay,c,built.catalog);if(!next.ok)throw Error(next.reason);replay=next.state;}
   expect(replay).toEqual(result.state);
 });
+
+it('plays a legal full-floor witness with existing rewards and carried party HP', () => {
+  const witness=dungeonJourney(43);expect(witness.won).toBe(true);
+  console.info(JSON.stringify({seed:witness.seed,battles:witness.battles.map(b=>({biome:b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome,kind:b.selection.kind,commands:b.commands,party:b.party}))}));
+  expect(witness.state.depth).toBe(1);expect(witness.state.floors.every(f=>f.completed===3)).toBe(true);
+},120000);
+
+it('legally clears both biome guardians and every encounter kind with carried rewards', () => {
+  const witness=dungeonJourney(198,2,true);expect(witness.won).toBe(true);
+  expect(witness.state.floors.map(f=>f.completed)).toEqual([3,3]);
+  expect(witness.battles).toHaveLength(6);
+  expect([...new Set(witness.battles.map(b=>b.selection.kind))].sort()).toEqual(['boss','elite','normal','vault']);
+  expect([...new Set(witness.battles.map(b=>b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome))].sort()).toEqual(['desert','forest']);
+  expect(witness.state.party).toEqual([{heroId:'fighter',hp:2},{heroId:'ranger',hp:0},{heroId:'mage',hp:0}]);
+},120000);
