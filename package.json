@@ -14,6 +14,8 @@
     "test": "playwright test",
     "test:unit": "vitest run",
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
+    "measure:verification": "node scripts/verification-timings.mjs",
+    "test:verification-tooling": "node --test tests/tooling/verification-timings.test.mjs",
     "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts",
     "posttest": "playwright test -c playwright.encounters.config.ts && playwright test -c playwright.run-items.config.ts",
     "telemetry:release": "node scripts/posthog-release.mjs",

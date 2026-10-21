@@ -47,6 +47,9 @@ After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/proto
 
 ## Browser smoke tests
 
+For repeatable per-stage build/test timings and before/after comparisons, see
+[verification timing baselines](docs/verification-timings.md).
+
 ```sh
 npx playwright install chromium
 npm run build
