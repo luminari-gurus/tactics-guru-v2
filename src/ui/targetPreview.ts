@@ -1,6 +1,6 @@
 import type { CellPosition } from '../content/types';
 import type { BattleSession } from '../app/BattleSession';
-import { actionCommand, type Action } from './hud';
+import { actionCommand, actionTargets, type Action } from './battleActions';
 import { lineOfSightBlocked, manhattanDistance } from '../domain/targeting';
 import { previewAttack, previewMagicMissile } from '../domain/combat';
 
@@ -41,7 +41,7 @@ export interface TargetOverlay {
 /** Presentation only: use the same preview as confirmation, without preparing a command or drawing RNG. */
 export function targetOverlays(session: BattleSession, action: Action | null, selected: CellPosition | null): TargetOverlay[] {
   if (session.phase !== 'player' || !action || action === 'move' || session.active.hasActed) return [];
-  const cells = session.state.units.filter(unit => unit.hp > 0 && unit.side !== session.active.side).map(unit => unit.cell);
+  const cells = actionTargets(session, action).map(unit => unit.cell);
   if (selected && !cells.some(cell => cell.x === selected.x && cell.y === selected.y)) cells.push(selected);
   return cells.map(cell => {
     const command = actionCommand(session, action, cell);

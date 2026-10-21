@@ -48,7 +48,36 @@ jobs:
       - name: Verify orchestration contracts
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run test:verification
-      - name: Combined fixtures (45 cases, one dev server)
+      - name: Verify exact fixture selection and plan
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          mkdir -p tmp/issue202-ci
+          npm run verify:full -- --list > tmp/issue202-ci/full-plan.txt
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { execFileSync } from 'node:child_process';
+          import { writeFileSync } from 'node:fs';
+          const select = config => {
+            const report = JSON.parse(execFileSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '-c', config, '--list', '--reporter=json'], { encoding: 'utf8' }));
+            const cases = [];
+            const walk = (suites, parents = []) => {
+              for (const suite of suites) {
+                const titles = [...parents, suite.title];
+                for (const spec of suite.specs ?? []) for (const test of spec.tests) cases.push(JSON.stringify([test.projectName, spec.file, ...titles.slice(1), spec.title]));
+                walk(suite.suites ?? [], titles);
+              }
+            };
+            walk(report.suites);
+            return cases.sort();
+          };
+          const combined = select('playwright.fixtures.config.ts');
+          const individual = ['encounters', 'run-items', 'abilities'].flatMap(name => select(`playwright.${name}.config.ts`)).sort();
+          assert.equal(combined.length, 57);
+          assert.equal(new Set(combined).size, 57);
+          assert.deepEqual(combined, individual);
+          writeFileSync('tmp/issue202-ci/fixture-selection.json', JSON.stringify(combined, null, 2));
+          JS
+      - name: Combined fixtures (57 cases, one dev server)
         if: ${{ !cancelled() && steps.browser.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue202-ci/fixtures.json
@@ -57,6 +86,19 @@ jobs:
         id: build
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run build
+      - name: Record updated toolchain and served build
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          node --input-type=module <<'JS'
+          import { createHash } from 'node:crypto';
+          import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)]);
+          const files = ['package.json', 'package-lock.json', 'playwright.config.ts', 'playwright.fixtures.config.ts', 'playwright.encounters.config.ts', 'playwright.run-items.config.ts', 'playwright.abilities.config.ts', 'scripts/verify-full.mjs', ...walk('dist')];
+          const versions = Object.fromEntries(['vite', 'rolldown', 'postcss', '@playwright/test'].map(name => [name, JSON.parse(readFileSync(`node_modules/${name}/package.json`, 'utf8')).version]));
+          const hashes = Object.fromEntries(files.map(path => [path, createHash('sha256').update(readFileSync(path)).digest('hex')]));
+          writeFileSync('tmp/issue202-ci/build-identity.json', JSON.stringify({ versions, hashes }, null, 2));
+          JS
       - name: Focused npm command (one case, no posttests)
         if: ${{ !cancelled() && steps.browser.outcome == 'success' && steps.build.outcome == 'success' }}
         env:
@@ -68,7 +110,7 @@ jobs:
           node --input-type=module <<'JS'
           import { readFileSync } from 'node:fs';
           import assert from 'node:assert/strict';
-          for (const [name, count] of [['fixtures', 45], ['focused', 1]]) {
+          for (const [name, count] of [['fixtures', 57], ['focused', 1]]) {
             const report = JSON.parse(readFileSync(`tmp/issue202-ci/${name}.json`, 'utf8'));
             assert.equal(report.stats.expected, count, `${name} passing count`);
             for (const key of ['unexpected', 'flaky', 'skipped']) assert.equal(report.stats[key], 0, `${name} ${key}`);

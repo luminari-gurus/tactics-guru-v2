@@ -30,7 +30,7 @@
     "@posthog/cli": "0.18.10",
     "@types/node": "26.6.4",
     "typescript": "7.0.2",
-    "vite": "8.3.2",
+    "vite": "8.3.5",
     "vitest": "5.0.3"
   }
 }

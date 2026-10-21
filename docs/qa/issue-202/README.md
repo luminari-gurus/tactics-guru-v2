@@ -68,3 +68,26 @@ production build and one focused boot case. It requires exact passing counts and
 zero failures, flaky results or skips, and retains separate JSON/artifacts.
 Runtime results will be recorded after the workflow completes. This authorization
 supersedes the self-hosted-only gate for this PR, not the wider epic.
+
+## Integration with current main — 2026-10-21
+
+The initial results above remain historical. Integrating main
+`f99765143ddd470b8115cea4993d68a16b767646` includes #211's ability picker,
+#213's native-select repair, patched Vite 8.3.5 and the proportional verification
+policy. Resolve the package/config/policy conflicts by retaining explicit fixture
+commands and the current policy; include all 12 ability-picker cases in the
+shared fixture lifecycle. Individual suite entry points remain supported.
+
+[Selection comparison](integration-selection.json) confirms the combined 57
+project/file/full-title entries exactly match the union of current-main's three
+individual suites: 24 encounters, 21 run-item and 12 ability-picker executions.
+Default selection remains 687 cases, with fixture files excluded. Seven existing
+orchestration contracts and focused npm discovery pass locally. Discovery used
+existing pinned local dependencies; it is not browser execution evidence.
+
+The PR-scoped hosted workflow now executes all 57 fixtures, seven orchestration
+contracts, the content/type/build pipeline, and exactly one focused npm boot case.
+It checks exact pass counts with no skipped/flaky/failed cases, compares combined
+versus individual fixture selection, and retains source/browser/toolchain/build
+identity with separate reports. Final runtime results belong to the PR and its
+retained Actions run; no new full gameplay regression or speedup is claimed.

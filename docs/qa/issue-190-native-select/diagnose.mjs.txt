@@ -1,0 +1,11 @@
+import {chromium,expect} from '@playwright/test';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+console.log({version:browser.version(),platform:process.platform,arch:process.arch});
+for(const keys of [['Home','ArrowDown'],['Space','Home','ArrowDown','Enter'],['ArrowDown','Enter'],['Space','ArrowDown','Enter'],['ArrowDown','Tab'],['Space','ArrowDown','Tab']]){
+ const page=await browser.newPage();await page.goto('http://127.0.0.1:4174');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.evaluate(()=>{window.events=[];for(const type of ['keydown','keyup','input','change','focus','blur'])document.querySelector('#battle-target').addEventListener(type,e=>window.events.push({type,key:e.key,value:e.target.value,index:e.target.selectedIndex,trusted:e.isTrusted,prevented:e.defaultPrevented}));});
+ const target=page.locator('#battle-target');await target.focus();
+ const steps=[];for(const key of keys){await page.keyboard.press(key);steps.push({key,value:await target.inputValue(),enabled:await page.locator('#battle-review').isEnabled()});}
+ console.log(JSON.stringify({keys,steps,events:await page.evaluate(()=>window.events)}));await page.close();
+}
+await browser.close();
