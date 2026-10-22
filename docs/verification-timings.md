@@ -158,3 +158,52 @@ continuation/restoration after failures, mode isolation, comparison compatibilit
 subprocess failure/timeout handling and real synthetic Vitest/Playwright reporting.
 The reporter fixtures intentionally contain failures, retries and skips; they use
 no browser fixture or server and do not alter production retry configuration.
+
+## Timeout recovery and per-case checkpoints (#219)
+
+On Linux, the timing runner observes descendants through `/proc` every 100 ms
+and again before termination. It retains PID/start-time identity and observed
+ancestry across detached process groups and reparenting; namespace-local PIDs are
+translated when `/proc` exposes an outer namespace. Cleanup sends TERM to verified
+owned processes, allows three seconds, escalates remaining identities to KILL,
+and waits for exit before returning the stage. Early launcher closure does not
+cancel escalation. Normal completion also cleans observed leftovers. The receipt
+records observed identities, escalated PIDs, survivors, errors and sampling mode.
+A cleanup error stops the capture rather than starting suites against a potentially
+contaminated host; ordinary test failures/timeouts still allow independent stages
+when cleanup succeeds. No port owners are killed and stale-server reuse stays off.
+
+This is observed-process lifecycle cleanup, not a containment boundary: a process
+that forks and reparents between observations can escape ancestry discovery.
+Unobserved inherited pipes are bounded and fail the capture. Linux qualification
+covers the actual long-lived Playwright/npm/Vite ancestry. Other platforms retain
+best-effort group/direct-child signaling and report `cleanup.complete=null`;
+detached descendants there are unverified. SIGKILL of the timing runner itself
+cannot execute cleanup. Inspect surviving workloads before removing its stale lock.
+
+Playwright additionally writes `<stage>-cases.jsonl` beside its final JSON, with
+planned count, test starts, completed attempts (including status, retry, project,
+worker, duration and errors), global errors and an end event when available. Each
+callback appends synchronously. The stage's `caseCheckpoint` reports completed
+attempts/unique IDs and whether the reporter ended. These are partial observations,
+not final outcome counts or passing coverage: missing final JSON, timeout and
+interrupt still fail the stage. A forcibly interrupted append or host loss can
+leave the final line incomplete; earlier lines remain raw evidence.
+
+`test:verification-tooling` includes detached-server timeout/interrupt/normal-exit
+contracts, unrelated sibling-process survival and real browser-free reporter
+interruption. A separate bounded qualification runs:
+
+```sh
+npm run build
+node --test tests/tooling/verification-browser.test.mjs
+```
+
+It launches actual Chromium and Vite preview/dev on port 4173, retains one completed
+canvas smoke before deliberately timing out a second case, then proves a fresh
+Playwright server can own that same port with `reuseExistingServer=false` and pass
+the smoke. Each mode has a 90-second contract bound. The dedicated #219 workflow
+uses the approved interim GitHub-hosted baseline capacity (15-minute job ceiling),
+not the in-progress self-hosted setup. It does not repeat the gameplay matrix,
+CPU/telemetry baseline, or replace #220/#221 follow-ups. Its logs, checkpoint JSONL,
+final reports and cleanup receipts are uploaded for 30 days.

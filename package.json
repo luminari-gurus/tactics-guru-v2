@@ -24,7 +24,7 @@
     "test:unit:all": "vitest run --config vitest.all.config.ts",
     "build:bundle": "vite build",
     "measure:verification": "node scripts/verification-timings.mjs",
-    "test:verification-tooling": "node --test tests/tooling/verification-timings.test.mjs tests/tooling/verification-reporters.test.mjs"
+    "test:verification-tooling": "node --test tests/tooling/verification-timings.test.mjs tests/tooling/verification-reporters.test.mjs tests/tooling/verification-processes.test.mjs"
   },
   "dependencies": {
     "@posthog/core": "1.59.1",
