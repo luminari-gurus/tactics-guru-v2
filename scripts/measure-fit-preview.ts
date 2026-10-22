@@ -110,7 +110,8 @@ export async function withPreview<T>(options: PreviewOptions & { remote: boolean
   process.on('SIGINT', sigint);
   process.on('SIGTERM', sigterm);
   let result: T | undefined, failure: unknown, failed = false;
-  const unexpectedExit = () => abort.abort(new Error(`Preview exited during capture\n${preview?.diagnostics()}`));
+  const previewExit = new Error('Preview exited during capture');
+  const unexpectedExit = () => abort.abort(previewExit);
   try {
     preview = ownedPreview(options);
     await preview.ready(abort.signal);
@@ -119,15 +120,27 @@ export async function withPreview<T>(options: PreviewOptions & { remote: boolean
     abort.signal.throwIfAborted();
   } catch (error) { failed = true; failure = error; }
   preview?.child.off('exit', unexpectedExit);
+  let cleanupFailure: unknown, cleanupFailed = false;
   try { await preview?.close(); }
-  catch (error) {
-    failure = failed ? new AggregateError([failure, error], `Capture failed: ${String(failure)}; cleanup failed: ${String(error)}`) : error;
-    failed = true;
-  } finally {
+  catch (error) { cleanupFailure = error; cleanupFailed = true; }
+  finally {
     process.off('SIGINT', sigint);
     process.off('SIGTERM', sigterm);
   }
-  if (!failed && abort.signal.aborted) { failed = true; failure = abort.signal.reason; }
+  if (abort.signal.aborted) {
+    const reason = abort.signal.reason;
+    // Exit aborts capture immediately; close above drains the diagnostic pipes
+    // (or reports bounded cleanup failure) before we snapshot their final tails.
+    const primary = reason === previewExit
+      ? new Error(`${previewExit.message}\n${preview?.diagnostics()}`, { cause: reason }) : reason;
+    failure = failed && failure !== reason
+      ? new AggregateError([primary, failure], `Capture aborted: ${String(primary)}; capture failed: ${String(failure)}`) : primary;
+    failed = true;
+  }
+  if (cleanupFailed) {
+    failure = failed ? new AggregateError([failure, cleanupFailure], `Capture failed: ${String(failure)}; cleanup failed: ${String(cleanupFailure)}`) : cleanupFailure;
+    failed = true;
+  }
   if (failed) throw failure;
   return result as T;
 }

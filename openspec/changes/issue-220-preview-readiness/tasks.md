@@ -14,6 +14,12 @@
 - [x] 3.1 Freeze implementation, run proportional units/orchestration/discovery/build and one isolated default production capture; retain all 18 samples or explicit failure, evaluate unchanged budgets and publish QA provenance.
 - [x] 3.2 Validate OpenSpec and documentation, update the continuation plan, commit/push and publish a focused review-ready PR; verify remote parity and PR head/base.
 
+## 4. PR #225 review repairs
+
+- [x] 4.1 Reproduce concurrent abort/capture rejection and retain the initiating SIGINT/SIGTERM or preview-exit cause alongside secondary capture/cleanup failures.
+- [x] 4.2 Reproduce trailing stderr after child exit; abort capture promptly and snapshot crash diagnostics only after bounded close/pipe drain.
+- [ ] 4.3 Run affected lifecycle/options/evaluation contracts and type checks, record source-bound evidence and reuse limits, publish fixes/replies, resolve addressed threads and verify final Git/PR state.
+
 ## Workflow follow-up
 
 - Leave the PR available for review; no merge, issue closure, production operation or archive is authorized here.

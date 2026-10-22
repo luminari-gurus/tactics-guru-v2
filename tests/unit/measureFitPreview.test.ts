@@ -173,6 +173,68 @@ describe('collector-owned preview', () => {
     } finally { clearTimeout(interruption); }
   });
 
+  it.each(['SIGINT', 'SIGTERM'] as const)('retains %s when browser closure also rejects capture', async interruption => {
+    const url = await freeUrl();
+    const secondary = new Error('browser closed during capture');
+    const handlers = process.listenerCount(interruption);
+    const error = await withPreview({ remote: false, url, command: [process.execPath, join(root, 'worker.mjs'), url, 'silent'] }, async activeSignal => {
+      const rejected = new Promise<never>((_done, reject) => activeSignal.addEventListener('abort', () => reject(secondary), { once: true }));
+      process.emit(interruption);
+      return rejected;
+    }).catch(error => error);
+    expect(error).toBeInstanceOf(AggregateError);
+    expect(error.message).toContain(interruption);
+    expect(error.errors).toContain(secondary);
+    expect(process.listenerCount(interruption)).toBe(handlers);
+    await expect(fetch(url)).rejects.toThrow();
+  });
+
+  it('retains preview exit when browser closure also rejects capture', async () => {
+    const url = await freeUrl();
+    const secondary = new Error('browser closed during capture');
+    const error = await withPreview({ remote: false, url, command: [process.execPath, join(root, 'worker.mjs'), url, 'silent'] }, async activeSignal => {
+      const rejected = new Promise<never>((_done, reject) => activeSignal.addEventListener('abort', () => reject(secondary), { once: true }));
+      void fetch(url + '/die').catch(() => {});
+      return rejected;
+    }).catch(error => error);
+    expect(error).toBeInstanceOf(AggregateError);
+    expect(error.message).toMatch(/Preview exited during capture.*exit=9/s);
+    expect(error.errors).toContain(secondary);
+    await expect(fetch(url)).rejects.toThrow();
+  });
+
+  it('aborts on exit before waiting for trailing stderr and retains it after pipe drain', async () => {
+    const url = await freeUrl();
+    let pid: number | undefined;
+    const events: string[] = [];
+    const originalEmit = ChildProcess.prototype.emit;
+    // Force the legal exit -> final pipe data -> close ordering without relying
+    // on platform-specific scheduling of the real child and its stderr pipe.
+    const ordered = vi.spyOn(ChildProcess.prototype, 'emit').mockImplementation(function (this: ChildProcess, event, ...args) {
+      const emitted = Reflect.apply(originalEmit, this, [event, ...args]);
+      if (this.pid === pid && event === 'exit') {
+        events.push('tail');
+        this.stderr!.emit('data', Buffer.from('FINAL VITE CRASH DETAIL'));
+      }
+      if (this.pid === pid && event === 'close') events.push('close');
+      return emitted;
+    });
+    try {
+      const error = await withPreview({ remote: false, url, command: [process.execPath, join(root, 'worker.mjs'), url, 'silent'] }, async activeSignal => {
+        pid = Number(await (await fetch(url + '/pid')).text());
+        const aborted = new Promise<never>((_done, reject) => activeSignal.addEventListener('abort', () => {
+          events.push('abort');
+          reject(activeSignal.reason);
+        }, { once: true }));
+        void fetch(url + '/die').catch(() => {});
+        return aborted;
+      }).catch(error => error);
+      expect(events).toEqual(['abort', 'tail', 'close']);
+      expect(error.message).toMatch(/Preview exited during capture.*exit=9.*stderr \(tail\):.*FINAL VITE CRASH DETAIL/s);
+      await expect(fetch(url)).rejects.toThrow();
+    } finally { ordered.mockRestore(); }
+  });
+
   it('aborts capture when the owned preview dies after readiness', async () => {
     const url = await freeUrl();
     await expect(withPreview({ remote: false, url, command: [process.execPath, join(root, 'worker.mjs'), url, 'silent'] }, async activeSignal => {
@@ -182,7 +244,7 @@ describe('collector-owned preview', () => {
     })).rejects.toThrow(/Preview exited during capture/);
   });
 
-  it('preserves capture failure alongside bounded cleanup failure', async () => {
+  it.each([false, true])('preserves capture and cleanup failures with concurrent interruption=%s', async interrupted => {
     const url = await freeUrl();
     const originalKill = ChildProcess.prototype.kill;
     let pid: number | undefined;
@@ -192,8 +254,11 @@ describe('collector-owned preview', () => {
     try {
       await expect(withPreview({ remote: false, url, graceMs: 50, command: [process.execPath, join(root, 'worker.mjs'), url, 'ignore'] }, async () => {
         pid = Number(await (await fetch(url + '/pid')).text());
+        if (interrupted) process.emit('SIGINT');
         throw new Error('original capture failure');
-      })).rejects.toThrow(/original capture failure.*cleanup failed.*Preview cleanup failed/s);
+      })).rejects.toThrow(interrupted
+        ? /SIGINT.*original capture failure.*cleanup failed.*Preview cleanup failed/s
+        : /original capture failure.*cleanup failed.*Preview cleanup failed/s);
     } finally {
       held.mockRestore();
       if (pid) process.kill(pid, 'SIGKILL');

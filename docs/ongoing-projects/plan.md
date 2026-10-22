@@ -1,6 +1,6 @@
 # Issue #220: reliable collector-owned preview startup
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and required qualification complete; [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225) is ready for review. OpenSpec change: `issue-220-preview-readiness`. No merge or production operation performed.
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and required qualification complete; both [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225) review findings are repaired and locally qualified, with publication/thread closeout in progress. OpenSpec change: `issue-220-preview-readiness`. No merge or production operation performed.
 
 - Issue: [#220](https://github.com/luminari-gurus/tactics-guru-v2/issues/220), DevOps: repair local performance collector preview readiness [P2].
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/220#issuecomment-6346084262).
@@ -17,6 +17,7 @@ The caller has now authorized implementation, focused tests, one capture, commit
 
 ## Continuation checkpoint
 
+- Review repair: both P2 findings reproduced against `1882cec` (five failing regressions) and repaired in the existing lifecycle helper. Preserve the initiating abort alongside secondary capture/cleanup errors; abort promptly on preview exit and defer its diagnostic snapshot until bounded close/pipe drain. Final affected contracts pass 67/67; both type scopes and two real Chromium browser-close checks pass. [Repair receipt](../qa/issue-220/review-repair.json) binds source/tests and compressed RED/GREEN/iteration/browser logs. Fourteen original input hashes and all app/assets are unchanged; reuse the earlier build/capture only for unchanged measurement behavior. No new sampling/build/full regression. Publish the fix and replies, resolve both addressed threads, then verify head/base/merge tree/parity and finish OpenSpec task 4.3.
 - Clean starting branch/HEAD: `233970a8730d886fe4d0fbad05285e0d142dd3b4`; fetched main remains `4f6614edee382def5f284a17e7f5872aafbbb02e`. #220 still assigned to `moshehbenavraham`; no existing implementation PR. #209 remains separate and open.
 - Recovered original artifact to ignored `tmp/issue-220/original-failure.zip`; extract bounded relevant receipts for durable QA records.
 - Initial Windows probe at unchanged collector source failed before binding because installed dependencies lack the Windows Rolldown native binding. Raw normal/colored stderr and `reproduction.json` are retained under `tmp/issue-220/`; repair via lockfile install before useful startup reproduction. This is a local setup failure, not an explanation of the historical hosted failure.
