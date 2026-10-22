@@ -1,7 +1,5 @@
 name: Issue 200 self-hosted verification timings
 on:
-  pull_request:
-    types: [labeled]
   workflow_dispatch:
     inputs:
       mode:
@@ -24,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   timings:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && ((github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings')) || (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'ready for work' && github.event.pull_request.number == 209 && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'work/issue-200-verification-timings' && github.actor == 'dubstylee'))
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 150
     steps:
@@ -32,7 +30,7 @@ jobs:
         run: date -u +%Y-%m-%dT%H:%M:%SZ > "$RUNNER_TEMP/issue200-job-start.txt"
       - uses: actions/checkout@v4
         with:
-          ref: 07f75d4bd17908d8dc81dd4bb02c2d19439eb898
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -65,7 +63,7 @@ jobs:
           RECEIPT: verification-receipts/timings/self-hosted-qualification-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           npm run measure:verification -- --stages tooling,typecheck-app,typecheck-domain --out "$RECEIPT" --conditions 'Self-hosted qualification only; not a full baseline'
-          npm run measure:verification -- compare "$RECEIPT/report.json" "$RECEIPT/report.json" > "$RECEIPT/self-comparison.json"
+          npm run --silent measure:verification -- compare "$RECEIPT/report.json" "$RECEIPT/report.json" > "$RECEIPT/self-comparison.json"
           cat "$RECEIPT/summary.md" >> "$GITHUB_STEP_SUMMARY"
         timeout-minutes: 5
       - name: Record source and runner conditions
