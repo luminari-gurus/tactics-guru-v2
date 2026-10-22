@@ -3,16 +3,25 @@
 Issue #200, part of epic #199. This tooling measures the existing verification
 plan; it does not change gameplay tests, suite selection, workers, retries or
 performance limits. PR #209 remains draft until the authoritative baseline is
-collected on the qualified self-hosted runner.
+collected and reviewed. The caller approved an interim GitHub-hosted baseline
+on 2026-10-21; migration to self-hosted capacity follows later.
 
 ## Capture on the qualified host
 
-Brian provisions the runner. First qualify its actual runner service account with
-#207 / PR #210, including browser launches, retained diagnostics and Phaser smoke
-checks. Install the locked dependencies, supported Node 24, lockfile-compatible
-Chromium/WebKit and required OS libraries using that setup. Do not launch the full
-baseline on GitHub-hosted capacity or silently fall back to it. Use an idle host
-and serialize browser/game-performance work across checkouts and workflows.
+The caller explicitly approved GitHub-hosted capacity to unblock #200. The
+branch-scoped `issue-200-hosted-baseline.yml` installs locked dependencies,
+Chromium/WebKit and OS libraries, verifies reporters, runs one sequential full
+capture and retains all receipts for 30 days even when tests fail. Its progress
+watchers do not rerun stages; a 110-minute outer limit leaves time for artifact
+upload before the 120-minute job limit. This is a named interim host class, not a
+claim that the future self-hosted machine has been qualified.
+
+Brian will provision that runner later. Qualify its actual service account under
+#207 / PR #210 before collecting the next baseline there. Record the changed host
+and compare it separately; do not attribute host differences to a code speedup.
+Install supported Node 24, locked dependencies and compatible browser/OS libraries.
+Keep browser/performance work sequential on either host. Hosted execution outside
+this explicit interim exception still requires caller authorization.
 
 ```sh
 npm run test:verification-tooling
