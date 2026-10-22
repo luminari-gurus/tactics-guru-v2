@@ -67,7 +67,14 @@ export class DungeonMap {
     grid.onclick=e=>{if(this.locked()||document.hidden)return;const cell=(e.target as HTMLElement).closest<HTMLElement>('[data-cell]');if(!cell)return;const destination=Number(cell.dataset.cell);if(neighbors(f.position).includes(destination)){this.move(destination);}else {feedback.textContent='Choose an adjacent cell or use the direction controls.';}};
     const feedback=el('p',`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/400 · Visited ${f.exploration.visited.length}. `);feedback.id='dungeon-map-feedback';feedback.setAttribute('role','status');
     const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
-    for(const [name,delta] of [['North',-20],['East',1],['South',20],['West',-1]] as const){const b=el('button',name);b.id=`dungeon-step-${name.toLowerCase()}`;b.type='button';b.disabled=s.phase!=='ready';b.onclick=()=>this.step(delta);directions.append(b);}
+    for(const [name,delta] of [['North',-20],['East',1],['South',20],['West',-1]] as const){
+      const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
+      button.append(el('span',name[0]));
+      const destination=f.position+delta;
+      button.disabled=s.phase!=='ready'||!neighbors(f.position).includes(destination)||!map.cells[destination];
+      button.onclick=()=>this.step(delta);directions.append(button);
+    }
+    const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
     const list=el('ul');list.setAttribute('aria-label','Discovered places');
     const entries=[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:s.depth===1?'Exit unavailable':'Available'},...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:p.encounterSlot<f.completed?'Cleared':p.encounterSlot===f.completed?(s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'):'Locked'})),{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:f.completed===3?'Unlocked':'Guardian locked'}];
     for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/20)+1}, column ${p.cell%20+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
