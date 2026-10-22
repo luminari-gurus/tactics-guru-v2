@@ -1,0 +1,34 @@
+{
+  "source": "233970a8730d886fe4d0fbad05285e0d142dd3b4",
+  "node": "v24.19.0",
+  "platform": "win32",
+  "vite": "8.3.5",
+  "observations": [
+    {
+      "color": false,
+      "pid": 15556,
+      "status": 200,
+      "lastHttpError": "TypeError: fetch failed",
+      "elapsedMs": 368.7461,
+      "oldGate": true,
+      "splitGate": false,
+      "stdout": "  ➜  Local:   http://127.0.0.1:4174/\n",
+      "stderr": "(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:\n  - import \"./types\" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension\n  - import \"./constants\" without a file extension (src/content/assets.ts:1:38). Add the file extension\n  - import \"./types\" without a file extension (src/content/assets.ts:2:43). Add the file extension\nSet `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.\n",
+      "exitCode": null,
+      "signal": "SIGTERM"
+    },
+    {
+      "color": true,
+      "pid": 26652,
+      "status": 200,
+      "lastHttpError": "TypeError: fetch failed",
+      "elapsedMs": 446.192,
+      "oldGate": false,
+      "splitGate": false,
+      "stdout": "  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://127.0.0.1:\u001b[1m4174\u001b[22m/\u001b[39m\n",
+      "stderr": "\u001b[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:\n  - import \"./types\" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension\n  - import \"./constants\" without a file extension (src/content/assets.ts:1:38). Add the file extension\n  - import \"./types\" without a file extension (src/content/assets.ts:2:43). Add the file extension\nSet `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.\u001b[39m\n",
+      "exitCode": null,
+      "signal": "SIGTERM"
+    }
+  ]
+}

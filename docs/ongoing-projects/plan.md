@@ -1,6 +1,6 @@
 # Issue #220: reliable collector-owned preview startup
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation plan only; collector code and tests have not been changed or executed for this handoff.
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation authorized and in progress; current OpenSpec change is `issue-220-preview-readiness`.
 
 - Issue: [#220](https://github.com/luminari-gurus/tactics-guru-v2/issues/220), DevOps: repair local performance collector preview readiness [P2].
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/220#issuecomment-6346084262).
@@ -13,7 +13,19 @@ Date: 2026-10-22 (Asia/Jerusalem). Status: implementation plan only; collector c
 
 Make `npm run measure:fit` start exactly one owned local Vite preview, recognize that preview within a bounded deadline independently of human-readable output, and await its cleanup on success or failure. Preserve actionable startup diagnostics, source/build identity, remote-origin behavior, strict port 4174 and all current measurement sampling and limits. Prove the startup/failure contract and one isolated local production capture without erasing prior failures or claiming the whole #200 baseline is complete.
 
-This request authorizes backlog selection, assignment, comments and publication of this plan. Implementation, new tests and capture execution await a subsequent implementation instruction. Use this single plan for the bounded repair; no additional planning framework or OpenSpec initialization is needed to resolve its scope.
+The caller has now authorized implementation, focused tests, one capture, commits, pushes and review-ready PR publication. Use the existing OpenSpec root and [issue-220 change](../../openspec/changes/issue-220-preview-readiness/proposal.md) to track implementation. No merge or production operation is authorized.
+
+## Continuation checkpoint
+
+- Clean starting branch/HEAD: `233970a8730d886fe4d0fbad05285e0d142dd3b4`; fetched main remains `4f6614edee382def5f284a17e7f5872aafbbb02e`. #220 still assigned to `moshehbenavraham`; no existing implementation PR. #209 remains separate and open.
+- Recovered original artifact to ignored `tmp/issue-220/original-failure.zip`; extract bounded relevant receipts for durable QA records.
+- Initial Windows probe at unchanged collector source failed before binding because installed dependencies lack the Windows Rolldown native binding. Raw normal/colored stderr and `reproduction.json` are retained under `tmp/issue-220/`; repair via lockfile install before useful startup reproduction. This is a local setup failure, not an explanation of the historical hosted failure.
+- Tool paths in this session: Node is bundled on PATH. npm CLI: `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/11.19.1/bin/npm-cli.js`; OpenSpec CLI: `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` (run both with Node). WSL also has npm/OpenSpec/gh available.
+- Scope remains minimal: private Vite IPC worker + lifecycle, collector integration, focused contracts, QA receipts. No shared harness, dependencies, runtime, assets or budgets need changing.
+- Reproduction and lifecycle implementation are complete. [QA reference](../qa/issue-220-preview-readiness.md) retains historical raw failure/metadata and actual normal/colored/chunked observations. Colored pinned Vite output deterministically misses the old predicate despite HTTP 200. Historical root cause remains unproved.
+- Focused final contracts: 62/62 pass (22 new + 40 existing). Production build passed 221 content cases, both type scopes and Vite; final helper/tests pass app TypeScript. Reuse unchanged content/domain evidence and bundle once after freezing HEAD to bake clean final identity. Default full-run discovery still has 19 stages; do not execute the full matrix.
+- Independent Windows orchestration assertion defect reproduced at exact main and repaired in [PR #224](https://github.com/luminari-gurus/tactics-guru-v2/pull/224), commit `39b7a7aefa5b7e96623415f955c31880d60660a8`; 10/10 portable contracts pass. This branch retains the unmodified test and its 9/10 Windows result. No collector dependency on that test-only PR.
+- Next: freeze/commit and publish the collector PR now; qualify local Chromium, build its production bundle, collect exactly one isolated default capture, retain/evaluate all results, and update this checkpoint and PR. No release tag is appropriate for this tooling repair.
 
 ## Selection from the complete backlog
 

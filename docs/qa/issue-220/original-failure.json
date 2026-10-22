@@ -1,0 +1,41 @@
+{
+  "runId": 39700595665,
+  "artifactId": 12396082054,
+  "artifactSha256": "748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b",
+  "source": {
+    "commit": "73d34dba1620174837cf15a93812d393abe690aa",
+    "dirty": false,
+    "inputHash": "92312fd122ec2912cb87be5622926c6d889fc50e60aa3223cbb8d4ffe817ab13"
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "osRelease": "6.17.0-1022-azure",
+    "cpus": 4,
+    "cpuModel": "AMD EPYC 7763 64-Core Processor",
+    "memoryBytes": 16766410752,
+    "CI": "true"
+  },
+  "conditions": "GitHub-hosted Ubuntu 24.04; fresh ephemeral host; locked dependencies and browsers installed; npm download cache may be warm; fresh app build/test caches; reporter qualification and browser preflight before timing; one sequential capture; lightweight 5-second progress watcher; no concurrent browser/performance jobs",
+  "performance": {
+    "id": "performance",
+    "command": [
+      "/opt/hostedtoolcache/node/24.21.0/x64/bin/node",
+      "/opt/hostedtoolcache/node/24.21.0/x64/lib/node_modules/npm/bin/npm-cli.js",
+      "run",
+      "measure:fit",
+      "--",
+      "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/timings/github-hosted-baseline/performance.json"
+    ],
+    "wallMs": 10583.642146999948,
+    "exitCode": 1,
+    "signal": null,
+    "timedOut": false,
+    "interrupted": false,
+    "error": null,
+    "status": "failed",
+    "reportError": "ENOENT: no such file or directory, stat '/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/timings/github-hosted-baseline/performance.json'"
+  },
+  "performanceJsonPresent": false
+}
