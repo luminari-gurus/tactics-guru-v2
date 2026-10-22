@@ -130,7 +130,9 @@ for(const route of ['/', '/run', '/dungeon'])for(const collapsed of [false,true]
   });
 }
 
- test('opt-in input report captures landscape touches locally',async({page})=>{
+test('opt-in input report captures landscape touches locally',async({browser,baseURL})=>{
+  const page=await browser.newPage({baseURL,hasTouch:true});
+  try {
   await page.setViewportSize({width:844,height:390});
   await page.goto('/?input-debug=1');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -144,4 +146,5 @@ for(const route of ['/', '/run', '/dungeon'])for(const collapsed of [false,true]
   expect(report.build.commit).toBeTruthy();
   await page.goto('/');
   await expect(page.getByText('Input report',{exact:true})).toHaveCount(0);
+  } finally { await page.close(); }
 });

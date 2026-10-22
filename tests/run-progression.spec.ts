@@ -1,4 +1,6 @@
 import {expect,test,type Page} from '@playwright/test';
+import {projectTile} from '../src/geometry/iso';
+import {pickTile} from '../src/geometry/picking';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {readSession,playCommand} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
@@ -50,16 +52,29 @@ async function prepare(page:Page){
 test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){
+  // Let the shared ResizeObserver/camera fit settle after restoring the HUD
+  // at an encounter boundary before deriving a pointer coordinate from its report.
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))));
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
   const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
   expect(board.selected).toBeNull();expect(board.selectionEvents).toBe(0);
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#battle-target')).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
   const runBefore=await snapshot(page);
-  const corner=board.tiles.find((t:{x:number;y:number})=>t.x===11&&t.y===11);
-  const x=(corner.x-corner.y)*40,y=(corner.x+corner.y)*20-corner.elevation*24;
-  await page.mouse.click(board.transform.x+x*board.transform.scale,board.transform.y+y*board.transform.scale);
-  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:11,y:11,elevation:corner.elevation});
+  // A new scene can start collapsed; expanding preserves that larger camera
+  // view, so a fixed far corner is not necessarily inside the drawable region.
+  const cell=board.tiles.find((tile:any)=>{
+   const local=projectTile(tile),picked=pickTile(board.tiles,local);
+   const x=board.transform.x+local.x*board.transform.scale,y=board.transform.y+local.y*board.transform.scale,r=board.region;
+   return picked?.x===tile.x && picked?.y===tile.y && x>r.x+10 && x<r.x+r.width-10 && y>r.y+10 && y<r.y+r.height-10
+    && board.units.every((unit:any)=>Math.hypot(local.x-unit.position.x,local.y-unit.position.y)>80);
+  });
+  expect(cell).toBeTruthy();const local=projectTile(cell);
+  const point={x:board.transform.x+local.x*board.transform.scale,y:board.transform.y+local.y*board.transform.scale};
+  const corner=projectTile(board.tiles.find((tile:any)=>tile.x===11&&tile.y===11));
+  await test.info().attach(`encounter-${index+1}-selection-geometry`,{contentType:'application/json',body:JSON.stringify({region:board.region,transform:board.transform,point,cell,originalCorner:{x:board.transform.x+corner.x*board.transform.scale,y:board.transform.y+corner.y*board.transform.scale}})});
+  await page.mouse.click(point.x,point.y);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:cell.x,y:cell.y,elevation:cell.elevation});
   expect(await snapshot(page)).toEqual(runBefore);
   // Each new scene owns exactly its current actor cue; a finished encounter tears it down.
   await expect.poll(async()=>{

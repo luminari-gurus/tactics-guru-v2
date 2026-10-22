@@ -1,6 +1,6 @@
 # Collapsible mobile battle HUD (#123)
 
-Current touch-input runtime: `443ab22`. Latest verification: 676 unit tests, 522 main Chromium + 39 posttests, 18 focused WebKit + 54 WebKit acceptance cases pass. Earlier matrices below retain their original source identities. See the final section and `iphone-touch/` for the iPhone-specific follow-up.
+Historical 2026-10-18 touch-input runtime: `443ab22`. Verification at that revision: 676 unit tests, 522 main Chromium + 39 posttests, 18 focused WebKit + 54 WebKit acceptance cases pass. Earlier matrices below retain their original source identities. See `iphone-touch/` for the iPhone-specific follow-up and the 2026-10-22 refresh below for current-main compatibility.
 
 Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/123
 Branch: `work/issue-123-collapsible-hud`; base `a009a3ec4c35b3e57adc58ac700e56721af9ae8f`.
@@ -81,3 +81,33 @@ The preview was verified to serve clean `443ab22` after publication. The caller 
 ## Reopened landscape investigation
 
 Caller reports portrait works but landscape pinch remains nonfunctional and pan mostly fails in both HUD states after the touch transport update. This remains unresolved. Added `?input-debug=1` local, bounded contact/geometry/reset capture with a copyable report; no network telemetry. Production build, 167 content checks, both typechecks, 7 input unit checks and 2 WebKit diagnostic checks pass. These checks verify the diagnostic tool, not resolution of the caller's failure.
+
+## Current-main mobile UI refresh — 2026-10-22
+
+Merged `main` at `4f6614edee382def5f284a17e7f5872aafbbb02e` into the PR in runtime commit `307c3766802b95c1428f88401f4b3384a32b7e6d`. Resolved five conflicts while retaining current ability-picker styles, hover/reach previews, overlap picking, right-click cancellation, layout-reset picking preservation, dungeon focus fallback and current run assertions. Native touch transport and the shared mobile collapse wrapper remain intact. The existing shared implementation was sufficient; no new runtime abstraction or dependency was added.
+
+Added dungeon coverage to the contact-stream HUD matrix and verified that explicit later abilities remain prepared across collapse. Dialog restoration chooses the visible collapsed toggle when needed and preserves the dungeon fallback elsewhere. Registered the HUD suite in the verification inventory. The original checkout's unrelated documentation edits were preserved; work used an isolated worktree.
+
+| Command / selection | Result |
+| --- | --- |
+| `npm run test:unit` | 908 tests / 52 files passed |
+| `npm run build` | 221 content tests, both TypeScript scopes and production bundle passed |
+| `npm run typecheck` after final test edits | Both scopes passed |
+| `npx playwright test tests/battle-hud-collapse.spec.ts tests/battle-board.spec.ts tests/layout.spec.ts tests/battle-loop.spec.ts tests/run-progression.spec.ts tests/dungeon.spec.ts --reporter=line` | 226 passed, 2 fixture failures retained; not a clean full-suite run |
+| Three-profile focused diagnostic, changed-save focus and legal-run selection | 8 passed, 1 portrait-run fixture failure retained |
+| `npx playwright test tests/run-progression.spec.ts -g 'legal run outcomes'` after final repair | All 3 profiles passed, including complete legal journeys, encounter transitions, state/replay and terminal resume/restart |
+| `npm run test:fixtures -- ability-picker.spec.ts` | All 12 cases passed; includes later-ability collapse preservation |
+| `npx playwright test -c playwright.hud.config.ts` | All 24 cases passed |
+| `npx playwright test -c playwright.device-acceptance.config.ts -g 'player HUD\|keyboard-only\|changed saved\|legal defeat reload\|run preparation\|review: recovery dismissal'` | All 14 selected cases passed |
+| `npx playwright test -c playwright.exploration.config.ts -g 'read-only entry, keyboard new dungeon'` | All 3 WebKit profiles passed: dungeon entry, action and active resume |
+| `openspec validate issue-123-collapsible-hud --strict`; `git diff origin/main --check` | Passed |
+
+The first browser attempt lacked the required Chromium executable and was interrupted; installing the configured Playwright browsers resolved setup. Its log remains retained. The completed broader run exposed a diagnostic fixture using `touchscreen.tap` in a non-touch desktop context; it now explicitly creates a touch-enabled context. The diagnostic and changed-save focus checks passed on all three Chromium profiles in the focused rerun.
+
+The other failure was a run fixture assuming cell (11,11) was visible after restoring expanded controls in encounter two. Waiting for layout frames alone did not repair it, and that failed intermediate result is retained. The current camera intentionally preserves the larger view initialized while collapsed. Final geometry attachments prove that in the portrait profile the old corner was at y=376.99 while the drawable region ended at y=318.25. The fixture now chooses visible, unobscured terrain with an asserted exact pick; fresh-scene selection, default Move, state equality, replay and terminal checks remain. All three final legal-run cases pass. JSON reports retain these geometry attachments.
+
+The application inputs and local built files are hashed in [source-build.json](issue-123-collapsible-hud/refresh-2026-10-22/source-build.json). The local preview build came from the precommit working tree with runtime inputs identical to `307c376`; its build metadata retains the earlier HEAD and dirty flag. The published branch preview was independently verified to embed clean `307c376`. Subsequent changes repair tests and update evidence only. The broader run was not frozen across test-only edits, so its original failures and focused final reruns are reported separately. Unchanged passing cases are reused under the merge-check policy; no full release, performance, telemetry or unrelated asset qualification is claimed.
+
+Inspected current screenshots: [collapsed portrait](issue-123-collapsible-hud/refresh-2026-10-22/chromium-portrait.png), [collapsed landscape](issue-123-collapsible-hud/refresh-2026-10-22/chromium-landscape.png), [expanded landscape](issue-123-collapsible-hud/refresh-2026-10-22/expanded-landscape.png). Desktop and native-touch Chromium device profiles plus WebKit emulation cover this refresh. WebKit contact-stream tests inject DOM contact records; native taps and Chromium CDP multitouch are distinct checks. No physical hardware was tested.
+
+The previously reported physical-iPhone Chrome landscape failure remains unreproduced by automation; this refresh does not claim to resolve that original report. The opt-in local input report and the unresolved investigation above remain available. Existing Vite extension and large-chunk warnings remain. Logs, JSON results, failures and screenshot evidence are retained under `refresh-2026-10-22/`; there were no configured retries in the selected reruns.
