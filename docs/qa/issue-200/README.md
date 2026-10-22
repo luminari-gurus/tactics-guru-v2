@@ -1,3 +1,5 @@
+> Current review status (2026-10-22): self-hosted qualification passed. See [the review handoff](self-hosted-qualification.md). The historical failures below remain unchanged; #200 full-baseline coverage is still open.
+
 # Issue #200: verification timing tooling
 
 ## Latest: approved GitHub-hosted attempt

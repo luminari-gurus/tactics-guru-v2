@@ -1,0 +1,101 @@
+{
+  "testedCheckout": "07f75d4bd17908d8dc81dd4bb02c2d19439eb898",
+  "testedInputHash": "c1fb2a91f63723f721d45cb80bba6d452497ff1d9713b18cf0c9816182bc7621",
+  "sourceCleanAtCapture": true,
+  "inputsUnchanged": true,
+  "integratedMain": "4f6614edee382def5f284a17e7f5872aafbbb02e",
+  "integratedCleanupPR": 222,
+  "qualification": {
+    "run": 39763731799,
+    "attempt": 1,
+    "job": 119773933320,
+    "conclusion": "success",
+    "runCreatedAt": "2026-10-22T10:31:24Z",
+    "jobStartedAt": "2026-10-22T10:31:26Z",
+    "jobCompletedAt": "2026-10-22T10:34:05Z",
+    "jobWallMs": 159000,
+    "runCreationToJobStartMs": 2000,
+    "queueNote": "Creation-to-job-start is a scheduling interval, not an isolated measured queue component. Local queueMs remains null.",
+    "timingReporterContractsPassed": 18,
+    "orchestrationContractsPassed": 10,
+    "diagnosticsRetentionContractsPassed": 1,
+    "contentCasesPassed": 221,
+    "bothTypeScopesAndViteBuild": "passed",
+    "twoEngineBootResizeCasesPassed": 2,
+    "lifecycleContractsPassed": 2,
+    "deliberatelyTimedOutInvocations": 2,
+    "fullBaselineCaptured": false
+  },
+  "environment": {
+    "capturedAt": "2026-10-22T10:33:58.485Z",
+    "setupStartedAt": "2026-10-22T10:31:29Z",
+    "setupAndQualificationMs": 149485,
+    "queueMs": null,
+    "node": "v24.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.8.0-139-generic",
+    "cpus": 6,
+    "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+    "memoryBytes": 8174178304,
+    "loadAverage": [
+      5.65,
+      2.98,
+      1.75
+    ],
+    "vite": "8.3.5",
+    "vitest": "5.0.3",
+    "playwright": "1.63.0",
+    "source": "07f75d4bd17908d8dc81dd4bb02c2d19439eb898",
+    "runnerName": "unraid-tactics-01",
+    "runnerOS": "Linux",
+    "runnerArch": "X64",
+    "runId": "39763731799",
+    "runAttempt": "1",
+    "hostClass": "self-hosted tactics-browser; persistent service-account caches",
+    "conditions": "Qualification only; background workloads unverified",
+    "notes": "Queue timing is available from this run/job API timestamps; setup/qualification precedes capture. Repository browser jobs are serialized; other host workloads require coordination."
+  },
+  "partialTiming": {
+    "scope": "partial",
+    "complete": true,
+    "passed": true,
+    "wallMs": 1452.047737,
+    "selectedStages": [
+      "tooling",
+      "typecheck-app",
+      "typecheck-domain"
+    ]
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "wallMs": 411.45206199999996,
+      "cleanupComplete": true
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed",
+      "wallMs": 782.549155,
+      "cleanupComplete": true
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed",
+      "wallMs": 130.53385000000003,
+      "cleanupComplete": true
+    }
+  ],
+  "artifact": {
+    "id": 12419775881,
+    "files": 28,
+    "bytes": 439902,
+    "sha256": "da18b4eaa6f025b1fafe708e153f26ad72d0828dc078d92a2bdca2074819d664",
+    "downloadVerified": true,
+    "expiresAt": "2026-11-21T10:33:58Z"
+  },
+  "intentionalFailures": "Diagnostics retention generates an intentional failure trace; both lifecycle contracts deliberately time out their second case. These are negative-test evidence, not unexpected suite failures.",
+  "remaining": "#200 comparable self-hosted full baseline/missing matrix coverage remains open; #220 collector startup remains separately tracked. Historical hosted failure remains failed/incomplete.",
+  "reuse": "Final workflow restores manual-only triggering/unpinned trusted dispatch checkout, suppresses npm banner for valid comparison JSON, and adds evidence docs. Tested runtime, test, package, build and browser config hashes remain unchanged."
+}
