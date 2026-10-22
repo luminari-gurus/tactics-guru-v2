@@ -1,0 +1,31 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 1772 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/_headers                               1.08 kB
+dist/index.html                             5.28 kB │ gzip:   1.86 kB
+dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+dist/assets/start-BOADROL2.js               0.06 kB │ gzip:   0.07 kB
+dist/assets/battleLayout-BVayxngr.js        0.55 kB │ gzip:   0.31 kB
+dist/assets/preload-helper-DjzSQ1t3.js      1.38 kB │ gzip:   0.75 kB
+dist/assets/rng-BCcJOpRP.js                 1.65 kB │ gzip:   0.81 kB
+dist/assets/index-AgTEWWth.js               1.75 kB │ gzip:   0.89 kB
+dist/assets/startBattleApp-B9D0617J.js      2.78 kB │ gzip:   1.17 kB
+dist/assets/browser-C-2WZqQQ.js             3.26 kB │ gzip:   1.37 kB
+dist/assets/view-BkTnGP2w.js                8.83 kB │ gzip:   3.51 kB
+dist/assets/startRunApp-FvW9EEqG.js        26.01 kB │ gzip:   8.87 kB
+dist/assets/start-BxcxqBPI.js           1,406.09 kB │ gzip: 363.88 kB
+
+✓ built in 496ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

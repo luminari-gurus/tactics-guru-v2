@@ -132,3 +132,5 @@ dialog button { touch-action: manipulation; }
   .battle-mode #battle-shell.hud-collapsed { grid-template-columns:minmax(0,1fr) 76px; }
   .battle-mode #battle-shell.hud-collapsed #battle-hud-toggle { margin:4px; }
 }
+.battle-mode #battle-ability { width:100%; min-width:0; margin:4px 0; }
+.battle-mode #battle-ability-info { font-size:.8rem; overflow-wrap:anywhere; }

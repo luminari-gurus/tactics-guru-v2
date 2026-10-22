@@ -34,7 +34,7 @@ const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
     goblin_archer: { ...base.enemies.goblin_archer, stats: { ...base.enemies.goblin_archer.stats, maxHp: 10, dexterity: dexterity.goblin_archer } } } };
 // A hand-built mid-battle snapshot: initiative 1, 3, 2, 4 with unit 1 active.
 function snapshot(): BattleState {
-  return { format: 1, versions: { rules: 1, rng: 1, content: contentVersion(catalog) }, seed: 7, rng: seedRng(7), mapId: map.id,
+  return { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed: 7, rng: seedRng(7), mapId: map.id,
     units: [
       { id: 1, side: 'player', defId: 'fighter', cell: { x: 0, y: 0 }, hp: 20, hasMoved: true, hasActed: true },
       { id: 2, side: 'player', defId: 'ranger', cell: { x: 0, y: 1 }, hp: 16, hasMoved: true, hasActed: false },
@@ -83,7 +83,7 @@ describe('battle creation', () => {
       expect(result.state.initiative).toEqual(orderInitiative(rolls.map(({ u, natural }) => ({ unitId: u.id, side: u.side, natural, dexterity: dexterity[u.defId] }))));
       expect(result.events.slice(4)).toEqual([{ type: 'turnStarted', unitId: result.state.initiative[0], round: 1 }]);
       expect(result.state).toMatchObject({ seed: 7, mapId: map.id, activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0,
-        versions: { rules: 1, rng: 1, content: contentVersion(catalog) } });
+        versions: { rules: 2, rng: 1, content: contentVersion(catalog) } });
       expect(readBattleState(copy(result.state), catalog)).toEqual({ ok: true, state: result.state });
       expect(readReplay({ format: 1, versions: result.state.versions, initial: result.state, commands: [] }, catalog).ok).toBe(true);
       expect(createBattle(map.id, 7, catalog)).toEqual(result);

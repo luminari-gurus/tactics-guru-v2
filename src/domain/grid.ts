@@ -1,5 +1,6 @@
 import type { CellPosition, ContentCatalog } from '../content/types';
 import { previewCommand, readBattleState } from './battle';
+import { movementEdgeCost } from './movementEdge';
 import { MOVEMENT_DIRECTIONS } from './constants';
 import type { BattleState, Command, CommandResult, Rejection } from './types';
 
@@ -27,9 +28,9 @@ function search(state: BattleState, unitId: number, catalog: ContentCatalog): Ma
       const tile = tiles.get(key(cell));
       if (!tile || cell.x < 0 || cell.y < 0 || cell.x >= map.width || cell.y >= map.height || occupied.has(key(cell))) continue;
       const terrain = catalog.terrains[tile.terrainId];
-      const uphill = Math.max(0, tile.elevation - from.elevation);
-      if (!terrain.walkable || uphill > stats.jump) continue;
-      const cost = current.cost + terrain.moveCost + uphill;
+      const edge = movementEdgeCost(from, tile, terrain, stats);
+      if (edge === null) continue;
+      const cost = current.cost + edge;
       if (cost > stats.move || cost >= (routes.get(key(cell))?.cost ?? Infinity)) continue;
       const route = { cell, cost, path: [...current.path, cell] };
       routes.set(key(cell), route); frontier.push(route);

@@ -1,0 +1,96 @@
+{
+  "runtimeCommit": "9b8ddb07e15602e3023c20279e490b346c2ec20e",
+  "buildStamp": {
+    "commit": "249fa0d4fb0ec407b9ffb02b09f99a33759cac31",
+    "dirty": true
+  },
+  "node": "v24.19.0",
+  "platform": "win32",
+  "playwright": "1.63.0",
+  "source": [
+    {
+      "path": "src/geometry/picking.ts",
+      "sha256": "9a999b60346c0f919e94f11e8201db4ba61ecffe457380f00d0bf35c47e89627",
+      "gitBlob": "a5fe226727b144f4f492862af512fb81d0083de1",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardRenderer.ts",
+      "sha256": "f8c08f34ea10ac6154d47e82c7d2e8f7c08eac6187ea0d65c6e9b2295e09d23b",
+      "gitBlob": "c2a0aa5eac67ed212f80cfa2dbaf9a14b7cf87b2",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardInput.ts",
+      "sha256": "ad8edb6828a4d8310626cd27016dda65485fb7ae83f11b610edd07dc1335a9dd",
+      "gitBlob": "eec189fa918a8c3eeed3a5cfd74a60645db170d8",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BattleScene.ts",
+      "sha256": "a3f5828601161df3ddaf8abdb185aed117309da559c091289711536fab3de999",
+      "gitBlob": "77aba681646e43d7b57fd404eaefe07d85144d9f",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cca93aa63c82908ae9c2efab0cf7d0166932d250276b17c41293238f502eda12",
+      "gitBlob": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+      "matchesPublishedRuntime": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "dist/assets/battleLayout-BVayxngr.js",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "dist/assets/battleLayout-C6wfuIJB.css",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "dist/assets/browser-CIRniBSj.js",
+      "sha256": "abbc96d2bfd1cc7ffb677edac2d4e291c4c4835e15a917b63fa83f035ffde2f2"
+    },
+    {
+      "path": "dist/assets/index-CD4v88Cr.js",
+      "sha256": "aeb21bb3b4f7faf7c6da82eceeb55ec1adcffa98ebe5fc26d5c3c01e65b96046"
+    },
+    {
+      "path": "dist/assets/preload-helper-DjzSQ1t3.js",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "dist/assets/rng-BCcJOpRP.js",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "dist/assets/start-BrN9LaMD.js",
+      "sha256": "4e0c9d437868117b4b461c55b65c7f30a002f16d53eced616412fc860b1c5173"
+    },
+    {
+      "path": "dist/assets/start-LnUKHICv.js",
+      "sha256": "59e37aad8cebc32a682c1ac1bc4c76ac369662366a6dc37f3db51271eb6e3de0"
+    },
+    {
+      "path": "dist/assets/startBattleApp-BDtrrzf0.js",
+      "sha256": "c72d252b76721040e010ee529abb05f31f8a9a74f5d6434dace4a419febe3f26"
+    },
+    {
+      "path": "dist/assets/startRunApp-Cnvc5Z3j.js",
+      "sha256": "3559462157a2073f1af4cad45f79ceb05a66f0543a512d34864241e269a852f0"
+    },
+    {
+      "path": "dist/assets/startRunApp-y3YtRGS5.css",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "dist/assets/view-BBW_du9E.css",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "dist/assets/view-CjckW5Wk.js",
+      "sha256": "5f78f4f5dc77b4e17a19beca917e214b09a929b1804c45235c5ae14ffbb20647"
+    }
+  ]
+}

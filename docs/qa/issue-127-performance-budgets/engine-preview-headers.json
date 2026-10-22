@@ -1,0 +1,84 @@
+{
+  "origin": "https://bd16aa53.tactics-guru-v2.pages.dev/",
+  "source": "ad50e392749ccb792ea9b10a1e10307cb5a7dc3c",
+  "records": [
+    {
+      "path": "/assets/index-B8Q2fkOA.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "b774045d72be6e0d4225c702867a6cc5714b55b156ae0581d2153da4d4e5f6ec"
+    },
+    {
+      "path": "/assets/battleLayout-BVayxngr.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "/assets/browser-HxjaKlpw.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "988f549cc4181c9c5d9fd68c73e4c67cc25ea2b90ef83447ce442604d159e60e"
+    },
+    {
+      "path": "/assets/preload-helper-DjzSQ1t3.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "/assets/rng-BCcJOpRP.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "/assets/start-BvJ86Qkl.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "99ce23fd92ad04048f0f7452144272d36a16359600eaf322f78b22e4de845065"
+    },
+    {
+      "path": "/assets/start-CTlkV5ZU.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "b676881cbe773ac17a639fe325cfb5918ab639a717a6f010dadb28bd94d96cdc"
+    },
+    {
+      "path": "/assets/startBattleApp-DskqUpaf.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "5223c55a3ae960d9bdcff978c7ee9caee61ac2994de7b729c1deb476292f2122"
+    },
+    {
+      "path": "/assets/startRunApp-DAUvoRE5.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "ee03b2e62af132d744497d5e223120a9afafd17f4cd6c2d2cc2e8abd42597724"
+    },
+    {
+      "path": "/assets/view-CE4vQ_9a.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cf0e6a0e4789b3d0613473657c5b61e6e7a4feff6029735c5983a69817264f79"
+    },
+    {
+      "path": "/assets/battleLayout-C6wfuIJB.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "/assets/startRunApp-y3YtRGS5.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "/assets/view-BBW_du9E.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    }
+  ]
+}

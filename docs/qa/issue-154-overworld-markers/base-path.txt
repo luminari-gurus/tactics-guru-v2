@@ -1,0 +1,32 @@
+npm notice run tactics-guru-v2@0.0.0 npx
+npm notice run 'playwright' test tests/overworld-map.spec.ts --grep art styles|markers follow|markers survive|art uses --output=tmp/issue-154-base-results
+[WebServer] npm notice run tactics-guru-v2@0.0.0 preview
+[WebServer] npm notice run vite preview --host 127.0.0.1 --base=/prototype/ --port 4173 --strictPort
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 18 tests using 1 worker
+
+  ✓   1 [desktop] › tests/overworld-map.spec.ts:339:1 › art styles preserve map data across all combinations and match legends (4.2s)
+  ✓   2 [desktop] › tests/overworld-map.spec.ts:475:1 › markers follow committed controls and preserve pending edits (650ms)
+  ✓   3 [desktop] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork success after a newer world (314ms)
+  ✓   4 [desktop] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork network after a newer world (216ms)
+  ✓   5 [desktop] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork decode after a newer world (210ms)
+  ✓   6 [desktop] › tests/overworld-map.spec.ts:656:1 › art uses configured base, bounded transfers and no battle requests (926ms)
+  ✓   7 [mobile-portrait] › tests/overworld-map.spec.ts:339:1 › art styles preserve map data across all combinations and match legends (5.2s)
+  ✓   8 [mobile-portrait] › tests/overworld-map.spec.ts:475:1 › markers follow committed controls and preserve pending edits (761ms)
+  ✓   9 [mobile-portrait] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork success after a newer world (375ms)
+  ✓  10 [mobile-portrait] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork network after a newer world (297ms)
+  ✓  11 [mobile-portrait] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork decode after a newer world (293ms)
+  ✓  12 [mobile-portrait] › tests/overworld-map.spec.ts:656:1 › art uses configured base, bounded transfers and no battle requests (1.4s)
+  ✓  13 [mobile-landscape] › tests/overworld-map.spec.ts:339:1 › art styles preserve map data across all combinations and match legends (6.5s)
+  ✓  14 [mobile-landscape] › tests/overworld-map.spec.ts:475:1 › markers follow committed controls and preserve pending edits (781ms)
+  ✓  15 [mobile-landscape] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork success after a newer world (331ms)
+  ✓  16 [mobile-landscape] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork network after a newer world (238ms)
+  ✓  17 [mobile-landscape] › tests/overworld-map.spec.ts:525:3 › markers survive delayed artwork decode after a newer world (324ms)
+  ✓  18 [mobile-landscape] › tests/overworld-map.spec.ts:656:1 › art uses configured base, bounded transfers and no battle requests (827ms)
+
+  18 passed (31.8s)

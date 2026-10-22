@@ -1,5 +1,44 @@
 # Signature abilities (#8)
 
+## Current ability controls (#162)
+
+The shared standalone/run battle HUD lists every owned non-basic ability in the
+**Ability** selector, ordered by ID. Changing the selector activates that exact
+ability; its named action button reactivates the selected ability after Move,
+Basic attack or cancellation. Selection prepares a preview only. Review action
+then Confirm executes the authoritative command. Move, Basic attack and Wait
+remain directly available, and spent budgets and locked phases disable actions
+with readable reasons.
+
+Range and target guidance come from the selected profile; hit/damage previews
+come from shared domain evaluation. Ordinary attacks target living enemies.
+Magic Missile may deliberately target a living ally within range and LOS, with a
+named **Friendly fire** warning in preview and confirmation. Its current minimum
+range excludes self-targeting. The HUD sends all missiles to the chosen creature;
+the domain's per-missile allocation API and spread rules are unchanged.
+
+Inspection and viewport changes retain ability/target/intent. Cancel, accepted
+commands, actor changes and restart discard stale intent; Continue reconstructs
+current availability without executing an uncommitted choice. Selection and
+cancellation do not change saved state, RNG or replay.
+
+Ownership currently comes from catalog `owners`. Production still has the same
+three hero signatures; extra test profiles demonstrate multiple choices per hero.
+There is no learned-level, limited-use or cooldown schema yet, so the HUD shows no
+invented values for those systems. Only attack, guardedAttack and magicMissile
+profiles are implemented; self-heal and cell/area mechanics remain future work.
+Additional well-formed ability IDs can use these existing profiles with bounded
+values and distinct existing owners. Canonical IDs remain required with their
+original kind and ordered owners. See `src/content/validate.ts` and
+[ability-picker acceptance](qa/issue-162-ability-picker.md).
+
+## Historical implementation and verification
+
+The sections below retain the original implementation sequence and test results.
+Their references to future UI integration and absent persistence describe those
+historical revisions, not the current application.
+
+
 Implementation branch: `codex/issue-8-signature-abilities`, based on merged #7 and #29.
 
 The first slice moves Basic Attack and Shortbow Shot into validated content while preserving
@@ -37,7 +76,9 @@ next-turn expiry is a game adaptation, not exact tabletop duration parity.
 The mapped slice uses the flat +2 rule: no Tumble-rank adjustment, distinct-source stacking,
 full attacks, or generic effects engine. Preview, resolution and attack events share the AC
 and accuracy calculation. Snapshots record only an active `guarded: true` on the Fighter;
-turn transitions remove it and emit expiry before `turnStarted`. UI and AI remain later work.
+turn transitions remove it and emit expiry before `turnStarted`. Shared effect projection now
+supplies HUD/inspection and the attack previews used by AI. Defeat removes guard; historical
+saves with inert defeated-unit guard remain readable. See [combat effects](combat-effects.md).
 
 ## Magic Missile replaces Ember Burst
 
@@ -130,3 +171,5 @@ production build (existing Phaser chunk-size warning); `git diff --check` passed
 passed all 117 configured browser regressions in 3.2 minutes. These exercise the current
 proof/content shell in desktop and mobile emulation; they do not claim a signature HUD
 or physical-device certification. #9 and #10 should consume the corrected shared preview.
+
+Additional guardedAttack profiles retain the domain’s Fighter-only guarded-effect lifecycle; the validator rejects other owners for that profile.

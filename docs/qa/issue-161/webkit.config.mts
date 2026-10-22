@@ -1,0 +1,3 @@
+import { defineConfig } from '/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/node_modules/@playwright/test/index.mjs';
+import base from '/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/playwright.config.ts';
+export default defineConfig({...base,webServer:{...base.webServer,cwd:'/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2'},testDir:'/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/tests',testMatch:'**/guarded-effects.spec.ts',outputDir:'/Users/brian/.codex/worktrees/issue-161-combat-effects/tactics-guru-v2/tmp/issue161-webkit',projects:base.projects.map(p=>({...p,name:p.name+'-webkit',use:{...p.use,browserName:'webkit',launchOptions:{}}}))});

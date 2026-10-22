@@ -22,7 +22,7 @@ function check(r:any,state?:BattleState) {
     if(state)expect(h.hp).toBe(state.units.find(v=>v.id===u.id)!.hp);
     expect(h.maxHp).toBe(definition.stats.maxHp);expect(h.ratio).toBe(healthFraction(h.hp,h.maxHp));
     expect(h.color).toBe(healthColor(h.ratio));expect(h.visible).toBe(h.hp>0);expect(h.interactive).toBe(false);
-    expect(h.position.x).toBeCloseTo(u.position.x,5);expect(h.position.y).toBeCloseTo(u.position.y+HEALTH_BAR.offsetY,5);
+    expect(h.position.x).toBeCloseTo(u.position.x,5);expect(h.position.y).toBeCloseTo(u.position.y-u.bobOffset+HEALTH_BAR.offsetY,5);
     expect(h.depth).toBeGreaterThan(u.depth);expect(h.depth).toBeLessThan(10000);
   }
   expect(r.depthOrder).toEqual([...r.depthOrder].sort((a:number,b:number)=>a-b));
@@ -165,7 +165,7 @@ test('real run reward healing carries into the next encounter without old bars',
   const healed:RunSnapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
   expect(healed.items.run.party.find(h=>h.heroId===hero.heroId)!.hp).toBeGreaterThan(hero.hp);
   await page.locator('#run-start-encounter').click();await ready(page);const state=(await readSession(page)).state,r=await settled(page);check(r,state);
-  expect(state.mapId).toBe('map:woodland_crossing');expect(r.units.filter((u:any)=>u.health.visible).length).toBe(state.units.filter(u=>u.hp>0).length);
+  expect(state.mapId).toBe('map:desert_woodland_crossing');expect(r.units.filter((u:any)=>u.health.visible).length).toBe(state.units.filter(u=>u.hp>0).length);
   await expect(page.locator('#battle-heading h1')).toHaveText('Encounter 2 of 3 · woodland crossing');
   await expect(page.locator('#run-progress')).toHaveText('Encounter 2 of 3 · woodland crossing');
   await page.screenshot({path:info.outputPath('health-second-encounter.png')});

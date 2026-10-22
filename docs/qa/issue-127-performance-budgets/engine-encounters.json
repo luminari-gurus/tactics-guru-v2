@@ -1,0 +1,1276 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-engine.config.ts"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\playwright-engine.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tmp/engine-encounters-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tmp/engine-encounters-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tmp/engine-encounters-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/cache-followup/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4208 --strictPort",
+      "cwd": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup",
+      "url": "http://127.0.0.1:4208/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "authored-encounters.spec.ts",
+      "file": "authored-encounters.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 13124,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:47:50.874Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-2df0a-ize-and-transformed-picking-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-9643088a5f620243a38b",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5554,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:04.810Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-c14a4-ize-and-transformed-picking-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-9ff734b579129eb73803",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5676,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:11.192Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-e3381-ize-and-transformed-picking-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-34f8a9d5b4a4e046a788",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5571,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 62
+                    },
+                    "snippet": "  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 62
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:17.677Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-unknow-a61eb-s-before-board-construction-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 62
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-fda3e40ec7c2b7dc8711",
+          "file": "authored-encounters.spec.ts",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5557,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:24.043Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-fd20a-g-produces-controlled-error-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-2dd655cb8109a414f4da",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5565,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:30.374Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-63cc9-e-produces-controlled-error-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-8b93cfb0a8dfe040a2f5",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        },
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5546,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:36.751Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-2df0a-ize-and-transformed-picking-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-b0b19289b4401df13b8a",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5565,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:43.092Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-c14a4-ize-and-transformed-picking-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-527e6b18e95fb369ec72",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5591,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:49.454Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-e3381-ize-and-transformed-picking-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-50aa4cbabe0f417a004c",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5558,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 62
+                    },
+                    "snippet": "  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 62
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:48:55.839Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-unknow-a61eb-s-before-board-construction-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 62
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-979ad4667d9d4a9fe390",
+          "file": "authored-encounters.spec.ts",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 10,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5567,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:02.174Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-fd20a-g-produces-controlled-error-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-60c89e26b0162a18bb8c",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5567,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:08.524Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-63cc9-e-produces-controlled-error-mobile-portrait\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-5cc7a453d4e41c198892",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        },
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5563,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:14.880Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-2df0a-ize-and-transformed-picking-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-4ce9f08a56a43b2c7eea",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5568,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:21.246Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-c14a4-ize-and-transformed-picking-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-a8b1c09b0491d3825afb",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5553,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 125,
+                      "line": 9
+                    },
+                    "snippet": "   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 125,
+                        "line": 9
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"game\"></div>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   7 | const entry='tests/fixtures/encounters/index.html';\n   8 | async function report(page:Page) { return page.locator('#game').evaluate(e=>JSON.parse((e as HTMLElement).dataset.battleReport!)); }\n>  9 | async function ready(page:Page,id:string) { await page.goto(`${entry}?encounter=${id}`);await expect(page.locator('#game')).toHaveAttribute('data-ready','true'); }\n     |                                                                                                                             ^\n  10 | async function selectVisible(page:Page, side=false) {\n  11 |   const r=await report(page);\n  12 |   let chosen: {tile:Tile;point:{x:number;y:number}}|undefined;\n    at ready (C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:9:125)\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:29:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:27.592Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-encoun-e3381-ize-and-transformed-picking-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 125,
+                    "line": 9
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-16b3e953bed1a0d10db4",
+          "file": "authored-encounters.spec.ts",
+          "line": 27,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 15,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5567,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 62
+                    },
+                    "snippet": "  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 62
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('status')\nExpected: \u001b[32m\"Error: Unknown encounter\"\u001b[39m\nReceived: \u001b[31m\"Loading\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  60 | test('unknown encounter fails before board construction',async({page})=>{\n  61 |   await page.goto(`${entry}?encounter=encounter:missing`);\n> 62 |   await expect(page.getByRole('status')).toHaveText('Error: Unknown encounter');\n     |                                          ^\n  63 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  64 | });\n  65 | for(const failure of ['missing','decode'])test(`required asset ${failure} produces controlled error`,async({page})=>{\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:62:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:33.939Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-unknow-a61eb-s-before-board-construction-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 62
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-40dbafe60c5df5e434e4",
+          "file": "authored-encounters.spec.ts",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 16,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5556,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:40.318Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-fd20a-g-produces-controlled-error-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-a437ee5d82cf7c40979a",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5563,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                      "column": 42,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                        "column": 42,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('status')\nExpected substring: \u001b[32m\"Error: Asset load failed\"\u001b[39m\nReceived string:    \u001b[31m\"Loading\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('status')\u001b[22m\n\u001b[2m    14 × locator resolved to <span id=\"status\" role=\"status\">Loading</span>\u001b[22m\n\u001b[2m       - unexpected value \"Loading\"\u001b[22m\n\n\n  66 |   await page.route('**/proof/fighter.png',route=>failure==='missing'?route.fulfill({status:404,body:''}):route.fulfill({status:200,contentType:'image/png',body:'invalid png'}));\n  67 |   await page.goto(`${entry}?encounter=encounter:woodland_crossing`);\n> 68 |   await expect(page.getByRole('status')).toContainText('Error: Asset load failed');\n     |                                          ^\n  69 |   await expect(page.locator('#game')).toHaveAttribute('data-ready','false');\n  70 |   expect(await page.locator('#game').getAttribute('data-battle-report')).toBeNull();\n  71 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts:68:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:49:46.707Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tmp\\engine-encounters-artifacts\\authored-encounters-requir-63cc9-e-produces-controlled-error-mobile-landscape\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\cache-followup\\tests\\authored-encounters.spec.ts",
+                    "column": 42,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-30835e28cba99db608b9",
+          "file": "authored-encounters.spec.ts",
+          "line": 65,
+          "column": 43
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T07:47:49.173Z",
+    "duration": 123960.336,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 18,
+    "flaky": 0
+  }
+}

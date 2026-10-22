@@ -56,3 +56,33 @@ The #73 integration provides `BattleSession.fromSnapshot(catalog, input, accepte
 The continuation tests compare decoded presentation snapshots against the **uninterrupted session's actual queued command, events and resulting state**, including seed 2/command 29 (archer 5 attacks without moving and must next Wait). Full authored battles for seeds 1–5 cover every accepted boundary. The original session's replay history is **not** contained in this snapshot; do not pass a mid-battle snapshot as `Replay.initial`, which requires an exact seed-created start. Fresh sessions expose a complete `replay`. Resumed sessions expose `replay: null` and `continuation: {snapshot, commands, events}`, recording only post-resume commands/events. Neither hydration nor diagnostic reads generate history, sounds or RNG draws. Session tests compare actual hydrated and uninterrupted queues for every boundary across seeds 1-5; browser coverage is recorded separately in the issue #73 QA report.
 
 The [#72 adapter](battle-storage.md) supplies Phaser-namespaced primary/backup storage, guarded failures, raw-data preservation and documented interrupted-write ordering without changing this pure codec. The #73 coordinator connects it to hydration, autosave, Continue/recovery/export controls and guarded restart invalidation. #74 retains physical persistence/lifecycle certification. Persistence is origin-scoped and best-effort. No live UI, Godot importer, run/reward model, deployment or parent-epic closure belongs to this codec contract.
+
+## Procedural run snapshots: format 2
+
+Run snapshots now require `{items, activeBattle, battlefield}`. `battlefield` is
+null without an active battle. Authored descriptors contain `encounterId`, `kind`,
+`mapId`, `mapHash`; generated descriptors also contain `layoutSeed`, `biome`,
+`generatorVersion`, `profileVersion`. Exact keys and bounded IDs/hashes are checked
+before canonical comparison; no geometry is accepted from saved input.
+
+Restoration validates run/items, derives the expected encounter seed and complete
+map from trusted source configuration, compares the descriptor/full-map hash,
+projects equipment and surviving heroes, then hydrates battle state. Source
+configuration contributes to the run envelope identity. The existing 32,768-code-
+unit cap and digest remain unchanged. Regression tests cover maximum inventory,
+roster and numeric widths within this cap.
+
+Run replay records carry the same descriptor alongside the existing replay fields.
+Canonical entry construction rejects altered source, seed, hash, HP, equipment,
+roster and initiative. Resumed session continuation records carry the descriptor
+and accepted snapshot/commands; they do not fabricate a full pre-resume replay.
+Committed events, audio, animation and rewards are not replayed on Continue.
+
+Run format 1, unsupported source versions and rules version 1 are incompatible.
+No migration or generator-version registry is provided. Existing recovery/export
+controls preserve original primary/backup bytes until explicit removal/reset.
+For rollback, restore authored source configuration and report incompatible run
+identities; export retained bytes before choosing Start new run. Do not convert,
+delete or silently resolve a saved recipe with a different generator. Independent
+single-battle storage keeps its existing namespace and recovery behavior; the rules
+version change explicitly rejects its old autonomous-decision saves too.

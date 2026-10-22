@@ -1,0 +1,106 @@
+[WebServer] (node:17764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+[WebServer]   - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+[WebServer]   - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 3 tests using 1 worker
+
+(node:17806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › tests/battle-loop.spec.ts:66:1 › clearing the native movement destination clears intent and preview without changing saves (6.1s)
+(node:17826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Cancel resets destination and permits native same-destination retry (6.1s)
+(node:17845) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Escape resets destination and permits native same-destination retry (6.1s)
+
+
+  1) [desktop] › tests/battle-loop.spec.ts:66:1 › clearing the native movement destination clears intent and preview without changing saves
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#battle-review')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" locator('#battle-review') with timeout 5000ms
+      - waiting for locator('#battle-review')
+        14 × locator resolved to <button disabled id="battle-review">Review action</button>
+           - unexpected value "disabled"
+
+
+      70 |   const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+      71 |   await target.focus();await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');
+    > 72 |   await expect(review).toBeEnabled();
+         |                        ^
+      73 |   const pending=(await session(page)).pending;expect(pending?.type).toBe('move');
+      74 |   await target.focus();await page.keyboard.press('Home');
+      75 |   await expect(target).toHaveValue('');
+        at /Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2/tests/battle-loop.spec.ts:72:24
+
+    Error Context: ../../../../../../tmp/tg157-baseline-results/battle-loop-clearing-the-n-819ea-view-without-changing-saves-desktop/error-context.md
+
+  2) [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Cancel resets destination and permits native same-destination retry
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#battle-review')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" locator('#battle-review') with timeout 5000ms
+      - waiting for locator('#battle-review')
+        14 × locator resolved to <button disabled id="battle-review">Review action</button>
+           - unexpected value "disabled"
+
+
+       99 |     const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+      100 |     await target.focus();await page.keyboard.press('Space');await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+    > 101 |     await expect(review).toBeEnabled();
+          |                          ^
+      102 |     const destination=await target.inputValue(),pending=(await session(page)).pending;
+      103 |     expect(pending?.type).toBe('move');
+      104 |     await review.click();await expect(page.getByRole('dialog')).toBeVisible();
+        at /Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2/tests/battle-loop.spec.ts:101:26
+
+    Error Context: ../../../../../../tmp/tg157-baseline-results/battle-loop-movement-confi-cf69a-tive-same-destination-retry-desktop/error-context.md
+
+  3) [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Escape resets destination and permits native same-destination retry
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#battle-review')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" locator('#battle-review') with timeout 5000ms
+      - waiting for locator('#battle-review')
+        14 × locator resolved to <button disabled id="battle-review">Review action</button>
+           - unexpected value "disabled"
+
+
+       99 |     const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+      100 |     await target.focus();await page.keyboard.press('Space');await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+    > 101 |     await expect(review).toBeEnabled();
+          |                          ^
+      102 |     const destination=await target.inputValue(),pending=(await session(page)).pending;
+      103 |     expect(pending?.type).toBe('move');
+      104 |     await review.click();await expect(page.getByRole('dialog')).toBeVisible();
+        at /Users/brian/.codex/worktrees/issue-157-baseline-check/tactics-guru-v2/tests/battle-loop.spec.ts:101:26
+
+    Error Context: ../../../../../../tmp/tg157-baseline-results/battle-loop-movement-confi-cbaa4-tive-same-destination-retry-desktop/error-context.md
+
+  3 failed
+    [desktop] › tests/battle-loop.spec.ts:66:1 › clearing the native movement destination clears intent and preview without changing saves
+    [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Cancel resets destination and permits native same-destination retry
+    [desktop] › tests/battle-loop.spec.ts:95:3 › movement confirmation Escape resets destination and permits native same-destination retry

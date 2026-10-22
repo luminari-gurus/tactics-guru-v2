@@ -1,4 +1,6 @@
-import type { ContentCatalog, MapId } from '../content/types';
+import type { BattlefieldEncounter } from '../content/battlefieldTypes';
+import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
+import type { ContentCatalog } from '../content/types';
 import type { ItemCatalog } from '../content/itemTypes';
 import { contentVersion, readBattleState } from './battle';
 import { canonical, hashJson } from './contentIdentity';
@@ -10,16 +12,16 @@ import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
-export const RUN_SAVE_FORMAT = 1;
+export const RUN_SAVE_FORMAT = 2;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
   readonly definition: RunDefinition;
-  readonly encounters: readonly { readonly id: string; readonly mapId: MapId }[];
+  readonly encounters: readonly BattlefieldEncounter[];
   readonly catalog: ContentCatalog;
   readonly items: ItemCatalog;
 }
-export interface RunSnapshot { readonly items: RunItems; readonly activeBattle: BattleState | null }
+export interface RunSnapshot { readonly items: RunItems; readonly activeBattle: BattleState | null; readonly battlefield: BattlefieldDescriptor | null }
 export type RunSnapshotRead = { readonly ok: true; readonly state: RunSnapshot } | SaveFailure;
 
 /** Equipment is projected exactly once; absent heroes are removed from the encounter roster.
@@ -28,29 +30,38 @@ export function runBattleCatalog(items: RunItems, context: RunSaveContext): Cont
   const projected = projectItemCatalog(items, context.definition, context.catalog, context.items);
   const encounter = context.encounters.find(e => e.id === items.run.encounters[items.run.encounterIndex]);
   if (!projected.ok || !encounter || items.run.phase !== 'battle') return null;
-  const map = projected.catalog.maps[encounter.mapId];
-  if (!map) return null;
+  const resolved = resolveRunBattlefield(items, context);
+  if (!resolved?.ok) return null;
+  const map = resolved.map;
   const living = new Set(items.run.party.filter(h => h.hp > 0).map(h => h.heroId));
   return { ...projected.catalog, maps: { ...projected.catalog.maps, [map.id]: { ...map,
     spawns: map.spawns.filter(s => s.side === 'enemies' || living.has(s.unitId)) } } };
 }
 
+/** Resolve complete geometry before survivor/equipment projection or hydration. */
+export function resolveRunBattlefield(items:RunItems, context:RunSaveContext) {
+  const encounter=context.encounters.find(e=>e.id===items.run.encounters[items.run.encounterIndex]);
+  if(!encounter)return null;
+  return resolveBattlefield(encounter,deriveRunSeed(items.run.seed,'encounter',items.run.encounterIndex),context.catalog);
+}
+
 export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSnapshotRead {
   const invalid = { ok: false, reason: 'invalidState' } as const;
-  if (!hasShape(input, ['items', 'activeBattle'])) return invalid;
+  if (!hasShape(input, ['items','activeBattle','battlefield'])) return invalid;
   const checked = readRunItems(input.items, context.definition, context.catalog, context.items);
   if (!checked.ok) return invalid;
   const items = checked.state;
-  if (input.activeBattle === null) return { ok: true, state: { items, activeBattle: null } };
+  if (input.activeBattle === null) return input.battlefield === null ? { ok: true, state: { items, activeBattle: null, battlefield:null } } : invalid;
+  const resolved=resolveRunBattlefield(items,context);
+  if(!resolved?.ok || !sameBattlefield(input.battlefield,resolved.descriptor))return invalid;
   const catalog = runBattleCatalog(items, context);
   if (!catalog) return invalid;
   const battle = readBattleState(input.activeBattle, catalog);
-  const encounter = context.encounters.find(e => e.id === items.run.encounters[items.run.encounterIndex]);
-  if (!battle.ok || battle.state.mapId !== encounter?.mapId ||
+  if (!battle.ok || battle.state.mapId !== resolved.map.id ||
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
   // No healing exists during a battle. Entry HP is the upper bound, not live HP.
   if (battle.state.units.some(u => u.side === 'player' && u.hp > items.run.party.find(h => h.heroId === u.defId)!.hp)) return invalid;
-  return { ok: true, state: { items, activeBattle: battle.state } };
+  return { ok: true, state: { items, activeBattle: battle.state, battlefield:resolved.descriptor } };
 }
 
 function identity(context: RunSaveContext) {
@@ -75,6 +86,9 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
   const expected = identity(context);
   if (input.kind !== RUN_SAVE_KIND || input.format !== RUN_SAVE_FORMAT || input.identity.content !== expected.content ||
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
+  if(hasShape(input.payload,['items','activeBattle','battlefield']) &&
+    hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
+    input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, context);
   if (!read.ok) return read;
   const body = { kind: RUN_SAVE_KIND, format: RUN_SAVE_FORMAT, identity: expected, payload: read.state };

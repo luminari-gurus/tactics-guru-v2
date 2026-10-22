@@ -1,0 +1,20 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:verification
+> node --test tests/tooling/verify-full.test.mjs
+
+✔ required failures do not suppress later suites and fail the aggregate (1.679946ms)
+✔ failed build blocks stale preview but still runs dev fixtures and restoration (0.413183ms)
+✔ signals, spawn errors and exceptions remain failures; results are checkpointed (0.546641ms)
+✔ all successful stages pass and fixture selection is combined exactly once (0.188541ms)
+✔ explicit modes isolate inherited build/report flags but preserve browser selection (0.258439ms)
+✔ aggregate refuses filters that could silently narrow required coverage (0.951426ms)
+✔ actual child process exit codes preserve later execution and separate logs (185.273874ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 316.461151

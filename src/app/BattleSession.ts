@@ -1,3 +1,5 @@
+import { reportFailure, setTelemetryContext } from '../telemetry/telemetry';
+import type { BattlefieldDescriptor } from '../domain/battlefield';
 import { createRunBattle } from '../domain/runBattle';
 import type { RunSaveContext } from '../domain/runSaveEnvelope';
 import type { ContentCatalog, MapId } from '../content/types';
@@ -30,29 +32,30 @@ export class BattleSession {
   phase: SessionPhase;
   error: string | null = null;
   readonly resumed: boolean;
-  constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState, fresh = false) {
+  constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState, fresh = false, readonly battlefield?: BattlefieldDescriptor) {
     this.resumed = typeof mapId !== 'string' && !fresh;
     const created = typeof mapId === 'string' ? createBattle(mapId, seed, catalog) : readBattleState(mapId, catalog);
     if (!created.ok) throw new Error(`Could not create battle: ${created.reason}`);
     this.current = this.initial = freeze(created.state);
     this.phase = this.decisionPhase();
+    setTelemetryContext({ phase: this.phase });
   }
   static fromRun(entry: unknown, context: RunSaveContext, accepted?: AcceptedState) {
     const created = createRunBattle(entry, context);
-    return created.ok ? { ok: true as const, session: new BattleSession(created.catalog, created.state, created.state.seed, accepted, true) } : created;
+    return created.ok ? { ok: true as const, session: new BattleSession(created.catalog, created.state, created.state.seed, accepted, true, created.battlefield) } : created;
   }
-  static fromSnapshot(catalog: ContentCatalog, input: unknown, accepted?: AcceptedState):
+  static fromSnapshot(catalog: ContentCatalog, input: unknown, accepted?: AcceptedState, battlefield?: BattlefieldDescriptor):
     { ok: true; session: BattleSession } | { ok: false; reason: 'invalidState' } {
     const read = readBattleState(input, catalog);
     if (!read.ok) return { ok: false, reason: 'invalidState' };
-    return { ok: true, session: new BattleSession(catalog, read.state, read.state.seed, accepted) };
+    return { ok: true, session: new BattleSession(catalog, read.state, read.state.seed, accepted, false, battlefield) };
   }
   get state() { return this.current; }
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): Replay | null { return this.resumed ? null : freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands]}); }
-  get continuation() { return this.resumed ? freeze({snapshot:this.initial, commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
+  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
+  get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
     if (command.type === 'move') return previewMove(this.current, command, this.catalog);
@@ -91,6 +94,7 @@ export class BattleSession {
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);
     this.phase = 'presenting';
+    setTelemetryContext({ phase: 'presenting' });
     // Observers cannot undo an accepted command or prevent its presentation.
     try { this.accepted?.(this.current); } catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
@@ -98,8 +102,9 @@ export class BattleSession {
   finishPresentation(token: number) {
     if (this.phase !== 'presenting' || token !== this.generation) return;
     this.phase = this.decisionPhase();
+    setTelemetryContext({ phase: this.phase });
     if (this.phase !== 'enemy') this.enemyQueue = [];
   }
-  private fail(reason: string) { this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
+  private fail(reason: string) { reportFailure('battle_resolution', { phase: this.phase }); this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
   dispose() { this.generation++; this.phase = 'disposed'; this.intent = null; this.enemyQueue = []; }
 }

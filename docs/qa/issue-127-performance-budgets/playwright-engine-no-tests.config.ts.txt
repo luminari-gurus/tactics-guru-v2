@@ -1,0 +1,17 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import standard from '../playwright.config';
+import webkit from '../playwright.device-acceptance.config';
+import encounters from '../playwright.encounters.config';
+import items from '../playwright.run-items.config';
+const suite=process.env.TG_SUITE??'browser';
+const base=suite.startsWith('webkit')?webkit:suite==='encounters'?encounters:suite==='items'?items:standard;
+const prefix=suite==='prefix',repaired=process.env.TG_REPAIRED==='1',dev=suite==='encounters'||suite==='items';
+const url=prefix?(repaired?'http://127.0.0.1:4211/tactics/':'http://127.0.0.1:4207/tactics/'):dev?'http://127.0.0.1:4208/':repaired?'http://127.0.0.1:4210/':'http://127.0.0.1:4206/';
+export default defineConfig({...base,testDir:resolve('tests'),
+ ...(prefix?{testMatch:'**/public-asset-base.spec.ts'}:{}),
+ ...(suite==='webkit-boundaries'?{testMatch:'**/public-asset-base.spec.ts',grep:/direct entry and refresh|image .*controlled|extracted map route|built startup hints/}:{}),
+ ...(process.env.TG_SMOKE==='1'?{testMatch:'**/public-asset-base.spec.ts',grep:/^battle direct entry and refresh/}:{}),
+ use:{...base.use,baseURL:url},outputDir:resolve('tmp','engine-'+(process.env.TG_ATTEMPT??'')+suite+'-artifacts'),
+ reporter:[['line'],['json',{outputFile:resolve('tmp','engine-'+(process.env.TG_ATTEMPT??'')+suite+'.json')}]],
+ webServer:prefix||dev?{command:prefix?`node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --base=/tactics/ --outDir ${repaired?'tmp/engine-repaired-prefix-dist':'tmp/engine-final-prefix-dist'} --port ${repaired?4211:4207} --strictPort`:'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4208 --strictPort',cwd:resolve('.'),url,reuseExistingServer:false}:undefined});

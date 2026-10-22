@@ -1,0 +1,37 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+tmp/engine-native-terser-dist/_headers                               1.08 kB
+tmp/engine-native-terser-dist/index.html                             5.28 kB │ gzip:   1.87 kB
+tmp/engine-native-terser-dist/assets/startRunApp-y3YtRGS5.css        2.13 kB │ gzip:   0.80 kB
+tmp/engine-native-terser-dist/assets/view-BBW_du9E.css               2.61 kB │ gzip:   1.03 kB
+tmp/engine-native-terser-dist/assets/battleLayout-C6wfuIJB.css      10.75 kB │ gzip:   2.68 kB
+tmp/engine-native-terser-dist/assets/start-C3yC9TRQ.js               0.07 kB │ gzip:   0.07 kB
+tmp/engine-native-terser-dist/assets/battleLayout-hOZQODH5.js        0.56 kB │ gzip:   0.31 kB
+tmp/engine-native-terser-dist/assets/preload-helper-C403KO7J.js      1.34 kB │ gzip:   0.74 kB
+tmp/engine-native-terser-dist/assets/rng-BLx0SQsX.js                 1.72 kB │ gzip:   0.84 kB
+tmp/engine-native-terser-dist/assets/index-DLRL3rDe.js               1.79 kB │ gzip:   0.89 kB
+tmp/engine-native-terser-dist/assets/startBattleApp-CrqUHWpi.js      2.80 kB │ gzip:   1.18 kB
+tmp/engine-native-terser-dist/assets/browser-7WzqHhLv.js             3.27 kB │ gzip:   1.37 kB
+tmp/engine-native-terser-dist/assets/view-B7sIF9Rd.js                8.95 kB │ gzip:   3.53 kB
+tmp/engine-native-terser-dist/assets/startRunApp-BZX0Lafl.js        25.78 kB │ gzip:   8.85 kB
+tmp/engine-native-terser-dist/assets/start-jYcO8SxO.js           1,418.22 kB │ gzip: 368.58 kB
+
+✓ built in 4.31s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 4.0s of this 4.3s build (92%).
+2 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin vite:terser renderChunk (10 calls)
+  - plugin vite:css transform (4 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+

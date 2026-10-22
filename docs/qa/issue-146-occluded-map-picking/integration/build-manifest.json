@@ -1,0 +1,231 @@
+{
+  "runtimeCommit": "ba815ace96736100e32a40ee84f44d8dda4f8fb8",
+  "buildStamp": {
+    "commit": "ba815ace96736100e32a40ee84f44d8dda4f8fb8",
+    "dirty": false
+  },
+  "node": "v24.19.0",
+  "platform": "win32",
+  "playwright": "1.63.0",
+  "source": [
+    {
+      "path": "src/geometry/picking.ts",
+      "sha256": "9a999b60346c0f919e94f11e8201db4ba61ecffe457380f00d0bf35c47e89627",
+      "gitBlob": "a5fe226727b144f4f492862af512fb81d0083de1",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardRenderer.ts",
+      "sha256": "cfbb0a7d261b869df4c77b8ef6ea487bd68693ae1be823896fb8126ff9dfc6b1",
+      "gitBlob": "b674f5d9241bf6a977671e9cd75e2e48bfb1486e",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BoardInput.ts",
+      "sha256": "e1ecc75fde156de7500fdccad8ace367fc14a41ca37c2e12813cf499008eaaf5",
+      "gitBlob": "b7613f616bb313765077e20ddb40b5e27618c898",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "src/phaser/BattleScene.ts",
+      "sha256": "32c7eb4982d9e2367d2ae33b6f372325156aa9f6b0575ef4b72947785632ce79",
+      "gitBlob": "61e724e1a869c242b59e1d0e88deb0fe98eaf3cb",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/battle-board.spec.ts",
+      "sha256": "2429f3f1df3c0553055943c7a7f8f7b57074369b67852eb13913e91c8054badf",
+      "gitBlob": "9a34216e08876c3e72313798edc1360ca46ec327",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/run-progression.spec.ts",
+      "sha256": "9a98df50dac4ae0df42b4f9d98ad02e9ed6ba49bd2658f25e0d373160cacc345",
+      "gitBlob": "e70659c03c3a7ea253de1d41b6f71c35a20b9651",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/battle-animations.spec.ts",
+      "sha256": "040c15d0603372dc547fbedb30e911a664efe6aaa74e87585d6aead6c0344860",
+      "gitBlob": "acb5ce39b662210831394584efd5c8b267ae01e1",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/unit-health-bars.spec.ts",
+      "sha256": "fc5bdd13e51e9b98c68ebcc2ba7841a895ca47818c925a911624180b1c134c69",
+      "gitBlob": "4df1c561872dd10ecc787412432ee9751d36723c",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/authored-encounters.spec.ts",
+      "sha256": "25aface5ba85e1cf0f487859a79ffb56702b477b724c2ebd24e863d00a7824a1",
+      "gitBlob": "535ba2cae2d0799379fa8da5b2d4c0e4e3292543",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/unit/picking.test.ts",
+      "sha256": "6c09d5d3ef1038c19cfa91194bee97ed6dd9cb0784abfa513dc017d77c27403c",
+      "gitBlob": "0e8f685201439e5d8b8aabac420ff7ca5163ee21",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "tests/unit/input.test.ts",
+      "sha256": "f227bcb8857e3a4b78da69776eb5c472e5ce1cef38d5b617f11f7964d021f802",
+      "gitBlob": "549d324101136155efcb9ef424e2b34ee97f75b0",
+      "matchesPublishedRuntime": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cca93aa63c82908ae9c2efab0cf7d0166932d250276b17c41293238f502eda12",
+      "gitBlob": "a05fb559f0da9e91eb1d7d6cf1900113d04ac3b7",
+      "matchesPublishedRuntime": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "dist/assets/battleLayout-BVayxngr.js",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "dist/assets/battleLayout-C6wfuIJB.css",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "dist/assets/browser-Cc3fx0Za.js",
+      "sha256": "e5281f8c1268e6ed77805524c1a58234dc7de1ca00b44e01ceec76f1f9cacb51"
+    },
+    {
+      "path": "dist/assets/index-DAUFswUa.js",
+      "sha256": "263442897f6e0538dc912a8ce3a7f3895c10211a9dd80c8747b3afe2995dfdcc"
+    },
+    {
+      "path": "dist/assets/preload-helper-DjzSQ1t3.js",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "dist/assets/rng-BCcJOpRP.js",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "dist/assets/start-BE4wtcW4.js",
+      "sha256": "e3483477c746a074290f16a3ed29d3f4044ec6b999642a656fc3b7925329f392"
+    },
+    {
+      "path": "dist/assets/start-YVjk0eNX.js",
+      "sha256": "e58a55c2027229f1fd4a0765544625458a67bdbf23fe76f775839243be57663b"
+    },
+    {
+      "path": "dist/assets/startBattleApp-C7Vxmq4d.js",
+      "sha256": "c2f2c9a5c8d4b6a5bbfef5ccd6c47a9efe2d19f2ca0cea9e1b26014e5fa6cdf8"
+    },
+    {
+      "path": "dist/assets/startRunApp-BSzMqPuR.js",
+      "sha256": "2e1e79c16088799910578761ff64bc00a9bd4fe4079bff66c9e88d56df917f7d"
+    },
+    {
+      "path": "dist/assets/startRunApp-y3YtRGS5.css",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "dist/assets/view-BBW_du9E.css",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "dist/assets/view-BckbAdYp.js",
+      "sha256": "1af5838dcdf286b2a04c98976c7edfc9e25f92ad8e98a5d5dd5e70726c6b310a"
+    }
+  ],
+  "validation": {
+    "verifiedAt": "2026-10-19T16:55:59.193Z",
+    "mainBase": "152a74d6f0e0d5ae3c69378cf428b9edc28f1ceb",
+    "parents": [
+      "6525b90e6b1573cfbbd228c81ce61a9d0c899639",
+      "152a74d6f0e0d5ae3c69378cf428b9edc28f1ceb"
+    ],
+    "browser": {
+      "engine": "Microsoft Edge",
+      "version": "155.0.4283.62",
+      "executable": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+    },
+    "webkit": {
+      "engine": "WebKit",
+      "version": "26.6",
+      "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\webkit-2359\\Playwright.exe",
+      "profiles": [
+        {
+          "name": "webkit-portrait",
+          "width": 390,
+          "height": 664
+        },
+        {
+          "name": "webkit-landscape",
+          "width": 750,
+          "height": 342
+        }
+      ]
+    },
+    "profiles": [
+      {
+        "name": "desktop",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "name": "mobile-portrait",
+        "width": 412,
+        "height": 839
+      },
+      {
+        "name": "mobile-landscape",
+        "width": 915,
+        "height": 412
+      }
+    ],
+    "gates": [
+      {
+        "command": "npm run test:unit",
+        "passed": 710,
+        "files": 41,
+        "exitCode": 0,
+        "receipt": "receipts/integration-unit.log.gz"
+      },
+      {
+        "command": "npm run build",
+        "contentChecks": 167,
+        "typechecks": 2,
+        "exitCode": 0,
+        "receipt": "receipts/integration-build.log.gz"
+      },
+      {
+        "command": "focused picking/camera/bob Playwright matrix",
+        "passed": 18,
+        "exitCode": 0,
+        "receipt": "receipts/integration-focused.log.gz"
+      },
+      {
+        "command": "npm test",
+        "mainPassed": 567,
+        "encountersPassed": 18,
+        "runItemsPassed": 21,
+        "exitCode": 0,
+        "receipt": "receipts/integration-full.log.gz"
+      },
+      {
+        "command": "focused mobile WebKit matrix on frozen clean build",
+        "passed": 4,
+        "exitCode": 0,
+        "receipt": "receipts/integration-webkit-clean.log.gz"
+      }
+    ],
+    "retries": 0,
+    "skips": 0,
+    "screenshots": [
+      "archer-desktop.png",
+      "ground-desktop.png",
+      "archer-portrait.png",
+      "ground-portrait.png",
+      "archer-landscape.png",
+      "ground-landscape.png"
+    ]
+  }
+}

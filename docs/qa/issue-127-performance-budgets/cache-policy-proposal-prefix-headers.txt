@@ -1,0 +1,38 @@
+/tactics/assets/index-qyHfp4FY.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/battleLayout-BVayxngr.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/browser-DnUF-IGp.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/preload-helper-3gX2X29a.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/rng-BCcJOpRP.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/start-Bw2Yc9UB.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/start-FRKFQ9z8.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/startBattleApp-D8UbxnZ5.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/startRunApp-BYVUtksN.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/view-D3FGqi0p.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/battleLayout-C6wfuIJB.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/startRunApp-y3YtRGS5.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/tactics/assets/view-BBW_du9E.css
+  Cache-Control: public, max-age=31536000, immutable

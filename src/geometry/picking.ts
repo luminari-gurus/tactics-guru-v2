@@ -17,6 +17,12 @@ function contains(vertices: readonly Point[], point: Point): boolean {
 export function pickTile(tiles: readonly Tile[], point: Point): Tile | null {
   return orderTiles(tiles).reverse().find(tile => Object.values(tileFaces(tile)).some(face => contains(face, point))) ?? null;
 }
+/** Preserve the visible solid first; only intersecting top surfaces can be selected behind it. */
+export function pickTileCandidates<T extends Tile>(tiles: readonly T[], point: Point): T[] {
+  const ordered = orderTiles(tiles).reverse();
+  const front = ordered.find(tile => Object.values(tileFaces(tile)).some(face => contains(face, point)));
+  return front ? [front, ...ordered.filter(tile => tile !== front && contains(tileFaces(tile).top, point))] : [];
+}
 /** Keep every board edge reachable at the center of the same region used to fit. */
 export function constrainView(view: View, bounds: Bounds, region: BoardRegion, fitScale: number): View {
   const scale = Math.max(fitScale * MIN_ZOOM, Math.min(fitScale * MAX_ZOOM, view.scale));

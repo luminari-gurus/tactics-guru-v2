@@ -32,16 +32,19 @@ export function itemCatalogIdentity(catalog: ItemCatalog): string {
 
 /** Trusted validated RunState/catalog. No live battle RNG or entropy source is accepted. */
 export function createRewardOffer(state: RunState, catalog: ItemCatalog): RewardOffer | null {
-  if (state.phase !== 'reward') return null;
+  return state.phase !== 'reward' ? null : rewardOffer(state.pendingReward.id, state.pendingReward.seed, catalog);
+}
+
+export function rewardOffer(id: string, seed: number, catalog: ItemCatalog): RewardOffer | null {
   const remaining = Object.keys(catalog).sort() as ItemId[];
   if (remaining.length < REWARD_POLICY.choiceCount) return null;
-  let rng = seedRng(state.pendingReward.seed);
+  let rng = seedRng(seed);
   const draw = (): RewardOption => {
     const next = nextUint32(rng); rng = next.rng;
     const index = Math.floor(next.value * remaining.length / UINT32_RANGE);
     return { itemId: remaining.splice(index, 1)[0], quantity: REWARD_POLICY.quantity };
   };
-  return { version: REWARD_POLICY.version, id: state.pendingReward.id, seed: state.pendingReward.seed,
+  return { version: REWARD_POLICY.version, id, seed,
     catalogIdentity: itemCatalogIdentity(catalog), options: [draw(), draw()] };
 }
 

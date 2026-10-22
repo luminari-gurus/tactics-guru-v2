@@ -1,0 +1,19 @@
+$ErrorActionPreference='Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+node node_modules/@playwright/test/cli.js test -c tmp/review/playwright-dev.config.ts --reporter=json > tmp/review/pr137-dev.json 2> tmp/review/pr137-dev-errors.txt
+if($LASTEXITCODE -ne 0){throw 'Development encounter/item posttests failed'}
+node node_modules/vite/bin/vite.js build --base=/review/ --outDir=tmp/review/dist-prefix > tmp/review/pr137-prefix-build.txt 2>&1
+if($LASTEXITCODE -ne 0){throw 'Prefix build failed'}
+node node_modules/@playwright/test/cli.js test -c tmp/review/playwright-prefix.config.ts tests/public-asset-base.spec.ts --reporter=json > tmp/review/pr137-prefix.json 2> tmp/review/pr137-prefix-errors.txt
+if($LASTEXITCODE -ne 0){throw 'Prefix checks failed'}
+$finalPreview=Start-Process -FilePath (Get-Command node.exe).Source -ArgumentList @('node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','4197','--strictPort') -WorkingDirectory (Get-Location).Path -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path (Get-Location) 'tmp/review/pr137-webkit-server.log') -RedirectStandardError (Join-Path (Get-Location) 'tmp/review/pr137-webkit-server-error.log')
+try {
+ $ready=$false
+ for($attempt=0;$attempt -lt 100;$attempt++){
+  try {if((Invoke-WebRequest 'http://127.0.0.1:4197/' -TimeoutSec 2).StatusCode -eq 200){$ready=$true;break}}catch{}
+  Start-Sleep -Milliseconds 100
+ }
+ if(-not $ready){throw 'Frozen preview did not start'}
+ wsl --exec env -u PLAYWRIGHT_CHROMIUM_EXECUTABLE node node_modules/@playwright/test/cli.js test -c tmp/review/playwright-final-webkit.config.ts --reporter=json > tmp/review/pr137-webkit.json 2> tmp/review/pr137-webkit-errors.txt
+ if($LASTEXITCODE -ne 0){throw 'WebKit acceptance checks failed'}
+} finally {Stop-Process -Id $finalPreview.Id -ErrorAction SilentlyContinue}

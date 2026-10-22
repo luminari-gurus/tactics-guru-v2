@@ -1,0 +1,13 @@
+{
+  "base": "f99765143ddd470b8115cea4993d68a16b767646",
+  "fixtures": 57,
+  "encounters": 24,
+  "runItems": 21,
+  "abilities": 12,
+  "combinedEqualsIndividualAndCurrentMain": true,
+  "defaultSelectionUnchanged": true,
+  "defaultCases": 687,
+  "fixtureSelectionSHA256": "40179ad00bc26b7d5de8e7aab685d2cb2569b820d9d144d0b0256d0e877adac7",
+  "fullPlanStages": 17,
+  "localOrchestrationContractsPassed": 7
+}

@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+assert.equal(head,'ab513ce6197e9f94923840f4de3610652bfe38f9');
+assert.equal(execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),'');
+const shared={};
+for(const file of ['src','public','index.html','package.json','package-lock.json','tsconfig.json','tsconfig.domain.json','scripts']) {
+  const current=execFileSync('git',['rev-parse',head+':'+file],{encoding:'utf8'}).trim();
+  assert.equal(current,execFileSync('git',['rev-parse','9382f13:'+file],{encoding:'utf8'}).trim());shared[file]=current;
+}
+const sha=data=>createHash('sha256').update(data).digest('hex');
+const collectorSha256=Object.fromEntries(['measure-fit.ts','measure-fit-options.ts','measure-fit-controls.ts','measure-fit-evaluate.ts'].map(n=>[n,sha(fs.readFileSync('scripts/'+n))]));
+assert.deepEqual(collectorSha256,JSON.parse(fs.readFileSync('docs/qa/issue-127-performance-budgets/current-source-binding.json')).collectorSha256);
+const builds={};
+for(const [base,dir] of [['/','tmp/cache-final-dist'],['/tactics/','tmp/cache-final-prefix-dist']]) {
+ const files=fs.readdirSync(dir,{recursive:true}).filter(f=>fs.statSync(dir+'/'+f).isFile());
+ const headers=fs.readFileSync(dir+'/_headers','utf8');
+ const rules=headers.trim().split('\n\n');
+ const paths=rules.map(r=>{const [p,h,...extra]=r.split('\n');assert.equal(h,'  Cache-Control: public, max-age=31536000, immutable');assert.deepEqual(extra,[]);assert(p.startsWith(base));return p.slice(base.length)});
+ assert.deepEqual(paths.slice().sort(),files.filter(f=>/^assets[\\/].+\.(js|css)$/.test(f)).map(f=>f.replaceAll('\\','/')).sort());
+ assert(paths.length>0&&paths.length<=100);assert(paths.every(p=>fs.existsSync(dir+'/'+p)));
+ builds[base]={directory:dir,rules:paths.length,headers,files:files.map(f=>({path:f.replaceAll('\\','/'),sha256:sha(fs.readFileSync(dir+'/'+f)),bytes:fs.statSync(dir+'/'+f).size}))};
+}
+const reports={};for(const name of ['root','prefix']){const r=JSON.parse(fs.readFileSync(`tmp/cache-${name}-functional.json`));assert.equal(r.stats.expected,18);assert.equal(r.stats.unexpected,0);assert.equal(r.stats.flaky,0);assert.equal(r.stats.skipped,0);reports[name]=r.stats;}
+fs.writeFileSync('tmp/cache-source-binding.json',JSON.stringify({source:head,baseline:'9382f135be8b845b2a5425c16c3ea1badc5a00f0',sharedInputs:shared,collectorSha256,builds,functionalPrecommitReports:reports},null,2)+'\n');
+console.log('Clean source, unchanged runtime/collector, 13 root + 13 prefix rules and 36 focused cases verified.');

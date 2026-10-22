@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickTile, screenToBoard, constrainView } from '../../src/geometry/picking';
+import { pickTile, pickTileCandidates, screenToBoard, constrainView } from '../../src/geometry/picking';
 import { projectTile, tileFaces } from '../../src/geometry/iso';
 
 describe('visible solid picking', () => {
@@ -15,6 +15,16 @@ describe('visible solid picking', () => {
   });
   it('inverts pan and zoom without pixel-density assumptions', () => {
     expect(screenToBoard({x: 140,y: 280}, {x: 100,y: 200,scale: 2})).toEqual({x:20,y:40});
+  });
+  it('offers the actual hidden top after the frontmost solid without duplicating its cell',()=>{
+    expect(pickTileCandidates(tiles,{x:20,y:0})).toEqual([tiles[1],tiles[0]]);
+    expect(pickTileCandidates([...tiles].reverse(),{x:20,y:0})).toEqual([tiles[1],tiles[0]]);
+    expect(pickTileCandidates(tiles,{x:40,y:-48})).toEqual([tiles[1]]);
+    expect(pickTileCandidates(tiles,{x:40,y:-48.01})).toEqual([]);
+    expect(pickTileCandidates(tiles,{x:1000,y:1000})).toEqual([]);
+    // A rear side is not a destination hit: only rear top surfaces are offered.
+    expect(pickTileCandidates([{x:0,y:0,elevation:0},{x:0,y:1,elevation:0}],{x:-20,y:22}))
+      .toEqual([{x:0,y:1,elevation:0}]);
   });
   it('bounds scale and keeps board inside reachable viewport', () => {
     expect(constrainView({x:9999,y:-9999,scale:99}, {left:-40,right:40,top:-20,bottom:20}, {x:0,y:100,width:400,height:500}, 1)).toEqual({x:360,y:270,scale:4});

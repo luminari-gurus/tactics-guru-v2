@@ -1,0 +1,17 @@
+[
+  {
+    "name": "missing CI credentials",
+    "exitCode": 1,
+    "expectedFailure": "Missing CI secret"
+  },
+  {
+    "name": "dry-run blocked",
+    "exitCode": 1,
+    "expectedFailure": "cannot use CLI dry-run"
+  },
+  {
+    "name": "missing maps blocked",
+    "exitCode": 1,
+    "expectedFailure": "No JavaScript source maps"
+  }
+]

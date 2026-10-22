@@ -1,0 +1,192 @@
+{
+  "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+  "origin": "https://77bd44ef.tactics-guru-v2.pages.dev",
+  "verifiedAt": "2026-10-18T16:52:56.549Z",
+  "files": [
+    {
+      "path": "/assets/index-CncXLlFX.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "97c93b5014ecc0b6ca9358aafca76c498de769c578bcdb11b1eb723601cb10c5"
+    },
+    {
+      "path": "/assets/battleLayout-BVayxngr.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "/assets/browser-C8oTUoxT.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "9940dab2987c88e4b757a959542a2f8f38a0ac77edaf7fa316752389cfdb2ab9"
+    },
+    {
+      "path": "/assets/preload-helper-DjzSQ1t3.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "/assets/rng-BCcJOpRP.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "/assets/start-BcKHGhCJ.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cd0689f874f8235ade033a07d83a8a6eebee6cdb81d47d43e974f18a7cca47c7"
+    },
+    {
+      "path": "/assets/start-Dii-uae0.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "84a7b445932d3bf9e4e0d859046bb582409fe9c7ea1aa145af17f7646b3ad115"
+    },
+    {
+      "path": "/assets/startBattleApp-BmuDoDz-.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "4af4f2cc09412796a235e9633598e53e3aa7c8247e87d17a1f8693844e3eb748"
+    },
+    {
+      "path": "/assets/startRunApp-B05xAu9N.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "07a324e879861db9a65e6e9b5c217be634c963dcc2feff23b3e96f586a5bc04e"
+    },
+    {
+      "path": "/assets/view-DiTs9Ckp.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "54947f2f817c4339d05de7b17aaaf5dfa841e93dacd96e21a0319f8a763345a9"
+    },
+    {
+      "path": "/assets/battleLayout-C6wfuIJB.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "/assets/startRunApp-y3YtRGS5.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "/assets/view-BBW_du9E.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    },
+    {
+      "path": "/assets/58625a5a9febe514/battle/terrain/grass.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8"
+    },
+    {
+      "path": "/assets/be249ec3f8849929/battle/terrain/grass_path.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9"
+    },
+    {
+      "path": "/assets/f8322179450af915/battle/terrain/stone.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a"
+    },
+    {
+      "path": "/assets/9f88a273b676fa0e/battle/terrain/forest.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26"
+    },
+    {
+      "path": "/assets/b47c382b0be6e6fe/battle/terrain/water.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622"
+    },
+    {
+      "path": "/assets/b5b947941d91b972/proof/fighter.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "/assets/f0c4ab9c2859f59e/battle/portraits/fighter.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3"
+    },
+    {
+      "path": "/assets/7203e2b3a992c9c8/battle/source/ranger_sprite.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332"
+    },
+    {
+      "path": "/assets/72b7f789a242de12/battle/portraits/ranger.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7"
+    },
+    {
+      "path": "/assets/37fcb2969f129de5/battle/source/mage_sprite.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b"
+    },
+    {
+      "path": "/assets/da44b5706aaadefb/battle/portraits/mage.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95"
+    },
+    {
+      "path": "/assets/57972fe37b1c0579/battle/source/goblin_grunt_sprite.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97"
+    },
+    {
+      "path": "/assets/cc6494048e8cd6a8/battle/portraits/goblin_grunt.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7"
+    },
+    {
+      "path": "/assets/070fb462027ed7a5/battle/source/goblin_archer_sprite.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e"
+    },
+    {
+      "path": "/assets/70f30350ea20aac9/battle/portraits/goblin_archer.png",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b"
+    }
+  ],
+  "fixed": [
+    {
+      "path": "/",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/battle/terrain/grass.png",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/audio/battle/move.mp3",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    }
+  ]
+}

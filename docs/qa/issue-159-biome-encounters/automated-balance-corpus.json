@@ -1,0 +1,4665 @@
+{
+  "date": "2026-10-21",
+  "method": "Exploratory two-full-floor extension of the existing playerDecision and journeyPreparation policy; no fabricated combat outcomes",
+  "source": "ad9a354 encounter runtime with test-only two-floor loop; production encounter rules unchanged through ac7fc9d",
+  "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+  "attemptedSeeds": 256,
+  "firstFloorClears": 27,
+  "twoFullFloorClears": 0,
+  "failures": [
+    {
+      "seed": 0,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 1,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 2,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 3,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 4,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 5,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 6,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 7,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 8,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 9,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 10,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 11,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 12,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 4
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 13,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 14,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 15,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 16,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 17,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 18,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 19,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 20,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 21,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 22,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 23,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 24,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 25,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 26,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 27,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 28,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 29,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 30,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 31,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 32,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 33,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 34,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 35,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 36,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 37,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 38,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 39,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 40,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 41,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 12
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 42,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 43,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 44,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 45,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 46,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 47,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 48,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 49,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 50,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 51,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 52,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 53,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 54,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 55,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 56,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 57,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 58,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 59,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 60,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 61,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 62,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 63,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 64,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 65,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 66,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 67,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 68,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 69,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 70,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 71,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 1
+        }
+      ]
+    },
+    {
+      "seed": 72,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 73,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 74,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 75,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 76,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 77,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 78,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 79,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 80,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 81,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 82,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 83,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 84,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 85,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 86,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 87,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 88,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 89,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 90,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 91,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 92,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 93,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 12
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 94,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 95,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 96,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 97,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 98,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 99,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 6
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 100,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 101,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 102,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 103,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 104,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 105,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 106,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 107,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 8
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 108,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 109,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 110,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 111,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 16
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 112,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 113,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 114,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 115,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 116,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 117,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 118,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 119,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 120,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 121,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 122,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 123,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 124,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 125,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 2
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 126,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 127,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 128,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 129,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 130,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 131,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 132,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 133,
+      "depth": 2,
+      "battles": 5,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 134,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 135,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 136,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 137,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 138,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 139,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 140,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 141,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 142,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 143,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 144,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 145,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 146,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 147,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 148,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 149,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 150,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 151,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 1
+        }
+      ]
+    },
+    {
+      "seed": 152,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 153,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 154,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 155,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 156,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 157,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 158,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 159,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 160,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 161,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 162,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 163,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 164,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 165,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 8
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 166,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 167,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 168,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 169,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 170,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 171,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 172,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 173,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 174,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 175,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 176,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 177,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 178,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 179,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 180,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 181,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 182,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 183,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 184,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 185,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 186,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 187,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 188,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 189,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    },
+    {
+      "seed": 190,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 191,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 192,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 193,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 194,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 195,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 196,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 197,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 198,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 8
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 1
+        }
+      ]
+    },
+    {
+      "seed": 199,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 200,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 201,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 16
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 202,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 203,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 204,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 205,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 206,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 11
+        }
+      ]
+    },
+    {
+      "seed": 207,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 208,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 209,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 210,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 211,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 8
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 1
+        }
+      ]
+    },
+    {
+      "seed": 212,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 213,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 214,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 215,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 216,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 217,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 218,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 219,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 6
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 220,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 221,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 222,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 223,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 224,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 225,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 226,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 227,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 228,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 229,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 230,
+      "depth": 1,
+      "battles": 1
+    },
+    {
+      "seed": 231,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 232,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 233,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 234,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 235,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 236,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 237,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 238,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 239,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 240,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 241,
+      "depth": 2,
+      "battles": 5,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 242,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 2
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 243,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 10
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 244,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 245,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 246,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 2
+        },
+        {
+          "heroId": "mage",
+          "hp": 3
+        }
+      ]
+    },
+    {
+      "seed": 247,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 248,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 249,
+      "depth": 2,
+      "battles": 4,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 0
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12
+        },
+        {
+          "heroId": "mage",
+          "hp": 1
+        }
+      ]
+    },
+    {
+      "seed": 250,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 4
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 251,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 252,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 18
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 253,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 254,
+      "depth": 1,
+      "battles": 2,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 2
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 0
+        }
+      ]
+    },
+    {
+      "seed": 255,
+      "depth": 1,
+      "battles": 3,
+      "partyBeforeLast": [
+        {
+          "heroId": "fighter",
+          "hp": 14
+        },
+        {
+          "heroId": "ranger",
+          "hp": 0
+        },
+        {
+          "heroId": "mage",
+          "hp": 7
+        }
+      ]
+    }
+  ]
+}

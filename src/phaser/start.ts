@@ -24,7 +24,7 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
 }
 
 /** Shared engine/audio initialization; caller owns the scene lifecycle. */
-export function createGame(scene: Phaser.Scene, battle: boolean) {
+export function createGame(scene: Phaser.Scene | Phaser.Scene[], battle: boolean) {
   return new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',

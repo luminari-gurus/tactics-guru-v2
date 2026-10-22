@@ -1,0 +1,32 @@
+import {chromium,devices} from '@playwright/test';
+import fs from 'node:fs';
+import {navigateCapture} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+const results=[];
+try {
+ for(const [name,device] of [['desktop',devices['Desktop Chrome']],['portrait',devices['Pixel 7']]]) {
+  const context=await browser.newContext(device);
+  await context.addInitScript(()=>{
+   window.startupCosts=[];
+   const record=(name,start,duration=0)=>window.startupCosts.push({name,start,duration});
+   document.addEventListener('click',e=>record('click:'+e.target.id,performance.now()),true);
+   document.addEventListener('DOMContentLoaded',()=>record('DOMContentLoaded',performance.now()));
+   window.addEventListener('load',()=>record('load',performance.now()));
+   const AC=window.AudioContext;
+   if(AC)window.AudioContext=new Proxy(AC,{construct(target,args,newTarget){const start=performance.now();try{return Reflect.construct(target,args,newTarget)}finally{record('AudioContext',start,performance.now()-start)}}});
+   const original=HTMLCanvasElement.prototype.getContext;
+   HTMLCanvasElement.prototype.getContext=function(...args){const start=performance.now();try{return original.apply(this,args)}finally{const duration=performance.now()-start;if(duration>1)record('getContext:'+args[0],start,duration)}};
+   const observer=new PerformanceObserver(list=>{for(const e of list.getEntries())record('longtask',e.startTime,e.duration)});observer.observe({type:'longtask',buffered:true});
+  });
+  const page=await context.newPage(),target=captureTarget(parseMeasureArgs(['--scene=battle','--url','https://7129419b.tactics-guru-v2.pages.dev/run'],{}));
+  await navigateCapture(page,target,'cold');await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+  for(let repetition=1;repetition<=3;repetition++) {
+   await navigateCapture(page,target,'warm');await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null);
+   results.push({name,repetition,...await page.evaluate(()=>({diagnostics:window.fitDiagnostics(),costs:window.startupCosts,navigation:performance.getEntriesByType('navigation').map(r=>r.toJSON()),resources:performance.getEntriesByType('resource').map(r=>r.toJSON())}))});
+  }
+  await context.close();
+ }
+}finally{await browser.close()}
+fs.writeFileSync('tmp/cache-startup-diagnostic.json',JSON.stringify({purpose:'Instrumented diagnostic; not acceptance',results},null,2)+'\n');
+for(const r of results)console.log(JSON.stringify({profile:r.name,rep:r.repetition,start:r.diagnostics.sceneStartedMs,ready:r.diagnostics.sceneReadyMs,usable:r.diagnostics.controlsUsableMs,costs:r.costs}));

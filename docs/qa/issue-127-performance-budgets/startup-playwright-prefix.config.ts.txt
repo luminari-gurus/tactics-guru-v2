@@ -1,0 +1,10 @@
+import {defineConfig} from '@playwright/test';
+import {resolve} from 'node:path';
+import base from '../playwright.config';
+const url='http://127.0.0.1:4200/tactics/';
+export default defineConfig({...base,testDir:resolve('tests'),outputDir:resolve('tmp','preload-prefix-artifacts'),
+  reporter:[['line'],['json',{outputFile:resolve('docs/qa/issue-127-performance-budgets/startup-startup-final-prefix.json')}]],
+  use:{...base.use,baseURL:url},
+  webServer:{command:'node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --base=/tactics/ --outDir tmp/startup-prefix-dist --port 4200 --strictPort',
+    cwd:resolve('.'),url,reuseExistingServer:false}});
+

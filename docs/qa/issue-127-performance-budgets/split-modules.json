@@ -1,0 +1,503 @@
+[
+  {
+    "file": "assets/index-CumbfRaW.js",
+    "imports": [
+      "assets/preload-helper-DjzSQ1t3.js"
+    ],
+    "dynamicImports": [
+      "assets/startRunApp-w2stx4RC.js",
+      "assets/view-DtJ84hde.js",
+      "assets/startBattleApp-BhP9GcVX.js"
+    ],
+    "modules": [
+      {
+        "id": "\u0000vite/modulepreload-polyfill.js",
+        "renderedLength": 1205
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/main.ts",
+        "renderedLength": 807
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/index.html",
+        "renderedLength": 0
+      }
+    ]
+  },
+  {
+    "file": "assets/BattleScene-Bk5NKB4E.js",
+    "imports": [
+      "assets/BattleScene-DlGapwDh.js"
+    ],
+    "dynamicImports": [],
+    "modules": []
+  },
+  {
+    "file": "assets/BattleScene-DlGapwDh.js",
+    "imports": [
+      "assets/browser-aNDq4ucg.js",
+      "assets/contentLoading--RoY19ly.js",
+      "assets/validation-DcTWv_L4.js",
+      "assets/rng-BnVmGYby.js",
+      "assets/phaser.esm-CTbIuaw5.js",
+      "assets/iso-BWvOnVL7.js",
+      "assets/BoardInput-Cfy_gxrO.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/itemTypes.ts",
+        "renderedLength": 298
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/contentIdentity.ts",
+        "renderedLength": 3737
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/battle.ts",
+        "renderedLength": 5718
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/targeting.ts",
+        "renderedLength": 723
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/combat.ts",
+        "renderedLength": 8767
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/grid.ts",
+        "renderedLength": 4134
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/turns.ts",
+        "renderedLength": 3517
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/run.ts",
+        "renderedLength": 7697
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/rewards.ts",
+        "renderedLength": 1668
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/items.ts",
+        "renderedLength": 10215
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/runSaveEnvelope.ts",
+        "renderedLength": 3743
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/runBattle.ts",
+        "renderedLength": 2070
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/ai.ts",
+        "renderedLength": 3782
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/app/BattleSession.ts",
+        "renderedLength": 4391
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/dialogs.ts",
+        "renderedLength": 3525
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/saveEnvelope.ts",
+        "renderedLength": 2009
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/persistence/battleStorage.ts",
+        "renderedLength": 3913
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/app/BattlePersistence.ts",
+        "renderedLength": 4836
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/hud.ts",
+        "renderedLength": 9766
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/persistence.ts",
+        "renderedLength": 4881
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/geometry/canopy.ts",
+        "renderedLength": 931
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/healthBar.ts",
+        "renderedLength": 955
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/abilityPresentation.ts",
+        "renderedLength": 1600
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/BoardRenderer.ts",
+        "renderedLength": 22121
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/audio/battleCues.ts",
+        "renderedLength": 1516
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/BattleAudio.ts",
+        "renderedLength": 9898
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/BattleScene.ts",
+        "renderedLength": 11000
+      }
+    ]
+  },
+  {
+    "file": "assets/BoardInput-Cfy_gxrO.js",
+    "imports": [
+      "assets/iso-BWvOnVL7.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/geometry/boardPresentation.ts",
+        "renderedLength": 1069
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/geometry/picking.ts",
+        "renderedLength": 1201
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/BoardInput.ts",
+        "renderedLength": 3615
+      }
+    ]
+  },
+  {
+    "file": "assets/ContentSmokeScene-C71-sDlU.js",
+    "imports": [
+      "assets/contentLoading--RoY19ly.js",
+      "assets/phaser.esm-CTbIuaw5.js",
+      "assets/iso-BWvOnVL7.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/ContentSmokeScene.ts",
+        "renderedLength": 3582
+      }
+    ]
+  },
+  {
+    "file": "assets/FitScene-DuZp0Pr0.js",
+    "imports": [
+      "assets/browser-aNDq4ucg.js",
+      "assets/phaser.esm-CTbIuaw5.js",
+      "assets/iso-BWvOnVL7.js",
+      "assets/BoardInput-Cfy_gxrO.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/terrain/materials.ts",
+        "renderedLength": 769
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/boardFixture.ts",
+        "renderedLength": 471
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/scriptedMove.ts",
+        "renderedLength": 815
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/proofAssets.ts",
+        "renderedLength": 1824
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/ProofBoardRenderer.ts",
+        "renderedLength": 7729
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/audioState.ts",
+        "renderedLength": 2629
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/ProofAudio.ts",
+        "renderedLength": 5338
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/FitScene.ts",
+        "renderedLength": 8935
+      }
+    ]
+  },
+  {
+    "file": "assets/browser-aNDq4ucg.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/measurements.ts",
+        "renderedLength": 3238
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/diagnostics/browser.ts",
+        "renderedLength": 1953
+      }
+    ]
+  },
+  {
+    "file": "assets/contentLoading--RoY19ly.js",
+    "imports": [
+      "assets/validation-DcTWv_L4.js",
+      "assets/iso-BWvOnVL7.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/constants.ts",
+        "renderedLength": 1409
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/assets.ts",
+        "renderedLength": 20592
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/abilities.ts",
+        "renderedLength": 988
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/forestRuins.ts",
+        "renderedLength": 10291
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/validate.ts",
+        "renderedLength": 12722
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/catalog.ts",
+        "renderedLength": 2490
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/contentLoading.ts",
+        "renderedLength": 1743
+      }
+    ]
+  },
+  {
+    "file": "assets/createGame-CFjUg2AT.js",
+    "imports": [
+      "assets/phaser.esm-CTbIuaw5.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/createGame.ts",
+        "renderedLength": 683
+      }
+    ]
+  },
+  {
+    "file": "assets/iso-BWvOnVL7.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/publicAssetUrl.ts",
+        "renderedLength": 121
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/geometry/iso.ts",
+        "renderedLength": 1982
+      }
+    ]
+  },
+  {
+    "file": "assets/phaser.esm-CTbIuaw5.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/node_modules/phaser/dist/phaser.esm.js",
+        "renderedLength": 2701357
+      }
+    ]
+  },
+  {
+    "file": "assets/preload-helper-DjzSQ1t3.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "\u0000vite/preload-helper.js",
+        "renderedLength": 2610
+      }
+    ]
+  },
+  {
+    "file": "assets/rng-BnVmGYby.js",
+    "imports": [
+      "assets/validation-DcTWv_L4.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/constants.ts",
+        "renderedLength": 478
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/rng.ts",
+        "renderedLength": 1496
+      }
+    ]
+  },
+  {
+    "file": "assets/start-DHYkvFE8.js",
+    "imports": [
+      "assets/preload-helper-DjzSQ1t3.js",
+      "assets/createGame-CFjUg2AT.js"
+    ],
+    "dynamicImports": [
+      "assets/ContentSmokeScene-C71-sDlU.js",
+      "assets/FitScene-DuZp0Pr0.js",
+      "assets/BattleScene-Bk5NKB4E.js"
+    ],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/phaser/start.ts",
+        "renderedLength": 1225
+      }
+    ]
+  },
+  {
+    "file": "assets/startBattleApp-BhP9GcVX.js",
+    "imports": [
+      "assets/preload-helper-DjzSQ1t3.js",
+      "assets/style-55IuO-_i.js",
+      "assets/browser-aNDq4ucg.js"
+    ],
+    "dynamicImports": [
+      "assets/start-DHYkvFE8.js"
+    ],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/app/startBattleApp.ts",
+        "renderedLength": 3482
+      }
+    ]
+  },
+  {
+    "file": "assets/startRunApp-w2stx4RC.js",
+    "imports": [
+      "assets/style-55IuO-_i.js",
+      "assets/browser-aNDq4ucg.js",
+      "assets/contentLoading--RoY19ly.js",
+      "assets/validation-DcTWv_L4.js",
+      "assets/BattleScene-DlGapwDh.js",
+      "assets/rng-BnVmGYby.js",
+      "assets/createGame-CFjUg2AT.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/runFlow.css",
+        "renderedLength": 0
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/woodlandCrossing.ts",
+        "renderedLength": 1085
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/ruinedApproach.ts",
+        "renderedLength": 1035
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/encounters.ts",
+        "renderedLength": 2254
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/validateItems.ts",
+        "renderedLength": 3061
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/content/items.ts",
+        "renderedLength": 930
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/persistence/runStorage.ts",
+        "renderedLength": 3877
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/app/RunItemSession.ts",
+        "renderedLength": 7502
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/runItems.css",
+        "renderedLength": 0
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/ui/runItems.ts",
+        "renderedLength": 10059
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/app/startRunApp.ts",
+        "renderedLength": 9983
+      }
+    ]
+  },
+  {
+    "file": "assets/style-55IuO-_i.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/style.css",
+        "renderedLength": 0
+      }
+    ]
+  },
+  {
+    "file": "assets/validation-DcTWv_L4.js",
+    "imports": [],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/domain/validation.ts",
+        "renderedLength": 985
+      }
+    ]
+  },
+  {
+    "file": "assets/view-DtJ84hde.js",
+    "imports": [
+      "assets/rng-BnVmGYby.js"
+    ],
+    "dynamicImports": [],
+    "modules": [
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/map/style.css",
+        "renderedLength": 0
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/map/generate.ts",
+        "renderedLength": 5734
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/map/biomes.ts",
+        "renderedLength": 695
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/map/art.ts",
+        "renderedLength": 1029
+      },
+      {
+        "id": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/src/map/view.ts",
+        "renderedLength": 6512
+      }
+    ]
+  }
+]

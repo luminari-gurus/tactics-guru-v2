@@ -1,0 +1,105 @@
+import type { diagnosticsSnapshot } from '../src/diagnostics/browser.ts';
+import { buildIdentity } from './measure-fit-options.ts';
+
+type Diagnostics = ReturnType<typeof diagnosticsSnapshot>;
+export interface CaptureSample {
+  profile: string; repetition: number; cache: 'cold' | 'warm';
+  idleDiagnostics: Diagnostics; diagnostics: Diagnostics;
+  workloadStartIndex: number; errors: string[];
+}
+export interface Capture {
+  measuredBuild: {commit: string; dirty: boolean} | null;
+  conditions: {scene: 'proof' | 'battle'; sceneUrl: string};
+  failures: string[]; failedCapture: unknown; samples: CaptureSample[];
+}
+export const LIMITS = { L1_cold_ms: 2500, L2_warm_ms: 750, L3_cold_code_bytes: 400000,
+  L4_cold_assets_bytes: 1500000, F1_p50_ms: 16.7, F1_p95_ms: 20, F2_p95_ms: 33.4 };
+export const FLOAT_NOISE_MS = 1e-6;
+const profiles = ['desktop', 'mobile-portrait', 'mobile-landscape'];
+const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+/** Evaluate each original sample. Never average repetitions or replace a failed attempt. */
+export function evaluateCapture(capture: Capture) {
+  const failures: string[] = [];
+  const rows: {profile: string; repetition: number; cache: string;
+    values: {usableMs: number | null; codeBytes: number; assetBytes: number; idleP50Ms: number | null; idleP95Ms: number | null};
+    violations: {metric: string; actual: number | null; limit: number; window?: number}[]}[] = [];
+  try {
+    if (!Array.isArray(capture.samples) || capture.samples.length !== 18) failures.push('Expected exactly 18 samples');
+    if (!Array.isArray(capture.failures) || capture.failures.length) failures.push('Collector reported failures or omitted failure status');
+    if (capture.failedCapture !== null) failures.push('Capture did not finish cleanly');
+    const build = buildIdentity(capture.samples);
+    if (!/^[a-f0-9]{40}$/.test(build.commit) || build.dirty !== false) failures.push('Invalid or dirty served build');
+    if (build.commit !== capture.measuredBuild?.commit || capture.measuredBuild?.dirty !== false) failures.push('Measured build does not match samples');
+    if (!['proof', 'battle'].includes(capture.conditions.scene)) failures.push('Missing or invalid scene');
+    const target = new URL(capture.conditions.sceneUrl);
+    const run = /\/run\/?$/.test(target.pathname);
+    if (run && capture.conditions.scene !== 'battle') failures.push('Run capture must measure battle');
+    const keys = new Set<string>();
+    for (const sample of capture.samples) {
+      const key = `${sample.profile}/${sample.repetition}/${sample.cache}`;
+      const invalid = (message: string) => failures.push(`${key}: ${message}`);
+      if (!profiles.includes(sample.profile) || ![1,2,3].includes(sample.repetition) || !['cold','warm'].includes(sample.cache) || keys.has(key)) invalid('Invalid or duplicate matrix cell');
+      keys.add(key);
+      try {
+        if (!Array.isArray(sample.errors) || sample.errors.length) invalid('Browser errors or missing error status');
+        const d = sample.diagnostics;
+        const checkFrames = (summary: Diagnostics['frames'], raw: number[], minimum: number, label: string) => {
+          if (!Array.isArray(raw) || raw.length < minimum || raw.length > 600 || raw.some(n => !finite(n) || n <= 0)) { invalid(`${label}: missing or invalid raw intervals`); return; }
+          const sorted = [...raw].sort((a,b) => a-b);
+          const expected = {count: raw.length, medianMs: sorted[Math.ceil(raw.length*.5)-1],
+            p95Ms: sorted[Math.ceil(raw.length*.95)-1], maxMs: sorted.at(-1)!};
+          for (const metric of ['count','medianMs','p95Ms','maxMs'] as const) {
+            if (!finite(summary?.[metric]) || Math.abs(summary[metric]! - expected[metric]) >= FLOAT_NOISE_MS) invalid(`${label}: inconsistent ${metric}`);
+          }
+        };
+        for (const snapshot of [sample.idleDiagnostics, d]) {
+          if (snapshot.build.commit !== build.commit || snapshot.build.dirty !== false) invalid('Mixed or dirty idle/final build');
+          if (snapshot.scene !== capture.conditions.scene || snapshot.visibility !== 'visible' ||
+              snapshot.measurementMethod?.version !== 3 || snapshot.measurementMethod.frameObservation !== 'post-render') invalid('Invalid scene, visibility or frame method');
+          checkFrames(snapshot.frames, snapshot.idleIntervalsMs, 120, 'idle');
+        }
+        if (!finite(d.controlsUsableMs) || d.controlsUsableMs !== sample.idleDiagnostics.controlsUsableMs) invalid('Missing or changed first controls-usable time');
+        let codeBytes=0, assetBytes=0;
+        if (!Array.isArray(d.resources) || !d.resources.length || d.resources[0].url !== target.href) invalid('Missing navigation/request inventory');
+        for (const [index, resource] of d.resources.entries()) {
+          if (![resource.transferBytes,resource.encodedBodyBytes,resource.decodedBodyBytes,resource.durationMs].every(finite)) invalid('Invalid request sizes/timing');
+          const path = new URL(resource.url).pathname;
+          if (index === 0 || /\.(js|css|html)$/.test(path)) codeBytes += resource.transferBytes;
+          else assetBytes += resource.transferBytes;
+        }
+        if (sample.cache === 'cold' && (!codeBytes || !d.resources.some(r => new URL(r.url).pathname.endsWith('.js') && r.transferBytes > 0))) invalid('Cold sample has no transferred code');
+        const values = {usableMs:d.controlsUsableMs,codeBytes,assetBytes,idleP50Ms:d.frames.medianMs,idleP95Ms:d.frames.p95Ms};
+        const violations: typeof rows[number]['violations'] = [];
+        const gate = (metric: string, actual: number | null, limit: number, tolerance = FLOAT_NOISE_MS, window?: number) => {
+          if (!finite(actual) || actual > limit + tolerance) violations.push({metric,actual,limit,...(window === undefined ? {} : {window})});
+        };
+        gate('usableMs',values.usableMs,sample.cache === 'cold' ? LIMITS.L1_cold_ms : LIMITS.L2_warm_ms);
+        gate('idleP50Ms',values.idleP50Ms,LIMITS.F1_p50_ms);
+        gate('idleP95Ms',values.idleP95Ms,LIMITS.F1_p95_ms);
+        if (sample.cache === 'cold') { gate('codeBytes',codeBytes,LIMITS.L3_cold_code_bytes,0); gate('assetBytes',assetBytes,LIMITS.L4_cold_assets_bytes,0); }
+        if (capture.conditions.scene === 'battle') {
+          if (!Number.isInteger(sample.workloadStartIndex) || sample.workloadStartIndex < 0 || sample.workloadStartIndex > d.workloads.length) invalid('Invalid workload boundary');
+          const exercised = d.workloads.slice(sample.workloadStartIndex);
+          for (const action of ['selection','pan','zoom','move']) {
+            if (!exercised.some(w => w.action === action && w.frames.count > 0)) invalid(`Missing ${action} workload`);
+          }
+          for (const [index, window] of d.workloads.entries()) {
+            checkFrames(window.frames,window.intervalsMs,1,window.action);
+            if (!Array.isArray(window.intervalStartedMs) || window.intervalStartedMs.length !== window.intervalsMs.length ||
+                window.intervalStartedMs.some(n => !finite(n))) invalid('Missing workload interval timestamps');
+            if (['pan','zoom','move'].includes(window.action)) gate(window.action+' p95',window.frames.p95Ms,LIMITS.F2_p95_ms,FLOAT_NOISE_MS,index);
+          }
+          const startup = d.workloads.slice(0,sample.workloadStartIndex).filter(w => w.action === 'move');
+          if (!run && (!startup.length || startup.some(w =>
+            !w.intervalStartedMs.some((start,i) => start+w.intervalsMs[i] < d.controlsUsableMs!)))) invalid('Missing pre-controls startup movement');
+        }
+        rows.push({profile:sample.profile,repetition:sample.repetition,cache:sample.cache,values,violations});
+      } catch { invalid('Malformed sample'); }
+    }
+    if (keys.size !== 18) failures.push('Incomplete capture matrix');
+  } catch { failures.push('Malformed capture or mixed build identities'); }
+  return {build:capture?.measuredBuild ?? null,captureFailures:failures,rows,
+    failedSamples:rows.filter(row => row.violations.length > 0).length,
+    passed:failures.length === 0 && rows.length === 18 && rows.every(row => row.violations.length === 0)};
+}

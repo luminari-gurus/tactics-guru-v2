@@ -1,0 +1,376 @@
+{
+  "build": {
+    "commit": "0b317e35bb5c4ce713c242311f0673fc27923637",
+    "dirty": false
+  },
+  "captureFailures": [],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1558.699999988079,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.600000023841858
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1108.4000000357628,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.799999952316284,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1108.4000000357628,
+          "limit": 750
+        },
+        {
+          "metric": "idleP50Ms",
+          "actual": 16.799999952316284,
+          "limit": 16.7
+        },
+        {
+          "metric": "move p95",
+          "actual": 39.19999998807907,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1594.800000011921,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 35.200000047683716,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1144.4000000357628,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1144.4000000357628,
+          "limit": 750
+        },
+        {
+          "metric": "move p95",
+          "actual": 37.39999997615814,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1419.199999988079,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.30000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 41.5,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1057.9000000357628,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1057.9000000357628,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1488.2000000476837,
+        "codeBytes": 408990,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 408990,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 738.3000000119209,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.799999952316284,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "idleP50Ms",
+          "actual": 16.799999952316284,
+          "limit": 16.7
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1737.8999999761581,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1106.6000000238419,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1106.6000000238419,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1557.3999999761581,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1107.8999999761581,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.700000047683716
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1107.8999999761581,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1009.1000000238419,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 737.6999999880791,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.700000047683716
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1506.8999999761581,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.700000047683716,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1125.0999999642372,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.099999964237213
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1125.0999999642372,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1755,
+        "codeBytes": 409245,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 409245,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 1122.699999988079,
+        "codeBytes": 3744,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 1122.699999988079,
+          "limit": 750
+        }
+      ]
+    }
+  ],
+  "failedSamples": 17,
+  "passed": false
+}

@@ -1,0 +1,67 @@
+name: Issue 206 CPU verification
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  verify:
+    # Temporary execution must be approved by the caller before triggering this PR.
+    if: github.event.pull_request.head.ref == 'work/issue-206-build-validation' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        id: dependencies
+        run: npm ci
+      - name: Record source and toolchain
+        run: |
+          mkdir -p tmp/issue206-ci
+          git rev-parse HEAD > tmp/issue206-ci/source.txt
+          node --input-type=module <<'JS' > tmp/issue206-ci/environment.json
+          import { readFileSync } from 'node:fs';
+          console.log(JSON.stringify({ node: process.version, platform: process.platform, arch: process.arch, vite: JSON.parse(readFileSync('node_modules/vite/package.json', 'utf8')).version, vitest: JSON.parse(readFileSync('node_modules/vitest/package.json', 'utf8')).version }));
+          JS
+      - name: Verify orchestration contracts
+        run: npm run test:verification
+      - name: Execute every unit and build-integration case
+        id: all_checks
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: npm run test:unit:all -- --reporter=json --outputFile=tmp/issue206-ci/all-checks.json
+      - name: Verify safe standalone build
+        id: build
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: npm run build
+      - name: Verify prefix bundle command
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.all_checks.outcome == 'success' }}
+        run: npm run build:bundle -- --base=/prototype/
+      - name: Restore root bundle
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.all_checks.outcome == 'success' }}
+        run: npm run build:bundle
+      - name: Verify exact complete CPU coverage
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const report = JSON.parse(readFileSync('tmp/issue206-ci/all-checks.json', 'utf8'));
+          assert.equal(report.numTotalTests, 909);
+          assert.equal(report.numPassedTests, 909);
+          assert.equal(report.numFailedTests, 0);
+          assert.equal(report.numPendingTests, 0);
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-206-${{ github.event.pull_request.head.sha }}
+          path: tmp/issue206-ci/
+          retention-days: 14
+          if-no-files-found: ignore

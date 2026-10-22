@@ -13,3 +13,45 @@ Canonical files are extracted from Git blobs in `luminari-gurus/tactics-guru` at
 Content E verifies packaged-file/image loading in a separate [catalog-loading and terrain-surface smoke scene](qa/issue-30-content-loading.md). The authored catalog still does not feed a full battle renderer; full board rendering/picking, canopy and selection remain issue 6. Browser emulation does not claim physical-device acceptance.
 
 For future unit artwork, use the [unit-art guide and annotated five-pair reference sheet](art/unit-art-guide.md), with separate [sprite](art/unit-sprite-brief.md) and [portrait](art/unit-portrait-brief.md) briefs. It distinguishes the current 32-pixel battle HUD from the 48-pixel portrait export target and records source identity/padding differences without changing canonical assets.
+
+## Run battlefield sources (procedural follow-up to PR #147)
+
+The independent `battleCatalog` retains its authored forest map and terrain
+records. `desertRunCatalog` adds sand (walkable, cost 1) and rock (blocked,
+LOS-blocking), with new project-generated surfaces and provenance in
+`src/content/desertAssets.ts` and `docs/art/desert/source/`.
+
+Each production `BattlefieldEncounter` selects exactly one source: authored
+`{kind:'authored', mapId:'map:ruined_approach'}` or generated
+`{kind:'generated', biome:'desert', generatorVersion:1, profileVersion:'desert-v1'}`.
+A bounded reader rejects mixed, missing, unknown and unsupported sources. Stable
+full roster templates remain independent of carried HP. The first two existing
+encounter IDs select generated desert; the final selects the authored ruined
+approach. The final authored map passes common admission unchanged. The historical
+forest court fails reversible admission and is not a run source; its independent
+single-battle behavior remains available.
+
+`resolveBattlefield` returns a deeply frozen full map, a bounded descriptor and
+attempt/fallback diagnostics. Its canonical full-map hash includes all cells and
+spawns before defeated heroes are filtered. Battle-local catalogs project
+survivors and equipment once without changing the base catalogs.
+
+Desert v1 is 12×12. It reserves flat deployment bands and a four-cell-wide core,
+then decorates outside that core with 6–14 sparse rock cells and a broad 2×2
+raised sand patch. Admission enforces at least 116 flat sand cells, at most 14
+rocks, elevations 0/1, raised patches of at least four cells, two terrain exits
+per spawn and two internally vertex-disjoint gateway routes. The gateways are
+(5,2) and (5,9). Authored sources receive common structural, movement, deployment
+and engagement checks without desert density or gateway restrictions.
+
+Generation derives a layout seed with purpose `battle-layout-v1` from the
+encounter seed/ID, then independent attempt seeds with `battle-attempt-v1` and
+indices 0–3. Four failed attempts select the fixed open flat fallback. The fallback
+is admitted through the same checks; its failure is a controlled error. No combat,
+initiative or reward RNG is consumed. Diagnostics never determine reconstruction.
+Reason codes are `structure`, `movementComponent`, `deployment`, `engagement`,
+`profile` and `gateways`, with relevant cells/unit IDs and details.
+
+Reproduce the corpus with `BATTLEFIELD_CORPUS=full npx vitest run
+tests/unit/battlefieldCorpus.test.ts`. See `docs/qa/procedural-grids/corpus.json`
+for exact versions, seeds, distinct hashes, selected attempts and measured cost.

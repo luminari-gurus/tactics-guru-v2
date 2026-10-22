@@ -1,0 +1,40 @@
+{
+  "build": {
+    "commit": "6c18fa7a30f68f7f6480fa7ae6416e90b913443e",
+    "dirty": false
+  },
+  "captureFailures": [
+    "Expected exactly 18 samples",
+    "Collector reported failures or omitted failure status",
+    "Incomplete capture matrix"
+  ],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 987.4000000357628,
+        "codeBytes": 414354,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.30000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 414354,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 42.30000001192093,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    }
+  ],
+  "failedSamples": 1,
+  "passed": false
+}

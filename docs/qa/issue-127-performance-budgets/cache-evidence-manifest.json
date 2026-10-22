@@ -1,0 +1,19 @@
+{
+  "createdAt": "2026-10-18T07:02:41.845Z",
+  "files": {
+    "cache-source-binding.json": "5f1195fe88440a26c8aaab637834139b659426f57154d8a49e49eac943c740eb",
+    "cache-preview-verification.json": "0ceb156bc58745e6f195cd6d0415c870884f301d356d73efeb107eb834ab4870",
+    "cache-final-summary.json": "59dc610b3c586fca8e7b4062ab46229bfc156e084095e6c03ff78f6b413ef7ce",
+    "cache-deployment.json": "f12328e117ddb45146345ca6b80b76bc72fa0f67fb32c2891b534778c9d7d4c7",
+    "cache-root-functional.json": "a2a05c71bc08b9ff53d56d9c9621f0e4cdaffe4514f32640235873f2a5faff70",
+    "cache-prefix-functional.json": "64e70d6bd836773e0ed8a4046868090aca2adf15d397dc9abce93bd71e761685",
+    "cache-final-preview-battle.json": "f6710ee44ad71a9524607c2bf420c9dd4eb6eb8a290fd9f873e9fb788596f0c3",
+    "cache-final-preview-battle-gates.json": "c0eac8bd138f1d93870e86bef36214194e70d2fcc92e25ccca4ce9075226e158",
+    "cache-final-preview-run.json": "34910e497a6d3a76d35e761e5ab520ceef4f98448c3837e178b08bb8e6d4c3ac",
+    "cache-final-preview-run-gates.json": "be355f7f55986cf2ea5148b0fdaab3f07795c07e7510c65e085631cdd67c3893",
+    "cache-final-local-battle.json": "8f58ca811623edacacd2d159652b51ddc1e9ae20280377673bca125202d40f14",
+    "cache-final-local-battle-gates.json": "e840b468c4b73012010b1af4c13b9970eaea7611c39179cf622c0d9b13bfc053",
+    "cache-final-local-run.json": "8b583b46d970b6bbca788a00d9ede7603af10a064155288c8987299da1384df8",
+    "cache-final-local-run-gates.json": "d96d4f6cad70d2c3de34f083ce2271307ac56d5209eda4046412f8a2c10e9751"
+  }
+}

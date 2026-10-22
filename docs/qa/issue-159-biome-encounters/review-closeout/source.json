@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "96b13ed3aaec7a99d45b6a8fb94f9361078a5174",
+  "runtimeTree": "63233e1ad50a030d59be334b76213babdf273dd6",
+  "testsTree": "9823d768b97411ad743f1547ef6f9d67eb68db1c",
+  "clockFixCommit": "18d25722d351c19545f5b191a32f9efc708fc588",
+  "legacyFixCommit": "804e50dea57b7a5a5e8415729a042be19826e723",
+  "notes": "The final runtime/unit/helper tree equals qualified PR #194 at 5d0ce05. Clock-test/config files equal the 12-case qualified 18d2572 tree. Final build/performance/posttests ran at sourceCommit. Build dirty metadata reflects the untracked dependency symlink and content-check snapshot line endings; task-generated tracked churn is restored before publication. Prior broad-run failures are retained, not relabeled."
+}

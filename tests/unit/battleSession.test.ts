@@ -6,6 +6,7 @@ import { replayBattle } from '../../src/domain/turns';
 import { assert } from 'vitest';
 import { saveFixtures } from '../helpers/saveFixtures';
 import { nextUint32 } from '../../src/domain/rng';
+import { targetOverlays, hoverPreview } from '../../src/ui/targetPreview';
 
 const make = (seed = 1) => new BattleSession(catalog, 'map:forest_ruins', seed);
 const finishEnemies = (s: BattleSession) => {
@@ -15,6 +16,53 @@ const finishEnemies = (s: BattleSession) => {
   }
 };
 describe('battle session', () => {
+  it('hover reach includes Magic Missile targets without adding movement cells or mutating the session',()=>{
+    const initial=make(2).state,mage=initial.units.find(u=>u.defId==='mage')!,enemy=initial.units.find(u=>u.side==='enemy')!;
+    const state={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===enemy.id?{...u,cell:{x:7,y:6}}:u)};
+    const s=new BattleSession(catalog,state,state.seed),origin={x:4,y:8};
+    s.prepare({type:'endTurn',unitId:mage.id});const pending=s.pending,before=s.state;
+    const hover=hoverPreview(s,origin)!;
+    expect(hover.cells).toContainEqual({x:7,y:6});expect(hover.targets).toContainEqual({x:7,y:6});
+    expect(hover.cells).toContainEqual({x:6,y:8}); // Water is in spell reach even though it cannot be walked on.
+    expect(s.state).toBe(before);expect(s.pending).toBe(pending);expect(s.events).toEqual([]);
+    const blockedState={...state,units:state.units.map(u=>u.id===enemy.id?{...u,cell:{x:2,y:3}}:u)};
+    const blocked=new BattleSession(catalog,blockedState,state.seed);
+    expect(hoverPreview(blocked,{x:0,y:3})!.targets).not.toContainEqual({x:2,y:3});
+    const spent=new BattleSession(catalog,{...state,units:state.units.map(u=>u.id===mage.id?{...u,hasActed:true}:u)},state.seed);
+    expect(hoverPreview(spent,origin)).toBeNull();
+    const fighter=initial.units.find(u=>u.defId==='fighter')!;
+    const melee=new BattleSession(catalog,{...initial,activeIndex:initial.initiative.indexOf(fighter.id)},initial.seed);
+    const meleePreview=hoverPreview(melee,{x:11,y:11})!;
+    expect(meleePreview.cells).toHaveLength(2);
+    expect(meleePreview.cells).toEqual(expect.arrayContaining([{x:10,y:11},{x:11,y:10}]));
+    expect(meleePreview.cells).not.toContainEqual({x:9,y:11}); // Within Move 4, outside every fighter ability's range 1.
+    expect(meleePreview.cells).not.toContainEqual({x:11,y:11}); // Origin is a marker, not ability range.
+  });
+  it('target overlays retain domain rejection reasons and never prepare, resolve or consume RNG', () => {
+    const initial = make(2).state;
+    const ranger = initial.units.find(u=>u.defId==='ranger')!;
+    const enemy = initial.units.find(u=>u.side==='enemy')!;
+    // A validated snapshot on the authored map with a forest cell between ranger and enemy.
+    const state = {...initial,activeIndex:initial.initiative.indexOf(ranger.id),units:initial.units.map(u=>
+      u.id===ranger.id?{...u,cell:{x:0,y:3}}:u.id===enemy.id?{...u,cell:{x:2,y:3}}:u)};
+    const s = new BattleSession(catalog,state,state.seed);
+    expect(s.phase).toBe('player');
+    const before=s.state;
+    expect(targetOverlays(s,'ability:high_shot',{x:2,y:3}).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'blockedLos'});
+    expect(targetOverlays(s,'basic',null).find(t=>t.cell.x===2&&t.cell.y===3))
+      .toMatchObject({valid:false,reason:'outOfRange'});
+    expect(targetOverlays(s,'ability:high_shot',s.active.cell).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'sameSide'});
+    expect(targetOverlays(s,'ability:high_shot',{x:0,y:0}).find(t=>t.selected))
+      .toMatchObject({valid:false,reason:'missingTarget'});
+    expect(targetOverlays(s,'move',null)).toEqual([]);
+    expect(targetOverlays(s,null,null)).toEqual([]);
+    expect(s.pending).toBeNull();expect(s.state).toBe(before);expect(s.events).toEqual([]);
+    s.prepare({type:'endTurn',unitId:s.active.id});const step=s.confirm()!;
+    expect(targetOverlays(s,'ability:high_shot',null)).toEqual([]);
+    s.finishPresentation(step.token);s.dispose();expect(targetOverlays(s,'ability:high_shot',null)).toEqual([]);
+  });
   it('automatically exposes enemy-first turns, locks player commands, records accepted commands and replays', () => {
     const s = make();
     expect(s.phase).toBe('enemy');

@@ -65,13 +65,30 @@ it('drops captured gestures at the drawable boundary, including outside release 
 it('removes every listener and restores touch style on shutdown', () => {
   const f = fake();
   const cleanup = bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));
-  expect(f.listeners.size).toBe(6);
+  expect(f.listeners.size).toBe(7);
   expect([...f.documentListeners.keys()]).toEqual(['visibilitychange']);
   expect(f.canvas.style.touchAction).toBe('none');
   cleanup();
   expect(f.listeners.size).toBe(0);
   expect(f.documentListeners.size).toBe(0);
   expect(f.canvas.style.touchAction).toBe('auto');
+});
+
+it('reports idle mouse/pen hover separately from selection and clears it on input boundaries', () => {
+  const f=fake(),hovers:({x:number;y:number}|null)[]=[];
+  const cleanup=bindBoardInput(f.canvas,{...board(f),hover:p=>hovers.push(p)},()=>({width:400,height:600}));
+  const move=(pointerType:string,buttons=0)=>f.listeners.get('pointermove')!({...pointer('pointermove',1,100,120),pointerType,buttons} as unknown as Event);
+  move('mouse');expect(hovers.at(-1)).toEqual({x:100,y:120});
+  move('touch');expect(hovers).toHaveLength(1);
+  move('pen');expect(hovers).toHaveLength(2);expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerleave')!(new Event('pointerleave'));expect(hovers.at(-1)).toBeNull();
+  move('mouse');f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,120));expect(hovers.at(-1)).toBeNull();
+  move('mouse',1);expect(hovers.at(-1)).toBeNull();
+  cleanup.reset();move('mouse');
+  f.listeners.get('wheel')!({clientX:100,clientY:120,deltaY:-100,preventDefault(){}} as unknown as Event);
+  expect(hovers.at(-1)).toBeNull();
+  move('mouse');f.document.visibilityState='hidden';f.documentListeners.get('visibilitychange')!(new Event('visibilitychange'));
+  expect(hovers.at(-1)).toBeNull();cleanup();
 });
 
 it('suppresses a trailing release after wheel zoom while a pointer is held', () => {
@@ -84,6 +101,47 @@ it('suppresses a trailing release after wheel zoom while a pointer is held', () 
   f.listeners.get('pointerdown')!(pointer('pointerdown', 2, 100, 100));
   f.listeners.get('pointerup')!(pointer('pointerup', 2, 100, 100));
   expect(f.board.selections).toBe(1);
+});
+
+it.each(['touch','pen'])('preserves overlap selection after completed %s taps but clears it for cancelled gestures',pointerType=>{
+  const f=fake();let resets=0;
+  const cleanup=bindBoardInput(f.canvas,{...board(f),resetPicking:()=>resets++},()=>({width:400,height:600}),p=>p.x>10&&p.y>10);
+  const touch=(type:string)=>({...pointer(type,1,100,100),pointerType} as unknown as Event);
+  for(let i=0;i<2;i++){
+    f.listeners.get('pointerdown')!(touch('pointerdown'));
+    f.listeners.get('pointerup')!(touch('pointerup'));
+    // WebKit sends this after pointerup with zero coordinates, outside the drawable region.
+    f.listeners.get('lostpointercapture')!({...touch('lostpointercapture'),clientX:0,clientY:0} as unknown as Event);
+    f.listeners.get('pointerleave')!(touch('pointerleave'));
+  }
+  expect(f.board.selections).toBe(2);expect(resets).toBe(0);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  cleanup.reset(true); // Layout can cancel capture while the camera/candidates stay unchanged.
+  expect(resets).toBe(0);expect(f.captured.size).toBe(0);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  f.listeners.get('pointercancel')!(touch('pointercancel'));
+  expect(resets).toBe(1);expect(f.board.selections).toBe(2);
+  f.listeners.get('pointerdown')!(touch('pointerdown'));
+  f.listeners.get('pointerleave')!(touch('pointerleave'));
+  expect(resets).toBe(2);expect(f.captured.size).toBe(0);cleanup();
+});
+
+it('secondary press cancels once, resets overlap and releases held pointers only inside the enabled board',()=>{
+  const f=fake();let cancels=0,resets=0,enabled=true;
+  const cleanup=bindBoardInput(f.canvas,{...board(f),cancel:()=>cancels++,resetPicking:()=>resets++},
+    ()=>({width:400,height:600}),p=>enabled&&p.x>20);
+  const secondary=(x=100)=>({...pointer('pointerdown',1,x,100),button:2} as unknown as Event);
+  f.listeners.get('pointerdown')!(secondary(10));expect(cancels).toBe(0);expect(resets).toBe(0);
+  enabled=false;f.listeners.get('pointerdown')!(secondary());expect(cancels).toBe(0);expect(resets).toBe(0);
+  enabled=true;f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100));
+  f.listeners.get('pointerdown')!(secondary());
+  expect(cancels).toBe(1);expect(resets).toBe(1);expect(f.captured.size).toBe(0);
+  f.listeners.get('pointermove')!(pointer('pointermove',1,130,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100));
+  expect(f.board.pans).toEqual([]);expect(f.board.selections).toBe(0);expect(cancels).toBe(1);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,100,100));
+  f.listeners.get('pointerup')!(pointer('pointerup',2,100,100));
+  expect(f.board.selections).toBe(1);cleanup();
 });
 
 it('drops a pointer that is down when the page is hidden so resume cannot pan without a press', () => {

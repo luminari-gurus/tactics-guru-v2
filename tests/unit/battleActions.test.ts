@@ -1,0 +1,33 @@
+import { expect,it } from 'vitest';
+import { abilityCatalog,abilitySession } from '../helpers/abilityCatalog';
+import { actionCommand,ownedAbilities,actionTargets,friendlyFire } from '../../src/ui/battleActions';
+import { BattleSession } from '../../src/app/BattleSession';
+import { previewText } from '../../src/ui/hud';
+import { targetOverlays } from '../../src/ui/targetPreview';
+it.each(['fighter','ranger','mage'] as const)('selects later %s abilities by identity across catalog order and rejects foreign IDs',hero=>{
+  const catalog=abilityCatalog(),s=abilitySession(hero,catalog),before=JSON.stringify({state:s.state,replay:s.replay});
+  const choices=ownedAbilities(s);expect(choices).toHaveLength(2);
+  const reverse=abilitySession(hero,{...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).reverse())});
+  expect(ownedAbilities(reverse)).toEqual(choices);
+  const target=s.state.units.find(u=>u.side==='enemy')!;
+  expect(actionCommand(s,choices[1].id,target.cell)).toMatchObject({abilityId:`ability:zz_${hero}`,target:{unitId:target.id}});
+  expect(actionCommand(s,'ability:missing',target.cell)).toBeNull();
+  expect(actionCommand(s,'ability:shortbow_shot',target.cell)).toBeNull();
+  targetOverlays(s,choices[1].id,target.cell);
+  expect(JSON.stringify({state:s.state,replay:s.replay})).toBe(before);expect(s.pending).toBeNull();
+});
+it('allocates all missiles to one legal friendly target and preserves atomic cancellation and spent locks',()=>{
+  const base=abilitySession('mage'),ally=base.state.units.find(u=>u.defId==='fighter')!;
+  const state=base.state;
+  const s=new BattleSession(base.catalog,state,2),before=JSON.stringify({state:s.state,replay:s.replay});
+  expect(actionTargets(s,'ability:zz_mage')).toContainEqual(s.state.units.find(u=>u.id===ally.id));
+  const command=actionCommand(s,'ability:zz_mage',ally.cell)!;
+  const preview=s.prepare(command);
+  expect(preview).toMatchObject({ok:true,missileCount:2,targetIds:[ally.id,ally.id]});
+  expect(previewText(preview)).toContain('2 missiles · 2–5 force damage each');
+  expect(friendlyFire(s,command)).toContain('fighter');s.cancel();
+  expect(JSON.stringify({state:s.state,replay:s.replay})).toBe(before);
+  s.prepare(command);const step=s.confirm()!;expect(step.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
+  expect(s.confirm()).toBeNull();s.finishPresentation(step.token);
+  expect(s.prepare(command)).toMatchObject({ok:false,reason:'alreadyActed'});
+});

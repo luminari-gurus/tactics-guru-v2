@@ -1,0 +1,51 @@
+import {chromium,devices} from '@playwright/test';
+import {writeFileSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {navigateCapture} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const [url,output]=process.argv.slice(2);
+const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',url],{}));
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+try{
+  const context=await browser.newContext({...devices['Pixel 7'],viewport:{width:915,height:412}});
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+  const ready=()=>page.waitForFunction(()=>window.fitDiagnostics?.().controlsUsableMs!==null && window.fitDiagnostics?.().frames.count>=120);
+  await navigateCapture(page,target,'cold');await ready();
+  await navigateCapture(page,target,'warm');await ready();
+  await page.screenshot({path:output+'.png'});
+  const cdp=await context.newCDPSession(page);
+  const counters=async()=>{await cdp.send('HeapProfiler.collectGarbage');return cdp.send('Memory.getDOMCounters');};
+  const beforeCounters=await counters();
+  const before=await page.locator('#game').getAttribute('data-session');
+  await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:1000});
+  await cdp.send('Profiler.start');await new Promise(resolve=>setTimeout(resolve,5000));
+  const {profile}=await cdp.send('Profiler.stop');await cdp.send('Profiler.disable');
+  const after=await page.locator('#game').getAttribute('data-session');
+  const diagnostics=await page.evaluate(()=>window.fitDiagnostics());
+  const gpu=await page.evaluate(()=>{
+    const canvas=document.querySelector('canvas');
+    const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');
+    const debug=gl?.getExtension('WEBGL_debug_renderer_info');
+    return gl?{renderer:gl.getParameter(gl.RENDERER),unmasked:debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):null}:null;
+  });
+  const restarts=[];
+  for(let index=0;index<3;index++){
+    const priorRun=await page.evaluate(()=>window.fitDiagnostics().run);
+    await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();
+    await page.locator('#run-start-encounter').click();
+    await page.waitForFunction(prior=>window.fitDiagnostics().run>prior && window.fitDiagnostics().frames.count>=120 &&
+      document.querySelector('#game')?.getAttribute('data-phase')==='player',priorRun);
+    restarts.push({run:await page.evaluate(()=>window.fitDiagnostics().run),...await counters()});
+  }
+  const samples=new Map();
+  for(let i=0;i<(profile.samples?.length??0);i++)samples.set(profile.samples[i],(samples.get(profile.samples[i])??0)+(profile.timeDeltas?.[i]??0));
+  const functions=profile.nodes.map(n=>({...n.callFrame,selfMicros:samples.get(n.id)??0})).sort((a,b)=>b.selfMicros-a.selfMicros).slice(0,30);
+  writeFileSync(output+'.cpuprofile',JSON.stringify(profile));
+  writeFileSync(output+'.json',JSON.stringify({purpose:'Separate diagnostic profile; NOT an acceptance capture',url,browser:browser.version(),
+    scriptSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),gpu,errors,
+    idleStateUnchanged:before===after,beforeCounters,restartCounters:restarts,diagnostics,
+    durationMicros:profile.endTime-profile.startTime,topSelfFunctions:functions},null,2)+'\n');
+  console.log(JSON.stringify({output,build:diagnostics.build,idleStateUnchanged:before===after,beforeCounters,restarts,gpu,errors,top:functions.slice(0,5)}));
+}finally{await browser.close();}

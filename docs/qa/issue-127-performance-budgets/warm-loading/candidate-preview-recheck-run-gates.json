@@ -1,0 +1,261 @@
+{
+  "floatNoiseToleranceMs": 0.000001,
+  "limits": {
+    "L1_cold_ms": 2500,
+    "L2_warm_ms": 750,
+    "L3_cold_code_bytes": 400000,
+    "L4_cold_assets_bytes": 1500000,
+    "F1_p50_ms": 16.7,
+    "F1_p95_ms": 20,
+    "F2_p95_ms": 33.4
+  },
+  "build": {
+    "commit": "6360e72c0973820e7a96c9368d2f02c3bed133f2",
+    "dirty": false
+  },
+  "captureFailures": [],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1089.5,
+        "codeBytes": 381050,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.699999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 729,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.400000035762787
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1159.7000000476837,
+        "codeBytes": 381021,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 763.0999999642372,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.199999988079071
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 763.0999999642372,
+          "limit": 750
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 930.0999999642372,
+        "codeBytes": 381050,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 8.699999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 697.0999999642372,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.599999964237213
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1076.2999999523163,
+        "codeBytes": 381010,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 725.3999999761581,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.299999952316284,
+        "idleP95Ms": 10.800000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1169,
+        "codeBytes": 381050,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.299999952316284
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 719.4000000357628,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 10.300000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1136,
+        "codeBytes": 381154,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 711.2000000476837,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.899999976158142
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 929.6999999880791,
+        "codeBytes": 381175,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 706.3000000119209,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 10
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 890.7999999523163,
+        "codeBytes": 381154,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 9.300000011920929
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 675.3000000119209,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 10.199999988079071
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 1178.5,
+        "codeBytes": 381050,
+        "assetBytes": 847929,
+        "idleP50Ms": 8.300000011920929,
+        "idleP95Ms": 9.600000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 737.3999999761581,
+        "codeBytes": 2356,
+        "assetBytes": 2400,
+        "idleP50Ms": 8.399999976158142,
+        "idleP95Ms": 10.300000011920929
+      },
+      "violations": []
+    }
+  ],
+  "failedSamples": 1,
+  "passed": false
+}

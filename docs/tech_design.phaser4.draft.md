@@ -9,6 +9,8 @@
 **Companion document:** `docs/phaser4-restart-plan.md` ("the plan") holds the legacy audit, the tracker mapping, the evidence for the release constraints and the open-decision register D1–D11. This document states the design contracts. Where the two disagree, that is a defect to fix, not a choice. The tracker's issues are the authority for scope and acceptance.[52]
 **Conventions:** *baseline* means legacy behaviour at the pinned SHA; *target* means the originally intended design, whose implementation status is reconciled in the current snapshot and §12; *proposal* means a design choice not yet made in code. D1–D11 refer to the plan's register; T1–T11 are historical engineering questions with current dispositions (§12). Source numbers [1]–[77] are the plan's; [78] onward are new here.
 
+**Map selection follow-up (#146, 2026-10-19):** [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149) adds exposed opaque living-sprite hits and repeated click/tap cycling through overlapping terrain cells via the existing selection/preview path. Hidden bodies do not override foreground terrain; the proof scene keeps frontmost-solid picking and domain legality is unchanged. This branch implementation supersedes the dated D8/T4 tile-only disposition below for battles; it is pending review, not a merged-main claim. See the [current contract and evidence](qa/issue-146-occluded-map-picking/README.md).
+
 ### Current state (verified 2026-10-16)
 
 GitHub main is [`b175ddb5dabed2ee8457e132e345e9a2fc2affdb`](https://github.com/luminari-gurus/tactics-guru-v2/commit/b175ddb5dabed2ee8457e132e345e9a2fc2affdb), the merged #80 integration (PR #120). Issue and PR states were refreshed on 2026-10-16. Initial local source inspection used `work/issue-79-reward-item-controls` at `3060060`; subsequent main changes below are confirmed by merged tracker records, not local execution. The documentation PR is based on the main revision above. Historical QA results retain their original revision/device limits; this documentation update ran no gameplay or physical-device tests.
@@ -863,7 +865,7 @@ Primary risk: full feature-parity creep defeats the purpose. The plan (§9) keep
 | # | Decision / current disposition | Evidence / remaining gate |
 | --- | --- | --- |
 | D1 | Required browser/orientation matrix retained; minimum versions and complete physical device details still open. | #64/#66; reported iPhone success is not the full matrix. |
-| D2 | Numeric loading/frame budgets established for measured acceptance. | #65: L1 cold ≤2500 ms, L2 warm ≤750 ms, L3 compressed code ≤400000 bytes, L4 assets ≤1500000 bytes; F1 idle p50 ≤16.7/p95 ≤20 ms, F2 pan/zoom/move p95 ≤33.4 ms. #64 still verifies hardware. |
+| D2 | Numeric loading/frame budgets established for measured acceptance. | #65: L1 cold ≤2500 ms, L2 warm: no hard time gate; any load >1000 ms warns, repeated slow loads prompt review, isolated spikes are history, L3 compressed code ≤400000 bytes, L4 assets ≤1500000 bytes; F1 idle p50 ≤16.7/p95 ≤20 ms, F2 pan/zoom/move p95 ≤33.4 ms. #64 still verifies hardware. |
 | D4 | Implemented Fighter/Ranger/Mage and two Goblin Grunts plus one Goblin Archer on Forest Ruins; no Shaman roster adopted. | #29/#3 and `src/content/forestRuins.ts`, `src/content/catalog.ts`. |
 | D5 | Resolved: Guarded on resolved hit/miss; Magic Missile replaced Ember Burst. | #8, [signature contract](signature-abilities.md). |
 | D6 | Resolved: Guarded Strike −2 attack / +2 AC; Basic Attack retains normal accuracy. | #49 / PR #50; no legacy −4 penalty. |

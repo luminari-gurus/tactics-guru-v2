@@ -4,13 +4,16 @@ import type { BattleEvent, BattleState } from '../domain/types';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
-import { constrainView, MAX_ZOOM, pickTile, screenToBoard, type View } from '../geometry/picking';
+import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
+import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
 
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
 const SELECTED_COLOR = 0xffffff;
+const BOB_HEIGHT = 2;
+const BOB_CYCLE_MS = 1200;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 
 /** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
@@ -32,12 +35,84 @@ export class BoardRenderer {
   private fitScale = 1;
   private snapshot: BattleState | undefined;
   private reachable: readonly CellPosition[] = [];
+  private targets: readonly TargetOverlay[] = [];
+  private hoverPreview: HoverPreview | null = null;
   private selected: Tile | null = null;
   private selectionEvents = 0;
+  private picking: { point: Point; keys: string; index: number } | null = null;
   private animatedSnapshot: BattleState | undefined;
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
   private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
+
+  private idle = false;
+  private bobId: number | null = null;
+  private bobElapsed = 0;
+  private bobOffset = 0;
+  private bobBase: Point | null = null;
+  private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /** Absolute offsets from the authoritative tile anchor never accumulate across refreshes. */
+  private readonly updateBob = (_time: number, delta: number): void => {
+    if (this.bobId === null) return;
+    this.bobElapsed = (this.bobElapsed + delta) % BOB_CYCLE_MS;
+    this.bobOffset = -BOB_HEIGHT * (1 - Math.cos(2 * Math.PI * this.bobElapsed / BOB_CYCLE_MS)) / 2;
+    this.placeBob();
+    // Update only the changing sprite diagnostics, not all board geometry each frame.
+    const game = document.querySelector<HTMLElement>('#game');
+    if (!game?.dataset.battleReport) return;
+    const report = JSON.parse(game.dataset.battleReport);
+    const unit = report.units.find((u: { id: number }) => u.id === this.bobId);
+    if (unit) {
+      const image = this.images.get(this.bobId)!;
+      unit.position = { x: image.x, y: image.y };
+      unit.bobOffset = this.bobOffset;
+      const base = this.root.getWorldTransformMatrix().transformPoint(this.bobBase!.x, this.bobBase!.y);
+      const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
+      unit.baseAnchorError = Math.hypot(base.x - actual.x, base.y - actual.y);
+      unit.anchorError = Math.hypot(base.x - actual.x, base.y + this.bobOffset * this.view.scale - actual.y);
+    }
+    game.dataset.battleReport = JSON.stringify(report);
+  };
+  private readonly motionChanged = (): void => {
+    this.syncBob();
+    this.publish();
+  };
+
+  setIdle(idle: boolean): void {
+    this.idle = idle;
+    this.syncBob();
+  }
+
+  private syncBob(): void {
+    const snapshot = this.snapshot;
+    const activeId = snapshot?.initiative[snapshot.activeIndex];
+    const active = snapshot?.units.find(unit => unit.id === activeId);
+    const next = this.idle && !this.animatedSnapshot && !this.reducedMotion.matches
+      && snapshot?.outcome === 'ongoing' && active && active.hp > 0 ? active.id : null;
+    if (next !== this.bobId) {
+      if (this.bobId !== null) {
+        const unit = snapshot?.units.find(unit => unit.id === this.bobId);
+        const image = this.images.get(this.bobId);
+        if (image?.scene) {
+          const point = unit ? projectTile(this.byCell.get(cellKey(unit.cell))!) : this.bobBase;
+          if (point) image.setPosition(point.x, point.y);
+        }
+      }
+      this.bobId = next;
+      this.bobElapsed = 0;
+      this.bobOffset = 0;
+    }
+    this.placeBob();
+  }
+
+  private placeBob(): void {
+    if (this.bobId === null || !this.snapshot) return;
+    const unit = this.snapshot.units.find(unit => unit.id === this.bobId)!;
+    const point = projectTile(this.byCell.get(cellKey(unit.cell))!);
+    this.bobBase = point;
+    this.images.get(unit.id)!.setPosition(point.x, point.y + this.bobOffset);
+  }
 
   constructor(private readonly scene: Phaser.Scene, private readonly catalog: ContentCatalog, private readonly mapId: MapId,
     private readonly onSelect: (cell: CellPosition | null) => void) {
@@ -99,13 +174,22 @@ export class BoardRenderer {
         const asset = catalog.assets[occupant.assetId];
         return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
       }))];
+    this.reducedMotion.addEventListener('change', this.motionChanged);
+    scene.events.on(Phaser.Scenes.Events.UPDATE, this.updateBob);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.idle = false;
+      this.bobId = null;
+      this.bobOffset = 0;
+      scene.events.off(Phaser.Scenes.Events.UPDATE, this.updateBob);
+      this.reducedMotion.removeEventListener('change', this.motionChanged);
+    });
     this.bounds = {
       left: Math.min(...rectangles.map(r => r.left)), right: Math.max(...rectangles.map(r => r.right)),
-      top: Math.min(...rectangles.map(r => r.top)), bottom: Math.max(...rectangles.map(r => r.bottom)),
+      top: Math.min(...rectangles.map(r => r.top)) - BOB_HEIGHT, bottom: Math.max(...rectangles.map(r => r.bottom)),
     };
   }
 
-  /** Local shape cache, bounded by elevations and the 16 overlay combinations.
+  /** Local shape cache, bounded by elevations and the overlay flag combinations.
    * Six pixels per board unit preserves the maximum fitted 1.5 × 4 zoom density.
    * Textures are owned by this game's manager and reused across scene restarts.
    */
@@ -133,23 +217,53 @@ export class BoardRenderer {
       if(flags&2) graphics.lineStyle(3,ACTIVE_COLOR).strokePoints(vertices,true);
       if(flags&4) graphics.lineStyle(2.5,0xb9b1ff).strokePoints(vertices,true);
       if(flags&8) graphics.lineStyle(2.5,SELECTED_COLOR).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.78,p.y*0.78)),true);
+      if(flags&128) {
+        graphics.fillStyle(0xb48aff,0.25).fillPoints(vertices,true);
+        graphics.lineStyle(1.5,0xd3b7ff).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.9,p.y*0.9)),true);
+        graphics.fillStyle(0xffffff).fillCircle(-3,13,1.3).fillCircle(3,13,1.3);
+      }
+      if(flags&256) graphics.lineStyle(2.5,0xffffff).strokeEllipse(0,0,18,9);
+      if(flags&512) {
+        graphics.fillStyle(0xff82c4,0.4).fillPoints(vertices,true);
+        graphics.lineStyle(2.5,0xffb9df).strokePoints(vertices,true);
+        graphics.lineStyle(4,0x172033).lineBetween(-5,13,5,13).lineBetween(0,9,0,17);
+        graphics.lineStyle(2,0xffffff).lineBetween(-5,13,5,13).lineBetween(0,9,0,17);
+      }
+      if(flags&48) {
+        const valid=!!(flags&16),color=valid?0x63eba0:0xff867c;
+        graphics.fillStyle(color,0.32).fillPoints(vertices,true);
+        graphics.lineStyle(flags&64?3.5:2,color).strokePoints(vertices,true);
+        // A check / X at the front edge stays clear of the unit's feet and reads without color.
+        graphics.lineStyle(4,0x172033).lineBetween(-5,10,valid?-1:5,16).lineBetween(valid?-1:-5,16,6,8);
+        graphics.lineStyle(2,0xffffff).lineBetween(-5,10,valid?-1:5,16).lineBetween(valid?-1:-5,16,6,8);
+        if(flags&64) graphics.lineStyle(2,0xffffff).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.82,p.y*0.82)),true);
+      }
     });
   }
 
-  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = []): void {
+  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = [], targets: readonly TargetOverlay[] = [], hover: HoverPreview | null = null): void {
     // Modal/layout refreshes must not remove a defeated target before impact.
     snapshot = this.animatedSnapshot ?? snapshot;
     this.snapshot = snapshot;
     this.reachable = reachable;
+    this.targets = this.animatedSnapshot ? [] : targets;
+    this.hoverPreview = this.animatedSnapshot ? null : hover;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
     const activeId = snapshot.initiative[snapshot.activeIndex];
     const active = snapshot.units.find(unit => unit.id === activeId)!;
     const reachableKeys = new Set(reachable.map(cellKey));
     const pathKeys = new Set(path.map(cellKey));
+    const targetByCell = new Map(this.targets.map(target => [cellKey(target.cell),target]));
+    const hoverKeys = new Set(this.hoverPreview?.cells.map(cellKey));
+    const hoverTargetKeys = new Set(this.hoverPreview?.targets.map(cellKey));
     for (const tile of this.board.tiles) {
       const key = cellKey(tile);
+      const target = targetByCell.get(key);
       const flags = (reachableKeys.has(key) && key !== cellKey(active.cell) ? 1 : 0)
-        | (key === cellKey(active.cell) ? 2 : 0) | (pathKeys.has(key) ? 4 : 0) | (this.selected === tile ? 8 : 0);
+        | (key === cellKey(active.cell) ? 2 : 0) | (pathKeys.has(key) ? 4 : 0) | (this.selected === tile && !target ? 8 : 0)
+        | (target ? target.valid ? 16 : 32 : 0) | (target?.selected ? 64 : 0)
+        | (hoverKeys.has(key) ? 128 : 0) | (this.hoverPreview && key===cellKey(this.hoverPreview.origin) ? 256 : 0)
+        | (hoverTargetKeys.has(key) && !target ? 512 : 0);
       this.highlights.get(key)!.setTexture(this.highlightTexture(flags));
     }
     for (const unit of snapshot.units) {
@@ -172,18 +286,20 @@ export class BoardRenderer {
         if (unit.hp <= 0) return false;
         const tile = this.byCell.get(cellKey(unit.cell))!;
         const image = this.images.get(unit.id)!;
-        return canopyOccludes(canopy.tile, tile, unitBounds(tile, { x: image.originX, y: image.originY }), this.catalog.maps[this.mapId].height);
+        const art = unitBounds(tile, { x: image.originX, y: image.originY });
+        return canopyOccludes(canopy.tile, tile, { ...art, top: art.top - BOB_HEIGHT }, this.catalog.maps[this.mapId].height);
       });
       canopy.graphics.setAlpha(overlaps ? CANOPY_ART.fadedAlpha : 1);
     }
+    this.syncBob();
     this.root.sort('depth');
     this.publish();
   }
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
-    this.present(before, [], null);
     this.animatedSnapshot = before;
+    this.present(before, [], null);
     const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
     const {signature, feedback} = abilityPresentation(events);
     const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
@@ -319,6 +435,7 @@ export class BoardRenderer {
     if (width !== window.innerWidth || height !== window.innerHeight) return;
     const layout = fitBoard(this.bounds, region);
     const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
+    if(viewportChanged)this.resetPicking();
     const zoom = this.view.scale / this.fitScale;
     this.viewport = { width, height };
     this.region = region;
@@ -336,7 +453,9 @@ export class BoardRenderer {
   }
 
   private applyView(view: View): void {
-    this.view = constrainView(view, this.bounds, this.region, this.fitScale);
+    const constrained=constrainView(view, this.bounds, this.region, this.fitScale);
+    if(constrained.x!==this.view.x || constrained.y!==this.view.y || constrained.scale!==this.view.scale)this.resetPicking();
+    this.view = constrained;
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
     for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
@@ -410,12 +529,14 @@ export class BoardRenderer {
   });}
 
   pan(dx: number, dy: number): boolean {
+    this.resetPicking();
     const before = this.view;
     this.applyView({ ...before, x: before.x + dx, y: before.y + dy });
     return this.view.x !== before.x || this.view.y !== before.y;
   }
 
   zoom(factor: number, anchor: Point): boolean {
+    this.resetPicking();
     const before = this.view;
     const point = screenToBoard(anchor, this.view);
     const scale = Math.max(this.fitScale, Math.min(this.fitScale * MAX_ZOOM, this.view.scale * factor));
@@ -424,9 +545,48 @@ export class BoardRenderer {
   }
 
   select(point: Point): void {
+    const candidates=this.pickCandidates(point),keys=candidates.map(cellKey).join('|');
+    const same=this.picking?.keys===keys && Math.hypot(point.x-this.picking.point.x,point.y-this.picking.point.y)<DRAG_THRESHOLD;
+    const index=same ? (this.picking!.index+1)%candidates.length : 0;
+    this.picking=candidates.length ? {point,keys,index} : null;
     this.selectionEvents++;
-    const tile = pickTile(this.board.tiles, screenToBoard(point, this.view));
-    this.onSelect(tile ? { x: tile.x, y: tile.y } : null);
+    const tile=candidates[index];
+    this.onSelect(tile ? {x:tile.x,y:tile.y} : null);
+  }
+
+  cellAt(point: Point): CellPosition | null {
+    const candidates=this.pickCandidates(point),keys=candidates.map(cellKey).join('|');
+    const same=this.picking?.keys===keys && Math.hypot(point.x-this.picking.point.x,point.y-this.picking.point.y)<DRAG_THRESHOLD;
+    const tile=candidates[same ? this.picking!.index : 0];
+    return tile ? { x: tile.x, y: tile.y } : null;
+  }
+
+  resetPicking(): void { this.picking=null; }
+
+  get pickingHint(): string {
+    const count=this.picking?.keys.split('|').length ?? 0;
+    return count>1 ? `Overlap ${this.picking!.index+1}/${count}: tap/click again for next tile · ` : '';
+  }
+
+  private pickCandidates(point: Point): Tile[] {
+    const local=screenToBoard(point,this.view);
+    const candidates=pickTileCandidates(this.board.tiles,local);
+    const front=candidates[0];
+    // Only visible opaque living art can precede the solid terrain hit. Use the
+    // authoritative cell/anchor, independent of transient presentation offsets.
+    const units=(this.snapshot?.units ?? []).filter(unit=>unit.hp>0).map(unit=>({unit,tile:this.byCell.get(cellKey(unit.cell))!}))
+      .sort((a,b)=>b.tile.depth-a.tile.depth);
+    for(const {unit,tile} of units){
+      if(front && tile.depth+OCCUPANT_LAYER<front.depth+1)continue;
+      const image=this.images.get(unit.id)!;
+      const bounds=unitBounds(tile,{x:image.originX,y:image.originY});
+      if(local.x<bounds.left || local.x>=bounds.right || local.y<bounds.top || local.y>=bounds.bottom)continue;
+      const x=Math.floor((local.x-bounds.left)*image.frame.realWidth/UNIT_ART.width);
+      const y=Math.floor((local.y-bounds.top)*image.frame.realHeight/UNIT_ART.height);
+      if(!this.scene.textures.getPixelAlpha(x,y,image.texture.key,image.frame.name))continue;
+      return [tile,...candidates.filter(candidate=>cellKey(candidate)!==cellKey(tile))];
+    }
+    return candidates;
   }
 
   private publish(): void {
@@ -445,7 +605,9 @@ export class BoardRenderer {
       const image = this.images.get(unit.id)!;
       const tile = this.byCell.get(cellKey(unit.cell))!;
       const projected = projectTile(tile);
-      const expected = matrix.transformPoint(projected.x, projected.y);
+      const bobOffset = unit.id === this.bobId ? this.bobOffset : 0;
+      const expected = matrix.transformPoint(projected.x, projected.y + bobOffset);
+      const base = matrix.transformPoint(projected.x, projected.y);
       const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
       return { id: unit.id, unitId: unit.defId, side: unit.side, tile: { ...unit.cell, elevation: tile.elevation },
         health: (()=>{
@@ -458,14 +620,18 @@ export class BoardRenderer {
             interactive:!!bar.input};
         })(),
         assetId: image.texture.key, origin: { x: image.originX, y: image.originY }, depth: image.depth,
-        position: { x: image.x, y: image.y }, anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
+        position: { x: image.x, y: image.y }, bobOffset, baseAnchorError: Math.hypot(base.x - actual.x, base.y - actual.y), anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
     });
     const { x, y, scale } = this.view;
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
       viewport: this.viewport, region: this.region, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
-      reachable: this.reachable, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
+      reachable: this.reachable, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
+      shapeTextures: this.scene.textures.getTextureKeys().filter(key=>key.startsWith('battle-shape-v1-')).sort().map(key=>{
+        const source=this.scene.textures.get(key).getSourceImage();
+        return {key,width:source.width,height:source.height,rgbaBytes:source.width*source.height*4};
+      }),
       effect: this.effect,
       feedbackBounds: this.feedbackBounds(),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),

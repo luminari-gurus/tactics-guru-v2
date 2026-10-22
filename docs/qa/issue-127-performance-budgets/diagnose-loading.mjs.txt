@@ -1,0 +1,35 @@
+import {chromium,devices} from '@playwright/test';
+import {writeFileSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {navigateCapture} from '../scripts/measure-fit-controls.ts';
+import {captureTarget,parseMeasureArgs} from '../scripts/measure-fit-options.ts';
+const [origin,output]=process.argv.slice(2);
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
+try{
+  const records=[];
+  for(const route of ['', '/run']){
+    const context=await browser.newContext(devices['Desktop Chrome']),page=await context.newPage(),errors=[];
+    page.on('pageerror',e=>errors.push(e.message));
+    page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+    let headers=[];
+    page.on('response',r=>headers.push(r.allHeaders().then(h=>({url:r.url(),status:r.status(),cacheControl:h['cache-control']??null,age:h.age??null,cfCacheStatus:h['cf-cache-status']??null}))));
+    const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',origin+route],{}));
+    for(const cache of ['cold','warm']){
+      headers=[];
+      await navigateCapture(page,target,cache);
+      await page.waitForFunction(()=>window.fitDiagnostics().controlsUsableMs!==null && window.fitDiagnostics().frames.count>=120);
+      records.push({route:route||'battle',cache,errors:[...errors],...await page.evaluate(()=>({
+        diagnostics:window.fitDiagnostics(),
+        navigation:performance.getEntriesByType('navigation').map(r=>r.toJSON()),
+        resources:performance.getEntriesByType('resource').map(r=>r.toJSON()),
+      })),headers:await Promise.all(headers)});
+    }
+    await context.close();
+  }
+  writeFileSync(output,JSON.stringify({purpose:'Separate navigation/cache diagnostic, not acceptance or a replacement attempt',
+    browser:browser.version(),scriptSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),records},null,2)+'\n');
+  console.log(records.map(r=>({route:r.route,cache:r.cache,build:r.diagnostics.build,usable:r.diagnostics.controlsUsableMs,
+    navigationResponseStart:r.navigation[0].responseStart,navigationResponseEnd:r.navigation[0].responseEnd,
+    sceneStart:r.diagnostics.sceneStartedMs,sceneReady:r.diagnostics.sceneReadyMs,
+    revalidated:r.headers.filter(h=>h.status===304).length,errors:r.errors})));
+}finally{await browser.close();}

@@ -1,0 +1,515 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "-c",
+      "tmp/review/playwright.config.ts",
+      "tests/run-progression.spec.ts",
+      "--project=desktop",
+      "--grep",
+      "review repair:",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\playwright.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/browser-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/browser-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tmp/review/browser-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/.codex/worktrees/review-pr129-138/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "cwd": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru",
+      "command": "node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4196 --strictPort",
+      "url": "http://127.0.0.1:4196/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5587,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 97,
+                      "line": 222
+                    },
+                    "snippet": "  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 97,
+                        "line": 222
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n\n  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:44:52.794Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-f8358-up-Continue-survives-Cancel-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 97,
+                    "line": 222
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-22983cc1ad0236740d33",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5594,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 97,
+                      "line": 222
+                    },
+                    "snippet": "  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 97,
+                        "line": 222
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n\n  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:44:59.274Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-deccc-up-Continue-survives-Escape-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 97,
+                    "line": 222
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2d9fd325406679938589",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5796,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 97,
+                      "line": 222
+                    },
+                    "snippet": "  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 97,
+                        "line": 222
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n\n  220 |  }\n  221 |  await expect(page.getByRole('dialog')).not.toBeVisible();\n> 222 |  await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();\n      |                                                                                                 ^\n  223 |  expect(await snapshot(page)).toEqual(saved);\n  224 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n  225 | });\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:222:97"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:45:05.674Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-9243e-up-Continue-survives-Export-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 97,
+                    "line": 222
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-86c96542030150750f02",
+          "file": "run-progression.spec.ts",
+          "line": 208,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6806,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:232:53",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 53,
+                      "line": 232
+                    },
+                    "snippet": "  230 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual([null,null]);\n  231 |  await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();\n> 232 |  await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);\n      |                                                     ^\n  233 |  expect(fresh.items.run.id).not.toBe(old.items.run.id);expect(fresh.items.run.seed).toBe((old.items.run.seed+1)>>>0);\n  234 |  expect(fresh.activeBattle).toBeNull();expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});\n  235 |  expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 53,
+                        "line": 232
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#run-start-encounter')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('#run-start-encounter') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#run-start-encounter')\u001b[22m\n\n\n  230 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual([null,null]);\n  231 |  await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();\n> 232 |  await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);\n      |                                                     ^\n  233 |  expect(fresh.items.run.id).not.toBe(old.items.run.id);expect(fresh.items.run.seed).toBe((old.items.run.seed+1)>>>0);\n  234 |  expect(fresh.activeBattle).toBeNull();expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});\n  235 |  expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:232:53"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:45:12.306Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-1da65-starts-a-fresh-playable-run-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 53,
+                    "line": 232
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-250819ad071425ed66f0",
+          "file": "run-progression.spec.ts",
+          "line": 227,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2761,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:2e1a68a0c226ea743d336e360204c86f7cf1aafdde529d7c76c0d6e4d099b946\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:28f8c893dec0cb3d3d3646422fcc3b1c7870b04307866be38c5a655b983942bb\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:2e1a68a0c226ea743d336e360204c86f7cf1aafdde529d7c76c0d6e4d099b946\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:28f8c893dec0cb3d3d3646422fcc3b1c7870b04307866be38c5a655b983942bb\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:254:106",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 106,
+                      "line": 254
+                    },
+                    "snippet": "  252 |  await page.evaluate(()=>Object.assign(window,{denyRunReads:false}));\n  253 |  for(let i=0;i<2;i++){await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}\n> 254 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n      |                                                                                                          ^\n  255 |  await expect(page.locator('#battle-persistence')).toContainText('unsaved');\n  256 |  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#run-retry-save').click();\n  257 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 106,
+                        "line": 254
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:97c0d1edf33dcd344a6885fd38a94065b59b13e81234969fffdf7ddc5fda9ce5\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"233e6b70-ec5c-41bd-9501-8e79ccb17da2\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:2e1a68a0c226ea743d336e360204c86f7cf1aafdde529d7c76c0d6e4d099b946\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:28f8c893dec0cb3d3d3646422fcc3b1c7870b04307866be38c5a655b983942bb\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"b8cace15-fde0-4586-9705-ce5cd65a574a\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\n  252 |  await page.evaluate(()=>Object.assign(window,{denyRunReads:false}));\n  253 |  for(let i=0;i<2;i++){await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}\n> 254 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n      |                                                                                                          ^\n  255 |  await expect(page.locator('#battle-persistence')).toContainText('unsaved');\n  256 |  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#run-retry-save').click();\n  257 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:254:106"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:45:19.939Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-e6d82-tes-until-explicit-continue-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 106,
+                    "line": 254
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5f292dcdd3b24b4ce3fa",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2648,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:74c1df9018b37ecd16045b34c6a381c86957715dddc0f3feb5c6542aa3660c68\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:fe25dfac224e14809976277cce1fdda13238dc19d831249844f5b044d327e8b1\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:74c1df9018b37ecd16045b34c6a381c86957715dddc0f3feb5c6542aa3660c68\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:fe25dfac224e14809976277cce1fdda13238dc19d831249844f5b044d327e8b1\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:254:106",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                      "column": 106,
+                      "line": 254
+                    },
+                    "snippet": "  252 |  await page.evaluate(()=>Object.assign(window,{denyRunReads:false}));\n  253 |  for(let i=0;i<2;i++){await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}\n> 254 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n      |                                                                                                          ^\n  255 |  await expect(page.locator('#battle-persistence')).toContainText('unsaved');\n  256 |  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#run-retry-save').click();\n  257 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                        "column": 106,
+                        "line": 254
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 2\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[32m-   \"{\\\"digest\\\":\\\"sha256:a2ec412756dfb29bd4609ff89b707ef019bf39348559b131db8dbf1246483b1c\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":null,\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"37c76627-9531-455c-9550-cfd5e3caee6f\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":14,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:74c1df9018b37ecd16045b34c6a381c86957715dddc0f3feb5c6542aa3660c68\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":5,\\\"commandCount\\\":8,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[31m+   \"{\\\"digest\\\":\\\"sha256:fe25dfac224e14809976277cce1fdda13238dc19d831249844f5b044d327e8b1\\\",\\\"format\\\":1,\\\"identity\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"encounters\\\":\\\"sha256:1f248de1106b80483ad6260d6be59a78a16987fdb0cc9f8ec97294ddce85aa92\\\",\\\"items\\\":\\\"sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9\\\"},\\\"kind\\\":\\\"tactics-guru:run-snapshot\\\",\\\"payload\\\":{\\\"activeBattle\\\":{\\\"activeIndex\\\":4,\\\"commandCount\\\":7,\\\"format\\\":1,\\\"initiative\\\":[5,1,6,4,2,3],\\\"mapId\\\":\\\"map:forest_ruins\\\",\\\"outcome\\\":\\\"ongoing\\\",\\\"rng\\\":{\\\"cursor\\\":6,\\\"words\\\":[806052816,1761759574,2898467135,19]},\\\"round\\\":1,\\\"seed\\\":1408146928,\\\"units\\\":[{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":8},\\\"defId\\\":\\\"fighter\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":18,\\\"id\\\":1,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":2,\\\"y\\\":8},\\\"defId\\\":\\\"ranger\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":12,\\\"id\\\":2,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":1,\\\"y\\\":9},\\\"defId\\\":\\\"mage\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":false,\\\"hp\\\":11,\\\"id\\\":3,\\\"side\\\":\\\"player\\\"},{\\\"cell\\\":{\\\"x\\\":6,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":4,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":2},\\\"defId\\\":\\\"goblin_archer\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":8,\\\"id\\\":5,\\\"side\\\":\\\"enemy\\\"},{\\\"cell\\\":{\\\"x\\\":5,\\\"y\\\":6},\\\"defId\\\":\\\"goblin_grunt\\\",\\\"hasActed\\\":false,\\\"hasMoved\\\":true,\\\"hp\\\":9,\\\"id\\\":6,\\\"side\\\":\\\"enemy\\\"}],\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}},\\\"items\\\":{\\\"itemRevision\\\":0,\\\"offer\\\":null,\\\"ownership\\\":{\\\"assignments\\\":[],\\\"consumables\\\":[],\\\"equipment\\\":[]},\\\"run\\\":{\\\"encounterIndex\\\":0,\\\"encounters\\\":[\\\"encounter:forest_ruins\\\",\\\"encounter:woodland_crossing\\\",\\\"encounter:ruined_approach\\\"],\\\"format\\\":1,\\\"id\\\":\\\"86e8d1ff-429b-4228-8081-ffb87fb054c7\\\",\\\"party\\\":[{\\\"heroId\\\":\\\"fighter\\\",\\\"hp\\\":18},{\\\"heroId\\\":\\\"ranger\\\",\\\"hp\\\":12},{\\\"heroId\\\":\\\"mage\\\",\\\"hp\\\":11}],\\\"pendingReward\\\":null,\\\"phase\\\":\\\"battle\\\",\\\"revision\\\":0,\\\"seed\\\":13,\\\"versions\\\":{\\\"content\\\":\\\"sha256:bd43ae71b28a856bfa9e1c2164272c960b07b84ef913cef13607011a5bf6de5a\\\",\\\"rng\\\":1,\\\"rules\\\":1}}}}}\",\u001b[39m\n\u001b[2m  ]\u001b[22m\n\n  252 |  await page.evaluate(()=>Object.assign(window,{denyRunReads:false}));\n  253 |  for(let i=0;i<2;i++){await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}\n> 254 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n      |                                                                                                          ^\n  255 |  await expect(page.locator('#battle-persistence')).toContainText('unsaved');\n  256 |  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#run-retry-save').click();\n  257 |  expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);\n    at C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts:254:106"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:45:23.533Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tmp\\review\\browser-results\\run-progression-review-rep-13643-ytes-until-explicit-replace-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\.codex\\worktrees\\review-pr129-138\\Tactics-Guru\\tests\\run-progression.spec.ts",
+                    "column": 106,
+                    "line": 254
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0b54aab0e6586b3b5d83",
+          "file": "run-progression.spec.ts",
+          "line": 240,
+          "column": 53
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:44:51.921Z",
+    "duration": 35235.554000000004,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

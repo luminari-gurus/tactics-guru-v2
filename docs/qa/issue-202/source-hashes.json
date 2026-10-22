@@ -1,0 +1,9 @@
+{
+  "package.json": "21c6d3c1b7bd63b528e166146db662799fbeb86f6cf16db9141927208834cb48",
+  "playwright.config.ts": "7a3a9cd8cbefe44d06895460facbfdcb111f5dc36aed9429f1034632d8c582d0",
+  "playwright.fixtures.config.ts": "e7e7a7235521bde57dac22b86fba394551fd2f69a8c005df68d48a6742ec7392",
+  "playwright.encounters.config.ts": "6dd21c1967cf0a3667061c9dcbc7c01513cb18f34bcd964dd25f1994bde5ac9c",
+  "playwright.run-items.config.ts": "33e9c62442c154bfdde12b6a7e5751c246c95dbcbac0f005becf4861af6e9130",
+  "scripts/verify-full.mjs": "d5a2051c6bcfa9d79fc35e16e3b771f35a345074cf12eb4713dca7978e7a0f86",
+  "tests/tooling/verify-full.test.mjs": "91bef81c0bac3563fc3093d606c0e097d37cb43bd4ae5de666f6d784dec36254"
+}

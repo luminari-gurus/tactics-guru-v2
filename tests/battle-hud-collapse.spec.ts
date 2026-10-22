@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { walkDungeon } from './helpers/dungeonTraversal';
 import { projectTile } from '../src/geometry/iso';
 import { confirmRestart, readSession } from './helpers/battlePolicy';
 
@@ -94,10 +95,14 @@ test('collapsed runtime errors remain reachable and recovery modal returns to vi
   await expect(page.locator('#battle-hud-contents')).toBeHidden();
 });
 
-for(const route of ['/', '/run'])for(const collapsed of [false,true]) {
+for(const route of ['/', '/run', '/dungeon'])for(const collapsed of [false,true]) {
   test(`touch contact stream supports landscape pinch and pan ${route} collapsed=${collapsed}`,async({page})=>{
     await page.setViewportSize({width:915,height:412});await page.goto(route);
     if(route==='/run'){await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();}
+    if(route==='/dungeon'){
+      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await page.locator('#dungeon-confirm-new').click();await walkDungeon(page);
+    }
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');if(collapsed)await activate(page);
     const initial=await settled(page),r=initial.region,x=r.x+r.width/2,y=r.y+r.height/2;
     const contact=(identifier:number,x:number)=>({identifier,clientX:x,clientY:y});

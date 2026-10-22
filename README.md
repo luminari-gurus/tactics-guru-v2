@@ -1,10 +1,15 @@
 # Tactics Guru v2
 
-The standalone [overworld map prototype](docs/overworld-map.md) opens at `/map` under the configured base path. Choose Rooms (default), Random walker or Cellular caves, and Grassland (default), Forest or Desert. Enter a seed from 0 to 4294967295 and press Generate to reproduce the map; either dropdown applies the displayed valid seed, and New seed retains selections. Invalid seed input preserves the last valid map and both choices. Seed, type/version, biome/version and fallback status are displayed with a matching walkable/blocked legend. Simple art supports all nine combinations; [terrain meanings and art integration](docs/overworld-map.md) are documented for #98. This inspection prototype uses no battle state or persistence; the normal entry path still opens the battle.
+The continuing [dungeon floor mode](docs/dungeon.md) opens at `/dungeon`, also linked from `/run`. Explore Rooms floors with seeded Forest/Desert encounters, normal/elite/vault kinds, a goblin stair guardian and bounded enemy depth scaling. Saved selections, discovery, party/items and active battles survive reload and backtracking. Prior dungeon saves retain their fixed, unscaled opponents. `/run` retains the terminal three-battle proof of concept and its existing saves.
 
-Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Design plans are maintained outside this repository.
+The standalone [overworld map prototype](docs/overworld-map.md) opens at `/map` under the configured base path. Choose Rooms (default), Random walker or Cellular caves, and Grassland (default), Forest or Desert. Enter a seed from 0 to 4294967295 and press Generate to reproduce the map; either dropdown applies the displayed valid seed, and New seed retains selections. Each complete world has one cyan player circle and three coral enemy diamonds on distinct walkable cells, with a matching legend and accessible coordinates. Marker positions reproduce from the same layout and seed and survive art switching or late image loads. Invalid seeds or failed placement preserve the previous complete world with explicit feedback. Simple art supports all nine combinations; [terrain, marker and art contracts](docs/overworld-map.md) document the controls and fallback behavior. This inspection prototype uses no movement, battle state or persistence; the normal entry path still opens the battle.
+
+Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Start with the [visual design guide](docs/DESIGN.md) for typography, colors, logo/title-screen direction, and links to the detailed art and interface documents.
 
 The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.
+
+During attack targeting, board diamonds show ✓ valid and × unavailable targets; a double outline marks the selected cell. Movement highlights return when targeting is cancelled. See the [legacy overlay review and target preview behavior](docs/target-preview-overlays.md).
+Hover a free, walkable tile to preview only the active unit's ability reach from that proposed destination. The existing teal overlay continues to show movement reach. Purple dotted diamonds include ability-range cells, including occupied tiles; pink plus markers identify units that can be targeted from the preview origin, marked by a white ring. Keyboard navigation and a prepared Move destination expose the same preview; hovering never changes selection or prepares a command.
 
 ## Requirements
 
@@ -36,25 +41,39 @@ npm run build -- --base=/prototype/
 npm run preview -- --base=/prototype/
 ```
 
-Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` or `/prototype/map` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
+Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` `/prototype/map`, `/prototype/run` or `/prototype/dungeon` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
 
 After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/prototype/ npm test -- tests/public-asset-base.spec.ts`; add `PLAYWRIGHT_SERVER_MODE=dev` to check development instead. Use `/` for root checks. These are shell environment assignments (in PowerShell, set `$env:PLAYWRIGHT_BASE_PATH='/prototype/'` and `$env:PLAYWRIGHT_SERVER_MODE='dev'` before `npm test`). Clear both variables and rebuild at root before running the complete default suite. See [review repair evidence](docs/qa/issue-92-public-asset-base.md).
+
+## Verification policy
+
+Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. Use `npm test -- <filters>` for focused browser work, `npm run test:fixtures` for all three dev fixture suites, and `npm run verify:full` for explicit full verification. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
+
+Fast unit checks, including content, use `npm run test:unit`. The two real root/prefix
+build checks use `npm run test:build`; `npm run test:unit:all` runs their complete
+union. Standalone `npm run build` still validates content and both type scopes.
+Full verification reuses its successful unit/content and type stages for ordinary
+root/prefix/restored bundles; configured telemetry builds remain separate.
 
 ## Browser smoke tests
 
 ```sh
-npx playwright install chromium
+npm run setup:browsers # Linux with missing OS libraries: npm run setup:browsers:linux
+npm run check:browsers
 npm run build
+npm run test:browser-smoke
 npm test
 ```
 
-Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Chromium projects select the full Chromium headless channel so cached-history tests exercise real BFCache returns; use the standard installation above rather than a shell-only installation. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
 
 If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
 
 ```sh
 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 ```
+
+See [browser setup and focused diagnostics](docs/browser-testing.md) for reproducible installation, launch receipts, exact-base comparison and the CI smoke check.
 
 ## Layout
 
@@ -127,3 +146,7 @@ The controls report Idle, Moving and Completed. Move/destination/fixture control
 While the page is hidden, a move in flight freezes at its current progress and resumes when the page is visible again, completing exactly once; `#move-status` stays Moving throughout and the locked controls stay locked. Window blur alone does not freeze the move. Pointers that are down when the page is hidden are dropped, so returning to the page cannot pan without a new press. Hidden, visible, blur and focus events are counted per scene run in the `lifecycle` block, with the tween progress at the last freeze and the number of completions. Nothing starts audio on visibility, focus or unlock events.
 
 The diagnostics panel is capped at 70% of the viewport height (45% in landscape under 500 px tall) and scrolls instead of hiding controls; **Board controls** collapses the fixture, opacity, move and audio rows. Every panel control is at least 44 CSS px tall. The page suppresses overscroll, selection and long-press callouts over the board and panel (the measurements JSON stays selectable), and the canvas has no context menu. `tests/audio.spec.ts`, `tests/lifecycle.spec.ts` and `tests/layout.spec.ts` cover these in Chromium emulation; safe-area insets, the iOS autoplay rules, OS-level suspension, browser-chrome changes and real touch gestures are physical checks listed for #20 in the QA note.
+
+## Optional telemetry
+
+Unconfigured builds and local development keep PostHog off. Configured production builds use the approved anonymous collection policy with a persistent opt-out. See [setup, privacy policy, event schema and source-map verification](docs/telemetry.md).

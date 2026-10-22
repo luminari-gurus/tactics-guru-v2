@@ -20,7 +20,7 @@ function setup(archer = false) {
   const catalog: ContentCatalog = { ...copy(catalogFixture), maps: { [map.id]: map } };
   const units: UnitState[] = map.spawns.map(s => ({ id: s.id, side: s.side === 'heroes' ? 'player' : 'enemy', defId: s.unitId,
     cell: { x: s.x, y: s.y }, hp: 18, hasMoved: false, hasActed: false }) as UnitState);
-  const state: BattleState = { format: 1, versions: { rules: 1, rng: 1, content: contentVersion(catalog) }, seed: 0, rng: seedRng(0),
+  const state: BattleState = { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed: 0, rng: seedRng(0),
     mapId: map.id, units, initiative: [3, 1, 2], activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0 };
   assert(readBattleState(state, catalog).ok);
   return { catalog, state };
@@ -325,4 +325,29 @@ describe('seeded battle replay', () => {
     vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock'); });
     try { expect(simulate()).toEqual(simulate()); } finally { vi.restoreAllMocks(); }
   });
+});
+
+it('takes a Manhattan-increasing detour and replans identical accepted suffixes without RNG',()=>{
+  const base=setup();
+  const map=base.catalog.maps[base.state.mapId];
+  const catalog:ContentCatalog={...base.catalog,terrains:{...base.catalog.terrains,forest:{...base.catalog.terrains.forest,walkable:false,blocksLineOfSight:true}},enemies:{...base.catalog.enemies,goblin_grunt:{...base.catalog.enemies.goblin_grunt,stats:{...base.catalog.enemies.goblin_grunt.stats,move:1}}},
+    maps:{[map.id]:{...map,cells:map.cells.map(c=>c.x===2&&c.y<=1?{...c,terrainId:'forest'}:c)}}};
+  let state:BattleState={...base.state,versions:{...base.state.versions,content:contentVersion(catalog)},units:base.state.units.map(u=>u.id===1?{...u,cell:{x:1,y:1}}:u.id===2?{...u,hp:0}:({...u,cell:{x:3,y:1}}))};
+  expect(commands(state,catalog)[0]).toEqual({type:'move',unitId:3,to:{x:3,y:2}});
+  const rng=state.rng;let attacked=false;
+  for(let turn=0;turn<8&&!attacked;turn++){
+    const list=commands(state,catalog);attacked=list.some(c=>c.type==='useAbility');
+    state=checkLegal(state,catalog,list);
+    if(!attacked){expect(state.rng).toEqual(rng);while(state.initiative[state.activeIndex]!==3){const next=dispatch(state,{type:'endTurn',unitId:state.initiative[state.activeIndex]},catalog);assert(next.ok);state=next.state;}}
+  }
+  expect(attacked).toBe(true);
+});
+
+it('uses shared Guarded AC when choosing between otherwise tied targets', () => {
+  const { state, catalog } = setup(true);
+  const tied = changeUnit(state, 2, { cell: { x: 1, y: 2 } });
+  expect(commands(tied, catalog)).toEqual([attack(1, true), wait]);
+  const guarded = changeUnit(tied, 1, { guarded: true });
+  expect(previewAttack(guarded, attack(1, true), catalog)).toMatchObject({ ok: true, armorClass: 16 });
+  expect(commands(guarded, catalog)).toEqual([attack(2, true), wait]);
 });

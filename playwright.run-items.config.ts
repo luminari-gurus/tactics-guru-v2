@@ -1,6 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import base from './playwright.config';
-export default defineConfig({ ...base, testIgnore: [], testMatch: '**/run-items.spec.ts',
-  webServer: { command: 'npm run dev -- --port 4173 --strictPort', url: 'http://127.0.0.1:4173', reuseExistingServer: false },
-  use: { ...base.use, baseURL: 'http://127.0.0.1:4173' },
-});
+import fixtures from './playwright.fixtures.config';
+
+// Compatibility entry point for running this fixture suite independently.
+export default defineConfig({ ...fixtures, testMatch: '**/run-items.spec.ts' });

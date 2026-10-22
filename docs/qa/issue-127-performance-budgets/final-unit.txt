@@ -1,0 +1,11 @@
+npm notice run tactics-guru-v2@0.0.0 test:unit
+npm notice run vitest run
+
+ RUN  v5.0.3 C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru
+
+
+ Test Files  40 passed (40)
+      Tests  696 passed (696)
+   Start at  21:44:16
+   Duration  10.13s (tests 78%, import 11%, transform 10%)
+

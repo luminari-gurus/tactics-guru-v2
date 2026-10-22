@@ -7,6 +7,7 @@ import { dispatch } from '../src/domain/turns';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
+import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
 import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
 
@@ -20,7 +21,10 @@ function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false,firstS
   for(let seed=firstSeed;seed<80;seed++){
     const session=new BattleSession(catalog,'map:forest_ruins',seed);
     for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
-      const command=session.phase==='player'?playerDecision(session.state):null;
+      let command=session.phase==='player'?playerDecision(session.state):null;
+      // The picker uses the domain's same-target shorthand, including for one missile.
+      if(command?.type==='useAbility' && command.abilityId==='ability:magic_missile' && 'missileTargets' in command.target && command.target.missileTargets.length===1)
+        command={...command,target:{unitId:command.target.missileTargets[0]}};
       if(command)session.prepare(command);
       const step=command?session.confirm():session.nextEnemy();
       if(!step)throw Error('Policy failed to make progress');
@@ -88,14 +92,55 @@ async function review(page:Page,fixture:Boundary,keyboard=false) {
     for(let y=cursor.y;y!==target.cell.y;y+=y<target.cell.y?1:-1)await page.keyboard.press(y<target.cell.y?'ArrowDown':'ArrowUp');
     await page.keyboard.press('Enter');
   }else await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  const targeting=await report(page);
+  expect(targeting.reachable).toEqual([]);
+  expect(targeting.targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
+  await page.clock.runFor(48);
+  await page.screenshot({path:test.info().outputPath(`${view.kind}-target-preview.png`)});
   await press(page,'#battle-review',keyboard);
   await expect(page.getByRole('dialog')).toBeVisible();
+  expect((await report(page)).targets).toEqual(targeting.targets);
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
   await page.locator('#dialog-confirm').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  expect((await report(page)).targets).toEqual([]);
 }
+
+test('target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands',async({page},info)=>{
+  const fixture=boundary('high_shot','any',true);await boot(page,fixture);
+  const saved=await stored(page),initial=(await readSession(page)).state;
+  await press(page,'[data-action="signature"]');
+  const actor=fixture.before.units.find(u=>u.id===fixture.command.unitId)!;
+  await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:actor.cell,valid:false,selected:true,reason:'sameSide'});
+  await expect(page.locator('#battle-preview')).toContainText('Unavailable: Same Side');
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  await page.clock.runFor(48);
+  await page.screenshot({path:info.outputPath('invalid-ally-target.png')});
+  await page.keyboard.press('ArrowRight');
+  const navigated=await report(page);
+  expect(navigated.targets.find((t:any)=>t.selected)?.cell).toEqual({x:Math.min(11,actor.cell.x+1),y:actor.cell.y});
+  const command=fixture.command;
+  if(command.type!=='useAbility' || !('unitId' in command.target))throw Error('Expected unit attack fixture');
+  const targetId=command.target.unitId;
+  const target=fixture.before.units.find(u=>u.id===targetId)!;
+  const current=await report(page),tile=current.tiles.find((t:any)=>t.x===target.cell.x&&t.y===target.cell.y),point=projectTile(tile);
+  const screen={x:current.transform.x+point.x*current.transform.scale,y:current.transform.y+point.y*current.transform.scale};
+  if(info.project.name.startsWith('mobile'))await page.touchscreen.tap(screen.x,screen.y);
+  else await page.mouse.click(screen.x,screen.y);
+  expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
+  await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();
+  expect((await report(page)).targets).toEqual([]);await expect(page.locator('#battle-review')).toBeDisabled();
+  await press(page,'[data-action="signature"]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await press(page,'[data-action="move"]');expect((await report(page)).targets).toEqual([]);
+  await press(page,'[data-action="basic"]');expect((await report(page)).targets.length).toBeGreaterThan(0);
+  await page.locator('#battle-cancel').click();expect((await report(page)).targets).toEqual([]);
+  expect((await readSession(page)).state).toEqual(initial);expect(await stored(page)).toEqual(saved);
+  await press(page,'[data-action="signature"]');await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
+  expect((await report(page)).targets).toEqual([]);
+});
 function aligned(r:any,fixture:Boundary) {
   const effect=r.effect;expect(effect).not.toBeNull();
   for(const [id,point] of [[effect.actorId,effect.from],[effect.targetId,effect.to]] as const){
@@ -245,7 +290,10 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
     await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
     await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
     await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
-    await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();await ready(page);
+    const replacementSeed=((await readSession(page)).state.seed+1)>>>0;
+    await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
+    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
+    await ready(page);
     expect((await readSession(page)).state.seed).toBe(fixture.before.seed+1);expect((await report(page)).effect).toBeNull();
     await expect(page.locator('canvas')).toHaveCount(1);
   }
@@ -338,4 +386,136 @@ test('visible action feedback stays inside the drawable board at small sizes and
     expect((await readSession(page)).state).toEqual(fixture.after);
     await page.screenshot({path:info.outputPath(`feedback-${size.width}.png`)});await page.clock.runFor(700);
   }
+});
+
+// Deliberately sample rendered coordinates as well as diagnostics: the cue is visual only.
+async function bobFrame(page: Page) {
+  const frame = await report(page);
+  const actor = frame.units.find((unit: any) => unit.id === frame.activeId);
+  for (const unit of frame.units) {
+    const tile = frame.tiles.find((tile: any) => tile.x === unit.tile.x && tile.y === unit.tile.y);
+    const base = projectTile(tile);
+    expect(unit.position.x).toBeCloseTo(base.x, 5);
+    expect(unit.position.y - base.y).toBeCloseTo(unit.bobOffset, 5);
+    expect(unit.bobOffset).toBeGreaterThanOrEqual(-2);
+    expect(unit.bobOffset).toBeLessThanOrEqual(0);
+    expect(unit.anchorError).toBeLessThan(0.001);
+    expect(unit.baseAnchorError).toBeCloseTo(Math.abs(unit.bobOffset) * frame.transform.scale, 4);
+    expect(unit.health.position).toEqual({x: base.x, y: base.y + HEALTH_BAR.offsetY});
+    if (unit.id !== frame.activeId) expect(unit.bobOffset).toBe(0);
+  }
+  return {frame, actor};
+}
+
+test('active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state', async ({page}, info) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  await boot(page, boundary('magic_missile'));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  const initial = await readSession(page), saved = await stored(page);
+  const {frame: baseline} = await bobFrame(page);
+  const offsets: number[] = [];
+  for (let i = 0; i < 16; i++) {
+    await page.clock.runFor(128);
+    offsets.push((await bobFrame(page)).actor.bobOffset);
+  }
+  expect(Math.min(...offsets)).toBeLessThan(-1.9);
+  expect(Math.max(...offsets)).toBeGreaterThan(-0.1);
+  await page.screenshot({path: info.outputPath('active-bob.png')});
+  await press(page, '[data-action="signature"]', true);
+  const enemy = initial.state.units.find(unit => unit.hp > 0 && unit.side === 'enemy')!;
+  await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);
+  await page.clock.runFor(400);
+  expect((await bobFrame(page)).frame.activeId).toBe(baseline.activeId);
+  await page.locator('#battle-inspect-target').click();
+  await page.clock.runFor(400);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  await page.locator('#inspection-close').click();
+  await press(page, '#battle-cancel', true);
+  await page.clock.runFor(560);
+  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
+  const r = (await report(page)).region;
+  await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+  await page.mouse.wheel(0, -200);
+  await page.clock.runFor(64);
+  const zoomed = await bobFrame(page);
+  expect(zoomed.frame.transform.scale).toBeGreaterThan(baseline.transform.scale);
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  // Chromium delivers media-query changes on its native rendering schedule.
+  await expect.poll(async () => { await page.clock.runFor(64); return (await bobFrame(page)).actor.bobOffset; }).toBe(0);
+  // Bobbing is disabled: advance the full idle interval without rendering 125
+  // inactive frames. Keep runFor for every window that samples actual motion.
+  await page.clock.fastForward(2000);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  await page.screenshot({path: info.outputPath('active-reduced-motion.png')});
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  await expect.poll(async () => { await page.clock.runFor(200); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-1.8);
+  const after = await readSession(page);
+  expect(after.state).toEqual(initial.state);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
+  expect(await stored(page)).toEqual(saved);
+  expect((await report(page)).objectCount).toBe(baseline.objectCount);
+  expect(errors).toEqual([]);
+});
+
+test('active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops', async ({page}) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  const fixture = boundary('magic_missile'); await boot(page, fixture);
+  await review(page, fixture); await confirmFrozen(page);
+  await page.clock.runFor(288);
+  const during = await report(page);
+  expect(during.units.every((unit: any) => unit.bobOffset === 0)).toBe(true);
+  aligned(during, fixture);
+  await page.clock.runFor(800); await ready(page);
+  await expect.poll(async () => { await page.clock.runFor(100); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-0.2);
+  const previousId = (await report(page)).activeId;
+  await press(page, '#battle-next');
+  // Settle on live frames without granting more than the original 3s of
+  // animation time. Keep this bound local; other readiness checks are unchanged.
+  const actorTransitionStarted = await page.evaluate(() => Date.now());
+  await page.clock.resume();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player', {timeout: 3000});
+  expect(await page.evaluate(() => Date.now()) - actorTransitionStarted).toBeLessThanOrEqual(3000);
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  expect((await bobFrame(page)).frame.activeId).not.toBe(previousId);
+  const saved = await stored(page), state = (await readSession(page)).state;
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', {configurable: true, get: () => true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  // Hidden-page bobbing is disabled; only elapsed time and invariance matter.
+  await page.clock.fastForward(2000);
+  expect((await bobFrame(page)).actor.bobOffset).toBe(0);
+  expect((await readSession(page)).state).toEqual(state); expect(await stored(page)).toEqual(saved);
+  await page.evaluate(() => { delete (document as unknown as {hidden?: boolean}).hidden; document.dispatchEvent(new Event('visibilitychange')); });
+  await page.clock.runFor(560);
+  expect((await bobFrame(page)).actor.bobOffset).toBeLessThan(-1.8);
+  for (let i = 0; i < 2; i++) {
+    const replacementSeed = ((await readSession(page)).state.seed + 1) >>> 0;
+    await page.locator('#fit-restart').click(); await confirmRestart(page, true);
+    // Async scene/asset startup needs live frames before controlled bob sampling resumes.
+    await page.clock.resume();
+    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
+    await ready(page);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+    const baseline = await report(page);
+    for (let sample = 0; sample < 5; sample++) { await page.clock.runFor(300); await bobFrame(page); }
+    expect((await report(page)).objectCount).toBe(baseline.objectCount);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('active bob: initial reduced motion keeps sprite and static actor marker anchored', async ({page}, info) => {
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  await boot(page, boundary('high_shot', 'any', true));
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  const initial = await report(page), saved = await stored(page);
+  for (let i = 0; i < 4; i++) {
+    await page.clock.runFor(900);
+    const {frame, actor} = await bobFrame(page);
+    expect(actor.bobOffset).toBe(0); expect(frame.activeId).toBe(initial.activeId);
+  }
+  await page.screenshot({path: info.outputPath('initial-reduced-motion.png')});
+  expect(await stored(page)).toEqual(saved);
 });

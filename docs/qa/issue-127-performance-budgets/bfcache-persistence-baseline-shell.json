@@ -1,0 +1,160 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\node_modules\\playwright\\cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-bfcache.config.ts",
+      "tests/battle-persistence.spec.ts",
+      "--grep",
+      "cached battle cannot overwrite",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\playwright-bfcache.config.ts",
+    "rootDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/bfcache-diagnostic/persistence-baseline-shell",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "battle-persistence.spec.ts",
+      "file": "battle-persistence.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "browser history with BFCache enabled",
+          "file": "battle-persistence.spec.ts",
+          "line": 210,
+          "column": 6,
+          "specs": [
+            {
+              "title": "cached battle cannot overwrite either slot of its replacement",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3126,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"http://127.0.0.1:4174/?history=first\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"http://127.0.0.1:4174/?history=first\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-persistence.spec.ts:230:84",
+                        "location": {
+                          "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-persistence.spec.ts",
+                          "column": 84,
+                          "line": 230
+                        },
+                        "snippet": "  228 |     await page.goBack({waitUntil:'commit'});\n  229 |     await expect(page.locator('#save-continue')).toBeVisible();\n> 230 |     expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);\n      |                                                                                    ^\n  231 |     expect(await stored(page)).toEqual(saved);\n  232 |     expect(await page.locator('#game').getAttribute('data-session')).toBeNull();\n  233 |     await page.screenshot({path:test.info().outputPath('cached-return-recovery.png')});"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-persistence.spec.ts",
+                            "column": 84,
+                            "line": 230
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"http://127.0.0.1:4174/?history=first\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n\n  228 |     await page.goBack({waitUntil:'commit'});\n  229 |     await expect(page.locator('#save-continue')).toBeVisible();\n> 230 |     expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);\n      |                                                                                    ^\n  231 |     expect(await stored(page)).toEqual(saved);\n  232 |     expect(await page.locator('#game').getAttribute('data-session')).toBeNull();\n  233 |     await page.screenshot({path:test.info().outputPath('cached-return-recovery.png')});\n    at C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-persistence.spec.ts:230:84"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-17T19:07:02.134Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tmp\\bfcache-diagnostic\\persistence-baseline-shell\\battle-persistence-browser-46c6d-her-slot-of-its-replacement-desktop\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\apexw\\.codex\\worktrees\\issue-127-performance-plan\\Tactics-Guru\\tests\\battle-persistence.spec.ts",
+                        "column": 84,
+                        "line": 230
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8352ba8e75a15b46318d-4194082cf3b7bda60852",
+              "file": "battle-persistence.spec.ts",
+              "line": 217,
+              "column": 52
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T19:07:01.441Z",
+    "duration": 4164.004,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

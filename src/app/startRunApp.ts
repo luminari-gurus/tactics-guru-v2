@@ -1,6 +1,9 @@
+import { mountTelemetryPreferences } from '../telemetry/preferences';
+import { reportFailure } from '../telemetry/telemetry';
 import '../style.css';
 import '../ui/runFlow.css';
-import { authoredRun, authoredEncounters, runCatalog } from '../content/encounters';
+import { authoredRun, battlefieldEncounters } from '../content/encounters';
+import { desertRunCatalog } from '../content/desertCatalog';
 import { itemCatalog } from '../content/items';
 import { freshRunSnapshot } from '../domain/runBattle';
 import { type RunSaveContext } from '../domain/runSaveEnvelope';
@@ -10,11 +13,10 @@ import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
 import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
-import type Phaser from 'phaser';
 import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
 
-const context: RunSaveContext = { definition: authoredRun, encounters: authoredEncounters, catalog: runCatalog, items: itemCatalog };
+const context: RunSaveContext = { definition: authoredRun, encounters: battlefieldEncounters, catalog: desertRunCatalog, items: itemCatalog };
 const storage=createRunStorage(context),initial=storage.load();
 const controller = new RunItemSession(initial.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage);
 const container = document.querySelector<HTMLElement>('#game')!;
@@ -28,13 +30,14 @@ const items = document.createElement('div');
 const actions = document.createElement('div');actions.className='run-actions';
 const nav = document.createElement('a');nav.href=import.meta.env.BASE_URL;nav.textContent='Single battle';nav.className='run-entry-link';
 const progress=document.createElement('p');progress.id='run-progress';panel.prepend(progress);
-panel.append(nav);
+const dungeonNav = document.createElement('a'); dungeonNav.href=`${import.meta.env.BASE_URL}dungeon`; dungeonNav.textContent='Dungeon floors'; dungeonNav.className='run-entry-link';
+panel.append(nav, dungeonNav);
 document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
 mountBattleLayout();
 const shell = document.querySelector<HTMLElement>('#battle-shell')!;
-let engine: Phaser.Game | null = null, host: RunBattleHost | null = null, mounted: (()=>void) | null = null;
+let host: RunBattleHost | null = null, mounted: (()=>void) | null = null;
 let live=true, playing=false, startup=true;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>host?.modalTransition(),()=>requestNew());
@@ -43,14 +46,14 @@ function button(label:string,run:()=>void,id?:string) {
  const node=document.createElement('button');node.type='button';node.textContent=label;if(id)node.id=id;node.addEventListener('click',run);return node;
 }
 function evidence() { container.dataset.runSnapshot=JSON.stringify(controller.snapshot); container.dataset.runBattleRecord=JSON.stringify(controller.completedBattle); }
-function fail(message:string) {status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;}
+function fail(message:string,handled=true) {if(handled)reportFailure('scene_load', { route: 'run' });status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;}
 function setStatus(value:'loading'|'ready'|'error') {
  status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';
  container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';
 }
 function unmount() {mounted?.();mounted=null;}
 function stopBattle() {
- playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';
+ playing=false;host=null;engine.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';
 }
 function endBattle() {if(!live || !playing)return;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();}
 function startBattle() {
@@ -66,8 +69,7 @@ function startBattle() {
  host={catalog:session.catalog,session,dialogs,sound,modalTransition:()=>{},ended:endBattle,restart:requestNew};
  const scene=new BattleScene(setStatus,fail,host);
  setStatus('loading');
- if(!engine)engine=createGame(scene,true);
- else {engine.scene.remove('battle');engine.scene.add('battle',scene,true);}
+ engine.scene.remove('battle');engine.scene.add('battle',scene,true);
  evidence();
 }
 function replace(review:RunLoadResult) {
@@ -78,10 +80,11 @@ function replace(review:RunLoadResult) {
 function requestNew() {
  if(!live || dialogs.open)return;
  const review=controller.inspect();
+ const cancel=()=>{if(startup){render();screen.querySelector<HTMLElement>('#run-start')?.focus();}else restart.focus();};
  dialogs.showChoices('Start new run?', 'Replace this run with a full party, empty inventory and a fresh seed? Export saved data first if needed.',[
   {id:'run-confirm-new',label:'Start new run',run:()=>replace(review)},
-  {id:'run-cancel-new',label:'Cancel',run:()=>restart.focus()},
- ],()=>restart.focus());
+  {id:'run-cancel-new',label:'Cancel',run:cancel},
+ ],cancel);
 }
 function showRecovery() {
  const closeRecovery=()=>{
@@ -94,7 +97,7 @@ function showRecovery() {
  for(const [index,{slot,text}] of controller.recoveryTexts(review).entries()) {
   choices.push({id:`run-export-${slot}-${index}`,label:`Export ${slot} save`,run:()=>{
    const url=URL.createObjectURL(new Blob([JSON.stringify({slot,text})],{type:'application/json'}));
-   const link=document.createElement('a');link.href=url;link.download=`tactics-guru-run-${slot}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+   const link=document.createElement('a');link.href=url;link.download=`tactics-guru-run-${slot}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);closeRecovery();
   }});
   if(review.ok && 'text' in review.inspection[slot] && review.inspection[slot].text===text)choices.push({id:`run-remove-${slot}`,label:`Remove ${slot} save`,run:()=>{
    dialogs.showChoices('Remove reviewed save?',`Export first if needed. Remove the reviewed ${slot} bytes?`,[
@@ -103,15 +106,15 @@ function showRecovery() {
    ]);
   }});
  }
- if(startup && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
+ if((startup || controller.isUnsavedOnly) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
  choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(!startup)controller.save();showRecovery();}},
   {id:'run-close-recovery',label:'Close',run:closeRecovery});
  const message=review.ok?`primary: ${review.inspection.primary.status}. backup: ${review.inspection.backup.status}. ${controller.status}`:`Storage ${review.kind}. Your run can continue unsaved.`;
  dialogs.showChoices('Run save recovery',message,choices,closeRecovery);
 }
 function continueRun(review:RunLoadResult) {
- if(!controller.continue(review))return;
- startup=false;render();
+ if(!controller.continue(review)){showRecovery();return;}
+ startup=false;stopBattle();render();
  if(controller.snapshot.activeBattle)startBattle();
 }
 function renderProgress() {
@@ -134,14 +137,16 @@ function render() {
   const title=items.querySelector('h1')!;title.textContent='Three-encounter run';
   if(review.ok && review.selected)actions.append(button('Continue saved run',()=>continueRun(review),'run-continue'));
   actions.append(button('Start new run',()=>{
+   const review=controller.inspect();
    if(review.ok && Object.values(review.inspection).every(s=>s.status==='missing')) {
-    startup=false;controller.save();render();
+    if(initial.ok && initial.selected)replace(review);
+    else {startup=false;controller.startNew();render();}
    } else requestNew();
   },'run-start'));
-  if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.save();render();},'run-unsaved'));
+  if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
-  items.replaceChildren(title);actions.append(nav.cloneNode(true));controller.onChange=()=>{evidence();};
+  items.replaceChildren(title);actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
  } else renderActions();
  const title=items.querySelector('h1');if(title)title.setAttribute('tabindex','-1');
 }
@@ -153,13 +158,16 @@ function renderActions() {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
   actions.append(button('Start new run',()=>replace(controller.inspect()),'run-new'));
  }
- actions.append(nav.cloneNode(true));
+ actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true));mountTelemetryPreferences(actions);
 }
 restart.addEventListener('click',requestNew);
 // Repeated activation must not cross replaced controls or trigger another destructive intent.
 document.addEventListener('keydown',e=>{if(e.repeat && (e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
-window.addEventListener('error',()=>fail('The run encountered a runtime error'));
-window.addEventListener('unhandledrejection',()=>fail('The run encountered an asynchronous error'));
+window.addEventListener('error',()=>fail('The run encountered a runtime error',false));
+window.addEventListener('unhandledrejection',()=>fail('The run encountered an asynchronous error',false));
 window.addEventListener('pagehide',()=>{live=false;controller.dispose();stopBattle();unmount();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 render();
+// Prepare the one engine while the read-only start screen is displayed. No
+// battle scene or save is created until the existing controls request it.
+const engine=createGame([],true);

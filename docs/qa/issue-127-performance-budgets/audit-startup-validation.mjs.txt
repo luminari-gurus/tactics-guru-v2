@@ -1,0 +1,46 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const qa='docs/qa/issue-127-performance-budgets/';
+const specs={
+  'startup-final-browser':[516,3], 'startup-final-board-recheck':[3,0],
+  'startup-final-encounters':[18,0], 'startup-final-items':[21,0],
+  'startup-final-webkit':[54,0], 'startup-final-webkit-boundaries':[25,1],
+  'startup-startup-final-prefix':[63,0],
+  'startup-proof-baseline-recheck':[6,0], 'startup-proof-candidate-recheck':[6,0],
+  'startup-proof-sequence-recheck':[11,1], 'startup-webkit-input-diagnostic':[6,0],
+  'startup-native-touch-root':[3,0], 'startup-native-touch-prefix':[3,0], 'startup-native-touch-webkit':[12,0],
+};
+const reports={},hashes={};
+const tests=s=>[...(s.specs??[]).flatMap(p=>(p.tests??[]).map(t=>({title:p.title,...t}))),...(s.suites??[]).flatMap(tests)];
+for(const [name,[expected,unexpected]]of Object.entries(specs)){
+  const raw=fs.readFileSync(qa+name+'.json'),report=JSON.parse(raw),cases=report.suites.flatMap(tests);
+  assert.equal(report.stats.expected,expected,name);assert.equal(report.stats.unexpected,unexpected,name);
+  assert.equal(report.stats.skipped,0,name);assert.equal(report.stats.flaky,0,name);assert.deepEqual(report.errors,[],name);
+  assert(cases.every(t=>t.results.every(r=>r.retry===0)),name+' has an automatic retry');
+  const failures=cases.filter(t=>t.status==='unexpected').map(t=>({title:t.title,project:t.projectName,
+    messages:t.results.flatMap(r=>r.errors??[]).map(e=>e.message.replace(/\x1b\[[0-9;]*m/g,''))}));
+  reports[name]={...report.stats,failures};hashes[name+'.json']=createHash('sha256').update(raw).digest('hex');
+}
+assert(reports['startup-final-browser'].failures.every(f=>f.title==='default authored board renders canonical units, highlights and stable restarts'&&f.messages.every(m=>m.includes('Expected length: 2')&&m.includes('Received length: 1'))));
+assert.equal(reports['startup-final-webkit-boundaries'].failures[0].title,'proof direct entry and refresh resolve public assets');
+assert.equal(reports['startup-proof-sequence-recheck'].failures[0].title,'battle direct entry and refresh resolve public assets');
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const measured='06ad2435c28c96b1614eb083acd8f953f76c8fe7',current='9382f135be8b845b2a5425c16c3ea1badc5a00f0';
+const changes=git('diff','--name-only',measured,current).split('\n');
+assert.deepEqual(changes,['tests/battle-board.spec.ts','tests/public-asset-base.spec.ts']);
+const inputs={};for(const file of ['src','public','vite.config.ts','index.html','package.json','package-lock.json','tsconfig.json','tsconfig.domain.json']){
+  const before=git('rev-parse',measured+':'+file),after=git('rev-parse',current+':'+file);assert.equal(before,after);inputs[file]=after;
+}
+const diagnostic=JSON.parse(fs.readFileSync(qa+'startup-proof-webkit-diagnostic.json'));
+assert.equal(diagnostic.records.length,24);assert(diagnostic.records.every(r=>r.failure===null&&r.errors.every(e=>e.startsWith('warning:'))));
+const result={measuredRuntimeCommit:measured,currentSourceCommit:current,testOnlyChanges:changes,unchangedRuntimeInputs:inputs,
+  unitTests:697,contentChecks:167,typechecks:2,
+  allRequiredCasesHavePassingEvidence:true,cleanFirstAttempt:false,
+  proofTimeoutDisposition:'One initial WebKit portrait proof readiness timeout remains retained and unreproduced. Baseline/candidate exact-case repeats and the final native-touch sequence pass; no causal application fix is claimed.',
+  inputDisposition:'One synthetic-mouse activation remained muted during a diagnostic sequence. The asset-path test now uses native taps on touch profiles; desktop retains mouse clicks. All 18 targeted root/prefix/WebKit cases pass. Product audio handling is unchanged.',
+  fixtureDisposition:'The board smoke fixture expected duplicate portrait requests. It now requires one request for every image; all three repaired profiles pass.',
+  reports,rawReportSha256:hashes};
+fs.writeFileSync(qa+'startup-validation-summary.json',JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify({current,changedFiles:changes,reports:Object.fromEntries(Object.entries(reports).map(([name,r])=>[name,{passed:r.expected,failed:r.unexpected}]))},null,2));

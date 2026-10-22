@@ -6,6 +6,9 @@ export interface BoardInputTarget {
   pan(dx: number, dy: number): void;
   zoom(factor: number, anchor: Point): void;
   select(point: Point): void;
+  cancel?(): void;
+  hover?(point: Point | null): void;
+  resetPicking?(): void;
 }
 
 /** Mouse/pen pointers and native touch contacts share one gesture state. */
@@ -22,9 +25,10 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   };
   const begin = (id:string, p:Point, capture:number|null): boolean => {
     if (!enabled(p)) { inputTrace('rejected-start', {p}); return false; }
+    board.hover?.(null);
     inputTrace('accepted-start', {p,id});
     pointers.set(id, {start:p,point:p,capture});
-    if (pointers.size>1) gesture=true;
+    if (pointers.size>1) { gesture=true; board.resetPicking?.(); }
     if (capture!==null) canvas.setPointerCapture(capture);
     return true;
   };
@@ -49,6 +53,8 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     const pointer=pointers.get(id);
     if (!pointer) { inputTrace('missing-contact', {id,next}); return false; }
     if (!enabled(next)) { inputTrace('rejected-contact', {id,next}); reset(); return true; }
+    board.hover?.(null);
+    if (!select) board.resetPicking?.();
     if (select && !gesture && pointers.size===1 && Math.hypot(next.x-pointer.start.x,next.y-pointer.start.y)<DRAG_THRESHOLD) board.select(next);
     pointers.delete(id);
     if (pointer.capture!==null && canvas.hasPointerCapture(pointer.capture)) canvas.releasePointerCapture(pointer.capture);
@@ -56,8 +62,18 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     return true;
   };
   const ignore = (event:PointerEvent) => nativeTouch && event.pointerType==='touch';
-  const down = (event:PointerEvent) => { if (!ignore(event) && event.button===0) begin(`p${event.pointerId}`,point(event),event.pointerId); };
-  const move = (event:PointerEvent) => { if (!ignore(event)) moveContact(`p${event.pointerId}`,point(event)); };
+  const down = (event:PointerEvent) => {
+    if (ignore(event) || !enabled(point(event))) return;
+    if (event.button===2) { reset(); board.cancel?.(); return; }
+    if (event.button===0) begin(`p${event.pointerId}`,point(event),event.pointerId);
+  };
+  const move = (event:PointerEvent) => {
+    if (ignore(event)) return;
+    const next=point(event);
+    if (!enabled(next)) { reset(); return; }
+    if (!pointers.size && event.buttons===0 && (event.pointerType==='mouse' || event.pointerType==='pen')) board.hover?.(next);
+    moveContact(`p${event.pointerId}`,next);
+  };
   const end = (event:PointerEvent) => { if (!ignore(event)) finish(`p${event.pointerId}`,point(event),event.type==='pointerup'); };
   // Use the native contact list for touch: capture/cancellation of compatibility
   // pointer events must not drop a second finger or dispatch the gesture twice.
@@ -73,17 +89,26 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   const wheel = (event:WheelEvent) => {
     event.preventDefault();
     if (!enabled(point(event))) { reset(); return; }
+    board.hover?.(null);
     if (pointers.size) gesture=true;
     board.zoom(Math.exp(-Math.max(-100,Math.min(100,event.deltaY))*0.002),point(event));
   };
-  const reset = ():void => {
+  const reset = (preservePicking=false):void => {
+    if (!preservePicking) board.resetPicking?.();
+    board.hover?.(null);
     inputTrace('reset', {contacts:pointers.size});
     const captured=[...pointers.values()];pointers.clear();gesture=false;
     for (const pointer of captured) if (pointer.capture!==null && canvas.hasPointerCapture(pointer.capture)) canvas.releasePointerCapture(pointer.capture);
   };
+  const leave = (event:PointerEvent):void => {
+    if (ignore(event)) return;
+    if ((event.pointerType==='touch' || event.pointerType==='pen') && !pointers.size) { board.hover?.(null); return; }
+    reset();
+  };
   const visibility = () => { if (owner.visibilityState==='hidden') reset(); };
   canvas.addEventListener('pointerdown',down);
   canvas.addEventListener('pointermove',move);
+  canvas.addEventListener('pointerleave',leave);
   canvas.addEventListener('pointerup',end);
   canvas.addEventListener('pointercancel',end);
   canvas.addEventListener('lostpointercapture',end);
@@ -95,6 +120,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     owner.removeEventListener('visibilitychange',visibility);
     canvas.removeEventListener('pointerdown',down);
     canvas.removeEventListener('pointermove',move);
+    canvas.removeEventListener('pointerleave',leave);
     canvas.removeEventListener('pointerup',end);
     canvas.removeEventListener('pointercancel',end);
     canvas.removeEventListener('lostpointercapture',end);

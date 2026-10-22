@@ -1,0 +1,39 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {evaluateCapture,LIMITS,FLOAT_NOISE_MS} from '../scripts/measure-fit-evaluate.ts';
+const source=JSON.parse(fs.readFileSync('tmp/engine-repaired-source-binding.json'));
+const sha=data=>createHash('sha256').update(data).digest('hex');
+const captures={},hashes={};
+for(const location of ['preview','local'])for(const route of ['battle','run']){
+ const name=`engine-final-${location}-${route}`,raw=fs.readFileSync('tmp/'+name+'.json'),capture=JSON.parse(raw);
+ assert.equal(capture.measuredBuild.commit,source.source);assert.equal(capture.measuredBuild.dirty,false);assert.equal(capture.sourceDirty,false);
+ assert.deepEqual(capture.collectorSha256,source.collectorSha256);assert.equal(capture.browserVersion,'155.0.4283.62');
+ const result=evaluateCapture(capture),saved=JSON.parse(fs.readFileSync('tmp/'+name+'-gates.json'));
+ assert.deepEqual(result.rows,saved.rows);assert.deepEqual(result.captureFailures,[]);assert.equal(result.rows.length,18);
+ const duplicateImages=[],warmCode=[];
+ for(const sample of capture.samples){
+  const images=sample.diagnostics.resources.map(r=>new URL(r.url).pathname).filter(p=>p.endsWith('.png'));
+  for(const image of new Set(images))if(images.filter(p=>p===image).length!==1)duplicateImages.push({profile:sample.profile,repetition:sample.repetition,cache:sample.cache,image});
+  if(sample.cache==='warm'){
+   const code=sample.diagnostics.resources.filter(r=>/\.(js|css)(?:\?|$)/.test(r.url));
+   assert(code.length>0);
+   if(location==='preview')assert(code.every(r=>r.transferBytes===0),'Preview warm code revalidation');
+   warmCode.push({profile:sample.profile,repetition:sample.repetition,requests:code.length,transferBytes:code.reduce((n,r)=>n+r.transferBytes,0)});
+  }
+ }
+ assert.deepEqual(duplicateImages,[]);
+ const cold=result.rows.filter(r=>r.cache==='cold'),warm=result.rows.filter(r=>r.cache==='warm');
+ const range=values=>({min:Math.min(...values),max:Math.max(...values)});
+ captures[name]={commit:capture.measuredBuild.commit,measuredAt:capture.measuredAt,samples:18,captureFailures:0,budgetFailedSamples:result.failedSamples,
+  coldCodeBytes:range(cold.map(r=>r.values.codeBytes)),coldUsableMs:range(cold.map(r=>r.values.usableMs)),warmUsableMs:range(warm.map(r=>r.values.usableMs)),
+  coldAssetBytes:range(cold.map(r=>r.values.assetBytes)),worstIdleP50Ms:Math.max(...result.rows.map(r=>r.values.idleP50Ms)),worstIdleP95Ms:Math.max(...result.rows.map(r=>r.values.idleP95Ms)),
+  worstInteractionP95Ms:Math.max(...capture.samples.flatMap(s=>s.diagnostics.workloads.filter(w=>['pan','zoom','move'].includes(w.action)).map(w=>w.frames.p95Ms))),
+  failedRows:result.rows.filter(r=>r.violations.length),duplicateImages,warmCode};
+ hashes[name+'.json']=sha(raw);
+}
+const summary={source:source.source,browser:'155.0.4283.62',samples:72,limits:LIMITS,floatNoiseToleranceMs:FLOAT_NOISE_MS,
+ allGatesPass:Object.values(captures).every(c=>c.budgetFailedSamples===0),captures,rawCaptureSha256:hashes};
+fs.writeFileSync('tmp/engine-final-summary.json',JSON.stringify(summary,null,2)+'\n');
+console.log(JSON.stringify(summary,null,2));
+

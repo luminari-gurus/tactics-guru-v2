@@ -1,0 +1,11 @@
+import {build} from 'vite';import fs from 'node:fs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
+const baseline='ad50e392749ccb792ea9b10a1e10307cb5a7dc3c';
+const results={};
+for(const [base,before,after]of [['/','tmp/engine-final-dist','tmp/engine-devfix-parity-root'],['/tactics/','tmp/engine-final-prefix-dist','tmp/engine-devfix-parity-prefix']]){
+ await build({base,logLevel:'error',define:{__BUILD_INFO__:JSON.stringify({commit:baseline,dirty:false})},build:{outDir:after}});
+ const paths=fs.readdirSync(before,{recursive:true}).filter(p=>fs.statSync(before+'/'+p).isFile());
+ assert.deepEqual(paths.slice().sort(),fs.readdirSync(after,{recursive:true}).filter(p=>fs.statSync(after+'/'+p).isFile()).sort());
+ for(const p of paths)assert(fs.readFileSync(before+'/'+p).equals(fs.readFileSync(after+'/'+p)),'Production output changed: '+p);
+ results[base]={files:paths.length,allBytesIdentical:true,headersSha256:createHash('sha256').update(fs.readFileSync(after+'/_headers')).digest('hex')};
+}
+fs.writeFileSync('tmp/engine-devfix-production-parity.json',JSON.stringify({purpose:'Compare production output with identical build metadata; not an acceptance artifact',baseline,results},null,2)+'\n');console.log(results);

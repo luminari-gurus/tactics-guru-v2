@@ -1,0 +1,387 @@
+{
+  "build": {
+    "commit": "0b317e35bb5c4ce713c242311f0673fc27923637",
+    "dirty": true
+  },
+  "captureFailures": [
+    "Collector reported failures or omitted failure status",
+    "Invalid or dirty served build",
+    "Measured build does not match samples",
+    "desktop/1/cold: Mixed or dirty idle/final build",
+    "desktop/1/cold: Mixed or dirty idle/final build",
+    "desktop/1/warm: Mixed or dirty idle/final build",
+    "desktop/1/warm: Mixed or dirty idle/final build",
+    "desktop/2/cold: Mixed or dirty idle/final build",
+    "desktop/2/cold: Mixed or dirty idle/final build",
+    "desktop/2/warm: Mixed or dirty idle/final build",
+    "desktop/2/warm: Mixed or dirty idle/final build",
+    "desktop/3/cold: Mixed or dirty idle/final build",
+    "desktop/3/cold: Mixed or dirty idle/final build",
+    "desktop/3/warm: Mixed or dirty idle/final build",
+    "desktop/3/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/1/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/1/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/1/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/2/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/2/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/2/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/2/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/3/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/3/cold: Mixed or dirty idle/final build",
+    "mobile-portrait/3/warm: Mixed or dirty idle/final build",
+    "mobile-portrait/3/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/1/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/1/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/1/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/2/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/2/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/2/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/2/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/3/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/3/cold: Mixed or dirty idle/final build",
+    "mobile-landscape/3/warm: Mixed or dirty idle/final build",
+    "mobile-landscape/3/warm: Mixed or dirty idle/final build"
+  ],
+  "rows": [
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 777.1999999880791,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 829.1999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 829.1999999880791,
+          "limit": 750
+        },
+        {
+          "metric": "move p95",
+          "actual": 51.10000002384186,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 766.1000000238419,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 36.19999998807907,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 774.2000000476837,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.599999964237213,
+        "idleP95Ms": 18.299999952316284
+      },
+      "violations": [
+        {
+          "metric": "usableMs",
+          "actual": 774.2000000476837,
+          "limit": 750
+        },
+        {
+          "metric": "move p95",
+          "actual": 33.59999996423721,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 750.3000000119209,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18.099999964237213
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        },
+        {
+          "metric": "move p95",
+          "actual": 37,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 709.6000000238419,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "move p95",
+          "actual": 40.09999996423721,
+          "limit": 33.4,
+          "window": 0
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 633.3000000119209,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 590.1999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 17.600000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 622.2999999523163,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.80000001192093,
+        "idleP95Ms": 17.899999976158142
+      },
+      "violations": [
+        {
+          "metric": "idleP50Ms",
+          "actual": 16.80000001192093,
+          "limit": 16.7
+        },
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 606.3000000119209,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 623.8999999761581,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.599999964237213,
+        "idleP95Ms": 17.900000035762787
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-portrait",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 625.6999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18.100000023841858
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "cold",
+      "values": {
+        "usableMs": 621,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 18.099999964237213
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 1,
+      "cache": "warm",
+      "values": {
+        "usableMs": 628.4000000357628,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "cold",
+      "values": {
+        "usableMs": 625.1999999880791,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.5
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 2,
+      "cache": "warm",
+      "values": {
+        "usableMs": 573.3000000119209,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.69999998807907
+      },
+      "violations": []
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "cold",
+      "values": {
+        "usableMs": 628,
+        "codeBytes": 407291,
+        "assetBytes": 848829,
+        "idleP50Ms": 16.600000023841858,
+        "idleP95Ms": 17.80000001192093
+      },
+      "violations": [
+        {
+          "metric": "codeBytes",
+          "actual": 407291,
+          "limit": 400000
+        }
+      ]
+    },
+    {
+      "profile": "mobile-landscape",
+      "repetition": 3,
+      "cache": "warm",
+      "values": {
+        "usableMs": 611.1999999880791,
+        "codeBytes": 2700,
+        "assetBytes": 7800,
+        "idleP50Ms": 16.69999998807907,
+        "idleP95Ms": 18
+      },
+      "violations": []
+    }
+  ],
+  "failedSamples": 12,
+  "passed": false
+}

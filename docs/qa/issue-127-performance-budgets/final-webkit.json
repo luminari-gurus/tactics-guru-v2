@@ -1,0 +1,1999 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/node_modules/playwright/cli.js",
+      "test",
+      "-c",
+      "tmp/playwright-external-webkit.config.ts"
+    ],
+    "configFile": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/playwright-external-webkit.config.ts",
+    "rootDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-portrait",
+        "name": "acceptance-webkit-portrait",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/battle-loop.spec.ts",
+          "**/battle-persistence.spec.ts",
+          "**/run-progression.spec.ts",
+          "**/battle-audio.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "acceptance-webkit-landscape",
+        "name": "acceptance-webkit-landscape",
+        "testDir": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/battle-loop.spec.ts",
+          "**/battle-persistence.spec.ts",
+          "**/run-progression.spec.ts",
+          "**/battle-audio.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/docs/qa/issue-127-performance-budgets/final-webkit.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "battle-audio.spec.ts",
+      "file": "battle-audio.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5089,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:26.290Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5b20c66b090c902460b9-4f20302b25000cf5291f",
+          "file": "battle-audio.spec.ts",
+          "line": 21,
+          "column": 1
+        },
+        {
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4874,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:31.599Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5b20c66b090c902460b9-173f85ad291b12496c8b",
+          "file": "battle-audio.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4270,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:36.136Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5b20c66b090c902460b9-02f4a075870f33651dea",
+          "file": "battle-audio.spec.ts",
+          "line": 21,
+          "column": 1
+        },
+        {
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4648,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:40.533Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5b20c66b090c902460b9-6ae98fee22d890c62a09",
+          "file": "battle-audio.spec.ts",
+          "line": 58,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "battle-loop.spec.ts",
+      "file": "battle-loop.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1718,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:36.531Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-3dca2731e08d9a5193d7",
+          "file": "battle-loop.spec.ts",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 37186,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:11:38.260Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "replay",
+                      "contentType": "application/json",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux/battle-loop-complete-legal-9136d-hrough-controls-and-replays-acceptance-webkit-portrait/attachments/replay-681ed3481aeccc470a3921222eb8eb3ca5092310.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-d4e7539308b7ce6a1a3f",
+          "file": "battle-loop.spec.ts",
+          "line": 41,
+          "column": 3
+        },
+        {
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 19832,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:16.697Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "replay",
+                      "contentType": "application/json",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux/battle-loop-complete-legal-c217e-hrough-controls-and-replays-acceptance-webkit-portrait/attachments/replay-9627bbc8610c878c369ec42549c02c1c28df20fc.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-fa6cb6effd02b4b79a63",
+          "file": "battle-loop.spec.ts",
+          "line": 41,
+          "column": 3
+        },
+        {
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3249,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:37.756Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-977589b56f7422f67732",
+          "file": "battle-loop.spec.ts",
+          "line": 182,
+          "column": 1
+        },
+        {
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1691,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:45.237Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-0da34193d07d4c350816",
+          "file": "battle-loop.spec.ts",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 36532,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:46.944Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "replay",
+                      "contentType": "application/json",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux/battle-loop-complete-legal-9136d-hrough-controls-and-replays-acceptance-webkit-landscape/attachments/replay-49ad39f01367314634c32a1f1691eee22be3f4ce.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-7a829993be174950e4f9",
+          "file": "battle-loop.spec.ts",
+          "line": 41,
+          "column": 3
+        },
+        {
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 21745,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:16:24.389Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "replay",
+                      "contentType": "application/json",
+                      "path": "/mnt/c/Users/apexw/.codex/worktrees/issue-127-performance-plan/Tactics-Guru/tmp/webkit-external-artifacts/final-linux/battle-loop-complete-legal-c217e-hrough-controls-and-replays-acceptance-webkit-landscape/attachments/replay-dfcb6d926e1a82eac22b5a08b644c85c77aaaeda.json"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-1075065ce1d7f5ec0c1d",
+          "file": "battle-loop.spec.ts",
+          "line": 41,
+          "column": 3
+        },
+        {
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3199,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:16:47.115Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "048cec556759de4a1f3c-87d87c96cb20116b5815",
+          "file": "battle-loop.spec.ts",
+          "line": 182,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "battle-persistence.spec.ts",
+      "file": "battle-persistence.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4965,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:42.042Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-b7da2fcb5b4c80035c55",
+          "file": "battle-persistence.spec.ts",
+          "line": 28,
+          "column": 1
+        },
+        {
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6510,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:47.110Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-dc18859c01289303ba53",
+          "file": "battle-persistence.spec.ts",
+          "line": 82,
+          "column": 47
+        },
+        {
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6307,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:53.633Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-1a7a3c390346668e4c79",
+          "file": "battle-persistence.spec.ts",
+          "line": 82,
+          "column": 47
+        },
+        {
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4464,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:12:59.951Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-a1b9e1434886cb8fc38e",
+          "file": "battle-persistence.spec.ts",
+          "line": 123,
+          "column": 1
+        },
+        {
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2811,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:05.657Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-de9ad2fca310cc3b25ea",
+          "file": "battle-persistence.spec.ts",
+          "line": 144,
+          "column": 1
+        },
+        {
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3321,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:08.477Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-0d89862f2fe39ea49b99",
+          "file": "battle-persistence.spec.ts",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2898,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:11.807Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-7bc08ea4bc4e449ee644",
+          "file": "battle-persistence.spec.ts",
+          "line": 180,
+          "column": 1
+        },
+        {
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3498,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:14.718Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-3b87b202defc6c737337",
+          "file": "battle-persistence.spec.ts",
+          "line": 189,
+          "column": 1
+        },
+        {
+          "title": "invalid startup requires explicit reset: {broken",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1670,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:18.226Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-d856acadd72dd3513a28",
+          "file": "battle-persistence.spec.ts",
+          "line": 199,
+          "column": 141
+        },
+        {
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1614,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:19.904Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-837e3e51240391504891",
+          "file": "battle-persistence.spec.ts",
+          "line": 199,
+          "column": 141
+        },
+        {
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4546,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:16:51.476Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-b0c1b1685f10268dc4e4",
+          "file": "battle-persistence.spec.ts",
+          "line": 28,
+          "column": 1
+        },
+        {
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10380,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:16:56.132Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-cc2ea1e99b15e7ff2a94",
+          "file": "battle-persistence.spec.ts",
+          "line": 82,
+          "column": 47
+        },
+        {
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10715,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:06.528Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-4c726e833e283dce0a15",
+          "file": "battle-persistence.spec.ts",
+          "line": 82,
+          "column": 47
+        },
+        {
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5879,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:18.201Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-0303c8bcc1aa992b4d28",
+          "file": "battle-persistence.spec.ts",
+          "line": 123,
+          "column": 1
+        },
+        {
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3743,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:24.098Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-b0744dba80b7344b2f80",
+          "file": "battle-persistence.spec.ts",
+          "line": 144,
+          "column": 1
+        },
+        {
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4170,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:27.856Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-927158d1e726d330456d",
+          "file": "battle-persistence.spec.ts",
+          "line": 162,
+          "column": 1
+        },
+        {
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3581,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:32.038Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-7c343f6df9f78ae52f1a",
+          "file": "battle-persistence.spec.ts",
+          "line": 180,
+          "column": 1
+        },
+        {
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3946,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:35.633Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-795e53df15811c214e8e",
+          "file": "battle-persistence.spec.ts",
+          "line": 189,
+          "column": 1
+        },
+        {
+          "title": "invalid startup requires explicit reset: {broken",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1907,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:39.596Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-9c5a932dbae91627ed8e",
+          "file": "battle-persistence.spec.ts",
+          "line": 199,
+          "column": 141
+        },
+        {
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2153,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:41.519Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8352ba8e75a15b46318d-8b2d13ded779e48fdbec",
+          "file": "battle-persistence.spec.ts",
+          "line": 199,
+          "column": 141
+        }
+      ]
+    },
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 59750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:13:22.631Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a8ef7ae3f89bae60aaca",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17764,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:24.956Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c33455a82043e9970b06",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2038,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:42.734Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a2a84084cdf747aa3386",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6287,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:44.780Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c0c7b55ee8bf2c79b32c",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1769,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:51.076Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-90c48e1fba4d37ab41bd",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1947,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:52.854Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-19e780bd31f15a4df717",
+          "file": "run-progression.spec.ts",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16458,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:14:54.811Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d1027787ad546b5dc0a8",
+          "file": "run-progression.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2262,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:12.733Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-e945013d243e69532fcc",
+          "file": "run-progression.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15552,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:15.003Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c760829ec3e03b026d56",
+          "file": "run-progression.spec.ts",
+          "line": 175,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1754,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:31.462Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-86d2d4e47ffdbf8996fa",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-portrait",
+              "projectName": "acceptance-webkit-portrait",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:15:33.226Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5a332911b1d18b111fda",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "legal three encounter run, rewards, preparation, final resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 63070,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:17:46.625Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2524bb8a8447d1c08cc4",
+          "file": "run-progression.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16832,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:18:51.600Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-723c0a56826b227a7ca8",
+          "file": "run-progression.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3276,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:08.443Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-ebc2efd4b87e85786e5c",
+          "file": "run-progression.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6907,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:11.736Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3351c126c3d4da839e6b",
+          "file": "run-progression.spec.ts",
+          "line": 79,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1970,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:18.659Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d76ae05a105eae65a8a1",
+          "file": "run-progression.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2294,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:20.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-4e03e06c6d11a4f7a26a",
+          "file": "run-progression.spec.ts",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20837,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:23.811Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-39c5fffb6cfa3b225dc9",
+          "file": "run-progression.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2939,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:44.664Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-63c0360e27ab2d723fac",
+          "file": "run-progression.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 19265,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:19:47.621Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a4a59a5a8f65a5a8fb05",
+          "file": "run-progression.spec.ts",
+          "line": 175,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2724,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:20:07.771Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-6db30e6cccc30620dc72",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "acceptance-webkit-landscape",
+              "projectName": "acceptance-webkit-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2419,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T20:20:10.516Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9da9d9a49d775db06714",
+          "file": "run-progression.spec.ts",
+          "line": 187,
+          "column": 50
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T20:11:24.335Z",
+    "duration": 513016.306,
+    "expected": 54,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

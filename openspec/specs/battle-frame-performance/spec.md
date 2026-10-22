@@ -31,7 +31,7 @@ Proof and battle comparisons SHALL use the same served build, browser, host, net
 - **AND** host or sampling effects alone do not establish an application fix
 
 ### Requirement: Preserved battle behavior and loading budgets
-Performance changes MUST preserve state, RNG, accepted-command replay, picking, modal capture and lifecycle/restart behavior. Deployed usable loading MUST remain ≤2500 ms cold and ≤750 ms warm; cold compressed code MUST remain ≤400000 bytes and scene assets ≤1500000 bytes.
+Performance changes MUST preserve state, RNG, accepted-command replay, picking, modal capture and lifecycle/restart behavior. Deployed usable loading MUST remain ≤2500 ms cold; cold compressed code MUST remain ≤400000 bytes and scene assets ≤1500000 bytes.
 
 #### Scenario: Optimized battle run
 - **WHEN** the same seed and legal commands run before and after a focused performance change
@@ -45,3 +45,16 @@ Evidence SHALL use only the existing approved release path. Missing release acce
 - **WHEN** a deployed gate fails or the approved release cannot serve the intended build
 - **THEN** retained evidence states the gap and delivery remains a draft referencing issue #65 without closing it
 - **AND** physical acceptance remains under #64 and Safari restart remediation under #66
+
+
+### Requirement: Loading warnings and history
+
+Loads above 1000 ms MUST produce warnings with raw timings. Warm loading MUST NOT have a fixed pass/fail time limit. Comparable repeated loads MUST be reviewed for sustained slowdown; isolated spikes SHALL remain historical information. Original captures and evaluations MUST remain unchanged.
+
+#### Scenario: Isolated slow warm load
+- **WHEN** one warm load exceeds 1000 ms and subsequent comparable loads return below that threshold
+- **THEN** the report records the warning and raw timings as history without a warm-loading budget failure
+
+#### Scenario: Repeated slow loading
+- **WHEN** a majority of three loads on the same route, device profile, cache and network conditions exceed 1000 ms
+- **THEN** the report flags the repeated slowdown for review and retains every sample without imposing a new warm-loading hard gate

@@ -1,0 +1,155 @@
+{
+  "note": "Unchanged base floor summary; same 30-rAF idle sampling as feature receipts. Above-budget samples remain failures; no exception is granted.",
+  "receipts": [
+    {
+      "name": "desktop",
+      "build": {
+        "commit": "38474f210da723c7d66cf323a19236de85cb5e57",
+        "dirty": true
+      },
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "samples": [
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        18,
+        16,
+        16,
+        17,
+        17,
+        16,
+        15,
+        19,
+        16,
+        15,
+        18,
+        17,
+        18,
+        14
+      ],
+      "idleP50": 17,
+      "idleP95": 18,
+      "budget": {
+        "idleP50": 16.7,
+        "idleP95": 20
+      }
+    },
+    {
+      "name": "portrait",
+      "build": {
+        "commit": "38474f210da723c7d66cf323a19236de85cb5e57",
+        "dirty": true
+      },
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "samples": [
+        15,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        18,
+        16,
+        16,
+        16,
+        17,
+        17,
+        16,
+        18,
+        16
+      ],
+      "idleP50": 17,
+      "idleP95": 18,
+      "budget": {
+        "idleP50": 16.7,
+        "idleP95": 20
+      }
+    },
+    {
+      "name": "landscape",
+      "build": {
+        "commit": "38474f210da723c7d66cf323a19236de85cb5e57",
+        "dirty": true
+      },
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "samples": [
+        16,
+        17,
+        17,
+        16,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        18,
+        16,
+        16,
+        16,
+        18,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16
+      ],
+      "idleP50": 17,
+      "idleP95": 18,
+      "budget": {
+        "idleP50": 16.7,
+        "idleP95": 20
+      }
+    }
+  ]
+}

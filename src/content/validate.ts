@@ -42,7 +42,7 @@ export function validateContent(input: unknown): ContentValidation {
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
       const path = `${group}.${key}`;
-      if (fixed ? !fixed.some(id => id === key) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
+      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock'].includes(key)) && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
       if (!isPlainRecord(record) || !hasShape(record, Object.keys(record))) { fail('shape', path, 'Expected a plain definition without accessors or hidden fields.'); continue; }
       if (record.id !== key) fail('id', `${path}.id`, 'Record ID must equal its catalog key.');
       if (typeof record.id === 'string') {
@@ -64,7 +64,7 @@ export function validateContent(input: unknown): ContentValidation {
     if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
     if (!shape(ability, keys, path)) continue;
     const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
-    if (!expected || ability.kind !== expected.kind) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
     if (ability.kind === 'guardedAttack') for (const field of ['attackPenalty','armorClassBonus'] as const)
       if (ability[field] !== GUARDED_STRIKE_TRADEOFF[field]) fail('number', `${path}.${field}`, `Expected ${GUARDED_STRIKE_TRADEOFF[field]}.`);
     if (ability.kind === 'magicMissile') {
@@ -79,9 +79,18 @@ export function validateContent(input: unknown): ContentValidation {
     }
     if (typeof ability.rangeMin === 'number' && typeof ability.rangeMax === 'number' && ability.rangeMin > ability.rangeMax)
       fail('number', path, 'Minimum range must not exceed maximum range.');
-    if (array(ability.owners, `${path}.owners`) && (!expected ||
-      ability.owners.length !== expected.owners.length || ability.owners.some((owner, i) => owner !== expected.owners[i])))
-      fail('reference', `${path}.owners`, 'Expected the approved ability owners in their defined order.');
+    if (array(ability.owners, `${path}.owners`)) {
+      if (ability.kind === 'guardedAttack' && ability.owners.some(owner=>owner!=='fighter'))
+        fail('reference', `${path}.owners`, 'Guarded attacks require the Fighter effect lifecycle.');
+      if (expected) {
+        if (ability.owners.length !== expected.owners.length || ability.owners.some((owner, i) => owner !== expected.owners[i]))
+          fail('reference', `${path}.owners`, 'Expected the approved ability owners in their defined order.');
+      } else if (!ability.owners.length || ability.owners.length > HERO_IDS.length + ENEMY_IDS.length
+        || new Set(ability.owners).size !== ability.owners.length
+        || ability.owners.some(owner => typeof owner !== 'string' || ![...HERO_IDS,...ENEMY_IDS].some(id=>id===owner))) {
+        fail('reference', `${path}.owners`, 'Expected distinct existing unit owners.');
+      }
+    }
   }
   for (const group of ['heroes', 'enemies'] as const) for (const [id, unit] of entries(group)) {
     const path = `${group}.${id}`;

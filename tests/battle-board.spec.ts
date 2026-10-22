@@ -4,16 +4,302 @@ import { battleCatalog } from '../src/content/catalog';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
+import { BattleSession } from '../src/app/BattleSession';
+import { hoverPreview } from '../src/ui/targetPreview';
+import { encodeBattleSave } from '../src/domain/saveEnvelope';
+import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
+import { playerDecision } from './helpers/playerPolicy';
+import { unitBounds } from '../src/geometry/canopy';
+
+/** Real accepted seed-1 boundaries, using the same policy as battle/save coverage. */
+async function occlusionBoundary(page: Page, count: number) {
+  const session = new BattleSession(battleCatalog, 'map:forest_ruins', 1);
+  while (session.state.commandCount < count) {
+    if (session.phase === 'player') expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+    const step = session.phase === 'player' ? session.confirm() : session.nextEnemy();
+    if (!step) throw Error('Occlusion fixture failed to progress');
+    session.finishPresentation(step.token);
+  }
+  expect(session.phase).toBe('player');
+  const save = encodeBattleSave(session.state, battleCatalog);
+  if (!save.ok) throw Error(save.reason);
+  await page.addInitScript(({key, text}) => localStorage.setItem(key, text), {key:BATTLE_STORAGE_KEYS.primary, text:save.text});
+  await page.goto('/'); await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page).toHaveTitle('Tactics Guru v2');
+  await expect(page.locator('#battle-shell')).toBeVisible();
+  await expect(page.locator('vite-error-overlay')).toHaveCount(0);
+  return session.state;
+}
+
+async function boardClick(page:Page, point:Point, touch=false) {
+  const r=await settledReport(page),x=r.transform.x+point.x*r.transform.scale,y=r.transform.y+point.y*r.transform.scale;
+  if(touch) await page.touchscreen.tap(x,y); else await page.mouse.click(x,y);
+}
+
+test('occluded archer exposed art selects the same legal target as the dropdown',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  const state=await occlusionBoundary(page,28);
+  expect(state.units.find(u=>u.id===5)).toMatchObject({defId:'goblin_archer',cell:{x:3,y:2},hp:8});
+  await page.locator('[data-action=signature]').click();
+  await page.locator('#battle-target').selectOption('3,2');
+  const expected=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(expected.pending).toMatchObject({type:'useAbility',target:{unitId:5}});
+  const preview=await page.locator('#battle-preview').textContent(),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await page.screenshot({path:info.outputPath('occluded-archer-dropdown.png')});
+  // Opaque head pixel (32,18) in the canonical 64x80 sprite, anchored at (32,76).
+  // Projected ground center is (40,100); displayed sprite is 40x50.
+  await boardClick(page,{x:40,y:63.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:2,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('occluded-archer-map.png')});
+  // The body under solid foreground terrain cannot steal the first hit.
+  await boardClick(page,{x:40,y:100},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:3,elevation:2});
+  // Transparent pixels in the same sprite rectangle still reach terrain.
+  await boardClick(page,{x:21,y:54},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:2,y:1,elevation:0});
+  // A visible distant grunt remains unavailable; art picking cannot grant range.
+  await page.locator('#battle-target').selectOption('4,6');
+  const unavailable=await page.locator('#battle-preview').textContent();
+  expect(unavailable).toContain('Unavailable');
+  const invalid=await page.locator('#game').getAttribute('data-session');
+  await boardClick(page,{x:-80,y:172.5},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:6,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(unavailable);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(invalid);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  expect(state.units.find(u=>u.id===6)?.hp).toBe(0);
+  // Inside the former grunt's head, clear of the shared (3,8)/(3,9) side edge.
+  await boardClick(page,{x:-195,y:223.75},!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:8,elevation:1});
+  expect(errors).toEqual([]);
+});
+
+test('repeated map selection reaches a legal ground destination behind the same platform',async({page,browserName},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await occlusionBoundary(page,9);
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');await page.locator('#battle-target').selectOption('3,5');
+  const expected=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(expected.pending).toMatchObject({type:'move',to:{x:3,y:5}});
+  const preview=await page.locator('#battle-preview').textContent(),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const p={x:-77,y:160}; // Inside ground (3,5), clear of touch-rounded diamond edges.
+  await boardClick(page,p,!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await boardClick(page,p,!!info.project.use.hasTouch);
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('occluded-ground-map.png')});
+  await expect(page.locator('#battle-board-caption')).toContainText('Overlap 2/2');
+  expect(await page.locator('#battle-board-caption').evaluate(node=>{
+    const range=document.createRange();range.setStart(node.firstChild!,0);range.setEnd(node.firstChild!,11);
+    const text=range.getBoundingClientRect(),box=node.getBoundingClientRect();
+    return text.top>=box.top && text.bottom<=box.bottom;
+  })).toBe(true); // The cycle hint must be visible without scrolling the compact caption.
+  const select=()=>boardClick(page,p,!!info.project.use.hasTouch);
+  // Hover never advances the explicitly selected alternate cell.
+  const r=await settledReport(page);
+  await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await page.locator('#battle-target').selectOption('3,5'); // Native control clears overlap history.
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();
+  await page.locator('#battle-review').click();
+  const locked=await report(page);await select();expect((await report(page)).selectionEvents).toBe(locked.selectionEvents);
+  await page.locator('#dialog-cancel').click();
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  // Action changes reset the sequence, and a fresh transformed-camera hit still cycles.
+  await page.locator('[data-action=basic]').click();await page.locator('#battle-move').click();
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();
+  const before=await settledReport(page);
+  const x=before.transform.x+p.x*before.transform.scale,y=before.transform.y+p.y*before.transform.scale;
+  await page.mouse.move(x,y);
+  if(browserName==='webkit'){
+    // Mobile WebKit's driver has no wheel API; exercise a real camera drag instead.
+    await page.mouse.down();await page.mouse.move(x+16,y+10,{steps:3});await page.mouse.up();
+  }else await page.mouse.wheel(0,-100);
+  const transformed=await settledReport(page);
+  expect(transformed.transform).not.toEqual(before.transform);
+  expect(transformed.selectionEvents).toBe(before.selectionEvents);
+  await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await select();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  // Only explicit confirmation commits the selected legal move.
+  await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
+  expect(moved.commandCount).toBe(expected.state.commandCount+1);
+  expect(moved.units.find((u:any)=>u.id===expected.pending.unitId).cell).toEqual({x:3,y:5});
+  expect(errors).toEqual([]);
+});
 
 async function report(page: Page) {
   return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 }
+
+test('completed pen taps keep overlap cycling after leaving hover range',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await occlusionBoundary(page,9);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption('3,5');
+  const expected=await page.locator('#game').getAttribute('data-session');
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const preview=await page.locator('#battle-preview').textContent();
+  const pen=await page.context().newCDPSession(page);
+  const tap=async()=>{
+    const r=await settledReport(page),x=r.transform.x-77*r.transform.scale,y=r.transform.y+160*r.transform.scale;
+    await pen.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1,pointerType:'pen'});
+    await pen.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1,pointerType:'pen'});
+    // Emulate the post-release boundary event of a pen without hover (or leaving hover range).
+    await page.locator('canvas').dispatchEvent('pointerleave',{pointerType:'pen',pointerId:2,clientX:x,clientY:y,buttons:0});
+  };
+  await tap();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  await tap();expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(expected);
+  expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+  await page.screenshot({path:info.outputPath('pen-overlap-ground.png')});
+  await tap();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  expect(errors).toEqual([]);
+});
+
+test('right-click cancels a prepared move through the existing action path and respects modal locks',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await occlusionBoundary(page,9);await page.locator('#battle-move').click();
+  const p={x:-77,y:160};await boardClick(page,p);await boardClick(page,p);
+  const prepared=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(prepared.pending).toEqual({type:'move',unitId:2,to:{x:3,y:5}});
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const rightClick=async()=>{
+    const r=await settledReport(page);
+    await page.mouse.click(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale,{button:'right'});
+  };
+  await page.locator('#battle-review').click();const locked=await page.locator('#game').getAttribute('data-session');
+  await rightClick();await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(locked);
+  await page.locator('#dialog-cancel').click();
+  await page.locator('#battle-target').selectOption('3,5');
+  await rightClick();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual({...prepared,pending:null});
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('right-click-cancelled.png')});
+  // A new choice starts at the foreground, with no stale overlap index or held gesture.
+  await page.locator('#battle-move').click();await boardClick(page,p);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  expect(errors).toEqual([]);
+});
 
 async function settledReport(page: Page) {
   // Let panel layout, ResizeObserver and the next render finish before using coordinates.
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
   return report(page);
 }
+
+test('layout clamping resets overlap history when the actual camera changes',async({page})=>{
+  await page.setViewportSize({width:750,height:342});
+  await occlusionBoundary(page,9);await page.locator('#battle-move').click();
+  const point={x:-77,y:160};
+  await boardClick(page,point);
+  let r=await settledReport(page);
+  await page.mouse.move(r.transform.x+point.x*r.transform.scale,r.transform.y+point.y*r.transform.scale);
+  await page.mouse.wheel(0,10000);await settledReport(page); // Minimum zoom for the current caption layout.
+  await boardClick(page,point);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+  const before=await settledReport(page);
+  await page.locator('#battle-board-caption').evaluate(node=>{
+    node.style.boxSizing='border-box';node.style.maxHeight=`${node.getBoundingClientRect().height-1}px`;
+  });
+  await expect.poll(async()=>(await report(page)).transform.scale).toBeGreaterThan(before.transform.scale);
+  r=await settledReport(page);
+  // This is a real camera change smaller than the repeated-click distance threshold.
+  expect(Math.hypot(r.transform.x+point.x*r.transform.scale-before.transform.x-point.x*before.transform.scale,
+    r.transform.y+point.y*r.transform.scale-before.transform.y-point.y*before.transform.scale)).toBeLessThan(6);
+  await boardClick(page,point);
+  expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
+});
+
+test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
+  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
+  const state=JSON.parse(before!).state,origin={x:11,y:11};
+  expect(initial.reachable).not.toContainEqual(origin);
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  const hover=async(cell:{x:number;y:number})=>{
+    const r=await settledReport(page),tile=r.tiles.find((t:any)=>t.x===cell.x&&t.y===cell.y),p=projectTile(tile);
+    await page.mouse.move(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale);
+  };
+  await hover(origin);
+  const expectedHover=hoverPreview(new BattleSession(battleCatalog,state,state.seed),origin);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(expectedHover);
+  expect(expectedHover?.cells).not.toContainEqual(origin);
+  expect((await report(page)).reachable).toEqual(initial.reachable);
+  await expect(page.locator('#battle-board-caption')).toContainText('Purple dots: ability reach');
+  await expect(page.locator('#battle-board-caption')).toContainText('Pink +: target in reach');
+  const shown=await settledReport(page);expect(shown.selected).toBeNull();expect(shown.selectionEvents).toBe(initial.selectionEvents);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.screenshot({path:info.outputPath('hover-movement-range.png')});
+  // Screenshot regression: occupied goblin cells must remain in the preview, including Magic Missile reach.
+  const mageOrigin={x:4,y:8};
+  if(state.units.find((u:any)=>u.id===initial.activeId).defId!=='mage')throw Error('Expected authored opening mage turn');
+  await hover(mageOrigin);
+  const magePreview=hoverPreview(new BattleSession(battleCatalog,state,state.seed),mageOrigin)!;
+  const goblin=state.units.find((u:any)=>u.side==='enemy' && magePreview.targets.some(c=>c.x===u.cell.x&&c.y===u.cell.y));
+  expect(goblin).toBeDefined();
+  await expect.poll(async()=>(await report(page)).hover?.cells).toContainEqual(goblin.cell);
+  await expect.poll(async()=>(await report(page)).hover?.targets).toContainEqual(goblin.cell);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  await settledReport(page);await page.screenshot({path:info.outputPath('hover-goblin-target.png')});
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.mouse.wheel(0,-100);
+  await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+  const prepared=await page.locator('#game').getAttribute('data-session'),destination=JSON.parse(prepared!).pending.to;
+  await hover(origin);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(origin);
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);
+  await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(destination);
+  await page.locator('#battle-review').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#dialog-cancel').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  // Native destination controls and keyboard navigation expose the same hypothetical-origin query.
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>(await report(page)).hover).not.toBeNull();
+  const selected=(await report(page)).selected;
+  const next=[{key:'ArrowRight',x:selected.x+1,y:selected.y},{key:'ArrowDown',x:selected.x,y:selected.y+1},
+    {key:'ArrowLeft',x:selected.x-1,y:selected.y},{key:'ArrowUp',x:selected.x,y:selected.y-1}]
+    .find(c=>hoverPreview(new BattleSession(battleCatalog,state,state.seed),{x:c.x,y:c.y}))!;
+  await page.locator('canvas').focus();await page.keyboard.press(next.key);
+  const navigated=await report(page);expect(navigated.hover?.origin).toMatchObject({x:navigated.selected.x,y:navigated.selected.y});
+  // Tab to the native control without pointer movement: its destination must replace the keyboard origin.
+  for(let i=0;i<20 && !await page.locator('#battle-target').evaluate(el=>el===document.activeElement);i++)await page.keyboard.press('Tab');
+  await expect(page.locator('#battle-target')).toBeFocused();
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending?.type).toBe('move');
+  const nativeSession=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(nativeSession.pending.type).toBe('move');
+  expect(nativeSession.pending.to).not.toEqual(navigated.hover.origin);
+  await expect.poll(async()=>(await report(page)).selected).toMatchObject(nativeSession.pending.to);
+  await expect.poll(async()=>(await report(page)).hover).toEqual(hoverPreview(new BattleSession(battleCatalog,state,state.seed),nativeSession.pending.to));
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.keyboard.press('Escape');await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await hover(origin);await page.locator('#fit-restart').click();await confirmRestart(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await report(page)).hover).toBeNull();
+  expect((await report(page)).objectCount).toBe(initial.objectCount);
+});
 
 test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
   await page.goto('/');
@@ -154,7 +440,7 @@ test('default authored board renders canonical units, highlights and stable rest
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const assetPaths = new Set(Object.values(battleCatalog.assets).map(asset => asset.runtimePath));
-  page.on('request', request => { const path = new URL(request.url()).pathname; if (assetPaths.has(path)) assetRequests.push(path); });
+  page.on('request', request => { const path = new URL(request.url()).pathname.replace(/^\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, ''); if (assetPaths.has(path)) assetRequests.push(path); });
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -201,7 +487,7 @@ test('default authored board renders canonical units, highlights and stable rest
     await expect(page.locator('canvas')).toHaveCount(1);
   }
   expect([...new Set(assetRequests)].sort()).toEqual([...assetPaths].sort());
-  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(asset.kind==='portrait'?2:1);
+  for(const asset of Object.values(battleCatalog.assets)) expect(assetRequests.filter(p=>p===asset.runtimePath)).toHaveLength(1);
   expect(errors).toEqual([]);
 });
 
@@ -220,18 +506,22 @@ for (const failure of ['missing', 'corrupt'] as const) {
   });
 }
 
-test('picks authored elevated tops and visible side faces through unit and canopy art', async ({ page }) => {
+test('picks authored elevated tops and visible side faces outside living unit art', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const { tiles } = buildBoardPresentation(battleCatalog, 'map:forest_ruins');
+  const units=(await settledReport(page)).units.filter((unit:any)=>unit.health.hp>0);
   for (const elevation of [0, 1, 2]) {
     for (const face of ['top', 'left', 'right'] as const) {
       const tile = tiles.find(tile => {
         if (tile.elevation !== elevation) return false;
         const vertices: readonly Point[] = tileFaces(tile)[face];
         const point = { x: vertices.reduce<number>((sum, p) => sum + p.x, 0) / 4, y: vertices.reduce<number>((sum, p) => sum + p.y, 0) / 4 };
-        return pickTile(tiles, point) === tile;
+        return pickTile(tiles, point) === tile && !units.some((unit:any)=>{
+          const b=unitBounds(unit.tile,unit.origin);
+          return point.x>=b.left && point.x<b.right && point.y>=b.top && point.y<b.bottom;
+        });
       });
       expect(tile).toBeDefined();
       const vertices: readonly Point[] = tileFaces(tile!)[face];
@@ -303,7 +593,11 @@ test('legal player movement updates elevation, reachability and canopy occlusion
   const after = await settledReport(page);
   const moved = after.units.find((u:any)=>u.id===initial.activeId);
   expect(moved.tile).toEqual({...elevated,elevation:1});
-  expect(moved.position).toEqual(projectTile(moved.tile));
+  const anchor = projectTile(moved.tile);
+  expect(moved.position.x).toBe(anchor.x);
+  expect(moved.position.y).toBeCloseTo(anchor.y + moved.bobOffset, 5);
+  expect(moved.bobOffset).toBeGreaterThanOrEqual(-2);
+  expect(moved.bobOffset).toBeLessThanOrEqual(0);
   expect(moved.anchorError).toBeLessThan(0.001);
   expect(after.reachable).toEqual([]);
   expect(after.commandCount).toBe(initial.commandCount+1);
@@ -315,7 +609,9 @@ test('legal player movement updates elevation, reachability and canopy occlusion
     const overlaps=state.units.some((u:any)=>{
       if(u.hp<=0)return false;
       const unit=after.units.find((v:any)=>v.id===u.id);
-      return canopyOccludes(canopy.tile,unit.tile,unitBounds(unit.tile,unit.origin),catalogMapHeight);
+      const art=unitBounds(unit.tile,unit.origin);
+      // Foliage conservatively clears the complete 2px idle envelope.
+      return canopyOccludes(canopy.tile,unit.tile,{...art,top:art.top-2},catalogMapHeight);
     });
     expect(canopy.alpha).toBe(overlaps?CANOPY_ART.fadedAlpha:1);
   }

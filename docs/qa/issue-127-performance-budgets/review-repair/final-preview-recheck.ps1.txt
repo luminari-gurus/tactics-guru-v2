@@ -1,0 +1,15 @@
+$ErrorActionPreference='Stop'
+$env:PLAYWRIGHT_CHROMIUM_EXECUTABLE='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+$failedBudget=$false
+foreach($route in @('battle','run')){
+ $raw="tmp/review/pr137-preview-v2-$route.json"
+ $gates="tmp/review/pr137-preview-v2-$route-gates.json"
+ if((Test-Path -LiteralPath $raw) -or (Test-Path -LiteralPath $gates)){throw 'Existing attempt must be retained'}
+ $url='https://f2ba4504.tactics-guru-v2.pages.dev'
+ if($route -eq 'run'){$url+='/run'}
+ node scripts/measure-fit.ts $raw --scene battle --url $url > "tmp/review/pr137-preview-v2-$route.log" 2>&1
+ if($LASTEXITCODE -ne 0){throw "Capture failed: $raw"}
+ node scripts/evaluate-fit.ts $raw $gates
+ if($LASTEXITCODE -ne 0){$failedBudget=$true}
+}
+if($failedBudget){throw 'Recheck complete with retained numeric failures; do not replace or retry samples'}

@@ -1,0 +1,292 @@
+{
+  "purpose": "Header and cache-reuse diagnostic; separate from acceptance timing",
+  "origin": "https://7129419b.tactics-guru-v2.pages.dev/",
+  "baseline": "https://b0761a21.tactics-guru-v2.pages.dev/",
+  "headerChecks": [
+    {
+      "path": "/assets/index-DvKdYwF6.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "819146fe228f8577481fa118303d062c2c33ba4d15c26fa613d078554e4b7a0b"
+    },
+    {
+      "path": "/assets/battleLayout-BVayxngr.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "/assets/browser-BOk1r4qm.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "6625e9640da45d8ef1b3b192ef8a2276574cf33731c713ce15fd8ea9716b6de1"
+    },
+    {
+      "path": "/assets/preload-helper-DjzSQ1t3.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "66c990b6727d220a346b45d00ee48d433c8d59ef03fbf8b91c6cdadeeadfdf3f"
+    },
+    {
+      "path": "/assets/rng-BCcJOpRP.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "/assets/start-B2jdJEtA.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "d8b66ec91369fed295949f594d87c49964a8183d1899eb22b046d9f9efa26cec"
+    },
+    {
+      "path": "/assets/start-CwZ-jTzk.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "dfd944e21fa87ee74e3a0db056cf273616c3d0f31e71b538ac6c5b613ec1a3de"
+    },
+    {
+      "path": "/assets/startBattleApp-BWWxWGAc.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "773ce26e2d397e7544431ff8a1a35415d4b521b6bbe7f933ba0ba2784070835a"
+    },
+    {
+      "path": "/assets/startRunApp-B-pPF-H1.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "6678e4a6c2805ce6e71de241b2938367ae73c77633f3cbd1c80e04c19b37b9ff"
+    },
+    {
+      "path": "/assets/view-DRuqFH3W.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "6521f13618ce18c0294dabf1d482fe685f4f64b2bcc4b6f8d874fdac892799e6"
+    },
+    {
+      "path": "/assets/battleLayout-C6wfuIJB.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "2ef57b8ed48c6688a2ade844a58866a48d280bfe24f214d4e7aaff87d8094def"
+    },
+    {
+      "path": "/assets/startRunApp-y3YtRGS5.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "/assets/view-BBW_du9E.css",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "sha256": "cc56cff020f26d76c4dc755c16db99ee1c57d378ae59357ed5e15d44d4e55a57"
+    }
+  ],
+  "unchangedPolicy": [
+    {
+      "path": "",
+      "baseline": "public, max-age=0, must-revalidate",
+      "candidate": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "battle/terrain/grass.png",
+      "baseline": "public, max-age=0, must-revalidate",
+      "candidate": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "audio/battle/move.mp3",
+      "baseline": "public, max-age=0, must-revalidate",
+      "candidate": "public, max-age=0, must-revalidate"
+    }
+  ],
+  "visits": [
+    {
+      "route": "battle",
+      "cache": "cold",
+      "build": {
+        "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+        "dirty": false
+      },
+      "code": [
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/index-DvKdYwF6.js",
+          "transferBytes": 1160
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/preload-helper-DjzSQ1t3.js",
+          "transferBytes": 1013
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startBattleApp-BWWxWGAc.js",
+          "transferBytes": 1452
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/browser-BOk1r4qm.js",
+          "transferBytes": 1668
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-BVayxngr.js",
+          "transferBytes": 584
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-CwZ-jTzk.js",
+          "transferBytes": 365
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/rng-BCcJOpRP.js",
+          "transferBytes": 1123
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-B2jdJEtA.js",
+          "transferBytes": 367662
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-C6wfuIJB.css",
+          "transferBytes": 3045
+        }
+      ],
+      "errors": []
+    },
+    {
+      "route": "battle",
+      "cache": "warm",
+      "build": {
+        "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+        "dirty": false
+      },
+      "code": [
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/index-DvKdYwF6.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/preload-helper-DjzSQ1t3.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startBattleApp-BWWxWGAc.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-BVayxngr.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/browser-BOk1r4qm.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-CwZ-jTzk.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-B2jdJEtA.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/rng-BCcJOpRP.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-C6wfuIJB.css",
+          "transferBytes": 0
+        }
+      ],
+      "errors": []
+    },
+    {
+      "route": "run",
+      "cache": "cold",
+      "build": {
+        "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+        "dirty": false
+      },
+      "code": [
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/index-DvKdYwF6.js",
+          "transferBytes": 1160
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/preload-helper-DjzSQ1t3.js",
+          "transferBytes": 1013
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startRunApp-B-pPF-H1.js",
+          "transferBytes": 9325
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-B2jdJEtA.js",
+          "transferBytes": 367621
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/browser-BOk1r4qm.js",
+          "transferBytes": 1668
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/rng-BCcJOpRP.js",
+          "transferBytes": 1123
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startRunApp-y3YtRGS5.css",
+          "transferBytes": 1055
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-BVayxngr.js",
+          "transferBytes": 584
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-C6wfuIJB.css",
+          "transferBytes": 3045
+        }
+      ],
+      "errors": []
+    },
+    {
+      "route": "run",
+      "cache": "warm",
+      "build": {
+        "commit": "ab513ce6197e9f94923840f4de3610652bfe38f9",
+        "dirty": false
+      },
+      "code": [
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/index-DvKdYwF6.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/preload-helper-DjzSQ1t3.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startRunApp-B-pPF-H1.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/start-B2jdJEtA.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/browser-BOk1r4qm.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/rng-BCcJOpRP.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-BVayxngr.js",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/startRunApp-y3YtRGS5.css",
+          "transferBytes": 0
+        },
+        {
+          "url": "https://7129419b.tactics-guru-v2.pages.dev/assets/battleLayout-C6wfuIJB.css",
+          "transferBytes": 0
+        }
+      ],
+      "errors": []
+    }
+  ]
+}
