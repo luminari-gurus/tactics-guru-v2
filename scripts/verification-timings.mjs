@@ -147,7 +147,7 @@ function summaryText(report) {
   return lines.join('\n');
 }
 
-async function browserMetadata(selected) {
+export async function browserMetadata(selected) {
   const engines = [...new Set(selected.flatMap(enginesFor))];
   if (!engines.length) return {};
   const { chromium, webkit } = await import('playwright');
@@ -166,6 +166,52 @@ async function browserMetadata(selected) {
     } catch (error) { browsers[name] = { ...metadata, version: null, error: error.message }; }
   }
   return browsers;
+}
+
+export async function executeTimingStage(stage, out, { browsers = {}, timeoutMs = 3_600_000, signal, blob = false } = {}) {
+  const failedEngines = enginesFor(stage).filter(name => browsers[name]?.error);
+  if (failedEngines.length) return { status: 'blocked', reason: 'Browser preflight failed', failedEngines, wallMs: 0 };
+  const { command, args, env, kind, rawPath } = stageCommand(stage, out);
+  if (blob && kind === 'playwright') {
+    args[args.findIndex(arg => arg.startsWith('--reporter='))] = '--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs';
+    env.PLAYWRIGHT_BLOB_OUTPUT_FILE = resolve(out, stage.id + '-blob.zip');
+  }
+  console.log(`[timings] ${stage.id}: starting; log ${relative(root, resolve(out, stage.id + '.log'))}`);
+  const result = await runCommand(command, args, { cwd: root, env,
+    logPath: resolve(out, stage.id + '.log'), timeoutMs, signal });
+  const entry = { command: [command, ...args], ...result,
+    status: result.exitCode === 0 && !result.signal && !result.timedOut && !result.interrupted && !result.error ? 'passed' : 'failed' };
+  if (kind === 'playwright') {
+    try {
+      const events = readFileSync(env.VERIFICATION_PLAYWRIGHT_EVENTS, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+      const finished = events.filter(event => event.event === 'testEnd');
+      entry.caseCheckpoint = { path: relative(out, env.VERIFICATION_PLAYWRIGHT_EVENTS),
+        planned: events.find(event => event.event === 'begin')?.planned ?? null,
+        completedAttempts: finished.length, completedCases: new Set(finished.map(event => event.id)).size,
+        runnerEnded: events.some(event => event.event === 'end') };
+    } catch (error) { entry.checkpointError = error.message; }
+  }
+  if (kind) {
+    try {
+      const raw = readReport(rawPath);
+      if (kind === 'performance') {
+        if (!Array.isArray(raw.samples) || !raw.samples.length || !Array.isArray(raw.failures)) throw Error('Invalid performance capture');
+        entry.performance = { samples: raw.samples.length, failures: raw.failures, measuredBuild: raw.measuredBuild };
+        if (raw.failures.length) entry.status = 'failed';
+      } else {
+        entry.summary = (kind === 'playwright' ? summarizePlaywright : summarizeVitest)(raw);
+        if (kind === 'vitest') {
+          Object.assign(entry.summary, readReport(env.VERIFICATION_VITEST_METADATA));
+          delete entry.summary.notes;
+        }
+        for (const test of entry.summary.tests) if (isAbsolute(test.file)) test.file = relative(root, test.file).replaceAll('\\', '/');
+        entry.slowest = slowest(entry.summary.tests);
+        if (stage.id === 'units') entry.contentValidation = summarizeContent(entry.summary, JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).scripts['validate:content']);
+        if (entry.summary.counts.total === 0 || entry.summary.success === false || entry.summary.counts.unexpected > 0 || entry.summary.globalErrors?.length) entry.status = 'failed';
+      }
+    } catch (error) { entry.reportError = error.message; entry.status = 'failed'; }
+  }
+  return entry;
 }
 
 async function capture(args) {
@@ -193,45 +239,8 @@ async function capture(args) {
     save();
     const preflight=performance.now();report.browsers=await browserMetadata(selected);report.browserPreflightMs=performance.now()-preflight;
     await runTimingStages(selected, async stage => {
-      const failedEngines = enginesFor(stage).filter(name => report.browsers[name]?.error);
-      if (failedEngines.length) return { status: 'blocked', reason: 'Browser preflight failed', failedEngines, wallMs: 0 };
-      const { command, args, env, kind, rawPath } = stageCommand(stage, out);
-      console.log(`[timings] ${stage.id}: starting; log ${relative(root,resolve(out,stage.id+'.log'))}`);
-      const result = await runCommand(command, args, { cwd: root, env,
-        logPath: resolve(out, stage.id + '.log'), timeoutMs: opts.timeoutMs, signal: abort.signal });
-      if (result.cleanup.complete === false) abort.abort(); // Do not contaminate later stages.
-      const entry = { command: [command, ...args], ...result,
-        status: result.exitCode === 0 && !result.signal && !result.timedOut && !result.interrupted && !result.error ? 'passed' : 'failed' };
-      if (kind === 'playwright') {
-        try {
-          const events = readFileSync(env.VERIFICATION_PLAYWRIGHT_EVENTS, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
-          const finished = events.filter(event => event.event === 'testEnd');
-          entry.caseCheckpoint = { path: relative(out, env.VERIFICATION_PLAYWRIGHT_EVENTS),
-            planned: events.find(event => event.event === 'begin')?.planned ?? null,
-            completedAttempts: finished.length, completedCases: new Set(finished.map(event => event.id)).size,
-            runnerEnded: events.some(event => event.event === 'end') };
-        } catch (error) { entry.checkpointError = error.message; }
-      }
-      if (kind) {
-        try {
-          const raw = readReport(rawPath);
-          if (kind === 'performance') {
-            if (!Array.isArray(raw.samples) || !raw.samples.length || !Array.isArray(raw.failures)) throw Error('Invalid performance capture');
-            entry.performance = { samples: raw.samples.length, failures: raw.failures, measuredBuild: raw.measuredBuild };
-            if (raw.failures.length) entry.status = 'failed';
-          } else {
-            entry.summary = (kind === 'playwright' ? summarizePlaywright : summarizeVitest)(raw);
-            if (kind === 'vitest') {
-              Object.assign(entry.summary, readReport(env.VERIFICATION_VITEST_METADATA));
-              delete entry.summary.notes;
-            }
-            for (const test of entry.summary.tests) if (isAbsolute(test.file)) test.file = relative(root, test.file).replaceAll('\\', '/');
-            entry.slowest = slowest(entry.summary.tests);
-            if (stage.id === 'units') entry.contentValidation = summarizeContent(entry.summary, JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).scripts['validate:content']);
-            if (entry.summary.counts.total === 0 || entry.summary.success === false || entry.summary.counts.unexpected > 0 || entry.summary.globalErrors?.length) entry.status = 'failed';
-          }
-        } catch (error) { entry.reportError = error.message; entry.status = 'failed'; }
-      }
+      const entry = await executeTimingStage(stage, out, { browsers: report.browsers, timeoutMs: opts.timeoutMs, signal: abort.signal });
+      if (entry.cleanup?.complete === false) abort.abort();
       return entry;
     }, results => {
       report.stages = results;

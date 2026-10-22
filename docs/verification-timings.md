@@ -8,6 +8,11 @@ limits. The runner setup from merged PR #210 is qualified on `unraid-tactics-01`
 
 ## Self-hosted qualification and capture
 
+For resumable self-hosted capture, use the [serial batch workflow](serial-verification.md).
+Its manual `pilot`/`capture` modes replace the single 100-minute capture shell;
+`batches` now selects job IDs, not the former workflow `stages` input. The direct
+local timing CLI and its `--stages` interface below remain available unchanged.
+
 `.github/workflows/issue-200-baseline.yml` is manual-dispatch-only on trusted
 `main` or `work/issue-200-verification-timings` refs. It targets the qualified
 runner labels, shares `tactics-browser-exclusive` with browser setup and lifecycle
@@ -21,9 +26,9 @@ Chromium timeout recovery, and a CPU-only partial timing receipt/comparison. Thi
 makes reporting changes reviewable without launching another hour-long matrix.
 Qualification receipts are explicitly partial and are not a new full baseline.
 
-Choose `mode: capture` deliberately for timed coverage after qualification. Empty
-`stages` selects the complete canonical plan; a comma-separated list selects only
-that coverage and its prerequisites. The workflow uses a unique run/attempt output
+Choose `mode: capture` deliberately for serial timed coverage after qualification.
+Empty `batches` selects the complete canonical plan; a comma-separated list selects
+only those jobs, after shared preparation, and remains partial. The workflow uses a unique run/attempt output
 path, a bounded foreground capture, failure-preserving artifact upload for 30 days,
 and an explicit conditions field. Never merge receipts from different hosts into
 one comparable performance baseline. Persistent npm/browser caches and pre-capture

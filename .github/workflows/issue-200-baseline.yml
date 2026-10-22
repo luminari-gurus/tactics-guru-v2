@@ -1,33 +1,71 @@
-name: Issue 200 self-hosted verification timings
+name: Issue 200 resumable serial verification
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Qualification checks or an explicitly requested timing capture
+        description: Bounded qualification, partial artifact pilot, or serial capture
         type: choice
-        options: [qualify, capture]
+        options: [qualify, pilot, capture]
         default: qualify
-      stages:
-        description: Optional comma-separated timing stage IDs (empty selects the full plan)
+      batches:
+        description: Optional comma-separated batch IDs; empty capture selects the full plan
         type: string
         default: ''
       conditions:
-        description: Host background workloads and cache conditions for this capture
+        description: Host workloads and cache conditions; coordinate unrelated workloads
         type: string
         default: 'Persistent runner; background workloads not independently verified'
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: tactics-browser-exclusive
   cancel-in-progress: false
+env:
+  SERIAL_MODE: ${{ inputs.mode }}
+  SERIAL_BATCHES: ${{ inputs.batches }}
+  SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
-  timings:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings')
+  qualify:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 150
+    timeout-minutes: 25
     steps:
-      - name: Record job setup start
-        run: date -u +%Y-%m-%dT%H:%M:%SZ > "$RUNNER_TEMP/issue200-job-start.txt"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 5
+      - run: npm run test:verification-tooling && npm run test:verification-batches && npm run test:verification
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
+      - run: npm run build && npm run test:browser-smoke
+      - run: node --test tests/tooling/verification-browser.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 30
+          if-no-files-found: warn
+  prepare:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 35
+    outputs:
+      matrix: ${{ steps.prepare.outputs.matrix }}
+      bundle: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Record setup start and check host disposition
+        run: |
+          echo "SERIAL_JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -37,85 +75,101 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - name: Install locked dependencies
-        run: npm ci
+      - run: npm ci
         timeout-minutes: 10
-      # OS libraries were provisioned and qualified under #207 / PR #210.
-      - name: Install service-account browser cache and check both engines
-        run: |
-          npm run setup:browsers
-          npm run check:browsers
-        timeout-minutes: 10
-      - name: Verify process, reporting and orchestration contracts
-        run: |
-          npm run test:verification-tooling
-          npm run test:verification
-          node --test tests/tooling/browser-diagnostics.test.mjs
+      - run: npm run setup:browsers && npm run check:browsers
         timeout-minutes: 5
-      - name: Qualify current build and browser lifecycle integration
-        run: |
-          npm run build
-          npm run test:browser-smoke
-          node --test tests/tooling/verification-browser.test.mjs
-        timeout-minutes: 10
-      - name: Exercise partial timing capture and comparison
-        env:
-          RECEIPT: verification-receipts/timings/self-hosted-qualification-${{ github.run_id }}-${{ github.run_attempt }}
-        run: |
-          npm run measure:verification -- --stages tooling,typecheck-app,typecheck-domain --out "$RECEIPT" --conditions 'Self-hosted qualification only; not a full baseline'
-          npm run --silent measure:verification -- compare "$RECEIPT/report.json" "$RECEIPT/report.json" > "$RECEIPT/self-comparison.json"
-          cat "$RECEIPT/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run test:verification-tooling && npm run test:verification-batches
         timeout-minutes: 5
-      - name: Record source and runner conditions
-        if: always()
-        env:
-          CAPTURE_CONDITIONS: ${{ inputs.conditions }}
-        run: |
-          mkdir -p verification-receipts/issue200-ci
-          node --input-type=module <<'JS' > verification-receipts/issue200-ci/environment.json
-          import os from 'node:os';
-          import { readFileSync } from 'node:fs';
-          import { execFileSync } from 'node:child_process';
-          const version = p => JSON.parse(readFileSync(`node_modules/${p}/package.json`, 'utf8')).version;
-          const setupStartedAt = readFileSync(`${process.env.RUNNER_TEMP}/issue200-job-start.txt`, 'utf8').trim();
-          console.log(JSON.stringify({ capturedAt: new Date().toISOString(), setupStartedAt,
-            setupAndQualificationMs: Date.now() - Date.parse(setupStartedAt), queueMs: null,
-            node: process.version, platform: process.platform, arch: process.arch, release: os.release(),
-            cpus: os.cpus().length, cpuModel: os.cpus()[0]?.model, memoryBytes: os.totalmem(), loadAverage: os.loadavg(),
-            vite: version('vite'), vitest: version('vitest'), playwright: version('@playwright/test'),
-            source: execFileSync('git', ['rev-parse','HEAD'], { encoding: 'utf8' }).trim(),
-            runnerName: process.env.RUNNER_NAME, runnerOS: process.env.RUNNER_OS, runnerArch: process.env.RUNNER_ARCH,
-            runId: process.env.GITHUB_RUN_ID, runAttempt: process.env.GITHUB_RUN_ATTEMPT,
-            hostClass: 'self-hosted tactics-browser; persistent service-account caches',
-            conditions: process.env.CAPTURE_CONDITIONS || 'Qualification only; background workloads unverified',
-            notes: 'Queue timing is available from this run/job API timestamps; setup/qualification precedes capture. Repository browser jobs are serialized; other host workloads require coordination.' }, null, 2));
-          JS
-      - name: Capture explicitly selected verification timings
-        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'capture'
-        env:
-          CAPTURE_STAGES: ${{ inputs.stages }}
-          CAPTURE_CONDITIONS: ${{ inputs.conditions }}
-          RECEIPT: verification-receipts/timings/self-hosted-${{ github.run_id }}-${{ github.run_attempt }}
-        run: |
-          stage_args=()
-          if [ -n "$CAPTURE_STAGES" ]; then stage_args=(--stages "$CAPTURE_STAGES"); fi
-          # The owned-descendant cleanup runs inside this bounded foreground process.
-          # TERM leaves time to write receipts and release servers before outer KILL.
-          timeout --signal=TERM --kill-after=15s 100m npm run measure:verification -- \
-            --out "$RECEIPT" "${stage_args[@]}" \
-            --conditions "Self-hosted tactics-browser; persistent npm/browser caches; build, smoke, process contracts and preflight warmed before timing; exclusive repository browser job; $CAPTURE_CONDITIONS"
-        timeout-minutes: 105
-      - name: Publish available capture summary
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'capture'
-        env:
-          RECEIPT: verification-receipts/timings/self-hosted-${{ github.run_id }}-${{ github.run_attempt }}
-        run: |
-          if [ -f "$RECEIPT/summary.md" ]; then cat "$RECEIPT/summary.md" >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Discover exact coverage and build the ordinary artifact once
+        id: prepare
+        run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare verification-receipts/serial/bundle
+        timeout-minutes: 16
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-200-self-hosted-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/
+          name: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/bundle/
           retention-days: 30
           compression-level: 1
+          if-no-files-found: warn
+  batch:
+    needs: prepare
+    if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    name: batch (${{ matrix.id }})
+    env:
+      SERIAL_BATCH_ID: ${{ matrix.id }}
+    steps:
+      - name: Record setup start and check host disposition
+        run: |
+          echo "SERIAL_JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.prepare.outputs.bundle }}
+          path: verification-receipts/serial/bundle/
+      - name: Verify and execute this batch with its independent budget
+        run: |
+          timeout --signal=TERM --kill-after=15s 65m npm run verify:batches -- run \
+            verification-receipts/serial/bundle "$SERIAL_BATCH_ID" "verification-receipts/serial/jobs/$SERIAL_BATCH_ID"
+        timeout-minutes: 66
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-receipts-${{ github.run_id }}-${{ matrix.id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/jobs/${{ matrix.id }}/
+          retention-days: 30
+          compression-level: 1
+          if-no-files-found: warn
+  aggregate:
+    name: Serial verification aggregate
+    needs: [prepare, batch]
+    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.prepare.outputs.bundle }}
+          path: verification-receipts/serial/bundle/
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: issue208-receipts-${{ github.run_id }}-*
+          path: verification-receipts/serial/downloads/
+      - name: Account for every expected batch, all attempts and scheduler overhead
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-aggregate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/aggregate/
+          retention-days: 30
           if-no-files-found: warn
