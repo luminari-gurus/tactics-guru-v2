@@ -1,6 +1,6 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: all five review findings repaired and locally qualified in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223); publication and review-thread closeout complete the handoff. OpenSpec `issue-221-desktop-timeouts` tracks the original work and PR review repairs.
+Date: 2026-10-22 (Asia/Jerusalem). Status: all five review findings repaired, locally qualified, published and resolved in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223). OpenSpec `issue-221-desktop-timeouts`: **6/6 tasks complete**. The PR remains open and ready to merge; integration and deployment are separate actions.
 
 ## Current handoff
 

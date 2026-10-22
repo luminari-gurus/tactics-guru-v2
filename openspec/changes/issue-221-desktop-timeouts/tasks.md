@@ -11,7 +11,7 @@
 
 ## 3. Integration and delivery
 
-- [ ] 3.1 Qualify the repaired cases across affected profiles and neighboring consumers with unchanged bounds; validate OpenSpec strictly, freeze relevant source/build hashes, update the plan/QA report, and publish a review-ready focused PR.
+- [x] 3.1 Qualify the repaired cases across affected profiles and neighboring consumers with unchanged bounds; validate OpenSpec strictly, freeze relevant source/build hashes, update the plan/QA report, and publish a review-ready focused PR.
 
 ## 4. PR #223 review repairs
 
