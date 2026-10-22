@@ -11,11 +11,77 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { priorDungeonEnvelope, journeyPreparation, dungeonJourney } from './helpers/dungeonFixtures';
+import { atCell, dungeonCapacityFixture, priorDungeonEnvelope, journeyPreparation, dungeonJourney } from './helpers/dungeonFixtures';
 import { dungeonContent } from '../src/content/dungeon';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+test('diamond compass directions, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{
+ const base=freshDungeon('compass-browser',1),floor=base.floors[0],map=generateMap(floor.descriptor.seed,'rooms');
+ const directions=[['North',-20],['East',1],['South',20],['West',-1]] as const;
+ const safe=(cell:number)=>map.cells[cell]&&!floor.exploration.pois.some(p=>poiCell(p)===cell);
+ const center=map.cells.findIndex((_,cell)=>safe(cell)&&neighbors(cell).length===4&&neighbors(cell).every(safe));
+ expect(center).toBeGreaterThanOrEqual(0);
+ const load=async(state:DungeonState)=>{
+  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ };
+ await load(atCell(base,center));
+ const compass=page.getByRole('group',{name:'Move player',exact:true});
+ await expect(compass.getByRole('button')).toHaveCount(4);
+ await expect(compass.locator('.dungeon-compass-center')).toHaveAttribute('aria-hidden','true');
+ expect(await compass.locator('.dungeon-compass-center').evaluate(node=>getComputedStyle(node).pointerEvents)).toBe('none');
+ await compass.scrollIntoViewIfNeeded();
+ const boxes=[];
+ for(const [name] of directions){
+  const button=compass.getByRole('button',{name,exact:true});await expect(button).toHaveText(name[0]);await expect(button).toBeEnabled();
+  const box=(await button.boundingBox())!;expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);boxes.push(box);
+  expect(await button.evaluate(node=>{
+   const rect=node.getBoundingClientRect(),cx=rect.x+rect.width/2,cy=rect.y+rect.height/2;
+   return [[0,0],[20,0],[-20,0],[0,20],[0,-20]].every(([dx,dy])=>node.contains(document.elementFromPoint(cx+dx,cy+dy)));
+  })).toBe(true);
+  const upright=await button.locator('span').evaluate(node=>({button:getComputedStyle(node.parentElement!).transform,label:getComputedStyle(node).transform}));
+  expect(upright.button).toBe('matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)');
+  expect(upright.label).toBe('matrix(0.707107, -0.707107, 0.707107, 0.707107, 0, 0)');
+ }
+ expect(boxes[0].y).toBeLessThan(boxes[1].y);expect(boxes[2].y).toBeGreaterThan(boxes[1].y);expect(boxes[3].x).toBeLessThan(boxes[0].x);expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
+ await page.locator('#dungeon-map').focus();await page.keyboard.press(browserName==='webkit'?'Alt+Tab':'Tab');
+ await expect(compass.getByRole('button',{name:'North',exact:true})).toBeFocused();
+ expect(await compass.getByRole('button',{name:'North',exact:true}).evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
+ await page.screenshot({path:test.info().outputPath('compass-focus.png')});
+ for(const [name,delta] of directions){
+  const before=await dungeonSnapshot(page),button=compass.getByRole('button',{name,exact:true});
+  if(isMobile)await button.tap();else {await button.focus();await page.keyboard.press(name==='North'?'Enter':'Space');}
+  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
+  expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
+  const reverse=directions.find(([,offset])=>offset===-delta)![0];
+  const back=compass.getByRole('button',{name:reverse,exact:true});if(isMobile)await back.tap();else await back.click();
+  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center);
+ }
+ if(!isMobile){
+  const north=compass.getByRole('button',{name:'North',exact:true});await north.hover();await page.mouse.down();
+  expect(await north.evaluate(node=>getComputedStyle(node).boxShadow)).not.toBe('none');
+  await page.screenshot({path:test.info().outputPath('compass-pressed.png')});await page.mouse.up();
+ }
+ const wallPosition=map.cells.findIndex((_,cell)=>safe(cell)&&neighbors(cell).some(next=>!map.cells[next]));
+ await load(atCell(base,wallPosition));const before=await dungeonSnapshot(page);
+ for(const [name,delta] of directions){
+  const unavailable=!neighbors(wallPosition).includes(wallPosition+delta)||!map.cells[wallPosition+delta];
+  const button=compass.getByRole('button',{name,exact:true});
+  if(unavailable){await expect(button).toBeDisabled();await button.evaluate(node=>(node as HTMLButtonElement).click());}
+  else await expect(button).toBeEnabled();
+ }
+ expect(await dungeonSnapshot(page)).toEqual(before);
+ await compass.scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('compass-unavailable.png')});
+ if(isMobile){await page.setViewportSize({width:320,height:740});await compass.scrollIntoViewIfNeeded();}
+ expect(await page.locator('#dungeon-screen').evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
+ const compassBox=(await compass.boundingBox())!;expect(compassBox.x).toBeGreaterThanOrEqual(0);expect(compassBox.x+compassBox.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+ await load(dungeonCapacityFixture());
+ for(const [name] of directions)await expect(compass.getByRole('button',{name,exact:true})).toBeDisabled();
+ const reward=await dungeonSnapshot(page);await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowUp');expect(await dungeonSnapshot(page)).toEqual(reward);
+});
+
 test('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
