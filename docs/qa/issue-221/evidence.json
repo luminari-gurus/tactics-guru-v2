@@ -1,0 +1,1090 @@
+{
+  "issue": 221,
+  "literalBase": "251db945569e3f1ac957caa091e9fa9eec11a034",
+  "original": {
+    "run": 39700595665,
+    "source": "73d34dba1620174837cf15a93812d393abe690aa",
+    "artifact": 12396082054,
+    "zipSha256": "748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b",
+    "disposition": "Four original 30-second failures retained; Chromium baseline interrupted, later results unknown."
+  },
+  "runs": [
+    {
+      "run": 39750405032,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39750405032",
+      "instrumented": false,
+      "environment": {
+        "commit": "251db945569e3f1ac957caa091e9fa9eec11a034",
+        "node": "v24.22.1",
+        "npm": "11.19.1",
+        "browser": "153.0.8010.12",
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+        "os": "6.8.0-139-generic",
+        "platform": "linux",
+        "cpu": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memory": 8174178304,
+        "load": [
+          1.62,
+          1.15,
+          1.05
+        ],
+        "runner": "unraid-tactics-01",
+        "workers": 1,
+        "retries": 0,
+        "trace": "off",
+        "mode": "preview"
+      },
+      "stats": {
+        "startTime": "2026-10-22T08:48:28.699Z",
+        "duration": 98520.363,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 410,
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 26674,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 459,
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "desktop",
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "timedOut",
+              "durationMs": 30139,
+              "retry": 0,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.getAttribute: Target page, context or browser has been closed\n\n  41 | }\n  42 | type Boundary=ReturnType<typeof boundary>;\n> 43 | const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);\n     |                                                                        ^\n  44 | const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);\n  45 | const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  46 |\n    at report (/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:43:72)\n    at bobFrame (/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:393:23)\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:494:86"
+              ]
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 16704,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 19969,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ],
+      "receiptSha256": {
+        "baseline.json": "c3edb69b7c8ee394590ddd0debfd7e792dc7b48ef7f30a044ed183285184c154",
+        "environment.json": "752cbc17eb3fbf6d00bfac4d80a2332852eb310aeed41f26f035fc421b46fbaa",
+        "build.log": "8b87244bddb5ac775fa53f1db1736b5f86389d8ef211b6582bc9564262d26fb8",
+        "baseline.log": "f4d5a8f6ae9b53cd5e8fd0db7324bc470f298d1eff201e435ce935d766a15405"
+      },
+      "relevantInputHashes": {
+        "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+        "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+        "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+        "src/phaser/BattleScene.ts": "196a902ebdaa834a8328c59a81e0909e89e5390bb85e692d7c51213b25971646",
+        "src/phaser/BoardRenderer.ts": "e23bf8243133d9ce4ac57a7819df2ca3af68f4762267fe656c7a00e7e16266d5",
+        "tests/battle-animations.spec.ts": "322ce904e98b7e3487724c0549caae5d86f568fa70c925c53a3eddf280189b0c",
+        "tests/battle-board.spec.ts": "fa56679828107ebcfe9b4f4070365bb39bef677715b2427916342a11afaaa197",
+        "tests/helpers/battlePolicy.ts": "f6513fc570fe75e50bd4a2c405b5c0f44890bf1cbd6bd2eca5bc80d67b2e4d56",
+        "tests/helpers/playerPolicy.ts": "15c5110c6d7a7a22d3fc4104c259802c013ce760185ef1a13882b7e7ef184599",
+        "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae"
+      }
+    },
+    {
+      "run": 39750995870,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39750995870",
+      "instrumented": true,
+      "environment": {
+        "commit": "251db945569e3f1ac957caa091e9fa9eec11a034",
+        "node": "v24.22.1",
+        "npm": "11.19.1",
+        "browser": "153.0.8010.12",
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+        "os": "6.8.0-139-generic",
+        "platform": "linux",
+        "cpu": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memory": 8174178304,
+        "load": [
+          2.06,
+          2.52,
+          1.77
+        ],
+        "runner": "unraid-tactics-01",
+        "workers": 1,
+        "retries": 0,
+        "trace": "off",
+        "mode": "preview"
+      },
+      "stats": {
+        "startTime": "2026-10-22T08:53:01.650Z",
+        "duration": 92680.708,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 410,
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 21766,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 459,
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "desktop",
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "timedOut",
+              "durationMs": 30147,
+              "retry": 0,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.getAttribute: Target page, context or browser has been closed\n\n  41 | }\n  42 | type Boundary=ReturnType<typeof boundary>;\n> 43 | const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);\n     |                                                                        ^\n  44 | const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);\n  45 | const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  46 |\n    at report (/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:43:72)\n    at bobFrame (/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:393:23)\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/battle-animations.spec.ts:494:86"
+              ]
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 16482,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 19581,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ],
+      "receiptSha256": {
+        "baseline.json": "c3cf60bb7391180cea2ed4a927efd4494fb1a70f6c4cf8234a7085733d246b0b",
+        "environment.json": "d9e9f576e552162015e0b9fdf82e5957d69bbee1b5b9ff0642e6db3f7e148f0c",
+        "build.log": "af6d4b40666ada6573a227552245b75f032d3718755d71fcec0869399f188bf1",
+        "steps.json": "7597f08d679ad0a53723b58109c9e5e2c755c6963e6212840e75a3c89f1ce2c6",
+        "steps.cjs": "9f465168523c16329343eae6c65a0c9fed20d578d6aef03ac9edb95906a6589a",
+        "baseline.log": "19907a1a550312e9ab90b7c2e0cba7caa99d43d0e8545b4665be5e250dde9b4e"
+      },
+      "relevantInputHashes": {
+        "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+        "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+        "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+        "src/phaser/BattleScene.ts": "196a902ebdaa834a8328c59a81e0909e89e5390bb85e692d7c51213b25971646",
+        "src/phaser/BoardRenderer.ts": "e23bf8243133d9ce4ac57a7819df2ca3af68f4762267fe656c7a00e7e16266d5",
+        "tests/battle-animations.spec.ts": "322ce904e98b7e3487724c0549caae5d86f568fa70c925c53a3eddf280189b0c",
+        "tests/battle-board.spec.ts": "fa56679828107ebcfe9b4f4070365bb39bef677715b2427916342a11afaaa197",
+        "tests/helpers/battlePolicy.ts": "f6513fc570fe75e50bd4a2c405b5c0f44890bf1cbd6bd2eca5bc80d67b2e4d56",
+        "tests/helpers/playerPolicy.ts": "15c5110c6d7a7a22d3fc4104c259802c013ce760185ef1a13882b7e7ef184599",
+        "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae"
+      },
+      "phases": [
+        {
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "durationMs": 21766,
+          "status": "passed",
+          "apiMs": 20434,
+          "unattributedRemainderMs": 1332,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {
+            "Install clock \"{timeNumber|timeString}\"": {
+              "count": 1,
+              "totalMs": 12,
+              "maxMs": 12
+            },
+            "Pause clock": {
+              "count": 1,
+              "totalMs": 134,
+              "maxMs": 134
+            },
+            "Run clock \"128\"": {
+              "count": 16,
+              "totalMs": 5264,
+              "maxMs": 400
+            },
+            "Run clock \"400\"": {
+              "count": 2,
+              "totalMs": 2237,
+              "maxMs": 1128
+            },
+            "Run clock \"560\"": {
+              "count": 1,
+              "totalMs": 1624,
+              "maxMs": 1624
+            },
+            "Run clock \"64\"": {
+              "count": 2,
+              "totalMs": 132,
+              "maxMs": 123
+            },
+            "Run clock \"2000\"": {
+              "count": 1,
+              "totalMs": 6882,
+              "maxMs": 6882
+            },
+            "Run clock \"200\"": {
+              "count": 3,
+              "totalMs": 1912,
+              "maxMs": 687
+            }
+          }
+        },
+        {
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "durationMs": 30147,
+          "status": "timedOut",
+          "apiMs": 28924,
+          "unattributedRemainderMs": 1223,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {
+            "Install clock \"{timeNumber|timeString}\"": {
+              "count": 1,
+              "totalMs": 9,
+              "maxMs": 9
+            },
+            "Run clock \"48\"": {
+              "count": 1,
+              "totalMs": 107,
+              "maxMs": 107
+            },
+            "Pause clock": {
+              "count": 3,
+              "totalMs": 183,
+              "maxMs": 85
+            },
+            "Run clock \"288\"": {
+              "count": 1,
+              "totalMs": 799,
+              "maxMs": 799
+            },
+            "Run clock \"800\"": {
+              "count": 1,
+              "totalMs": 2323,
+              "maxMs": 2323
+            },
+            "Run clock \"100\"": {
+              "count": 1,
+              "totalMs": 182,
+              "maxMs": 182
+            },
+            "Run clock \"3000\"": {
+              "count": 1,
+              "totalMs": 8762,
+              "maxMs": 8762
+            },
+            "Run clock \"2000\"": {
+              "count": 1,
+              "totalMs": 5674,
+              "maxMs": 5674
+            },
+            "Run clock \"560\"": {
+              "count": 1,
+              "totalMs": 1565,
+              "maxMs": 1565
+            },
+            "Resume clock": {
+              "count": 2,
+              "totalMs": 5,
+              "maxMs": 3
+            },
+            "Run clock \"300\"": {
+              "count": 9,
+              "totalMs": 7242,
+              "maxMs": 839
+            }
+          }
+        },
+        {
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "durationMs": 16482,
+          "status": "passed",
+          "apiMs": 11312,
+          "unattributedRemainderMs": 5170,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {}
+        },
+        {
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "durationMs": 19581,
+          "status": "passed",
+          "apiMs": 10307,
+          "unattributedRemainderMs": 9274,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {}
+        }
+      ]
+    },
+    {
+      "run": 39751877999,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39751877999",
+      "instrumented": true,
+      "environment": {
+        "commit": "34c86fc8051ce02b30a3dc88910e692edb120fcb",
+        "node": "v24.22.1",
+        "npm": "11.19.1",
+        "browser": "153.0.8010.12",
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+        "os": "6.8.0-139-generic",
+        "platform": "linux",
+        "cpu": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memory": 8174178304,
+        "load": [
+          1.52,
+          2.3,
+          2.11
+        ],
+        "runner": "unraid-tactics-01",
+        "workers": 1,
+        "retries": 0,
+        "trace": "off",
+        "mode": "preview"
+      },
+      "stats": {
+        "startTime": "2026-10-22T08:59:54.423Z",
+        "duration": 162496.95299999998,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 410,
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 16301,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 461,
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 18152,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 410,
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 7884,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 461,
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 9573,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 410,
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 9064,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-animations.spec.ts",
+          "line": 461,
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 10325,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 16853,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 19527,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 9006,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 10488,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 9425,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 11318,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ],
+      "receiptSha256": {
+        "candidate.json": "a2f184ed31c6399cb6b92678e92ce85f8ea793228ca688d41533572148d58b86",
+        "environment.json": "37719caeaf97ecf73e9e60ca762f020bcb9bd93f485a43cd6766e331e4a4a914",
+        "build.log": "b3aa60659cb236c46b8318189061b6cc9ac093082baae7e70398c3f66a2ef7d7",
+        "build-sha256.txt": "35c89997e99c6af8d7a05043b864ff4a3b14be4d2d7f8dd9f9725a9a9e40098b",
+        "steps.json": "ba0fccb346126f2fc123c57f6095cf53db63d24c0c0d6619abd7d3f34ea8c9d5",
+        "steps.cjs": "9f465168523c16329343eae6c65a0c9fed20d578d6aef03ac9edb95906a6589a",
+        "neighbors.json": "4b6bba66c6bab220188bf37d47b367c19b93e1d29a83bed0efb48ea421bc8758",
+        "neighbors.log": "84d2d6e355fa2c47b00b57e6201fe0cfb330e7c1034d461feb41a5bb74fa1876",
+        "candidate.log": "81bae49349f0cb28e93f938afd79c835f55e4ec734848d6827a7756aff679e76"
+      },
+      "relevantInputHashes": {
+        "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+        "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+        "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+        "src/phaser/BattleScene.ts": "196a902ebdaa834a8328c59a81e0909e89e5390bb85e692d7c51213b25971646",
+        "src/phaser/BoardRenderer.ts": "e23bf8243133d9ce4ac57a7819df2ca3af68f4762267fe656c7a00e7e16266d5",
+        "tests/battle-animations.spec.ts": "33c7e4defcf06dd8a318f9ce120ef07075afddc2fafc2800bd46c2cdc2416fe7",
+        "tests/battle-board.spec.ts": "fa56679828107ebcfe9b4f4070365bb39bef677715b2427916342a11afaaa197",
+        "tests/helpers/battlePolicy.ts": "f6513fc570fe75e50bd4a2c405b5c0f44890bf1cbd6bd2eca5bc80d67b2e4d56",
+        "tests/helpers/playerPolicy.ts": "15c5110c6d7a7a22d3fc4104c259802c013ce760185ef1a13882b7e7ef184599",
+        "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae"
+      },
+      "phases": [
+        {
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "durationMs": 16301,
+          "status": "passed",
+          "apiMs": 14747,
+          "unattributedRemainderMs": 1554,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {
+            "Install clock \"{timeNumber|timeString}\"": {
+              "count": 1,
+              "totalMs": 11,
+              "maxMs": 11
+            },
+            "Pause clock": {
+              "count": 1,
+              "totalMs": 136,
+              "maxMs": 136
+            },
+            "Run clock \"128\"": {
+              "count": 16,
+              "totalMs": 5503,
+              "maxMs": 658
+            },
+            "Run clock \"400\"": {
+              "count": 2,
+              "totalMs": 1629,
+              "maxMs": 1440
+            },
+            "Run clock \"560\"": {
+              "count": 1,
+              "totalMs": 1480,
+              "maxMs": 1480
+            },
+            "Run clock \"64\"": {
+              "count": 2,
+              "totalMs": 18,
+              "maxMs": 10
+            },
+            "Fast forward clock \"2000\"": {
+              "count": 1,
+              "totalMs": 189,
+              "maxMs": 189
+            },
+            "Run clock \"200\"": {
+              "count": 3,
+              "totalMs": 1924,
+              "maxMs": 700
+            }
+          }
+        },
+        {
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "durationMs": 18152,
+          "status": "passed",
+          "apiMs": 15580,
+          "unattributedRemainderMs": 2572,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {
+            "Install clock \"{timeNumber|timeString}\"": {
+              "count": 1,
+              "totalMs": 9,
+              "maxMs": 9
+            },
+            "Run clock \"48\"": {
+              "count": 1,
+              "totalMs": 194,
+              "maxMs": 194
+            },
+            "Pause clock": {
+              "count": 4,
+              "totalMs": 97,
+              "maxMs": 85
+            },
+            "Run clock \"288\"": {
+              "count": 1,
+              "totalMs": 834,
+              "maxMs": 834
+            },
+            "Run clock \"800\"": {
+              "count": 1,
+              "totalMs": 2272,
+              "maxMs": 2272
+            },
+            "Run clock \"100\"": {
+              "count": 1,
+              "totalMs": 242,
+              "maxMs": 242
+            },
+            "Resume clock": {
+              "count": 3,
+              "totalMs": 6,
+              "maxMs": 2
+            },
+            "Fast forward clock \"2000\"": {
+              "count": 1,
+              "totalMs": 4,
+              "maxMs": 4
+            },
+            "Run clock \"560\"": {
+              "count": 1,
+              "totalMs": 1572,
+              "maxMs": 1572
+            },
+            "Run clock \"300\"": {
+              "count": 10,
+              "totalMs": 8234,
+              "maxMs": 877
+            }
+          }
+        },
+        {
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "durationMs": 16853,
+          "status": "passed",
+          "apiMs": 11453,
+          "unattributedRemainderMs": 5400,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {}
+        },
+        {
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "durationMs": 19527,
+          "status": "passed",
+          "apiMs": 10372,
+          "unattributedRemainderMs": 9155,
+          "remainderIncludes": "Unreported attribute reads, fixture work, assertions and other driver overhead; not a direct read-cost measurement.",
+          "clocks": {}
+        }
+      ],
+      "neighbors": {
+        "stats": {
+          "startTime": "2026-10-22T09:02:37.846Z",
+          "duration": 120987.49299999999,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "cases": [
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 111,
+            "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+            "project": "desktop",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 5093,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 506,
+            "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+            "project": "desktop",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 12044,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 111,
+            "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+            "project": "mobile-portrait",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 3695,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 506,
+            "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+            "project": "mobile-portrait",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 6142,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 111,
+            "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+            "project": "mobile-landscape",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 3776,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-animations.spec.ts",
+            "line": 506,
+            "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+            "project": "mobile-landscape",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 7048,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 387,
+            "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+            "project": "desktop",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 13435,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 437,
+            "title": "default authored board renders canonical units, highlights and stable restarts",
+            "project": "desktop",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 9893,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 387,
+            "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+            "project": "mobile-portrait",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 12206,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 437,
+            "title": "default authored board renders canonical units, highlights and stable restarts",
+            "project": "mobile-portrait",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 10246,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 387,
+            "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+            "project": "mobile-landscape",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 12744,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          },
+          {
+            "file": "battle-board.spec.ts",
+            "line": 437,
+            "title": "default authored board renders canonical units, highlights and stable restarts",
+            "project": "mobile-landscape",
+            "status": "expected",
+            "results": [
+              {
+                "status": "passed",
+                "durationMs": 9751,
+                "retry": 0,
+                "errors": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "run": 39752731873,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39752731873",
+      "instrumented": false,
+      "environment": {
+        "commit": "85f1fe08c76ab4e203164c050526f21138d3dbfb",
+        "node": "v24.22.1",
+        "npm": "11.19.1",
+        "browser": "153.0.8010.12",
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+        "os": "6.8.0-139-generic",
+        "platform": "linux",
+        "cpu": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memory": 8174178304,
+        "load": [
+          3.28,
+          4.5,
+          3.34
+        ],
+        "runner": "unraid-tactics-01",
+        "workers": 1,
+        "retries": 0,
+        "trace": "off",
+        "mode": "preview"
+      },
+      "stats": {
+        "startTime": "2026-10-22T09:06:26.739Z",
+        "duration": 48313.469000000005,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "battle-board.spec.ts",
+          "line": 213,
+          "title": "layout clamping resets overlap history when the actual camera changes",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 8892,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 236,
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 16989,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "battle-board.spec.ts",
+          "line": 304,
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "durationMs": 19683,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ],
+      "receiptSha256": {
+        "probe.json": "71098e213f2643cf8e34eaab985a8bb230af2d3d25b9a81d57af439b8c6034c1",
+        "environment.json": "88514dc43977f6b3432b341f4ef6f80579dcefc97ee6678008176e30c27646b9",
+        "build.log": "e861e44cfc0cfd44a21e165994bab7835655afdfcaedfcdcdb9e1b5cabcde7ba",
+        "build-sha256.txt": "3afdea1dd4b4f57d64eaa6f59147267155b080f0cfaf9c84259e560de52b5a27"
+      },
+      "relevantInputHashes": {
+        "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+        "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+        "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+        "src/phaser/BattleScene.ts": "196a902ebdaa834a8328c59a81e0909e89e5390bb85e692d7c51213b25971646",
+        "src/phaser/BoardRenderer.ts": "e23bf8243133d9ce4ac57a7819df2ca3af68f4762267fe656c7a00e7e16266d5",
+        "tests/battle-animations.spec.ts": "33c7e4defcf06dd8a318f9ce120ef07075afddc2fafc2800bd46c2cdc2416fe7",
+        "tests/battle-board.spec.ts": "fa56679828107ebcfe9b4f4070365bb39bef677715b2427916342a11afaaa197",
+        "tests/helpers/battlePolicy.ts": "f6513fc570fe75e50bd4a2c405b5c0f44890bf1cbd6bd2eca5bc80d67b2e4d56",
+        "tests/helpers/playerPolicy.ts": "15c5110c6d7a7a22d3fc4104c259802c013ce760185ef1a13882b7e7ef184599",
+        "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae"
+      }
+    }
+  ],
+  "sourceComparison": {
+    "current": "85f1fe08c76ab4e203164c050526f21138d3dbfb",
+    "runtimeTree": "b32b066546de313b7f28a850ca2c04e26d104646",
+    "changedRuntimeOrSharedInputs": [],
+    "changedTestFiles": [
+      "tests/battle-animations.spec.ts"
+    ]
+  },
+  "artifacts": [
+    {
+      "run": 39750405032,
+      "id": 12413277869,
+      "apiZipDigest": "2b74ea123fe98c46b27b049b9a2a15faa816e3d0cc64be77327bace1cdcf0931"
+    },
+    {
+      "run": 39750995870,
+      "id": 12413003662,
+      "apiZipDigest": "a1af1c9dd2bd8077be8e548515eba7363aba3fc0d9919e931ba49071f5fcbd70"
+    },
+    {
+      "run": 39751877999,
+      "id": 12414715905,
+      "apiZipDigest": "ed6509e523c41316a28f8fb55637975df37312b5a558f741e29cb1a447f89e37"
+    },
+    {
+      "run": 39752731873,
+      "id": 12414118130,
+      "apiZipDigest": "8e9205e2fb3511c1a69a19f9fe27286a006dcfce8a9ac0b7de14e0365671ef24"
+    }
+  ],
+  "finalRelevantGitBlobComparison": {
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+    "package.json": "0bc4825760af989f5881a4d9efcf32b2ae4a53c7d8e33e491325bac386b976ff",
+    "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+    "src/phaser/BattleScene.ts": "196a902ebdaa834a8328c59a81e0909e89e5390bb85e692d7c51213b25971646",
+    "src/phaser/BoardRenderer.ts": "e23bf8243133d9ce4ac57a7819df2ca3af68f4762267fe656c7a00e7e16266d5",
+    "tests/battle-animations.spec.ts": "33c7e4defcf06dd8a318f9ce120ef07075afddc2fafc2800bd46c2cdc2416fe7",
+    "tests/battle-board.spec.ts": "fa56679828107ebcfe9b4f4070365bb39bef677715b2427916342a11afaaa197",
+    "tests/helpers/battlePolicy.ts": "f6513fc570fe75e50bd4a2c405b5c0f44890bf1cbd6bd2eca5bc80d67b2e4d56",
+    "tests/helpers/playerPolicy.ts": "15c5110c6d7a7a22d3fc4104c259802c013ce760185ef1a13882b7e7ef184599",
+    "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae"
+  }
+}

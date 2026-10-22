@@ -1,0 +1,509 @@
+{
+  "createdAt": "2026-10-22T09:47:45.024Z",
+  "pr": 223,
+  "base": "419ebcdd3ddf5eefb0786dfc4231a7ae476b17b9",
+  "testedCommit": "611fcf02d1162696730f6bb0f70bfac0c1a5b8ae",
+  "positiveRuns": {
+    "reported": {
+      "source": "verification-receipts/browser-runs/run-P6yC9B/results.json",
+      "stats": {
+        "startTime": "2026-10-22T09:40:35.368Z",
+        "duration": 163845.973,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "286d6706ee2ad93b5a1a-35030b1af5f858cd16fe",
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 12600,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-554f4712c47ff87fcff9",
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 17381,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-7293b885996bfc225737",
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 8438,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-4ccc7515f69c6738db45",
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 12118,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-374fffa57f4d16f94b3d",
+          "title": "active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 8157,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-3be0c17253fd9a646242",
+          "title": "active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 12172,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-975bf85982502467c17b",
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 12313,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-05f27fc668633ad680fa",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 16461,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-4389bf3a10f5dea5a163",
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 8755,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-184d8ba609a4dab9643c",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 11144,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-a1dbd4d744032a65d33b",
+          "title": "hovered origins show only ability reach without changing selection, pending commands or saves",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 8857,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-5391e2b1a1038a2602bf",
+          "title": "selection labels retain the zoomed and panned camera without gameplay commands",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 11683,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    "neighbors": {
+      "source": "verification-receipts/browser-runs/run-Mk8hEW/results.json",
+      "stats": {
+        "startTime": "2026-10-22T09:43:31.326Z",
+        "duration": 114330.246,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "286d6706ee2ad93b5a1a-851de8aca666c78f8619",
+          "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 3577,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-44ac08d40fb7d43ad30c",
+          "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 9447,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-1456623bec3a4786489c",
+          "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 3654,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-2f265ac3d0ca1ce92c3a",
+          "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 6546,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-016941fefb12a2f062b3",
+          "title": "target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 3712,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "286d6706ee2ad93b5a1a-e61de75ea6737b03fa40",
+          "title": "active bob: initial reduced motion keeps sprite and static actor marker anchored",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 7092,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-c9697101401c9cd31010",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 11451,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-82089feb62f9efa00fa2",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 9640,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-f4a1a5bec0b5e23793c9",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 10829,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-c610e0be1a259e8d4301",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 10143,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-b3a5ca27037a0a6e6f1a",
+          "title": "authored camera keeps zoom bounds and refits on real orientation changes",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 11833,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "2285cd14e26b4e18f62c-219af80335b65d1aed1e",
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "duration": 9684,
+              "retry": 0,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "negativeProbe": {
+    "source": "probe-summary.json.gz",
+    "delayMs": 3500,
+    "repairedBoundMs": 3000,
+    "repairedResult": "expected rejection at the 3000ms assertion",
+    "oldDefaultResult": "passes the same 3500ms readiness delay",
+    "restored": true,
+    "restoredSha256": "97913a3c94367fef59889aae5b53e15415ae518bca1c97c632103c77825e1483"
+  },
+  "build": {
+    "command": "npm ci --ignore-scripts --no-audit --no-fund && npm run build",
+    "exitCode": 0,
+    "contentTests": 221,
+    "typeScopes": 2,
+    "hashes": "source-build.json.gz",
+    "log": "build.log.gz"
+  },
+  "environment": "environment.json",
+  "execution": {
+    "mode": "preview",
+    "basePath": "/",
+    "workers": 1,
+    "retries": 0,
+    "trace": "off",
+    "profiles": [
+      "desktop",
+      "mobile-portrait",
+      "mobile-landscape"
+    ],
+    "deviceEvidence": "Chromium device emulation; no physical-device testing",
+    "webKit": "environment launch only; no WebKit gameplay qualification claimed"
+  },
+  "sourceBinding": {
+    "recordedDirty": true,
+    "note": "Raw WSL Git reported 1082 CRLF files as dirty. Native Windows Git was clean at the source checkpoint, WSL git -c core.autocrlf=true status was empty, and native git diff 611fcf0 for src/tests/public/scripts/package/config inputs was empty. Raw tested file/build SHA-256 values are retained. Later edits are documentation and ledger only; the probe restored the exact tested spec bytes.",
+    "equivalenceCommand": "git diff --quiet 611fcf0 -- src tests public scripts package.json package-lock.json *config*",
+    "equivalenceExitCode": 0
+  },
+  "scope": {
+    "changedRuntime": false,
+    "sharedHelpers": false,
+    "configuration": false,
+    "dependencies": false,
+    "affectedConsumers": "Two local bob cases on three Chromium projects plus unchanged neighboring target/cancel, camera/rotation, restart and initial reduced-motion checks.",
+    "historicalFailures": "Original interrupted #200 baseline and board non-reproductions remain recorded; fresh scoped success does not complete that matrix."
+  },
+  "screenshots": [
+    {
+      "path": "verification-receipts/browser-runs/run-P6yC9B/artifacts/battle-animations-active-b-2f295-reserve-authoritative-state-desktop/active-bob.png",
+      "sha256": "808d85f777e21502b30ab3ba096c2ac48e91287a1a3485bc47c6d58ceda30aa0",
+      "inspected": true,
+      "retention": "local ignored receipt; not copied to this evidence directory"
+    },
+    {
+      "path": "verification-receipts/browser-runs/run-P6yC9B/artifacts/battle-animations-active-b-2f295-reserve-authoritative-state-mobile-landscape/active-bob.png",
+      "sha256": "357b08bd7cd88a2644d28b013e0982ac6cd963d3f2ab0827b9ee7b3c1a1ec1b9",
+      "inspected": true,
+      "retention": "local ignored receipt; not copied to this evidence directory"
+    },
+    {
+      "path": "verification-receipts/browser-runs/run-P6yC9B/artifacts/battle-animations-active-b-2f295-reserve-authoritative-state-mobile-portrait/active-bob.png",
+      "sha256": "9017a8cc9a46829877f445c4c2935133d3b8b1ef4ae0255bf220988e84fcff76",
+      "inspected": true,
+      "retention": "local ignored receipt; not copied to this evidence directory"
+    }
+  ],
+  "retainedFiles": {
+    "source-build.json.gz": {
+      "source": "tmp/issue-223-review/source-build.json",
+      "sha256": "45a1a72e146f1b6b1a9634284e9ebc3470af599bd18869afad484121cdab288c",
+      "uncompressedSha256": "aa22dade276399673dfdb1f3adf445d2b67398ce4415acfe47b78e84229122bf",
+      "bytes": 19455
+    },
+    "probe-summary.json.gz": {
+      "source": "tmp/issue-223-review/probe-summary.json",
+      "sha256": "20abf1b3414a9afa48adf0b464efcb5b1964625262e4e99663f06012633c5149",
+      "uncompressedSha256": "427e9f7469e3cd110455d05b452b5b70154836932e4f3916fc5102fc75952b4d",
+      "bytes": 1618
+    },
+    "probe.mjs.gz": {
+      "source": "tmp/issue-223-review/probe.mjs",
+      "sha256": "d63591b9c6d64c57e906a1215f1504a6984c7e021db75af4ae1d3a8c7d49d2df",
+      "uncompressedSha256": "416235e84b7b5765934e9b0a623a74cfa0405f23718be7dc41a090d117a2a1ef",
+      "bytes": 1415
+    },
+    "run-positive.sh.gz": {
+      "source": "tmp/issue-223-review/run-positive.sh",
+      "sha256": "a9a659ec6bd53f75b67e6861064843c22eeeeba428fa7108662587b83cf429be",
+      "uncompressedSha256": "42204f7ab69d8a4775c37d37394472e0e0f84d968a4e37deb6c0df4aaa7cb93e",
+      "bytes": 1394
+    },
+    "build.log.gz": {
+      "source": "tmp/issue-223-review/build.log",
+      "sha256": "b31703f982bf57bee21facaf6174980493a3db9fcfa85231ebfc34258996b4ad",
+      "uncompressedSha256": "e6188cc7a1479bbee84ccfa799be7b47c60778de5ebb464343ff511868d5ef1b",
+      "bytes": 2563
+    },
+    "reported.log.gz": {
+      "source": "tmp/issue-223-review/reported.log",
+      "sha256": "b3494c36d5ee0bb01e51991066f69ff27bc88aeb9f350e35ea0325703dabd887",
+      "uncompressedSha256": "3b01cb9af855b7dbd73cb21c763cf982d06533a130f2fafc955f61030a61b19c",
+      "bytes": 961
+    },
+    "neighbors.log.gz": {
+      "source": "tmp/issue-223-review/neighbors.log",
+      "sha256": "fba6be1e3a9566c87c8a882340aa53a2dc2499d539925aadb372d39ee99b8cb6",
+      "uncompressedSha256": "73595c7fcbc13ecc072a99e17413256fbe6604f8835104a741728a78558f960d",
+      "bytes": 951
+    },
+    "bound-rejects-delay.json.gz": {
+      "source": "tmp/issue-223-review/bound-rejects-delay.json",
+      "sha256": "a85eedbd4104eb7089d8e8209e3f80a14e24e6d3b012b67734a2b3e6e3dd5050",
+      "uncompressedSha256": "b2511e0904512d09a65923140a3d3c84337b6313ee62ffa2dbe0836e547ef505",
+      "bytes": 2450
+    },
+    "old-bound-control.json.gz": {
+      "source": "tmp/issue-223-review/old-bound-control.json",
+      "sha256": "2c847be9da4d2270b46ba5c964212be550702929d7e9ec7c3b8d2aefb7fad577",
+      "uncompressedSha256": "7e3e7743c4a25d2bd11311d545fb21fee07e2418aa6e00f6d0417e05bb332d6e",
+      "bytes": 1274
+    },
+    "reported.json.gz": {
+      "source": "verification-receipts/browser-runs/run-P6yC9B/results.json",
+      "sha256": "be77fb198e00df64e0b4473d7fbecd1fc27ace608453e3307e9a8e4ee8ac62c0",
+      "uncompressedSha256": "ef44bcf504a845caf5c3fe81a17ca3ecc414a5a198f3aa274f932950bedd0ee4",
+      "bytes": 1957
+    },
+    "neighbors.json.gz": {
+      "source": "verification-receipts/browser-runs/run-Mk8hEW/results.json",
+      "sha256": "33558ed176d138361bc2883cd6f8a79550deed9a04aea671ad34735366fdfa04",
+      "uncompressedSha256": "7102e933a4c72befb323059a844399bf1749683b46ec4be6f0b70aab4dc6c5e0",
+      "bytes": 1944
+    },
+    "environment.json": {
+      "source": "verification-receipts/browser-environment/run-60A7Hl/environment.json",
+      "sha256": "ecee2249c59bef2e0d2617567edd97b75f2b9b063805896cff8e7e5d9019d097",
+      "bytes": 709
+    }
+  }
+}
