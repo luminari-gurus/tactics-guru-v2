@@ -261,7 +261,10 @@ test('changed saved data refuses an old confirmation and requires fresh review',
   await page.locator('#save-confirm-reset').click();await expect(page.getByRole('dialog')).toContainText('Reset incomplete');
   expect((await stored(page)).primary).toBe('changed');expect((await readSession(page)).state.seed).toBe(2);
   await page.locator('#save-close').click();await page.locator('#fit-restart').click();await page.locator('#save-cancel-reset').click();
-  expect((await stored(page)).primary).toBe('changed');await expect(page.locator('#fit-restart')).toBeFocused();
+  expect((await stored(page)).primary).toBe('changed');
+  // WebKit mouse activation can retain the scroll region as the modal invoker.
+  const restoredFocus=page.locator('#fit-restart:focus, #battle-scroll:focus');
+  await expect(restoredFocus).toHaveCount(1);await expect(restoredFocus).toBeVisible();
 });
 
 test('successful reset with failed fresh save cannot recover an old battle on reload',async({page})=>{

@@ -1,0 +1,52 @@
+{
+  "touch-red": {
+    "file": "touch-red.log.gz",
+    "sha256": "ce74ffcec5e9eeeba4091c7e92ce8e9089d824939d4d641e2fec5b81a3509237",
+    "bytes": 1138
+  },
+  "touch-green": {
+    "file": "touch-green.log.gz",
+    "sha256": "af04ef275e6cf488c04a5cb861d0a6536b48fba681a47f1627ccd2f5fe98fece",
+    "bytes": 232
+  },
+  "touch-unit": {
+    "file": "touch-unit.log.gz",
+    "sha256": "48d6099a0af2b5a661c65ccb8a74b5b03f14d85e8e5dcbe1a7a650315d1936cf",
+    "bytes": 274
+  },
+  "touch-build": {
+    "file": "touch-build.log.gz",
+    "sha256": "7ee3f7c13aed116d05ed731e2b741b159e2e4e3ca3de84e368f4e1fddb67963e",
+    "bytes": 2149
+  },
+  "touch-frozen-build": {
+    "file": "touch-frozen-build.log.gz",
+    "sha256": "df109b382578e85ddb9bc28610c8da30e2e3252629c2ece9716faf2b60cf7290",
+    "bytes": 2149
+  },
+  "touch-chromium": {
+    "file": "touch-chromium.log.gz",
+    "sha256": "2e4d6939d340f5d31e8c1f90fed3976f29b5c301eddf544c3c0679b5bd410b7d",
+    "bytes": 4958
+  },
+  "touch-webkit": {
+    "file": "touch-webkit.log.gz",
+    "sha256": "19df7b8080f50dee8eb5dfbc43b179628ffe6def0150383c964530c1a76e2d33",
+    "bytes": 17158
+  },
+  "touch-webkit-fixed": {
+    "file": "touch-webkit-fixed.log.gz",
+    "sha256": "b0e64cec96675332d44ee035b9555ba1bcca5e237407d51bcf9f8a432ad16b17",
+    "bytes": 3446
+  },
+  "touch-acceptance": {
+    "file": "touch-acceptance.log.gz",
+    "sha256": "cab216edc3ebed4818deab0035ca35eba89f2297492245c4dc87f7ffb38d1c87",
+    "bytes": 10587
+  },
+  "touch-full": {
+    "file": "touch-full.log.gz",
+    "sha256": "5259233d06ba9487a9f940bdfcc8bb644c9ccfbb4af1dfc9f0ed1640195e9e3f",
+    "bytes": 87446
+  }
+}

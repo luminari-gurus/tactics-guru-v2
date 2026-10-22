@@ -58,7 +58,7 @@ export class BattleDialogs {
     callback?.();
     // The callback can disable the invoker or open a replacement modal.
     if(this.open)return;
-    if(prior?.isConnected && prior!==document.body && prior!==document.documentElement && !prior.closest('dialog') && !prior.matches(':disabled')) {
+    if(prior?.isConnected && prior!==document.body && prior!==document.documentElement && !prior.closest('dialog') && !prior.matches(':disabled') && !prior.closest('[hidden], [inert]')) {
       prior.focus();
       if(document.activeElement===prior){
         // Native dialog restoration can already have focused an offscreen
@@ -67,7 +67,9 @@ export class BattleDialogs {
         return;
       }
     }
-    if(this.fallbackFocus)this.fallbackFocus();
+    const toggle=document.querySelector<HTMLElement>('#battle-hud-toggle');
+    if(toggle?.getAttribute('aria-expanded')==='false' && !toggle.closest('[hidden], [inert]'))toggle.focus();
+    else if(this.fallbackFocus)this.fallbackFocus();
     else document.querySelector<HTMLElement>('#fit-restart')?.focus();
   }
   dispose(){this.abort.abort();this.element.close();this.element.remove();this.choices=[];this.cancel=null;}

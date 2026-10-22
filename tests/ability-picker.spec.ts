@@ -16,6 +16,12 @@ for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later abili
   await expect(page.locator('#battle-review')).toBeEnabled();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending.abilityId).toBe(`ability:zz_${hero}`);
   const prepared=await page.locator('#game').getAttribute('data-session');
+  const toggle=page.locator('#battle-hud-toggle');
+  if(await toggle.isVisible()){
+    await toggle.click();await expect(picker).toBeHidden();
+    await toggle.click();await expect(picker).toHaveValue(`ability:zz_${hero}`);
+    expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);
+  }
   await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
   await picker.scrollIntoViewIfNeeded();
   await page.screenshot({path:test.info().outputPath(`${hero}-original-viewport.png`)});

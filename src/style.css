@@ -122,5 +122,15 @@ dialog button { touch-action: manipulation; }
 
 .run-entry-link { display:inline-flex; align-items:center; min-width:44px; min-height:44px; color:inherit; padding:4px 8px; box-sizing:border-box; }
 
+/* One shared visibility owner keeps normal HUD refreshes from revealing hidden controls. */
+.battle-mode #battle-hud-contents { display:flex; flex-direction:column; min-height:0; flex:1; overflow:hidden; }
+.battle-mode #battle-hud-toggle { flex:none; min-width:44px; min-height:44px; margin:4px; }
+@media (max-width:759px) and (min-height:501px), (orientation:portrait) {
+  .battle-mode #battle-shell.hud-collapsed { grid-template-rows:minmax(0,1fr) auto; }
+}
+@media (orientation:landscape) and (max-height:500px) {
+  .battle-mode #battle-shell.hud-collapsed { grid-template-columns:minmax(0,1fr) 76px; }
+  .battle-mode #battle-shell.hud-collapsed #battle-hud-toggle { margin:4px; }
+}
 .battle-mode #battle-ability { width:100%; min-width:0; margin:4px 0; }
 .battle-mode #battle-ability-info { font-size:.8rem; overflow-wrap:anywhere; }

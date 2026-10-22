@@ -488,7 +488,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       if(!stress){await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
       const measurement=await page.evaluate(()=>{
         const rect=(s:string)=>document.querySelector(s)!.getBoundingClientRect().toJSON();
-        const controls=[...document.querySelectorAll<HTMLElement>('#fit-panel button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
+        const controls=[...document.querySelectorAll<HTMLElement>('#battle-hud-contents button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
           e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect(),p=document.querySelector('#battle-scroll')!.getBoundingClientRect();
           return {name:e.textContent,width:r.width,height:r.height,left:r.left,right:r.right,reachable:r.bottom>p.top&&r.top<p.bottom};
         });

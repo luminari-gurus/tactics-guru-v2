@@ -120,7 +120,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Root/prefix asset behavior | `npx --no-install playwright test tests/public-asset-base.spec.ts` | Run root preview, prefixed preview and corresponding dev modes for full regression or affected build/base changes; recipe below. |
 | Performance capture | `npm run measure:fit` | Isolated production proof-scene collector; this is not a substitute for runtime budget assertions in browser tests. Required for affected performance work and release qualification, not every docs/UI-copy edit. |
 
-The 27 default browser files (all included by the default config) are grouped here
+The 28 default browser files (all included by the default config) are grouped here
 so every browser file has an owner in the inventory:
 
 - Assets/boot/rendering: `assets.spec.ts`, `boot.spec.ts`, `content-loading.spec.ts`,
@@ -129,7 +129,7 @@ so every browser file has an owner in the inventory:
 - Proof interaction/audio/layout: `board.spec.ts`, `input.spec.ts`, `move.spec.ts`,
   `opacity.spec.ts`, `audio.spec.ts`, `lifecycle.spec.ts`, `layout.spec.ts`.
 - Battle presentation/commands/persistence: `battle-board.spec.ts`,
-  `battle-animations.spec.ts`, `battle-loop.spec.ts`, `battle-persistence.spec.ts`,
+  `battle-hud-collapse.spec.ts`, `battle-animations.spec.ts`, `battle-loop.spec.ts`, `battle-persistence.spec.ts`,
   `battle-audio.spec.ts`, `guarded-effects.spec.ts`, `unit-health-bars.spec.ts`.
 - Run/dungeon/map: `run-progression.spec.ts`, `dungeon.spec.ts`,
   `dungeon-exploration.spec.ts`, `dungeon-lifecycle.spec.ts`, `overworld-map.spec.ts`.

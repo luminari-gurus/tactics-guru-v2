@@ -1,4 +1,6 @@
 import {expect,test,type Page} from '@playwright/test';
+import {projectTile} from '../src/geometry/iso';
+import {pickTile} from '../src/geometry/picking';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {readSession,playCommand} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
@@ -17,11 +19,17 @@ async function start(page:Page){
  expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
 }
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
-async function fight(page:Page,wait=false){
+async function fight(page:Page,wait=false,collapse=false){
  for(let i=0;i<500;i++){
   await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
+  if(collapse && await page.locator('#battle-hud-toggle').isVisible() && await page.locator('#battle-hud-toggle').getAttribute('aria-expanded')==='false')await page.locator('#battle-hud-toggle').click();
   const battle=await readSession(page);expect(battle.phase).toBe('player');const catalog=runBattleCatalog(current.items,runContext)!;
   await playCommand(page,wait?{type:'endTurn',unitId:battle.state.initiative[battle.state.activeIndex]}:playerDecision(battle.state,catalog));
+  if(collapse && await page.locator('#battle-hud-toggle').isVisible()) {
+   // Enemy presentations continue while the toggle is used; final replay/state
+   // equivalence below verifies the run without assuming time stopped here.
+   await page.locator('#battle-hud-toggle').click();
+  }
  }
  await expect(page.locator('#run-screen')).toBeVisible();
 }
@@ -44,16 +52,29 @@ async function prepare(page:Page){
 test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){
+  // Let the shared ResizeObserver/camera fit settle after restoring the HUD
+  // at an encounter boundary before deriving a pointer coordinate from its report.
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))));
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
   const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
   expect(board.selected).toBeNull();expect(board.selectionEvents).toBe(0);
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#battle-target')).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
   const runBefore=await snapshot(page);
-  const corner=board.tiles.find((t:{x:number;y:number})=>t.x===11&&t.y===11);
-  const x=(corner.x-corner.y)*40,y=(corner.x+corner.y)*20-corner.elevation*24;
-  await page.mouse.click(board.transform.x+x*board.transform.scale,board.transform.y+y*board.transform.scale);
-  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:11,y:11,elevation:corner.elevation});
+  // A new scene can start collapsed; expanding preserves that larger camera
+  // view, so a fixed far corner is not necessarily inside the drawable region.
+  const cell=board.tiles.find((tile:any)=>{
+   const local=projectTile(tile),picked=pickTile(board.tiles,local);
+   const x=board.transform.x+local.x*board.transform.scale,y=board.transform.y+local.y*board.transform.scale,r=board.region;
+   return picked?.x===tile.x && picked?.y===tile.y && x>r.x+10 && x<r.x+r.width-10 && y>r.y+10 && y<r.y+r.height-10
+    && board.units.every((unit:any)=>Math.hypot(local.x-unit.position.x,local.y-unit.position.y)>80);
+  });
+  expect(cell).toBeTruthy();const local=projectTile(cell);
+  const point={x:board.transform.x+local.x*board.transform.scale,y:board.transform.y+local.y*board.transform.scale};
+  const corner=projectTile(board.tiles.find((tile:any)=>tile.x===11&&tile.y===11));
+  await test.info().attach(`encounter-${index+1}-selection-geometry`,{contentType:'application/json',body:JSON.stringify({region:board.region,transform:board.transform,point,cell,originalCorner:{x:board.transform.x+corner.x*board.transform.scale,y:board.transform.y+corner.y*board.transform.scale}})});
+  await page.mouse.click(point.x,point.y);
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toEqual({x:cell.x,y:cell.y,elevation:cell.elevation});
   expect(await snapshot(page)).toEqual(runBefore);
   // Each new scene owns exactly its current actor cue; a finished encounter tears it down.
   await expect.poll(async()=>{
@@ -65,7 +86,7 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   const beforeBob=await snapshot(page);
   await page.screenshot({path:test.info().outputPath(`encounter-${index+1}-active-bob.png`)});
   expect(await snapshot(page)).toEqual(beforeBob);
-  await fight(page);
+  await fight(page,false,true);
   await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(index===2?['victory','defeat']:['reward','defeat']).toContain(current.items.run.phase);expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(current.items.run.phase==='defeat')break;
@@ -74,6 +95,10 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
    if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(current);}
    await prepare(page);const prepared=await snapshot(page);if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(prepared);}
    await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   if(await page.locator('#battle-hud-toggle').isVisible()){
+    await expect(page.locator('#battle-hud-toggle')).toHaveAttribute('aria-expanded',index===0?'false':'true');
+    if(index===0)await page.locator('#battle-hud-toggle').click();
+   }
    await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed',index===0?'true':'false');
   }
  }
@@ -151,7 +176,9 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
  }
  await activate('#run-start-encounter');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await page.locator('#fit-restart').click();await expect(page.getByRole('dialog')).toBeVisible();const before=await snapshot(page);await page.mouse.click(3,3);expect(await snapshot(page)).toEqual(before);await page.locator('#run-cancel-new').click();
- await expect(page.locator('#fit-restart')).toBeFocused();
+ // WebKit mouse activation can retain the scroll region as the modal invoker.
+ const restoredFocus=page.locator('#fit-restart:focus, #battle-scroll:focus');
+ await expect(restoredFocus).toHaveCount(1);await expect(restoredFocus).toBeVisible();
  await page.locator('#battle-sound').click();await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
 });
 

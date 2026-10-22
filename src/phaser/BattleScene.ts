@@ -1,3 +1,4 @@
+import { inputTrace } from '../diagnostics/inputTrace';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
@@ -179,7 +180,7 @@ export class BattleScene extends Phaser.Scene {
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
     const fit=()=>{
-      if(this.scale.width!==innerWidth || this.scale.height!==innerHeight)return;
+      if(this.scale.width!==innerWidth || this.scale.height!==innerHeight){ inputTrace('fit-skipped',{scale:{width:this.scale.width,height:this.scale.height},width:innerWidth,height:innerHeight}); return; }
       const r=drawable.getBoundingClientRect(),c=canvas.getBoundingClientRect();
       const next={x:(r.left-c.left)*this.scale.width/c.width,y:(r.top-c.top)*this.scale.height/c.height,
         width:r.width*this.scale.width/c.width,height:r.height*this.scale.height/c.height};

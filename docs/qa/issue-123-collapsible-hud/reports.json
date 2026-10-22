@@ -1,0 +1,62 @@
+{
+  "browser-final": {
+    "sha256": "a5f23a07df346391161f05d18b01793f03cd21beccde60b5a4b556fde53b1fc5",
+    "bytes": 84098,
+    "file": "browser-final.log.gz"
+  },
+  "unit-final": {
+    "sha256": "cc6fc4d29f617af8435f5a3fe03df2f5cdc07813c4ef68d52a4b497063bfe68e",
+    "bytes": 274,
+    "file": "unit-final.log.gz"
+  },
+  "content-final": {
+    "sha256": "caf3de4c8cb480456014eeed0c5741d94bb064e2677d3ecea5607c459be9419a",
+    "bytes": 431,
+    "file": "content-final.log.gz"
+  },
+  "typecheck-final": {
+    "sha256": "95cc8ca4fc2ed359f121fe771274c94ce441f355f498132f8fd5420f1fb348c9",
+    "bytes": 91,
+    "file": "typecheck-final.log.gz"
+  },
+  "frozen-build": {
+    "sha256": "c4d1e77613c540ecfa5628b24974bbbf0da4bc717d95e974513185b2136b67af",
+    "bytes": 2149,
+    "file": "frozen-build.log.gz"
+  },
+  "openspec-final": {
+    "sha256": "1e43e46acd19f8cef4717bb15feea0220e292aceff081bb466ea80e8a0fd270c",
+    "bytes": 44,
+    "file": "openspec-final.log.gz"
+  },
+  "webkit-hud": {
+    "sha256": "ea533475f7f6cf09d383427f794ccc8ac5676a153d453b2f202dc792efefb3cf",
+    "bytes": 2170,
+    "file": "webkit-hud.log.gz"
+  },
+  "webkit-acceptance": {
+    "sha256": "0dcbc945af91ecb431c131974caa577354e555349ff64f18f778c2536d8d86a5",
+    "bytes": 18535,
+    "file": "webkit-acceptance.log.gz"
+  },
+  "webkit-base": {
+    "sha256": "eb751f6dacd82b90a614e6bdfb67e68033d07dae39b710ecdf2be5920acbd74a",
+    "bytes": 8606,
+    "file": "webkit-base.log.gz"
+  },
+  "webkit-acceptance-fixed": {
+    "sha256": "ddadfc8f92b4cd828ae3e38770d47a62706c8f9518e97544c7c9b0a1e9cc5789",
+    "bytes": 10587,
+    "file": "webkit-acceptance-fixed.log.gz"
+  },
+  "focus-chromium-fixed": {
+    "sha256": "3abf74a2ef511af68e0370d770629362ccab95294cd705aae663a8a738249a27",
+    "bytes": 2150,
+    "file": "focus-chromium-fixed.log.gz"
+  },
+  "focus-webkit-fixed": {
+    "sha256": "fedb7738d35a40741da455ef80e66914abca618363ab32d018d9018ea16c1138",
+    "bytes": 1568,
+    "file": "focus-webkit-fixed.log.gz"
+  }
+}
