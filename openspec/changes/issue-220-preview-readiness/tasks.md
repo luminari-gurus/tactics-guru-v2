@@ -12,7 +12,7 @@
 ## 3. Qualification and review delivery
 
 - [x] 3.1 Freeze implementation, run proportional units/orchestration/discovery/build and one isolated default production capture; retain all 18 samples or explicit failure, evaluate unchanged budgets and publish QA provenance.
-- [ ] 3.2 Validate OpenSpec and documentation, update the continuation plan, commit/push and publish a focused review-ready PR; verify remote parity and PR head/base.
+- [x] 3.2 Validate OpenSpec and documentation, update the continuation plan, commit/push and publish a focused review-ready PR; verify remote parity and PR head/base.
 
 ## Workflow follow-up
 
