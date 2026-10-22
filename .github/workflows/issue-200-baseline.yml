@@ -1,7 +1,5 @@
 name: Issue 200 self-hosted verification timings
 on:
-  pull_request:
-    types: [labeled]
   workflow_dispatch:
     inputs:
       mode:
@@ -24,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   timings:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && ((github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings')) || ((github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'ready for work') && github.event.pull_request.number == 209 && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'work/issue-200-verification-timings' && github.actor == 'dubstylee'))
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 150
     steps:
@@ -32,7 +30,7 @@ jobs:
         run: date -u +%Y-%m-%dT%H:%M:%SZ > "$RUNNER_TEMP/issue200-job-start.txt"
       - uses: actions/checkout@v4
         with:
-          ref: 6f20a3d6a8087e40777cccb6ee7c2cf4a09ece89
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -71,7 +69,7 @@ jobs:
       - name: Record source and runner conditions
         if: always()
         env:
-          CAPTURE_CONDITIONS: ${{ inputs.conditions || 'User-requested full self-hosted baseline; background workloads unverified' }}
+          CAPTURE_CONDITIONS: ${{ inputs.conditions }}
         run: |
           mkdir -p verification-receipts/issue200-ci
           node --input-type=module <<'JS' > verification-receipts/issue200-ci/environment.json
@@ -93,10 +91,10 @@ jobs:
             notes: 'Queue timing is available from this run/job API timestamps; setup/qualification precedes capture. Repository browser jobs are serialized; other host workloads require coordination.' }, null, 2));
           JS
       - name: Capture explicitly selected verification timings
-        if: ((github.event_name == 'workflow_dispatch' && inputs.mode == 'capture') || (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'ready for work'))
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'capture'
         env:
           CAPTURE_STAGES: ${{ inputs.stages }}
-          CAPTURE_CONDITIONS: ${{ inputs.conditions || 'User-requested full self-hosted baseline; background workloads unverified' }}
+          CAPTURE_CONDITIONS: ${{ inputs.conditions }}
           RECEIPT: verification-receipts/timings/self-hosted-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           stage_args=()
@@ -108,7 +106,7 @@ jobs:
             --conditions "Self-hosted tactics-browser; persistent npm/browser caches; build, smoke, process contracts and preflight warmed before timing; exclusive repository browser job; $CAPTURE_CONDITIONS"
         timeout-minutes: 105
       - name: Publish available capture summary
-        if: always() && ((github.event_name == 'workflow_dispatch' && inputs.mode == 'capture') || (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'ready for work'))
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'capture'
         env:
           RECEIPT: verification-receipts/timings/self-hosted-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
