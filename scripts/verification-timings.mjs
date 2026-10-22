@@ -3,6 +3,7 @@ import { createWriteStream, mkdirSync, writeFileSync, readFileSync, openSync, cl
 import { resolve, relative, isAbsolute, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { trackOwnedProcesses } from './verification-processes.mjs';
 import { stages as fullStages, stageEnvironment } from './verify-full.mjs';
 import { sourceIdentity, summarizePlaywright, summarizeVitest, summarizeContent, slowest, compareReports, readReport } from './verification-report.mjs';
 
@@ -53,7 +54,10 @@ export function stageCommand(stage, directory, inherited = process.env, npmPath 
   }
   const kind = stage.browser ? 'playwright' : ['units', 'build-integration'].includes(stage.id) ? 'vitest'
     : stage.id === 'performance' ? 'performance' : null;
-  if (kind === 'playwright') args.push('--reporter=line,json', '--output', resolve(directory, stage.id + '-artifacts'));
+  if (kind === 'playwright') {
+    args.push('--reporter=line,json,./scripts/verification-playwright-reporter.mjs', '--output', resolve(directory, stage.id + '-artifacts'));
+    env.VERIFICATION_PLAYWRIGHT_EVENTS = resolve(directory, stage.id + '-cases.jsonl');
+  }
   if (kind === 'vitest') {
     args.push('--', '--reporter=default', '--reporter=json', '--reporter=./scripts/verification-vitest-reporter.mjs', `--outputFile.json=${rawPath}`);
     env.VERIFICATION_VITEST_METADATA = resolve(directory, stage.id + '-metadata.json');
@@ -73,26 +77,46 @@ export function selectStages(names) {
 export async function runCommand(command, args, { cwd, env, logPath, timeoutMs = 3_600_000, signal } = {}) {
   const started = performance.now();
   const log = createWriteStream(logPath, { flags: 'wx' });
-  return await new Promise((resolveResult, reject) => {
-    let child, error = null, timedOut = false, killTimer;
-    const terminate = () => {
-      if (!child?.pid) return;
-      const kill = sig => { try { if (process.platform === 'win32') child.kill(sig); else process.kill(-child.pid, sig); } catch {} };
-      kill('SIGTERM'); killTimer = setTimeout(()=>kill('SIGKILL'), 3000);
-    };
-    log.on('error', e => { error = e.message; terminate(); reject(e); });
-    child = spawn(command, args, { cwd, env, shell: false, detached: process.platform !== 'win32', stdio: ['ignore','pipe','pipe'] });
-    child.stdout.pipe(log, { end: false }); child.stderr.pipe(log, { end: false });
-    child.on('error', e => { error = e.message; });
-    const timer = setTimeout(()=>{timedOut=true;terminate();},timeoutMs);
-    signal?.addEventListener('abort', terminate, { once: true });
-    if (signal?.aborted) terminate();
-    child.on('close', (exitCode, exitSignal) => {
-      clearTimeout(timer); clearTimeout(killTimer); signal?.removeEventListener('abort',terminate);
-      log.end(()=>resolveResult({ wallMs: performance.now()-started, exitCode, signal: exitSignal,
-        timedOut, interrupted: signal?.aborted ?? false, error }));
-    });
+  let error = null, timedOut = false;
+  const child = spawn(command, args, { cwd, env, shell: false, detached: process.platform !== 'win32', stdio: ['ignore','pipe','pipe'] });
+  const owned = trackOwnedProcesses(child);
+  const terminate = () => { void owned.stop(); };
+  log.on('error', e => { error = e.message; terminate(); });
+  child.stdout.pipe(log, { end: false }); child.stderr.pipe(log, { end: false });
+  child.on('error', e => { error = e.message; });
+  // Start cleanup on exit, not close: detached descendants may still hold pipes.
+  child.once('exit', terminate);
+  const timer = setTimeout(() => { timedOut = true; terminate(); }, timeoutMs);
+  signal?.addEventListener('abort', terminate, { once: true });
+  if (signal?.aborted) terminate();
+  const closed = new Promise(resolve => child.once('close', (exitCode, exitSignal) => resolve({ exitCode, exitSignal })));
+  // Cleanup can outlive launcher close. Never cancel its SIGKILL escalation.
+  const exited = new Promise(resolve => {
+    child.once('exit', resolve);
+    child.once('error', resolve);
   });
+  await exited;
+  clearTimeout(timer);
+  const cleanup = await owned.stop();
+  if (cleanup.complete === false) error ??= 'Owned process cleanup failed; capture must stop';
+  // A failed cleanup must not leave the receipt waiting forever on inherited pipes.
+  if (cleanup.complete === false) { child.stdout.destroy(); child.stderr.destroy(); }
+  let drainTimer;
+  const drained = await Promise.race([closed, new Promise(resolve => {
+    drainTimer = setTimeout(() => resolve(null), 1000);
+  })]);
+  clearTimeout(drainTimer);
+  if (!drained) {
+    error ??= 'Subprocess pipes remained open after owned process cleanup';
+    cleanup.complete = false;
+    cleanup.errors.push(error);
+    child.stdout.destroy(); child.stderr.destroy();
+  }
+  const { exitCode, exitSignal } = drained ?? await closed;
+  signal?.removeEventListener('abort', terminate);
+  if (!log.destroyed) await new Promise(resolve => log.end(resolve));
+  return { wallMs: performance.now() - started, exitCode, signal: exitSignal,
+    timedOut, interrupted: signal?.aborted ?? false, error, cleanup };
 }
 
 function options(args) {
@@ -175,8 +199,19 @@ async function capture(args) {
       console.log(`[timings] ${stage.id}: starting; log ${relative(root,resolve(out,stage.id+'.log'))}`);
       const result = await runCommand(command, args, { cwd: root, env,
         logPath: resolve(out, stage.id + '.log'), timeoutMs: opts.timeoutMs, signal: abort.signal });
+      if (result.cleanup.complete === false) abort.abort(); // Do not contaminate later stages.
       const entry = { command: [command, ...args], ...result,
         status: result.exitCode === 0 && !result.signal && !result.timedOut && !result.interrupted && !result.error ? 'passed' : 'failed' };
+      if (kind === 'playwright') {
+        try {
+          const events = readFileSync(env.VERIFICATION_PLAYWRIGHT_EVENTS, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+          const finished = events.filter(event => event.event === 'testEnd');
+          entry.caseCheckpoint = { path: relative(out, env.VERIFICATION_PLAYWRIGHT_EVENTS),
+            planned: events.find(event => event.event === 'begin')?.planned ?? null,
+            completedAttempts: finished.length, completedCases: new Set(finished.map(event => event.id)).size,
+            runnerEnded: events.some(event => event.event === 'end') };
+        } catch (error) { entry.checkpointError = error.message; }
+      }
       if (kind) {
         try {
           const raw = readReport(rawPath);

@@ -1,0 +1,214 @@
+{
+  "head": "63335b745d0b8366a603d1ed54b6019cc9e4e8a8",
+  "base": "0ca15c2f076f0f982cf05c18a85ee8613c641d24",
+  "node": "v24.19.0",
+  "local": {
+    "processTimingReporterContracts": {
+      "passed": 18,
+      "failed": 0
+    },
+    "orchestrationContracts": {
+      "passed": 10,
+      "failed": 0
+    },
+    "baseDetachedServerReproduction": {
+      "failed": 3,
+      "reason": "Owned detached server retained the port after timeout, abort and normal launcher exit."
+    },
+    "realBrowser": "not run locally; Chromium download invalid ZIP, WebKit missing OS libraries"
+  },
+  "hashes": {
+    "scripts/verification-processes.mjs": "8fe0686ab4c1c552b2f58fb831e6c93620f0162a89f154aeef34140c6cfe8440",
+    "scripts/verification-timings.mjs": "3a526872af65f8b0eef4999678552282f67208c7ffebc7f5f4aab19e288408de",
+    "scripts/verification-playwright-reporter.mjs": "a70fac946463603873943972bf0339767a31d944bb08db23f110525c9004a767",
+    "tests/tooling/verification-processes.test.mjs": "d37b14f4a725889d0ff115f668f2619cb784903ec5852ddf58ac2bdc1868f3e1",
+    "tests/tooling/verification-reporters.test.mjs": "0402af066a4d3471530e81400cbb1b94e69d984f29be263e2f4fcde05294d1ef",
+    "tests/tooling/verification-browser.test.mjs": "3c83450857f920a0e13fe84947d188df25ff056a4dfa413207ba8d93eb9a806e",
+    "scripts/verify-full.mjs": "15e2b9420393f71038434c73a0786bca3c952642ec09152da60838241e2cd027",
+    "package.json": "afec32027ce434b5d3d100d2c3a7b4927fef21e8d33324e84afaa1fadfba66a4",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+    "playwright.config.ts": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648"
+  },
+  "qualifiedHead": "97a369f09bc7e7229969719fb8bf1e9408c2cf6f",
+  "testedMerge": "e091edd8292e053cd08c933a2346e0ae86a1a456",
+  "hosted": {
+    "run": 39713862333,
+    "job": 119611322693,
+    "conclusion": "success",
+    "platform": "Ubuntu 24.04, Linux x64",
+    "node": "v24.22.0",
+    "playwright": "1.63.0",
+    "installedChromium": "153.0.8010.12",
+    "toolingContractsPassed": 18,
+    "orchestrationContractsPassed": 10,
+    "contentCasesPassed": 221,
+    "bothTypeScopesAndBuild": "passed",
+    "browserRecoveryContractsPassed": 2,
+    "completedBrowserSmokes": 4,
+    "deliberatelyInterruptedCases": 2,
+    "artifact": 12397374537,
+    "artifactSha256": "b180981e38b6c7eac90d8e17933cc7808e266a0c4c4aff537f94e04734db39ce",
+    "expiresAt": "2026-11-21T02:55:52Z",
+    "install": "npm ci --ignore-scripts --no-audit --no-fund; explicit Playwright Chromium/OS installation",
+    "modes": {
+      "preview": {
+        "interrupted": {
+          "wallMs": 20139.163838999997,
+          "exitCode": null,
+          "signal": "SIGTERM",
+          "timedOut": true,
+          "interrupted": false,
+          "error": null,
+          "cleanup": {
+            "mode": "linux-proc-ancestry",
+            "sampleIntervalMs": 100,
+            "complete": true,
+            "survivors": [],
+            "errors": [],
+            "escalated": []
+          },
+          "observedProcesses": 19,
+          "caseEvents": [
+            {
+              "event": "begin"
+            },
+            {
+              "event": "testBegin"
+            },
+            {
+              "event": "testEnd",
+              "status": "passed"
+            },
+            {
+              "event": "testBegin"
+            }
+          ]
+        },
+        "recovered": {
+          "wallMs": 3580.264414000001,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "error": null,
+          "cleanup": {
+            "mode": "linux-proc-ancestry",
+            "sampleIntervalMs": 100,
+            "complete": true,
+            "survivors": [],
+            "errors": [],
+            "escalated": []
+          },
+          "observedProcesses": 16,
+          "caseEvents": [
+            {
+              "event": "begin"
+            },
+            {
+              "event": "testBegin"
+            },
+            {
+              "event": "testEnd",
+              "status": "passed"
+            },
+            {
+              "event": "end",
+              "status": "passed"
+            }
+          ]
+        },
+        "recoveredFinalStats": {
+          "startTime": "2026-10-22T02:55:26.048Z",
+          "duration": 3000.7290000000003,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "dev": {
+        "interrupted": {
+          "wallMs": 20129.342107,
+          "exitCode": null,
+          "signal": "SIGTERM",
+          "timedOut": true,
+          "interrupted": false,
+          "error": null,
+          "cleanup": {
+            "mode": "linux-proc-ancestry",
+            "sampleIntervalMs": 100,
+            "complete": true,
+            "survivors": [],
+            "errors": [],
+            "escalated": []
+          },
+          "observedProcesses": 19,
+          "caseEvents": [
+            {
+              "event": "begin"
+            },
+            {
+              "event": "testBegin"
+            },
+            {
+              "event": "testEnd",
+              "status": "passed"
+            },
+            {
+              "event": "testBegin"
+            }
+          ]
+        },
+        "recovered": {
+          "wallMs": 3116.8163859999986,
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "error": null,
+          "cleanup": {
+            "mode": "linux-proc-ancestry",
+            "sampleIntervalMs": 100,
+            "complete": true,
+            "survivors": [],
+            "errors": [],
+            "escalated": []
+          },
+          "observedProcesses": 16,
+          "caseEvents": [
+            {
+              "event": "begin"
+            },
+            {
+              "event": "testBegin"
+            },
+            {
+              "event": "testEnd",
+              "status": "passed"
+            },
+            {
+              "event": "end",
+              "status": "passed"
+            }
+          ]
+        },
+        "recoveredFinalStats": {
+          "startTime": "2026-10-22T02:55:49.740Z",
+          "duration": 2562.605,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    }
+  },
+  "superseded": {
+    "run": 39713266531,
+    "head": "63335b745d0b8366a603d1ed54b6019cc9e4e8a8",
+    "conclusion": "cancelled",
+    "note": "Completed logs retain all tooling/build and both recovery contract passes before supersession; not claimed as a successful completed workflow. npm ci took about five minutes; exact install-delay cause unproved.",
+    "artifact": 12398122456
+  },
+  "reuse": "Final evidence-only documentation changes preserve the tested process/reporter/browser-contract/package/config hashes. No full browser matrix, performance collector, WebKit, self-hosted or release-CLI qualification is claimed."
+}

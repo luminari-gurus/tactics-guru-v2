@@ -2,7 +2,7 @@
 
 ## Context
 
-See [the continuation plan](../../../docs/ongoing-projects/plan.md) for the audited source and exact accepted policy. DungeonSession already supplies one catalog to BattleSession, and storage already persists candidates before publishing movement/travel. Prior format identities must remain byte compatible.
+See [the continuation plan](../../../docs/ongoing-projects/issue-159-biome-encounters-plan.md) for the audited source and exact accepted policy. DungeonSession already supplies one catalog to BattleSession, and storage already persists candidates before publishing movement/travel. Prior format identities must remain byte compatible.
 
 ## Goals / Non-Goals
 

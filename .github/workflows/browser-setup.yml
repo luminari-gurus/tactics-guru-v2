@@ -1,0 +1,36 @@
+name: Browser setup smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-exclusive
+  cancel-in-progress: false
+jobs:
+  browser-setup:
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      # OS libraries are provisioned once by the runner administrator.
+      - run: npm run setup:browsers
+      - run: npm run check:browsers
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
+      - run: npm run build
+      - run: npm run test:browser-smoke -- --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-setup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            verification-receipts/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore

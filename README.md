@@ -61,8 +61,10 @@ For repeatable per-stage build/test timings and before/after comparisons, see
 [verification timing baselines](docs/verification-timings.md).
 
 ```sh
-npx playwright install chromium
+npm run setup:browsers # Linux with missing OS libraries: npm run setup:browsers:linux
+npm run check:browsers
 npm run build
+npm run test:browser-smoke
 npm test
 ```
 
@@ -73,6 +75,8 @@ If browser downloads are unavailable, an existing compatible Chromium can be sel
 ```sh
 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
 ```
+
+See [browser setup and focused diagnostics](docs/browser-testing.md) for reproducible installation, launch receipts, exact-base comparison and the CI smoke check.
 
 ## Layout
 

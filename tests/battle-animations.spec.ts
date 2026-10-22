@@ -443,7 +443,9 @@ test('active bob: targets, cancel, inspection, camera and live reduced motion pr
   await page.emulateMedia({reducedMotion: 'reduce'});
   // Chromium delivers media-query changes on its native rendering schedule.
   await expect.poll(async () => { await page.clock.runFor(64); return (await bobFrame(page)).actor.bobOffset; }).toBe(0);
-  await page.clock.runFor(2000);
+  // Bobbing is disabled: advance the full idle interval without rendering 125
+  // inactive frames. Keep runFor for every window that samples actual motion.
+  await page.clock.fastForward(2000);
   expect((await bobFrame(page)).actor.bobOffset).toBe(0);
   await page.screenshot({path: info.outputPath('active-reduced-motion.png')});
   await page.emulateMedia({reducedMotion: 'no-preference'});
@@ -469,14 +471,21 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   await expect.poll(async () => { await page.clock.runFor(100); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-0.2);
   const previousId = (await report(page)).activeId;
   await press(page, '#battle-next');
-  await page.clock.runFor(3000); await ready(page);
+  // Settle on live frames without granting more than the original 3s of
+  // animation time. Keep this bound local; other readiness checks are unchanged.
+  const actorTransitionStarted = await page.evaluate(() => Date.now());
+  await page.clock.resume();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player', {timeout: 3000});
+  expect(await page.evaluate(() => Date.now()) - actorTransitionStarted).toBeLessThanOrEqual(3000);
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   expect((await bobFrame(page)).frame.activeId).not.toBe(previousId);
   const saved = await stored(page), state = (await readSession(page)).state;
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', {configurable: true, get: () => true});
     document.dispatchEvent(new Event('visibilitychange'));
   });
-  await page.clock.runFor(2000);
+  // Hidden-page bobbing is disabled; only elapsed time and invariance matter.
+  await page.clock.fastForward(2000);
   expect((await bobFrame(page)).actor.bobOffset).toBe(0);
   expect((await readSession(page)).state).toEqual(state); expect(await stored(page)).toEqual(saved);
   await page.evaluate(() => { delete (document as unknown as {hidden?: boolean}).hidden; document.dispatchEvent(new Event('visibilitychange')); });
