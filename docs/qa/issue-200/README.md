@@ -1,6 +1,24 @@
 # Issue #200: verification timing tooling
 
-## Current preparation refresh
+## Latest: approved GitHub-hosted attempt
+
+The caller approved hosted capacity now, with self-hosted migration later.
+[Run 39700595665](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665)
+at `73d34dba1620174837cf15a93812d393abe690aa` retained an **81.56-minute failed attempt**.
+All 909 unit/build cases, both type scopes, ordinary bundles and 72 telemetry cases
+passed. Chromium hit its one-hour process limit after reaching test 257/687;
+leftover port 4173 invalidated eight later zero-test launches. Performance preview
+startup also failed. This is not a complete/passing full-regression baseline.
+
+[Full findings and stage timings](hosted-baseline.md) / [machine-readable summary](hosted-baseline.json)
+/ [30-day raw artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665/artifacts/12396082054).
+Follow-ups: **#219 (P1)** owned descendant cleanup, **#220 (P2)** collector preview
+readiness, **#221 (P1)** four observed desktop board/active-bob timeouts.
+PR #209 remains draft; #200 remains open. Automatic PR-triggered baseline repeats
+are retired; future captures are deliberate/manual. Historical evidence below is
+retained. No code speedup, complete browser acceptance, merge or deployment claimed.
+
+## Previous preparation refresh
 
 Integrated main `251db945569e3f1ac957caa091e9fa9eec11a034` (#215 / #217), retaining
 all merged verification policy, explicit fixtures, build deduplication and bounded

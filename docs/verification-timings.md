@@ -9,12 +9,21 @@ on 2026-10-21; migration to self-hosted capacity follows later.
 ## Capture on the qualified host
 
 The caller explicitly approved GitHub-hosted capacity to unblock #200. The
-branch-scoped `issue-200-hosted-baseline.yml` installs locked dependencies,
+`issue-200-hosted-baseline.yml` installs locked dependencies,
 Chromium/WebKit and OS libraries, verifies reporters, runs one sequential full
 capture and retains all receipts for 30 days even when tests fail. Its progress
 watchers do not rerun stages; a 110-minute outer limit leaves time for artifact
-upload before the 120-minute job limit. This is a named interim host class, not a
-claim that the future self-hosted machine has been qualified.
+upload before the 120-minute job limit. The initial PR-triggered run is retained as an 81.56-minute failed attempt;
+see [the capture findings](qa/issue-200/hosted-baseline.md). Chromium was cut off
+and a leaked server invalidated later suites; this is not complete browser
+coverage. Fix #219 and disposition #220/#221 before treating a later run as an
+accepted baseline. The workflow is now manual-only to prevent ordinary PR updates
+from repeating the expensive capture. Once registered on main, dispatch it
+explicitly from GitHub Actions on the permitted trusted ref. Full checkout history
+avoids repeated shallow-base metadata fetches.
+
+This is a named interim host class, not a claim that the future self-hosted machine
+has been qualified.
 
 Brian will provision that runner later. Qualify its actual service account under
 #207 / PR #210 before collecting the next baseline there. Record the changed host
