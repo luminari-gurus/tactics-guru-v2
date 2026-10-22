@@ -1,12 +1,14 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: bounded bob test repair implemented; three-profile qualification in progress. Draft PR: [#223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and qualification complete; preparing review-ready delivery in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
 
 ## Current handoff
 
-OpenSpec change `issue-221-desktop-timeouts`: 1/4 tasks complete. Original artifact recovered (ZIP SHA-256 `748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b`). Literal-base run `39750405032` and diagnostic run `39750995870` each pass hover/camera/first-bob and reproduce the lifecycle-bob timeout. Measured dominant work is long controlled-clock rendering, including frames where bobbing is disabled. Repair changes only the two bob test bodies; preserves every assertion/sample and all operation limits. The board cases are unchanged and explicitly dispositioned as non-reproduced on the qualified host. See [QA evidence](../qa/issue-221-desktop-timeouts.md).
+Original artifact recovered (ZIP SHA-256 `748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b`). Literal-base run `39750405032` and diagnostic run `39750995870` each pass hover/camera/first-bob and reproduce the lifecycle-bob timeout. Measured dominant work is long controlled-clock rendering, including frames where bobbing is disabled. Repair changes only the two bob test bodies, preserving every assertion/sample and all operation limits. The board cases are unchanged and explicitly dispositioned as non-reproduced on the qualified host, including the immediately preceding workload. Their original hosted cause remains unproved. See [QA evidence](../qa/issue-221-desktop-timeouts.md) and [source-bound receipts](../qa/issue-221/evidence.json).
 
-Next: inspect the candidate self-hosted run on PR #223 (12 reported cases + 12 neighboring cases across desktop/portrait/landscape); preserve failures, compare step timings to the diagnostic base, resolve any failures, freeze source/build/report identities, finish OpenSpec tasks, remove temporary diagnostic reporting and mark the PR review-ready. Do not rerun an hour-long baseline or merge/deploy.
+Qualification at `34c86fc8051ce02b30a3dc88910e692edb120fcb`: self-hosted run `39751877999` passes the build (221 content cases and both type scopes), all 12 reported desktop/portrait/landscape cases, and 12 neighboring cases. Probe `39752731873` at `85f1fe0` passes the immediate predecessor + hover + camera, 3/3. **27 checks pass, zero skips/retries**. Desktop lifecycle bob now takes 18.152s (base timed out at 30.147s); first bob takes 16.301s. Shared/runtime/test inputs are frozen; later workflow/docs changes reuse that explicitly identified evidence.
+
+Next: finish review-ready publication and OpenSpec task 3.1, then review/integration is the only remaining handoff. Temporary step reporting and PR/label triggers have been removed; the focused workflow is manual-dispatch-only, with unchanged runner/concurrency, selection, workers, retries and timeouts. No automatic rerun is needed for documentation progress. Do not rerun an hour-long baseline or merge/deploy. #199/#200 remain incomplete; these focused results do not replace their interrupted capture.
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
@@ -37,7 +39,7 @@ Native dependency data recorded only #155 blocked by already-closed #154. Other 
 
 ## Source findings and uncertainties
 
-The original [failed capture](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665) tested `73d34dba1620174837cf15a93812d393abe690aa` on Ubuntu 24.04, Node 24.21.0 and Playwright 1.63.0. Its [retained artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665/artifacts/12396082054) is reported with 30-day retention. Recover it and verify its provenance during implementation; planning has not downloaded or independently revalidated its raw traces/logs. The issue/PR reports retain four 30-second case failures, a one-hour Chromium cutoff at test-start marker 257/687, and unknown later outcomes. None is a clean regression result.
+The original [failed capture](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665) tested `73d34dba1620174837cf15a93812d393abe690aa` on Ubuntu 24.04, Node 24.21.0 and Playwright 1.63.0. Its [retained artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665/artifacts/12396082054) has 30-day retention. Implementation recovered it and verified source provenance and the raw failure log; see the current handoff and QA report. It retains four 30-second case failures, a one-hour Chromium cutoff at test-start marker 257/687, and unknown later outcomes. It remains an incomplete regression result.
 
 Direct comparison of that capture commit with the selected base shows **no differences in `src/`, `tests/helpers/`, the two affected test files, `playwright.config.ts` or `package-lock.json`**. Package scripts and other verification work have changed. This establishes relevant source equality, not matching host performance, a new reproduction or root-cause attribution.
 
@@ -64,7 +66,7 @@ Do not change combat rules, seeds, content, save formats, action UX (#187), stat
 
 ## Files
 
-Planning changes are only this file and the preserved previous plan. Expected implementation files are the affected cases/local helpers in `tests/battle-board.spec.ts` and `tests/battle-animations.spec.ts`, plus `docs/qa/issue-221-desktop-timeouts.md` and compact source-bound evidence as needed. Extend existing units only for a demonstrated uncovered behavior.
+Actual implementation changes only the two bob case bodies in `tests/battle-animations.spec.ts`; `tests/battle-board.spec.ts` is unchanged. Supporting files are the focused manual self-hosted workflow, this handoff, QA report/compact source-bound evidence, and the caller-requested OpenSpec proposal/design/tasks. The prior plan remains preserved. No new unit infrastructure or product change was needed.
 
 `src/phaser/BattleScene.ts`, `src/phaser/BoardRenderer.ts` or `tests/helpers/battlePolicy.ts` are **conditional**: touch them only after reproduction identifies their defect and enumerate their callers before qualification. `src/app/BattleSession.ts` is an authority boundary to preserve, not a planned rewrite. A task-specific self-hosted verification workflow is justified only if necessary to execute this focused proof on approved capacity; reuse an existing safe dispatch route when available. No package/lockfile/global config/matrix change is currently planned.
 

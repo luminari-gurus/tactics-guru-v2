@@ -20,7 +20,7 @@ Production build passed. Four-case discovery passed; untraced execution used pre
 
 Raw receipt download: ignored `tmp/issue-221/baseline/issue-221-39750405032-1/`. A separate diagnostic invocation adds a temporary reporter of existing API/assertion steps; its timings are identified separately. Initial run `39750301292` failed YAML parsing before any job/case execution, corrected in `cbe576e`.
 
-No repair or passing acceptance is claimed yet. See `docs/ongoing-projects/plan.md` and OpenSpec `issue-221-desktop-timeouts` for remaining tasks.
+This failed base result remains distinct from the passing repair below.
 
 ## Measured diagnosis and bounded repair
 
@@ -32,6 +32,33 @@ No repair or passing acceptance is claimed yet. See `docs/ongoing-projects/plan.
 
 Repair changes only the two bob test bodies. Fast-forward the same 2,000ms reduced-motion/hidden intervals after those modes have disabled bobbing, keeping their final zero-offset and exact state/save assertions. Run the real actor transition on live frames until the existing player-readiness check succeeds, then pause again before controlled sampling. No product speed, deadline, expectation timeout, fixture, assertion or sample count changes.
 
-Assertion mapping: all `bobFrame` sprite/health/anchor checks are unchanged; all 16 initial samples and both five-sample restart loops remain. Target/cancel/inspection/camera and both live media changes remain; presentation at 288ms and completion at 800ms remain; actor identity, hidden-page state/save invariance, restored bobbing, replacement seed, object counts and browser-error checks remain. Hover/camera tests are byte-identical. Their original hosted failures remain retained as host-specific observations, with two qualified-host non-reproductions rather than an invented code repair.
+Assertion mapping: all `bobFrame` sprite/health/anchor checks are unchanged; all 16 initial samples and both five-sample restart loops remain. Target/cancel/inspection/camera and both live media changes remain; presentation at 288ms and completion at 800ms remain; actor identity, hidden-page state/save invariance, restored bobbing, replacement seed, object counts and browser-error checks remain. Hover/camera tests are byte-identical. Their original hosted failures remain retained; their cause on the original host/workload is unproved. Qualified-host non-reproductions do not establish a runtime repair.
 
 Consumer scope: three Chromium projects execute these local tests. Runtime, shared helpers, configs and lockfile are unchanged. Neighboring target/cancel, camera/rotation, canonical-unit/restart and initial-reduced-motion cases cover the adjacent paths. No WebKit/route/full-baseline rerun is triggered by a case-local clock edit; no new WebKit acceptance claim is made.
+
+## Final qualification
+
+[Run 39751877999](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39751877999) executed candidate `34c86fc8051ce02b30a3dc88910e692edb120fcb` on the same qualified runner/browser:
+
+- `npm ci --ignore-scripts --no-audit --no-fund` and `npm run build` passed: 221 content cases, both TypeScript scopes and the production Vite bundle.
+- Exact four-case discovery selected **12 cases**, four per desktop/Pixel 7 portrait/Pixel 7 landscape project. Execution passed **12/12**, 162.497s including setup, one worker, zero retries/skips, trace off. The temporary diagnostic reporter was also enabled for comparison.
+- The four neighboring target/cancel, initial-reduced-motion, authored camera/rotation and canonical-unit/restart cases passed **12/12** across those same profiles, 120.987s including setup. This invocation uses ordinary list/JSON reporting.
+- Desktop first bob: **16.301s** vs diagnostic base **21.766s**. Its disabled 2,000ms interval now costs **189ms**, vs **6,882ms**. Lifecycle bob: **18.152s** vs base **30.147s timeout**; its hidden interval costs **4ms**, vs **5,674ms**. These are test-driver timing observations, not a product performance claim.
+- Screenshots from desktop and both mobile orientations were inspected: board, hero/health anchors, readable HUD and unobstructed playfield are retained. Mobile screenshots are emulation, not physical-device evidence.
+
+[Preceding-workload run 39752731873](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39752731873) at `85f1fe08c76ab4e203164c050526f21138d3dbfb` tests the immediately preceding `layout clamping resets overlap history when the actual camera changes`, then the original hover and camera cases: **3/3 pass**, 48.3s, zero skips/retries, untraced. Hover takes 17.0s, camera 19.7s. This is the smallest evidenced preceding workload; the original board failures still do not reproduce. It does not claim reproduction of the one-hour hosted workload or prove its host/resource cause.
+
+The two final runs provide **27 passing checks**, not a complete regression matrix. Commands and selectors are retained in the workflow at the tested commits; the final manual workflow selects the same 12 reported and 12 neighboring cases. No blanket retry, timeout increase, forced click, assertion deletion or test split was introduced.
+
+## Source binding, artifacts and delivery
+
+[Machine-readable receipts](issue-221/evidence.json) retain per-case results, host/browser metadata, relevant input hashes, report/log hashes, aggregate clock timings and emitted-build receipt hashes. API ZIP digests are labeled separately from independently hashed local files. Shared retained artifacts (30 days, through 2026-11-21):
+
+- [Literal base](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39750405032/artifacts/12413277869).
+- [Diagnostic base](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39750995870/artifacts/12413003662).
+- [12 reported + 12 neighboring cases, build hashes and screenshots](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39751877999/artifacts/12414715905).
+- [Preceding-workload probe](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39752731873/artifacts/12414118130).
+
+Later delivery changes remove temporary diagnostic reporting and the PR/label triggers, restore the same 24-case selection under manual dispatch, and update documentation/OpenSpec progress. Candidate application, tests, helpers, configs, dependencies, assets and build inputs remain unchanged; final Git-blob hashes are checked against the candidate receipt. The passing run executed `34c86fc`, not the later evidence commits. Existing bundle-size and future Vite-native-loader warnings remain; no new warning or product-budget qualification is claimed.
+
+Workflow setup failures `39750301292` and `39752480564` executed no browser cases; both YAML defects were corrected before their respective useful runs. The two failed literal-base executions and original interrupted hosted baseline remain failures. #199/#200's full baseline, missing coverage and unrelated follow-ups remain open. No merge, production deployment or physical-device run was performed; pushes triggered the repository's ordinary Cloudflare branch previews.

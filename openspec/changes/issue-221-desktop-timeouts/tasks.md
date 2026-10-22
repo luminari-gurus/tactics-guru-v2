@@ -6,8 +6,8 @@
 
 ## 2. Bounded repairs
 
-- [ ] 2.1 Repair the demonstrated board hover/restart and camera causes, preserving every original obligation; verify before/after results and record assertion mapping and consumer scope.
-- [ ] 2.2 Repair the demonstrated active-bob causes, preserving anchors, state/saves, media, presentation, actor and restart obligations; verify measured causal improvement and retain screenshots.
+- [x] 2.1 Repair the demonstrated board hover/restart and camera causes, preserving every original obligation; verify before/after results and record assertion mapping and consumer scope.
+- [x] 2.2 Repair the demonstrated active-bob causes, preserving anchors, state/saves, media, presentation, actor and restart obligations; verify measured causal improvement and retain screenshots.
 
 ## 3. Integration and delivery
 
