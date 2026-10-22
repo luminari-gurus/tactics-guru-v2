@@ -1,11 +1,8 @@
 name: Issue 221 focused timeout verification
 on:
+  workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - '.github/workflows/issue-221-verification.yml'
-      - 'tests/battle-board.spec.ts'
-      - 'tests/battle-animations.spec.ts'
+    types: [labeled]
 permissions:
   contents: read
 concurrency:
@@ -13,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   focused:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'branch/issue-221-desktop-timeouts'
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.number == 223 && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'branch/issue-221-desktop-timeouts' && github.event.label.name == 'issue-221-probe')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 15
     defaults:
@@ -22,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -50,38 +47,41 @@ jobs:
       - name: Record served build hashes
         run: |
           find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue-221/build-sha256.txt
-      - name: Discover four cases across the three Chromium profiles
+      - name: Discover board workload probe
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
-      - name: Record temporary diagnostic step timings
-        run: |
-          cat > verification-receipts/issue-221/steps.cjs <<'JS'
-          const fs = require('node:fs');
-          module.exports = class {
-            tests = [];
-            active = new Map();
-            onTestBegin(test) {
-              const row = {title:test.title,start:Date.now(),steps:[]};
-              this.tests.push(row); this.active.set(test.id,row);
-            }
-            onStepEnd(test,result,step) {
-              this.active.get(test.id).steps.push({title:step.title,category:step.category,duration:step.duration,start:step.startTime.getTime(),location:step.location});
-            }
-            onTestEnd(test,result) { Object.assign(this.active.get(test.id),{duration:result.duration,status:result.status}); }
-            onEnd() { fs.writeFileSync('verification-receipts/issue-221/steps.json',JSON.stringify(this.tests,null,2)); }
-          };
-          JS
-      - name: Qualify repaired cases across Chromium profiles
+          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands) | tee verification-receipts/issue-221/discovery.log
+      - name: Investigate the immediately preceding board workload
         env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/candidate.json
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/probe.json
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json,./verification-receipts/issue-221/steps.cjs --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/candidate.log
-      - name: Qualify neighboring camera, target, reduced-motion and restart cases
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)
+        if: always()
+        with:
+          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue-221/
+          retention-days: 30
+          if-no-files-found: error
+ --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/probe 2>&1 | tee verification-receipts/issue-221/probe.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue-221/
+          retention-days: 30
+          if-no-files-found: error
+ --list | tee verification-receipts/issue-221/discovery.log
+      - name: Investigate the immediately preceding board workload
         env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/neighbors.json
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/probe.json
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands|active bob: initial reduced motion keeps sprite and static actor marker anchored|authored camera keeps zoom bounds and refits on real orientation changes|default authored board renders canonical units, highlights and stable restarts)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/neighbors 2>&1 | tee verification-receipts/issue-221/neighbors.log
+          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)
+        if: always()
+        with:
+          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue-221/
+          retention-days: 30
+          if-no-files-found: error
+ --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/probe 2>&1 | tee verification-receipts/issue-221/probe.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
