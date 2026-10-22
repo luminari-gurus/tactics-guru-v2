@@ -1,6 +1,6 @@
 # Issue #220 preview readiness
 
-Date: 2026-10-22 (Asia/Jerusalem). Implementation and focused verification complete; isolated production capture pending. OpenSpec: `issue-220-preview-readiness`.
+Date: 2026-10-22 (Asia/Jerusalem). Implementation, focused verification and one isolated production capture complete. [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225) is ready for review. Collection passed; unchanged performance budgets failed for two samples. OpenSpec: `issue-220-preview-readiness`.
 
 ## Reproduction and retained failure
 
@@ -29,6 +29,25 @@ Remote mode, including explicit loopback origins, creates/stops no process and i
 
 ## Capture and handoff
 
-Pending: freeze implementation; qualify otherwise idle local Chromium capacity; rebuild the production bundle from clean HEAD; run the default collector once with FIT_URL unset; evaluate to a distinct output file; retain raw results, source/build/hash identities, host/cache/load conditions and exit status. Do not resample merely to obtain passing budgets. Publish compact receipts here and retain raw data at a retrievable location.
+Frozen implementation/build: **`33f3595be96dd12a4cfc7fdb3e443352a5f4b30d`, clean**, with the same clean commit served in every sample. `npm run build:bundle` rebaked that identity using the unchanged content/type prerequisites already validated by the ordinary build. Final documentation/receipt commits change none of the 16 recorded collector/test/build inputs; their evidence is reused without another build or capture.
+
+[Qualification receipt](issue-220/qualification.json): Windows 10.0.26300 x64, Node 24.19.0, Intel Core Ultra 9 285H, 16 reported CPUs, 68.3 GB RAM, Chromium **153.0.8010.12**, lockfile-matching Playwright 1.63.0. The collector uses its normal headless launch. No concurrent Vite/Playwright/measure-fit job was observed; qualification and capture ran sequentially. Existing desktop apps remained open, browser caches were warm and a one-second preflight CPU sample was **17.0% busy**. These are explicit background-load limits, not a controlled cross-host baseline or speedup comparison.
+
+The actual collector CLI with a deliberately nonexistent browser executable failed **exit 1**, wrote no performance file and released port 4174 before returning: [launch-failure receipt](issue-220/launch-failure.json), [raw failure](issue-220/launch-failure.log.gz). This proves the integrated browser-launch failure boundary in addition to callback-level contracts.
+
+Exactly one default production capture ran from **17:09:27 to 17:10:10 UTC** (20:09:27–20:10:10 Asia/Jerusalem), with FIT_URL unset and no executable override:
+
+```sh
+npm run measure:fit -- tmp/issue-220/performance.json
+node --experimental-strip-types scripts/evaluate-fit.ts tmp/issue-220/performance.json tmp/issue-220/evaluation.json
+```
+
+Collection returned **exit 0**, retained **18/18** samples (three profiles × three repetitions × cold/warm), no capture/browser failures, matching source/build identities and **zero remaining preview listeners**. [Capture exit](issue-220/capture-exit.json), [raw capture](issue-220/performance.json.gz), [raw output](issue-220/capture.log.gz).
+
+Evaluation returned **exit 1**: **zero capture failures, zero loading warnings, two budget-failing samples**. Desktop/warm/repetition 1 and portrait/warm/repetition 1 each have initial/current idle p50 **16.79999995 ms**, above the unchanged **16.7 ms** F1 limit. These four metric violations across two samples remain failures; no threshold/tolerance change or resampling was performed. [Complete evaluation](issue-220/evaluation.json.gz) and [compact provenance/violation/hash receipt](issue-220/receipts.json) retain the outcome. The source or environmental cause of these small frame overruns has not been established. They belong to #200's outstanding performance acceptance, rather than reopening preview-readiness implementation or claiming a passing baseline.
+
+Representative proof-scene screenshots were inspected at [desktop](issue-220/desktop.png), [portrait](issue-220/mobile-portrait.png) and [landscape](issue-220/mobile-landscape.png). They show the expected scene and readable profile layouts; landscape keeps its existing scrollable controls panel. These are emulated viewport/device checks, not physical testing or complete gameplay certification.
+
+The receipt manifest records SHA-256 of each uncompressed/compressed raw file, the full five-file collector source set, lockfile and other relevant inputs. Gzip streams were decompressed and checked byte-for-byte. Raw snapshots include all sample intervals, measured build, build inventory and per-file hashes. Download any `.gz` from this PR's repository tree and decompress it to recover its original JSON/log; no expiring artifact is needed for current evidence. The 62-test, first-failure, build and portable-tooling logs are retained alongside it. The historical full ZIP remains locally at `tmp/issue-220/original-failure.zip`; its bounded relevant evidence is committed here.
 
 No gameplay/browser matrix, WebKit, telemetry, complete #200 baseline, claimed speedup, physical-device certification, merge or production operation is included. The only transitive production consumer is the unchanged performance stage in `verify-full.mjs`; unmerged PR #209 remains independent.

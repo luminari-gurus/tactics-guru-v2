@@ -1,6 +1,6 @@
 # Issue #220: reliable collector-owned preview startup
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation authorized and in progress; current OpenSpec change is `issue-220-preview-readiness`.
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and required qualification complete; [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225) is ready for review. OpenSpec change: `issue-220-preview-readiness`. No merge or production operation performed.
 
 - Issue: [#220](https://github.com/luminari-gurus/tactics-guru-v2/issues/220), DevOps: repair local performance collector preview readiness [P2].
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/220#issuecomment-6346084262).
@@ -25,9 +25,13 @@ The caller has now authorized implementation, focused tests, one capture, commit
 - Reproduction and lifecycle implementation are complete. [QA reference](../qa/issue-220-preview-readiness.md) retains historical raw failure/metadata and actual normal/colored/chunked observations. Colored pinned Vite output deterministically misses the old predicate despite HTTP 200. Historical root cause remains unproved.
 - Focused final contracts: 62/62 pass (22 new + 40 existing). Production build passed 221 content cases, both type scopes and Vite; final helper/tests pass app TypeScript. Reuse unchanged content/domain evidence and bundle once after freezing HEAD to bake clean final identity. Default full-run discovery still has 19 stages; do not execute the full matrix.
 - Independent Windows orchestration assertion defect reproduced at exact main and repaired in [PR #224](https://github.com/luminari-gurus/tactics-guru-v2/pull/224), commit `39b7a7aefa5b7e96623415f955c31880d60660a8`; 10/10 portable contracts pass. This branch retains the unmodified test and its 9/10 Windows result. No collector dependency on that test-only PR.
-- Next: freeze/commit and publish the collector PR now; qualify local Chromium, build its production bundle, collect exactly one isolated default capture, retain/evaluate all results, and update this checkpoint and PR. No release tag is appropriate for this tooling repair.
+- Delivered collector implementation: `33f3595be96dd12a4cfc7fdb3e443352a5f4b30d`, pushed in [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225), targeting main. This exact clean source was bundled and served throughout the one default production capture. Subsequent commits contain only evidence/docs/OpenSpec tracking, so reuse the recorded relevant input hashes without rerunning the app.
+- Qualification: local Windows/Node 24.19.0, Chromium 153.0.8010.12, Playwright 1.63.0; desktop/portrait/landscape screenshots inspected. No concurrent browser-test/collector/Vite job; existing desktop apps and 17.0% preflight CPU load are recorded limitations. Actual CLI launch-failure injection exits 1 and leaves no result file/listener.
+- **Capture complete, acceptance distinguished:** one capture retained 18/18 default samples in 43.3 seconds, exit 0, no browser/capture failure and no preview listener left. Evaluator exit 1 preserves two F1 budget-failing samples (desktop/warm/1 and portrait/warm/1, initial/current p50 16.8 ms > unchanged 16.7 ms), zero loading warnings. Do not rerun for greener numbers or claim #200/performance acceptance. Original historical failure also remains failed.
+- Durable [receipts](../qa/issue-220/receipts.json), [raw capture](../qa/issue-220/performance.json.gz), [evaluation](../qa/issue-220/evaluation.json.gz), screenshots and compressed logs live under `docs/qa/issue-220/`. The QA reference explains decompression, commands, provenance, limitations, original failures and follow-up ownership. No release tag is appropriate for this tooling repair.
+- Remaining work is review/integration of #225 and independent #224, with merges separately authorized. #199/#200's other coverage and performance acceptance and PR #209 remain independently tracked. Do not archive the OpenSpec change or close coordinating issues during this handoff.
 
-## Selection from the complete backlog
+## Selection from the complete backlog (planning snapshot)
 
 Reviewed all **42 open issue bodies**, labels and assignees, all **three open PRs**, current remote branches, native blocked-by/Development links and repository/organization Projects V2. The GraphQL inventory reports 42 issues and `hasNextPage: false`; both project inventories report zero projects and all issue project memberships are empty. The initial review included issues without `ready for work`. Labels were not changed.
 
@@ -77,7 +81,7 @@ Physical-device access in the caller checkout is `android`; it is capability inf
 
 ## Files
 
-Expected implementation files, after authorization:
+Implementation files used, with completed proof in the QA reference:
 
 - `scripts/measure-fit.ts`: integrate owned-preview lifecycle, bound startup, retain diagnostic failures, await cleanup and extend source hashing if a helper is added.
 - `scripts/measure-fit-preview.ts` (new): one private collector lifecycle boundary, including the child entry that starts the existing Vite preview and acknowledges its own bind. Use the current config, host/strict port and production output; explicitly reject missing build output rather than relying on the CLI-only missing-dist check.
@@ -88,7 +92,7 @@ Expected implementation files, after authorization:
 
 Application code, `package.json`, lockfile, Vite config, browser projects and full/timing runners should remain unchanged. If actual reach expands, record the demonstrated cause and revise the affected-consumer proof before continuing.
 
-## Implementation sequence
+## Implementation sequence (completed; see continuation checkpoint)
 
 1. **Rebind and reproduce.** Refresh main, #220 ownership/comments, PR #209 and active captures; preserve this branch and plan. Record literal base/current inputs, Node/Vite/OS and child PID. Retain the original failure record. Run the existing pinned CLI startup with piped normal/colored output and controlled chunk splitting; record complete raw stdout/stderr, the old URL predicate and independent HTTP outcomes. Distinguish a deterministic reproduction of the fragile predicate from a proven explanation of the historical run.
 2. **Make owned readiness explicit.** Start one direct Node child for the private Vite worker. Await Vite's strict `127.0.0.1:4174` bind before its structured acknowledgement, then poll the existing local document endpoint while the child is alive. Preserve config/plugin and `dist` semantics. Use the existing nominal 10-second startup allowance as a hard monotonic total deadline, with per-request cancellation bounded by the remaining time. Spawn failure, child exit, bind failure, timeout and persistent non-OK/hanging HTTP must fail with bounded stdout/stderr tails, PID/exit/signal and last HTTP error/status. Do not inflate measurement or startup limits, shift to another port or accept a foreign listener.
@@ -98,7 +102,7 @@ Application code, `package.json`, lockfile, Vite config, browser projects and fu
 
 ## Proof and acceptance
 
-Follow [verification-policy.md](../verification-policy.md). This publication is documentation-only: validate document links/commands, the preserved plan bytes, diff and remote/issue linkage; no app build or browser rerun is required now. The following checks are planned, not executed results.
+Follow [verification-policy.md](../verification-policy.md). The initial planning publication was documentation-only. Implementation and the proof below have now executed; the QA reference and machine-readable receipts give exact results and limitations. Final evidence/docs changes reuse the unchanged collector/app/build inputs instead of repeating the capture or full application suites.
 
 Iteration contracts must prove:
 
@@ -127,4 +131,4 @@ Use qualified, otherwise idle local/self-hosted capacity for the single capture,
 
 No battle/run/dungeon gameplay, WebKit, telemetry or full regression rerun is selected for the bounded collector lifecycle change. Their implementation/config inputs are unchanged. If any of those inputs changes, or lifecycle reach becomes shared/unbounded, expand according to the policy and document why. Neither focused contracts nor a completed 18-sample capture constitutes a complete #200 baseline, a claimed speedup, physical-device proof or production acceptance.
 
-Completion of the later implementation requires an evidence-backed disposition of every #220 acceptance bullet: reproduction, bounded owned HTTP readiness and diagnostics, preserved identity/modes/strict port/limits, awaited cleanup with foreign-process survival, focused contracts and one retained isolated production capture. Preserve the 10.58-second historical failure and all subsequent failed/incomplete captures. This planning handoff completes only after branch/commit publication, assignment/comment readback and native issue-to-branch linkage are verified.
+Every #220 implementation acceptance bullet now has an evidence-backed disposition in the QA reference: reproduction, bounded owned HTTP readiness/diagnostics, preserved identity/modes/strict port/limits, awaited cleanup/foreign survival, focused contracts and one retained isolated production capture. The 10.58-second historical failure and current evaluator budget failures remain preserved. Review PRs and final Git parity are the handoff boundaries; no full-baseline or performance-budget pass is claimed.
