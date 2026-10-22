@@ -1,10 +1,6 @@
 name: Browser setup smoke
 on:
   workflow_dispatch:
-  # Temporary manual bootstrap: label this reviewed PR with qualify-<head SHA>.
-  pull_request:
-    types: [labeled]
-    branches: [main]
 permissions:
   contents: read
 concurrency:
@@ -12,29 +8,11 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
-    if: >-
-      github.repository == 'luminari-gurus/tactics-guru-v2' &&
-      (
-        github.event_name == 'workflow_dispatch' ||
-        (
-          github.event_name == 'pull_request' &&
-          github.event.action == 'labeled' &&
-          github.event.label.name == format('qualify-{0}', github.event.pull_request.head.sha) &&
-          github.actor == 'dubstylee' &&
-          github.triggering_actor == 'dubstylee' &&
-          github.event.pull_request.number == 210 &&
-          github.event.pull_request.state == 'open' &&
-          github.event.pull_request.base.ref == 'main' &&
-          github.event.pull_request.head.repo.full_name == 'luminari-gurus/tactics-guru-v2' &&
-          github.event.pull_request.head.ref == 'work/issue-207-browser-setup'
-        )
-      )
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
