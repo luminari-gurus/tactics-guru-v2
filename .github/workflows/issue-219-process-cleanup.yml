@@ -13,7 +13,7 @@ permissions:
   contents: read
 concurrency:
   group: tactics-issue219-qualification
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   qualify:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'work/issue-219-owned-process-cleanup') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/issue-219-owned-process-cleanup'))
@@ -28,8 +28,12 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      # This qualification never invokes the release CLI. Avoid its unrelated
+      # binary postinstall and registry audit requests; keep lockfile resolution.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        timeout-minutes: 3
       - run: npx --no-install playwright install --with-deps chromium
+        timeout-minutes: 3
       - run: npm run test:verification-tooling && npm run test:verification
       - run: npm run build
       - run: node --test tests/tooling/verification-browser.test.mjs

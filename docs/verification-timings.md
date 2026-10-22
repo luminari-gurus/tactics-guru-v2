@@ -204,6 +204,9 @@ canvas smoke before deliberately timing out a second case, then proves a fresh
 Playwright server can own that same port with `reuseExistingServer=false` and pass
 the smoke. Each mode has a 90-second contract bound. The dedicated #219 workflow
 uses the approved interim GitHub-hosted baseline capacity (15-minute job ceiling),
-not the in-progress self-hosted setup. It does not repeat the gameplay matrix,
+not the in-progress self-hosted setup. Its bounded install uses `npm ci
+--ignore-scripts --no-audit --no-fund`: the release-only PostHog CLI installer is
+not needed by these checks; Chromium is installed explicitly. This is not
+release-CLI or security-audit qualification. It does not repeat the gameplay matrix,
 CPU/telemetry baseline, or replace #220/#221 follow-ups. Its logs, checkpoint JSONL,
 final reports and cleanup receipts are uploaded for 30 days.
