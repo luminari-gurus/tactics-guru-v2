@@ -471,9 +471,12 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   await expect.poll(async () => { await page.clock.runFor(100); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-0.2);
   const previousId = (await report(page)).activeId;
   await press(page, '#battle-next');
-  // Settle the real presentation/enemy chain on live frames, then resume
-  // controlled sampling. A fixed virtual delay needlessly renders past ready.
-  await page.clock.resume(); await ready(page);
+  // Settle on live frames without granting more than the original 3s of
+  // animation time. Keep this bound local; other readiness checks are unchanged.
+  const actorTransitionStarted = await page.evaluate(() => Date.now());
+  await page.clock.resume();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player', {timeout: 3000});
+  expect(await page.evaluate(() => Date.now()) - actorTransitionStarted).toBeLessThanOrEqual(3000);
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   expect((await bobFrame(page)).frame.activeId).not.toBe(previousId);
   const saved = await stored(page), state = (await readSession(page)).state;

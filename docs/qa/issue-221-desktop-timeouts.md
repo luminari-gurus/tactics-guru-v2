@@ -30,7 +30,7 @@ This failed base result remains distinct from the passing repair below.
 - Lifecycle bob: 30.147s, timed out. Its fixed `runFor(3000)` actor transition costs 8.762s, hidden `runFor(2000)` costs 5.674s, and repeated 300ms sampling advances cost about 0.8s apiece. The long inactive windows and surplus frames dominate the deadline; the final report read is where the deadline lands, not a demonstrated missing-report defect.
 - Hover 16.482s and camera 19.581s pass again. Restart readiness completes normally; camera waits consume about 1s per accepted transition. No runtime defect is demonstrated for these observations, and no board edit is justified.
 
-Repair changes only the two bob test bodies. Fast-forward the same 2,000ms reduced-motion/hidden intervals after those modes have disabled bobbing, keeping their final zero-offset and exact state/save assertions. Run the real actor transition on live frames until the existing player-readiness check succeeds, then pause again before controlled sampling. No product speed, deadline, expectation timeout, fixture, assertion or sample count changes.
+Repair changes only the two bob test bodies. Fast-forward the same 2,000ms reduced-motion/hidden intervals after those modes have disabled bobbing, keeping their final zero-offset and exact state/save assertions. Run the real actor transition on live frames, then pause again before controlled sampling. PR review correctly identified that the first version used the default five-second readiness assertion instead of preserving the original three-second animation checkpoint. The review repair applies an explicit 3,000ms readiness timeout and checks browser-clock elapsed time from before resume before pausing. No product speed, fixture, assertion or sample count changes; other readiness checks retain their existing limits.
 
 Assertion mapping: all `bobFrame` sprite/health/anchor checks are unchanged; all 16 initial samples and both five-sample restart loops remain. Target/cancel/inspection/camera and both live media changes remain; presentation at 288ms and completion at 800ms remain; actor identity, hidden-page state/save invariance, restored bobbing, replacement seed, object counts and browser-error checks remain. Hover/camera tests are byte-identical. Their original hosted failures remain retained; their cause on the original host/workload is unproved. Qualified-host non-reproductions do not establish a runtime repair.
 
@@ -48,7 +48,7 @@ Consumer scope: three Chromium projects execute these local tests. Runtime, shar
 
 [Preceding-workload run 39752731873](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39752731873) at `85f1fe08c76ab4e203164c050526f21138d3dbfb` tests the immediately preceding `layout clamping resets overlap history when the actual camera changes`, then the original hover and camera cases: **3/3 pass**, 48.3s, zero skips/retries, untraced. Hover takes 17.0s, camera 19.7s. This is the smallest evidenced preceding workload; the original board failures still do not reproduce. It does not claim reproduction of the one-hour hosted workload or prove its host/resource cause.
 
-The two final runs provide **27 passing checks**, not a complete regression matrix. Commands and selectors are retained in the workflow at the tested commits; the final manual workflow selects the same 12 reported and 12 neighboring cases. No blanket retry, timeout increase, forced click, assertion deletion or test split was introduced.
+The two historical final runs provide **27 passing checks**, not a complete regression matrix or proof of the subsequently restored actor-transition bound. Commands and selectors remain available in the workflow at the tested commits and in the local recipe below. No blanket retry, forced click, assertion deletion or test split was introduced.
 
 ## Source binding, artifacts and delivery
 
@@ -59,6 +59,23 @@ The two final runs provide **27 passing checks**, not a complete regression matr
 - [12 reported + 12 neighboring cases, build hashes and screenshots](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39751877999/artifacts/12414715905).
 - [Preceding-workload probe](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39752731873/artifacts/12414118130).
 
-Later delivery changes remove temporary diagnostic reporting and the PR/label triggers, restore the same 24-case selection under manual dispatch, and update documentation/OpenSpec progress. Candidate application, tests, helpers, configs, dependencies, assets and build inputs remain unchanged; final Git-blob hashes are checked against the candidate receipt. The passing run executed `34c86fc`, not the later evidence commits. Existing bundle-size and future Vite-native-loader warnings remain; no new warning or product-budget qualification is claimed.
+The original delivery removed temporary diagnostic reporting and PR/label triggers and retained a manual workflow. PR review retires that workflow entirely: its new-file manual dispatch was unavailable before merge, and branch-selected execution exposed the persistent runner to branch code. Local execution supplies equivalent coverage without a new CI entry point. Historical source bindings apply to the recorded runs; fresh review proof must cover the changed actor bound. The passing run executed `34c86fc`, not later evidence commits. Existing bundle-size and future Vite-native-loader warnings remain; no new warning or product-budget qualification is claimed.
 
 Workflow setup failures `39750301292` and `39752480564` executed no browser cases; both YAML defects were corrected before their respective useful runs. The two failed literal-base executions and original interrupted hosted baseline remain failures. #199/#200's full baseline, missing coverage and unrelated follow-ups remain open. No merge, production deployment or physical-device run was performed; pushes triggered the repository's ordinary Cloudflare branch previews.
+
+## Local rerun
+
+Main's #207 browser tooling is now merged into this branch. Follow [browser setup](../browser-testing.md) for prerequisites; run from the repository root on a trusted local checkout. These commands retain the workflow's exact four reported and four neighboring titles across all three Chromium profiles, one worker, zero retries and tracing off. The wrapper retains unique JSON/artifact directories and preserves failure exit status. Stop before browser execution if the build fails.
+
+```sh
+npm ci --ignore-scripts --no-audit --no-fund
+npm run check:browsers
+npm run build
+reported='(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$'
+neighbors='(target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands|active bob: initial reduced motion keeps sprite and static actor marker anchored|authored camera keeps zoom bounds and refits on real orientation changes|default authored board renders canonical units, highlights and stable restarts)$'
+npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep "$reported" --list
+npm run test:browser -- tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep "$reported" --workers=1
+npm run test:browser -- tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep "$neighbors" --workers=1
+```
+
+The variables use POSIX shell syntax; in PowerShell use `$reported = '...'` and `$neighbors = '...'`. No GitHub dispatch or CI wait is required. The retired workflow's historical runs and artifacts remain linked above.

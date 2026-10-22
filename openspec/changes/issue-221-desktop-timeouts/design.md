@@ -11,9 +11,11 @@ Measure fixture, browser action, readiness and controlled-clock phases separatel
 ## Decisions
 
 - Run a four-case literal-base reproduction first, on one worker with zero retries. Retain the original hosted failure independently; different host timings are not regression attribution.
-- Use a branch-scoped PR workflow and `tactics-browser-exclusive` concurrency. Existing main has no suitable self-hosted dispatch route; do not import the unmerged #207 tooling or use hosted capacity.
+- The original diagnosis used a branch-scoped workflow and `tactics-browser-exclusive` concurrency. After merging main's #207 tooling, retire that temporary workflow and use the existing local `test:browser` wrapper with the same selections, one worker and zero retries. A workflow introduced only on the PR cannot provide pre-merge manual dispatch, and branch-controlled code must not gain a new entry point to the persistent runner.
 - Use existing reports and Playwright traces/steps for diagnosis; any temporary instrumentation is identified separately from ordinary timing evidence.
 - Keep repairs local when supported by measurements. Splitting a cumulative case requires an assertion mapping and equivalent setup; reducing work must preserve every obligation and operation limit.
+- Bound the live actor transition with an explicit 3,000ms readiness timeout and a browser-clock elapsed check from before resume. Pause only after checking readiness, retaining all subsequent controlled samples. Prove delayed readiness beyond 3,000ms is rejected.
+- Record hover/camera as non-reproductions with their original failures and cause still unproved; a completed disposition is not a completed runtime repair. Keep issue-159 references attached to its preserved plan when the generic handoff changes owner.
 - Runtime/helper changes require tracing standalone, run and dungeon consumers before expanding verification. No automatic full baseline rerun.
 
 ## Risks / Trade-offs
