@@ -1,6 +1,6 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: planning complete; implementation has not started.
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation authorized; literal-base reproduction in progress.
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
@@ -13,7 +13,7 @@ Date: 2026-10-22 (Asia/Jerusalem). Status: planning complete; implementation has
 
 Disposition all four reported desktop failures with source-bound evidence, repair their demonstrated causes, and retain the assertions that protect gameplay, saves, camera geometry, animation, reduced motion and lifecycle behavior. The four cases must pass on the selected qualified capacity without blanket retries, timeout inflation, skipped coverage or weakened assertions. A passing focused repair does not complete #200's baseline or replace its interrupted full run.
 
-This task currently authorizes selection, assignment, planning and branch publication. Application/test implementation, browser execution, PR delivery and integration follow a subsequent implementation request. No new approval procedure or planning framework is needed for this bounded investigation.
+The caller has authorized implementation, browser verification, commits, pushes and focused review-ready PR delivery. Use OpenSpec change `issue-221-desktop-timeouts` alongside this handoff plan. No merge or deployment is requested.
 
 ## Why this task
 
@@ -53,7 +53,7 @@ Do not change combat rules, seeds, content, save formats, action UX (#187), stat
 - **Simplify** diagnosis to phase timings and existing reports/traces. Measure fixture construction, boot/Continue, action completion, restart identity and bob sampling separately before changing code. Retain useful failure diagnostics outside Playwright cleanup; use temporary instrumentation first rather than adding a permanent profiler.
 - **Simplify** repairs to existing local helpers or the demonstrated scene/renderer defect. Reuse legal session commands and save codecs; never inject arbitrary state. If a cumulative case needs independent scenarios, each must preserve its own equivalent setup and assertions, with a mapping of every original obligation and unchanged per-operation bounds. Splitting only to evade the deadline is not sufficient evidence.
 - **Investigate** clock scheduling, fixture CPU cost, report serialization and cancellation independently. The observed timeout location does not decide which layer to edit. Optimize only measured work; no speculative cache, new fallback, generic fixture framework or alternate diagnostics subsystem.
-- **Drop** OpenSpec setup and extra proposal/design files: this investigation has an existing acceptance contract and unresolved empirical causes, not an architectural/product decision that another artifact resolves. Keep this single implementation plan and the eventual focused QA evidence.
+- **Keep** the caller-requested OpenSpec change with concise proposal/design/tasks referencing this acceptance contract. The project already has an OpenSpec root; no setup or new product requirement is needed (`skip_specs: true`).
 - **Drop** automatic full-matrix reruns for isolated test repairs. Escalate only when changed shared behavior or unbounded consumer reach meets the verification policy's full-regression trigger; retain all explicit issue gates.
 
 ## Files

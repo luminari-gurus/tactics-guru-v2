@@ -1,0 +1,61 @@
+name: Issue 221 focused timeout verification
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/issue-221-verification.yml'
+      - 'tests/battle-board.spec.ts'
+      - 'tests/battle-animations.spec.ts'
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-exclusive
+  cancel-in-progress: false
+jobs:
+  focused:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'branch/issue-221-desktop-timeouts'
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '251db945569e3f1ac957caa091e9fa9eec11a034'
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Record qualified host and literal-base identity
+        run: |
+          mkdir -p verification-receipts/issue-221
+          node --input-type=module <<'JS'
+          import { chromium } from '@playwright/test';
+          import { execFileSync } from 'node:child_process';
+          import { createHash } from 'node:crypto';
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import os from 'node:os';
+          const files = execFileSync('git', ['ls-files', 'src', 'tests', 'public', '*config*', 'package.json', 'package-lock.json'], {encoding:'utf8'}).trim().split('\n');
+          const hashes = Object.fromEntries(files.map(path=>[path,createHash('sha256').update(readFileSync(path)).digest('hex')]));
+          const browser = await chromium.launch({channel:'chromium'});
+          writeFileSync('verification-receipts/issue-221/environment.json',JSON.stringify({commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,npm:execFileSync('npm',['--version'],{encoding:'utf8'}).trim(),browser:browser.version(),executable:chromium.executablePath(),os:os.release(),platform:os.platform(),cpu:os.cpus()[0].model,cpus:os.cpus().length,memory:os.totalmem(),load:os.loadavg(),runner:process.env.RUNNER_NAME,workers:1,retries:0,trace:'off',mode:'preview',hashes},null,2));
+          await browser.close();
+          JS
+      - name: Build literal base
+        run: npm run build 2>&1 | tee verification-receipts/issue-221/build.log
+      - name: Discover exactly four desktop cases
+        run: npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
+      - name: Reproduce four cases on the literal base
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/baseline.json
+        run: npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/baseline.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue-221/
+          retention-days: 30
+          if-no-files-found: error
