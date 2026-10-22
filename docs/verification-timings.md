@@ -158,7 +158,9 @@ npm run measure:verification -- compare verification-receipts/timings/before/rep
 ```
 
 Comparison warns about changed coverage plans/scopes, environments, source,
-conditions, counts, selected IDs and workers. Missing/failed/blocked stages do not
+conditions, counts, selected IDs and workers. Playwright selection uses case IDs
+and projects; historical reports without IDs fall back to file and title.
+Missing/failed/blocked stages do not
 get a passing speedup. Deltas are descriptive, not statistical acceptance or proof
 of causality. Do not rerun the full matrix just to obtain a nicer measurement.
 

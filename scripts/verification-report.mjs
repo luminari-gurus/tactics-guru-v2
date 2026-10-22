@@ -99,7 +99,7 @@ export function compareReports(before, after) {
     const comparable = a?.status === 'passed' && b?.status === 'passed';
     if (!comparable) warnings.push(`${id}: missing, failed or blocked stage; not a passing speedup`);
     if (JSON.stringify(a?.summary?.counts) !== JSON.stringify(b?.summary?.counts)) warnings.push(`${id}: test counts/results differ`);
-    const selection = s => s?.summary?.tests?.map(t=>`${t.project ?? ''}:${t.file}:${t.title}`).sort();
+    const selection = s => s?.summary?.tests?.map(t=>JSON.stringify([t.project ?? '', t.id ?? [t.file, t.title]])).sort();
     if (JSON.stringify(selection(a)) !== JSON.stringify(selection(b))) warnings.push(`${id}: test selection differs`);
     if (a?.summary?.configuredWorkers !== b?.summary?.configuredWorkers) warnings.push(`${id}: worker count differs`);
     if (a?.summary?.observedWorkers !== b?.summary?.observedWorkers) warnings.push(`${id}: observed Vitest worker count differs`);

@@ -33,6 +33,27 @@ test('stage selection includes build prerequisites exactly once and rejects typo
   assert.deepEqual(selectStages(['chromium','build-root']).map(s=>s.id),['units','typecheck-app','typecheck-domain','build-root','chromium']);
   assert.throws(()=>selectStages(['typo']),/Unknown stage/);
 });
+test('comparison detects changed Playwright IDs with identical short titles', () => {
+  const before = { schemaVersion: 2, complete: true, environment: {}, source: { inputHash: 'same' },
+    stages: [{ id: 'chromium', status: 'passed', wallMs: 100, summary: { counts: { total: 1 },
+      tests: [{ id: 'suite-a', project: 'desktop', file: 'nested.spec.ts', title: 'renders' }] } }] };
+  const after = structuredClone(before);
+  after.stages[0].summary.tests[0].id = 'suite-b';
+  assert.ok(compareReports(before, after).warnings.some(warning => warning.includes('test selection differs')));
+  assert.deepEqual(compareReports(before, structuredClone(before)).warnings, []);
+});
+test('comparison retains historical title selection and distinguishes projects', () => {
+  const before = { schemaVersion: 1, complete: true, environment: {}, source: { inputHash: 'same' },
+    stages: [{ id: 'chromium', status: 'passed', wallMs: 100, summary: { counts: { total: 1 },
+      tests: [{ project: 'desktop', file: 'nested.spec.ts', title: 'renders' }] } }] };
+  assert.deepEqual(compareReports(before, structuredClone(before)).warnings, []);
+  const after = structuredClone(before);
+  after.stages[0].summary.tests[0].title = 'loads';
+  assert.ok(compareReports(before, after).warnings.some(warning => warning.includes('test selection differs')));
+  before.stages[0].summary.tests[0].id = 'shared-id';
+  after.stages[0].summary.tests[0] = { ...before.stages[0].summary.tests[0], project: 'portrait' };
+  assert.ok(compareReports(before, after).warnings.some(warning => warning.includes('test selection differs')));
+});
 test('subprocess exit code, raw log and timeout remain visible',async()=>{
   const dir=mkdtempSync(join(tmpdir(),'tg-timing-'));
   try {
