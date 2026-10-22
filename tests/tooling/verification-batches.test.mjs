@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling } from '../../scripts/verification-batches.mjs';
 import { digest } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -142,6 +142,20 @@ test('targeted rerun replaces only the selected current outcome and retains earl
   assert.equal(result.passed, true); assert.equal(result.history.find(row => row.batchId === 'first' && row.attempt === 1).passed, false);
   assert.equal(result.latest.find(row => row.batchId === 'second').attempt, 1);
   value.receipts[0].passed = false; assert.equal(summarize(value).passed, false);
+});
+
+test('a failed setup/upload on a newer Actions attempt cannot reuse an older passing receipt', () => {
+  const value = fixture(), summary = summarize(value);
+  const scheduler = { jobs: ['prepare', 'first', 'second'].map(id => ({ name: id === 'prepare' ? id : `batch (${id})`, attempt: 1, status: 'completed', conclusion: 'success' })) };
+  assert.deepEqual(validateScheduling(value.plan, summary, scheduler), []);
+  scheduler.jobs.push({ name: 'batch (first)', attempt: 2, status: 'completed', conclusion: 'failure' });
+  assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
+  scheduler.jobs.at(-1).conclusion = 'success';
+  assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
+  summary.latest.find(receipt => receipt.batchId === 'first').attempt = 2;
+  assert.deepEqual(validateScheduling(value.plan, summary, scheduler), []);
+  scheduler.jobs.at(-1).status = 'in_progress';
+  assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
 });
 
 test('partial, dirty or budget-failing evidence never qualifies a full baseline', () => {

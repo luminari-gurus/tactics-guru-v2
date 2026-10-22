@@ -80,6 +80,9 @@ source/build/plan/runner/browser provenance, chooses the latest attempt per batc
 and keeps prior outcomes in `history`. A successful explicit rerun can recover the
 current result; its earlier failure remains visible. Missing, malformed, duplicate
 or mismatched receipts fail the stable **Serial verification aggregate** check.
+The aggregate also checks the latest Actions job attempts: a newer setup or
+upload failure without a receipt cannot fall back to an older passing artifact.
+If that Actions API check fails, CI fails closed instead of guessing success.
 Reports merge by canonical stage and case ID/project; intentional coverage of the
 same test in different root/prefix/dev modes is not deduplicated. Native blob ZIPs
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.

@@ -244,6 +244,19 @@ function findReceipts(directory) {
   });
 }
 
+export function validateScheduling(plan, summary, scheduler) {
+  const errors = [];
+  for (const id of ['prepare', ...plan.requested]) {
+    const name = id === 'prepare' ? 'prepare' : `batch (${id})`;
+    const latest = scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
+    const report = summary.latest?.find(receipt => receipt.batchId === id);
+    if (!latest || latest.status !== 'completed' || latest.conclusion !== 'success' || latest.attempt !== report?.attempt) {
+      errors.push(`${id}: latest Actions job failed, incomplete or lacks its matching receipt`);
+    }
+  }
+  return errors;
+}
+
 async function scheduling() {
   if (!process.env.GITHUB_TOKEN) return null;
   const headers = { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' };
@@ -253,6 +266,7 @@ async function scheduling() {
   for (let page = 1; ; page++) {
     const result = await get(`${api}/jobs?filter=all&per_page=100&page=${page}`);
     jobs.push(...result.jobs.map(job => ({ id: job.id, name: job.name, attempt: job.run_attempt,
+      status: job.status, conclusion: job.conclusion,
       createdAt: job.created_at, startedAt: job.started_at, completedAt: job.completed_at,
       queueMs: job.started_at ? Date.parse(job.started_at) - Date.parse(job.created_at) : null,
       computeMs: job.completed_at ? Date.parse(job.completed_at) - Date.parse(job.started_at) : null })));
@@ -317,7 +331,17 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       result = aggregate(plan, existsSync(join(bundle, 'build.json')) ? read(join(bundle, 'build.json')) : null,
         read(join(bundle, 'preparation/receipt.json')), findReceipts(resolve(batchId)));
     } catch (error) { result = { passed: false, complete: false, baselineEligible: false, errors: [String(error)] }; }
-    try { result.scheduling = await scheduling(); } catch (error) { result.schedulingError = String(error); }
+    try {
+      result.scheduling = await scheduling();
+      if (result.scheduling) {
+        const errors = validateScheduling(plan, result, result.scheduling);
+        if (errors.length) { result.errors.push(...errors); result.passed = false; result.complete = false; result.baselineEligible = false; }
+      }
+    } catch (error) {
+      result.schedulingError = String(error);
+      result.errors.push('Could not verify latest Actions attempts');
+      result.passed = false; result.complete = false; result.baselineEligible = false;
+    }
     save(join(out, 'summary.json'), result);
     const summary = `# Serial verification\n\nScope: ${plan.scope}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
     writeFileSync(join(out, 'summary.md'), summary);
