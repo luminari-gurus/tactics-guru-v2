@@ -49,39 +49,12 @@ jobs:
           find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue-221/build-sha256.txt
       - name: Discover board workload probe
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands) | tee verification-receipts/issue-221/discovery.log
+          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)$' --list | tee verification-receipts/issue-221/discovery.log
       - name: Investigate the immediately preceding board workload
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/probe.json
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)
-        if: always()
-        with:
-          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/issue-221/
-          retention-days: 30
-          if-no-files-found: error
- --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/probe 2>&1 | tee verification-receipts/issue-221/probe.log
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/issue-221/
-          retention-days: 30
-          if-no-files-found: error
- --list | tee verification-receipts/issue-221/discovery.log
-      - name: Investigate the immediately preceding board workload
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/probe.json
-        run: |
-          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)
-        if: always()
-        with:
-          name: issue-221-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/issue-221/
-          retention-days: 30
-          if-no-files-found: error
- --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/probe 2>&1 | tee verification-receipts/issue-221/probe.log
+          npx --no-install playwright test tests/battle-board.spec.ts --project=desktop --grep '(layout clamping resets overlap history when the actual camera changes|hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/probe 2>&1 | tee verification-receipts/issue-221/probe.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
