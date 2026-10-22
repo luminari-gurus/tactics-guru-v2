@@ -1,6 +1,6 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation authorized; literal-base reproduction in progress.
+Date: 2026-10-22 (Asia/Jerusalem). Status: implementation in progress; literal-base reproduction retained, phase diagnosis running. Draft PR: [#223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
