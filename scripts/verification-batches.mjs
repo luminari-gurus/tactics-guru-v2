@@ -26,7 +26,7 @@ export function definitions(mode = 'capture') {
   const chromium = stages.find(stage => stage.id === 'chromium');
   if (mode === 'pilot') return [
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
-      'tests/boot.spec.ts', '-g', '^boots a Phaser scene and fits the viewport after resize$'] }] },
+      'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
     { id: 'pilot-webkit', stages: [{ ...chromium, id: 'pilot-webkit', args: [...chromium.args,
       '-c', 'playwright.setup-smoke.config.ts', '--project=setup-webkit'] }] },
   ];
@@ -123,6 +123,13 @@ export function validateBrowserResult(stage, row) {
     !row.checkpointError, 'Missing final checkpoints');
 }
 
+export function validatePerformanceResult(row, source) {
+  invariant(row.performance?.samples === 18 && row.performance.failures?.length === 0 && row.performance.measuredBuild?.commit === source.commit,
+    'Missing/incomplete performance capture or wrong build');
+  invariant(row.evaluation?.exitCode === 0 && !row.evaluation.error && !row.evaluation.timedOut && !row.evaluation.interrupted &&
+    row.evaluationReport?.passed === true && row.evaluationReport.captureFailures?.length === 0, 'Performance evaluation missing or failed');
+}
+
 async function execute(stage, out, browsers, signal) {
   const row = await executeTimingStage(stage, out, { browsers, signal, blob: true });
   if (row.cleanup?.complete === false) {
@@ -141,6 +148,10 @@ async function execute(stage, out, browsers, signal) {
       join(out, 'performance.json'), join(out, 'performance-evaluation.json')],
     { cwd: root, logPath: join(out, 'performance-evaluation.log'), timeoutMs: 60000, signal });
     if (row.evaluation.exitCode !== 0 || row.evaluation.error || row.evaluation.timedOut || row.evaluation.interrupted) row.status = 'failed';
+    try {
+      row.evaluationReport = read(join(out, 'performance-evaluation.json'));
+      validatePerformanceResult(row, sourceIdentity(root));
+    } catch (error) { row.status = 'failed'; row.evaluationError = String(error); }
   }
   return row;
 }
@@ -186,7 +197,8 @@ export function aggregate(plan, build, preparation, receipts) {
     const attempts = (id === 'prepare' ? [preparation] : receipts.filter(report => report.batchId === id)).filter(Boolean)
       .sort((left, right) => left.attempt - right.attempt);
     invariant(new Set(attempts.map(report => report.attempt)).size === attempts.length, `Duplicate attempts for ${id}`);
-    history.push(...attempts.map(report => ({ batchId: id, attempt: report.attempt, passed: report.passed, stages: report.stages, error: report.error })));
+    history.push(...attempts.map(report => ({ batchId: id, attempt: report.attempt, passed: report.passed, stages: report.stages, error: report.error,
+      source: report.source, planHash: report.planHash, buildHash: report.buildHash, runId: report.runId })));
     const report = attempts.at(-1);
     if (!report) { errors.push(`${id}: missing receipt`); complete = false; continue; }
     latest.push(report);
@@ -204,6 +216,10 @@ export function aggregate(plan, build, preparation, receipts) {
       catch (error) { errors.push(`${stage.id}: ${error.message}`); complete = false; }
       try { validateBrowserResult(stage, actual ?? {}); }
       catch (error) { errors.push(`${stage.id}: ${error.message}`); }
+    }
+    for (const row of report.stages.filter(stage => stage.id === 'performance')) {
+      try { validatePerformanceResult(row, plan.source); }
+      catch (error) { errors.push(`performance: ${error.message}`); }
     }
   }
   const unexpected = receipts.filter(report => !plan.requested.includes(report.batchId));
@@ -252,6 +268,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
   if (command === 'discover' || command === 'prepare') {
     invariant(!existsSync(join(bundle, 'plan.json')) && !existsSync(join(bundle, 'dist')), 'Refusing to overwrite a prior plan/build');
     mkdirSync(bundle, { recursive: true });
+    if (command === 'prepare') save(join(bundle, 'preparation-start.json'), { source: sourceIdentity(root), startedAt: new Date().toISOString(), runId: process.env.GITHUB_RUN_ID ?? 'local' });
     const plan = { ...createPlan(process.env.SERIAL_MODE ?? 'capture', discover, process.env.SERIAL_BATCHES ?? ''),
       source: sourceIdentity(root), environment: environment(), browsers: await browserMetadata(command === 'prepare' ? stages : []) };
     plan.planHash = digest(JSON.stringify(plan));
@@ -266,8 +283,19 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, hash: digest(JSON.stringify(files)) });
     return 0;
   }
-  const plan = read(join(bundle, 'plan.json'));
-  invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
+  let plan;
+  try {
+    plan = read(join(bundle, 'plan.json'));
+    invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
+  } catch (error) {
+    if (command !== 'aggregate') throw error;
+    const out = resolve(outputArgument); mkdirSync(out, { recursive: true });
+    save(join(out, 'summary.json'), { passed: false, complete: false, baselineEligible: false, errors: ['Missing or invalid preparation plan: ' + String(error)] });
+    const summary = '# Serial verification failed\n\nMissing or invalid preparation plan. Inspect the preparation artifact and logs.\n';
+    writeFileSync(join(out, 'summary.md'), summary);
+    if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+    return 1;
+  }
   if (command === 'run') {
     const job = plan.jobs.find(job => job.id === batchId);
     invariant(job && plan.requested.includes(batchId), 'Batch not in requested plan');

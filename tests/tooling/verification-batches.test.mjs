@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult } from '../../scripts/verification-batches.mjs';
 import { digest } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -57,6 +57,26 @@ test('targeted runs and pilot cannot claim full coverage; unknown batch filters 
   assert.equal(createPlan('pilot', () => [testcase('pilot')]).scope, 'partial');
   assert.throws(() => createPlan('capture', discovery, 'typo'), /Unknown/);
   assert.throws(() => createPlan('capture', discovery, 'performance,performance'), /duplicate/);
+});
+
+test('real Playwright pilot discovery matches full titles in all intended projects', () => {
+  const jobs = definitions('pilot');
+  const chromium = discover(jobs[0].stages[0]), webkit = discover(jobs[1].stages[0]);
+  assert.equal(chromium.length, 3); assert.equal(webkit.length, 1);
+  assert.deepEqual(chromium.map(row => row.project).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
+  assert.equal(webkit[0].project, 'setup-webkit');
+  assert.ok([...chromium, ...webkit].every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+});
+
+test('performance acceptance requires complete source-bound samples and successful evaluation', () => {
+  const source = { commit: 'source' };
+  const row = { performance: { samples: 18, failures: [], measuredBuild: source },
+    evaluation: { exitCode: 0 }, evaluationReport: { passed: true, captureFailures: [] } };
+  validatePerformanceResult(row, source);
+  for (const mutate of [entry => { entry.performance.samples = 17; }, entry => { entry.performance.measuredBuild.commit = 'other'; },
+    entry => { delete entry.evaluationReport; }, entry => { entry.evaluation.exitCode = 1; }, entry => { entry.evaluationReport.passed = false; }]) {
+    const changed = structuredClone(row); mutate(changed); assert.throws(() => validatePerformanceResult(changed, source));
+  }
 });
 
 test('artifact validation rejects altered files, missing files, wrong source and wrong plan', () => {
