@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { join } from 'node:path';
 import { runStages, stages, stageEnvironment, main } from '../../scripts/verify-full.mjs';
 
 test('required failures do not suppress later suites and fail the aggregate', () => {
@@ -90,7 +91,7 @@ test('explicit modes isolate inherited build/report flags but preserve browser s
   assert.equal(env.POSTHOG_SOURCEMAPS, undefined);
   assert.equal(env.PLAYWRIGHT_TELEMETRY_DEV, 'true');
   assert.equal(env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, '/browser');
-  assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_FILE, '/reports/telemetry-development.json');
+  assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_FILE, join('/reports', 'telemetry-development.json'));
   assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_DIR, undefined);
 });
 
