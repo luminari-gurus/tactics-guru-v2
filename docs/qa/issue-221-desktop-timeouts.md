@@ -8,9 +8,9 @@ Its `issue200-ci/source.txt` identifies `73d34dba1620174837cf15a93812d393abe690a
 
 `timings/github-hosted-baseline/chromium.log` retains all four 30-second timeouts. Hover fails waiting for player phase after restart; camera expires clicking Wait; first bob expires reading the report at line 447 (after the 2,000ms reduced-motion advance); second bob at line 480 (after the hidden-page advance). These locations are observations, not causal conclusions. The full Chromium invocation was interrupted at start marker 257/687 and remains incomplete.
 
-## Current qualification
+## Original host qualification
 
-At kickoff, runner `unraid-tactics-01` is online and not busy, labels `[self-hosted, Linux, X64, tactics-browser]`. PR #210 provides prior Chromium/WebKit setup qualification; this branch does not import its unmerged tooling. The branch-scoped workflow rechecks actual Chromium launch and records runtime/host/input identity, then builds and runs exactly the four desktop cases untraced with one worker and zero retries.
+At kickoff, runner `unraid-tactics-01` was online and not busy, labels `[self-hosted, Linux, X64, tactics-browser]`. PR #210 provided prior Chromium/WebKit setup qualification; its tooling was unmerged at that checkpoint. The historical branch-scoped workflow rechecked actual Chromium launch and recorded runtime/host/input identity, then built and ran exactly the four desktop cases untraced with one worker and zero retries. Review later merges #210 through current main and uses its local wrapper, as documented below.
 
 ## Literal-base reproduction
 
@@ -79,3 +79,17 @@ npm run test:browser -- tests/battle-board.spec.ts tests/battle-animations.spec.
 ```
 
 The variables use POSIX shell syntax; in PowerShell use `$reported = '...'` and `$neighbors = '...'`. No GitHub dispatch or CI wait is required. The retired workflow's historical runs and artifacts remain linked above.
+
+## PR #223 review qualification
+
+All five review findings were valid. Main `419ebcdd3ddf5eefb0786dfc4231a7ae476b17b9` was merged cleanly as `edf9ba0`; published evidence history was preserved. Review implementation `611fcf02d1162696730f6bb0f70bfac0c1a5b8ae` restores the local three-second actor bound, corrects the OpenSpec non-reproduction disposition, retargets both issue-159 acceptance links and removes the temporary workflow. Its dispatch and runner-exposure issues are eliminated by removal; the local recipe above preserves all 24 selected checks. No replacement CI trigger, hosted fallback, runtime/helper/config/dependency change or release tag is added.
+
+Fresh local WSL2 qualification uses Node 24.15.0, Playwright 1.63.0, full Chromium 153.0.8010.12, one worker, zero retries, tracing off, root production preview:
+
+- `npm ci --ignore-scripts --no-audit --no-fund` and `npm run build` pass: **221** content tests, both TypeScript scopes and production bundle. Existing Vite warnings remain.
+- Reported cases: **12/12 pass**, 162.7s including setup. Lifecycle bob passes in **17.4s desktop / 12.1s portrait / 12.2s landscape** with the restored bound. Neighboring cases: **12/12 pass**, 115.5s including setup. Both runs have zero skips/retries.
+- Sensitivity probe: temporarily withhold only the DOM readiness signal for **3,500ms** in the real lifecycle case. The old default readiness check passes; the repaired check fails at its **3,000ms** assertion with `review-delay` still present. This deliberately injected failure is retained separately from the 24 positive checks. Probe source, both reports and restoration hash are retained; the original tested file bytes were restored exactly. No runtime delay hook remains.
+- Desktop, portrait and landscape screenshots were inspected for board/HUD readability and anchors. This is device emulation. WebKit passed environment launch only; no new WebKit gameplay, physical-device, full-matrix or product-performance claim is made.
+- Both affected OpenSpec changes validate strictly. Relative Markdown targets, exact 12-case discovery and `git diff --check` pass. The preserved issue-159 plan has Git blob `947a6cb6a14afff756652fa3b29619ee27abba64`, identical to the original plan on main.
+
+[Review source/report/build manifest](issue-221/review/evidence.json) binds the compressed raw reports, probe source, build log, environment, all relevant input hashes and emitted-build hashes. The source receipt records `dirty: true` from WSL Git treating CRLF files as changes; native Windows Git was clean at the source checkpoint, normalized WSL status was empty and the native relevant-input diff against `611fcf0` was empty. Later handoff/receipt edits do not change application, tests, helpers, configs, dependencies, assets or build inputs. Fresh checks executed the recorded source, not later evidence commits. Historical failed/incomplete runs and the unproved hover/camera cause remain unchanged above.

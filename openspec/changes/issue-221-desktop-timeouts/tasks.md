@@ -15,8 +15,8 @@
 
 ## 4. PR #223 review repairs
 
-- [ ] 4.1 Restore the explicit three-second actor-transition deadline while using live frames; prove the real case passes and delayed readiness beyond the bound fails.
-- [ ] 4.2 Retarget issue-159 references to its preserved plan and retire the temporary issue-221 workflow; document equivalent local selections and remove claims that pre-merge manual dispatch is available.
+- [x] 4.1 Restore the explicit three-second actor-transition deadline while using live frames; prove the real case passes and delayed readiness beyond the bound fails.
+- [x] 4.2 Retarget issue-159 references to its preserved plan and retire the temporary issue-221 workflow; document equivalent local selections and remove claims that pre-merge manual dispatch is available.
 
 ## Workflow follow-up
 

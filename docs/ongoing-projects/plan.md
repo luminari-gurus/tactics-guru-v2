@@ -1,6 +1,6 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: review repairs in progress in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223). OpenSpec `issue-221-desktop-timeouts` tracks the original work and PR review repairs; final qualification is reopened until the restored timing bound is verified.
+Date: 2026-10-22 (Asia/Jerusalem). Status: all five review findings repaired and locally qualified in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223); publication and review-thread closeout complete the handoff. OpenSpec `issue-221-desktop-timeouts` tracks the original work and PR review repairs.
 
 ## Current handoff
 
@@ -8,7 +8,9 @@ Original artifact recovered (ZIP SHA-256 `748aba4ed5450557980eb652fe2fb496db4664
 
 Qualification at `34c86fc8051ce02b30a3dc88910e692edb120fcb`: self-hosted run `39751877999` passes the build (221 content cases and both type scopes), all 12 reported desktop/portrait/landscape cases, and 12 neighboring cases. Probe `39752731873` at `85f1fe0` passes the immediate predecessor + hover + camera, 3/3. **27 checks pass, zero skips/retries**. Desktop lifecycle bob now takes 18.152s (base timed out at 30.147s); first bob takes 16.301s. Shared/runtime/test inputs are frozen; later workflow/docs changes reuse that explicitly identified evidence.
 
-PR review found the live-frame actor transition lacked the original explicit three-second bound. Restore a 3,000ms readiness timeout plus an elapsed-browser-clock check and qualify the changed case and adjacent selections locally. The original 27 passes remain historical evidence, not proof of this restored bound. Merge main `419ebcd` without rewriting the published branch history. Retire the temporary focused workflow: pre-merge manual dispatch is unavailable for a newly introduced workflow, and it adds an unnecessary branch-code entry point to the persistent runner. Use the existing local wrapper and selections in the [QA report](../qa/issue-221-desktop-timeouts.md#local-rerun) instead. #199/#200 remain incomplete; these focused results do not replace their interrupted capture. Leave PR #223 open for merge; no release tag or deployment is needed.
+Review source `611fcf02d1162696730f6bb0f70bfac0c1a5b8ae` restores a 3,000ms readiness timeout plus an elapsed-browser-clock check. Fresh local proof passes **24/24** reported and neighboring cases, zero skips/retries, across desktop/portrait/landscape Chromium; 221 content tests, both TypeScript scopes and production build pass. A 3,500ms readiness gate passes with the old default but fails the repaired 3,000ms assertion; the original spec bytes are restored. See [review receipts](../qa/issue-221/review/evidence.json) for source/build hashes, exact reports, probe source and metadata. These are WSL2 runs, distinct from the historical self-hosted 27 checks above.
+
+Main `419ebcd` is merged via `edf9ba0` without rewriting published history. The temporary focused workflow is removed: pre-merge manual dispatch was unavailable for a newly introduced workflow, and it added an unnecessary branch-code entry point to the persistent runner. Use the existing local wrapper and selections in the [QA report](../qa/issue-221-desktop-timeouts.md#local-rerun). The issue-159 plan remains byte-identical and both incoming acceptance references now target it. #199/#200 remain incomplete; these focused results do not replace their interrupted capture. Leave PR #223 open for merge; no release tag or deployment is needed.
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
@@ -66,7 +68,7 @@ Do not change combat rules, seeds, content, save formats, action UX (#187), stat
 
 ## Files
 
-Actual implementation changes only the two bob case bodies in `tests/battle-animations.spec.ts`; `tests/battle-board.spec.ts` is unchanged. Supporting files are the focused manual self-hosted workflow, this handoff, QA report/compact source-bound evidence, and the caller-requested OpenSpec proposal/design/tasks. The prior plan remains preserved. No new unit infrastructure or product change was needed.
+Actual implementation changes only the two bob case bodies in `tests/battle-animations.spec.ts`; `tests/battle-board.spec.ts` is unchanged. Supporting files are this handoff, QA report/compact source-bound evidence, the caller-requested OpenSpec proposal/design/tasks, and the two corrected issue-159 references. The temporary self-hosted workflow is removed after review; the existing local wrapper supplies reruns. The prior plan remains preserved byte-for-byte. No new unit infrastructure or product change was needed.
 
 `src/phaser/BattleScene.ts`, `src/phaser/BoardRenderer.ts` or `tests/helpers/battlePolicy.ts` are **conditional**: touch them only after reproduction identifies their defect and enumerate their callers before qualification. `src/app/BattleSession.ts` is an authority boundary to preserve, not a planned rewrite. A task-specific self-hosted verification workflow is justified only if necessary to execute this focused proof on approved capacity; reuse an existing safe dispatch route when available. No package/lockfile/global config/matrix change is currently planned.
 
