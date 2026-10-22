@@ -1,6 +1,6 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and qualification complete; preparing review-ready delivery in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
+Date: 2026-10-22 (Asia/Jerusalem). Status: complete and ready for review in [PR #223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223). OpenSpec `issue-221-desktop-timeouts`: **4/4 tasks complete**, strictly validated; not archived pending review/integration.
 
 ## Current handoff
 
@@ -8,7 +8,7 @@ Original artifact recovered (ZIP SHA-256 `748aba4ed5450557980eb652fe2fb496db4664
 
 Qualification at `34c86fc8051ce02b30a3dc88910e692edb120fcb`: self-hosted run `39751877999` passes the build (221 content cases and both type scopes), all 12 reported desktop/portrait/landscape cases, and 12 neighboring cases. Probe `39752731873` at `85f1fe0` passes the immediate predecessor + hover + camera, 3/3. **27 checks pass, zero skips/retries**. Desktop lifecycle bob now takes 18.152s (base timed out at 30.147s); first bob takes 16.301s. Shared/runtime/test inputs are frozen; later workflow/docs changes reuse that explicitly identified evidence.
 
-Next: finish review-ready publication and OpenSpec task 3.1, then review/integration is the only remaining handoff. Temporary step reporting and PR/label triggers have been removed; the focused workflow is manual-dispatch-only, with unchanged runner/concurrency, selection, workers, retries and timeouts. No automatic rerun is needed for documentation progress. Do not rerun an hour-long baseline or merge/deploy. #199/#200 remain incomplete; these focused results do not replace their interrupted capture.
+Next: review/integration is the only remaining handoff; PR #223 is open and non-draft, with `Closes #221`. Temporary step reporting and PR/label triggers have been removed; the focused workflow is manual-dispatch-only, with unchanged runner/concurrency, selection, workers, retries and timeouts. No automatic rerun is needed for documentation progress. Do not rerun an hour-long baseline or merge/deploy without a new request. #199/#200 remain incomplete; these focused results do not replace their interrupted capture.
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
