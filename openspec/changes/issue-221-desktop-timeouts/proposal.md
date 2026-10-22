@@ -16,4 +16,4 @@ No spec-level product behavior change is intended. This investigation repairs ve
 
 ## Impact
 
-Primary scope: the existing browser cases and QA evidence. The temporary focused workflow is retired after diagnosis; the existing local browser wrapper supplies reruns without a new runner entry point. Runtime/helper edits are conditional on demonstrated defects and require consumer mapping. No dependency, combat, save-format, animation-speed or product-budget change. See `docs/ongoing-projects/plan.md` for the full acceptance contract.
+Primary scope: the existing browser cases and QA evidence. The temporary focused workflow is retired after diagnosis; the existing local browser wrapper supplies reruns without a new runner entry point. Runtime/helper edits are conditional on demonstrated defects and require consumer mapping. No dependency, combat, save-format, animation-speed or product-budget change. See [the preserved plan](../../../docs/ongoing-projects/issue-221-desktop-timeouts-plan.md) for the full acceptance contract.

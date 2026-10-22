@@ -1,0 +1,38 @@
+{
+  "source": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+  "dirty": false,
+  "node": "v24.19.0",
+  "os": "win32",
+  "release": "10.0.26300",
+  "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+  "cpus": 16,
+  "memory": 68276973568,
+  "cpuBusyPercent": 17.004504504504503,
+  "chromiumExecutable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\chromium-1243\\chrome-win64\\chrome.exe",
+  "screens": [
+    {
+      "profile": "desktop",
+      "build": {
+        "commit": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+        "dirty": false
+      }
+    },
+    {
+      "profile": "mobile-portrait",
+      "build": {
+        "commit": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+        "dirty": false
+      }
+    },
+    {
+      "profile": "mobile-landscape",
+      "build": {
+        "commit": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+        "dirty": false
+      }
+    }
+  ],
+  "conditions": "Local Windows; sequential isolated collector validation; no concurrent Vite/Playwright/measure-fit job observed; existing desktop apps remain open; lockfile installed; browser cache warm; fresh clean-source production bundle. No cross-host speedup claim.",
+  "browserVersion": "153.0.8010.12",
+  "portReleased": true
+}

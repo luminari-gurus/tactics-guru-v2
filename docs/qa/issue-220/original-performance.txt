@@ -1,0 +1,12 @@
+
+> tactics-guru-v2@0.0.0 measure:fit
+> node --experimental-strip-types scripts/measure-fit.ts /home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/timings/github-hosted-baseline/performance.json
+
+file:///home/runner/work/tactics-guru-v2/tactics-guru-v2/scripts/measure-fit.ts:84
+    if (!ready) throw new Error('Preview failed to start');
+                      ^
+
+Error: Preview failed to start
+    at file:///home/runner/work/tactics-guru-v2/tactics-guru-v2/scripts/measure-fit.ts:84:23
+
+Node.js v24.21.0

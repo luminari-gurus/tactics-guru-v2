@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-22",
+  "reviewedHead": "1882cecc9de0312ac8f8bba908d8cbbc8b8819f3",
+  "base": "4f6614edee382def5f284a17e7f5872aafbbb02e",
+  "node": "v24.19.0",
+  "platform": "win32",
+  "implementationGitBlob": "afae055b70089d9493e891d6f9b13612a36e26e3",
+  "testGitBlob": "dab80b5c748ec2fa54a0e61e5e37d5f621053c7e",
+  "findings": [
+    {
+      "comment": 4351286730,
+      "valid": true,
+      "result": "Abort reason precedes distinct capture rejection; cleanup failure is retained too."
+    },
+    {
+      "comment": 4351286737,
+      "valid": true,
+      "result": "Exit aborts immediately; diagnostic snapshot follows bounded child close/pipe drain."
+    }
+  ],
+  "verification": {
+    "red": {
+      "command": "node node_modules/vitest/vitest.mjs run tests/unit/measureFitPreview.test.ts -t 'also rejects capture|trailing stderr|concurrent interruption=true'",
+      "helperSource": "git show 1882cecc9de0312ac8f8bba908d8cbbc8b8819f3:scripts/measure-fit-preview.ts",
+      "exitCode": 1,
+      "failed": 5,
+      "skipped": 22
+    },
+    "green": {
+      "command": "node node_modules/vitest/vitest.mjs run tests/unit/measureFitPreview.test.ts tests/unit/measureFitOptions.test.ts tests/unit/measurements.test.ts",
+      "exitCode": 0,
+      "passed": 67,
+      "total": 67,
+      "durationSeconds": 9.72
+    },
+    "types": [
+      {
+        "command": "node node_modules/typescript/bin/tsc --noEmit",
+        "exitCode": 0
+      },
+      {
+        "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.domain.json",
+        "exitCode": 0
+      }
+    ],
+    "browser": {
+      "passed": 2,
+      "chromium": "153.0.8010.12",
+      "modes": [
+        "SIGTERM event during real page.waitForFunction",
+        "Owned preview exit during real page.waitForFunction"
+      ],
+      "portReleased": true,
+      "scope": "Tiny HTTP fixture and real browser close; no production game capture or OS signal delivery claim."
+    },
+    "discovery": {
+      "command": "node scripts/verify-full.mjs --list",
+      "stages": 19,
+      "execution": false
+    },
+    "openspec": {
+      "command": "openspec validate issue-220-preview-readiness --strict",
+      "exitCode": 0
+    }
+  },
+  "inputHashes": {
+    "package.json": "74cd27321e5a3f05fbc3cc78166845f8bb9a61cd5bb25f1739dfaa0dbb575bc9",
+    "package-lock.json": "e31871b78d9c1444b26db7c3311c24e0234d4c6df4b694b9d3943fb9a67e62c7",
+    "vite.config.ts": "ab342823509326a2ccf26245bb06ec2f8c130720d754a66a8711b2c058e42e3a",
+    "tsconfig.json": "0dd83947555cc594acbd955a45ef4789e9387a99cff759b460fd988a6e5c97da",
+    "tsconfig.domain.json": "94b255ca7ab890df804d9e4b06d9ed62b5f0e01a9f77ace3ac9798d47572591e",
+    "vitest.config.ts": "8b967780731d5b199a8eff59c600789b2ccc84584d523c07796b8c896e09c2cf",
+    "scripts/verify-full.mjs": "6e476ee419cdbe26a4a30c3c92b7350767cc8de644176aaff3aaf9887104389c",
+    "scripts/measure-fit.ts": "d05b44271c24eafa38ed9962eac80504f0b7cd0eeb5b73b46477c4e2ed1d4af6",
+    "scripts/measure-fit-preview.ts": "2b66c32f7061f598fe6df5f78492727d52ac045dc0e226ae29685154ed22d363",
+    "scripts/measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "scripts/measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+    "scripts/measure-fit-evaluate.ts": "d9074efc425f7db8a0ab3f7045f4c79c21e80ccdfb2768b40944fa8c76b89664",
+    "scripts/evaluate-fit.ts": "f940ffc79ac0134601d34fc2a45213dba28254cf9f9f3b210bec8aaa7db825e8",
+    "tests/unit/measureFitPreview.test.ts": "63a0d10948d76e77fbe9abdc3842d593fd493d6e64e1c0ea3a098c07d9b1d1e1",
+    "tests/unit/measureFitOptions.test.ts": "af066456ccf1a9efc146e779283ad5668c30e0d5ab8a9d7082b40b929e55ef8b",
+    "tests/unit/measurements.test.ts": "2cab42f9e963dc7d472b3d6b8829126f2b010a7869183f173bc4a3f6d6f32458"
+  },
+  "changedInputs": [
+    "scripts/measure-fit-preview.ts",
+    "tests/unit/measureFitPreview.test.ts"
+  ],
+  "reuse": {
+    "captureSource": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+    "unchangedInputs": [
+      "package.json",
+      "package-lock.json",
+      "vite.config.ts",
+      "tsconfig.json",
+      "tsconfig.domain.json",
+      "vitest.config.ts",
+      "scripts/verify-full.mjs",
+      "scripts/measure-fit.ts",
+      "scripts/measure-fit-options.ts",
+      "scripts/measure-fit-controls.ts",
+      "scripts/measure-fit-evaluate.ts",
+      "scripts/evaluate-fit.ts",
+      "tests/unit/measureFitOptions.test.ts",
+      "tests/unit/measurements.test.ts"
+    ],
+    "note": "Fourteen recorded inputs and all application/assets match the prior build/capture. Old capture proves unchanged success-path sampling and measurement only; repaired helper failure paths are qualified by current contracts and browser-close checks. No new performance capture/build/full matrix. Prior two budget-failing samples and independent Windows orchestration failure remain unchanged."
+  },
+  "iterationFailure": "Initial descendant-held stderr fixture did not retain trailing output on Windows; replaced with deterministic real-child exit -> injected final stderr data -> close event ordering. review-green-focused.log preserves the failed interim run; final fixtures fail all five regressions against the original helper.",
+  "logs": {
+    "review-red-final-fixtures.log": {
+      "path": "review-red-final-fixtures.log.gz",
+      "rawSha256": "200ba60734e4efff09062be2325515a97a3f2ee7cae5b554946b1c4befce6843",
+      "gzipSha256": "370b75ff37c287bf42ad5762514ce252a4219653c21f1896b10da6301dc3f457"
+    },
+    "review-green-focused.log": {
+      "path": "review-green-focused.log.gz",
+      "rawSha256": "df7ca7358fcbd189a1d8453c0f4bd1249552c6efe7c52aafb41eac94f0450155",
+      "gzipSha256": "59e20b9e039752a03cc4db680747c319b6e5d57e665c9a99fa860ee848ed1f60"
+    },
+    "review-units-final.log": {
+      "path": "review-units-final.log.gz",
+      "rawSha256": "cd213c04ec20ebf08fb43ebc68d17f06e80e77b2831c9d37c9098b73f8d6783c",
+      "gzipSha256": "cca0e59b7f1f5e567ca008245c74ce406b03f644d1219b53552bf2b75b9539a2"
+    },
+    "review-browser-smoke.log": {
+      "path": "review-browser-smoke.log.gz",
+      "rawSha256": "d907cd8151b47279597bb6849dfc96b9d456de2b92282313ebfb0fa1e7ee906e",
+      "gzipSha256": "ba5de02ae6b06322dbd3c5f2a4b420da78e6ab9273bd1da75a1c5010bd6ba577"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -7,22 +7,17 @@ import { chromium, devices, type Page } from '@playwright/test';
 import { buildIdentity, collectorConditions, parseMeasureArgs, captureTarget, captureFailures } from './measure-fit-options.ts';
 import { navigateCapture, battleGesturePoint } from './measure-fit-controls.ts';
 import { evaluateCapture } from './measure-fit-evaluate.ts';
+import { withPreview } from './measure-fit-preview.ts';
 
 // `measure:fit [output] [--url <origin>]`: without --url the collector serves `dist` itself on the preview port;
 // with --url (or FIT_URL) it measures that deployed origin and reads the served build from the page.
 const options = parseMeasureArgs(process.argv.slice(2), process.env);
-const { output, url } = options;
+const { output } = options;
 const target = captureTarget(options);
 // Bind the collector actually loaded, before a long capture can overlap later source edits.
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const sourceDirty = Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim());
-const collectorSha256 = Object.fromEntries(await Promise.all(['measure-fit.ts','measure-fit-options.ts','measure-fit-controls.ts','measure-fit-evaluate.ts'].map(async name => [name,createHash('sha256').update(await readFile(new URL(name,import.meta.url))).digest('hex')])));
-const server = options.remote ? null : spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'pipe' });
-let serverError = '';
-let previewListening = false;
-server?.stdout.on('data', chunk => { if (String(chunk).includes(url)) previewListening = true; });
-server?.stderr.on('data', chunk => { serverError += String(chunk); });
-server?.on('error', error => { serverError += error.message; });
+const collectorSha256 = Object.fromEntries(await Promise.all(['measure-fit.ts','measure-fit-preview.ts','measure-fit-options.ts','measure-fit-controls.ts','measure-fit-evaluate.ts'].map(async name => [name,createHash('sha256').update(await readFile(new URL(name,import.meta.url))).digest('hex')])));
 
 async function buildFiles(directory: string): Promise<{ path: string; bytes: number; sha256: string }[]> {
   const files = [];
@@ -73,21 +68,12 @@ async function battleWorkload(page: Page) {
   return { workloadStartIndex, actions: ['zoom: wheel -100', 'pan: drag +40/-25 in eight steps', 'selection: legal Move target', 'move: Review and Confirm'] };
 }
 
-try {
-  if (server) {
-    let ready = false;
-    for (let attempt = 0; attempt < 100; attempt++) {
-      if (server.exitCode !== null) throw new Error(`Preview exited: ${serverError}`);
-      try { if (previewListening && (await fetch(url)).ok) { ready = true; break; } } catch { /* server starting */ }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    if (!ready) throw new Error('Preview failed to start');
-  } else {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`${url} answered ${response.status}`);
-  }
+await withPreview(options, async signal => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE });
+  const interrupted = () => { void browser.close().catch(() => {}); };
+  signal.addEventListener('abort', interrupted, { once: true });
   try {
+    signal.throwIfAborted();
     const samples = [];
     const profiles = [
       { name: 'desktop', options: { ...devices['Desktop Chrome'] } },
@@ -165,5 +151,8 @@ try {
     for (const row of evaluation.rows) for (const warning of row.warnings) console.warn(`Load warning: ${row.profile}/${row.cache} repetition ${row.repetition}: ${warning.actual} ms > ${warning.threshold} ms`);
     for (const group of evaluation.loadingHistory) if (group.disposition === 'review-repeated-slow-loads') console.warn(`Review repeated slow loads: ${group.profile}/${group.cache}`);
     if (failures.length) throw new Error(failures.join('; '));
-  } finally { await browser.close(); }
-} finally { server?.kill(); }
+  } finally {
+    signal.removeEventListener('abort', interrupted);
+    await browser.close();
+  }
+});

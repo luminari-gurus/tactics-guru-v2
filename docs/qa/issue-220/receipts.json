@@ -1,0 +1,269 @@
+{
+  "sourceCommit": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+  "sourceDirty": false,
+  "measuredBuild": {
+    "commit": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d",
+    "dirty": false
+  },
+  "browserVersion": "153.0.8010.12",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "node": "v24.19.0"
+  },
+  "sampling": {
+    "url": "http://127.0.0.1:4174",
+    "mode": "headless Chromium; mobile profiles are emulation",
+    "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+    "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+    "frames": "v3: first >=120 visible active post-render intervals; raw idle intervals; nearest-rank p50/p95; cap 600; no interaction workload",
+    "scene": "proof",
+    "route": "proof",
+    "sceneUrl": "http://127.0.0.1:4174/?scene=proof",
+    "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+  },
+  "samples": 18,
+  "collection": {
+    "startedAt": "2026-10-22T17:09:27.0701996Z",
+    "finishedAt": "2026-10-22T17:10:10.3802466Z",
+    "exitCode": 0,
+    "remainingListeners": 0
+  },
+  "evaluation": {
+    "exitCode": 1,
+    "passed": false,
+    "captureFailures": [],
+    "warningSamples": 0,
+    "failedSamples": 2,
+    "limits": {
+      "L1_cold_ms": 2500,
+      "L3_cold_code_bytes": 400000,
+      "L4_cold_assets_bytes": 1500000,
+      "F1_p50_ms": 16.7,
+      "F1_p95_ms": 20,
+      "F2_p95_ms": 33.4
+    },
+    "violations": [
+      {
+        "profile": "desktop",
+        "repetition": 1,
+        "cache": "warm",
+        "values": {
+          "usableMs": 266.6999999284744,
+          "codeBytes": 3900,
+          "assetBytes": 4800,
+          "idleP50Ms": 16.799999952316284,
+          "idleP95Ms": 18
+        },
+        "warnings": [],
+        "violations": [
+          {
+            "metric": "initialIdleP50Ms",
+            "actual": 16.799999952316284,
+            "limit": 16.7
+          },
+          {
+            "metric": "idleP50Ms",
+            "actual": 16.799999952316284,
+            "limit": 16.7
+          }
+        ]
+      },
+      {
+        "profile": "mobile-portrait",
+        "repetition": 1,
+        "cache": "warm",
+        "values": {
+          "usableMs": 207.10000002384186,
+          "codeBytes": 3900,
+          "assetBytes": 4800,
+          "idleP50Ms": 16.799999952316284,
+          "idleP95Ms": 18.09999990463257
+        },
+        "warnings": [],
+        "violations": [
+          {
+            "metric": "initialIdleP50Ms",
+            "actual": 16.799999952316284,
+            "limit": 16.7
+          },
+          {
+            "metric": "idleP50Ms",
+            "actual": 16.799999952316284,
+            "limit": 16.7
+          }
+        ]
+      }
+    ]
+  },
+  "inputHashes": {
+    "package.json": "74cd27321e5a3f05fbc3cc78166845f8bb9a61cd5bb25f1739dfaa0dbb575bc9",
+    "package-lock.json": "e31871b78d9c1444b26db7c3311c24e0234d4c6df4b694b9d3943fb9a67e62c7",
+    "vite.config.ts": "ab342823509326a2ccf26245bb06ec2f8c130720d754a66a8711b2c058e42e3a",
+    "tsconfig.json": "0dd83947555cc594acbd955a45ef4789e9387a99cff759b460fd988a6e5c97da",
+    "tsconfig.domain.json": "94b255ca7ab890df804d9e4b06d9ed62b5f0e01a9f77ace3ac9798d47572591e",
+    "vitest.config.ts": "8b967780731d5b199a8eff59c600789b2ccc84584d523c07796b8c896e09c2cf",
+    "scripts/verify-full.mjs": "6e476ee419cdbe26a4a30c3c92b7350767cc8de644176aaff3aaf9887104389c",
+    "scripts/measure-fit.ts": "d05b44271c24eafa38ed9962eac80504f0b7cd0eeb5b73b46477c4e2ed1d4af6",
+    "scripts/measure-fit-preview.ts": "7b6a7b0e0a4988fe30b41a8eb739b4121fd748fc226d3d325b29890ef59c45ae",
+    "scripts/measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "scripts/measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+    "scripts/measure-fit-evaluate.ts": "d9074efc425f7db8a0ab3f7045f4c79c21e80ccdfb2768b40944fa8c76b89664",
+    "scripts/evaluate-fit.ts": "f940ffc79ac0134601d34fc2a45213dba28254cf9f9f3b210bec8aaa7db825e8",
+    "tests/unit/measureFitPreview.test.ts": "8b017a88381867e23e8acfb4710d4f5a122fb82b3fe6c201e67f63b6d95deeb5",
+    "tests/unit/measureFitOptions.test.ts": "af066456ccf1a9efc146e779283ad5668c30e0d5ab8a9d7082b40b929e55ef8b",
+    "tests/unit/measurements.test.ts": "2cab42f9e963dc7d472b3d6b8829126f2b010a7869183f173bc4a3f6d6f32458"
+  },
+  "files": {
+    "performance.json": {
+      "file": "performance.json.gz",
+      "bytes": 715093,
+      "sha256": "5fb4147ae6ae09979eb8a459863f3eabcbf6006e0c1c0a4fbbbda67d622aeb79",
+      "compressedSha256": "06daf74382507a1738e620330bf37d594651b03237c8cd19b9e019880237e89d"
+    },
+    "evaluation.json": {
+      "file": "evaluation.json.gz",
+      "bytes": 9509,
+      "sha256": "43e0bbfd57e6ad7a401f9db7dde4f2797f1c81e083ac7ab523186aba9e78ab2a",
+      "compressedSha256": "be9369736119759a3f032fc26b560eb60380eb456387aedcf0a1160d4ce1951c"
+    },
+    "capture.log": {
+      "file": "capture.log.gz",
+      "bytes": 201,
+      "sha256": "1cb9491b12ecf3183499339f41187d4d9baa8fc97e0573becd13dbc567621042",
+      "compressedSha256": "e47bf0f3913ed971f4c5bb2288efb96b21d9691dfef762d20fdd810991846914"
+    },
+    "units-first.log": {
+      "file": "units-first.log.gz",
+      "bytes": 1445,
+      "sha256": "d83701007e63464dd5f67f3bfd3e4489d320880181fcf919d3eb15a3ded28e16",
+      "compressedSha256": "dc08adde8bdbe58054c13a7fdb67cbce7934b191b50430ade00de5e900ba184d"
+    },
+    "units-second.log": {
+      "file": "units-second.log.gz",
+      "bytes": 212,
+      "sha256": "6a5eea864b45f9aad1fe8b561c2fbd590e407a80307a8e722ff01f2065775c9b",
+      "compressedSha256": "fd1fb1f74ce1502223acdd99ef5a57cb288188a62600572493bbbb622237d736"
+    },
+    "units-final.log": {
+      "file": "units-final.log.gz",
+      "bytes": 212,
+      "sha256": "e1a9afb75dd91d79cc485f3f6c345791c591a6d480d3a05abe37ec43e924bdb5",
+      "compressedSha256": "6e7888f1d0f5ea3353145ee2d458c05c78c8eb512aaae2b59d0903f947781dc2"
+    },
+    "orchestration.log": {
+      "file": "orchestration.log.gz",
+      "bytes": 2170,
+      "sha256": "fc8cc8d73321102f65d4be0f3327088b3e8b5376981f1c0349fb7f8283d93aec",
+      "compressedSha256": "bf7ef66d2f0978df3f1931ef2f77a20a46323705497fa6b08bb7578fb8652768"
+    },
+    "orchestration-exact-base.log": {
+      "file": "orchestration-exact-base.log.gz",
+      "bytes": 2188,
+      "sha256": "6bfbdb80809def9aa4673e7752065d2de59bcf62ea13c5b2d2c2128470bb58aa",
+      "compressedSha256": "91ffee8dfb9e7d99914a1c4f3869556a337f17a866f92c9668a41d50d41e5efd"
+    },
+    "orchestration-portable.log": {
+      "file": "orchestration-portable.log.gz",
+      "bytes": 1042,
+      "sha256": "83c835ffcbbdaac951f6104aac1d8b720e5d23f9212a29aa3acd6763c0c29490",
+      "compressedSha256": "75c09c3b1c32c5cc092a9d900d0a811943856f36ece66fe34c1007d0983500f0"
+    },
+    "build-first.log": {
+      "file": "build-first.log.gz",
+      "bytes": 5526,
+      "sha256": "a1c4457a4d4ff9d0b81bdac200cf49cde3d52c36a2f3de54b6809cad0ecf76fd",
+      "compressedSha256": "d87d4c763b3b58eccad0da456a61663936a44e55ec63afa22c7cd8e72d7e6b98"
+    },
+    "build-frozen.log": {
+      "file": "build-frozen.log.gz",
+      "bytes": 4857,
+      "sha256": "f861ade0f059529be40757bc8224fc70493fa3615afa99d3ac98a405bef11937",
+      "compressedSha256": "d952de26db0b4cf09651b4bbc74469bf0708d1702e8f0e6eaf312ce5874247b1"
+    },
+    "npm-ci.log": {
+      "file": "npm-ci.log.gz",
+      "bytes": 1376,
+      "sha256": "7c7149d95f0d346462c2c4046b9333a14c6a7cd4551e80c5e6118ecc8fdced52",
+      "compressedSha256": "06c0793e25addcf8ca29da0e389ff07108f1222c11fc58fb1e7a21f612175f6b"
+    },
+    "npm-ci-repair.log": {
+      "file": "npm-ci-repair.log.gz",
+      "bytes": 340,
+      "sha256": "b6310de7364f5b3341638b684fc73a4cefd2163ff4934ce90391dc20b038c7e2",
+      "compressedSha256": "ca97afb127c8507f92827933182483ad06d93b3963ead2891761b858eec7fdb9"
+    },
+    "setup-failed-reproduction.json": {
+      "file": "setup-failed-reproduction.json.gz",
+      "bytes": 8845,
+      "sha256": "7123a7f3ee6ff7b2e1cfc00c450e6d9eb9e610727535fb5d88645731ccb1b299",
+      "compressedSha256": "9a4676257693c21be1543d3caa9965ed2e16627a8f2a9faf034781e20efb2a0b"
+    },
+    "launch-failure.log": {
+      "file": "launch-failure.log.gz",
+      "bytes": 610,
+      "sha256": "307c120c82137ec30bc0c7999047417a00f7b8bae97361d723b3085e942c541c",
+      "compressedSha256": "46ac5d2e81e99cccdbfc28867a2cc3c72d00bc115f33513bef13a0956b83ab88"
+    },
+    "qualification-setup-failed.log": {
+      "file": "qualification-setup-failed.log.gz",
+      "bytes": 1178,
+      "sha256": "8362417a023e55a0a449851f2f4b573892ace482a4e4e9728cc8b2724283e2a1",
+      "compressedSha256": "440d8ceee9cf67ed8d1d26c91077d18e485c0719dd214d892aa78ebf6dc4c8aa"
+    },
+    "qualification.json": {
+      "file": "qualification.json",
+      "bytes": 1205,
+      "sha256": "f66f6795581f73ab082ad451758bc3174a9783c2e3802e1d2cb2b3103bde8e18"
+    },
+    "capture-exit.json": {
+      "file": "capture-exit.json",
+      "bytes": 148,
+      "sha256": "4aa43b77326bc45373917afbb44d6c62fc98aa4bc7901e22b94f88aebf7f0045"
+    },
+    "evaluation-exit.json": {
+      "file": "evaluation-exit.json",
+      "bytes": 23,
+      "sha256": "c34bc644b4dfc96082e294ccb49ac40bdf34a3c659c956ffef43981ed30b2234"
+    },
+    "launch-failure.json": {
+      "file": "launch-failure.json",
+      "bytes": 87,
+      "sha256": "a8886d768dcfbb6204df00667797589dd55cdda4a14fbfab86f2c23d920f2108"
+    },
+    "desktop.png": {
+      "file": "desktop.png",
+      "bytes": 114258,
+      "sha256": "cb432144a7f61e1fc123a91d56db2dda6aae851f925b0cf2f8d6d1ee5ce26c17"
+    },
+    "mobile-portrait.png": {
+      "file": "mobile-portrait.png",
+      "bytes": 506144,
+      "sha256": "08ca015c68133236adfc695ffb24befdcbbf1ef2fead3f5fc404c76a476db9d3"
+    },
+    "mobile-landscape.png": {
+      "file": "mobile-landscape.png",
+      "bytes": 332277,
+      "sha256": "10507631e895df6bf0fbada9b25a3f4c436497707db17400473112e8dd6e0040"
+    }
+  },
+  "verification": {
+    "units": {
+      "passed": 62,
+      "total": 62,
+      "command": "node node_modules/vitest/vitest.mjs run tests/unit/measureFitPreview.test.ts tests/unit/measureFitOptions.test.ts tests/unit/measurements.test.ts"
+    },
+    "content": {
+      "passed": 221,
+      "total": 221,
+      "command": "npm run build"
+    },
+    "types": "both scopes passed in ordinary build; final app scope rerun after helper/tests froze",
+    "bundle": "npm run build:bundle from clean frozen source; prerequisites reused unchanged",
+    "orchestration": "unchanged Windows exact-main contract 9/10; portable PR #224 10/10; original failure retained",
+    "discovery": "node scripts/verify-full.mjs --list: 19 stages; no full execution",
+    "sourceAfterCapture": "33f3595be96dd12a4cfc7fdb3e443352a5f4b30d"
+  }
+}
