@@ -1,5 +1,9 @@
 # Dungeon diamond compass (#195)
 
+The original implementation receipt below describes commit `2c6368a`. The
+[review follow-up](#review-follow-up-preserve-keyboard-focus) records the focus
+repair and its fresh validation separately.
+
 Issue #195 is assigned to `dubstylee`. GitHub's `blocked_by` and `blocking`
 dependency lists were both empty on 2026-10-22; the issue has no comments or
 additional prerequisite links. The selected compact diamond design is recorded
@@ -90,3 +94,57 @@ Committed screenshots, captured from the tested production preview:
 
 Additional local artifacts remain under ignored `tmp/issue-195/`, including the
 unit JSON report, initial WebKit failure contexts and traversal battle receipts.
+
+## Review follow-up: preserve keyboard focus
+
+Addressed [review comment 4352061929](https://github.com/luminari-gurus/tactics-guru-v2/pull/226#discussion_r4352061929).
+When keyboard movement makes the activated compass button unavailable, the outer
+`renderDungeon` renderer now restores focus to the map. It still restores the
+previous control when that control remains available. Native disabled semantics,
+movement validation and `preventScroll` remain intact. The outer renderer owns
+this restoration because it detaches the map before `DungeonMap.draw` executes.
+
+The new `compass keeps keyboard focus when movement disables the activated
+direction` case loads the review's validated seed-1 position-27 fixture. For both
+Enter and Space it moves West to 26, verifies West is disabled and the map has
+visible keyboard focus, rejects ArrowLeft into the wall without changing state,
+and accepts ArrowRight back to 27 while retaining focus and incrementing the
+revision exactly once per legal move.
+
+The new case first failed on the original production build at map-focus
+restoration. An initial inner-map-only candidate still failed on all three
+Chromium profiles (six other selected cases passed). That candidate was reverted;
+the final change is confined to the outer renderer. Original failure contexts
+and the intermediate JSON report remain under `tmp/issue-195/review-before/`,
+`review-chromium/` and `review-chromium.json`.
+
+Fresh validation on 2026-10-22 uses the same runtime/browser versions, ordinary
+root preview, one worker and zero retries recorded above:
+
+- `npm run build`: passed, including 221 content tests and both TypeScript scopes; log `tmp/issue-195/review-build-final.log`.
+- `PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/issue-195/review-chromium-final.json npx --no-install playwright test tests/dungeon-exploration.spec.ts -g 'compass|real traversal' --output=tmp/issue-195/review-chromium-final --reporter=list,json`: 9/9 passed in 20.4 seconds, desktop and Pixel 7 portrait/landscape.
+- `PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/issue-195/review-webkit-final.json npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'compass|real traversal' --output=tmp/issue-195/review-webkit-final --reporter=list,json`: 9/9 passed in 20.2 seconds, desktop Safari and iPhone 13 portrait/landscape.
+
+The 18 browser cases cover the new Enter/Space focus transition, all existing
+compass interactions including native touch, and legal traversal/battle/reload
+plus modal locks. Unchanged domain code, helpers, lockfile and unit files permit
+reuse of the original 70/70 domain-unit evidence. Hidden-input, art and geometry
+paths are unchanged; their original results remain historical evidence, not a
+claim of a new full regression. No standalone/run/shared HUD consumers changed.
+
+Tested build base: `2c6368a8f5ca109e452f99ddbe0ee501aa24b8dc`, dirty with the
+outer-renderer repair and new browser case. After these checks, only QA prose and
+copied screenshots were added; final runtime/test inputs match these SHA-256s:
+
+```text
+8c2b98b4a6b50be40f0d3b38f7bc85c5a162f8c7e09df6bd7f0e519678b39bc0  src/ui/dungeon.ts
+b289545f87f99da56faa5ef1944a35fd5d837136adc888e6bbf897b1de133143  tests/dungeon-exploration.spec.ts
+b30de05274d2c316c81b64b317e9b186c7a0db2a11d61c07fefa9e212f942e48  dist/assets/startDungeonApp-CMqkq6UP.js
+927795b9223fc4fcd933b90cf6d2e726c4b9c5b8fa47553592cef936cc282299  tmp/issue-195/review-chromium-final.json
+7eee44a02faf8d227840c5a08a6d9cace66ad823dd0d742b015e1f687c61f7bc  tmp/issue-195/review-webkit-final.json
+```
+
+Focus-fallback screenshots: [desktop](focus-fallback-desktop.png),
+[mobile portrait](focus-fallback-portrait.png),
+[iPhone landscape](focus-fallback-iphone-landscape.png). Remaining screenshots,
+JSON reports and legal-traversal receipts remain in the local output folders.

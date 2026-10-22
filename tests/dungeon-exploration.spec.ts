@@ -82,6 +82,24 @@ test('diamond compass directions, focus, touch targets and unavailable states',a
  const reward=await dungeonSnapshot(page);await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowUp');expect(await dungeonSnapshot(page)).toEqual(reward);
 });
 
+test('compass keeps keyboard focus when movement disables the activated direction',async({page})=>{
+ const initial=atCell(freshDungeon('compass-browser',1),27),encoded=encodeDungeon(initial);
+ if(!encoded.ok)throw Error(encoded.reason);
+ for(const key of ['Enter','Space']){
+  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+  const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
+  await expect(west).toBeEnabled();await west.focus();await page.keyboard.press(key);
+  const moved=await dungeonSnapshot(page);expect(moved.floors[0].position).toBe(26);expect(moved.revision).toBe(initial.revision+1);
+  await expect(west).toBeDisabled();await expect(map).toBeFocused();
+  expect(await map.evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
+  await page.screenshot({path:test.info().outputPath(`compass-focus-fallback-${key}.png`)});
+  await page.keyboard.press('ArrowLeft');expect(await dungeonSnapshot(page)).toEqual(moved);await expect(map).toBeFocused();
+  await page.keyboard.press('ArrowRight');const returned=await dungeonSnapshot(page);
+  expect(returned.floors[0].position).toBe(27);expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
+ }
+});
+
 test('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
