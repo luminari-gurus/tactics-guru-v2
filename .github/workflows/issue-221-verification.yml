@@ -47,11 +47,13 @@ jobs:
       - name: Build literal base
         run: npm run build 2>&1 | tee verification-receipts/issue-221/build.log
       - name: Discover exactly four desktop cases
-        run: npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
+        run: |
+          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
       - name: Reproduce four cases on the literal base
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/baseline.json
-        run: npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/baseline.log
+        run: |
+          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/baseline.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
