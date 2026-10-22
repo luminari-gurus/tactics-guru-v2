@@ -1,0 +1,76 @@
+{
+  "integrated_main": "251db945569e3f1ac957caa091e9fa9eec11a034",
+  "qualification": "CPU-only preparation; authoritative runner baseline pending",
+  "tooling_contracts": {
+    "passed": 14,
+    "failed": 0
+  },
+  "capture": {
+    "schemaVersion": 2,
+    "scope": "partial",
+    "complete": true,
+    "passed": true,
+    "inputsUnchanged": true,
+    "environment": {
+      "node": "v24.19.0",
+      "platform": "linux",
+      "arch": "x64",
+      "osRelease": "6.18.55",
+      "cpus": 9,
+      "cpuModel": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "memoryBytes": 10451435520,
+      "CI": null
+    },
+    "requestedStages": [
+      "tooling",
+      "typecheck-app",
+      "typecheck-domain"
+    ],
+    "selectedStages": [
+      "tooling",
+      "typecheck-app",
+      "typecheck-domain"
+    ]
+  },
+  "capture_source": {
+    "commit": "2313b461fe5ee6a4d5d2296f7ee3849751dacbc8",
+    "dirty": true,
+    "inputHash": "92312fd122ec2912cb87be5622926c6d889fc50e60aa3223cbb8d4ffe817ab13"
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "exitCode": 0,
+      "wallMs": 689.3033499999999
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed",
+      "exitCode": 0,
+      "wallMs": 1209.498911
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed",
+      "exitCode": 0,
+      "wallMs": 242.68890499999998
+    }
+  ],
+  "sha256": {
+    "scripts/verification-timings.mjs": "1d344cba5c662e2b87e66be0e2be28a115932c839bb2c57e3347a03e244f6dc7",
+    "scripts/verification-report.mjs": "96811a77a77a00812322335c93dacdfc69f560647143b1d18ca565ca6d17853a",
+    "scripts/verification-vitest-reporter.mjs": "3035def2c034cc534dd060d08ace1a3f6843d053a41cbd2b88aea432ecc3fe58",
+    "tests/tooling/verification-timings.test.mjs": "de57364b8a775e9522f16a15c55e11891f49a34d17dfb6b0725eaa2542f46743",
+    "tests/tooling/verification-reporters.test.mjs": "f6ebe7229798c8b167504dbea4ce17e7b83d429d31711feaefdb64903ce38da0",
+    "scripts/verify-full.mjs": "15e2b9420393f71038434c73a0786bca3c952642ec09152da60838241e2cd027",
+    "package.json": "3422b548a50ce0f4729893515242158e3c1ebb9415433fbe8ba3bdf1422b4f2d",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d"
+  },
+  "browsers_launched": false,
+  "limitations": [
+    "No authoritative self-hosted baseline or overall speedup claimed.",
+    "Original incomplete capture and failures retained in README.",
+    "No raw capture logs published; local receipts remain ignored."
+  ]
+}

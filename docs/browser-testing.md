@@ -146,3 +146,13 @@ preflight must use the same full-Chromium channel as the test configuration.
 Keep environment receipts alongside the timing report. Passing CI smoke alone
 does not establish a complete timing baseline or repair unrelated content/unit
 failures. Do not widen timeouts or change workers merely to label the baseline green.
+
+## Qualified runner and timing integration (2026-10-22)
+
+PR #210 is merged. `unraid-tactics-01` passed setup, diagnostics retention,
+Chromium/WebKit preflight and both Phaser smoke cases in
+[run 39717745142](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39717745142).
+This clears the provisioning blocker; it is not a full regression or timing baseline.
+PR #209's manual timing workflow uses `[self-hosted, tactics-browser]`,
+`tactics-browser-exclusive`, the same service-account cache, and no privileged
+OS installation or hosted fallback. See [timing qualification/capture](verification-timings.md).

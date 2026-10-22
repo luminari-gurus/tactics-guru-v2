@@ -1,0 +1,444 @@
+{
+  "source": "73d34dba1620174837cf15a93812d393abe690aa",
+  "inputHash": "92312fd122ec2912cb87be5622926c6d889fc50e60aa3223cbb8d4ffe817ab13",
+  "sourceInitiallyDirty": false,
+  "sourceAfterDirty": true,
+  "inputsUnchanged": true,
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665",
+  "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665/artifacts/12396082054",
+  "artifactSha256": "748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b",
+  "artifactExpiresAt": "2026-11-21T01:58:12Z",
+  "scope": "full",
+  "allSelectedStagesAttempted": true,
+  "coverageComplete": false,
+  "passed": false,
+  "captureWallMs": 4893565.3360520005,
+  "jobQueueMs": 3000.0,
+  "setupBeforeCaptureMs": 70705.0,
+  "jobWallMs": 4970000.0,
+  "browserPreflightMs": 1171.8223510000003,
+  "environment": {
+    "capturedAt": "2026-10-22T00:36:37.547Z",
+    "node": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.17.0-1022-azure",
+    "cpus": 4,
+    "cpuModel": "AMD EPYC 7763 64-Core Processor",
+    "memoryBytes": 16766410752,
+    "vite": "8.3.5",
+    "vitest": "5.0.3",
+    "playwright": "1.63.0",
+    "runnerOS": "Linux",
+    "runnerArch": "X64",
+    "runId": "39700595665",
+    "runAttempt": "1",
+    "hostClass": "GitHub-hosted ubuntu-24.04; interim baseline before self-hosted migration"
+  },
+  "browsers": {
+    "chromium": {
+      "channel": "chromium",
+      "executableOverride": null,
+      "executablePath": "/home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+      "version": "153.0.8010.12"
+    },
+    "webkit": {
+      "channel": null,
+      "executableOverride": null,
+      "executablePath": "/home/runner/.cache/ms-playwright/webkit-2359/pw_run.sh",
+      "version": "26.6"
+    },
+    "chromium-headless": {
+      "channel": null,
+      "executableOverride": null,
+      "executablePath": null,
+      "version": "153.0.8010.12"
+    }
+  },
+  "chromium": {
+    "timedOut": true,
+    "processLimitMs": 3600000,
+    "declaredCases": 687,
+    "lastStartedOrdinal": 257,
+    "finalJsonPresent": false,
+    "completedCaseCounts": null,
+    "explicitDesktopFailures": [
+      "tests/battle-board.spec.ts:236:1 \u203a hovered origins show only ability reach without changing selection, pending commands or saves ",
+      "tests/battle-board.spec.ts:304:1 \u203a selection labels retain the zoomed and panned camera without gameplay commands ",
+      "tests/battle-animations.spec.ts:410:1 \u203a active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state ",
+      "tests/battle-animations.spec.ts:459:1 \u203a active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops "
+    ]
+  },
+  "followups": {
+    "ownedDescendantCleanup": 219,
+    "collectorPreviewReadiness": 220,
+    "desktopFailureTriage": 221
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "wallMs": 356.80233799999996,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "wallMs": 67805.772384,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 907,
+        "passed": 907,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": {
+        "files": [
+          "tests/unit/content.test.ts",
+          "tests/unit/authoredContent.test.ts",
+          "tests/unit/authoredEncounters.test.ts",
+          "tests/unit/items.test.ts",
+          "tests/unit/rewards.test.ts",
+          "tests/unit/battlefieldSources.test.ts",
+          "tests/unit/battlefield.test.ts",
+          "tests/unit/dungeonEncounters.test.ts"
+        ],
+        "counts": {
+          "total": 221,
+          "passed": 221,
+          "failed": 0,
+          "pending": 0
+        },
+        "summedTestDurationMs": 21232.31093999999,
+        "wallMs": null,
+        "note": "Included in units; summed assertion durations are work, not separate wall time."
+      }
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed",
+      "wallMs": 902.7364459999953,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed",
+      "wallMs": 120.53532399999676,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "wallMs": 6407.338403000002,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "build-root",
+      "status": "passed",
+      "wallMs": 943.2355370000005,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "chromium",
+      "status": "failed",
+      "wallMs": 3600105.475233,
+      "exitCode": null,
+      "signal": "SIGTERM",
+      "timedOut": true,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": "ENOENT: no such file or directory, stat '/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/timings/github-hosted-baseline/chromium.json'",
+      "contentValidation": null
+    },
+    {
+      "id": "fixtures",
+      "status": "failed",
+      "wallMs": 3945.8229629998095,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "placement-dev",
+      "status": "failed",
+      "wallMs": 3871.110592999961,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "webkit-acceptance",
+      "status": "failed",
+      "wallMs": 3920.6336910002865,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "webkit-exploration",
+      "status": "failed",
+      "wallMs": 3915.2341399998404,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "health-bars",
+      "status": "failed",
+      "wallMs": 3931.0203479998745,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "telemetry-production",
+      "status": "passed",
+      "wallMs": 581342.5037809997,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "telemetry-development",
+      "status": "passed",
+      "wallMs": 590078.8311430002,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "assets-root-dev",
+      "status": "failed",
+      "wallMs": 3844.296814999543,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "performance",
+      "status": "failed",
+      "wallMs": 10583.642146999948,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": "ENOENT: no such file or directory, stat '/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/timings/github-hosted-baseline/performance.json'",
+      "contentValidation": null
+    },
+    {
+      "id": "build-prefix",
+      "status": "passed",
+      "wallMs": 927.06250299979,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "assets-prefix-preview",
+      "status": "failed",
+      "wallMs": 3855.893159000203,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/prototype/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "assets-prefix-dev",
+      "status": "failed",
+      "wallMs": 3863.121700000018,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "counts": {
+        "total": 0,
+        "expected": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "globalErrors": [
+        "Error: http://127.0.0.1:4173/prototype/ is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer."
+      ],
+      "reportError": null,
+      "contentValidation": null
+    },
+    {
+      "id": "restore-root",
+      "status": "passed",
+      "wallMs": 938.8345659999177,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "counts": null,
+      "globalErrors": [],
+      "reportError": null,
+      "contentValidation": null
+    }
+  ],
+  "interpretation": [
+    "complete=true in the capture schema means every selected stage was attempted; it does not mean every case executed.",
+    "Chromium was cut off without final JSON; no pass/fail count is inferred for its remaining cases.",
+    "Eight independent browser stages failed before tests because port 4173 stayed occupied after Chromium termination.",
+    "The collector produced no performance samples; full successful regression duration and a speedup are unknown.",
+    "Inputs began clean and verification input hashes stayed identical; final non-input tree dirtiness remains recorded."
+  ]
+}

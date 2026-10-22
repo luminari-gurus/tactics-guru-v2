@@ -33,3 +33,6 @@ ORIGINAL/
 
 # Local scratch for hand-run media-generation candidates (docs/media-gen)
 tmp/
+
+# Verification receipts survive ordinary Playwright output cleanup
+verification-receipts/

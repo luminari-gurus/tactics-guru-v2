@@ -1,0 +1,568 @@
+{
+  "schemaVersion": 1,
+  "kind": "investigation-and-proposed-batch-plan",
+  "source": "6f20a3d6a8087e40777cccb6ee7c2cf4a09ece89",
+  "sourceInputHash": "c1fb2a91f63723f721d45cb80bba6d452497ff1d9713b18cf0c9816182bc7621",
+  "inspectedBranch": "a0185e492d558c29ead872414ffebc6129516876",
+  "run": 39767156870,
+  "attempt": 2,
+  "job": 119849080072,
+  "artifact": {
+    "id": 12435277901,
+    "sha256": "92c312b7a6294b1d6ee8d0046f9d193fda77e8320169427901f5612c8702a1d0",
+    "verifiedDownload": true,
+    "expiresAt": "2026-11-21T15:02:33Z"
+  },
+  "capture": {
+    "complete": false,
+    "passed": false,
+    "wallMs": 6000044.7659,
+    "inputsUnchanged": true,
+    "exitCode": 124
+  },
+  "chromium": {
+    "planned": 687,
+    "started": 471,
+    "completed": 470,
+    "passed": 468,
+    "skipped": 2,
+    "unexpectedCompletedFailures": 0,
+    "incompleteCases": 217,
+    "testWorkMs": 3580929,
+    "wallMs": 3600247.155671,
+    "byProject": [
+      {
+        "project": "desktop",
+        "completed": 229,
+        "testWorkMs": 2091560,
+        "passed": 228,
+        "skipped": 1
+      },
+      {
+        "project": "mobile-portrait",
+        "completed": 229,
+        "testWorkMs": 1451111,
+        "passed": 228,
+        "skipped": 1
+      },
+      {
+        "project": "mobile-landscape",
+        "completed": 12,
+        "testWorkMs": 38258,
+        "passed": 12,
+        "skipped": 0
+      }
+    ],
+    "byFile": [
+      {
+        "file": "dungeon-exploration.spec.ts",
+        "observedTestWorkMs": 653136.0
+      },
+      {
+        "file": "battle-audio.spec.ts",
+        "observedTestWorkMs": 611321.0
+      },
+      {
+        "file": "run-progression.spec.ts",
+        "observedTestWorkMs": 472239.0
+      },
+      {
+        "file": "battle-loop.spec.ts",
+        "observedTestWorkMs": 464380.0
+      },
+      {
+        "file": "battle-animations.spec.ts",
+        "observedTestWorkMs": 274609.0
+      },
+      {
+        "file": "battle-persistence.spec.ts",
+        "observedTestWorkMs": 207357.0
+      },
+      {
+        "file": "battle-board.spec.ts",
+        "observedTestWorkMs": 186910.0
+      },
+      {
+        "file": "unit-health-bars.spec.ts",
+        "observedTestWorkMs": 146173.0
+      },
+      {
+        "file": "public-asset-base.spec.ts",
+        "observedTestWorkMs": 131582.0
+      },
+      {
+        "file": "audio.spec.ts",
+        "observedTestWorkMs": 82321.0
+      },
+      {
+        "file": "dungeon.spec.ts",
+        "observedTestWorkMs": 72471.0
+      },
+      {
+        "file": "guarded-effects.spec.ts",
+        "observedTestWorkMs": 64890.0
+      },
+      {
+        "file": "overworld-map.spec.ts",
+        "observedTestWorkMs": 43964.0
+      },
+      {
+        "file": "content-loading.spec.ts",
+        "observedTestWorkMs": 27462.0
+      },
+      {
+        "file": "procedural-grids.spec.ts",
+        "observedTestWorkMs": 26919.0
+      },
+      {
+        "file": "move.spec.ts",
+        "observedTestWorkMs": 22463.0
+      },
+      {
+        "file": "lifecycle.spec.ts",
+        "observedTestWorkMs": 20849.0
+      },
+      {
+        "file": "dungeon-lifecycle.spec.ts",
+        "observedTestWorkMs": 19428.0
+      },
+      {
+        "file": "assets.spec.ts",
+        "observedTestWorkMs": 12215.0
+      },
+      {
+        "file": "layout.spec.ts",
+        "observedTestWorkMs": 12148.0
+      },
+      {
+        "file": "input.spec.ts",
+        "observedTestWorkMs": 6819.0
+      },
+      {
+        "file": "boot.spec.ts",
+        "observedTestWorkMs": 5883.0
+      },
+      {
+        "file": "engine-fit.spec.ts",
+        "observedTestWorkMs": 5369.0
+      },
+      {
+        "file": "opacity.spec.ts",
+        "observedTestWorkMs": 3682.0
+      },
+      {
+        "file": "terrain-materials.spec.ts",
+        "observedTestWorkMs": 2567.0
+      },
+      {
+        "file": "board.spec.ts",
+        "observedTestWorkMs": 2268.0
+      },
+      {
+        "file": "grass-surface.spec.ts",
+        "observedTestWorkMs": 1504.0
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "wallMs": 407.39915999999994,
+      "counts": null,
+      "checkpoint": null
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "wallMs": 35952.797675,
+      "counts": {
+        "total": 907,
+        "passed": 907,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "checkpoint": null
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed",
+      "wallMs": 799.1292940000058,
+      "counts": null,
+      "checkpoint": null
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed",
+      "wallMs": 136.7648429999972,
+      "counts": null,
+      "checkpoint": null
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "wallMs": 6771.150527999998,
+      "counts": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "checkpoint": null
+    },
+    {
+      "id": "build-root",
+      "status": "passed",
+      "wallMs": 902.6742149999991,
+      "counts": null,
+      "checkpoint": null
+    },
+    {
+      "id": "chromium",
+      "status": "failed",
+      "wallMs": 3600247.155671,
+      "counts": null,
+      "checkpoint": {
+        "path": "chromium-cases.jsonl",
+        "planned": 687,
+        "completedAttempts": 470,
+        "completedCases": 470,
+        "runnerEnded": false
+      }
+    },
+    {
+      "id": "fixtures",
+      "status": "passed",
+      "wallMs": 211560.21276000002,
+      "counts": {
+        "total": 57,
+        "expected": 57,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "checkpoint": {
+        "path": "fixtures-cases.jsonl",
+        "planned": 57,
+        "completedAttempts": 57,
+        "completedCases": 57,
+        "runnerEnded": true
+      }
+    },
+    {
+      "id": "placement-dev",
+      "status": "passed",
+      "wallMs": 9992.341692000162,
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "checkpoint": {
+        "path": "placement-dev-cases.jsonl",
+        "planned": 3,
+        "completedAttempts": 3,
+        "completedCases": 3,
+        "runnerEnded": true
+      }
+    },
+    {
+      "id": "webkit-acceptance",
+      "status": "passed",
+      "wallMs": 484291.4311609999,
+      "counts": {
+        "total": 52,
+        "expected": 52,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "checkpoint": {
+        "path": "webkit-acceptance-cases.jsonl",
+        "planned": 52,
+        "completedAttempts": 52,
+        "completedCases": 52,
+        "runnerEnded": true
+      }
+    },
+    {
+      "id": "webkit-exploration",
+      "status": "passed",
+      "wallMs": 926962.8516490003,
+      "counts": {
+        "total": 51,
+        "expected": 51,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "checkpoint": {
+        "path": "webkit-exploration-cases.jsonl",
+        "planned": 51,
+        "completedAttempts": 51,
+        "completedCases": 51,
+        "runnerEnded": true
+      }
+    },
+    {
+      "id": "health-bars",
+      "status": "passed",
+      "wallMs": 325089.85133,
+      "counts": {
+        "total": 25,
+        "expected": 25,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "checkpoint": {
+        "path": "health-bars-cases.jsonl",
+        "planned": 25,
+        "completedAttempts": 25,
+        "completedCases": 25,
+        "runnerEnded": true
+      }
+    },
+    {
+      "id": "telemetry-production",
+      "status": "failed",
+      "wallMs": 392557.22398300003,
+      "counts": null,
+      "checkpoint": {
+        "path": "telemetry-production-cases.jsonl",
+        "planned": 36,
+        "completedAttempts": 24,
+        "completedCases": 24,
+        "runnerEnded": false
+      }
+    }
+  ],
+  "batchPlan": {
+    "execution": "PROPOSED serial jobs on the one qualified runner; not executed browser qualification",
+    "batchesPerProject": 3,
+    "workers": 1,
+    "estimatedFullChromiumTestWorkMs": 4994270,
+    "estimatedTotalIsNotObservedWallTime": true,
+    "coverageValidation": {
+      "method": "actual Playwright --list JSON for canonical selection and every batch at the inspected source; no browsers/server launched",
+      "canonicalCases": 687,
+      "selectedCases": 687,
+      "uniqueSelectedCases": 687,
+      "missing": 0,
+      "duplicates": 0,
+      "extra": 0,
+      "canonicalSortedIdsSha256": "0a1d0779607f9c4b7bb05ba534b5adf075fcc55b0b565c3ddee029f734b7dc93",
+      "selectedSortedIdsSha256": "0a1d0779607f9c4b7bb05ba534b5adf075fcc55b0b565c3ddee029f734b7dc93"
+    },
+    "batches": [
+      {
+        "id": "desktop-1",
+        "project": "desktop",
+        "files": [
+          "tests/battle-board.spec.ts",
+          "tests/battle-persistence.spec.ts",
+          "tests/dungeon-exploration.spec.ts",
+          "tests/dungeon-lifecycle.spec.ts",
+          "tests/dungeon.spec.ts",
+          "tests/grass-surface.spec.ts",
+          "tests/input.spec.ts",
+          "tests/opacity.spec.ts",
+          "tests/overworld-map.spec.ts"
+        ],
+        "cases": 77,
+        "estimatedTestWorkMs": 697521,
+        "measuredCases": 77,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-board.spec.ts tests/battle-persistence.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/dungeon.spec.ts tests/grass-surface.spec.ts tests/input.spec.ts tests/opacity.spec.ts tests/overworld-map.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-board.spec.ts tests/battle-persistence.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/dungeon.spec.ts tests/grass-surface.spec.ts tests/input.spec.ts tests/opacity.spec.ts tests/overworld-map.spec.ts --list --reporter=json",
+        "testIdSha256": "7bffe723763846afd2bc145667e0b2e1e9f8c0f39ec09a0ed70bb4f3870981f1"
+      },
+      {
+        "id": "desktop-2",
+        "project": "desktop",
+        "files": [
+          "tests/battle-animations.spec.ts",
+          "tests/battle-audio.spec.ts",
+          "tests/engine-fit.spec.ts",
+          "tests/guarded-effects.spec.ts",
+          "tests/layout.spec.ts",
+          "tests/move.spec.ts",
+          "tests/procedural-grids.spec.ts",
+          "tests/terrain-materials.spec.ts",
+          "tests/unit-health-bars.spec.ts"
+        ],
+        "cases": 68,
+        "estimatedTestWorkMs": 697201,
+        "measuredCases": 68,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "testIdSha256": "33af38cf8495a73ce08a4b394cfdc402897ad44efa71c81d87e30b1082941dde"
+      },
+      {
+        "id": "desktop-3",
+        "project": "desktop",
+        "files": [
+          "tests/assets.spec.ts",
+          "tests/audio.spec.ts",
+          "tests/battle-loop.spec.ts",
+          "tests/board.spec.ts",
+          "tests/boot.spec.ts",
+          "tests/content-loading.spec.ts",
+          "tests/lifecycle.spec.ts",
+          "tests/public-asset-base.spec.ts",
+          "tests/run-progression.spec.ts"
+        ],
+        "cases": 84,
+        "estimatedTestWorkMs": 696838,
+        "measuredCases": 84,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=desktop --workers=1 tests/assets.spec.ts tests/audio.spec.ts tests/battle-loop.spec.ts tests/board.spec.ts tests/boot.spec.ts tests/content-loading.spec.ts tests/lifecycle.spec.ts tests/public-asset-base.spec.ts tests/run-progression.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=desktop --workers=1 tests/assets.spec.ts tests/audio.spec.ts tests/battle-loop.spec.ts tests/board.spec.ts tests/boot.spec.ts tests/content-loading.spec.ts tests/lifecycle.spec.ts tests/public-asset-base.spec.ts tests/run-progression.spec.ts --list --reporter=json",
+        "testIdSha256": "3f1c6af7efaa59f48e538e66ebf06a22a36f46aa8e5153e60b994ea14bc34090"
+      },
+      {
+        "id": "mobile-portrait-1",
+        "project": "mobile-portrait",
+        "files": [
+          "tests/battle-persistence.spec.ts",
+          "tests/board.spec.ts",
+          "tests/content-loading.spec.ts",
+          "tests/dungeon-exploration.spec.ts",
+          "tests/dungeon.spec.ts",
+          "tests/input.spec.ts",
+          "tests/layout.spec.ts",
+          "tests/move.spec.ts",
+          "tests/opacity.spec.ts",
+          "tests/public-asset-base.spec.ts"
+        ],
+        "cases": 73,
+        "estimatedTestWorkMs": 483630,
+        "measuredCases": 73,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-persistence.spec.ts tests/board.spec.ts tests/content-loading.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/input.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/opacity.spec.ts tests/public-asset-base.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-persistence.spec.ts tests/board.spec.ts tests/content-loading.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/input.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/opacity.spec.ts tests/public-asset-base.spec.ts --list --reporter=json",
+        "testIdSha256": "f52db62d79375513ebd8e24f2e16e6d13dcb0f6cc14280c9f9ce438fbb278c00"
+      },
+      {
+        "id": "mobile-portrait-2",
+        "project": "mobile-portrait",
+        "files": [
+          "tests/assets.spec.ts",
+          "tests/audio.spec.ts",
+          "tests/battle-animations.spec.ts",
+          "tests/battle-audio.spec.ts",
+          "tests/battle-board.spec.ts",
+          "tests/engine-fit.spec.ts",
+          "tests/grass-surface.spec.ts",
+          "tests/lifecycle.spec.ts",
+          "tests/overworld-map.spec.ts"
+        ],
+        "cases": 100,
+        "estimatedTestWorkMs": 483716,
+        "measuredCases": 100,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/assets.spec.ts tests/audio.spec.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-board.spec.ts tests/engine-fit.spec.ts tests/grass-surface.spec.ts tests/lifecycle.spec.ts tests/overworld-map.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/assets.spec.ts tests/audio.spec.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-board.spec.ts tests/engine-fit.spec.ts tests/grass-surface.spec.ts tests/lifecycle.spec.ts tests/overworld-map.spec.ts --list --reporter=json",
+        "testIdSha256": "fc6bbc0bdb5037fbc702835a142cbcbf7c5df20002ed3098e1d6a0cd6427be5a"
+      },
+      {
+        "id": "mobile-portrait-3",
+        "project": "mobile-portrait",
+        "files": [
+          "tests/battle-loop.spec.ts",
+          "tests/boot.spec.ts",
+          "tests/dungeon-lifecycle.spec.ts",
+          "tests/guarded-effects.spec.ts",
+          "tests/procedural-grids.spec.ts",
+          "tests/run-progression.spec.ts",
+          "tests/terrain-materials.spec.ts",
+          "tests/unit-health-bars.spec.ts"
+        ],
+        "cases": 56,
+        "estimatedTestWorkMs": 483765,
+        "measuredCases": 56,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "testIdSha256": "94db3ea82ca03ef79cca1b62bdf5be9d597b3854ae5d055fd37013cebaa36efc"
+      },
+      {
+        "id": "mobile-landscape-1",
+        "project": "mobile-landscape",
+        "files": [
+          "tests/battle-persistence.spec.ts",
+          "tests/board.spec.ts",
+          "tests/content-loading.spec.ts",
+          "tests/dungeon-exploration.spec.ts",
+          "tests/dungeon.spec.ts",
+          "tests/grass-surface.spec.ts",
+          "tests/input.spec.ts",
+          "tests/layout.spec.ts",
+          "tests/move.spec.ts",
+          "tests/opacity.spec.ts",
+          "tests/public-asset-base.spec.ts"
+        ],
+        "cases": 74,
+        "estimatedTestWorkMs": 484314,
+        "measuredCases": 0,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/battle-persistence.spec.ts tests/board.spec.ts tests/content-loading.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/grass-surface.spec.ts tests/input.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/opacity.spec.ts tests/public-asset-base.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/battle-persistence.spec.ts tests/board.spec.ts tests/content-loading.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/grass-surface.spec.ts tests/input.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/opacity.spec.ts tests/public-asset-base.spec.ts --list --reporter=json",
+        "testIdSha256": "403327d5e0b923b5514bdf02eb606124f92440c66fd9d831e8e3223704a15cdf"
+      },
+      {
+        "id": "mobile-landscape-2",
+        "project": "mobile-landscape",
+        "files": [
+          "tests/assets.spec.ts",
+          "tests/battle-animations.spec.ts",
+          "tests/battle-audio.spec.ts",
+          "tests/battle-board.spec.ts",
+          "tests/engine-fit.spec.ts",
+          "tests/guarded-effects.spec.ts",
+          "tests/lifecycle.spec.ts",
+          "tests/overworld-map.spec.ts"
+        ],
+        "cases": 95,
+        "estimatedTestWorkMs": 483640,
+        "measuredCases": 5,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/assets.spec.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-board.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/lifecycle.spec.ts tests/overworld-map.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/assets.spec.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-board.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/lifecycle.spec.ts tests/overworld-map.spec.ts --list --reporter=json",
+        "testIdSha256": "2b3f2b59e0ac592a0178e4d70f032be3a93cf4eb17e27d1cb4ad24972222f41b"
+      },
+      {
+        "id": "mobile-landscape-3",
+        "project": "mobile-landscape",
+        "files": [
+          "tests/audio.spec.ts",
+          "tests/battle-loop.spec.ts",
+          "tests/boot.spec.ts",
+          "tests/dungeon-lifecycle.spec.ts",
+          "tests/procedural-grids.spec.ts",
+          "tests/run-progression.spec.ts",
+          "tests/terrain-materials.spec.ts",
+          "tests/unit-health-bars.spec.ts"
+        ],
+        "cases": 60,
+        "estimatedTestWorkMs": 483645,
+        "measuredCases": 7,
+        "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
+        "command": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "testIdSha256": "5bd3ba97c48f8d55272b1b808fb4e6ece425e1cac3c9502e0e6feb601e7fa02a"
+      }
+    ]
+  },
+  "limits": "Desktop and portrait finished; landscape projection uses portrait timings for 217 uncompleted cases. Estimates exclude future host contention, batch/browser/server startup, fixture duplication and CI setup. No worker parallelism, matrix reduction, complete full baseline or speedup claim."
+}
