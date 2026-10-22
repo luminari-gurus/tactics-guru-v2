@@ -2,7 +2,7 @@
 
 ## 1. Evidence and diagnosis
 
-- [ ] 1.1 Recover the original artifact, verify source equality and reproduce the four literal-base desktop cases on the qualified self-hosted runner; retain provenance, results and per-phase diagnostics in the QA report and plan.
+- [x] 1.1 Recover the original artifact, verify source equality and reproduce the four literal-base desktop cases on the qualified self-hosted runner; retain provenance, results and per-phase diagnostics in the QA report and plan.
 
 ## 2. Bounded repairs
 

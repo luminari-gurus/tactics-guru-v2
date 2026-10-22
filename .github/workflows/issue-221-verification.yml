@@ -22,14 +22,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: '251db945569e3f1ac957caa091e9fa9eec11a034'
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Record qualified host and literal-base identity
+      - name: Record qualified host and candidate identity
         run: |
           mkdir -p verification-receipts/issue-221
           node --input-type=module <<'JS'
@@ -44,11 +44,15 @@ jobs:
           writeFileSync('verification-receipts/issue-221/environment.json',JSON.stringify({commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,npm:execFileSync('npm',['--version'],{encoding:'utf8'}).trim(),browser:browser.version(),executable:chromium.executablePath(),os:os.release(),platform:os.platform(),cpu:os.cpus()[0].model,cpus:os.cpus().length,memory:os.totalmem(),load:os.loadavg(),runner:process.env.RUNNER_NAME,workers:1,retries:0,trace:'off',mode:'preview',hashes},null,2));
           await browser.close();
           JS
-      - name: Build literal base
+      - name: Build candidate
+        id: build
         run: npm run build 2>&1 | tee verification-receipts/issue-221/build.log
-      - name: Discover exactly four desktop cases
+      - name: Record served build hashes
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue-221/build-sha256.txt
+      - name: Discover four cases across the three Chromium profiles
+        run: |
+          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --list | tee verification-receipts/issue-221/discovery.log
       - name: Record temporary diagnostic step timings
         run: |
           cat > verification-receipts/issue-221/steps.cjs <<'JS'
@@ -67,11 +71,17 @@ jobs:
             onEnd() { fs.writeFileSync('verification-receipts/issue-221/steps.json',JSON.stringify(this.tests,null,2)); }
           };
           JS
-      - name: Diagnose four cases on the literal base
+      - name: Qualify repaired cases across Chromium profiles
         env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/baseline.json
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/candidate.json
         run: |
-          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --project=desktop --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json,./verification-receipts/issue-221/steps.cjs --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/baseline.log
+          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(hovered origins show only ability reach without changing selection, pending commands or saves|selection labels retain the zoomed and panned camera without gameplay commands|active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state|active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops)$' --workers=1 --retries=0 --trace=off --reporter=list,json,./verification-receipts/issue-221/steps.cjs --output=verification-receipts/issue-221/artifacts 2>&1 | tee verification-receipts/issue-221/candidate.log
+      - name: Qualify neighboring camera, target, reduced-motion and restart cases
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-221/neighbors.json
+        run: |
+          npx --no-install playwright test tests/battle-board.spec.ts tests/battle-animations.spec.ts --grep '(target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands|active bob: initial reduced motion keeps sprite and static actor marker anchored|authored camera keeps zoom bounds and refits on real orientation changes|default authored board renders canonical units, highlights and stable restarts)$' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/issue-221/neighbors 2>&1 | tee verification-receipts/issue-221/neighbors.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:

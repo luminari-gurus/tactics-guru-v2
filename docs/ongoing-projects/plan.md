@@ -1,6 +1,12 @@
 # Issue #221: diagnose and repair four desktop browser timeouts
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation in progress; literal-base reproduction retained, phase diagnosis running. Draft PR: [#223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
+Date: 2026-10-22 (Asia/Jerusalem). Status: bounded bob test repair implemented; three-profile qualification in progress. Draft PR: [#223](https://github.com/luminari-gurus/tactics-guru-v2/pull/223).
+
+## Current handoff
+
+OpenSpec change `issue-221-desktop-timeouts`: 1/4 tasks complete. Original artifact recovered (ZIP SHA-256 `748aba4ed5450557980eb652fe2fb496db4664f9529631f173c0b29b0cb01a8b`). Literal-base run `39750405032` and diagnostic run `39750995870` each pass hover/camera/first-bob and reproduce the lifecycle-bob timeout. Measured dominant work is long controlled-clock rendering, including frames where bobbing is disabled. Repair changes only the two bob test bodies; preserves every assertion/sample and all operation limits. The board cases are unchanged and explicitly dispositioned as non-reproduced on the qualified host. See [QA evidence](../qa/issue-221-desktop-timeouts.md).
+
+Next: inspect the candidate self-hosted run on PR #223 (12 reported cases + 12 neighboring cases across desktop/portrait/landscape); preserve failures, compare step timings to the diagnostic base, resolve any failures, freeze source/build/report identities, finish OpenSpec tasks, remove temporary diagnostic reporting and mark the PR review-ready. Do not rerun an hour-long baseline or merge/deploy.
 
 - Issue: [#221](https://github.com/luminari-gurus/tactics-guru-v2/issues/221).
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/221#issuecomment-6336358452).
