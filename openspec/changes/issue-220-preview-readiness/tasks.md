@@ -18,7 +18,7 @@
 
 - [x] 4.1 Reproduce concurrent abort/capture rejection and retain the initiating SIGINT/SIGTERM or preview-exit cause alongside secondary capture/cleanup failures.
 - [x] 4.2 Reproduce trailing stderr after child exit; abort capture promptly and snapshot crash diagnostics only after bounded close/pipe drain.
-- [ ] 4.3 Run affected lifecycle/options/evaluation contracts and type checks, record source-bound evidence and reuse limits, publish fixes/replies, resolve addressed threads and verify final Git/PR state.
+- [x] 4.3 Run affected lifecycle/options/evaluation contracts and type checks, record source-bound evidence and reuse limits, publish fixes/replies, resolve addressed threads and verify final Git/PR state.
 
 ## Workflow follow-up
 
