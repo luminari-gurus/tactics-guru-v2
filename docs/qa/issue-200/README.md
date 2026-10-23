@@ -1,8 +1,18 @@
-> Current review status (2026-10-22): self-hosted qualification passed. See [the review handoff](self-hosted-qualification.md). The historical failures below remain unchanged; #200 full-baseline coverage is still open.
+# Issue #200: current verification results
 
-# Issue #200: verification timing tooling
+The full serial capture and merged repairs are consolidated in the
+[current results report](serial-baseline-2026-10-23/README.md), with
+[durable machine-readable evidence](serial-baseline-2026-10-23/results.json).
+All 19 batches were attempted; two failed. #231, #232 and #233 provide focused
+follow-up evidence, not a passing replacement full baseline. #200 remains open.
+The next optimization recommendation is review of existing PR #229 for #205.
 
-## Latest: approved GitHub-hosted attempt
+The dated records below preserve earlier attempts. Their draft/provisioning and
+pending-capture statements describe historical states, not current status.
+
+# Historical issue #200 tooling and capture notes
+
+## Historical: approved GitHub-hosted attempt
 
 The caller approved hosted capacity now, with self-hosted migration later.
 [Run 39700595665](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665)

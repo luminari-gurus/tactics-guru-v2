@@ -1,0 +1,367 @@
+{
+  "run": 39952038146,
+  "source": {
+    "commit": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+    "dirty": false,
+    "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1"
+  },
+  "planHash": "34b7d47875f8a7c6ca415ee64d034378f78df5db68e45128f80d0bfa99ab45d8",
+  "disposition": {
+    "scope": "full",
+    "complete": false,
+    "passed": false,
+    "baselineEligible": false
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.8.0-147-generic",
+    "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+    "cpus": 6,
+    "memoryBytes": 8174170112,
+    "runner": "unraid-tactics-01",
+    "versions": {
+      "@playwright/test": "1.63.0",
+      "vite": "8.3.5",
+      "vitest": "5.0.3",
+      "typescript": "7.0.2"
+    }
+  },
+  "browsers": {
+    "chromium": {
+      "version": "153.0.8010.12"
+    },
+    "webkit": {
+      "version": "26.6"
+    },
+    "chromium-headless": {
+      "version": "153.0.8010.12"
+    }
+  },
+  "conditions": "Persistent runner; background workloads not independently verified",
+  "wallMs": 9539329,
+  "stageWallMs": 8831588.899372,
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "wallMs": 397.2262379999993,
+      "counts": null
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "wallMs": 35173.232169,
+      "counts": {
+        "total": 934,
+        "passed": 934,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed",
+      "wallMs": 807.868048999997,
+      "counts": null
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed",
+      "wallMs": 132.6610109999965,
+      "counts": null
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "wallMs": 6766.707234999994,
+      "counts": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    },
+    {
+      "id": "build-root",
+      "status": "passed",
+      "wallMs": 988.8878269999987,
+      "counts": null
+    },
+    {
+      "id": "chromium",
+      "status": "failed",
+      "wallMs": 5170962.530843999,
+      "counts": {
+        "total": 693,
+        "expected": 689,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "fixtures",
+      "status": "passed",
+      "wallMs": 212034.440757,
+      "counts": {
+        "total": 57,
+        "expected": 57,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "placement-dev",
+      "status": "passed",
+      "wallMs": 11407.378302,
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "webkit-acceptance",
+      "status": "passed",
+      "wallMs": 485834.40439499996,
+      "counts": {
+        "total": 52,
+        "expected": 52,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "webkit-exploration",
+      "status": "passed",
+      "wallMs": 957528.34803,
+      "counts": {
+        "total": 57,
+        "expected": 57,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "health-bars",
+      "status": "passed",
+      "wallMs": 324990.05728500005,
+      "counts": {
+        "total": 25,
+        "expected": 25,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "telemetry-production",
+      "status": "passed",
+      "wallMs": 460979.765458,
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "telemetry-development",
+      "status": "passed",
+      "wallMs": 444112.857829,
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "assets-root-dev",
+      "status": "passed",
+      "wallMs": 234503.888162,
+      "counts": {
+        "total": 69,
+        "expected": 66,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "performance",
+      "status": "failed",
+      "wallMs": 45559.941211,
+      "counts": null
+    },
+    {
+      "id": "build-prefix",
+      "status": "passed",
+      "wallMs": 910.194344,
+      "counts": null
+    },
+    {
+      "id": "assets-prefix-preview",
+      "status": "passed",
+      "wallMs": 202139.119456,
+      "counts": {
+        "total": 69,
+        "expected": 69,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "assets-prefix-dev",
+      "status": "passed",
+      "wallMs": 235440.27155499998,
+      "counts": {
+        "total": 69,
+        "expected": 66,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      }
+    },
+    {
+      "id": "restore-root",
+      "status": "passed",
+      "wallMs": 919.1192150000134,
+      "counts": null
+    }
+  ],
+  "chromiumFilesByDurationMs": [
+    [
+      "dungeon-exploration.spec.ts",
+      958521
+    ],
+    [
+      "battle-audio.spec.ts",
+      858645
+    ],
+    [
+      "run-progression.spec.ts",
+      685351
+    ],
+    [
+      "battle-loop.spec.ts",
+      650578
+    ],
+    [
+      "battle-animations.spec.ts",
+      391578
+    ],
+    [
+      "battle-persistence.spec.ts",
+      292950
+    ],
+    [
+      "battle-board.spec.ts",
+      268336
+    ],
+    [
+      "unit-health-bars.spec.ts",
+      207276
+    ],
+    [
+      "public-asset-base.spec.ts",
+      193276
+    ],
+    [
+      "dungeon.spec.ts",
+      106899
+    ],
+    [
+      "guarded-effects.spec.ts",
+      93294
+    ],
+    [
+      "audio.spec.ts",
+      88340
+    ],
+    [
+      "overworld-map.spec.ts",
+      71728
+    ],
+    [
+      "content-loading.spec.ts",
+      41311
+    ],
+    [
+      "procedural-grids.spec.ts",
+      39158
+    ],
+    [
+      "move.spec.ts",
+      33258
+    ],
+    [
+      "lifecycle.spec.ts",
+      30513
+    ],
+    [
+      "dungeon-lifecycle.spec.ts",
+      28247
+    ],
+    [
+      "layout.spec.ts",
+      17886
+    ],
+    [
+      "assets.spec.ts",
+      12027
+    ],
+    [
+      "input.spec.ts",
+      9424
+    ],
+    [
+      "boot.spec.ts",
+      8823
+    ],
+    [
+      "engine-fit.spec.ts",
+      7883
+    ],
+    [
+      "board.spec.ts",
+      4451
+    ],
+    [
+      "opacity.spec.ts",
+      4204
+    ],
+    [
+      "terrain-materials.spec.ts",
+      3530
+    ],
+    [
+      "grass-surface.spec.ts",
+      2590
+    ]
+  ],
+  "retainedReport": "case-results.json"
+}
