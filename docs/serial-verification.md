@@ -80,9 +80,13 @@ source/build/plan/runner/browser provenance, chooses the latest attempt per batc
 and keeps prior outcomes in `history`. A successful explicit rerun can recover the
 current result; its earlier failure remains visible. Missing, malformed, duplicate
 or mismatched receipts fail the stable **Serial verification aggregate** check.
-The aggregate also checks the latest Actions job attempts: a newer setup or
+The aggregate also checks the latest Actions job execution timestamps: a newer setup or
 upload failure without a receipt cannot fall back to an older passing artifact.
 If that Actions API check fails, CI fails closed instead of guessing success.
+GitHub copies successful job snapshots into a new attempt during a targeted
+rerun; those copied attempt numbers are not evidence of re-execution. Receipt
+timestamps must fit the actual job interval. Identical execution intervals are
+counted once for compute, and copied snapshots cannot create negative queue time.
 Reports merge by canonical stage and case ID/project; intentional coverage of the
 same test in different root/prefix/dev modes is not deduplicated. Native blob ZIPs
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.
@@ -93,6 +97,18 @@ is partial, not an implicit combination with old runs or hosts. Preserve raw
 artifacts beyond expiry if review or a baseline obligation still needs them.
 
 ## Timing and performance acceptance
+
+The aggregate artifact includes a compact stage/count table and schema-two
+`timing-report.json` for the existing comparison CLI. Chromium stage time sums its
+nine invocations; setup/preflight remains separate. Compare equivalent serial
+plans, not a partial monolith against a complete batched run:
+
+```sh
+npm run measure:verification -- compare before/timing-report.json after/timing-report.json
+```
+
+The export preserves canonical stage rows and selected IDs. Different batch plans
+warn about coverage; missing/failed rows cannot receive a passing speedup.
 
 Each receipt separates setup from execution and records host/runtime/browser
 identity, load, commands and conditions. Browser preflight warms caches in every

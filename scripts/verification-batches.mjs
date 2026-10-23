@@ -250,11 +250,53 @@ export function validateScheduling(plan, summary, scheduler) {
     const name = id === 'prepare' ? 'prepare' : `batch (${id})`;
     const latest = scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
     const report = summary.latest?.find(receipt => receipt.batchId === id);
-    if (!latest || latest.status !== 'completed' || latest.conclusion !== 'success' || latest.attempt !== report?.attempt) {
+    const start = Date.parse(latest?.startedAt), end = Date.parse(latest?.completedAt);
+    const receiptStart = Date.parse(report?.startedAt), receiptEnd = Date.parse(report?.finishedAt);
+    if (!latest || latest.status !== 'completed' || latest.conclusion !== 'success' ||
+        ![start, end, receiptStart, receiptEnd].every(Number.isFinite) || receiptStart < start - 1000 || receiptEnd > end + 1000 || receiptEnd < start || receiptEnd < receiptStart) {
       errors.push(`${id}: latest Actions job failed, incomplete or lacks its matching receipt`);
     }
   }
   return errors;
+}
+
+export function schedulingCompute(jobs) {
+  const executions = new Map();
+  for (const job of jobs) if (job.computeMs != null && job.computeMs >= 0) {
+    executions.set(JSON.stringify([job.name, job.startedAt, job.completedAt]), job.computeMs);
+  }
+  return [...executions.values()].reduce((total, duration) => total + duration, 0);
+}
+
+export function timingReport(plan, summary) {
+  const actual = (summary.latest ?? []).flatMap(receipt => receipt.stages);
+  const jobs = plan.jobs.filter(job => plan.requested.includes(job.id));
+  const selected = plan.mode === 'pilot' ? [...stages.filter(stage => preparationIds.includes(stage.id)), ...jobs.flatMap(job => job.stages)]
+    : stages.filter(stage => preparationIds.includes(stage.id) || jobs.some(job => job.stages.some(row => row.sourceStage === stage.id)));
+  const rows = selected.map(stage => {
+    const parts = stage.id === 'chromium'
+      ? jobs.flatMap(job => job.stages.filter(row => row.sourceStage === 'chromium').map(row => row.id)) : [stage.id];
+    const found = parts.map(id => actual.find(row => row.id === id)).filter(Boolean);
+    if (found.length === 1 && parts.length === 1 && found[0].id === stage.id) return found[0];
+    const row = { id: stage.id, status: found.length !== parts.length ? 'missing' : found.every(part => part.status === 'passed') ? 'passed' : 'failed',
+      wallMs: found.reduce((sum, part) => sum + (part.wallMs ?? 0), 0), batches: found };
+    if (stage.browser && found.length) {
+      const summaries = found.map(part => part.summary).filter(Boolean);
+      const names = ['total', 'expected', 'unexpected', 'flaky', 'skipped', 'retryAttempts'];
+      row.summary = { kind: 'playwright', configuredWorkers: 1,
+        counts: Object.fromEntries(names.map(name => [name, summaries.reduce((sum, item) => sum + (item.counts[name] ?? 0), 0)])),
+        tests: summaries.flatMap(item => item.tests), globalErrors: summaries.flatMap(item => item.globalErrors ?? []) };
+    }
+    return row;
+  });
+  return { schemaVersion: 2, scope: plan.scope, source: plan.source, environment: plan.environment, browsers: plan.browsers,
+    conditions: [...new Set((summary.latest ?? []).map(receipt => receipt.conditions))].join('; '),
+    coveragePlan: selected.map(stage => ({ id: stage.id, args: stage.args, env: stage.env ?? {},
+      serialBatches: jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).map(row => ({ id: row.id, args: row.args }))) })),
+    complete: summary.complete === true, passed: summary.passed === true && rows.every(row => row.status === 'passed'),
+    inputsUnchanged: (summary.latest ?? []).every(receipt => receipt.inputsUnchanged), stages: rows,
+    wallMs: summary.wallMs, totalJobMs: summary.totalJobMs, totalAttemptMs: summary.totalAttemptMs,
+    notes: 'Stage wall time sums serial invocations, excluding per-job setup/preflight. Compare equivalent serial plans; failed historical runs stay failed.' };
 }
 
 async function scheduling() {
@@ -268,13 +310,14 @@ async function scheduling() {
     jobs.push(...result.jobs.map(job => ({ id: job.id, name: job.name, attempt: job.run_attempt,
       status: job.status, conclusion: job.conclusion,
       createdAt: job.created_at, startedAt: job.started_at, completedAt: job.completed_at,
-      queueMs: job.started_at ? Date.parse(job.started_at) - Date.parse(job.created_at) : null,
-      computeMs: job.completed_at ? Date.parse(job.completed_at) - Date.parse(job.started_at) : null })));
+      queueMs: job.started_at && Date.parse(job.started_at) >= Date.parse(job.created_at) ? Date.parse(job.started_at) - Date.parse(job.created_at) : null,
+      computeMs: job.completed_at && job.conclusion !== 'skipped' && Date.parse(job.completed_at) >= Date.parse(job.started_at)
+        ? Date.parse(job.completed_at) - Date.parse(job.started_at) : null })));
     if (result.jobs.length < 100) break;
   }
   return { createdAt: run.created_at, elapsedMs: Date.now() - Date.parse(run.created_at),
-    completedJobComputeMs: jobs.reduce((sum, job) => sum + (job.computeMs ?? 0), 0), jobs,
-    note: 'Job creation-to-start includes scheduling/dependencies. Running aggregate job is excluded from completed compute.' };
+    completedJobComputeMs: schedulingCompute(jobs), jobs,
+    note: 'Actions copies successful job snapshots into rerun attempts; execution timestamps identify receipt freshness and deduplicate compute. Creation-to-start includes scheduling/dependencies; unavailable copied-snapshot queue times stay null. Running aggregate job is excluded.' };
 }
 
 export async function main([command, bundleArgument, batchId, outputArgument]) {
@@ -343,7 +386,12 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       result.passed = false; result.complete = false; result.baselineEligible = false;
     }
     save(join(out, 'summary.json'), result);
-    const summary = `# Serial verification\n\nScope: ${plan.scope}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
+    save(join(out, 'timing-report.json'), timingReport(plan, result));
+    const table = (result.latest ?? []).flatMap(receipt => receipt.stages.map(stage =>
+      `| ${receipt.batchId} / ${stage.id} | ${stage.status} | ${((stage.wallMs ?? 0) / 1000).toFixed(2)} | ${JSON.stringify(stage.summary?.counts ?? stage.performance ?? {})} |`));
+    const summary = `# Serial verification\n\nScope: ${plan.scope}; complete: ${result.complete}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n` +
+      `Job wall span: ${result.wallMs ?? 'unknown'} ms; total job time: ${result.totalJobMs ?? 'unknown'} ms; completed Actions compute: ${result.scheduling?.completedJobComputeMs ?? 'unknown'} ms.\n\n` +
+      `| Batch / stage | Result | Stage seconds | Counts |\n| --- | --- | ---: | --- |\n${table.join('\n')}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return result.passed ? 0 : 1;

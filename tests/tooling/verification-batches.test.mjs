@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling } from '../../scripts/verification-batches.mjs';
-import { digest } from '../../scripts/verification-report.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport } from '../../scripts/verification-batches.mjs';
+import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
 const batches = JSON.parse(readFileSync(new URL('../../docs/qa/issue-200/chromium-timeout-investigation.json', import.meta.url))).batchPlan.batches;
@@ -122,6 +122,28 @@ test('aggregate accepts exact complete receipts and records attempts/compute', (
   assert.equal(result.historicalFailures.length, 3);
 });
 
+test('serial timing reports preserve canonical rows, exact IDs and comparison compatibility', () => {
+  const plan = { ...createPlan('capture', discovery), source: { inputHash: 'inputs' }, environment: {}, browsers: {} };
+  const latest = [{ stages: preparationIds.map(id => ({ id, status: 'passed', wallMs: 1 })), inputsUnchanged: true },
+    ...plan.jobs.map(job => ({ inputsUnchanged: true, stages: job.stages.map(stage => ({ id: stage.id, status: 'passed', wallMs: 1,
+      ...(stage.browser ? { summary: { tests: stage.expected, counts: { total: stage.expected.length, expected: stage.expected.length, unexpected: 0, flaky: 0, skipped: 0, retryAttempts: 0 } } } : {}) })) }))];
+  const result = timingReport(plan, { latest, passed: true, complete: true });
+  assert.equal(result.stages.length, stages.length); assert.equal(result.passed, true);
+  const chromium = result.stages.find(stage => stage.id === 'chromium');
+  assert.equal(chromium.batches.length, 9); assert.equal(chromium.summary.counts.total, discovery(stages.find(stage => stage.id === 'chromium')).length);
+  exactCoverage(plan.canonical.find(stage => stage.id === 'chromium').tests, chromium.summary.tests);
+  assert.deepEqual(compareReports(result, structuredClone(result)).warnings, []);
+  const subset = { ...plan, scope: 'partial', requested: [plan.jobs[0].id] };
+  const partial = timingReport(subset, { latest: latest.slice(0, 2), passed: true, complete: true });
+  assert.equal(partial.passed, true); assert.equal(partial.scope, 'partial');
+  assert.equal(partial.stages.length, preparationIds.length + 1);
+  assert.equal(partial.stages.at(-1).id, 'chromium');
+  latest.pop();
+  const missing = timingReport(plan, { latest, passed: false, complete: false });
+  assert.equal(missing.passed, false);
+  assert.equal(compareReports(result, missing).stages.find(stage => stage.id === 'build-prefix').percent, null);
+});
+
 for (const field of ['planHash', 'buildHash', 'runId', 'environment', 'browsers']) test(`aggregate rejects mismatched ${field}`, () => {
   const value = fixture(); value.receipts[0][field] = 'wrong';
   assert.equal(summarize(value).passed, false);
@@ -146,15 +168,33 @@ test('targeted rerun replaces only the selected current outcome and retains earl
 
 test('a failed setup/upload on a newer Actions attempt cannot reuse an older passing receipt', () => {
   const value = fixture(), summary = summarize(value);
-  const scheduler = { jobs: ['prepare', 'first', 'second'].map(id => ({ name: id === 'prepare' ? id : `batch (${id})`, attempt: 1, status: 'completed', conclusion: 'success' })) };
+  const scheduler = { jobs: ['prepare', 'first', 'second'].map(id => ({ name: id === 'prepare' ? id : `batch (${id})`, attempt: 1, status: 'completed', conclusion: 'success',
+    startedAt: '2026-10-22T00:00:00Z', completedAt: '2026-10-22T00:00:02Z' })) };
   assert.deepEqual(validateScheduling(value.plan, summary, scheduler), []);
-  scheduler.jobs.push({ name: 'batch (first)', attempt: 2, status: 'completed', conclusion: 'failure' });
+  scheduler.jobs.push({ name: 'batch (first)', attempt: 2, status: 'completed', conclusion: 'failure',
+    startedAt: '2026-10-22T00:00:10Z', completedAt: '2026-10-22T00:00:12Z' });
   assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
   scheduler.jobs.at(-1).conclusion = 'success';
   assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
   summary.latest.find(receipt => receipt.batchId === 'first').attempt = 2;
+  summary.latest.find(receipt => receipt.batchId === 'first').startedAt = '2026-10-22T00:00:10Z';
+  summary.latest.find(receipt => receipt.batchId === 'first').finishedAt = '2026-10-22T00:00:11Z';
   assert.deepEqual(validateScheduling(value.plan, summary, scheduler), []);
   scheduler.jobs.at(-1).status = 'in_progress';
+  assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
+});
+
+test('Actions copied successful snapshots can reuse old receipts without double-counting compute', () => {
+  const value = fixture(), summary = summarize(value);
+  const original = { name: 'prepare', attempt: 1, status: 'completed', conclusion: 'success',
+    startedAt: '2026-10-22T00:00:00Z', completedAt: '2026-10-22T00:00:02Z', computeMs: 2000 };
+  const scheduler = { jobs: [original, { ...original, attempt: 2 },
+    ...['first', 'second'].map(id => ({ ...original, name: `batch (${id})`, attempt: 2 }))] };
+  assert.deepEqual(validateScheduling(value.plan, summary, scheduler), []);
+  assert.equal(schedulingCompute(scheduler.jobs), 6000);
+  scheduler.jobs.push({ ...original, name: 'batch (first)', attempt: 3,
+    startedAt: '2026-10-22T00:00:10Z', completedAt: '2026-10-22T00:00:12Z' });
+  assert.equal(schedulingCompute(scheduler.jobs), 8000);
   assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
 });
 
