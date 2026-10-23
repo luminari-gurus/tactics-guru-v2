@@ -51,6 +51,20 @@ jobs:
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry.json
         run: npm run test:telemetry -- --project=desktop --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-artifacts > tmp/issue160-ci/telemetry.txt 2>&1
+      - name: Retain environment and exact source/build manifests
+        if: always()
+        run: |
+          if test -d verification-receipts; then cp -R verification-receipts tmp/issue160-ci/browser-receipts; fi
+          node --input-type=module <<'JS' > tmp/issue160-ci/inputs.json
+          import fs from 'node:fs';
+          import os from 'node:os';
+          import crypto from 'node:crypto';
+          import {execFileSync} from 'node:child_process';
+          const files=execFileSync('git',['ls-files','-z','--','src','tests','package.json','package-lock.json','*config*.ts'],{encoding:'utf8'}).split(String.fromCharCode(0)).filter(Boolean);
+          const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+          const tree=root=>fs.existsSync(root)?Object.fromEntries(fs.readdirSync(root,{recursive:true}).map(p=>root+'/'+p).filter(p=>fs.statSync(p).isFile()).sort().map(p=>[p,hash(p)])):{};
+          console.log(JSON.stringify({source:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch,release:os.release(),cpuCount:os.cpus().length,files:Object.fromEntries(files.map(p=>[p,hash(p)])),ordinaryBuild:tree('dist'),telemetryBuild:tree('tmp/issue128-dist')},null,2));
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:

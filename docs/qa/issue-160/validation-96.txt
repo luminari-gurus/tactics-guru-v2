@@ -6,4 +6,3 @@
       Tests  96 passed (96)
    Start at  18:36:11
    Duration  266ms (transform 51%, tests 35%, import 13%, worker 1%)
-

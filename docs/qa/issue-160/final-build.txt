@@ -71,7 +71,7 @@ dist/assets/startDungeonApp-CAF8Ifsu.js                                 42.18 kB
 dist/assets/start-DfGXnKrU.js                                        1,424.84 kB │ gzip: 372.14 kB
 
 ✓ built in 205ms
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting

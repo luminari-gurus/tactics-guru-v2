@@ -70,7 +70,7 @@ dist/assets/startRunApp-ClQuWXmM.js                                     23.74 kB
 dist/assets/startDungeonApp-Bsl1XM_K.js                                 42.18 kB │ gzip:  14.04 kB
 dist/assets/start-C7fiSRe5.js                                        1,424.85 kB │ gzip: 372.15 kB
 
-[plugin builtin:vite-reporter] 
+[plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
