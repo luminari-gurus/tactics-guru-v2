@@ -59,6 +59,8 @@ root/prefix/restored bundles; configured telemetry builds remain separate.
 
 For repeatable per-stage build/test timings and before/after comparisons, see
 [verification timing baselines](docs/verification-timings.md).
+For independently budgeted self-hosted jobs, exact coverage and targeted resume,
+see [serial verification](docs/serial-verification.md).
 
 ```sh
 npm run setup:browsers # Linux with missing OS libraries: npm run setup:browsers:linux
