@@ -1,0 +1,92 @@
+{
+  "now": 1630.0999999940395,
+  "ready": "Ready",
+  "portrait": {
+    "complete": true,
+    "width": 96
+  },
+  "marks": [
+    {
+      "name": "fit:scene-start",
+      "startTime": 449.3999999910593
+    },
+    {
+      "name": "fit:scene-ready",
+      "startTime": 547.5
+    },
+    {
+      "name": "fit:controls-usable",
+      "startTime": 568
+    }
+  ],
+  "contextCalls": [
+    {
+      "api": "webgl",
+      "started": 110.19999998807907,
+      "duration": 229.70000000298023
+    },
+    {
+      "api": "2d",
+      "started": 340,
+      "duration": 0.09999999403953552
+    },
+    {
+      "api": "2d",
+      "started": 342,
+      "duration": 0
+    },
+    {
+      "api": "getImageData",
+      "started": 342.09999999403954,
+      "duration": 0.09999999403953552
+    },
+    {
+      "api": "getImageData",
+      "started": 342.19999998807907,
+      "duration": 0
+    },
+    {
+      "api": "2d",
+      "started": 356.3999999910593,
+      "duration": 0
+    },
+    {
+      "api": "AudioContext",
+      "started": 357,
+      "duration": 39.3999999910593
+    },
+    {
+      "api": "webgl",
+      "started": 399,
+      "duration": 6.199999988079071
+    },
+    {
+      "api": "2d",
+      "started": 466.69999998807907,
+      "duration": 0.10000000894069672
+    },
+    {
+      "api": "getImageData",
+      "started": 466.8999999910593,
+      "duration": 1
+    },
+    {
+      "api": "getImageData",
+      "started": 467.8999999910593,
+      "duration": 0
+    }
+  ],
+  "phase": {
+    "sceneStartedMs": 449.3999999910593,
+    "sceneReadyMs": 547.5,
+    "controlsUsableMs": 568,
+    "build": {
+      "commit": "0a900bdbfae3881f32b6ca8c86b1219a7bb90ce2",
+      "dirty": false
+    },
+    "scene": "proof"
+  },
+  "status": "passed",
+  "project": "mobile-landscape",
+  "run": 40004852329
+}

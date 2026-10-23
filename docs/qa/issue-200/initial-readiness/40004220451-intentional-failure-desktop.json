@@ -1,0 +1,28 @@
+{
+  "now": 5081.699999988079,
+  "ready": "Loading",
+  "portrait": {
+    "complete": true,
+    "width": 0
+  },
+  "marks": [
+    {
+      "name": "fit:scene-start",
+      "startTime": 392.5
+    }
+  ],
+  "contextCalls": null,
+  "phase": {
+    "sceneStartedMs": 392.5,
+    "sceneReadyMs": null,
+    "controlsUsableMs": null,
+    "build": {
+      "commit": "43a0bd5f15b9918169297cb60a662e72d8564314",
+      "dirty": false
+    },
+    "scene": "proof"
+  },
+  "status": "failed",
+  "project": "desktop",
+  "run": 40004220451
+}

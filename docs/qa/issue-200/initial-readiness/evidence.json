@@ -1,0 +1,298 @@
+{
+  "baseCommit": "b169112",
+  "applicationChanged": false,
+  "productPerformanceBudgetsChanged": false,
+  "assertionTimeoutsChanged": false,
+  "coldGpuStartupResolved": false,
+  "testSetupChanged": "Graphics qualification runs in the actual audio browser worker before the app context; setup has a 15-second bound and separate receipt. Functional assertions no longer include first-context initialization.",
+  "runner": "unraid-tactics-01",
+  "browser": "Chromium 153.0.8010.12",
+  "workers": 1,
+  "retries": 0,
+  "emulation": "Desktop, Pixel 7 portrait and landscape",
+  "runs": [
+    {
+      "run": 40003300061,
+      "label": "tracing comparison",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40003300061",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40003300061/artifacts/12522448592",
+      "reports": [
+        {
+          "name": "screenshots.json",
+          "stats": {
+            "startTime": "2026-10-23T18:27:12.993Z",
+            "duration": 14964.701000000001,
+            "expected": 3,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "446ab727c41436d3d58bdc90e7c2d820ba2cc17e60e08a560911f3eadd09750a"
+        },
+        {
+          "name": "off.json",
+          "stats": {
+            "startTime": "2026-10-23T18:27:28.841Z",
+            "duration": 12930.148000000001,
+            "expected": 3,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "3d9f2604923bfae25836871218b8280ac7e2c37c399f91fcb259b1fa2f6fde92"
+        },
+        {
+          "name": "snapshots.json",
+          "stats": {
+            "startTime": "2026-10-23T18:27:42.646Z",
+            "duration": 14006.886999999999,
+            "expected": 3,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "ca97d1f326a56bd4bf73a5ba443a2eda44997b962ea8e6e57a642b214726b4a5"
+        }
+      ]
+    },
+    {
+      "run": 40003763056,
+      "label": "post-test observations",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40003763056",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40003763056/artifacts/12522319716",
+      "reports": [
+        {
+          "name": "screenshots.json",
+          "stats": {
+            "startTime": "2026-10-23T18:30:32.371Z",
+            "duration": 40090.124,
+            "expected": 6,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "bd29218d12dff653c65cc52ab51aecb81903697c3ec9f0181119063943003fe1"
+        }
+      ]
+    },
+    {
+      "run": 40004220451,
+      "label": "untraced failure and intentional diagnostic contract",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40004220451",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40004220451/artifacts/12523905526",
+      "reports": [
+        {
+          "name": "ordinary.json",
+          "stats": {
+            "startTime": "2026-10-23T18:33:48.512Z",
+            "duration": 26555.482,
+            "expected": 2,
+            "skipped": 0,
+            "unexpected": 1,
+            "flaky": 0
+          },
+          "sha256": "a833bb71109b8a10d1f046083a30488ee0b9950a53a5529ea9becdce15126412"
+        },
+        {
+          "name": "intentional-failure.json",
+          "stats": {
+            "startTime": "2026-10-23T18:34:15.806Z",
+            "duration": 7497.053,
+            "expected": 0,
+            "skipped": 0,
+            "unexpected": 1,
+            "flaky": 0
+          },
+          "sha256": "90f532f8e668e0571490448b2eca6b802f0dab361278b36fd8ab84690a8bf0a4"
+        }
+      ]
+    },
+    {
+      "run": 40004852329,
+      "label": "native initialization timing",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40004852329",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40004852329/artifacts/12523771423",
+      "reports": [
+        {
+          "name": "ordinary.json",
+          "stats": {
+            "startTime": "2026-10-23T18:38:20.542Z",
+            "duration": 24112.899999999998,
+            "expected": 3,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "c7755891bae5942e4ac093501dc2e27639b3edf7e297cf7be6e938d452b7ccdf"
+        }
+      ]
+    },
+    {
+      "run": 40005996661,
+      "label": "actual-worker audio qualification",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40005996661",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40005996661/artifacts/12523409172",
+      "reports": [
+        {
+          "name": "ordinary.json",
+          "stats": {
+            "startTime": "2026-10-23T18:46:40.527Z",
+            "duration": 93184.856,
+            "expected": 21,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "10d6e49aca258b7307350d30a39547c13d705a5d434e2a3b26a86867f4a7feba"
+        }
+      ]
+    },
+    {
+      "run": 40006450165,
+      "label": "final artifact retention",
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40006450165",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40006450165/artifacts/12525160458",
+      "reports": [
+        {
+          "name": "ordinary.json",
+          "stats": {
+            "startTime": "2026-10-23T18:49:59.900Z",
+            "duration": 24625.15,
+            "expected": 3,
+            "skipped": 0,
+            "unexpected": 0,
+            "flaky": 0
+          },
+          "sha256": "0abfa3cf2a1cb05128456d10ac1912dfecd246bc3da8cd71fef7da4b97a9aa73"
+        }
+      ]
+    }
+  ],
+  "setupFailure": {
+    "run": 40004621949,
+    "reason": "Diagnostic-only TypeScript error before browser execution; corrected before later timing run"
+  },
+  "ineffectiveSeparatePreflight": {
+    "run": 40005461119,
+    "result": "Graphics check in a different browser passed but ordinary desktop readiness still failed; discarded from final implementation"
+  },
+  "limits": "Cold graphics startup for players remains unresolved. No complete #200 baseline or overall performance improvement is claimed. Original failures stay failed.",
+  "qualificationGraphics": [
+    {
+      "project": "mobile-landscape",
+      "worker": 2,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:47:46.175Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 356.59999999403954,
+        "elapsedMs": 358.20000000298023,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 486.6234310000001
+    },
+    {
+      "project": "mobile-portrait",
+      "worker": 1,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:47:17.093Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 545.2000000029802,
+        "elapsedMs": 546.5,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 671.215753
+    },
+    {
+      "project": "desktop",
+      "worker": 0,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:46:41.727Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 4017.199999988079,
+        "elapsedMs": 4018.7999999970198,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 4145.80926
+    }
+  ],
+  "retentionGraphics": [
+    {
+      "project": "desktop",
+      "worker": 0,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:50:01.107Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 4405.20000000298,
+        "elapsedMs": 4406.29999999702,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 4536.539985
+    },
+    {
+      "project": "mobile-landscape",
+      "worker": 2,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:50:21.545Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 267.40000000596046,
+        "elapsedMs": 268.59999999403954,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 393.481908
+    },
+    {
+      "project": "mobile-portrait",
+      "worker": 1,
+      "browser": "153.0.8010.12",
+      "startedAt": "2026-10-23T18:50:18.132Z",
+      "passed": true,
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 558.2999999970198,
+        "elapsedMs": 560,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 683.5417550000001
+    }
+  ]
+}

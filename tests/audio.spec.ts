@@ -1,5 +1,49 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test as base, type Page } from '@playwright/test';
 import { AUDIO_LOAD_TIMEOUT_MS } from '../src/diagnostics/proofAssets';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+// These cases test audio behavior after graphics setup, not cold GPU initialization.
+// Qualify the same browser process that the test's isolated context will use.
+const test = base.extend({ browser: [async ({ browser }, use, worker) => {
+  const started = performance.now();
+  const receipt: Record<string, unknown> = { project: worker.project.name, worker: worker.workerIndex,
+    browser: browser.version(), startedAt: new Date().toISOString(), passed: false };
+  const context = await browser.newContext();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const page = await context.newPage();
+    await page.setContent('<canvas width=1 height=1></canvas>');
+    receipt.graphics = await Promise.race([
+      page.evaluate(() => {
+        const started = performance.now(), canvas = document.querySelector('canvas')!;
+        const gl = canvas.getContext('webgl');
+        const contextMs = performance.now()-started;
+        let pixel: Uint8Array | Uint8ClampedArray;
+        if (gl) {
+          gl.clearColor(0,1,0,1); gl.clear(gl.COLOR_BUFFER_BIT);
+          pixel = new Uint8Array(4); gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+        } else {
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('No WebGL or Canvas renderer');
+          context.fillStyle='#00ff00'; context.fillRect(0,0,1,1); pixel=context.getImageData(0,0,1,1).data;
+        }
+        if (pixel[0]!==0 || pixel[1]!==255 || pixel[2]!==0 || pixel[3]!==255) throw new Error('Graphics setup pixel mismatch');
+        return {mode:gl?'webgl':'canvas',contextMs,elapsedMs:performance.now()-started,pixel:[...pixel]};
+      }),
+      new Promise((_,reject) => { timer=setTimeout(()=>reject(new Error('Audio worker graphics setup exceeded 15000ms')),15000); }),
+    ]);
+    receipt.passed = true;
+  } catch (error) { receipt.error=String(error); throw error; }
+  finally {
+    clearTimeout(timer);
+    await context.close();
+    receipt.elapsedMs=performance.now()-started;
+    const directory=join(worker.project.outputDir,'graphics-setup'); mkdirSync(directory,{recursive:true});
+    writeFileSync(join(directory,`worker-${process.pid}-${worker.workerIndex}-${Date.now()}.json`),JSON.stringify(receipt,null,2)+'\n');
+  }
+  await use(browser);
+}, {scope:'worker'}] });
 
 // Headless Chromium creates Phaser's AudioContext suspended and a Playwright click is trusted input,
 // so the locked -> played path below does exercise Chromium's gesture gate. iOS Safari's rules
@@ -14,6 +58,20 @@ function watchErrors(page: Page): string[] {
 }
 
 const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!);
+
+test.afterEach(async ({page}, info) => {
+  if (!info.title.startsWith('the test tone plays only') || info.status === info.expectedStatus) return;
+  const snapshot = await page.evaluate(() => ({
+    now: performance.now(), visibility: document.visibilityState,
+    ready: document.querySelector('#fit-status')?.textContent,
+    portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete,
+      width: document.querySelector<HTMLImageElement>('#proof-portrait')?.naturalWidth},
+    diagnostics: window.fitDiagnostics?.(),
+    marks: performance.getEntriesByType('mark').map(({name,startTime})=>({name,startTime})),
+    resources: performance.getEntriesByType('resource').map(({name,startTime,duration})=>({name,startTime,duration})),
+  })).catch(error => ({ diagnosticError: String(error) }));
+  await info.attach('initial-readiness', {body: JSON.stringify(snapshot), contentType: 'application/json'});
+});
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {
   const errors = watchErrors(page);

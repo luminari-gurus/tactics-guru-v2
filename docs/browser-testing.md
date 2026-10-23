@@ -38,6 +38,26 @@ for preflight and the test command. WebKit keeps its own engine and launch optio
 never substitute a Chromium binary for WebKit. Existing BFCache assertions and
 native-select tests are unchanged; native-select repair belongs to #190.
 
+## Proof audio functional setup
+
+`tests/audio.spec.ts` qualifies graphics once in each actual Playwright browser
+worker, before opening the test's isolated app context. The bounded setup creates
+WebGL (or Canvas 2D fallback), renders and reads back a known pixel, and fails the
+worker if setup exceeds 15 seconds or the pixel is wrong. Setup failures remain
+failures; no case retry, skip or assertion-timeout relaxation is added.
+
+Each worker writes a graphics setup receipt under its configured output directory's
+`graphics-setup/`, alongside the existing retained browser artifacts. The receipt
+records browser version, project, setup time and outcome. This avoids conflating
+first-context initialization with the suite's audio behavior assertions. It warms
+graphics state in that browser, so these cases are not cold GPU/driver startup
+measurements. Stage wall time still includes setup. Cold app-cache performance
+captures and their budgets remain separate and unchanged; no performance speedup
+or cold GPU acceptance follows from these functional results.
+
+A failed initial test also attaches scene marks, resource timings, portrait state
+and a live diagnostics snapshot. It does not change startup, gameplay or rendering.
+
 ## Bounded diagnostics
 
 ```sh
