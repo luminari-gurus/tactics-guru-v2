@@ -74,7 +74,7 @@ export class RunItemSession {
         if (run.phase === 'victory' || run.phase === 'defeat') track('run_outcome', { route: 'run', phase: run.phase, encounter: run.encounterIndex, outcome: run.phase }, run.id);
       }
       this.save();
-      if (feedback) this.report(feedback);
+      if (feedback) this.report(`${this.status}. ${feedback}`);
     };
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog

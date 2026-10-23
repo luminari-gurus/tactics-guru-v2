@@ -1,5 +1,5 @@
 import { awardHero, progressHero, readProgressHero, type ProgressHero } from './progression';
-import { HERO_PROGRESSION } from '../content/progression';
+import { HERO_PROGRESSION, SHORT_RUN_KINDS } from '../content/progression';
 import { HERO_IDS } from '../content/constants';
 import type { ContentCatalog, HeroId } from '../content/types';
 import { contentVersion } from './battle';
@@ -141,7 +141,7 @@ export function transitionRun(input: unknown, command: unknown, definition: RunD
       return { ok: false, reason: 'invalidCommand' };
     // Command progression must equal entry facts; completion only supplies final combat HP.
     if (party.some((h,i) => h.xp !== state.party[i].xp)) return { ok: false, reason: 'invalidCommand' };
-    const awarded = command.outcome === 'victory' ? party.map(h => awardHero(h, HERO_PROGRESSION.awards[state.encounterIndex === 2 ? 'boss' : 'normal'], catalog)) : party;
+    const awarded = command.outcome === 'victory' ? party.map(h => awardHero(h, HERO_PROGRESSION.awards[SHORT_RUN_KINDS[state.encounterIndex]], catalog)) : party;
     const base = { ...state, party: awarded, revision: state.revision + 1 };
     if (command.outcome === 'defeat' || state.encounterIndex === 2) {
       const outcome = command.outcome;

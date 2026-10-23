@@ -47,7 +47,7 @@ jobs:
         if: always()
         run: |
           npm run test:browser-smoke > tmp/issue160-ci/engine.log 2>&1
-          PLAYWRIGHT_JSON_OUTPUT_FILE=tmp/issue160-ci/webkit.json npx playwright test -c playwright.webkit.config.ts tests/run-progression.spec.ts tests/dungeon-lifecycle.spec.ts --grep 'resume|recovery|keyboard|read-only' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.log 2>&1
+          PLAYWRIGHT_JSON_OUTPUT_FILE=tmp/issue160-ci/webkit.json npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/dungeon-lifecycle.spec.ts --grep 'resume|recovery|keyboard|read-only' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.log 2>&1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

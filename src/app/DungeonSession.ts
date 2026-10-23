@@ -68,7 +68,7 @@ export class DungeonSession {
       this.current = next.state; this.review = null;
       if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
       this.save();
-      if (feedback) this.report(feedback);
+      if (feedback) this.report(`${this.status}. ${feedback}`);
     };
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.
     session = new BattleSession(source.catalog, this.current.activeBattle, this.current.activeBattle.seed, accepted,

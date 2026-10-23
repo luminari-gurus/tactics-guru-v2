@@ -1,3 +1,10 @@
+import { emptyItemOwnership as emptyOwnership } from '../../src/domain/items';
+import { encodeRunSave, decodeRunSave } from '../../src/domain/runSaveEnvelope';
+import { freshRunSnapshot, createRunBattle, replayRunBattle } from '../../src/domain/runBattle';
+import { runContext } from '../helpers/runItemFixtures';
+import { projectEncounterSpawns, authoredEncounters } from '../../src/content/encounters';
+import { abilitySession } from '../helpers/abilityCatalog';
+import { dispatch } from '../../src/domain/turns';
 import { describe, expect, it } from 'vitest';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import { HERO_IDS } from '../../src/content/constants';
@@ -39,12 +46,25 @@ describe('bounded progression',()=>{
     expect(validateContent(base).ok).toBe(true);
     const party=(xp:number)=>HERO_IDS.map(id=>progressHero(id,xp,1,base));
     expect(projectProgression(party(0),base).abilities['ability:later']).toBeUndefined();
+    const lockedCatalog=projectProgression(party(0),base),locked=abilitySession('ranger',lockedCatalog);
+    const rejected=dispatch(locked.state,{type:'useAbility',unitId:locked.active.id,abilityId:'ability:later',target:{unitId:locked.state.units.find(u=>u.side==='enemy')!.id}},lockedCatalog);
+    expect(rejected).toEqual({ok:false,reason:'unknownAbility'});
+
     expect(projectProgression(party(60),base).abilities['ability:later'].owners).toEqual(['ranger']);
     for(const requiredLevel of [0,6,1.5])expect(validateContent({...base,abilities:{...base.abilities,'ability:later':{...base.abilities['ability:later'],requiredLevel}}}).ok).toBe(false);
     for(const [xp,count] of [[0,1],[180,2],[600,3]]){
       const a=projectProgression(party(xp),base).abilities['ability:magic_missile'];
-      if(a.kind!=='magicMissile')throw Error();expect(Math.floor((a.casterLevel+1)/2)).toBe(count);
+      if(a.kind!=='magicMissile')throw Error();
+      const projected=projectProgression(party(xp),base),session=abilitySession('mage',projected);
+      const cast=dispatch(session.state,{type:'useAbility',unitId:session.active.id,abilityId:'ability:magic_missile',target:{unitId:session.state.units.find(u=>u.side==='enemy')!.id}},projected);
+      expect(cast.ok).toBe(true);if(cast.ok)expect(cast.events.filter(e=>e.type==='missileRolled')).toHaveLength(count);
     }
+  });
+  it('projects progressed survivors into authored encounter rosters',()=>{
+    const party=HERO_IDS.map(id=>progressHero(id,600,id==='mage'?0:30,runCatalog));
+    const projected=projectEncounterSpawns(authoredEncounters[0].id,party);expect(projected.ok).toBe(true);
+    if(projected.ok)expect(projected.map.spawns.some(s=>s.unitId==='mage')).toBe(false);
+    expect(projectEncounterSpawns(authoredEncounters[0].id,party.map(h=>({...h,maxHp:999}))).ok).toBe(false);
   });
   it('awards only accepted victory boundaries including the terminal boss',()=>{
     const made=createRun('xp-run',13,authoredRun,runCatalog);if(!made.ok)throw Error();let s=made.state;
@@ -57,4 +77,18 @@ describe('bounded progression',()=>{
     }
     expect(s.phase).toBe('victory');expect(s.party[0].level).toBe(2);
   });
+  it('round-trips progressed battle entry and replay without repeated projection or awards',()=>{
+    const fresh=freshRunSnapshot('progress-save',13,runContext),party=HERO_IDS.map(id=>progressHero(id,180,4,runContext.catalog));
+    // Explicit later-entry fixture; no claim of a preceding browser playthrough.
+    const entry={...fresh.items,run:{...fresh.items.run,encounterIndex:2,revision:4,party},ownership:emptyOwnership()};
+    const created=createRunBattle(entry,runContext);expect(created.ok).toBe(true);if(!created.ok)throw Error();
+    const snapshot={items:entry,activeBattle:created.state,battlefield:created.battlefield};
+    const encoded=encodeRunSave(snapshot,runContext);if(!encoded.ok)throw Error(encoded.reason);
+    expect(decodeRunSave(encoded.text,runContext)).toEqual({ok:true,state:snapshot});
+    expect(createRunBattle(entry,runContext)).toEqual(created);
+    const replay={format:created.state.format,versions:created.state.versions,initial:created.state,commands:[],battlefield:created.battlefield};
+    const result=replayRunBattle(replay,entry,runContext);expect(result.ok).toBe(true);if(result.ok)expect(result.state).toEqual(created.state);
+    const older=JSON.stringify({...JSON.parse(encoded.text),format:2});expect(decodeRunSave(older,runContext)).toEqual({ok:false,reason:'incompatible'});
+  });
+
 });

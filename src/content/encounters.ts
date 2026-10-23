@@ -1,3 +1,4 @@
+import { readProgressHero } from '../domain/progression';
 import { battleCatalog } from './catalog';
 import { HERO_IDS } from './constants';
 import type { ContentCatalog, MapId, MapRecord, SpawnRecord } from './types';
@@ -53,8 +54,13 @@ export function projectEncounterSpawns(encounterId: unknown, party: unknown):
   if (!isDenseArray(party, 3) || party.length === 0) return { ok: false, reason: 'invalidParty' };
   const seen = new Set<string>(), living = new Set<string>();
   for (const hero of party) {
-    if (!hasShape(hero, ['heroId', 'hp']) || !HERO_IDS.some(id => id === hero.heroId) || typeof hero.hp !== 'number' || !Number.isSafeInteger(hero.hp) ||
-      hero.hp < 0 || hero.hp > catalog.heroes[hero.heroId as typeof HERO_IDS[number]].stats.maxHp || seen.has(hero.heroId as string)) return { ok: false, reason: 'invalidParty' };
+    if (typeof hero !== 'object' || hero === null || !hasShape(hero,Object.keys(hero))) return {ok:false,reason:'invalidParty'};
+    const heroId = HERO_IDS.find(id => id === hero.heroId);
+    if (!heroId || seen.has(heroId)) return {ok:false,reason:'invalidParty'};
+    const progressed = Object.hasOwn(hero,'xp'), progress = progressed ? readProgressHero(hero,heroId,catalog) : null;
+    if (progressed ? !progress : !hasShape(hero,['heroId','hp'])) return {ok:false,reason:'invalidParty'};
+    if (typeof hero.hp !== 'number' || !Number.isSafeInteger(hero.hp) || hero.hp < 0 ||
+      hero.hp > (progress?.maxHp ?? catalog.heroes[heroId].stats.maxHp)) return {ok:false,reason:'invalidParty'};
     seen.add(hero.heroId as string); if (hero.hp > 0) living.add(hero.heroId as string);
   }
   if (living.size === 0) return { ok: false, reason: 'invalidParty' };

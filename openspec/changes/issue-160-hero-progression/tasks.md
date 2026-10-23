@@ -4,19 +4,19 @@ Caller approved proposal/design/specs in chat on 2026-10-23. Issue #160; branch 
 
 ## 1. Progression definitions and pure rules
 
-- [ ] 1.1 Add validated progression definitions, hero state/derivation and ability required-level metadata; verify all five thresholds, three HP curves, multi-level/huge awards, cap saturation and malformed definitions/state with focused unit contracts.
-- [ ] 1.2 Add shared learned-ability projection using implemented content only; verify fixture unlock/locked-command boundaries, existing level-1 signatures, Mage level 1/3/5 missiles and unchanged non-HP stats. Document cumulative XP representation and HP/formula adaptations in current rules docs with pinned legacy references.
+- [x] 1.1 Add validated progression definitions, hero state/derivation and ability required-level metadata; verify all five thresholds, three HP curves, multi-level/huge awards, cap saturation and malformed definitions/state with focused unit contracts.
+- [x] 1.2 Add shared learned-ability projection using implemented content only; verify fixture unlock/locked-command boundaries, existing level-1 signatures, Mage level 1/3/5 missiles and unchanged non-HP stats. Document cumulative XP representation and HP/formula adaptations in current rules docs with pinned legacy references.
 
 ## 2. Accepted encounter advancement and shared projection
 
-- [ ] 2.1 Integrate authoritative short-run normal/normal/boss kinds and completion awards; verify all award kinds, living-only eligibility, defeat/no revival, terminal award, atomic rejection and repeated/stale completion in run/session tests. Document award timing and eligibility.
-- [ ] 2.2 Integrate dungeon descriptor-kind awards at completion, including guardian boundaries and prior encounter policy; verify repeated callback/reward/reload/backtrack cannot re-award and floor travel retains progress with domain/session tests.
-- [ ] 2.3 Apply progression before existing equipment in shared catalog projection and update carried-HP/spawn/readers/preparation caps; verify repeated construction, healing caps, equipment, Guarded, preview/resolution/AI/replay and no cumulative bonuses across all three heroes. Update item/projection contract documentation.
+- [x] 2.1 Integrate authoritative short-run normal/normal/boss kinds and completion awards; verify all award kinds, living-only eligibility, defeat/no revival, terminal award, atomic rejection and repeated/stale completion in run/session tests. Document award timing and eligibility.
+- [x] 2.2 Integrate dungeon descriptor-kind awards at completion, including guardian boundaries and prior encounter policy; verify repeated callback/reward/reload/backtrack cannot re-award and floor travel retains progress with domain/session tests.
+- [x] 2.3 Apply progression before existing equipment in shared catalog projection and update carried-HP/spawn/readers/preparation caps; verify repeated construction, healing caps, equipment, Guarded, preview/resolution/AI/replay and no cumulative bonuses across all three heroes. Update item/projection contract documentation.
 
 ## 3. Saves and recovery
 
-- [ ] 3.1 Version progression-bearing state/envelopes/identity and validate learned/progress state on resume; verify run/dungeon active, reward, ready, victory/defeat round trips, seeded replay equivalence and malformed data rejection. Document new versions and identity scope.
-- [ ] 3.2 Preserve incompatible old run/dungeon bytes and recovery/export behavior, including prior legacy dungeon formats; verify load/inspection never overwrites slots and explicit replacement safeguards still apply. Check whether shared identity affects standalone saves and cover/document its actual compatibility outcome.
+- [x] 3.1 Version progression-bearing state/envelopes/identity and validate learned/progress state on resume; verify run/dungeon active, reward, ready, victory/defeat round trips, seeded replay equivalence and malformed data rejection. Document new versions and identity scope.
+- [x] 3.2 Preserve incompatible old run/dungeon bytes and recovery/export behavior, including prior legacy dungeon formats; verify load/inspection never overwrites slots and explicit replacement safeguards still apply. Check whether shared identity affects standalone saves and cover/document its actual compatibility outcome.
 
 ## 4. Player feedback and browser behavior
 
