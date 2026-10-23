@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Option C · Radial hold gestures</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>Option C · Radial / hold</h1>
+      <small>Hold a tile or unit. Drag to a slice. Release commits. Desktop: right-click radial, left-click default.</small>
+    </div>
+    <a href="index.html">All options</a>
+    <a href="option-c.html?export=1">Export view</a>
+  </header>
+  <main class="stage c-stage">
+    <div class="c-top">
+      <div class="chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Hold target</p>
+          <h2>Fighter</h2>
+          <p class="meta">HP 18/18 · AC 14 · Move · Action</p>
+        </div>
+      </div>
+      <nav class="rail-icons" aria-label="Desktop shortcuts">
+        <button title="Move" aria-pressed="true">Mv</button>
+        <button title="Attack">Atk</button>
+        <button title="Signature">Sig</button>
+        <button title="Wait">Wait</button>
+        <button title="More">···</button>
+      </nav>
+    </div>
+    <section class="board-photo c-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="radial" aria-label="Hold radial">
+        <div class="radial-ring"></div>
+        <span class="slice-label" style="left:50%;top:10%;transform:translate(-50%,0)">Attack</span>
+        <span class="slice-label" style="right:2%;top:36%">Strike</span>
+        <span class="slice-label" style="left:50%;bottom:12%;transform:translate(-50%,0)">Inspect</span>
+        <span class="slice-label" style="left:6%;top:38%">Move</span>
+        <div class="radial-center">
+          <strong>Release</strong>
+          Basic attack<br>65% · 5 dmg
+        </div>
+      </div>
+      <p class="hold-hint">Hold on an enemy to strike · hold empty reachable tile to move</p>
+    </section>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>

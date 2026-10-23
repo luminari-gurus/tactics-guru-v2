@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Combat UI mockups · Tactics Guru</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <article class="docs">
+    <p class="eyebrow">Design exploration · no game code</p>
+    <h1>Combat UI — fewer steps</h1>
+    <p class="lead">The shipped battle HUD (issue #108 design, #111 rail/dock) makes every move and attack a four-control ritual: pick a verb, pick a target (often twice), Review, then Confirm. These mockups keep preview-before-commit and 44px targets, and cut the redundant chrome. Items stay out of combat, as they do today.</p>
+
+    <div class="cards">
+      <a class="card" href="current.html"><strong>Current UI</strong> Recreation of the live rail/dock. Move 3 taps · Attack 4 · Wait 1.</a>
+      <a class="card" href="option-a.html"><strong>A · Board + wheel</strong> Direct manipulation. Confirm on the tile. Move 2 · Attack 2.</a>
+      <a class="card" href="option-b.html"><strong>B · Bar + defaults</strong> Recommended. Persistent Go. Move 1–2 · Attack 1–2.</a>
+      <a class="card" href="option-c.html"><strong>C · Radial hold</strong> Hold/release gestures. Move 1 · Attack 1. Harder to discover.</a>
+    </div>
+
+    <h2>Step counts vs today</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th class="num">Today</th>
+          <th class="num">A Wheel</th>
+          <th class="num">B Bar</th>
+          <th class="num">C Radial</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Move (default already selected)</td><td class="num">3</td><td class="num">2</td><td class="num">1–2</td><td class="num">1</td></tr>
+        <tr><td>Basic attack</td><td class="num">4</td><td class="num">2</td><td class="num">1–2</td><td class="num">1</td></tr>
+        <tr><td>Signature ability</td><td class="num">4</td><td class="num">2–3</td><td class="num">2</td><td class="num">2</td></tr>
+        <tr><td>Wait / End turn</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+        <tr><td>Use item in combat</td><td class="num">n/a</td><td class="num">n/a</td><td class="num">n/a</td><td class="num">n/a</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Today’s Move is auto-selected at turn start (#145). Count is still destination → Review → Confirm. Attacks add the verb tap. Wait already skips the dialog. Items are blocked during battle.</p>
+
+    <h2>What is redundant today</h2>
+    <ul class="pain">
+      <li>Ability dropdown and the Signature button bind the same owned ability.</li>
+      <li>Target dropdown duplicates board taps (and keyboard cell select).</li>
+      <li>“Selected (x, y)”, target-info, ability-info, availability copy, button subtitles, preview, and the Confirm dialog all restate the same decision.</li>
+      <li>Review action plus a Confirm modal is two confirms. Wait needs none.</li>
+      <li>Confirm dialog also offers Restart battle.</li>
+      <li>Board heading, round/turn line, and the legend caption compete for the same status.</li>
+      <li>Inspect party restates the actor panel. Inspect target is a third stats surface.</li>
+      <li>Portrait HUD on mobile is capped at 56% of the viewport, so the board is a strip.</li>
+    </ul>
+
+    <h2>Recommendation</h2>
+    <div class="rec">
+      <p><strong>Ship Option B</strong> (persistent action bar, smart Move/Attack default, one gold Go). It is the fewest taps that still matches the battle-controls spec: legal preview, then one explicit confirm, cancel without spending. Go never moves. The bar stays ≥44px. Overflow holds inspect, log, sound, and restart.</p>
+      <p style="margin-top:10px">Borrow Option A’s on-tile path chip for movement preview. Treat Option C’s hold-to-inspect as a later mobile extra — do not make hold the only way to act (it fights pan/zoom and has no hover equivalent).</p>
+    </div>
+
+    <h2>Open each layout</h2>
+    <p>Desktop mockups are designed at 1440×900. Portrait phone uses the same files at ~390×844. Add <code>?export=1</code> to hide this reviewer chrome.</p>
+    <ul>
+      <li><a href="current.html">current.html</a> · <a href="current.html?export=1">export</a></li>
+      <li><a href="option-a.html">option-a.html</a> · <a href="option-a.html?export=1">export</a></li>
+      <li><a href="option-b.html">option-b.html</a> · <a href="option-b.html?export=1">export</a></li>
+      <li><a href="option-c.html">option-c.html</a> · <a href="option-c.html?export=1">export</a></li>
+    </ul>
+    <p class="muted">Read <a href="README.md">README.md</a> for the full step table, removed elements, and how these sketches sit next to #108/#111.</p>
+  </article>
+</body>
+</html>
