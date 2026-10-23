@@ -73,7 +73,7 @@ export class DungeonSession {
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.
     session = new BattleSession(source.catalog, this.current.activeBattle, this.current.activeBattle.seed, accepted,
       entry.activeBattle!.commandCount === 0, source.battlefield);
-    this.battle = session; session.progression = this.current.party;
+    this.battle = session; session.progression = structuredClone(this.current.party);
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     return session;
   }

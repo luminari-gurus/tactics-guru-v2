@@ -133,7 +133,7 @@ test('pre-progression dungeon remains incompatible and exportable',async({page})
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(raw);
 });
 
-test('cold format-3 Continue retains a long saved history within the startup budget',async({page})=>{
+test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
  const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
   const descriptor=floorDescriptor(base.seed,i+1);
   return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};

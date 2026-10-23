@@ -170,7 +170,7 @@ describe('pre-progression save preservation',()=>{
   });
 });
 describe('durable encounter policies', () => {
-  it('cold-decodes a bounded format-3 history by resolving only the current floor', async () => {
+  it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
     const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
       return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
@@ -182,7 +182,7 @@ describe('durable encounter policies', () => {
     const resolver=vi.spyOn(coldFields,'resolveBattlefield');
     try {
       const begin=performance.now(),decoded=coldEnvelope.decodeDungeon(encoded.text);
-      console.info(JSON.stringify({format:3,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
+      console.info(JSON.stringify({format:JSON.parse(encoded.text).format,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
       expect(decoded).toEqual({ok:true,state});expect(resolver).toHaveBeenCalledTimes(3);
       expect(encodeDungeon(decoded.ok?decoded.state:null)).toEqual(encoded);
     } finally {resolver.mockRestore();}
@@ -229,7 +229,7 @@ describe('durable encounter policies', () => {
     const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
     expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);
   });
-  it('keeps fully resolved legacy format-3 descriptors compatible with deferred legacy entry', () => {
+  it('keeps fully resolved legacy-policy descriptors compatible with deferred legacy entry', () => {
     const base=freshDungeon('resolved-legacy',13,LEGACY_ENCOUNTER_POLICY),floor=base.floors[0];
     const encounters=floor.descriptor.encounters.map((plan,slot)=>{
       const resolved=resolveBattlefield(plan.selection.encounter,dungeonSeed(base.seed,1,'battle',slot),dungeonContent.catalog);

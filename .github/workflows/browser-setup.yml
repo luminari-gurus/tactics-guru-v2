@@ -37,7 +37,12 @@ jobs:
         if: always()
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit.json
-        run: npx playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts --grep 'hero progression' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.txt 2>&1
+        run: npx playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts --grep 'hero progression|pre-progression dungeon remains incompatible|cold progression-format' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.txt 2>&1
+      - name: Remaining WebKit run persistence consumers
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit-run.json
+        run: npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts --grep 'accepted player presentation reload|run preparation and dialogs|review: read-level' --reporter=line,json --output=tmp/issue160-ci/webkit-run-artifacts > tmp/issue160-ci/webkit-run.txt 2>&1
       - name: Final learned ability and caster restoration fixtures
         if: always()
         env:

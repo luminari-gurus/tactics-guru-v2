@@ -120,7 +120,7 @@ export function createRun(id: string, seed: number, definition: RunDefinition, c
 /** Pure previews of an already validated state; no draws or state changes. */
 export function describeRunBattle(state: RunState): RunBattleDescriptor | null {
   return state.phase !== 'battle' ? null : { encounterId: state.encounters[state.encounterIndex], seed: deriveRunSeed(state.seed, 'encounter', state.encounterIndex),
-    boundaryId: runBoundaryId(state), party: state.party.filter(h => h.hp > 0).map(h => ({ ...h })) };
+    boundaryId: runBoundaryId(state), party: state.party.filter(h => h.hp > 0).map(h => ({ ...h, learned: [...h.learned] })) };
 }
 
 /** Reference boundary reducer. Reward acknowledgement is NOT an inventory grant. */

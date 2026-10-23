@@ -81,7 +81,7 @@ export class RunItemSession {
       ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted, battlefield)
       : BattleSession.fromRun(this.current.items, this.context, accepted);
     if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
-    session = created.session; this.battle = session; session.progression = this.current.items.run.party;
+    session = created.session; this.battle = session; session.progression = structuredClone(this.current.items.run.party);
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     this.current = { ...this.current, activeBattle: session.state, battlefield:battlefield }; this.review = null;
     if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.save(); } return session;

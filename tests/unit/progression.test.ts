@@ -1,3 +1,6 @@
+import { describeRunBattle } from '../../src/domain/run';
+import { RunItemSession } from '../../src/app/RunItemSession';
+import { createRunStorage } from '../../src/persistence/runStorage';
 import { emptyItemOwnership as emptyOwnership } from '../../src/domain/items';
 import { encodeRunSave, decodeRunSave } from '../../src/domain/runSaveEnvelope';
 import { freshRunSnapshot, createRunBattle, replayRunBattle } from '../../src/domain/runBattle';
@@ -92,6 +95,18 @@ describe('bounded progression',()=>{
     const replay={format:created.state.format,versions:created.state.versions,initial:created.state,commands:[],battlefield:created.battlefield};
     const result=replayRunBattle(replay,entry,runContext);expect(result.ok).toBe(true);if(result.ok)expect(result.state).toEqual(created.state);
     const older=JSON.stringify({...JSON.parse(encoded.text),format:2});expect(decodeRunSave(older,runContext)).toEqual({ok:false,reason:'incompatible'});
+  });
+
+  it('owns learned arrays exposed through previews and inspection metadata',()=>{
+    const snapshot=freshRunSnapshot('owned-progress',13,runContext),before=structuredClone(snapshot);
+    const preview=describeRunBattle(snapshot.items.run)!;
+    (preview.party[0].learned as string[]).push('ability:forged');
+    expect(snapshot).toEqual(before);
+    const controller=new RunItemSession(snapshot,runContext,createRunStorage(runContext,()=>null));
+    const battle=controller.startEncounter()!;
+    (battle.progression[0].learned as string[]).push('ability:forged');
+    expect(controller.snapshot.items.run.party).toEqual(before.items.run.party);
+    controller.dispose();
   });
 
 });
