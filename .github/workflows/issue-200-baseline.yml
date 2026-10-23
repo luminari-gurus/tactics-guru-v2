@@ -56,7 +56,7 @@ jobs:
         if: inputs.selection == 'startup'
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/audio/startup.json
-        run: npx --no-install playwright test tests/audio.spec.ts --project=desktop -g '^the test tone plays only' --repeat-each=3 --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/startup
+        run: npx --no-install playwright test tests/audio.spec.ts --project=desktop -g 'the test tone plays only' --repeat-each=3 --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/startup
       - name: Qualify affected audio consumers on all Chromium profiles
         if: inputs.selection == 'qualify'
         env:
