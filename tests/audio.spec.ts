@@ -16,8 +16,9 @@ function watchErrors(page: Page): string[] {
 const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!);
 
 test.afterEach(async ({page}, info) => {
-  if (!info.title.startsWith('the test tone plays only') || info.status === info.expectedStatus) return;
+  if (!info.title.startsWith('the test tone plays only')) return;
   const snapshot = await page.evaluate(() => ({
+    contextCalls: (window as unknown as {contextCalls: unknown}).contextCalls,
     now: performance.now(), visibility: document.visibilityState,
     ready: document.querySelector('#fit-status')?.textContent,
     portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete,
@@ -30,6 +31,16 @@ test.afterEach(async ({page}, info) => {
 });
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {
+  await page.addInitScript(() => {
+    const calls: {api: string; started: number; duration: number}[] = [];
+    (window as unknown as {contextCalls: unknown}).contextCalls = calls;
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (...args: Parameters<typeof getContext>) {
+      const started = performance.now();
+      try { return Reflect.apply(getContext, this, args); }
+      finally { calls.push({api: args[0], started, duration: performance.now()-started}); }
+    } as typeof getContext;
+  });
   const errors = watchErrors(page);
   await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
