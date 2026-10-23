@@ -22,41 +22,50 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Final source and focused domain qualification
+      - name: Focused healing-consumer checks and build
         run: |
           mkdir -p tmp/issue160-ci
           git rev-parse HEAD > tmp/issue160-ci/source.txt
           node --version > tmp/issue160-ci/node.txt
-          npx vitest run tests/unit/progression.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts tests/unit/exploration.test.ts tests/unit/abilityValidation.test.ts tests/unit/authoredEncounters.test.ts --maxWorkers=1 > tmp/issue160-ci/unit.txt 2>&1
+          npx vitest run tests/unit/dungeonBattle.test.ts tests/unit/progression.test.ts > tmp/issue160-ci/unit.txt 2>&1
           npm run build > tmp/issue160-ci/build.txt 2>&1
-      - name: Final Chromium progression boundary
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/chromium.json
-        run: npx playwright test tests/dungeon.spec.ts --grep 'hero progression' --reporter=line,json --output=tmp/issue160-ci/chromium-artifacts > tmp/issue160-ci/chromium.txt 2>&1
-      - name: Final WebKit progression boundary
-        if: always()
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit.json
-        run: npx playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts --grep 'hero progression|pre-progression dungeon remains incompatible|cold progression-format' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.txt 2>&1
-      - name: Remaining WebKit run persistence consumers
-        if: always()
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit-run.json
-        run: |
-          npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts --grep 'accepted player presentation reload|run preparation and dialogs|review: read-level' --reporter=line,json --output=tmp/issue160-ci/webkit-run-artifacts > tmp/issue160-ci/webkit-run.txt 2>&1
-      - name: Final learned ability and caster restoration fixtures
-        if: always()
+      - name: Progressed health bars and learned-ability fixtures
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/fixtures.json
         run: npm run test:fixtures -- --grep 'progression XP' --reporter=line,json --output=tmp/issue160-ci/fixture-artifacts > tmp/issue160-ci/fixtures.txt 2>&1
-      - name: Engine smoke
-        if: always()
-        run: npm run test:browser-smoke > tmp/issue160-ci/engine.txt 2>&1
-      - name: Run telemetry boundary with separate configured build
+      - name: Repaired production telemetry journeys on all profiles
         if: always()
         env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry.json
-        run: npm run test:telemetry -- --project=desktop --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-artifacts > tmp/issue160-ci/telemetry.txt 2>&1
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry-production.json
+        run: npm run test:telemetry -- --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-production-artifacts > tmp/issue160-ci/telemetry-production.txt 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue160-telemetry-production-checkpoint
+          path: tmp/issue160-ci/
+          retention-days: 30
+      - name: Repaired development telemetry journeys on all profiles
+        if: always()
+        env:
+          PLAYWRIGHT_TELEMETRY_DEV: 'true'
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry-development.json
+        run: npm run test:telemetry -- --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-development-artifacts > tmp/issue160-ci/telemetry-development.txt 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue160-telemetry-development-checkpoint
+          path: tmp/issue160-ci/
+          retention-days: 30
+      - name: Complete WebKit exploration and progressed floor journeys
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit-exploration.json
+        run: npx playwright test -c playwright.exploration.config.ts --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit-exploration.txt 2>&1
+      - name: Guarded preservation across standalone run and dungeon saves
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/guarded.json
+        run: npx playwright test tests/guarded-effects.spec.ts --reporter=line,json --output=tmp/issue160-ci/guarded-artifacts > tmp/issue160-ci/guarded.txt 2>&1
       - name: Retain environment and exact source/build manifests
         if: always()
         run: |

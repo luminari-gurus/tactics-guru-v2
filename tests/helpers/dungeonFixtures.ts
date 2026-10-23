@@ -46,7 +46,7 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
     const offer=dungeon.offer!;
     const itemId=offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??offer.options[0].itemId;
     dungeon=checkedDungeon(dungeonItem(dungeon,{...dungeonBoundary(dungeon),type:'claimReward',offerId:offer.id,itemId}));
-    for(const hero of dungeon.party)if(hero.hp>0&&hero.hp<18&&dungeon.ownership.consumables.length) {
+    for(const hero of dungeon.party)if(hero.hp>0&&hero.hp<hero.maxHp&&dungeon.ownership.consumables.length) {
       const used=dungeonItem(dungeon,{...dungeonBoundary(dungeon),type:'useItem',itemId:'item:healing_draught',heroId:hero.heroId});if(used.ok)dungeon=used.state;
     }
   }
