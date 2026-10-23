@@ -16,15 +16,17 @@ function watchErrors(page: Page): string[] {
 const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!);
 
 test.afterEach(async ({page}, info) => {
-  if (!info.title.startsWith('the test tone plays only')) return;
-  await info.attach('initial-readiness', {body: JSON.stringify(await page.evaluate(() => ({
+  if (!info.title.startsWith('the test tone plays only') || info.status === info.expectedStatus) return;
+  const snapshot = await page.evaluate(() => ({
     now: performance.now(), visibility: document.visibilityState,
     ready: document.querySelector('#fit-status')?.textContent,
-    portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete, width: document.querySelector<HTMLImageElement>('#proof-portrait')?.naturalWidth},
+    portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete,
+      width: document.querySelector<HTMLImageElement>('#proof-portrait')?.naturalWidth},
     diagnostics: window.fitDiagnostics?.(),
     marks: performance.getEntriesByType('mark').map(({name,startTime})=>({name,startTime})),
     resources: performance.getEntriesByType('resource').map(({name,startTime,duration})=>({name,startTime,duration})),
-  }))), contentType: 'application/json'});
+  })).catch(error => ({ diagnosticError: String(error) }));
+  await info.attach('initial-readiness', {body: JSON.stringify(snapshot), contentType: 'application/json'});
 });
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {

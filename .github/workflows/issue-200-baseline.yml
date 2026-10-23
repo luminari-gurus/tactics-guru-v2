@@ -24,24 +24,39 @@ jobs:
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
       - run: npm run build
-      - name: Compare tracing modes on the unchanged application
+      - name: Verify ordinary first-tone coverage on all Chromium profiles
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/readiness/ordinary.json
         run: |
           mkdir -p verification-receipts/readiness
+          npx --no-install playwright test tests/audio.spec.ts -g 'the test tone plays only' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/readiness/ordinary-artifacts
+      - name: Prove failure-only attachment with a deliberately stalled portrait
+        if: always() && !cancelled()
+        run: |
           node --input-type=module <<'JS'
-          import {writeFileSync} from 'node:fs';
-          import {resolve} from 'node:path';
+          import assert from 'node:assert/strict';
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {spawnSync} from 'node:child_process';
+          import {createRequire} from 'node:module';
           import {sourceIdentity} from './scripts/verification-report.mjs';
+          const require=createRequire(import.meta.url);
+          const path='tests/audio.spec.ts', original=readFileSync(path,'utf8');
           writeFileSync('verification-receipts/readiness/source.json',JSON.stringify(sourceIdentity(process.cwd()),null,2));
-          for(const mode of ['screenshots']) {
-            const trace = mode==='off'?'off':{mode:'retain-on-failure',screenshots:mode==='screenshots',snapshots:true,sources:true};
-            writeFileSync(`verification-receipts/readiness/${mode}.config.ts`, `import base from ${JSON.stringify(resolve('playwright.config.ts'))}; export default {...base,testDir:${JSON.stringify(resolve('tests'))},use:{...base.use,trace:${JSON.stringify(trace)}}};`);
-          }
+          try {
+            const target="test('the test tone plays only from its button and reports played each time', async ({ page }) => {";
+            assert.ok(original.includes(target));
+            writeFileSync(path,original.replace(target,target+"\n  await page.route('**/proof/fighter-portrait-96.webp', () => {});"));
+            const result=spawnSync(process.execPath,[require.resolve('@playwright/test/cli'),'test','tests/audio.spec.ts','--project=desktop','-g','the test tone plays only','--workers=1','--retries=0','--trace=off','--reporter=list,json','--output=verification-receipts/readiness/intentional-failure'],{stdio:'inherit',timeout:60000,env:{...process.env,PLAYWRIGHT_JSON_OUTPUT_FILE:'verification-receipts/readiness/intentional-failure.json'}});
+            assert.equal(result.status,1);
+            const report=JSON.parse(readFileSync('verification-receipts/readiness/intentional-failure.json','utf8'));
+            assert.equal(report.stats.unexpected,1);assert.equal(report.stats.expected,0);
+            const attachment=report.suites[0].specs[0].tests[0].results[0].attachments.find(item=>item.name==='initial-readiness');
+            assert.ok(attachment,'failure attachment must be retained');
+            const data=JSON.parse(Buffer.from(attachment.body,'base64'));
+            assert.equal(data.ready,'Loading');assert.ok(Array.isArray(data.marks));assert.ok(Array.isArray(data.resources));assert.ok(data.diagnostics);
+            console.log('Diagnostic contract passed; its intentionally failed browser result remains failed.');
+          } finally {writeFileSync(path,original);}
           JS
-          result=0
-          for mode in screenshots; do
-            PLAYWRIGHT_JSON_OUTPUT_FILE="verification-receipts/readiness/$mode.json" npx --no-install playwright test -c "verification-receipts/readiness/$mode.config.ts" tests/audio.spec.ts --project=desktop -g 'the test tone plays only' --repeat-each=6 --workers=1 --retries=0 --reporter=list,json --output="verification-receipts/readiness/$mode-artifacts" || result=1
-          done
-          exit "$result"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
