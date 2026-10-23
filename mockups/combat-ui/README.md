@@ -146,6 +146,10 @@ Confirm modal, heading, caption, inspect as a primary control, duplicate
 preview copy. The chevron is not a second selector when there is nothing to
 select.
 
+The chevron mockup stays in the gallery for comparison. The three pages
+below keep Option B’s bar, Go, path chip, and “no Ability dropdown” rule, and
+replace ▾ / long-press with a different choice mechanic.
+
 ### C — Radial / hold gestures
 
 Hold (touch) or right-click (desktop) on a unit or tile. A radial appears;
@@ -167,21 +171,129 @@ Risks: hold fights pan/zoom (`BoardInput` already uses press-and-drag to pan);
 no hover on a phone; slices are easy to miss; worse keyboard/screen-reader
 parity unless a non-gesture path remains.
 
+## Option B special-selection alternatives
+
+All three assume the same Fighter fixture as the chevron picker: Guarded Strike
+(last-used, melee), Extended Strike (range 1–5, legal on the grunt), Far Shot
+(no legal preview). Production heroes still own one special.
+
+Counts keep B’s convention: **target + Go** is the second step. Default
+special stays **2**. Switching adds **at most 1**, except Segment, where every
+owned special is a first-class verb so another special costs the same as the
+default.
+
+### Target-first (recommended)
+
+Tap an enemy or tile first. The bar replaces the special slot with **inline
+buttons for specials that currently preview as legal on that target**.
+Last-used valid special is already pressed. Far Shot is omitted, not greyed.
+Move / Attack / Wait and Go stay put. Choosing a special is part of targeting.
+
+| Path | Steps |
+| --- | ---: |
+| Default / last-used special | **2** — tap target (Guarded preselected) → Go |
+| A different legal special | **3** — tap target → Extended → Go (**+1**, no menu) |
+| Single-special unit | **2** — one pressed button, no extra chrome |
+
+Keyboard: **1 / 2 / …** select a listed special (order on the bar). **S**
+cycles the valid list (Shift+S previous). Enter = Go. Arrow keys move along
+the valid row.
+
+**Pros:** scales when a class has 3–5 specials (only legal ones appear); no
+popover; illegal options never compete for a tap; production heroes look like
+today’s single slot; pairs with the existing on-board forecast.
+
+**Cons:** ability-second — you do not pick a special in order to paint range
+highlights; a special with no current legal target is invisible (must retarget
+or tap Attack); the bar changes after the target tap.
+
+### Segmented row
+
+The special slot **expands in place** into a segmented control of every owned
+special. Unavailable segments stay visible and greyed with the reason. One
+owned special → one button, no segment chrome. No popover.
+
+| Path | Steps |
+| --- | ---: |
+| Default / last-used special | **2** — tap Guarded (same as Attack) → target + Go |
+| A different special | **2** — tap Extended instead; switching is not extra |
+| Single-special unit | **2** — collapses to one button |
+
+Keyboard: Left / Right move within the segment. **S** cycles owned specials
+(wraps; skips nothing, lands on greyed). Enter = Go.
+
+**Pros:** best discoverability; switching is free vs the default; ability-first
+so range highlights can still follow the pressed segment; keyboard maps to a
+toolbar.
+
+**Cons:** the bar grows with the catalog (three specials already crowd a 390px
+dock); greyed Far Shot reintroduces “why is this here?”; shortened labels
+(Guarded / Extended) hide full names on mobile.
+
+### On-board chips
+
+No special slot in the bar. After a target tap, **ability chips with forecast**
+appear next to that unit. Last-used legal chip is gold / pressed. Far Shot has
+no chip. Tap a chip to select it, then Go. Single-special units get one chip
+(the forecast). Move / Attack / Wait remain in the bar.
+
+| Path | Steps |
+| --- | ---: |
+| Default / last-used special | **2** — tap target (chip preselected) → Go |
+| A different legal special | **3** — tap target → other chip → Go (**+1**) |
+| Single-special unit | **2** — one chip, no picker |
+
+Keyboard: **1 / 2 / …** select a chip. **S** cycles chips for the current
+target. Enter = Go.
+
+**Pros:** specials live where the decision is; matches Option A’s on-tile path
+chip; bar stays three verbs + Go; illegal specials stay off-screen.
+
+**Cons:** chips occlude isometric tiles and stack badly on clustered enemies;
+ability-second, same as target-first; the bar no longer shows “what special do
+I even have?” until a target is chosen; mobile docks the stack to the board
+bottom, on top of the forecast zone.
+
+### Swipe-the-slot (not mocked)
+
+A swipe / scroll on the special slot with count dots was considered and
+**not** built as a fourth page. `BoardInput` already uses press-and-drag to
+pan, so a competing swipe on the dock fights the board. Dots do not name the
+next special. Desktop has no natural swipe, so it would still need a click
+path — which is the chevron again.
+
+### Comparison
+
+| | Chevron (kept) | Target-first | Segment | Board chips |
+| --- | --- | --- | --- | --- |
+| Default special | 2 | **2** | **2** | **2** |
+| Different special | 3 (+1) | 3 (+1) | **2** | 3 (+1) |
+| Single-special | 2, no ▾ | 2, one button | 2, one button | 2, one chip |
+| When the list appears | ▾ / long-press | after target tap | always in the bar | after target tap, on the board |
+| Illegal specials | greyed rows | omitted | greyed segments | omitted |
+| Keyboard | S cycle | 1/2…, S on valid list | ←/→, S on owned | 1/2…, S on chips |
+| Affordance if 1 special | none | none | none | one chip (the forecast) |
+
 ## Recommendation
 
-**Owner picked Option B**, with A’s on-tile path chip and the split special slot
-above. Implement that. Do not restore the Ability `<select>`.
+**Keep Option B’s persistent bar, smart defaults, one gold Go, and Option A’s
+on-tile path chip.** Ship **target-first** instead of the chevron picker.
 
-- Default special stays 2 steps; another owned special is one extra tap on ▾
-  then the row (the pick also selects, so it replaces the slot tap).
-- Production heroes hide ▾. Multi-ability catalogs (#162 fixtures, later
-  class skills) get the picker without a new dropdown.
-- `S` cycles specials for keyboard (Shift+S previous). Enter still confirms via Go.
-- Greyed picker rows use real rejection copy, not placeholder cooldowns.
+Target-first is the only alternative that stays compact as catalogs grow past
+two specials, never puts illegal rows under a thumb, and still meets the step
+budget (2 default, +1 to switch, 2 for a single-special unit). It does not
+bring back a dropdown. Keyboard 1/2… maps to the buttons the player can
+actually use on this target.
 
-Spec note: `openspec/specs/battle-controls/spec.md` currently requires Review
-then Confirm. Adopting B is a **spec change** from two confirms to one, not a
-CSS restyle of the rail.
+Pick **segmented** instead if the live catalog will stay at two or three
+specials and you want switching to cost the same as tapping Attack, with range
+highlights before a target. Use **board chips** only if you want to push more
+of combat onto the tile (pairing with the path chip) and accept occlusion.
+
+Leave `option-b.html` (chevron) in the gallery. Do not implement swipe-the-slot.
+Do not restore the Ability `<select>`. Spec note is unchanged: adopting B is a
+**spec change** from Review-then-Confirm to one Go
+(`openspec/specs/battle-controls/spec.md` currently requires Review then Confirm).
 
 ## Files
 
@@ -190,7 +302,10 @@ CSS restyle of the rail.
 | `index.html` | Comparison, links |
 | `current.html` | Shipped HUD recreation |
 | `option-a.html` | Board + wheel |
-| `option-b.html` | Action bar + Go. `?state=move` (default), `picker`, `single` |
+| `option-b.html` | Action bar + Go + chevron picker. `?state=move`, `picker`, `single` |
+| `option-b-specials-target.html` | B alternative: target-first valid specials |
+| `option-b-specials-segment.html` | B alternative: inline segmented specials |
+| `option-b-specials-chips.html` | B alternative: on-board ability chips |
 | `option-c.html` | Radial hold |
 | `styles.css` | Shared tokens (game colors) |
 | `export.js` | `?export=1` hides reviewer chrome |
@@ -208,6 +323,9 @@ Captured with headless Chrome at device scale 1:
 - `previews/option-a-desktop.png` / `previews/option-a-mobile.png`
 - `previews/option-b-desktop.png` / `previews/option-b-mobile.png` (move chip + ▾)
 - `previews/option-b-picker-desktop.png` / `previews/option-b-picker-mobile.png`
+- `previews/option-b-specials-target-desktop.png` / `previews/option-b-specials-target-mobile.png`
+- `previews/option-b-specials-segment-desktop.png` / `previews/option-b-specials-segment-mobile.png`
+- `previews/option-b-specials-chips-desktop.png` / `previews/option-b-specials-chips-mobile.png`
 - `previews/option-c-desktop.png` / `previews/option-c-mobile.png`
 
 Live app (Vite, this checkout, Mage first in initiative):

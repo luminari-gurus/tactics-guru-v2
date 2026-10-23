@@ -15,9 +15,36 @@
     <div class="cards">
       <a class="card" href="current.html"><strong>Current UI</strong> Recreation of the live rail/dock. Move 3 taps · Attack 4 · Wait 1.</a>
       <a class="card" href="option-a.html"><strong>A · Board + wheel</strong> Direct manipulation. Confirm on the tile. Move 2 · Attack 2.</a>
-      <a class="card" href="option-b.html"><strong>B · Bar + defaults</strong> Chosen. Persistent Go. Special chevron only when 2+ abilities. Move 1–2 · Attack 1–2 · special 2, +1 to switch.</a>
+      <a class="card" href="option-b.html"><strong>B · Bar + defaults</strong> Chosen. Persistent Go. Chevron picker kept for comparison. Move 1–2 · Attack 1–2 · special 2, +1 to switch.</a>
       <a class="card" href="option-c.html"><strong>C · Radial hold</strong> Hold/release gestures. Move 1 · Attack 1. Harder to discover.</a>
     </div>
+
+    <h2>Option B · special-selection alternatives</h2>
+    <p>Chevron stays. These three replace the ▾ / long-press picker with different ways to choose among multiple specials, still without an Ability dropdown.</p>
+    <div class="cards">
+      <a class="card" href="option-b-specials-target.html"><strong>B · Target-first</strong> Tap an enemy. The bar lists only specials legal for that target. Last-used valid special is already pressed. Recommended.</a>
+      <a class="card" href="option-b-specials-segment.html"><strong>B · Segmented row</strong> Every owned special is a first-class bar button. Greyed in place. One special → one button.</a>
+      <a class="card" href="option-b-specials-chips.html"><strong>B · On-board chips</strong> After a target tap, ability chips with forecast sit next to that unit. No special slot in the bar.</a>
+    </div>
+
+    <h2>Special-selection step counts (Option B)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th class="num">Chevron (kept)</th>
+          <th class="num">Target-first</th>
+          <th class="num">Segment</th>
+          <th class="num">Board chips</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Default / last-used special</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td></tr>
+        <tr><td>A different special</td><td class="num">3 (+1)</td><td class="num">3 (+1)</td><td class="num">2 (same as default)</td><td class="num">3 (+1)</td></tr>
+        <tr><td>Single-special unit</td><td class="num">2, no ▾</td><td class="num">2, one button</td><td class="num">2, one button</td><td class="num">2, one chip</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Counts keep Option B’s “target + Go” as the second step. Swipe-the-slot was sketched and dropped: it fights board pan and has no desktop equivalent.</p>
 
     <h2>Step counts vs today</h2>
     <table>
@@ -55,8 +82,8 @@
 
     <h2>Recommendation</h2>
     <div class="rec">
-      <p><strong>Owner picked Option B.</strong> Persistent action bar, smart Move/Attack default, one gold Go, Option A’s on-tile path chip for move preview. The special slot shows the last-used (or only) non-basic ability. A 44px ▾ appears only when the unit owns two or more specials; tapping it opens a compact picker. Default special stays 2 steps; switching adds at most 1. Keyboard: <kbd>S</kbd> cycles specials. No Ability dropdown.</p>
-      <p style="margin-top:10px">Treat Option C’s hold-to-inspect as a later mobile extra — do not make hold the only way to act (it fights pan/zoom and has no hover equivalent).</p>
+      <p><strong>Keep Option B’s bar + Go + path chip.</strong> Replace the chevron picker with <strong>target-first specials</strong>: tap an enemy (or tile), the bar shows only specials that currently preview as legal, last-used valid special is preselected, Go commits. Default special stays 2 steps; another legal special is one extra tap on that button. A production hero with one special sees one pressed button and nothing else to pick. Keyboard: <kbd>1</kbd>/<kbd>2</kbd>… pick a listed special, <kbd>S</kbd> cycles the valid list, Enter = Go.</p>
+      <p style="margin-top:10px">Segmented is the runner-up if the catalog stays at two or three specials and you want switching to cost the same as tapping Attack (ability-first, range highlights before a target). Board chips match Option A’s on-tile language but occlude isometric cells. Leave the chevron page in the gallery; do not ship the dropdown. Swipe-the-slot is out. Treat Option C’s hold as a later mobile extra, not the only way to act.</p>
     </div>
 
     <h2>Open each layout</h2>
@@ -65,6 +92,9 @@
       <li><a href="current.html">current.html</a> · <a href="current.html?export=1">export</a></li>
       <li><a href="option-a.html">option-a.html</a> · <a href="option-a.html?export=1">export</a></li>
       <li><a href="option-b.html">option-b.html</a> · <a href="option-b.html?state=move&amp;export=1">move export</a> · <a href="option-b.html?state=picker&amp;export=1">picker export</a> · <a href="option-b.html?state=single">one special</a></li>
+      <li><a href="option-b-specials-target.html">option-b-specials-target.html</a> · <a href="option-b-specials-target.html?export=1">export</a></li>
+      <li><a href="option-b-specials-segment.html">option-b-specials-segment.html</a> · <a href="option-b-specials-segment.html?export=1">export</a></li>
+      <li><a href="option-b-specials-chips.html">option-b-specials-chips.html</a> · <a href="option-b-specials-chips.html?export=1">export</a></li>
       <li><a href="option-c.html">option-c.html</a> · <a href="option-c.html?export=1">export</a></li>
     </ul>
     <p class="muted">Read <a href="README.md">README.md</a> for the full step table, removed elements, and how these sketches sit next to #108/#111.</p>

@@ -33,6 +33,9 @@ for (const [page, desk, mob] of [
   ['option-a.html', 'option-a-desktop.png', 'option-a-mobile.png'],
   ['option-b.html?state=move', 'option-b-desktop.png', 'option-b-mobile.png'],
   ['option-b.html?state=picker', 'option-b-picker-desktop.png', 'option-b-picker-mobile.png'],
+  ['option-b-specials-target.html', 'option-b-specials-target-desktop.png', 'option-b-specials-target-mobile.png'],
+  ['option-b-specials-segment.html', 'option-b-specials-segment-desktop.png', 'option-b-specials-segment-mobile.png'],
+  ['option-b-specials-chips.html', 'option-b-specials-chips-desktop.png', 'option-b-specials-chips-mobile.png'],
   ['option-c.html', 'option-c-desktop.png', 'option-c-mobile.png'],
 ]) {
   await shot(file(page), 1440, 900, desk);

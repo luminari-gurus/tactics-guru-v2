@@ -255,6 +255,68 @@ ul.pain li { margin: 6px 0; }
   .float-chip { max-width: calc(100% - 24px); }
 }
 
+/* ========== Option B special-selection alternatives ========== */
+.b-alt-nav { font-size: .8rem; }
+.b-alt-nav a { color: var(--gold); padding: 8px 0; }
+.b-alt-nav a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 650; }
+.bar-target {
+  grid-template-columns: minmax(132px, 180px) minmax(0, 1.4fr) minmax(0, 1.1fr) auto;
+}
+.valid-row {
+  display: flex; gap: 6px; min-width: 0;
+}
+.valid-row button {
+  flex: 1; min-height: 56px; min-width: 44px;
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 8px 10px;
+}
+.valid-row strong { font-size: .9rem; }
+.valid-row span { font-size: .68rem; color: var(--muted); margin-top: 4px; }
+.bar-target .verbs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.segment-group {
+  display: flex; gap: 4px; flex: 2 1 240px; min-width: 0;
+  border: 1px solid var(--gold); border-radius: 6px; padding: 4px; background: #101827;
+}
+.segment-group button {
+  flex: 1; min-width: 44px; min-height: 48px; padding: 6px 8px;
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+}
+.segment-group button strong { font-size: .8rem; }
+.segment-group button span { font-size: .65rem; color: var(--muted); margin-top: 3px; }
+.segment-group button:disabled { opacity: .7; }
+.verbs-flex { display: flex; gap: 6px; flex-wrap: wrap; align-items: stretch; min-width: 0; }
+.verbs-flex > button {
+  flex: 1 1 88px; min-height: 56px; min-width: 44px;
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 8px 10px;
+}
+.verbs-flex > button strong { font-size: .9rem; }
+.verbs-flex > button span { font-size: .68rem; color: var(--muted); margin-top: 4px; }
+.board-chips {
+  position: absolute; left: 52%; top: 46%;
+  display: flex; flex-direction: column; gap: 6px; pointer-events: auto; z-index: 4;
+  min-width: 210px; max-width: min(260px, 46%);
+}
+.board-chips button {
+  min-height: 44px; text-align: left;
+  display: flex; flex-direction: column; align-items: flex-start; padding: 8px 12px;
+  box-shadow: 0 8px 24px #0008;
+}
+.board-chips button strong { font-size: .85rem; }
+.board-chips button span { font-size: .7rem; color: var(--muted); }
+.board-chips button[aria-pressed="true"] { background: var(--pressed); }
+.chips-bar .verbs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 759px) {
+  .bar-target { grid-template-columns: 1fr; }
+  .valid-row { flex-wrap: wrap; }
+  .valid-row button { flex: 1 1 140px; }
+  .bar-target .verbs { grid-template-columns: 1fr 1fr 1fr; }
+  .segment-group { flex: 1 1 100%; order: 4; }
+  .board-chips {
+    left: 12px; right: 12px; top: auto; bottom: 12px;
+    min-width: 0; max-width: none;
+  }
+}
+
 /* ========== Option C: radial / hold ========== */
 .c-stage { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: 10px; gap: 8px; }
 .c-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
