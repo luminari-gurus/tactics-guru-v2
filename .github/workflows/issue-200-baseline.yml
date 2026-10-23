@@ -193,12 +193,13 @@ jobs:
       PLAYWRIGHT_SERVER_MODE: preview
       PLAYWRIGHT_BASE_PATH: /
       PLAYWRIGHT_TELEMETRY_DEV: 'false'
-      RECEIPTS: ${{ runner.temp }}/issue203-comparison-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Check host and prepare durable comparison output
         run: |
           test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
-          mkdir -p "$RECEIPTS"
+          comparison_receipts="$RUNNER_TEMP/issue203-comparison-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          mkdir -p "$comparison_receipts"
+          echo "RECEIPTS=$comparison_receipts" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           ref: 958bbd90546e1305aab10e370d5555a1d7c9a43a
@@ -223,10 +224,10 @@ jobs:
           unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
           npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/base.json" 2> "$RECEIPTS/base.err"
       - name: Retain base failure artifacts before the next checkout
-        if: always()
+        if: always() && env.RECEIPTS != ''
         run: test ! -d test-results || cp -R test-results "$RECEIPTS/base-artifacts"
       - uses: actions/checkout@v4
-        if: always()
+        if: always() && env.RECEIPTS != ''
         with:
           ref: 5bd53985aa5f3ded04b6853e5ce718165e289094
           fetch-depth: 0
@@ -246,14 +247,14 @@ jobs:
           unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
           npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/candidate.json" 2> "$RECEIPTS/candidate.err"
       - name: Retain candidate failure artifacts
-        if: always()
+        if: always() && env.RECEIPTS != ''
         run: test ! -d test-results || cp -R test-results "$RECEIPTS/candidate-artifacts"
       - name: Preserve both observations without converting the original failure to a pass
-        if: always()
+        if: always() && env.RECEIPTS != ''
         run: |
           node --input-type=module -e 'import {readFileSync,writeFileSync} from "node:fs"; const reports=Object.fromEntries(["base","candidate"].map(name=>[name,JSON.parse(readFileSync(process.env.RECEIPTS+"/"+name+".json"))])); for(const r of Object.values(reports))if(r.stats.expected+r.stats.unexpected+r.stats.skipped!==1||r.errors.length)throw Error("Incomplete comparison"); writeFileSync(process.env.RECEIPTS+"/summary.json",JSON.stringify({purpose:"Exact-base attribution only; original full-capture failure remains failed",results:Object.fromEntries(Object.entries(reports).map(([name,r])=>[name,r.stats]))},null,2));'
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && env.RECEIPTS != ''
         with:
           name: issue203-base-comparison-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ env.RECEIPTS }}/

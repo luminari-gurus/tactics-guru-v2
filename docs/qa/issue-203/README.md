@@ -150,3 +150,9 @@ zero retries. It follows final tooling qualification on the same exclusive runne
 Both observations and original failure will be retained; neither a later pass nor
 source equivalence alone will be described as reproducing the baseline failure.
 The temporary mode/job/branch permission will be removed after evidence collection.
+
+The initial comparison dispatch was rejected during workflow parsing because
+`runner.temp` is unavailable in job-level env expressions. No comparison job or
+browser ran. Its output path is now assigned in a step through `GITHUB_ENV`, and
+always-run copy/upload steps require a nonempty owned path. The rejected dispatch
+is a tooling setup error, separate from the real landscape assertion failure.
