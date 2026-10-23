@@ -1,6 +1,6 @@
 # Issue #205: reduce repeated full-battle audio equivalence testing
 
-Date: 2026-10-23 (Asia/Jerusalem). Status: implementation authorized and started.
+Date: 2026-10-23 (Asia/Jerusalem). Status: implemented, qualified and ready for review.
 The caller requested end-to-end implementation, OpenSpec tracking, proportional
 verification and review-ready publication. No merge or deployment is authorized.
 
@@ -10,8 +10,8 @@ verification and review-ready publication. No merge or deployment is authorized.
   refactor) are pushed in [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229).
   Main base remains `b749ba4`; #228 packaging stays separate.
 - OpenSpec `issue-205-audio-equivalence` is valid (spec-driven, skip_specs: true).
-  [Tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md): 6/7 complete;
-  only final publication/readback remains. The caller requested the ledger.
+  [Tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md): 7/7 complete.
+  The caller requested the ledger; existing product specs remain unchanged.
 - Refactor complete: 12 full UI battles become six audible journeys plus short
   enabled/muted legal comparisons. Both original seeds have real-adapter proof
   at every accepted boundary. No production/helper/dependency/config changes.
@@ -27,9 +27,14 @@ verification and review-ready publication. No merge or deployment is authorized.
 - Raw receipts: `tmp/verification/issue-205/`; [QA mapping and detailed results](../qa/issue-205-audio-equivalence.md).
   Original setup/WebKit/diagnostic failures are preserved. The detached base
   worktree and temporary diagnostic source/config have been removed.
-- Next: commit/push the small gesture repair and qualified ledger, publish the
-  receipt archive/manifest and final PR description, then mark final delivery
-  complete after remote parity/readback. Do not merge or deploy; #199/#200 stay open.
+- Code/receipt publication: `3153e8d`, with verified archive/manifest and final PR
+  description. Local inputs exactly match the final focused captures (SHA-256
+  `f9c0e36b0fd07ed667eca4e472030e96df0421180b287c09ed0a57b8c31a6d59`).
+  Later handoff-only commits reuse that evidence; they were not re-executed.
+- Delivery is complete and PR #229 is ready for review. Main remained `b749ba4`,
+  checkout was clean and tracking parity was `0 0` at publication readback.
+  No implementation/acceptance work remains before review. Do not merge or
+  deploy; #199/#200 stay open. Archive OpenSpec after review if requested.
 
 - Issue: [#205](https://github.com/luminari-gurus/tactics-guru-v2/issues/205), P1.
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/205#issuecomment-6362068879).

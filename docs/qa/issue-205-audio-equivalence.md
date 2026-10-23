@@ -1,7 +1,8 @@
 # Issue #205: audio equivalence qualification
 
 2026-10-23 (Asia/Jerusalem). Implementation and affected qualification passed;
-publication is being finalized in [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229).
+code and evidence are published in [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229)
+at `3153e8d`. Later handoff-only commits reuse the unchanged qualified inputs.
 Application code, assets, dependencies, shared helpers and browser configuration
 are unchanged. No performance limits, retries or existing timeouts changed.
 
