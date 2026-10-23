@@ -7,6 +7,10 @@ unchanged authored ruined approach. The independent authored battle remains
 available. New enemy types, balancing changes and the overworld generator are
 outside this change.
 
+Fresh simulation receipts and full-corpus receipts are written to ignored
+`verification-receipts/procedural-grids/`. Files in this directory are retained
+historical evidence; test execution must not overwrite them or dirty a later build.
+
 ## Evidence
 
 - `corpus.json`: seeds 0–9,999 plus both upper uint32 edges. Every candidate goes

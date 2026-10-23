@@ -22,7 +22,7 @@ it('reproduces legal representative battles with independent pursuit and waiting
   expect(replay.state).toEqual(session.state);expect(replay.events).toEqual(session.events);
   results.push({seed,policy,wounded,descriptor:session.battlefield,outcome:session.state.outcome,commands:session.state.commandCount,stateHash:hashJson(session.state),eventsHash:hashJson(session.events)});
  }
- mkdirSync('docs/qa/procedural-grids',{recursive:true});writeFileSync('docs/qa/procedural-grids/simulations.json',JSON.stringify({rulesVersion:2,generatorVersion:1,profileVersion:'desert-v1',results},null,2)+'\n');
+ mkdirSync('verification-receipts/procedural-grids',{recursive:true});writeFileSync('verification-receipts/procedural-grids/simulations.json',JSON.stringify({rulesVersion:2,generatorVersion:1,profileVersion:'desert-v1',results},null,2)+'\n');
  expect(results.some(r=>r.outcome==='playerLoss')).toBe(true);
 },120000);
 
