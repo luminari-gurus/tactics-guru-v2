@@ -94,3 +94,39 @@ remain authoritative. The final temporary control config removes only those
 project filters, and all 27 contracts pass. Both failed and successful tooling
 outputs are retained; actual selections remain byte-for-byte identical across
 all 15 modes after this contract-only repair. The prior #200 full capture remains failed, irrespective of this PR.
+
+## Consumer ledger and self-hosted preparation
+
+[Coverage ledger](coverage-ledger.json) retains original source/input/build hashes,
+case IDs, environment and results for 266 unchanged special-mode selections from
+run 39952038146. All IDs match current discovery. Its runtime delta to current
+main is confined to proof-only audio cleanup; battle/run/map/dungeon/fixture route
+consumers are unchanged. All four newly refactored run-recovery WebKit executions
+instead reuse #204's committed passing after report on unchanged relevant inputs.
+Configured telemetry production and development remain separate 36-case reports;
+ordinary builds are not used as telemetry proof.
+
+Fresh root dev, prefix preview and prefix dev asset runs passed **201 cases**, with
+**six expected dev-only resource-hint skips**, zero failures or retries. Each raw
+JSON report and both prefix/restored-root build logs are retained here. Root preview
+assets remain part of the self-hosted default matrix. The original 18-sample dirty
+performance capture remains failed; the separate clean 18-sample recovery at
+5a161da remains historical evidence, not a fresh performance claim for this PR.
+#203 changes no runtime or performance collector/evaluator inputs and does not
+change measure:fit selection. Existing performance budget findings stay intact.
+
+[Self-hosted run 40014331247](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40014331247)
+pins clean commit `5bd53985aa5f3ded04b6853e5ce718165e289094`. Preparation passed
+**935 units, both type scopes, two real root/prefix build integrations and the
+ordinary production bundle**. Exact prepared plan and bundle inventory/hash are
+retained in `self-hosted-plan.json.gz` and `self-hosted-build.json.gz`; preparation
+source/environment/results are in `self-hosted-preparation-receipt.json.gz`.
+The run requests only the nine Chromium batches and will be explicitly partial in
+the full-inventory aggregate; the coverage ledger supplies the unchanged modes.
+
+Later contract-only refinement `5c73fb9` changes discovery-control tooling/tests and
+evidence, with **all 15 actual selections/effective project configurations exactly
+unchanged**. It passes all 27 final contracts locally. Browser specs, config,
+runtime, assets, dependencies, full-unit/build inputs and the actual nine-batch
+selection remain identical to the self-hosted tested commit; those runs are reused
+on that basis rather than claimed to execute later commits.

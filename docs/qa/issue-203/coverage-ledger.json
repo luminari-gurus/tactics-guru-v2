@@ -5225,5 +5225,36 @@
     "root dev and prefix preview/dev asset modes on final implementation",
     "CPU tooling, units/build integrations and both type scopes behind self-hosted preparation"
   ],
-  "artifactRetention": "Original Actions reports expire 2026-11-22; aggregate source hashes and per-case outcomes are retained here in gzip. #204 replacement raw reports are already committed in docs/qa/issue-204/after-webkit.json.gz."
+  "artifactRetention": "Original Actions reports expire 2026-11-22; aggregate source hashes and per-case outcomes are retained here in gzip. #204 replacement raw reports are already committed in docs/qa/issue-204/after-webkit.json.gz.",
+  "freshAssetModes": [
+    {
+      "mode": "assets-root-dev",
+      "startTime": "2026-10-23T19:49:44.916Z",
+      "duration": 140604.201,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    {
+      "mode": "assets-prefix-preview",
+      "startTime": "2026-10-23T19:52:11.194Z",
+      "duration": 138419.38700000002,
+      "expected": 69,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    {
+      "mode": "assets-prefix-dev",
+      "startTime": "2026-10-23T19:54:30.004Z",
+      "duration": 140265.38199999998,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  ],
+  "verifiedReuseIdentity": "All 266 special-mode selected IDs exactly match retained reports; four matching WebKit IDs are replaced by docs/qa/issue-204/after-webkit.json.gz (4 passes, zero retries).",
+  "finalContractRefinement": "5c73fb9 changes only discovery-control tooling tests and reports relative to 5bd5398. All 15 actual selections/effective project settings are deep-equal; browser specs/configs/runtime/assets/dependencies are identical. 27 final contracts pass locally. Self-hosted default reports are explicitly from 5bd5398, not a later commit."
 }
