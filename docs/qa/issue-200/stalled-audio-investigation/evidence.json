@@ -1,0 +1,140 @@
+{
+  "originalFailureRun": 39952038146,
+  "originalTimeoutReproduced": false,
+  "rootCauseOfOriginalTimeoutProven": false,
+  "discoveredDefect": "Scene shutdown leaves old audio XHRs alive and retrying through the restarted loader",
+  "selection": {
+    "before": 33,
+    "after": 33,
+    "missing": 0,
+    "extra": 0
+  },
+  "environment": {
+    "runner": "unraid-tactics-01",
+    "node": "v24.22.1",
+    "chromium": "153.0.8010.12",
+    "playwright": "1.63.0",
+    "workers": 1,
+    "retries": 0,
+    "mode": "production preview",
+    "capacity": "exclusive workflow lock; persistent host; unrelated workloads unverified",
+    "emulation": "desktop, Pixel 7 portrait and landscape"
+  },
+  "runs": [
+    {
+      "label": "base-isolated",
+      "run": 39998362663,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39998362663",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39998362663/artifacts/12521216650",
+      "commit": "f33e31a58a7da186d6b4193b6c4fb7b2c35f266d",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T17:51:01.060Z",
+        "duration": 55339.05699999999,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "31b7958b08b04d4cd4303ea5327b456cfa1220a5716606e53318df0f08292aea",
+      "sourceReceiptSha256": "e2c85d2ba238078d17c86ae028e62082050262d18a1c85084419d372d0e0bd22"
+    },
+    {
+      "label": "diagnostic-family",
+      "run": 39998749961,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39998749961",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39998749961/artifacts/12520524311",
+      "commit": "7ab61fdd0f3919e531111374793c9dcb7b86aaae",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T17:53:49.997Z",
+        "duration": 32629.721,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "88b1a0314bee6fb079b18c4565f8e64f37243a4e875c1825fe7ca6ec6214aef1",
+      "sourceReceiptSha256": "91e39d79f280a1b56279d012d28136a4091322eb4a87a2fb556cfdb58df1c241"
+    },
+    {
+      "label": "restart-regression-red",
+      "run": 39999176852,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39999176852",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39999176852/artifacts/12520958120",
+      "commit": "2d857304bfd1c7e3aa757a8b33b8251124adfead",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T17:56:57.422Z",
+        "duration": 38020.667,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "reportSha256": "ca8f9f0bc94a054903d1b88b626a23246108d422e46fc329454c7a63ae5c4dc7",
+      "sourceReceiptSha256": "e06d5811b763bbbad2efd9b74dfe9d859a552f4c9029d1dde2f343a2c79f3db3"
+    },
+    {
+      "label": "repair-qualification",
+      "run": 39999417958,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39999417958",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39999417958/artifacts/12521078280",
+      "commit": "fbef6697e8a8bc5453ca48b6e8aafba43719ca29",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T17:58:43.620Z",
+        "duration": 147020.84100000001,
+        "expected": 32,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "reportSha256": "18946fb5c87ef801d2737bacab142c677c6dd8dea74956f7bfcae0f3a64807ac",
+      "sourceReceiptSha256": "900afa110a80e0689020137add993fee9430be1e60e7cef0292507feedf90326"
+    },
+    {
+      "label": "repair-startup",
+      "run": 40000183279,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40000183279",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40000183279/artifacts/12521392895",
+      "commit": "0beb51989841b0a60c562abeaf6b14d3718f4a83",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T18:04:19.372Z",
+        "duration": 24625.565,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "4b6b6c7edd4d3a520c97542557c6aac9f2329d82d7c942070d0860344d9b6af8",
+      "sourceReceiptSha256": "7da4c442c1897b6626260baf32028de91eea4201cd3ae52173e1653038d11e7e"
+    },
+    {
+      "label": "base-startup",
+      "run": 40000400640,
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40000400640",
+      "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40000400640/artifacts/12521562796",
+      "commit": "f33e31a58a7da186d6b4193b6c4fb7b2c35f266d",
+      "sourceDirty": false,
+      "stats": {
+        "startTime": "2026-10-23T18:05:48.603Z",
+        "duration": 25906.923,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "reportSha256": "c1701a22d19b451643cce0736269492e97cd2129907d22131492842c2483c763",
+      "sourceReceiptSha256": "e2c85d2ba238078d17c86ae028e62082050262d18a1c85084419d372d0e0bd22"
+    }
+  ],
+  "setupFailures": {
+    "39998154582": "Abbreviated SHA checkout failed; no browser cases",
+    "39999995931": "Anchored selector matched zero cases",
+    "39999999421": "Anchored selector matched zero cases",
+    "40000180031": "Canceled while pending; no jobs"
+  },
+  "limits": "No timeout/retry/threshold changes. Original timeout not causally resolved. Qualification 32/33 plus focused follow-up is not a clean full-file/full-regression pass."
+}
