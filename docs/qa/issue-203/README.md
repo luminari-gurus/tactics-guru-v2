@@ -130,3 +130,23 @@ unchanged**. It passes all 27 final contracts locally. Browser specs, config,
 runtime, assets, dependencies, full-unit/build inputs and the actual nine-batch
 selection remain identical to the self-hosted tested commit; those runs are reused
 on that basis rather than claimed to execute later commits.
+
+## Preserved landscape startup failure
+
+The first landscape batch completed 71 selections: **70 passed, one failed**,
+zero retries/skips. The failure is the initial `data-phase="player"` assertion in
+`battle-persistence.spec.ts`'s `default Move Continue is read-only and confirmed
+movement keeps the remaining-action flow` case. After five seconds the page still
+reported `data-ready="false"`, before any interaction. This spec and its runtime,
+device options, assertion and timeout are unchanged by #203. Cleanup completed
+with no surviving owned process or error; independent later batches continue.
+The raw JSON and receipt are retained as `self-hosted-mobile-landscape-1-*.gz`.
+
+This is a failed run, not a retry-qualified pass. A temporary comparison mode is
+being added to the existing exact-branch manual self-hosted workflow to run the
+same case once on literal main base `958bbd9` and once on the capture source
+`5bd5398`, with matching unconfigured root builds, native profile, no tracing and
+zero retries. It follows final tooling qualification on the same exclusive runner.
+Both observations and original failure will be retained; neither a later pass nor
+source equivalence alone will be described as reproducing the baseline failure.
+The temporary mode/job/branch permission will be removed after evidence collection.

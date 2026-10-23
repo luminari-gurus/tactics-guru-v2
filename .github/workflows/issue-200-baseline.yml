@@ -5,7 +5,7 @@ on:
       mode:
         description: Bounded qualification, partial artifact pilot, or serial capture
         type: choice
-        options: [qualify, pilot, capture]
+        options: [qualify, pilot, capture, battle-compare]
         default: qualify
       batches:
         description: Optional comma-separated batch IDs; empty capture selects the full plan
@@ -27,7 +27,7 @@ env:
   SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
   qualify:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (inputs.mode == 'qualify' || inputs.mode == 'battle-compare') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 25
     steps:
@@ -65,7 +65,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (inputs.mode == 'pilot' || inputs.mode == 'capture') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 35
     outputs:
@@ -153,7 +153,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
+    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && (inputs.mode == 'pilot' || inputs.mode == 'capture') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-203-browser-coverage')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 10
     steps:
@@ -181,5 +181,81 @@ jobs:
         with:
           name: issue208-aggregate-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/serial/aggregate/
+          retention-days: 30
+          if-no-files-found: warn
+
+  battle-compare:
+    needs: qualify
+    if: always() && inputs.mode == 'battle-compare' && github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-203-browser-coverage'
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 15
+    env:
+      PLAYWRIGHT_SERVER_MODE: preview
+      PLAYWRIGHT_BASE_PATH: /
+      PLAYWRIGHT_TELEMETRY_DEV: 'false'
+      RECEIPTS: ${{ runner.temp }}/issue203-comparison-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Check host and prepare durable comparison output
+        run: |
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+          mkdir -p "$RECEIPTS"
+      - uses: actions/checkout@v4
+        with:
+          ref: 958bbd90546e1305aab10e370d5555a1d7c9a43a
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Build and identify literal main base
+        run: |
+          for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
+          unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
+          npm ci
+          npm run check:browsers > "$RECEIPTS/base-environment.log" 2>&1
+          npm run build > "$RECEIPTS/base-build.log" 2>&1
+          node --input-type=module -e 'import {writeFileSync} from "node:fs"; import os from "node:os"; import {sourceIdentity,digest} from "./scripts/verification-report.mjs"; import {inventory} from "./scripts/verification-batches.mjs"; const files=inventory("dist"); writeFileSync(process.env.RECEIPTS+"/base-source.json",JSON.stringify({source:sourceIdentity(process.cwd()),environment:{node:process.version,runner:process.env.RUNNER_NAME,platform:process.platform,arch:process.arch,release:os.release(),cpu:os.cpus()[0]?.model,memoryBytes:os.totalmem(),loadAverage:os.loadavg(),conditions:process.env.SERIAL_CONDITIONS},files,buildHash:digest(JSON.stringify(files))},null,2));'
+      - name: Observe unchanged case on literal base without retries or tracing
+        continue-on-error: true
+        run: |
+          for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
+          unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
+          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/base.json" 2> "$RECEIPTS/base.err"
+      - name: Retain base failure artifacts before the next checkout
+        if: always()
+        run: test ! -d test-results || cp -R test-results "$RECEIPTS/base-artifacts"
+      - uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: 5bd53985aa5f3ded04b6853e5ce718165e289094
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build and identify the failed-capture source
+        run: |
+          for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
+          unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
+          npm ci
+          npm run check:browsers > "$RECEIPTS/candidate-environment.log" 2>&1
+          npm run build > "$RECEIPTS/candidate-build.log" 2>&1
+          node --input-type=module -e 'import {writeFileSync} from "node:fs"; import os from "node:os"; import {sourceIdentity,digest} from "./scripts/verification-report.mjs"; import {inventory} from "./scripts/verification-batches.mjs"; const files=inventory("dist"); writeFileSync(process.env.RECEIPTS+"/candidate-source.json",JSON.stringify({source:sourceIdentity(process.cwd()),environment:{node:process.version,runner:process.env.RUNNER_NAME,platform:process.platform,arch:process.arch,release:os.release(),cpu:os.cpus()[0]?.model,memoryBytes:os.totalmem(),loadAverage:os.loadavg(),conditions:process.env.SERIAL_CONDITIONS},files,buildHash:digest(JSON.stringify(files))},null,2));'
+      - name: Observe same case on the failed-capture source without retries or tracing
+        continue-on-error: true
+        run: |
+          for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
+          unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
+          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/candidate.json" 2> "$RECEIPTS/candidate.err"
+      - name: Retain candidate failure artifacts
+        if: always()
+        run: test ! -d test-results || cp -R test-results "$RECEIPTS/candidate-artifacts"
+      - name: Preserve both observations without converting the original failure to a pass
+        if: always()
+        run: |
+          node --input-type=module -e 'import {readFileSync,writeFileSync} from "node:fs"; const reports=Object.fromEntries(["base","candidate"].map(name=>[name,JSON.parse(readFileSync(process.env.RECEIPTS+"/"+name+".json"))])); for(const r of Object.values(reports))if(r.stats.expected+r.stats.unexpected+r.stats.skipped!==1||r.errors.length)throw Error("Incomplete comparison"); writeFileSync(process.env.RECEIPTS+"/summary.json",JSON.stringify({purpose:"Exact-base attribution only; original full-capture failure remains failed",results:Object.fromEntries(Object.entries(reports).map(([name,r])=>[name,r.stats]))},null,2));'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue203-base-comparison-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.RECEIPTS }}/
           retention-days: 30
           if-no-files-found: warn

@@ -57,7 +57,6 @@
       "stage": "fixtures",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -1130,13 +1129,27 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/fixtures/fixtures-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
     },
     {
       "stage": "placement-dev",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -1237,13 +1250,28 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/overworld-map.spec.ts",
+        "-g",
+        "controlled placement failure preserves complete state and supports retry",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/placement-dev/placement-dev-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
     },
     {
       "stage": "webkit-acceptance",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -2226,13 +2254,27 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers, with four WebKit run-recovery executions replaced by issue-204 evidence"
+      "disposition": "reuse unchanged route/runtime/test consumers, with four WebKit run-recovery executions replaced by issue-204 evidence",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.device-acceptance.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/webkit-acceptance/webkit-acceptance-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
     },
     {
       "stage": "webkit-exploration",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -3305,13 +3347,27 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.exploration.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/webkit-exploration/webkit-exploration-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
     },
     {
       "stage": "health-bars",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -3808,13 +3864,27 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.health-bars.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/health-bars/health-bars-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
     },
     {
       "stage": "telemetry-production",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -4509,13 +4579,28 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/telemetry-production/telemetry-production-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
+      "configuredBuild": "Dedicated playwright.telemetry.config.ts build/dev environment. ordinaryArtifactHash is only the batch downloaded ordinary bundle and is NOT the configured telemetry build identity or proof; the separate configured raw report is retained."
     },
     {
       "stage": "telemetry-development",
       "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
       "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
-      "buildHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
       "environment": {
         "node": "v24.22.1",
         "platform": "linux",
@@ -5210,7 +5295,23 @@
           ]
         }
       ],
-      "disposition": "reuse unchanged route/runtime/test consumers"
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/telemetry-development/telemetry-development-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
+      "configuredBuild": "Dedicated playwright.telemetry.config.ts build/dev environment. ordinaryArtifactHash is only the batch downloaded ordinary bundle and is NOT the configured telemetry build identity or proof; the separate configured raw report is retained."
     }
   ],
   "scopeReason": "Only runtime delta from original capture is inside proof-only FitScene create/shutdown. These stages exercise battle/run/map/dungeon/fixture routes, not scene=proof. All other src, public assets, dependencies, stage scripts and their spec/helper bodies are byte-identical; config filters preserve every selected ID and effective use option. package.json changes only include the new Node selection contracts. Four run-progression recovery executions reuse the complete #204 post-refactor reports on unchanged runtime and assertion inputs. New base failure metadata is outside these stage selectors.",
@@ -5256,5 +5357,9 @@
     }
   ],
   "verifiedReuseIdentity": "All 266 special-mode selected IDs exactly match retained reports; four matching WebKit IDs are replaced by docs/qa/issue-204/after-webkit.json.gz (4 passes, zero retries).",
-  "finalContractRefinement": "5c73fb9 changes only discovery-control tooling tests and reports relative to 5bd5398. All 15 actual selections/effective project settings are deep-equal; browser specs/configs/runtime/assets/dependencies are identical. 27 final contracts pass locally. Self-hosted default reports are explicitly from 5bd5398, not a later commit."
+  "finalContractRefinement": "5c73fb9 changes only discovery-control tooling tests and reports relative to 5bd5398. All 15 actual selections/effective project settings are deep-equal; browser specs/configs/runtime/assets/dependencies are identical. 27 final contracts pass locally. Self-hosted default reports are explicitly from 5bd5398, not a later commit.",
+  "issue204HashVerification": {
+    "matchingRelevantInputs": 170,
+    "scope": "All src/public paths plus run-progression spec, recovery/item helpers, lockfile and WebKit acceptance config match the committed #204 tested-inputs.json. Base Chromium filters changed, but WebKit replaces projects; exact effective discovery/use and four case IDs are unchanged."
+  }
 }
