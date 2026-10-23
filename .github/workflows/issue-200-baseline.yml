@@ -27,7 +27,7 @@ env:
   SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
   qualify:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-200-performance-provenance')
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 25
     steps:
@@ -65,7 +65,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-200-performance-provenance')
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 35
     outputs:
@@ -153,7 +153,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || github.ref == 'refs/heads/work/issue-200-performance-provenance')
+    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 10
     steps:
