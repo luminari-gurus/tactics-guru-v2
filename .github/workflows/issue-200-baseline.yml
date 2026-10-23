@@ -1,18 +1,38 @@
-name: Issue 200 initial-readiness comparison
+name: Issue 200 resumable serial verification
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Bounded qualification, partial artifact pilot, or serial capture
+        type: choice
+        options: [qualify, pilot, capture]
+        default: qualify
+      batches:
+        description: Optional comma-separated batch IDs; empty capture selects the full plan
+        type: string
+        default: ''
+      conditions:
+        description: Host workloads and cache conditions; coordinate unrelated workloads
+        type: string
+        default: 'Persistent runner; background workloads not independently verified'
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: tactics-browser-exclusive
   cancel-in-progress: false
+env:
+  SERIAL_MODE: ${{ inputs.mode }}
+  SERIAL_BATCHES: ${{ inputs.batches }}
+  SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
-  readiness:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-200-initial-readiness'
+  qualify:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
-      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - name: Check host disposition before qualification
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -22,24 +42,144 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+        timeout-minutes: 10
       - run: npm run setup:browsers && npm run check:browsers
-      - run: npm run build
-      - name: Verify ordinary first-tone coverage on all Chromium profiles
+        timeout-minutes: 5
+      - run: npm run test:verification-tooling && npm run test:verification-batches && npm run test:verification
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
+      - run: npm run build && npm run test:browser-smoke
+      - run: node --test tests/tooling/verification-browser.test.mjs
+      - name: Preserve the qualification timing receipt and comparison
         env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/readiness/ordinary.json
+          RECEIPT: verification-receipts/timings/self-hosted-qualification-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
-          mkdir -p verification-receipts/readiness
-          node --input-type=module <<'JS'
-          import os from 'node:os';import {writeFileSync,readFileSync} from 'node:fs';import {sourceIdentity} from './scripts/verification-report.mjs';
-          writeFileSync('verification-receipts/readiness/source.json',JSON.stringify({source:sourceIdentity(process.cwd()),node:process.version,cpus:os.cpus().length,load:os.loadavg(),free:os.freemem(),memory:os.totalmem(),pressure:Object.fromEntries(['cpu','memory','io'].map(name=>[name,readFileSync('/proc/pressure/'+name,'utf8')]))},null,2));
-          JS
-          npx --no-install playwright test tests/audio.spec.ts -g 'the test tone plays only' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/readiness/ordinary-artifacts
+          npm run measure:verification -- --stages tooling,typecheck-app,typecheck-domain --out "$RECEIPT" --conditions 'Qualification only; not a full baseline'
+          npm run --silent measure:verification -- compare "$RECEIPT/report.json" "$RECEIPT/report.json" > "$RECEIPT/self-comparison.json"
+          cat "$RECEIPT/summary.md" >> "$GITHUB_STEP_SUMMARY"
+        timeout-minutes: 5
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue200-readiness-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            verification-receipts/readiness/
-            verification-receipts/browser-environment/
-            verification-receipts/browser-graphics/
+          name: issue208-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
           retention-days: 30
+          if-no-files-found: warn
+  prepare:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 35
+    outputs:
+      matrix: ${{ steps.prepare.outputs.matrix }}
+      bundle: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Record setup start and check host disposition
+        run: |
+          echo "SERIAL_JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 5
+      - run: npm run test:verification-tooling && npm run test:verification-batches
+        timeout-minutes: 5
+      - name: Discover exact coverage and build the ordinary artifact once
+        id: prepare
+        run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare verification-receipts/serial/bundle
+        timeout-minutes: 16
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/bundle/
+          retention-days: 30
+          compression-level: 1
+          if-no-files-found: warn
+  batch:
+    needs: prepare
+    if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    name: batch (${{ matrix.id }})
+    env:
+      SERIAL_BATCH_ID: ${{ matrix.id }}
+    steps:
+      - name: Record setup start and check host disposition
+        run: |
+          echo "SERIAL_JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.prepare.outputs.bundle }}
+          path: verification-receipts/serial/bundle/
+      - name: Verify and execute this batch with its independent budget
+        run: |
+          timeout --signal=TERM --kill-after=15s 65m npm run verify:batches -- run \
+            verification-receipts/serial/bundle "$SERIAL_BATCH_ID" "verification-receipts/serial/jobs/$SERIAL_BATCH_ID"
+        timeout-minutes: 66
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-receipts-${{ github.run_id }}-${{ matrix.id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/jobs/${{ matrix.id }}/
+          retention-days: 30
+          compression-level: 1
+          if-no-files-found: warn
+  aggregate:
+    name: Serial verification aggregate
+    needs: [prepare, batch]
+    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.prepare.outputs.bundle }}
+          path: verification-receipts/serial/bundle/
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: issue208-receipts-${{ github.run_id }}-*
+          path: verification-receipts/serial/downloads/
+      - name: Account for every expected batch, all attempts and scheduler overhead
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-aggregate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/aggregate/
+          retention-days: 30
+          if-no-files-found: warn
