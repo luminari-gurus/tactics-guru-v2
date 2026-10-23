@@ -1,8 +1,34 @@
 # Issue #205: reduce repeated full-battle audio equivalence testing
 
-Date: 2026-10-23 (Asia/Jerusalem). Status: planning complete; implementation has
-not started. This request authorizes issue claiming and publication of this plan.
-Implement only after a later caller instruction to apply it.
+Date: 2026-10-23 (Asia/Jerusalem). Status: implementation authorized and started.
+The caller requested end-to-end implementation, OpenSpec tracking, proportional
+verification and review-ready publication. No merge or deployment is authorized.
+
+## Current continuation state
+
+- Working from planning commit `34b7c72`, on the requested branch; refreshed
+  `origin/main` remains `b749ba4`. PR #228 remains separate and unchanged.
+- Using OpenSpec change `issue-205-audio-equivalence` (spec-driven, skip_specs:
+  true): [tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md).
+  The caller's explicit OpenSpec request supersedes the earlier no-ledger decision.
+- Original 54 audio selections confirmed. Chromium 153.0.8010.12 and WebKit 26.6
+  launch preflight passed locally under WSL/Node 24.15.0. Local qualification is
+  distinct from the registered `unraid-tactics-01` CI runner; no CI dispatched.
+- Locked Linux dependencies installed; build passed 221 content checks, both
+  type scopes and production bundling. Two-engine Phaser smoke passed 2/2;
+  original audio units passed. Preserve the two initial setup-failure logs.
+- Original browser baseline passed 54/54, including landscape: 780,826 ms runner,
+  797,196 ms wrapper wall; zero retries/skips/failures. Bundle unchanged. Only
+  the two non-executed unit files changed during that capture; browser inputs
+  were frozen. The raw receipt includes before/after hashes.
+- The mapper-only seeded loop is consolidated into the real-adapter fake-host
+  tests for both outcome seeds. Audio units pass 29/29; session/save compatibility
+  and both TypeScript scopes pass. Per-file audio unit cost added about 486 ms.
+- First unit proof chunk is ready for commit/push/review. Next: replace browser
+  repetitions, run targeted new cases, then final affected audio/WebKit/consumer
+  qualification and comparison. No app/shared-helper/config changes. Raw receipts:
+  `tmp/verification/issue-205/`; durable mapping/results will live in
+  `docs/qa/issue-205-audio-equivalence.md`.
 
 - Issue: [#205](https://github.com/luminari-gurus/tactics-guru-v2/issues/205), P1.
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/205#issuecomment-6362068879).
@@ -162,8 +188,9 @@ that is availability, not testing. Playwright emulation satisfies AGENTS.md.
   generation, configuration changes and another monolithic baseline. None is
   required by the identified invariant. Add a small legal checkpoint helper only
   if a retained assertion cannot be reached cheaply through existing controls.
-- **Simplify** planning to this file. Existing behavior is the contract; a second
-  OpenSpec proposal/spec/task set would duplicate this bounded test-refactor plan.
+- **Keep** this file as the continuation reference and a short OpenSpec ledger
+  requested by the caller. Existing behavior is the contract; skip spec deltas
+  for this test-only refactor rather than inventing product requirements.
 
 ## Files
 
@@ -275,5 +302,6 @@ its corrected inbound proposal link. Final readback must confirm issue
 assignment/comment, native Development linkage, remote commit/plan identity,
 clean checkout and `0 0` tracking parity.
 
-Implementation acceptance remains wholly unexecuted. Publish this concrete plan
-for review and stop before changing tests/application code or launching baselines.
+The paragraph above records the completed planning-only pass. The later caller
+instruction now authorizes implementation and affected baseline execution; track
+actual completion and remaining acceptance in Current continuation state above.
