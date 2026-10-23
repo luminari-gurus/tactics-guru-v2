@@ -16,9 +16,8 @@ function watchErrors(page: Page): string[] {
 const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!);
 
 test.afterEach(async ({page}, info) => {
-  if (!info.title.startsWith('the test tone plays only')) return;
+  if (!info.title.startsWith('the test tone plays only') || info.status === info.expectedStatus) return;
   const snapshot = await page.evaluate(() => ({
-    contextCalls: (window as unknown as {contextCalls: unknown}).contextCalls,
     now: performance.now(), visibility: document.visibilityState,
     ready: document.querySelector('#fit-status')?.textContent,
     portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete,
@@ -31,27 +30,6 @@ test.afterEach(async ({page}, info) => {
 });
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {
-  await page.addInitScript(() => {
-    const calls: {api: string; started: number; duration: number}[] = [];
-    (window as unknown as {contextCalls: unknown}).contextCalls = calls;
-    const getContext = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, ...args: Parameters<typeof getContext>) {
-      const started = performance.now();
-      try { return Reflect.apply(getContext, this, args); }
-      finally { calls.push({api: args[0], started, duration: performance.now()-started}); }
-    } as typeof getContext;
-    const getImageData = CanvasRenderingContext2D.prototype.getImageData;
-    CanvasRenderingContext2D.prototype.getImageData = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof getImageData>) {
-      const started = performance.now();
-      try { return Reflect.apply(getImageData, this, args); }
-      finally { calls.push({api: 'getImageData', started, duration: performance.now()-started}); }
-    };
-    window.AudioContext = new Proxy(AudioContext, {construct(target, args, newTarget) {
-      const started = performance.now();
-      try { return Reflect.construct(target, args, newTarget); }
-      finally { calls.push({api: 'AudioContext', started, duration: performance.now()-started}); }
-    }});
-  });
   const errors = watchErrors(page);
   await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });

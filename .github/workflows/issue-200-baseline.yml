@@ -23,6 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
       - run: npm run build
       - name: Verify ordinary first-tone coverage on all Chromium profiles
         env:
@@ -38,5 +39,7 @@ jobs:
         if: always()
         with:
           name: issue200-readiness-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/readiness/
+          path: |
+            verification-receipts/readiness/
+            verification-receipts/browser-environment/
           retention-days: 30

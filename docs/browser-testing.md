@@ -26,7 +26,14 @@ See [Playwright browsers](https://playwright.dev/docs/browsers).
 writes a unique ignored `verification-receipts/browser-environment/run-*/environment.json`.
 It records the commit, Node/Playwright/OS versions, resolved executable paths,
 actual launched browser versions and launch failures. A failed engine makes the
-command fail. This is only environment qualification; the two-engine smoke test
+command fail. The preflight also creates a WebGL context (or Canvas 2D fallback),
+renders and reads back a known pixel, and records the renderer, context creation
+and total graphics setup times. A failed pixel check or graphics setup exceeding
+15 seconds fails qualification. It does not skip tests or relax their timeouts.
+This initializes graphics/driver caches before functional checks; account for that
+warmup separately from execution and record it in performance-capture conditions.
+A cold app-cache sample after this preflight is not proof of cold GPU/driver setup.
+This is only environment qualification; the two-engine smoke test
 also boots Phaser and checks viewport resizing. Production smoke tests require a
 successful build; do not use an old `dist/` after validation fails.
 
