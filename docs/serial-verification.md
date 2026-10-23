@@ -60,9 +60,12 @@ JSON, per-case JSONL checkpoints and Playwright blob ZIPs, as well as process lo
 cleanup diagnostics, test outcomes/skips/retries and slowest-case/file summaries.
 Missing final reports or interrupted JSONL are incomplete evidence, never passes.
 Ordinary failures allow other jobs to continue. A failed cleanup records a
-persistent `RUNNER_TOOL_CACHE/issue208-unsafe-host` marker; later serial jobs refuse
+persistent `RUNNER_TOOL_CACHE/issue208-unsafe-host` marker; qualification and serial jobs refuse
 execution until an administrator inspects owned workloads and clears it. The
-marker survives job temp-directory cleanup. The local CLI also shares the timing
+marker survives job temp-directory cleanup. Stage and evaluator cleanup failures
+stop subsequent work even if writing the marker fails; the receipt retains the
+cleanup diagnostics and marker-write error, and requires manual runner inspection.
+The local CLI also shares the timing
 capture lock with the original timing tool; inspect stale locks before removal.
 
 Build artifacts, per-batch receipts and aggregates are retained for 30 days.

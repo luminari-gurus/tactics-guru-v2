@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -122,6 +123,34 @@ test('aggregate accepts exact complete receipts and records attempts/compute', (
   assert.equal(result.historicalFailures.length, 3);
 });
 
+test('cleanup failure quarantines stage and evaluator processes before continuing', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'tg-batch-quarantine-'));
+  try {
+    for (const evaluation of [false, true]) {
+      const abort = new AbortController();
+      const cleanup = { complete: false, errors: ['owned process survived'] };
+      const row = { status: 'passed', ...(evaluation ? { evaluation: { cleanup } } : { cleanup }) };
+      const results = await runRows([{ id: 'unsafe' }, { id: 'must-not-run' }], [], async () => {
+        quarantineCleanup(row, abort, directory);
+        return row;
+      }, () => {}, abort.signal);
+      assert.equal(abort.signal.aborted, true);
+      assert.equal(results.length, 1);
+      assert.equal(results[0].status, 'failed');
+      assert.deepEqual(JSON.parse(readFileSync(join(directory, 'issue208-unsafe-host'), 'utf8')), [cleanup]);
+    }
+    const abort = new AbortController(), row = { status: 'passed', cleanup: { complete: false } };
+    quarantineCleanup(row, abort, join(directory, 'missing-parent'));
+    assert.equal(abort.signal.aborted, true);
+    assert.equal(row.status, 'failed');
+    assert.match(row.quarantineError, /ENOENT/);
+    assert.equal(row.cleanup.complete, false);
+    const safe = new AbortController();
+    quarantineCleanup({ status: 'passed', cleanup: { complete: true } }, safe, directory);
+    assert.equal(safe.signal.aborted, false);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('serial timing reports preserve canonical rows, exact IDs and comparison compatibility', () => {
   const plan = { ...createPlan('capture', discovery), source: { inputHash: 'inputs' }, environment: {}, browsers: {} };
   const latest = [{ stages: preparationIds.map(id => ({ id, status: 'passed', wallMs: 1 })), inputsUnchanged: true },
@@ -224,4 +253,17 @@ test('workflow stays manual, exclusive, serial, failure-preserving and pinned to
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
+  for (const id of ['qualify', 'prepare', 'batch']) {
+    const job = workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0];
+    assert.ok(job.indexOf('test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"') > 0);
+    assert.ok(job.indexOf('test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"') < job.indexOf('uses: actions/checkout@v4'));
+    const directory = mkdtempSync(join(tmpdir(), 'tg-host-guard-'));
+    try {
+      const guard = job.match(/test ! -f "\$RUNNER_TOOL_CACHE\/issue208-unsafe-host"/)[0];
+      const options = { env: { ...process.env, RUNNER_TOOL_CACHE: directory } };
+      assert.equal(spawnSync('sh', ['-c', guard], options).status, 0);
+      writeFileSync(join(directory, 'issue208-unsafe-host'), 'unsafe');
+      assert.equal(spawnSync('sh', ['-c', guard], options).status, 1);
+    } finally { rmSync(directory, { recursive: true, force: true }); }
+  }
 });

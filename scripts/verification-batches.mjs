@@ -130,13 +130,21 @@ export function validatePerformanceResult(row, source) {
     row.evaluationReport?.passed === true && row.evaluationReport.captureFailures?.length === 0, 'Performance evaluation missing or failed');
 }
 
+export function quarantineCleanup(row, abort, toolCache = process.env.RUNNER_TOOL_CACHE) {
+  const failures = [row.cleanup, row.evaluation?.cleanup].filter(cleanup => cleanup?.complete === false);
+  if (!failures.length) return;
+  abort.abort();
+  row.status = 'failed';
+  row.error = 'Cleanup failed; inspect the runner before clearing RUNNER_TOOL_CACHE/issue208-unsafe-host';
+  if (toolCache) {
+    try { writeFileSync(join(toolCache, 'issue208-unsafe-host'), JSON.stringify(failures)); }
+    catch (error) { row.quarantineError = String(error); }
+  }
+}
+
 async function execute(stage, out, browsers, signal) {
   const row = await executeTimingStage(stage, out, { browsers, signal, blob: true });
-  if (row.cleanup?.complete === false) {
-    if (process.env.RUNNER_TOOL_CACHE) writeFileSync(join(process.env.RUNNER_TOOL_CACHE, 'issue208-unsafe-host'), JSON.stringify(row.cleanup));
-    row.status = 'failed';
-    row.error = 'Cleanup failed; inspect the runner before clearing RUNNER_TOOL_CACHE/issue208-unsafe-host';
-  }
+  if (row.cleanup?.complete === false) return row;
   if (stage.browser && row.status === 'passed') {
     try {
       validateBrowserResult(stage, row);
@@ -173,7 +181,7 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
     await runRows(rows, prerequisites, async stage => {
       if (stage.browser) exactCoverage(stage.expected, discover(stage));
       const result = await execute(stage, out, report.browsers, abort.signal);
-      if (result.cleanup?.complete === false) abort.abort();
+      quarantineCleanup(result, abort);
       return result;
     }, results => { report.stages = results; checkpoint(); }, abort.signal);
     report.inputsUnchanged = sourceIdentity(root).inputHash === plan.source.inputHash;

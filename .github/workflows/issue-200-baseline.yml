@@ -31,6 +31,8 @@ jobs:
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 25
     steps:
+      - name: Check host disposition before qualification
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
