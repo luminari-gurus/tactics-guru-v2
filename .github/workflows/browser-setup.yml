@@ -42,7 +42,8 @@ jobs:
         if: always()
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit-run.json
-        run: npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts --grep 'accepted player presentation reload|run preparation and dialogs|review: read-level' --reporter=line,json --output=tmp/issue160-ci/webkit-run-artifacts > tmp/issue160-ci/webkit-run.txt 2>&1
+        run: |
+          npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts --grep 'accepted player presentation reload|run preparation and dialogs|review: read-level' --reporter=line,json --output=tmp/issue160-ci/webkit-run-artifacts > tmp/issue160-ci/webkit-run.txt 2>&1
       - name: Final learned ability and caster restoration fixtures
         if: always()
         env:
