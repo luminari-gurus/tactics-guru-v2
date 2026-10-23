@@ -49,11 +49,13 @@ export class FitScene extends Phaser.Scene {
     // XHR timeout so a request that neither completes nor errors becomes a load error, and the audio control
     // stays at Loading until that pass settles.
     let audio: ProofAudio | undefined;
+    let audioFiles: Phaser.Loader.File[] = [];
     const audioLoaded = (): void => { audio = new ProofAudio(this, this.audioLoadErrors); };
     const pendingAudio = PROOF_AUDIO.filter(asset => !this.cache.audio.exists(asset.key));
     if (pendingAudio.length === 0) audioLoaded();
     else {
       for (const asset of pendingAudio) this.load.audio(asset.key, publicAssetUrl(asset.url), undefined, { responseType: 'arraybuffer', timeout: AUDIO_LOAD_TIMEOUT_MS });
+      audioFiles = [...this.load.list].filter(file => PROOF_AUDIO_KEYS.has(file.key));
       this.load.once(Phaser.Loader.Events.COMPLETE, audioLoaded);
       this.load.start();
     }
@@ -185,6 +187,14 @@ export class FitScene extends Phaser.Scene {
       this.game.events.off(Phaser.Core.Events.FOCUS, onFocus);
       setLifecycleDiagnostics(null);
       this.load.off(Phaser.Loader.Events.COMPLETE, audioLoaded);
+      // Phaser 4.2.1 clears loader sets on shutdown but leaves in-flight XHRs alive.
+      // Retain this run's files so late timeouts cannot retry through the new run's loader.
+      for (const file of audioFiles) {
+        const xhr = file.xhrLoader;
+        if (!xhr || xhr.readyState === XMLHttpRequest.DONE) continue;
+        xhr.onload = xhr.onerror = xhr.onprogress = xhr.ontimeout = null;
+        xhr.abort();
+      }
       audio?.destroy();
       moveButton.removeEventListener('click', startMove);
       destination.removeEventListener('change', previewMove);

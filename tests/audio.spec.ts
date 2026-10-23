@@ -167,7 +167,7 @@ test('a stalled tone request never holds the board; the control reports unavaila
     let sequence = 0;
     XMLHttpRequest.prototype.open = function (method: string, url: string | URL) {
       urls.set(this, String(url));
-      return open.call(this, method, url, true);
+      return Reflect.apply(open, this, arguments);
     };
     XMLHttpRequest.prototype.send = function (body) {
       const url = urls.get(this) ?? '';
@@ -208,6 +208,11 @@ test('a stalled tone request never holds the board; the control reports unavaila
   await expect(page.locator('#audio-status')).toHaveText('Unavailable: Could not load unlock-tone', { timeout: AUDIO_LOAD_TIMEOUT_MS * 3 + 5000 });
   await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
   expect(await audio(page)).toMatchObject({ state: 'unavailable', attempts: 0, playedCount: 0, cached: { mp3: false, ogg: true } });
+  const events = await page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: {id: number; url: string; event: string}[] }).audioRequestEvents);
+  expect(events.filter(event => event.id === 1 && event.event === 'timeout')).toEqual([]);
+  // One canceled request in run 1, followed by the unchanged three attempts in run 2.
+  expect(events.filter(event => event.url.endsWith('unlock-tone.mp3') && event.event === 'send')).toHaveLength(4);
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
   expect(errors).toEqual([]);
