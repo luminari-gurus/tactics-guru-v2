@@ -29,6 +29,10 @@ jobs:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/readiness/ordinary.json
         run: |
           mkdir -p verification-receipts/readiness
+          node --input-type=module <<'JS'
+          import os from 'node:os';import {writeFileSync,readFileSync} from 'node:fs';import {sourceIdentity} from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/readiness/source.json',JSON.stringify({source:sourceIdentity(process.cwd()),node:process.version,cpus:os.cpus().length,load:os.loadavg(),free:os.freemem(),memory:os.totalmem(),pressure:Object.fromEntries(['cpu','memory','io'].map(name=>[name,readFileSync('/proc/pressure/'+name,'utf8')]))},null,2));
+          JS
           npx --no-install playwright test tests/audio.spec.ts -g 'the test tone plays only' --workers=1 --retries=0 --trace=off --reporter=list,json --output=verification-receipts/readiness/ordinary-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
