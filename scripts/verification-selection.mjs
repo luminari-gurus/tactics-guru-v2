@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { stages, stageEnvironment } from './verify-full.mjs';
 import { sourceIdentity } from './verification-report.mjs';
@@ -37,11 +38,26 @@ export function discoverSelection(args = [], env = {}, cwd = root) {
   return report;
 }
 
-export function captureSelections() {
+export function captureSelections({ allProfiles = false } = {}) {
+  const capture = (args, env) => {
+    if (!allProfiles) return discoverSelection(args, env);
+    // A temporary discovery-only config removes project filters. CLI grep flags
+    // do not override project-level grepInvert in Playwright. No app/test flag
+    // or persistent configuration bypass is introduced.
+    const directory = mkdtempSync(join(tmpdir(), 'tactics-selection-control-'));
+    try {
+      const selected = args.indexOf('-c');
+      const config = resolve(root, selected >= 0 ? args[selected + 1] : 'playwright.config.ts');
+      const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
+      const control = join(directory, 'control.config.ts');
+      writeFileSync(control, `import base from ${JSON.stringify(config)};\nexport default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))}, projects: base.projects.map(({ grepInvert, ...project }) => project) };\n`);
+      return discoverSelection([...remaining, '-c', control], env);
+    } finally { rmSync(directory, { recursive: true, force: true }); }
+  };
   const selections = Object.fromEntries(stages.filter(stage => stage.browser).map(stage => [stage.id,
-    discoverSelection(stage.args.slice(stage.args.indexOf('test') + 1), stage.env)]));
+    capture(stage.args.slice(stage.args.indexOf('test') + 1), stage.env)]));
   for (const config of ['playwright.encounters.config.ts', 'playwright.run-items.config.ts', 'playwright.abilities.config.ts', 'playwright.setup-smoke.config.ts']) {
-    selections[config] = discoverSelection(['-c', config]);
+    selections[config] = capture(['-c', config]);
   }
   return { source: sourceIdentity(root), selections };
 }

@@ -26,8 +26,12 @@ exploration; health-bar selection remains 25. Fixtures remain 57.
 
 `npm run test:verification-batches` executes real discoveries and checks exact
 mappings, negative omissions/extras/duplicates, wrong filters, altered device
-settings, timeout drift and unchanged assertion bodies against literal base.
+settings, timeout drift and retained metadata.
 It also proves the nine existing serial batches exactly partition all 670 IDs.
+The ongoing contract compares live normal discovery with a temporary discovery-only
+config that removes project filters; new unclassified cases keep their profiles
+without changing historical snapshots. This PR also separately verified that
+stripping only tag metadata restores the four source files exactly to base.
 No rebalancing or changes to historical #200 receipts were needed.
 
 ## Matched local timing
@@ -84,4 +88,9 @@ workflow on `unraid-tactics-01`, one worker/job, max-parallel 1 and the shared
 `tactics-browser-exclusive` lock, with no GitHub-hosted fallback. Preserve all
 failures and incomplete runs. Special-mode evidence reuse requires source-bound
 consumer comparison and original reports; discovery equality alone is not runtime
-acceptance. The prior #200 full capture remains failed, irrespective of this PR.
+acceptance. The initial attempt to create the live unfiltered control with CLI
+grep flags failed its expected 23-removal contract: Playwright project-level filters
+remain authoritative. The final temporary control config removes only those
+project filters, and all 27 contracts pass. Both failed and successful tooling
+outputs are retained; actual selections remain byte-for-byte identical across
+all 15 modes after this contract-only repair. The prior #200 full capture remains failed, irrespective of this PR.
