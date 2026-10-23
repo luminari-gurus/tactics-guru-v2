@@ -151,7 +151,36 @@ test('a resume() that never settles is reported as blocked with retry, then play
   expect(errors).toEqual([]);
 });
 
+test.afterEach(async ({ page }, info) => {
+  if (!info.title.startsWith('a stalled tone request')) return;
+  await info.attach('audio-request-events', { body: JSON.stringify(await page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: unknown[] }).audioRequestEvents)), contentType: 'application/json' });
+});
+
 test('a stalled tone request never holds the board; the control reports unavailable after the load timeout', async ({ page }) => {
+  await page.addInitScript(() => {
+    const events: unknown[] = [];
+    (window as unknown as { audioRequestEvents: unknown[] }).audioRequestEvents = events;
+    const open = XMLHttpRequest.prototype.open;
+    const send = XMLHttpRequest.prototype.send;
+    const urls = new WeakMap<XMLHttpRequest, string>();
+    let sequence = 0;
+    XMLHttpRequest.prototype.open = function (method: string, url: string | URL) {
+      urls.set(this, String(url));
+      return Reflect.apply(open, this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function (body) {
+      const url = urls.get(this) ?? '';
+      if (url.includes('unlock-tone')) {
+        const id = ++sequence;
+        const record = (event: string) => events.push({id, url, event, timeout: this.timeout,
+          at: performance.now(), run: document.querySelector<HTMLElement>('#game')?.dataset.run});
+        for (const event of ['load', 'error', 'timeout', 'abort', 'loadend']) this.addEventListener(event, () => record(event));
+        record('send');
+      }
+      return send.call(this, body);
+    };
+  });
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   // Never fulfilled, never aborted: the request neither completes nor errors on its own.
@@ -171,10 +200,19 @@ test('a stalled tone request never holds the board; the control reports unavaila
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
   await expect(page.locator('#audio-status')).toHaveText('Loading');
+  // The old run must cancel its request, not let its timeout callbacks retry through the restarted loader.
+  await expect.poll(() => page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: {id: number; event: string}[] }).audioRequestEvents
+      .filter(event => event.id === 1 && event.event === 'abort').length)).toBe(1);
   // Each attempt times out after AUDIO_LOAD_TIMEOUT_MS and Phaser's loader retries twice by default (`loader.maxRetries`).
   await expect(page.locator('#audio-status')).toHaveText('Unavailable: Could not load unlock-tone', { timeout: AUDIO_LOAD_TIMEOUT_MS * 3 + 5000 });
   await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
   expect(await audio(page)).toMatchObject({ state: 'unavailable', attempts: 0, playedCount: 0, cached: { mp3: false, ogg: true } });
+  const events = await page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: {id: number; url: string; event: string}[] }).audioRequestEvents);
+  expect(events.filter(event => event.id === 1 && event.event === 'timeout')).toEqual([]);
+  // One canceled request in run 1, followed by the unchanged three attempts in run 2.
+  expect(events.filter(event => event.url.endsWith('unlock-tone.mp3') && event.event === 'send')).toHaveLength(4);
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
   expect(errors).toEqual([]);
