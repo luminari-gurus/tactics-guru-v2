@@ -1,0 +1,52 @@
+{
+  "runUrl": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39991089115",
+  "testedCommit": "5a161daa59c71e7929df20c574ee9cf3b723d98a",
+  "scope": "partial performance-only",
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.8.0-147-generic",
+    "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+    "cpus": 6,
+    "memoryBytes": 8174170112,
+    "runner": "unraid-tactics-01",
+    "versions": {
+      "@playwright/test": "1.63.0",
+      "vite": "8.3.5",
+      "vitest": "5.0.3",
+      "typescript": "7.0.2"
+    }
+  },
+  "conditions": "Performance-only provenance recovery for issue 200; exclusive self-hosted browser lock; persistent caches; unrelated host workloads not independently verified",
+  "sourceDirty": false,
+  "measuredBuild": {
+    "commit": "5a161daa59c71e7929df20c574ee9cf3b723d98a",
+    "dirty": false
+  },
+  "samples": 18,
+  "captureFailures": [],
+  "budgetFailingSamples": 0,
+  "passed": true,
+  "inputsUnchanged": true,
+  "preparation": {
+    "units": 934,
+    "buildIntegrations": 2,
+    "bothTypeScopes": "passed",
+    "rootBuild": "passed"
+  },
+  "stageMs": 45715.954492000004,
+  "cleanupComplete": true,
+  "evaluatorCleanupComplete": true,
+  "rawFileSha256": {
+    "performance.json": "160ed89bbaacb90cf80264a8ffb832144e4270b3d5bacb0d46e99f2a54b5378c",
+    "performance-evaluation.json": "835a02ca8657271dc6e754c1efb12b0128b7b0468a6d577bbbf73ef8770f5939",
+    "receipt.json": "9f5ea2549db9df6c86e563b1400ba5677e60ab61cd79d260c997ace735e12f47"
+  },
+  "aggregate": {
+    "scope": "partial",
+    "complete": true,
+    "passed": true,
+    "baselineEligible": false
+  }
+}

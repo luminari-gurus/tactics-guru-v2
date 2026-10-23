@@ -17,7 +17,7 @@ it('admits the reproducible seed corpus with bounded fallback and varied maps',(
  }
  expect(fallbacks/seeds.length).toBeLessThan(.01);expect(hashes.size/seeds.length).toBeGreaterThanOrEqual(.95);
  if(count===10000){
-  times.sort((a,b)=>a-b);mkdirSync('docs/qa/procedural-grids',{recursive:true});
-  writeFileSync('docs/qa/procedural-grids/corpus.json',JSON.stringify({generatorVersion:1,profileVersion:'desert-v1',seeds:'0..9999, 4294967294, 4294967295',survivorSubsets:7,admission:'Every resolver candidate checks all seven subsets',count:seeds.length,unique:hashes.size,fallbacks,attempts,timingMs:{min:times[0],median:times[Math.floor(times.length/2)],p95:times[Math.floor(times.length*.95)],max:times.at(-1)},examples},null,2)+'\n');
+  times.sort((a,b)=>a-b);mkdirSync('verification-receipts/procedural-grids',{recursive:true});
+  writeFileSync('verification-receipts/procedural-grids/corpus.json',JSON.stringify({generatorVersion:1,profileVersion:'desert-v1',seeds:'0..9999, 4294967294, 4294967295',survivorSubsets:7,admission:'Every resolver candidate checks all seven subsets',count:seeds.length,unique:hashes.size,fallbacks,attempts,timingMs:{min:times[0],median:times[Math.floor(times.length/2)],p95:times[Math.floor(times.length*.95)],max:times.at(-1)},examples},null,2)+'\n');
  }
 },600000);
