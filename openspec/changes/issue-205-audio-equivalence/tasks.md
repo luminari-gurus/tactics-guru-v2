@@ -11,7 +11,7 @@
 
 ## 3. Browser reduction and integration
 
-- [ ] 3.1 Retain complete audible win/loss journeys and add short paired legal sound-control/session/save comparisons; verify targeted browser cases and update assertion mapping.
+- [x] 3.1 Retain complete audible win/loss journeys and add short paired legal sound-control/session/save comparisons; verify targeted browser cases and update assertion mapping.
 - [ ] 3.2 Execute the final affected audio matrix, four WebKit cases and required persistence/run consumers; verify build/type prerequisites, unchanged unrelated discovery, screenshots and matched before/after receipts.
 - [ ] 3.3 Publish timings, limitations and continuation state; verify OpenSpec, diff, clean tracking parity and a focused review-ready PR referencing #205.
 

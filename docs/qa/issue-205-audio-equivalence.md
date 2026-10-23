@@ -56,6 +56,18 @@ stayed frozen. Original audio units passed 28/28.
 The consolidated adapter/cue units pass 29/29. Combined per-file test duration
 changed from 305 ms to 791 ms (about 486 ms added); this excludes transform,
 worker and runner startup. Session/save compatibility checks and both TypeScript
-scopes pass. The first implementation chunk is ready for review; browser
-reduction and final matched captures are still pending. No speedup or completed
-issue acceptance is claimed yet.
+scopes pass (43/43 session/save tests). Commit `d5f7a45` is published in PR #229.
+
+The browser reduction passes its two focused desktop short cases (13.5/13.4 s).
+Each seed compares the initial boundary and two legal commands in muted/enabled
+mode, including both saved slots, replay and canonical primary bytes, then proves
+Continue plus a new enabling gesture cannot play historical cues. All complete
+audible cue/ability/outcome/replay assertions remain in the two full journeys.
+The original 360-second outcome allowance is unchanged; new short tests use the
+existing 30-second default, with no timeout/config relaxation.
+
+Discovery changes from 693 to 699 default IDs: six paired outcomes are replaced
+by six complete audible outcomes and six short pairs. All 687 retained IDs are
+identical, including all 48 non-outcome audio IDs; the full WebKit discovery is
+identical. Final affected capture is pending. No speedup or completed issue
+acceptance is claimed yet.

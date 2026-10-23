@@ -6,8 +6,9 @@ verification and review-ready publication. No merge or deployment is authorized.
 
 ## Current continuation state
 
-- Working from planning commit `34b7c72`, on the requested branch; refreshed
-  `origin/main` remains `b749ba4`. PR #228 remains separate and unchanged.
+- Planning commit `34b7c72`; first tested unit chunk `d5f7a45` pushed on the
+  requested branch. [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229)
+  is open for review. Refreshed `origin/main` remains `b749ba4`; #228 is separate.
 - Using OpenSpec change `issue-205-audio-equivalence` (spec-driven, skip_specs:
   true): [tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md).
   The caller's explicit OpenSpec request supersedes the earlier no-ledger decision.
@@ -24,9 +25,13 @@ verification and review-ready publication. No merge or deployment is authorized.
 - The mapper-only seeded loop is consolidated into the real-adapter fake-host
   tests for both outcome seeds. Audio units pass 29/29; session/save compatibility
   and both TypeScript scopes pass. Per-file audio unit cost added about 486 ms.
-- First unit proof chunk is ready for commit/push/review. Next: replace browser
-  repetitions, run targeted new cases, then final affected audio/WebKit/consumer
-  qualification and comparison. No app/shared-helper/config changes. Raw receipts:
+- Browser reduction is implemented; both desktop short cases pass (13.5/13.4 s),
+  and final TypeScript checks pass. Discovery is 699 default IDs versus 693:
+  six old paired outcomes replaced with six audible outcomes plus six short pairs.
+  All 687 retained IDs (including 48 other audio IDs) are exact matches; the
+  complete WebKit selection is identical. Audio now has 60 default executions.
+- Next: commit/push the browser chunk, then final affected audio/WebKit/consumer qualification and matched comparison,
+  then update the same focused PR. No app/shared-helper/config changes. Raw receipts:
   `tmp/verification/issue-205/`; durable mapping/results will live in
   `docs/qa/issue-205-audio-equivalence.md`.
 
