@@ -31,7 +31,7 @@ test('canonical assets, near/far fixtures and restart remain stable', async ({ p
   expect(errors).toEqual([]);
 });
 
-test('failed canonical asset load gives a controlled visible error', async ({ page }) => {
+test('failed canonical asset load gives a controlled visible error', { tag: '@canonical' }, async ({ page }) => {
   await page.route('**/proof/fighter.png', route => route.abort());
   await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toContainText('Error: Could not load proof asset fighter');
@@ -42,7 +42,7 @@ test('failed canonical asset load gives a controlled visible error', async ({ pa
 
 // Phaser 4.2.1 loads images by XHR. A 200 response the browser cannot decode goes through File.onProcessError, which
 // only logs, so FILE_LOAD_ERROR never fires and create() has to report the missing texture itself (#35 review, finding 1).
-test('a proof image that downloads but cannot be decoded gives a controlled visible error', async ({ page }) => {
+test('a proof image that downloads but cannot be decoded gives a controlled visible error', { tag: '@canonical' }, async ({ page }) => {
   await page.route('**/proof/tree-grass-v1-480.webp', route => route.fulfill({ status: 200, contentType: 'image/webp', body: Buffer.from('RIFF not a decodable image') }));
   await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toContainText('Error: Could not load proof asset tree');
@@ -53,7 +53,7 @@ test('a proof image that downloads but cannot be decoded gives a controlled visi
 
 // The Pages deploy and `vite preview` answer a missing /proof/ path with index.html and status 200, so a missing or
 // renamed proof asset takes the same decode path, never the network path the abort case above exercises.
-test('a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error', async ({ page }) => {
+test('a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error', { tag: '@canonical' }, async ({ page }) => {
   await page.route('**/proof/fighter-portrait-96.webp', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Tactics Guru v2</title>' }));
   await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toContainText('Error: Could not load proof asset fighter-portrait');

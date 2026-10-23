@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 for (const route of ['', '?scene=proof', '?scene=content-smoke', 'run']) {
-  test(`missing engine chunk reports a recoverable startup error on ${route || 'battle'}`, async ({page}) => {
+  test(`missing engine chunk reports a recoverable startup error on ${route || 'battle'}`, { tag: '@canonical' }, async ({page}) => {
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
     await page.route(/\/start-[^/]+\.js$/,r=>r.abort());
     await page.goto('./'+route);

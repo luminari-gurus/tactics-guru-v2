@@ -1,0 +1,520 @@
+[
+  {
+    "revision": "before",
+    "stats": {
+      "startTime": "2026-10-23T19:42:50.412Z",
+      "duration": 12949.234999999999,
+      "expected": 42,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "summedCaseMs": 11183,
+    "firstTestDelayMs": 582.9999446868896,
+    "cases": [
+      {
+        "id": "381c53c131d04f5e8243-ff429536748eade9a5cc",
+        "title": "failed canonical asset load gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 379,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-a0f355c076cba5206156",
+        "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 212,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-c0b02c6a8d538070e363",
+        "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 213,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-69360d1ec10b0204c999",
+        "title": "failed canonical asset load gives a controlled visible error",
+        "project": "mobile-portrait",
+        "durationMs": 369,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-4ef0030755f914b3d3a1",
+        "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+        "project": "mobile-portrait",
+        "durationMs": 210,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-a35b106c8d2b74101056",
+        "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+        "project": "mobile-portrait",
+        "durationMs": 214,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-a0e269bf3d15017e68d4",
+        "title": "failed canonical asset load gives a controlled visible error",
+        "project": "mobile-landscape",
+        "durationMs": 370,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-267d8899d65174cde20a",
+        "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+        "project": "mobile-landscape",
+        "durationMs": 209,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-379194399666b4e1ef24",
+        "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+        "project": "mobile-landscape",
+        "durationMs": 214,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-6979cc1983b1a6165c92",
+        "title": "missing engine chunk reports a recoverable startup error on battle",
+        "project": "desktop",
+        "durationMs": 118,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-9d081dfd860c37f0c2a1",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=proof",
+        "project": "desktop",
+        "durationMs": 117,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-acd23e144d82d4843f2a",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=content-smoke",
+        "project": "desktop",
+        "durationMs": 118,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-02d17a5305b08b88ee05",
+        "title": "missing engine chunk reports a recoverable startup error on run",
+        "project": "desktop",
+        "durationMs": 121,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-3d36cd09d5a9e5a7cddf",
+        "title": "missing engine chunk reports a recoverable startup error on battle",
+        "project": "mobile-portrait",
+        "durationMs": 120,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-0efb998b2198d380dc72",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=proof",
+        "project": "mobile-portrait",
+        "durationMs": 113,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-00065221c5cad38aeee1",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=content-smoke",
+        "project": "mobile-portrait",
+        "durationMs": 119,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-cb78a7fffb966711f205",
+        "title": "missing engine chunk reports a recoverable startup error on run",
+        "project": "mobile-portrait",
+        "durationMs": 120,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-dd20ae753f55387d502e",
+        "title": "missing engine chunk reports a recoverable startup error on battle",
+        "project": "mobile-landscape",
+        "durationMs": 120,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-95788a91e286e81297d4",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=proof",
+        "project": "mobile-landscape",
+        "durationMs": 115,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-2939066f10a2a5fa4a73",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=content-smoke",
+        "project": "mobile-landscape",
+        "durationMs": 115,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-ae172d0220b40d9d5e25",
+        "title": "missing engine chunk reports a recoverable startup error on run",
+        "project": "mobile-landscape",
+        "durationMs": 120,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-c77c486809e4447c2f02",
+        "title": "shows loading before boot and a controlled error if the engine module cannot load",
+        "project": "desktop",
+        "durationMs": 115,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-5ec9b1113a840be7278f",
+        "title": "shell initially displays loading while the engine is delayed",
+        "project": "desktop",
+        "durationMs": 291,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-c9db338633d782c601dd",
+        "title": "shows loading before boot and a controlled error if the engine module cannot load",
+        "project": "mobile-portrait",
+        "durationMs": 114,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-bf666af252a14f4c0f86",
+        "title": "shell initially displays loading while the engine is delayed",
+        "project": "mobile-portrait",
+        "durationMs": 289,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-9068612c991731081426",
+        "title": "shows loading before boot and a controlled error if the engine module cannot load",
+        "project": "mobile-landscape",
+        "durationMs": 115,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-a44a1a819c6bc81bf615",
+        "title": "shell initially displays loading while the engine is delayed",
+        "project": "mobile-landscape",
+        "durationMs": 290,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-585821acf46263bbc90f",
+        "title": "controls stay at least 44 px and reachable at 390x844",
+        "project": "desktop",
+        "durationMs": 359,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-463f912c9a05ea08504c",
+        "title": "controls stay at least 44 px and reachable at 844x390",
+        "project": "desktop",
+        "durationMs": 357,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-79d5945ab63180765f5e",
+        "title": "controls stay at least 44 px and reachable at 360x640",
+        "project": "desktop",
+        "durationMs": 342,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-5d4b30d3118ed1c91390",
+        "title": "controls stay at least 44 px and reachable at 915x412",
+        "project": "desktop",
+        "durationMs": 338,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-9268334626217d7fb86a",
+        "title": "controls stay at least 44 px and reachable at 1280x720",
+        "project": "desktop",
+        "durationMs": 345,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-adb605fd3acafe7419e4",
+        "title": "controls stay at least 44 px and reachable at 390x844",
+        "project": "mobile-portrait",
+        "durationMs": 397,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-072fad16d0d65eef2290",
+        "title": "controls stay at least 44 px and reachable at 844x390",
+        "project": "mobile-portrait",
+        "durationMs": 386,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-9dc2b3e99b10283aabb6",
+        "title": "controls stay at least 44 px and reachable at 360x640",
+        "project": "mobile-portrait",
+        "durationMs": 487,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-00cdbb5ff9b41cab064f",
+        "title": "controls stay at least 44 px and reachable at 915x412",
+        "project": "mobile-portrait",
+        "durationMs": 394,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-4b2991ec18be8ff101da",
+        "title": "controls stay at least 44 px and reachable at 1280x720",
+        "project": "mobile-portrait",
+        "durationMs": 521,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-41de3b32593e6b895c21",
+        "title": "controls stay at least 44 px and reachable at 390x844",
+        "project": "mobile-landscape",
+        "durationMs": 515,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-380558499549b713eb1c",
+        "title": "controls stay at least 44 px and reachable at 844x390",
+        "project": "mobile-landscape",
+        "durationMs": 410,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-6064cbc04ddcadb93058",
+        "title": "controls stay at least 44 px and reachable at 360x640",
+        "project": "mobile-landscape",
+        "durationMs": 500,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-8c20acab6dd06b216863",
+        "title": "controls stay at least 44 px and reachable at 915x412",
+        "project": "mobile-landscape",
+        "durationMs": 391,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-d30def9d75b62e1f9e5e",
+        "title": "controls stay at least 44 px and reachable at 1280x720",
+        "project": "mobile-landscape",
+        "durationMs": 421,
+        "status": "passed",
+        "retry": 0
+      }
+    ]
+  },
+  {
+    "revision": "after",
+    "stats": {
+      "startTime": "2026-10-23T19:44:37.330Z",
+      "duration": 6934.573,
+      "expected": 19,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "summedCaseMs": 5618,
+    "firstTestDelayMs": 584.0001106262207,
+    "cases": [
+      {
+        "id": "381c53c131d04f5e8243-ff429536748eade9a5cc",
+        "title": "failed canonical asset load gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 387,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-a0f355c076cba5206156",
+        "title": "a proof image that downloads but cannot be decoded gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 211,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "381c53c131d04f5e8243-c0b02c6a8d538070e363",
+        "title": "a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error",
+        "project": "desktop",
+        "durationMs": 211,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-6979cc1983b1a6165c92",
+        "title": "missing engine chunk reports a recoverable startup error on battle",
+        "project": "desktop",
+        "durationMs": 119,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-9d081dfd860c37f0c2a1",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=proof",
+        "project": "desktop",
+        "durationMs": 116,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-acd23e144d82d4843f2a",
+        "title": "missing engine chunk reports a recoverable startup error on ?scene=content-smoke",
+        "project": "desktop",
+        "durationMs": 119,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "3be9e5b40a014dc58fa3-02d17a5305b08b88ee05",
+        "title": "missing engine chunk reports a recoverable startup error on run",
+        "project": "desktop",
+        "durationMs": 122,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-c77c486809e4447c2f02",
+        "title": "shows loading before boot and a controlled error if the engine module cannot load",
+        "project": "desktop",
+        "durationMs": 116,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "1e630212af8913307fdf-5ec9b1113a840be7278f",
+        "title": "shell initially displays loading while the engine is delayed",
+        "project": "desktop",
+        "durationMs": 297,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-585821acf46263bbc90f",
+        "title": "controls stay at least 44 px and reachable at 390x844",
+        "project": "desktop",
+        "durationMs": 347,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-463f912c9a05ea08504c",
+        "title": "controls stay at least 44 px and reachable at 844x390",
+        "project": "desktop",
+        "durationMs": 353,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-79d5945ab63180765f5e",
+        "title": "controls stay at least 44 px and reachable at 360x640",
+        "project": "desktop",
+        "durationMs": 350,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-5d4b30d3118ed1c91390",
+        "title": "controls stay at least 44 px and reachable at 915x412",
+        "project": "desktop",
+        "durationMs": 359,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-9268334626217d7fb86a",
+        "title": "controls stay at least 44 px and reachable at 1280x720",
+        "project": "desktop",
+        "durationMs": 347,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-adb605fd3acafe7419e4",
+        "title": "controls stay at least 44 px and reachable at 390x844",
+        "project": "mobile-portrait",
+        "durationMs": 577,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-072fad16d0d65eef2290",
+        "title": "controls stay at least 44 px and reachable at 844x390",
+        "project": "mobile-portrait",
+        "durationMs": 392,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-9dc2b3e99b10283aabb6",
+        "title": "controls stay at least 44 px and reachable at 360x640",
+        "project": "mobile-portrait",
+        "durationMs": 382,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-00cdbb5ff9b41cab064f",
+        "title": "controls stay at least 44 px and reachable at 915x412",
+        "project": "mobile-portrait",
+        "durationMs": 395,
+        "status": "passed",
+        "retry": 0
+      },
+      {
+        "id": "9f98fd8c8d1538f5ebbb-4b2991ec18be8ff101da",
+        "title": "controls stay at least 44 px and reachable at 1280x720",
+        "project": "mobile-portrait",
+        "durationMs": 418,
+        "status": "passed",
+        "retry": 0
+      }
+    ]
+  }
+]

@@ -23,7 +23,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
-    { name: 'mobile-portrait', use: { ...devices['Pixel 7'], channel: 'chromium' } },
-    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], channel: 'chromium', viewport: { width: 915, height: 412 } } },
+    { name: 'mobile-portrait', grepInvert: /@canonical/, use: { ...devices['Pixel 7'], channel: 'chromium' } },
+    { name: 'mobile-landscape', grepInvert: /@canonical|@fixed-viewport/, use: { ...devices['Pixel 7'], channel: 'chromium', viewport: { width: 915, height: 412 } } },
   ],
 });
