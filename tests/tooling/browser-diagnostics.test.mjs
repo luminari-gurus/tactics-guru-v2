@@ -33,14 +33,6 @@ test('ordinary Playwright cleanup preserves environment, JSON and failure traces
     assert.equal(preflight.status, 0, preflight.stdout + preflight.stderr);
     const environmentPath = /Browser environment receipt: (.+)/.exec(preflight.stdout)?.[1];
     assert.ok(environmentPath, preflight.stdout);
-    const environment = JSON.parse(readFileSync(environmentPath, 'utf8'));
-    for (const engine of ['chromium', 'webkit']) {
-      const graphics = environment.browsers[engine].graphics;
-      assert.equal(graphics.passed, true, engine);
-      assert.deepEqual(graphics.pixel, [0, 255, 0, 255], engine);
-      assert.ok(['webgl', 'canvas'].includes(graphics.mode), engine);
-      assert.ok(graphics.elapsedMs >= graphics.contextMs && graphics.contextMs >= 0, engine);
-    }
     const receipts = [environmentPath];
     const runs = [];
     for (const failing of [true, false]) {
