@@ -32,14 +32,14 @@ jobs:
           import {resolve} from 'node:path';
           import {sourceIdentity} from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/readiness/source.json',JSON.stringify(sourceIdentity(process.cwd()),null,2));
-          for(const mode of ['screenshots','off','snapshots']) {
+          for(const mode of ['screenshots']) {
             const trace = mode==='off'?'off':{mode:'retain-on-failure',screenshots:mode==='screenshots',snapshots:true,sources:true};
             writeFileSync(`verification-receipts/readiness/${mode}.config.ts`, `import base from ${JSON.stringify(resolve('playwright.config.ts'))}; export default {...base,testDir:${JSON.stringify(resolve('tests'))},use:{...base.use,trace:${JSON.stringify(trace)}}};`);
           }
           JS
           result=0
-          for mode in screenshots off snapshots; do
-            PLAYWRIGHT_JSON_OUTPUT_FILE="verification-receipts/readiness/$mode.json" npx --no-install playwright test -c "verification-receipts/readiness/$mode.config.ts" tests/audio.spec.ts --project=desktop -g 'the test tone plays only' --repeat-each=3 --workers=1 --retries=0 --reporter=list,json --output="verification-receipts/readiness/$mode-artifacts" || result=1
+          for mode in screenshots; do
+            PLAYWRIGHT_JSON_OUTPUT_FILE="verification-receipts/readiness/$mode.json" npx --no-install playwright test -c "verification-receipts/readiness/$mode.config.ts" tests/audio.spec.ts --project=desktop -g 'the test tone plays only' --repeat-each=6 --workers=1 --retries=0 --reporter=list,json --output="verification-receipts/readiness/$mode-artifacts" || result=1
           done
           exit "$result"
       - uses: actions/upload-artifact@v4

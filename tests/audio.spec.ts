@@ -18,7 +18,9 @@ const audio = (page: Page) => page.evaluate(() => window.fitDiagnostics().audio!
 test.afterEach(async ({page}, info) => {
   if (!info.title.startsWith('the test tone plays only')) return;
   await info.attach('initial-readiness', {body: JSON.stringify(await page.evaluate(() => ({
-    boot: (window as unknown as {bootTiming: unknown}).bootTiming,
+    now: performance.now(), visibility: document.visibilityState,
+    ready: document.querySelector('#fit-status')?.textContent,
+    portrait: {complete: document.querySelector<HTMLImageElement>('#proof-portrait')?.complete, width: document.querySelector<HTMLImageElement>('#proof-portrait')?.naturalWidth},
     diagnostics: window.fitDiagnostics?.(),
     marks: performance.getEntriesByType('mark').map(({name,startTime})=>({name,startTime})),
     resources: performance.getEntriesByType('resource').map(({name,startTime,duration})=>({name,startTime,duration})),
@@ -26,21 +28,6 @@ test.afterEach(async ({page}, info) => {
 });
 
 test('the test tone plays only from its button and reports played each time', async ({ page }) => {
-  await page.addInitScript(() => {
-    const calls: {name: string; started: number; duration: number}[] = [];
-    (window as unknown as {bootTiming: unknown}).bootTiming = {calls};
-    for (const prototype of [HTMLCanvasElement.prototype, WebGLRenderingContext.prototype, WebGL2RenderingContext.prototype]) {
-      for (const name of ['getContext','compileShader','linkProgram','getProgramParameter','getShaderParameter','readPixels','texImage2D']) {
-        const original = (prototype as unknown as Record<string, Function>)[name];
-        if (!original) continue;
-        (prototype as unknown as Record<string, Function>)[name] = function (...args: unknown[]) {
-          const started = performance.now();
-          try { return Reflect.apply(original, this, args); }
-          finally { const duration = performance.now()-started; if (duration>5) calls.push({name,started,duration}); }
-        };
-      }
-    }
-  });
   const errors = watchErrors(page);
   await page.goto('/?scene=proof');
   const button = page.getByRole('button', { name: 'Play test sound' });
