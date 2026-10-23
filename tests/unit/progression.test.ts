@@ -52,6 +52,9 @@ describe('bounded progression',()=>{
 
     expect(projectProgression(party(60),base).abilities['ability:later'].owners).toEqual(['ranger']);
     for(const requiredLevel of [0,6,1.5])expect(validateContent({...base,abilities:{...base.abilities,'ability:later':{...base.abilities['ability:later'],requiredLevel}}}).ok).toBe(false);
+    let accessed=false;const owners:string[]=[];Object.defineProperty(owners,'0',{get:()=>{accessed=true;return 'ranger';},enumerable:true});
+    expect(validateContent({...base,abilities:{...base.abilities,'ability:later':{...base.abilities['ability:later'],owners}}}).ok).toBe(false);expect(accessed).toBe(false);
+
     for(const [xp,count] of [[0,1],[180,2],[600,3]]){
       const a=projectProgression(party(xp),base).abilities['ability:magic_missile'];
       if(a.kind!=='magicMissile')throw Error();

@@ -63,7 +63,7 @@ export function validateContent(input: unknown): ContentValidation {
     const keys = ability.kind === 'magicMissile' ? ['id','kind','owners','casterLevel','rangeMin','rangeMax'] : ['id','kind','owners','rangeMin','rangeMax','baseDamage','uphillDamage'];
     if (Object.hasOwn(ability,'requiredLevel')) {
       keys.push('requiredLevel');
-      if (typeof ability.requiredLevel !== 'number' || !Number.isInteger(ability.requiredLevel) || ability.requiredLevel < 1 || ability.requiredLevel > 5 || !Array.isArray(ability.owners) || ability.owners.some(id => !HERO_IDS.includes(id as typeof HERO_IDS[number]))) fail('number', `${path}.requiredLevel`, 'Expected hero ability level 1–5.');
+      if (typeof ability.requiredLevel !== 'number' || !Number.isInteger(ability.requiredLevel) || ability.requiredLevel < 1 || ability.requiredLevel > 5 || !isDenseArray(ability.owners) || ability.owners.some(id => !HERO_IDS.includes(id as typeof HERO_IDS[number]))) fail('number', `${path}.requiredLevel`, 'Expected hero ability level 1–5.');
     }
     if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
     if (!shape(ability, keys, path)) continue;

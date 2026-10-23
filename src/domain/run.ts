@@ -1,7 +1,7 @@
 import { awardHero, progressHero, readProgressHero, type ProgressHero } from './progression';
 import { HERO_PROGRESSION, SHORT_RUN_KINDS } from '../content/progression';
 import { HERO_IDS } from '../content/constants';
-import type { ContentCatalog, HeroId } from '../content/types';
+import type { ContentCatalog } from '../content/types';
 import { contentVersion } from './battle';
 import { RULE_BOUNDS, RNG_VERSION, RULES_VERSION } from './constants';
 import { isIntegerIn, nextUint32, seedRng } from './rng';

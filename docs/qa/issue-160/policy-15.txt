@@ -1,0 +1,9 @@
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  18:33:07
+   Duration  5.25s (tests 97%, transform 2%, import 1%)
+

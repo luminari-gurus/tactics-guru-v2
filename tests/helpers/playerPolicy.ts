@@ -19,7 +19,7 @@ export function playerDecision(state:BattleState, catalog:ContentCatalog = defau
   }
   const candidates:{command:Command;move?:Command;score:number;cost:number}[]=[];
   for(const position of positions)for(const target of targets)for(const ability of Object.values(catalog.abilities).filter(a=>a.owners.includes(actor.defId))){
-    const command:Command={type:'useAbility',unitId:actor.id,abilityId:ability.id,target:ability.kind==='magicMissile'?{missileTargets:[target.id]}:{unitId:target.id}};
+    const command:Command={type:'useAbility',unitId:actor.id,abilityId:ability.id,target:ability.kind==='magicMissile'?{missileTargets:Array.from({length:Math.min(5,Math.floor((ability.casterLevel+1)/2))},()=>target.id)}:{unitId:target.id}};
     const preview=ability.kind==='magicMissile'?previewMagicMissile(position.state,command,catalog):previewAttack(position.state,command,catalog);
     if(!preview.ok)continue;
     const score='bonus' in preview ? Array.from({length:20},(_,i)=>i+1).reduce((sum,n)=>sum+(n===20?Math.min(target.hp,preview.criticalDamage):n!==1 && n+preview.bonus>=preview.armorClass?Math.min(target.hp,preview.damage):0),0)/20

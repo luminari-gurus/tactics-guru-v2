@@ -1,3 +1,4 @@
+import { HERO_PROGRESSION } from '../../src/content/progression';
 import { atEncounter } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
@@ -105,6 +106,12 @@ it('legally clears both biome guardians and every encounter kind with carried re
   const witness=dungeonJourney(190,2,true);expect(witness.won).toBe(true);
   expect(witness.state.floors.map(f=>f.completed)).toEqual([3,3]);
   expect(witness.battles).toHaveLength(6);
+  let previous=[0,0,0];
+  for(const battle of witness.battles){
+    battle.party.forEach((hero,i)=>expect(hero.xp-previous[i]).toBe(hero.hp>0?HERO_PROGRESSION.awards[battle.selection.kind]:0));
+    previous=battle.party.map(h=>h.xp);
+  }
+
   expect([...new Set(witness.battles.map(b=>b.selection.kind))].sort()).toEqual(['boss','elite','normal','vault']);
   expect([...new Set(witness.battles.map(b=>b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome))].sort()).toEqual(['desert','forest']);
   expect(witness.state.party.some(h=>h.hp>0)).toBe(true);

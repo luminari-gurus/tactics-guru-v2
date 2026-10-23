@@ -1,0 +1,78 @@
+
+> tactics-guru-v2@0.0.0 build
+> npm run validate:content && npm run typecheck && vite build
+
+
+> tactics-guru-v2@0.0.0 validate:content
+> vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts tests/unit/dungeonEncounters.test.ts
+
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+
+ Test Files  8 passed (8)
+      Tests  221 passed (221)
+   Start at  18:36:31
+   Duration  4.14s (tests 90%, transform 8%, import 2%)
+
+
+> tactics-guru-v2@0.0.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.domain.json
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./types" without a file extension (src/content/desertAssets.ts:1:43). Add the file extension
+  - import "./constants" without a file extension (src/content/assets.ts:1:38). Add the file extension
+  - import "./types" without a file extension (src/content/assets.ts:2:43). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 1843 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/_headers                                                            3.59 kB
+dist/index.html                                                          7.00 kB │ gzip:   2.24 kB
+dist/assets/b5b947941d91b972/proof/fighter.png                           8.84 kB
+dist/assets/7203e2b3a992c9c8/battle/source/ranger_sprite.png             9.09 kB
+dist/assets/57972fe37b1c0579/battle/source/goblin_grunt_sprite.png       9.30 kB
+dist/assets/37fcb2969f129de5/battle/source/mage_sprite.png               9.56 kB
+dist/assets/070fb462027ed7a5/battle/source/goblin_archer_sprite.png     10.21 kB
+dist/assets/72b7f789a242de12/battle/portraits/ranger.png                19.88 kB
+dist/assets/70f30350ea20aac9/battle/portraits/goblin_archer.png         20.41 kB
+dist/assets/cc6494048e8cd6a8/battle/portraits/goblin_grunt.png          20.55 kB
+dist/assets/da44b5706aaadefb/battle/portraits/mage.png                  20.67 kB
+dist/assets/f0c4ab9c2859f59e/battle/portraits/fighter.png               20.75 kB
+dist/assets/0bf5465d7ad8396a/battle/terrain/sand.png                   107.93 kB
+dist/assets/74e8838120256800/battle/terrain/rock.png                   116.20 kB
+dist/assets/b47c382b0be6e6fe/battle/terrain/water.png                  118.20 kB
+dist/assets/9f88a273b676fa0e/battle/terrain/forest.png                 139.18 kB
+dist/assets/be249ec3f8849929/battle/terrain/grass_path.png             139.39 kB
+dist/assets/58625a5a9febe514/battle/terrain/grass.png                  140.32 kB
+dist/assets/f8322179450af915/battle/terrain/stone.png                  142.88 kB
+dist/assets/preferences-D1bXSLXU.css                                     0.71 kB │ gzip:   0.35 kB
+dist/assets/startRunApp-y3YtRGS5.css                                     2.13 kB │ gzip:   0.80 kB
+dist/assets/view-BJiQju0W.css                                            3.41 kB │ gzip:   1.29 kB
+dist/assets/startDungeonApp-Bs6ZGJ6B.css                                 3.89 kB │ gzip:   1.28 kB
+dist/assets/battleLayout-CfYoACL1.css                                   10.89 kB │ gzip:   2.70 kB
+dist/assets/start-C-n0oZdc.js                                            0.04 kB │ gzip:   0.06 kB
+dist/assets/telemetry-DUsjSLnt.js                                        0.45 kB │ gzip:   0.24 kB
+dist/assets/battleLayout-RW58LTUw.js                                     0.55 kB │ gzip:   0.31 kB
+dist/assets/preload-helper-BLdHbfdN.js                                   1.51 kB │ gzip:   0.79 kB
+dist/assets/rng-BCcJOpRP.js                                              1.65 kB │ gzip:   0.81 kB
+dist/assets/index-DWUK-CMp.js                                            2.39 kB │ gzip:   1.11 kB
+dist/assets/startBattleApp-CnpPk1K5.js                                   2.92 kB │ gzip:   1.22 kB
+dist/assets/browser-Z89-QcBJ.js                                          3.26 kB │ gzip:   1.37 kB
+dist/assets/biomes-B5t1B-JD.js                                           4.13 kB │ gzip:   1.82 kB
+dist/assets/preferences-DaRWJ8HI.js                                      5.44 kB │ gzip:   2.45 kB
+dist/assets/view-B-xZXgMG.js                                             6.70 kB │ gzip:   2.74 kB
+dist/assets/items-Ds9EN1vO.js                                            8.33 kB │ gzip:   3.10 kB
+dist/assets/transport-CPtkaPOU.js                                       11.43 kB │ gzip:   4.98 kB
+dist/assets/startRunApp-v5wI2NPO.js                                     23.74 kB │ gzip:   7.87 kB
+dist/assets/startDungeonApp-CAF8Ifsu.js                                 42.18 kB │ gzip:  14.05 kB
+dist/assets/start-DfGXnKrU.js                                        1,424.84 kB │ gzip: 372.14 kB
+
+✓ built in 205ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

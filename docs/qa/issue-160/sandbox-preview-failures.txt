@@ -1,0 +1,364 @@
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > uses stable separate purposes and safe numerical bounds 57ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > reconstructs evicted maps and retains legal distinct stairs 95ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > gates stairs, rejects duplicates and restores visited positions without rewards 92ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > continues at multi-digit depth with checked resource bounds and no fixed victory 206ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > roundtrips battle, reward and travel boundaries and rejects malformed descriptors 193ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > atomically refuses a full six-charm reward without losing the pending offer 77ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > owns saved reward data instead of retaining caller mutation aliases 33ms
+ ✓ tests/unit/dungeon.test.ts > dungeon floors > carries injured survivors and applies equipped charm once across reconstruction 61ms
+ ✓ tests/unit/dungeon.test.ts > dungeon persistence > preserves other namespaces, corrupt bytes, backup and compare-before-removal 32ms
+ ✓ tests/unit/dungeon.test.ts > dungeon persistence > does not publish travel on quota failure and can explicitly recover 107ms
+ ✓ tests/unit/dungeon.test.ts > dungeon persistence > requires explicit recovery after uncertain primary writes 104ms
+ ✓ tests/unit/dungeon.test.ts > dungeon persistence > allows explicit unsaved battles but blocks travel and disposes stale sessions 122ms
+ ✓ tests/unit/dungeon.test.ts > dungeon recovery limits > keeps primary recoverable on backup-write/security failures and changed reset slots 89ms
+ ✓ tests/unit/dungeon.test.ts > dungeon recovery limits > rejects incompatible and tampered envelopes without replacing raw bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > dungeon recovery limits > preserves every visited floor until the byte budget explicitly refuses the candidate 6227ms
+stdout | tests/unit/dungeon.test.ts > durable encounter policies > cold-decodes a bounded format-3 history by resolving only the current floor
+{"format":3,"floors":250,"bytes":924857,"decodeMs":105.8266249999997,"resolutions":3}
+
+ ✓ tests/unit/dungeon.test.ts > pre-progression save preservation > rejects old format 1 without changing raw storage 0ms
+ ✓ tests/unit/dungeon.test.ts > pre-progression save preservation > rejects old format 2 without changing raw storage 0ms
+ ✓ tests/unit/dungeon.test.ts > pre-progression save preservation > rejects old format 3 without changing raw storage 0ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > cold-decodes a bounded format-3 history by resolving only the current floor 4068ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects historical source mismatches immediately and geometry tampering before travel is published 37ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > reuses admitted facts across a long retained floor history 699ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > resolves saved admitted definitions without selecting a map again 45ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > keeps fully resolved legacy format-3 descriptors compatible with deferred legacy entry 48ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered policy facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered catalog facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered kind facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered depth facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered pool facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered composition facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered boss facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered roster facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered source facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered hash facts and retains raw recovery bytes 20ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered version facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > rejects tampered deferred facts and retains raw recovery bytes 15ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > retains all floor choices through travel, revisit and damage without compounding 128ms
+ ✓ tests/unit/dungeon.test.ts > durable encounter policies > requires the entire guardian roster, then completes exactly once 80ms
+ ✓ tests/unit/dungeon.test.ts > confirmed dungeon charm disposal > frees equipped capacity once, preserves the offer/RNG and persists the separate reward claim 91ms
+ ✓ tests/unit/dungeon.test.ts > confirmed dungeon charm disposal > rejects unowned/malformed/battle/defeat commands without mutation 94ms
+ ✓ tests/unit/dungeon.test.ts > confirmed dungeon charm disposal > saves confirmed disposal through the existing session and reports failed saving honestly 89ms
+ ✓ tests/unit/abilities.test.ts > maps frozen accepted signature events to affected units without changing state or the next RNG draw 21ms
+ ✓ tests/unit/abilities.test.ts > High Shot uses the real Ranger stats and elevation in shared preview and dispatch 3ms
+ ✓ tests/unit/abilities.test.ts > Guarded Strike trades two accuracy for defense on a miss, hit or critical without changing damage 4ms
+ ✓ tests/unit/abilities.test.ts > Guarded raises the same AC used by preview and resolution, lasts across a round wrap, and expires at the Fighter turn 1ms
+ ✓ tests/unit/abilities.test.ts > rejected Guarded Strike never grants defense or consumes action/RNG; snapshots reject malformed guards 1ms
+ ✓ tests/unit/abilities.test.ts > validates the exact defensive tradeoff and applies its penalty only once to an already Guarded attacker 2ms
+ ✓ tests/unit/abilities.test.ts > replays Guarded Strike and expiry deterministically through actual commands 3ms
+ ✓ tests/unit/abilities.test.ts > High Shot resolves uphill bonus on a natural critical and rejects illegal intents without RNG or action cost 1ms
+ ✓ tests/unit/abilities.test.ts > High Shot accepts only range 2–5 and is owned only by the Ranger 3ms
+ ✓ tests/unit/abilities.test.ts > validates attack profiles and includes their numbers in the content identity 3ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile dispatch automatically hits with seeded 1d4+1 damage, pure preview and one action 39ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile follows caster-level progression and splits assigned missiles with deterministic replay 6ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile validates all targets before spending action or RNG and honors range, LOS and ownership 1ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile replays from the real battle creation boundary 1ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile rejects cursor exhaustion atomically, validates profiles and ends battle only once 2ms
+ ✓ tests/unit/abilities.test.ts > Magic Missile accepts its five-tile edge and rejects separated targets and malformed assignments 1ms
+ ✓ tests/unit/abilities.test.ts > Guarded Strike tradeoff changes content identity and rejects old snapshots/replays 0ms
+ ✓ tests/unit/abilities.test.ts > shares Guarded projection with inspection on an already projected equipment catalog 1ms
+ ✓ tests/unit/abilities.test.ts > removes guard on lethal ordinary or missile damage without emitting a turn-expiry event 1ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > reads independent canonical ownership with bounded identities and frozen input 6ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects unknown field without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects zero stack without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects stack overflow without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects unsafe quantity without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects fractional quantity without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects unknown item without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects wrong stack kind without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects duplicate stack without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects wrong instance kind without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects duplicate instance without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects seven instances without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects foreign run without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects invalid ordinal without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects nonexact instance encoding without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects unowned assignment without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects wrong slot without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects unknown hero without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects instance assigned twice without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects hero assigned twice without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects sparse array without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects extended array without input mutation 0ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects hidden fields, symbols and accessors without evaluating them 1ms
+ ✓ tests/unit/itemCommands.test.ts > strict owned data and aggregate > rejects invalid aggregate revisions, runs and mismatched stored offers 1ms
+ ✓ tests/unit/itemCommands.test.ts > context, stale intents and atomic reward grant > rejects initial/terminal phases, active battle and mismatched contexts 1ms
+ ✓ tests/unit/itemCommands.test.ts > context, stale intents and atomic reward grant > rejects stale identity/revisions, malformed commands and exhausted item revision 0ms
+ ✓ tests/unit/itemCommands.test.ts > context, stale intents and atomic reward grant > grants equipment once, advances once and has stable option-derived identity 1ms
+ ✓ tests/unit/itemCommands.test.ts > context, stale intents and atomic reward grant > preserves both sides of a failed grant or stale/invalid offer choice 1ms
+ ✓ tests/unit/itemCommands.test.ts > context, stale intents and atomic reward grant > stacks consumable grants and rejects overflow before acknowledgment 0ms
+ ✓ tests/unit/itemCommands.test.ts > healing and equipment operations > heals at reward and encounter preparation, caps HP and consumes exactly once 1ms
+ ✓ tests/unit/itemCommands.test.ts > healing and equipment operations > rejects full-health, defeated, unknown, unowned and wrong-category targets atomically 0ms
+ ✓ tests/unit/itemCommands.test.ts > healing and equipment operations > replaces and unequips without losing instances or sharing one across heroes 0ms
+ ✓ tests/unit/itemCommands.test.ts > healing and equipment operations > rejects unowned/incompatible equipment and retains defeated assignments without changes 0ms
+ ✓ tests/unit/itemCommands.test.ts > generic effects and real domain battle composition > projects once from base across construction, replacement, unequip and JSON restoration 10ms
+ ✓ tests/unit/itemCommands.test.ts > generic effects and real domain battle composition > existing attack resolution consumes projected accuracy/armor class with identical next RNG after restore 9ms
+ ✓ tests/unit/itemCommands.test.ts > generic effects and real domain battle composition > extends claim/use/equip/projection through allowed effect types and eligible heroes 1ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > moves to a reachable melee attack, then Waits using shared dispatch 5ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > prefers no movement and the lowest target ID on equal expected damage 2ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > breaks equal attack-position costs by cell y then x 3ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > normalizes unit order and ignores catalog insertion order without mutation or entropy 4ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects malformed state, unknown, inactive, defeated and player actors without touching input 1ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > does not normalize invalid units into valid snapshots 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects hidden field before normalization without evaluating accessors 1ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects record prototype before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects array field before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects array prototype before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects units getter before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects array getter before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects id getter before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > rejects other getter before normalization without evaluating accessors 0ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > normalizes reversed units for execution without mutating the input 3ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > ignores defeated targets and rejects completed battles 1ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > uses higher ground to improve expected damage despite greater movement cost 3ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > respects line of sight and the archer minimum range when movement is spent 1ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > orders tied abilities lexically and excludes unowned hero signatures 4ms
+ ✓ tests/unit/ai.test.ts > enemy candidate selection > uses target defense and natural roll boundaries for expected damage ranking 4ms
+ ✓ tests/unit/ai.test.ts > movement and Wait fallback > moves closer when no attack is reachable 1ms
+ ✓ tests/unit/ai.test.ts > movement and Wait fallback > Waits at an occupied chokepoint without stepping into a living ally 2ms
+ ✓ tests/unit/ai.test.ts > movement and Wait fallback > Waits at an impassable wall even with a living unreachable target 1ms
+ ✓ tests/unit/ai.test.ts > movement and Wait fallback > Waits after acting even with unused movement, without mutating the snapshot or RNG 0ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > dispatches move/attack/Wait and exposes the accepted commands and events 3ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > executes immediate attack/Wait and no-action Wait 1ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > stops after the last player falls without an illegal turn end 1ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > reports a first resolution rejection without changing turn ownership or RNG 2ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > reports an accepted move prefix when the following attack rejects 4ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > stops at command and round limits without retries or implicit ownership changes 2ms
+ ✓ tests/unit/ai.test.ts > bounded enemy execution > returns no state for malformed input and canonical state for rejected player input 1ms
+ ✓ tests/unit/ai.test.ts > seeded battle replay > repeats authored battle commands, events and outcome from seed 0 128ms
+ ✓ tests/unit/ai.test.ts > seeded battle replay > repeats authored battle commands, events and outcome from seed 1 102ms
+ ✓ tests/unit/ai.test.ts > seeded battle replay > repeats authored battle commands, events and outcome from seed 42 107ms
+ ✓ tests/unit/ai.test.ts > takes a Manhattan-increasing detour and replans identical accepted suffixes without RNG 2ms
+ ✓ tests/unit/ai.test.ts > uses shared Guarded AC when choosing between otherwise tied targets 3ms
+ ✓ tests/unit/turns.test.ts > initiative order (legacy TurnManager.gd:8-27,101-108; test_turn_manager.gd:43-95) > sorts by total, then Dexterity, then player side, then lower ID, regardless of input order 1ms
+ ✓ tests/unit/turns.test.ts > battle creation > builds units from spawns and rolls one d20 per unit in ID order from the seeded RNG only 3ms
+ ✓ tests/unit/turns.test.ts > battle creation > rejects an unknown map or a seed outside uint32 0ms
+ ✓ tests/unit/turns.test.ts > end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137) > ends the turn without a move or action, and starts the next unit with cleared flags 0ms
+ ✓ tests/unit/turns.test.ts > end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137) > adds one round when the order wraps 0ms
+ ✓ tests/unit/turns.test.ts > end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137) > skips defeated units, adding one round at most once across the wrap 0ms
+ ✓ tests/unit/turns.test.ts > end turn (legacy Wait; TurnManager.gd:64-73,90-94,119-137) > rejects other actors, other commands, finished battles and exhausted counters without change 0ms
+ ✓ tests/unit/turns.test.ts > restart (D7: a new battle with a new seed) > starts a valid fresh battle on the same map from a finished or mid-battle snapshot, with the session's new seed 1ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > routes each command type to its resolver and rejects anything else 1ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > replays a full seeded battle command by command to the identical state and events 11ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > names the first command that does not apply, and rejects a bad envelope 7ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > replays only from the battle its map and seed create, whatever the key order 1ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > replays the longest accepted log on the largest map within five seconds 415ms
+ ✓ tests/unit/turns.test.ts > dispatch and replay > stops a battle at the replay limit, so its last accepted command still replays 395ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > imports and acquires safely without a browser, and lazily guards the browser getter 1ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from missing primary / missing backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from missing primary / valid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from missing primary / invalid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from missing primary / unavailable backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from valid primary / missing backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from valid primary / valid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from valid primary / invalid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from valid primary / unavailable backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from invalid primary / missing backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from invalid primary / valid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from invalid primary / invalid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from invalid primary / unavailable backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from unavailable primary / missing backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from unavailable primary / valid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from unavailable primary / invalid backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > selects from unavailable primary / unavailable backup without mutation 0ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > retains exact invalid bytes and every codec failure category in either slot 2ms
+ ✓ tests/unit/battleStorage.test.ts > guarded acquisition and read-only recovery > returns owned state and preserves noncanonical valid text for recovery 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > rejects invalid input before any storage access and re-reads slots on every save 1ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > preserves invalid primary and refuses all mutations 1ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > a failed primary read is not treated as an absent slot 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > preserves invalid backup and refuses all mutations 1ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > a failed backup read is not treated as an absent slot 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > publishes safely from existing primary and backup 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after backup write failure from existing primary and backup 1ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after primary write failure from existing primary and backup 1ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > publishes safely from primary only 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after backup write failure from primary only 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after primary write failure from primary only 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > publishes safely from backup only 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after primary write failure from backup only 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > publishes safely from first save 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after backup write failure from first save 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > retains recovery after primary write failure from first save 0ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > recovers from each between-operation snapshot without executing the remainder 2ms
+ ✓ tests/unit/battleStorage.test.ts > write preflight and backup ordering > backs up the exact noncanonical validated primary text 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > rejects unknown slot names before acquiring or accessing storage 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > removes only explicitly inspected primary, including undecodable text 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > refuses stale primary inspection and succeeds idempotently only after a read 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > preserves inspected bytes after primary read failure 1ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > preserves inspected bytes after primary remove failure 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > removes only explicitly inspected backup, including undecodable text 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > refuses stale backup inspection and succeeds idempotently only after a read 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > preserves inspected bytes after backup read failure 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > preserves inspected bytes after backup remove failure 0ms
+ ✓ tests/unit/battleStorage.test.ts > explicit single-slot removal > reports partial reset without pretending to provide a two-slot transaction 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > guards acquisition for all operations with exception shape 0 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > guards acquisition for all operations with exception shape 1 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > guards acquisition for all operations with exception shape 2 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > guards acquisition for all operations with exception shape 3 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > guards acquisition for all operations with exception shape 4 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > treats null and undefined providers as unavailable for every operation 0ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > keeps browser Storage method receivers and guards method accessors 1ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > preserves accepted state, next command/RNG/enemy decisions across all shared boundaries 20ms
+ ✓ tests/unit/battleStorage.test.ts > failure taxonomy and unchanged memory > never mutates frozen caller state/catalog after success or failure at each effect 3ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > matches the uninterrupted queued continuation at every boundary: seed 1 253ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > matches the uninterrupted queued continuation at every boundary: seed 2 131ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > matches the uninterrupted queued continuation at every boundary: seed 3 102ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > matches the uninterrupted queued continuation at every boundary: seed 4 172ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > matches the uninterrupted queued continuation at every boundary: seed 5 114ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: start-1 5ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: start-2 8ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: player-presenting 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: enemy-presenting 1ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: guarded-presenting 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: playerWin 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: playerLoss 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > preserves state, next command/events, RNG and enemy decisions: maximum-commands 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > captures committed presentation state and excludes pending, rejected and cancelled previews 12ms
+ ✓ tests/unit/saveEnvelope.test.ts > accepted snapshot boundaries > has canonical output and an independent SHA-256 oracle over every covered field 1ms
+ ✓ tests/unit/saveEnvelope.test.ts > untrusted serialized input > bounds text before parsing and handles malformed JSON/envelopes without throwing 1ms
+ ✓ tests/unit/saveEnvelope.test.ts > untrusted serialized input > rejects unsafe numbers, unknown IDs, extra fields, bounds and state invariants even with a fresh digest 1ms
+ ✓ tests/unit/saveEnvelope.test.ts > untrusted serialized input > rejects corrupt covered values and incompatible format/state/rules/RNG/content identities 2ms
+ ✓ tests/unit/saveEnvelope.test.ts > untrusted serialized input > preserves frozen inputs and original text on both success and failure 1ms
+ ✓ tests/unit/saveEnvelope.test.ts > untrusted serialized input > requires semantic replay validation in the comparison and never accepts replay as a snapshot 0ms
+ ✓ tests/unit/saveEnvelope.test.ts > supports the documented 64-unit/128-ID/numeric limits within the cap 7ms
+ ✓ tests/unit/saveEnvelope.test.ts > verifies historic defeated Guarded digest without normalizing input and cleans only accepted turns 1ms
+ ✓ tests/unit/combat.test.ts > d20 attack numbers (legacy CombatResolver.gd:1236-1260; test_combat_resolver.gd:66-155) > hits when the total equals AC and misses one below 5ms
+ ✓ tests/unit/combat.test.ts > d20 attack numbers (legacy CombatResolver.gd:1236-1260; test_combat_resolver.gd:66-155) > makes natural 1 always miss and natural 20 always a doubled critical 1ms
+ ✓ tests/unit/combat.test.ts > d20 attack numbers (legacy CombatResolver.gd:1236-1260; test_combat_resolver.gd:66-155) > floors hit damage at 1 before a critical doubles it 1ms
+ ✓ tests/unit/combat.test.ts > d20 attack numbers (legacy CombatResolver.gd:1236-1260; test_combat_resolver.gd:66-155) > adds exactly +2 from higher ground and -2 from lower ground (test_m4_height_attack.gd) 2ms
+ ✓ tests/unit/combat.test.ts > attack legality (legacy TargetingService.gd:28-49) > rejects in a fixed order, identically in preview and resolution, without change or RNG 7ms
+ ✓ tests/unit/combat.test.ts > attack legality (legacy TargetingService.gd:28-49) > accepts exactly the profile range, and units never block line of sight 2ms
+ ✓ tests/unit/combat.test.ts > attack legality (legacy TargetingService.gd:28-49) > rejects a battle at the command limit, and an exhausted RNG as invalid state instead of throwing 1ms
+ ✓ tests/unit/combat.test.ts > attack resolution > previews purely and resolves with one d20 from the snapshot RNG 1ms
+ ✓ tests/unit/combat.test.ts > attack resolution > allows one move and one action in either order 1ms
+ ✓ tests/unit/combat.test.ts > defeat and outcome (legacy CombatResolver.gd:1188-1194; BattleController.gd:1910-1930) > defeats once, frees the cell, and skips the defeated unit in turn order 1ms
+ ✓ tests/unit/combat.test.ts > defeat and outcome (legacy CombatResolver.gd:1188-1194; BattleController.gd:1910-1930) > ends the battle once when the last enemy falls, then rejects every command 0ms
+ ✓ tests/unit/combat.test.ts > defeat and outcome (legacy CombatResolver.gd:1188-1194; BattleController.gd:1910-1930) > gives the enemy side the win when the last player falls 0ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > preserves retained battle gates and independently evaluates initial idle 4ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > preserves retained run gates and independently evaluates initial idle 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > warns only above 1s, retains isolated loads as history, and flags repeated slow loads without warm violations 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects missing sample instead of claiming acceptance 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects duplicate sample instead of claiming acceptance 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects dirty build instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects mixed build instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects idle build mismatch instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects browser error instead of claiming acceptance 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects collector failure instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects partial capture instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects missing timing instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects invalid timing instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects missing workload instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects empty workload instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects missing raw idle instead of claiming acceptance 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects fabricated summary instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects invalid bytes instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects missing navigation instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects wrong method instead of claiming acceptance 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > rejects malformed JSON shapes and preserves the historical near-60Hz failure 1ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > accepts a complete valid matrix and fails a single numeric regression 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > retains an initial-only idle p50 failure after faster frames dilute the final summary 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > retains an initial-only idle p95 failure after faster frames dilute the final summary 2ms
+ ✓ tests/unit/measurements.test.ts > capture acceptance > CLI refuses existing output and filesystem aliases without altering capture bytes 454ms
+ ✓ tests/unit/measurements.test.ts > proof measurements > keeps navigation-relative scene and controls timing separate, and resets on restart 0ms
+ ✓ tests/unit/measurements.test.ts > proof measurements > samples only usable visible idle frames, excludes background gaps and bounds storage 0ms
+ ✓ tests/unit/measurements.test.ts > proof measurements > returns isolated snapshots rather than exposing measurement state 0ms
+ ✓ tests/unit/measurements.test.ts > keeps idle and action windows independent and records first rendered response 0ms
+ ✓ tests/unit/measurements.test.ts > drops hidden pending input and resets bounded workload data on restart 0ms
+ ✓ tests/unit/measurements.test.ts > exports bounded raw idle intervals with exact summary and isolated snapshots 0ms
+ ✓ tests/unit/measurements.test.ts > samples startup movement before controls usability without admitting idle or input 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > keeps dimensions, borders, connectivity and repeatability across the representative seed matrix 39ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects invalid numeric seed -1 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects invalid numeric seed 4294967296 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects invalid numeric seed 1.5 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects invalid numeric seed NaN 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects invalid numeric seed Infinity 0ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > has no clock dependency or effect on an existing battle and its next RNG draw (rooms) 4ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > has no clock dependency or effect on an existing battle and its next RNG draw (random-walker) 2ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > has no clock dependency or effect on an existing battle and its next RNG draw (cellular) 1ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > caps unusable candidates and returns the same validated fallback (rooms) 1ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > caps unusable candidates and returns the same validated fallback (random-walker) 10ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > caps unusable candidates and returns the same validated fallback (cellular) 2ms
+ ✓ tests/unit/overworldMap.test.ts > independent seeded map > rejects malformed, empty, border-crossing and disconnected candidates 0ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > preserves the pre-marker rooms matrix fingerprint 9ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > preserves the pre-marker random-walker matrix fingerprint 171ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > preserves the pre-marker cellular matrix fingerprint 49ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > rooms is valid, deterministic and diverse 31ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > random-walker is valid, deterministic and diverse 358ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > cellular is valid, deterministic and diverse 111ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > rejects unknown types and invalid seeds for all types 0ms
+ ✓ tests/unit/overworldMap.test.ts > map type contract > the three algorithms have different layouts at representative seeds 2ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for rooms seed 0 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for rooms seed 1 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for rooms seed 4294967295 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for random-walker seed 0 1ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for random-walker seed 1 1ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for random-walker seed 4294967295 1ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for cellular seed 0 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for cellular seed 1 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > pins markers-v1 for cellular seed 4294967295 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > rooms populates every seed/biome with reproducible distinct reachable markers 178ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > random-walker populates every seed/biome with reproducible distinct reachable markers 345ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > cellular populates every seed/biome with reproducible distinct reachable markers 225ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > populates the real generator fallback with unmocked placement (rooms) 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > populates the real generator fallback with unmocked placement (random-walker) 4ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > populates the real generator fallback with unmocked placement (cellular) 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > fails explicitly without partial state for malformed or unusable layouts 0ms
+ ✓ tests/unit/overworldMap.test.ts > authoritative overworld markers > uses exactly four local selection draws without entropy, time or battle changes 1ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > grassland reproduces every map type without mutating frozen layout 446ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > forest reproduces every map type without mutating frozen layout 434ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > desert reproduces every map type without mutating frozen layout 448ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > defaults to grassland and rejects unknown biomes 0ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > retains bounded fallback for every biome (rooms) 0ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > retains bounded fallback for every biome (random-walker) 3ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > retains bounded fallback for every biome (cellular) 0ms
+ ✓ tests/unit/overworldMap.test.ts > topology-preserving biome treatment > has no entropy/clock dependency and preserves battle RNG and layout 1ms
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > accepts owned HTTP with silent output/startup and releases the port for reuse 5006ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > accepts owned HTTP with color output/startup and releases the port for reuse 5004ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > accepts owned HTTP with split output/startup and releases the port for reuse 5008ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > accepts owned HTTP with slow output/startup and releases the port for reuse 5005ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > bounds status readiness and reports HTTP/process diagnostics 5006ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > bounds hang readiness and reports HTTP/process diagnostics 5004ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > bounds noack readiness and reports HTTP/process diagnostics 5008ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > fails promptly when child exits exit 5004ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > fails promptly when child exits die 5006ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > reports spawn errors without waiting for the startup deadline 5005ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > bounds diagnostic tails independently 5005ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > forces unresponsive exact-child cleanup while an unrelated sibling survives 5005ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > uses pinned Vite with the fixture config and rejects foreign port ownership without probing it 5002ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > rejects missing production output and leaves no preview listener 5001ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/unit/measureFitPreview.test.ts > collector-owned preview > awaits cleanup while preserving browser launch failed 5003ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".

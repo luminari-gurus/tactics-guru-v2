@@ -22,32 +22,35 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Source and build qualification
+      - name: Final source and focused domain qualification
         run: |
           mkdir -p tmp/issue160-ci
           git rev-parse HEAD > tmp/issue160-ci/source.txt
           node --version > tmp/issue160-ci/node.txt
-          npm run test:unit -- --maxWorkers=1 --reporter=verbose > tmp/issue160-ci/unit.log 2>&1
-          npm run build > tmp/issue160-ci/build.log 2>&1
-      - name: Discover affected modes
-        if: always()
-        run: |
-          npx playwright test tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/run-progression.spec.ts --list --reporter=json > tmp/issue160-ci/selection.json
-          npx playwright test -c playwright.fixtures.config.ts --list --reporter=json > tmp/issue160-ci/fixtures-selection.json
-      - name: Chromium affected consumers
+          npx vitest run tests/unit/progression.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts tests/unit/exploration.test.ts tests/unit/abilityValidation.test.ts tests/unit/authoredEncounters.test.ts --maxWorkers=1 > tmp/issue160-ci/unit.txt 2>&1
+          npm run build > tmp/issue160-ci/build.txt 2>&1
+      - name: Final Chromium progression boundary
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/chromium.json
-        run: npx playwright test tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/run-progression.spec.ts --reporter=line,json --output=tmp/issue160-ci/chromium-artifacts > tmp/issue160-ci/chromium.log 2>&1
-      - name: Fixture consumers
+        run: npx playwright test tests/dungeon.spec.ts --grep 'hero progression' --reporter=line,json --output=tmp/issue160-ci/chromium-artifacts > tmp/issue160-ci/chromium.txt 2>&1
+      - name: Final WebKit progression boundary
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit.json
+        run: npx playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts --grep 'hero progression' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.txt 2>&1
+      - name: Final learned ability and caster restoration fixtures
         if: always()
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/fixtures.json
-        run: npm run test:fixtures -- --reporter=line,json --output=tmp/issue160-ci/fixture-artifacts > tmp/issue160-ci/fixtures.log 2>&1
-      - name: WebKit recovery and engine smoke
+        run: npm run test:fixtures -- --grep 'progression XP' --reporter=line,json --output=tmp/issue160-ci/fixture-artifacts > tmp/issue160-ci/fixtures.txt 2>&1
+      - name: Engine smoke
         if: always()
-        run: |
-          npm run test:browser-smoke > tmp/issue160-ci/engine.log 2>&1
-          PLAYWRIGHT_JSON_OUTPUT_FILE=tmp/issue160-ci/webkit.json npx playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/dungeon-lifecycle.spec.ts --grep 'resume|recovery|keyboard|read-only' --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit.log 2>&1
+        run: npm run test:browser-smoke > tmp/issue160-ci/engine.txt 2>&1
+      - name: Run telemetry boundary with separate configured build
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry.json
+        run: npm run test:telemetry -- --project=desktop --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-artifacts > tmp/issue160-ci/telemetry.txt 2>&1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

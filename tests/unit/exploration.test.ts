@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { freshDungeon, stepDungeon, readDungeon, readLegacyDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
+import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
 import { encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';

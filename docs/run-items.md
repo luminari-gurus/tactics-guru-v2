@@ -6,15 +6,15 @@
 
 | ID | Label | Kind | Effect | Slot |
 | --- | --- | --- | --- | --- |
-| item:healing_draught | Healing Draught | Consumable | Restore 6 HP, capped at base max HP | None |
+| item:healing_draught | Healing Draught | Consumable | Restore 6 HP, capped at progressed max HP | None |
 | item:warding_charm | Warding Charm | Equipment | +1 armor class | charm |
 | item:aiming_charm | Aiming Charm | Equipment | +1 accuracy | charm |
 
-All entries allow Fighter, Ranger and Mage and use `context: betweenEncounters`. A hero with zero HP stays defeated; these items never revive. Healing requires a living injured hero; full-health targets are rejected without consumption. Equipment can be assigned only to a living eligible hero, with one shared charm slot per hero. No automatic healing, maximum-HP increase, attack-power change or signature-damage change is included.
+All entries allow Fighter, Ranger and Mage and use `context: betweenEncounters`. A hero with zero HP stays defeated; these items never revive. Healing requires a living injured hero; full-health targets are rejected without consumption. Equipment can be assigned only to a living eligible hero, with one shared charm slot per hero. Items do not automatically heal or grant max HP, power or signature damage. Separately, [hero progression](hero-progression.md) projects max HP before equipment and heals on level-up.
 
 Item use, equip and unequip are permitted at the first two reward boundaries and the subsequent encounter entry before constructing its active battle. Initial entry and terminal outcomes are excluded. A trusted adapter must check the run boundary and that no active battle exists; run `phase: battle` alone is not permission. Claim grants ownership and advances the reward boundary atomically. The next encounter preparation screen can then use the newly claimed item before battle construction. #78 supplies the pure context preflight; #79/#80 supply controls and the trusted active-battle context. Those implementations are outside this package.
 
-For example, Fighter at 12/18 HP uses a draught and enters the next encounter at 18 HP; Fighter at 16/18 reaches 18, consuming one draught without carrying excess healing forward. A zero-HP Mage and an 18/18 Fighter are invalid healing targets. The explicit item transition updates carried HP; the battle-completion reducer's prohibition on healing/revival is unchanged.
+For example, Fighter at 12/18 HP uses a draught and enters the next encounter at 18 HP; Fighter at 16/18 reaches 18, consuming one draught without carrying excess healing forward. A zero-HP Mage and an 18/18 Fighter are invalid healing targets. The explicit item transition updates carried HP; combat HP is checked before XP is awarded; a level-up then fully heals a living hero under [hero progression](hero-progression.md). Revival remains rejected.
 
 ## Definitions and validation
 

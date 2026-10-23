@@ -1,0 +1,28 @@
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+ ❯ tests/unit/run.test.ts (62 tests | 4 failed) 21ms
+   ❯ run identity and validation (51)
+     × creates the fixed full-HP party and owns all returned arrays 6ms
+     × accepts damaged survivor entry HP at later encounter 2 1ms
+     × rejects future format 1ms
+   ❯ atomic run progression (8)
+     × replays the complete acyclic trace identically and retains survivor HP 1ms
+ ❯ tests/unit/exploration.test.ts (21 tests | 2 failed) 794ms
+   ❯ v1 migration and format-3 recovery (2)
+     × converts ready/reward/active/defeat with exact party, ownership and battle RNG 42ms
+     × preserves exact legacy primary in backup on first format-3 write and rejects foreign/tampered legacy 1ms
+ ❯ tests/unit/dungeonBattle.test.ts (8 tests | 3 failed) 5764ms
+   × preserves legal Guarded battle and next command from format 1 84ms
+   × preserves legal Guarded battle and next command from format 2 83ms
+   × legally clears both biome guardians and every encounter kind with carried rewards 794ms
+ ❯ tests/unit/dungeon.test.ts (41 tests | 4 failed) 14461ms
+   ❯ durable encounter policies (23)
+     × normalizes a long format-1 history without resolving inactive legacy battlefields 41ms
+     × normalizes a long format-2 history without resolving inactive legacy battlefields 43ms
+     × normalizes format 1 across prior phases and keeps later floors fixed/unscaled 94ms
+     × normalizes format 2 across prior phases and keeps later floors fixed/unscaled 93ms

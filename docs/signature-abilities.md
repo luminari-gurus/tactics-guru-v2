@@ -22,10 +22,9 @@ commands, actor changes and restart discard stale intent; Continue reconstructs
 current availability without executing an uncommitted choice. Selection and
 cancellation do not change saved state, RNG or replay.
 
-Ownership currently comes from catalog `owners`. Production still has the same
+Ownership comes from catalog `owners` after shared [progression projection](hero-progression.md). Production still has the same
 three hero signatures; extra test profiles demonstrate multiple choices per hero.
-There is no learned-level, limited-use or cooldown schema yet, so the HUD shows no
-invented values for those systems. Only attack, guardedAttack and magicMissile
+Implemented hero abilities can declare `requiredLevel` (default 1); canonical learned state gates availability. Limited-use and cooldown schemas remain future work. Only attack, guardedAttack and magicMissile
 profiles are implemented; self-heal and cell/area mechanics remain future work.
 Additional well-formed ability IDs can use these existing profiles with bounded
 values and distinct existing owners. Canonical IDs remain required with their
@@ -115,7 +114,7 @@ All three signatures are implemented in the pure domain. Magic Missile uses `pre
 from `src/domain/combat.ts` and resolves through `dispatch`. A `{ unitId }` target sends every
 missile to one creature; `{ missileTargets: [id, ...] }` assigns one target per missile in order.
 It may deliberately target allies, as the tabletop creature-target rule permits; the minimum one-tile range excludes self-targeting in this slice.
-Profiles record the starting caster level; no progression tree or spell-resistance system is added.
+Profiles record starting caster level; run/dungeon projection uses the Mage hero level (1–5), preserving this formula. No spell-resistance system is added.
 All assigned dice are drawn before applying damage, so RNG exhaustion rejects the whole cast.
 Overkill does not retarget later missiles or emit duplicate defeat/outcome events.
 
