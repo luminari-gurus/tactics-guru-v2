@@ -108,9 +108,14 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  expect((await snapshot(page)).party).toEqual(completed.state.party);
  await expect(page.locator('section[aria-label="Party"]')).toContainText('Level 2');
  await expect(page.locator('section[aria-label="Party"]')).toContainText('XP');
+ await expect(page.locator('.dungeon-status')).toContainText('reached level 2');
+ await page.locator('section[aria-label="Party"]').scrollIntoViewIfNeeded();
+ await expect(page.locator('section[aria-label="Party"]')).toBeVisible();
+ expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
  await page.screenshot({path:test.info().outputPath('hero-level-up.png'),fullPage:true});
  const saved=await snapshot(page);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
  expect((await snapshot(page)).party).toEqual(saved.party);
+ await expect(page.locator('.dungeon-status')).not.toContainText('reached level');
  const offer=saved.offer!;await page.getByRole('button',{name:`Claim ${dungeonContent.items[offer.options[0].itemId].label}`,exact:true}).click();await page.locator('#dungeon-item-confirm').click();
  expect((await snapshot(page)).party).toEqual(saved.party);
 });
