@@ -93,3 +93,49 @@ performance resampling, true parallelism or production operation was launched.
 #200 remains open for current-source complete comparable coverage and disposition
 of failures. #208 phase B still requires qualified isolated capacity/contended-host
 measurement. PR #228 requires Brian's approval before merge.
+
+## PR #228 blocking-review repairs (2026-10-23)
+
+The review found that default qualification bypassed the persistent unsafe-host
+marker. Qualification now checks it before checkout or setup; the separate manual
+browser-setup and process-cleanup entry points have the same guard. Contracts run
+each actual shell guard with and without a synthetic marker, without deliberately
+contaminating the live runner.
+
+Cleanup failures now abort before attempting to persist quarantine state, retain
+the original cleanup evidence if the marker write fails, and also quarantine a
+failed performance-evaluator cleanup. A failed collector cleanup does not start
+evaluation. Negative contracts cover both cleanup sources and an unwritable
+marker path; no surviving-process experiment was launched on the live host.
+
+The serial repair was frozen at `3929d81012d8ba33ff00e491cb8fd36483bdc816`:
+
+- [Self-hosted qualification 39947676898](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39947676898)
+  passed all 53 tooling/batching/orchestration contracts, diagnostics retention,
+  both-engine smoke, real lifecycle timeout/recovery, production build and the
+  partial CPU receipt/self-comparison. That receipt is clean, complete, passed,
+  input-stable and bound to the frozen source; comparison has zero warnings.
+- [Fresh pilot 39947680324](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39947680324)
+  passed 934 units/content cases, both compiler scopes, two real build integrations,
+  root build, 3/3 Chromium profile cases and 1/1 WebKit case. Both consumers verified
+  build hash `4dcdcc21fdd9eefb4795eb7dc304825c408f0ba03411f70e65fe6b569f2aa781`.
+  Cleanup is complete; browser skips/retries/unexpected failures are all zero.
+  The actual aggregate is partial, complete and passed, not baseline-eligible;
+  its schema-two export self-comparison has zero warnings.
+- [Pilot aggregate artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39947680324/artifacts/12498339894)
+  has SHA-256 `2a3189f5a7222b5b3288dda4a32cf5df18dfac1da32c6c4985ef72f715b6b599`.
+- Fresh before/after discovery retains identical IDs and commands for all 11 browser
+  modes and 19 jobs, including exactly 693 Chromium cases across nine groups.
+  Actual retained targeted-resume receipts were replayed with the repair: original
+  preparation/Chromium reuse, both WebKit attempts, timestamp validation and
+  comparison all pass. The scheduler/aggregation logic itself is unchanged.
+- Final local contracts: 50 passed, three Linux-only skips, zero failures across
+  53 tests. An initial sandboxed checkpoint test timed out; the complete rerun with
+  loopback access passed. Workflow YAML and whitespace checks pass. The final
+  separate-workflow guards and their expanded shell contracts are checked locally;
+  they and this evidence update follow the frozen pilot source without changing
+  serial execution, browser selection, dependencies or performance limits.
+
+No full capture or performance resampling was run. Historical failures, including
+PR #225's two budget failures, remain unresolved evidence rather than being erased
+by these successful tooling checks. #200 remains open. No merge was performed.

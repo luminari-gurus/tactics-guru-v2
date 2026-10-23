@@ -60,7 +60,8 @@ JSON, per-case JSONL checkpoints and Playwright blob ZIPs, as well as process lo
 cleanup diagnostics, test outcomes/skips/retries and slowest-case/file summaries.
 Missing final reports or interrupted JSONL are incomplete evidence, never passes.
 Ordinary failures allow other jobs to continue. A failed cleanup records a
-persistent `RUNNER_TOOL_CACHE/issue208-unsafe-host` marker; qualification and serial jobs refuse
+persistent `RUNNER_TOOL_CACHE/issue208-unsafe-host` marker; qualification, serial
+jobs and the separate browser-setup/process-cleanup workflows refuse
 execution until an administrator inspects owned workloads and clears it. The
 marker survives job temp-directory cleanup. Stage and evaluator cleanup failures
 stop subsequent work even if writing the marker fails; the receipt retains the

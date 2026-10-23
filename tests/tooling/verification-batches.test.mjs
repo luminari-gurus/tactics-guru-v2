@@ -253,8 +253,10 @@ test('workflow stays manual, exclusive, serial, failure-preserving and pinned to
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
-  for (const id of ['qualify', 'prepare', 'batch']) {
-    const job = workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0];
+  const jobs = ['qualify', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
+  jobs.push(...['browser-setup.yml', 'issue-219-process-cleanup.yml'].map(file =>
+    readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8')));
+  for (const job of jobs) {
     assert.ok(job.indexOf('test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"') > 0);
     assert.ok(job.indexOf('test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"') < job.indexOf('uses: actions/checkout@v4'));
     const directory = mkdtempSync(join(tmpdir(), 'tg-host-guard-'));
