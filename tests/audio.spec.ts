@@ -200,6 +200,10 @@ test('a stalled tone request never holds the board; the control reports unavaila
   await expect(page.getByRole('status')).toHaveText('Ready');
   await expect(page.locator('#game')).toHaveAttribute('data-run', '2');
   await expect(page.locator('#audio-status')).toHaveText('Loading');
+  // The old run must cancel its request, not let its timeout callbacks retry through the restarted loader.
+  await expect.poll(() => page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: {id: number; event: string}[] }).audioRequestEvents
+      .filter(event => event.id === 1 && event.event === 'abort').length)).toBe(1);
   // Each attempt times out after AUDIO_LOAD_TIMEOUT_MS and Phaser's loader retries twice by default (`loader.maxRetries`).
   await expect(page.locator('#audio-status')).toHaveText('Unavailable: Could not load unlock-tone', { timeout: AUDIO_LOAD_TIMEOUT_MS * 3 + 5000 });
   await expect(page.getByRole('button', { name: 'Play test sound' })).toBeDisabled();
