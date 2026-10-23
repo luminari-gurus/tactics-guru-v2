@@ -39,7 +39,7 @@ const test = base.extend({ browser: [async ({ browser }, use, worker) => {
     clearTimeout(timer);
     await context.close();
     receipt.elapsedMs=performance.now()-started;
-    const directory='verification-receipts/browser-graphics'; mkdirSync(directory,{recursive:true});
+    const directory=join(worker.project.outputDir,'graphics-setup'); mkdirSync(directory,{recursive:true});
     writeFileSync(join(directory,`worker-${process.pid}-${worker.workerIndex}-${Date.now()}.json`),JSON.stringify(receipt,null,2)+'\n');
   }
   await use(browser);
