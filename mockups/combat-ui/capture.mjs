@@ -42,6 +42,13 @@ for (const [page, desk, mob] of [
   await shot(file(page), 390, 844, mob);
 }
 
+for (const state of ['start', 'move', 'target', 'spent', 'segment']) {
+  await shot(file(`desktop-b-final.html?state=${state}`), 1440, 900, `desktop-b-final-${state}.png`);
+}
+for (const state of ['idle', 'move', 'enemy', 'specials', 'cancel']) {
+  await shot(file(`mobile-c-final.html?state=${state}`), 390, 844, `mobile-c-final-${state}.png`);
+}
+
 if (process.env.LIVE_URL) {
   const live = async (page) => {
     await page.waitForSelector('#game[data-ready="true"], #dialog-confirm, #save-continue, #save-new, #battle-dialog', { timeout: 90_000 }).catch(() => {});

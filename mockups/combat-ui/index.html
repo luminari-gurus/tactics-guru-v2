@@ -12,6 +12,37 @@
     <h1>Combat UI — fewer steps</h1>
     <p class="lead">The shipped battle HUD (issue #108 design, #111 rail/dock) makes every move and attack a four-control ritual: pick a verb, pick a target (often twice), Review, then Confirm. These mockups keep preview-before-commit and 44px targets, and cut the redundant chrome. Items stay out of combat, as they do today.</p>
 
+    <h2>Split-platform plan</h2>
+    <p>Owner direction: <strong>Option B on desktop</strong>, <strong>Option C on mobile</strong>. Same underlying action/target state. Older sketches stay below for comparison.</p>
+    <div class="cards">
+      <a class="card" href="desktop-b-final.html"><strong>Desktop final · B</strong> 1440×900. Bar + Go + path chip. Target-first specials. Turn start, path, enemy targeted, spent.</a>
+      <a class="card" href="mobile-c-final.html"><strong>Mobile final · C</strong> 390×844. Radial hold, tap fallback, pan-on-drag, special sub-ring, cancel in the hub, docked End turn.</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th class="num">Today</th>
+          <th class="num">Desktop B</th>
+          <th class="num">Mobile C (hold)</th>
+          <th class="num">Mobile C (tap fallback)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Move</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">2</td></tr>
+        <tr><td>Basic attack</td><td class="num">4</td><td class="num">2–3</td><td class="num">1</td><td class="num">2</td></tr>
+        <tr><td>Default / last-used special</td><td class="num">4</td><td class="num">2</td><td class="num">1</td><td class="num">2–3</td></tr>
+        <tr><td>A different special</td><td class="num">5*</td><td class="num">3</td><td class="num">1</td><td class="num">2–3</td></tr>
+        <tr><td>Wait / End turn</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Desktop: click enemy preselects last-used legal special (2), Attack is +1. Mobile hold is one gesture even when sliding to a slice. Tap fallback exists so hold is never the only path. Wait is a first-class control on both — never a radial slice.</p>
+
+    <div class="rec">
+      <p><strong>Shared model:</strong> both skins write the same session fields — selected cell, selected verb (<code>move</code> / <code>basic_attack</code> / ability id), legal preview, then one confirm. Desktop Go and mobile release-on-slice (or tap-on-slice) are the same <code>prepare</code> + <code>confirm</code>. Esc and “release in the hub” clear the preview without committing.</p>
+    </div>
+
+    <h2>Earlier options (kept)</h2>
     <div class="cards">
       <a class="card" href="current.html"><strong>Current UI</strong> Recreation of the live rail/dock. Move 3 taps · Attack 4 · Wait 1.</a>
       <a class="card" href="option-a.html"><strong>A · Board + wheel</strong> Direct manipulation. Confirm on the tile. Move 2 · Attack 2.</a>
@@ -82,13 +113,25 @@
 
     <h2>Recommendation</h2>
     <div class="rec">
-      <p><strong>Keep Option B’s bar + Go + path chip.</strong> Replace the chevron picker with <strong>target-first specials</strong>: tap an enemy (or tile), the bar shows only specials that currently preview as legal, last-used valid special is preselected, Go commits. Default special stays 2 steps; another legal special is one extra tap on that button. A production hero with one special sees one pressed button and nothing else to pick. Keyboard: <kbd>1</kbd>/<kbd>2</kbd>… pick a listed special, <kbd>S</kbd> cycles the valid list, Enter = Go.</p>
-      <p style="margin-top:10px">Segmented is the runner-up if the catalog stays at two or three specials and you want switching to cost the same as tapping Attack (ability-first, range highlights before a target). Board chips match Option A’s on-tile language but occlude isometric cells. Leave the chevron page in the gallery; do not ship the dropdown. Swipe-the-slot is out. Treat Option C’s hold as a later mobile extra, not the only way to act.</p>
+      <p><strong>Ship the split.</strong> Desktop uses the developed Option B pages (<a href="desktop-b-final.html">desktop-b-final.html</a>): persistent bar, one gold Go, on-tile path chip, <strong>target-first specials</strong>. Segmented is a cheap secondary variant only. Mobile uses the developed Option C pages (<a href="mobile-c-final.html">mobile-c-final.html</a>): radial hold with a 300ms threshold so pan still works, a tap fallback so hold is not the sole path, a Special sub-ring of legal specials, cancel in the hub, End turn docked.</p>
+      <p style="margin-top:10px">Do not restore the Ability dropdown. Keep every earlier mockup in this folder for comparison. Adopting this is a spec change from Review-then-Confirm to one confirm.</p>
     </div>
 
     <h2>Open each layout</h2>
-    <p>Desktop mockups are designed at 1440×900. Portrait phone uses the same files at ~390×844. Add <code>?export=1</code> to hide this reviewer chrome.</p>
+    <p>Developed finals: desktop at 1440×900, mobile at 390×844. Earlier pages still scale to both. Add <code>?export=1</code> to hide reviewer chrome.</p>
     <ul>
+      <li><a href="desktop-b-final.html">desktop-b-final.html</a> ·
+        <a href="desktop-b-final.html?state=start">start</a> ·
+        <a href="desktop-b-final.html?state=move">move</a> ·
+        <a href="desktop-b-final.html?state=target">target</a> ·
+        <a href="desktop-b-final.html?state=spent">spent</a> ·
+        <a href="desktop-b-final.html?state=segment">segment</a></li>
+      <li><a href="mobile-c-final.html">mobile-c-final.html</a> ·
+        <a href="mobile-c-final.html?state=idle">idle</a> ·
+        <a href="mobile-c-final.html?state=move">hold tile</a> ·
+        <a href="mobile-c-final.html?state=enemy">hold enemy</a> ·
+        <a href="mobile-c-final.html?state=specials">sub-ring</a> ·
+        <a href="mobile-c-final.html?state=cancel">cancel</a></li>
       <li><a href="current.html">current.html</a> · <a href="current.html?export=1">export</a></li>
       <li><a href="option-a.html">option-a.html</a> · <a href="option-a.html?export=1">export</a></li>
       <li><a href="option-b.html">option-b.html</a> · <a href="option-b.html?state=move&amp;export=1">move export</a> · <a href="option-b.html?state=picker&amp;export=1">picker export</a> · <a href="option-b.html?state=single">one special</a></li>

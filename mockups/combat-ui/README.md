@@ -7,6 +7,11 @@ These pages explore a **lower-step** combat HUD for desktop (1440×900) and
 portrait phone (~390×844). The owner asked for the fewest taps and for redundant
 chrome to go. The live HUD this replaces is the #108 / #111 rail/dock.
 
+**Current direction:** Option B on desktop, Option C on mobile, one shared
+action/target model. Developed pages are [`desktop-b-final.html`](desktop-b-final.html)
+and [`mobile-c-final.html`](mobile-c-final.html). Every earlier sketch stays in
+this folder for comparison.
+
 ## How combat works today
 
 A player turn is **one move and one action, in either order**, then **Wait / End
@@ -274,39 +279,162 @@ path — which is the chevron again.
 | Keyboard | S cycle | 1/2…, S on valid list | ←/→, S on owned | 1/2…, S on chips |
 | Affordance if 1 special | none | none | none | one chip (the forecast) |
 
-## Recommendation
+## Split-platform plan (current recommendation)
 
-**Keep Option B’s persistent bar, smart defaults, one gold Go, and Option A’s
-on-tile path chip.** Ship **target-first** instead of the chevron picker.
+Ship **two skins, one ruleset**.
 
-Target-first is the only alternative that stays compact as catalogs grow past
-two specials, never puts illegal rows under a thumb, and still meets the step
-budget (2 default, +1 to switch, 2 for a single-special unit). It does not
-bring back a dropdown. Keyboard 1/2… maps to the buttons the player can
-actually use on this target.
+| Platform | Skin | Developed page |
+| --- | --- | --- |
+| Desktop 1440×900 | Option B — bar + Go + path chip, **target-first specials** | [`desktop-b-final.html`](desktop-b-final.html) |
+| Mobile 390×844 | Option C — radial hold, tap fallback, docked End turn | [`mobile-c-final.html`](mobile-c-final.html) |
 
-Pick **segmented** instead if the live catalog will stay at two or three
-specials and you want switching to cost the same as tapping Attack, with range
-highlights before a target. Use **board chips** only if you want to push more
-of combat onto the tile (pairing with the path chip) and accept occlusion.
+Segmented specials stay as a **cheap secondary desktop variant**
+(`?state=segment`) if the catalog never grows past two or three. Chevron,
+board chips, Option A, and the first Option C sketch remain in the gallery.
+Do not restore the Ability `<select>`. Adopting this is a **spec change**
+from Review-then-Confirm to one confirm
+(`openspec/specs/battle-controls/spec.md`).
 
-Leave `option-b.html` (chevron) in the gallery. Do not implement swipe-the-slot.
-Do not restore the Ability `<select>`. Spec note is unchanged: adopting B is a
-**spec change** from Review-then-Confirm to one Go
-(`openspec/specs/battle-controls/spec.md` currently requires Review then Confirm).
+### Shared action / target model
+
+Both skins write the same session fields. The HUD is a view; legality still
+comes from `battleActions` + `targetPreview`.
+
+| Field | Meaning | Desktop B | Mobile C |
+| --- | --- | --- | --- |
+| `selectedCell` | Board cell under consideration | Click, arrows, hover-then-click | Hold or tap a unit/tile |
+| `selectedAction` | `move` · `basic_attack` · ability id | Bar verbs + legal-special buttons | Radial slice / sub-ring chip |
+| `preview` | Hit %, damage, rejection copy | On-board forecast + bar subtitles | Hub text updates while a slice is held |
+| Confirm | One commit | Gold **Go** / Enter | Release on a slice, or tap a slice |
+| Cancel | Clear preview, no commit | Esc | Release in the hub |
+| End turn | Wait, no second confirm | Wait button (`W`) — commits immediately | Docked **End turn** — never a slice |
+
+`prepare` then `confirm` is the same call on both. A later “undo last confirm”
+is out of scope; cancel only drops an unconfirmed preview.
+
+### Desktop B — developed
+
+States: `start` · `move` · `target` · `spent` · `segment` (secondary).
+
+- **Turn start.** Move is the smart default (same as #145). Go is disabled until
+  a tile or enemy is chosen. Specials are a placeholder (“Click an enemy”) —
+  they are not a dropdown. Hovering an enemy shows a **ghost forecast**; it
+  does not select. Click selects.
+- **Move.** Click a reachable tile. Teal path dots + on-tile **Move here** chip
+  are the preview. Go / Enter commits. The chip is not a second confirm.
+- **Enemy targeted.** Click an enemy. The bar lists **only specials that
+  currently preview as legal**. Last-used legal special is preselected.
+  Far Shot is omitted. Hovering a special button shows a tooltip (full name,
+  range, hotkey). Attack remains a verb (+1 if they want basic instead).
+- **Action spent.** Move and action budgets spent. Attack / specials greyed
+  with “Action spent”. Wait is pressed. **Wait commits immediately** (1 step,
+  same as today). Go stays in the same place and stays disabled.
+- **Keyboard.** `M` Move, `A` Attack, `1`–`9` legal specials in bar order,
+  `S` cycle (Shift+S previous), `W` Wait, Enter Go, Esc clear, arrows move
+  the cell cursor. Keys are drawn on the buttons.
+- **Hover.** Enemy hover = ghost forecast (no select). Button hover = tooltip.
+  Pressed border is selection; tooltip is naming only.
+
+Segmented (`?state=segment`) keeps every owned special in the bar, greyed in
+place. Use it only if the catalog stays tiny and you want switching to cost
+the same as Attack. It is not the desktop default.
+
+### Mobile C — developed
+
+States: `idle` · `move` · `enemy` · `specials` · `cancel`.
+
+**Pan vs hold (the known conflict).** `BoardInput` already pans on
+press-and-drag. The radial must not steal that.
+
+1. Finger down.
+2. If it moves **more than ~10px before 300ms** → this is a **pan**. The
+   radial never opens.
+3. If it stays still **300ms** on a unit or tile → **radial opens**, light
+   haptic, press-ring on the cell. Further movement is slice aiming, not pan.
+4. If it lifts **before 300ms** with little movement → **tap fallback**:
+   select that cell and open the same radial. A second tap on a slice commits.
+   Reduce Motion skips step 3 and always uses tap.
+
+Hold is therefore **not** the sole path. TalkBack / VoiceOver get named slice
+buttons (44px labels) after a cell tap. End turn is a persistent 48px control.
+
+**Slices adapt to what was held**
+
+| Held | Default slice | Other slices |
+| --- | --- | --- |
+| Empty reachable tile | **Move** (path + cost in the hub) | Inspect. Attack / Special disabled (“Need an enemy”) |
+| Enemy | **Attack** (forecast in the hub) | Special (expands), Inspect, Move if budget remains |
+| Own unit | Inspect | Move if pointing at a reachable standing tile; Special only if it has a self preview |
+
+**Multiple specials.** The Special slice is labeled with the last-used name
+and a count (“2 legal · Guarded”). Sliding onto it **expands a sub-ring of
+legal specials only**. Last-used is preselected. Far Shot has no chip. Sliding
+onto Extended updates the hub forecast; release commits. Tap fallback: tap
+Special to expand, tap Guarded to commit last-used.
+
+**Forecast.** While the finger is on a slice (or a sub-ring chip), the hub
+shows that slice’s preview. Nothing commits until release (hold) or a second
+tap (fallback).
+
+**Cancel.** Release in the **hub**. The hub is not a slice, so the rim cannot
+cancel by accident. Same intent as desktop Esc.
+
+**End turn / Wait.** Docked full-width button under the board. Never a radial
+slice — Wait is too easy to miss on a rim and too important to hide behind a
+hold.
+
+### Step counts
+
+Hold-and-slide is **one** step (one gesture). Tap fallback is one tap per
+distinct control.
+
+| Action | Today | Desktop B | Mobile hold | Mobile tap |
+| --- | ---: | ---: | ---: | ---: |
+| Move | 3 | **2** (tile, Go) | **1** | **2** (tile, Move slice) |
+| Basic attack | 4 | **2–3** (2 if no legal special / they clicked Attack first; 3 when last-used special was preselected) | **1** | **2** |
+| Default special | 4 | **2** (enemy, Go) | **1** (slide to Special, release) | **2–3** (expand then Guarded) |
+| Different special | 5* | **3** (enemy, other, Go) | **1** (slide to Extended) | **2–3** |
+| Wait / End turn | 1 | **1** | **1** | **1** |
+
+### Risks
+
+- **Two skins, one ruleset.** Testers must prove both HUDs against the same
+  `targetPreview` rejections. A special that is omitted on desktop must also
+  be absent from the mobile sub-ring.
+- **300ms hold vs impatient taps.** The tap fallback is mandatory; if the
+  threshold feels slow, lower it toward 250ms, do not remove tap-to-open.
+- **Radial labels vs 44px.** Slice buttons are 44px; the painted wedge behind
+  them is larger. Do not ship wedges without the labeled buttons.
+- **Sub-ring occlusion.** Two special chips sit off the east rim and will
+  cover nearby tiles while aiming. They dismiss on cancel / commit.
+- **Desktop basic attack is sometimes +1** vs last-used special, because
+  target-first preselects the special. Accept that, or flip the default to
+  Attack when the player has not used a special this battle.
+- **Spec.** Battle-controls still says Review then Confirm. This plan is one
+  confirm. Wait already skips the dialog today — the split makes that the
+  rule for every verb except that Wait stays immediate and Go is unused for it.
+
+### Earlier recommendation (superseded)
+
+The previous pass recommended target-first as a replacement for the chevron
+**on both platforms**. That still holds for **desktop**. Mobile no longer uses
+the B bar; it uses the developed radial instead. Chevron, segmented, and board
+chips remain as comparison sketches.
 
 ## Files
 
 | File | Role |
 | --- | --- |
 | `index.html` | Comparison, links |
+| `desktop-b-final.html` | Developed desktop B. `?state=start`, `move`, `target`, `spent`, `segment` |
+| `mobile-c-final.html` | Developed mobile C. `?state=idle`, `move`, `enemy`, `specials`, `cancel` |
 | `current.html` | Shipped HUD recreation |
 | `option-a.html` | Board + wheel |
 | `option-b.html` | Action bar + Go + chevron picker. `?state=move`, `picker`, `single` |
 | `option-b-specials-target.html` | B alternative: target-first valid specials |
 | `option-b-specials-segment.html` | B alternative: inline segmented specials |
 | `option-b-specials-chips.html` | B alternative: on-board ability chips |
-| `option-c.html` | Radial hold |
+| `option-c.html` | Early radial hold sketch |
 | `styles.css` | Shared tokens (game colors) |
 | `export.js` | `?export=1` hides reviewer chrome |
 | `assets/` | Board capture + portraits copied for a self-contained folder |
@@ -327,6 +455,8 @@ Captured with headless Chrome at device scale 1:
 - `previews/option-b-specials-segment-desktop.png` / `previews/option-b-specials-segment-mobile.png`
 - `previews/option-b-specials-chips-desktop.png` / `previews/option-b-specials-chips-mobile.png`
 - `previews/option-c-desktop.png` / `previews/option-c-mobile.png`
+- `previews/desktop-b-final-start.png` · `move` · `target` · `spent` · `segment` (1440×900)
+- `previews/mobile-c-final-idle.png` · `move` · `enemy` · `specials` · `cancel` (390×844)
 
 Live app (Vite, this checkout, Mage first in initiative):
 
