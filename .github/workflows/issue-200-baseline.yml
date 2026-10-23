@@ -8,7 +8,7 @@ on:
         default: f33e31a
       selection:
         type: choice
-        options: [reproduce, diagnose, qualify]
+        options: [reproduce, diagnose, startup, qualify]
         default: reproduce
 permissions:
   contents: read
@@ -52,6 +52,11 @@ jobs:
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/audio/diagnosis.json
         run: npx --no-install playwright test tests/audio.spec.ts --project=mobile-landscape --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/diagnosis
+      - name: Compare initial desktop audio readiness three times
+        if: inputs.selection == 'startup'
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/audio/startup.json
+        run: npx --no-install playwright test tests/audio.spec.ts --project=desktop -g '^the test tone plays only' --repeat-each=3 --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/startup
       - name: Qualify affected audio consumers on all Chromium profiles
         if: inputs.selection == 'qualify'
         env:
