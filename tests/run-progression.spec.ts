@@ -7,7 +7,20 @@ import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
 import {replayRunBattle} from '../src/domain/runBattle';
 // Exercise actual BFCache rather than Playwright's default disabled cache.
 test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+import {legalDefeatSaves} from './helpers/runRecoveryFixtures';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
+async function loadLegalDefeat(page:Page){
+ await test.step('reach legal outcome',async()=>{
+  const {primary,backup}=legalDefeatSaves();
+  await page.goto('/run');
+  await page.evaluate(({keys,primary,backup})=>{
+   localStorage.setItem(keys.primary,primary);localStorage.setItem(keys.backup,backup);
+  },{keys:RUN_STORAGE_KEYS,primary,backup});
+  await page.reload();await page.locator('#run-continue').click();
+  await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+  expect(await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS)).toEqual({primary,backup});
+ });
+}
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
 async function start(page:Page){
  await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -168,7 +181,7 @@ test('cached run return cannot overwrite either slot of a newer replacement',asy
 });
 
 test('review: in-flow Continue resumes an ongoing backup battle after legal defeat',async({page})=>{
- test.setTimeout(90000);await start(page);await fight(page,true);
+ await loadLegalDefeat(page);
  await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const backup=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.backup);
  const expected=JSON.parse(backup!).payload.activeBattle;expect(expected.outcome).toBe('ongoing');
@@ -201,7 +214,7 @@ test('review: read-level SecurityError permits explicit unsaved play without cha
  expect(await page.evaluate(()=>(window as unknown as {reviewReadEvidence:()=>unknown}).reviewReadEvidence())).toEqual({primary:'preserve primary',backup:'preserve backup',calls:[]});
 });
 test('review: reopened outcome recovery exports the exact retained backup after partial reset',async({page})=>{
- test.setTimeout(90000);await start(page);await fight(page,true);const ended=await snapshot(page);
+ await loadLegalDefeat(page);const ended=await snapshot(page);
  const saved=await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);expect(saved.backup).not.toBeNull();
  await page.evaluate(primary=>{const remove=Storage.prototype.removeItem;Storage.prototype.removeItem=function(key){if(key===primary)throw new DOMException('Removal denied','SecurityError');return remove.call(this,key);};},RUN_STORAGE_KEYS.primary);
  await page.locator('#run-new').click();await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();

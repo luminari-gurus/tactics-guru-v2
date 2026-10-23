@@ -1,0 +1,102 @@
+[
+  {
+    "test": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+    "profile": "desktop",
+    "beforeMs": 14987,
+    "afterMs": 3305,
+    "beforeSetupMs": 14370,
+    "afterSetupMs": 2586,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+    "profile": "desktop",
+    "beforeMs": 14320,
+    "afterMs": 2674,
+    "beforeSetupMs": 14078,
+    "afterSetupMs": 2439,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+    "profile": "mobile-portrait",
+    "beforeMs": 14799,
+    "afterMs": 3140,
+    "beforeSetupMs": 14189,
+    "afterSetupMs": 2469,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+    "profile": "mobile-portrait",
+    "beforeMs": 14174,
+    "afterMs": 2614,
+    "beforeSetupMs": 13898,
+    "afterSetupMs": 2367,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+    "profile": "mobile-landscape",
+    "beforeMs": 14913,
+    "afterMs": 3310,
+    "beforeSetupMs": 14190,
+    "afterSetupMs": 2634,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+    "profile": "mobile-landscape",
+    "beforeMs": 14332,
+    "afterMs": 2656,
+    "beforeSetupMs": 14057,
+    "afterSetupMs": 2424,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+    "profile": "acceptance-webkit-portrait",
+    "beforeMs": 14118,
+    "afterMs": 3043,
+    "beforeSetupMs": 13405,
+    "afterSetupMs": 2392,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+    "profile": "acceptance-webkit-portrait",
+    "beforeMs": 13576,
+    "afterMs": 2579,
+    "beforeSetupMs": 13297,
+    "afterSetupMs": 2308,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+    "profile": "acceptance-webkit-landscape",
+    "beforeMs": 15049,
+    "afterMs": 3149,
+    "beforeSetupMs": 14415,
+    "afterSetupMs": 2403,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  },
+  {
+    "test": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+    "profile": "acceptance-webkit-landscape",
+    "beforeMs": 13625,
+    "afterMs": 2730,
+    "beforeSetupMs": 13346,
+    "afterSetupMs": 2456,
+    "beforeStatus": "passed",
+    "afterStatus": "passed"
+  }
+]
