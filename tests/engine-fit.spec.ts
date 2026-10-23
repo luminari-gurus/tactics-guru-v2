@@ -44,14 +44,14 @@ test('proof controls survive repeated restart and expose distinct ready markers'
   expect(errors).toEqual([]);
 });
 
-test('shows loading before boot and a controlled error if the engine module cannot load', async ({ page }) => {
+test('shows loading before boot and a controlled error if the engine module cannot load', { tag: '@canonical' }, async ({ page }) => {
   await page.route('**/assets/start-*.js', route => route.abort());
   await page.goto('/?scene=proof');
   await expect(page.getByRole('status')).toContainText('Error');
   await expect(page.getByRole('button', { name: 'Restart proof scene' })).toBeDisabled();
 });
 
-test('shell initially displays loading while the engine is delayed', async ({ page }) => {
+test('shell initially displays loading while the engine is delayed', { tag: '@canonical' }, async ({ page }) => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/assets/start-*.js', async route => { await gate; await route.continue(); });

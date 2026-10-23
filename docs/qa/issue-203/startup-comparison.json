@@ -1,0 +1,23 @@
+{
+  "run": 40026132069,
+  "baseCommit": "958bbd90546e1305aab10e370d5555a1d7c9a43a",
+  "candidateCommit": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+  "matchingRuntimeCaseAssetDependencyHashes": 167,
+  "baseStatus": "failed",
+  "candidateStatus": "passed",
+  "failedFullCaptureStatus": "failed",
+  "case": {
+    "id": "8352ba8e75a15b46318d-d795161be3b8712ee585",
+    "title": "default Move Continue is read-only and confirmed movement keeps the remaining-action flow",
+    "project": "mobile-landscape"
+  },
+  "sharedFailure": {
+    "helperLine": 15,
+    "caseLine": 41,
+    "expectedPhase": "player",
+    "timeoutMs": 5000
+  },
+  "retries": 0,
+  "tracing": "off",
+  "disposition": "Initial startup assertion reproduced on literal main base; candidate focused observation passed. Cause and reliability remain unresolved; full capture remains failed, not retry-qualified."
+}

@@ -56,6 +56,41 @@ for touch-device or WebKit coverage when those behaviors are affected. Selecting
 focused checks under this policy does not remove tests from the configured full
 matrices. #203 owns measured matrix changes and #204/#205 own fixture/audio refactors.
 
+### Browser profile selection
+
+The default Chromium matrix keeps unclassified cases on desktop, native touch
+portrait and native touch landscape. Only reviewed metadata narrows selection:
+
+- `@canonical`: desktop runs the complete device-independent resource failure or
+  loading-delay case; both mobile projects exclude it.
+- `@fixed-viewport`: desktop and mobile portrait run the complete explicit viewport
+  corpus. Mobile landscape excludes only the duplicate execution after the test
+  overwrites its viewport before navigation with otherwise identical Pixel settings.
+
+Metadata is in Playwright test details, preserving titles and retained test IDs.
+Neither tag is a runtime skip, a replacement for touch or WebKit, nor permission
+to classify additional cases without reviewing their assertions. Current approved
+scope is nine canonical startup/asset cases and five explicit-viewport layout
+cases. All other interactions and complete journeys retain their matrix.
+
+`npm run test:verification-batches` also checks real selection discovery, exact
+removed-to-retained mappings and negative selection/device drift. Batch discovery
+must still partition the canonical default set exactly. Special configs/modes
+retain their prior sets. The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
+and QA evidence in `docs/qa/issue-203/` describe the classification and measurements.
+
+```sh
+node scripts/verification-selection.mjs capture tmp/selection.json
+node scripts/verification-selection.mjs compare tmp/before.json tmp/after.json tmp/coverage-map.json
+# Existing resumable self-hosted plan and exact batch discovery:
+npm run verify:batches -- discover verification-receipts/serial/selection-plan
+```
+
+Capture before changing selection. The compare command rejects unmapped omissions,
+extra/duplicate IDs, changed retained metadata and unexpected effective device
+settings. Historical captures are immutable; deliberate later selection changes
+need their own source-bound comparison and updated contract, not rewritten history.
+
 ### Small dependency patches
 
 For a patch whose impact can be bounded from its advisory/changelog, dependency

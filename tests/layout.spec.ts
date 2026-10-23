@@ -27,7 +27,7 @@ async function controlBoxes(page: Page): Promise<Box[]> {
 }
 
 for (const viewport of VIEWPORTS) {
-  test(`controls stay at least 44 px and reachable at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`controls stay at least 44 px and reachable at ${viewport.width}x${viewport.height}`, { tag: '@fixed-viewport' }, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width: viewport.width, height: viewport.height });

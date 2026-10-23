@@ -31,7 +31,7 @@
     "measure:verification": "node scripts/verification-timings.mjs",
     "test:verification-tooling": "node --test tests/tooling/verification-timings.test.mjs tests/tooling/verification-reporters.test.mjs tests/tooling/verification-processes.test.mjs",
     "verify:batches": "node scripts/verification-batches.mjs",
-    "test:verification-batches": "node --test tests/tooling/verification-batches.test.mjs"
+    "test:verification-batches": "node --test tests/tooling/verification-batches.test.mjs tests/tooling/verification-selection.test.mjs"
   },
   "dependencies": {
     "@posthog/core": "1.59.1",

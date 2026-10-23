@@ -1,0 +1,5414 @@
+{
+  "finalImplementation": "5bd5398",
+  "historicalRun": 39952038146,
+  "historicalDisposition": {
+    "complete": false,
+    "passed": false,
+    "baselineEligible": false
+  },
+  "changedInputs": {
+    "package.json": {
+      "before": "02f018e31fd786b13f58d0086477172881e19999abdfe520e3ced1450be4b4b8",
+      "after": "b28b6e3cb02f2ea14ec1546635b0f6e53ad1508d0412e18decfdcc925a35e7e7"
+    },
+    "playwright.config.ts": {
+      "before": "5ef1d80f4322f3e1f1ddd845716ef24220f47755ed3880bb9d1cd3c30462e648",
+      "after": "c482e2f4895b596d250bad1e5439733c9a605f7012f189c843047e9fd8a93891"
+    },
+    "src/phaser/FitScene.ts": {
+      "before": "54914047c6882e0525d1af3af8c3003249eeeab7ea9cb7e83bc3c777a82db974",
+      "after": "93217a3cc43c15dde47d50b991b53f2076d073b4f16c390d97cae9ff32ed5f24"
+    },
+    "tests/assets.spec.ts": {
+      "before": "46c46acb4617440c2065d5867019727c2bf661d0bb972a35bfffe8afdbccc424",
+      "after": "c21af334bb1e6258e0781a9464288196995aa9ddacd4cfa2533fbabacea8fd4a"
+    },
+    "tests/audio.spec.ts": {
+      "before": "bef0f0fcaaf0c0a06256454cc99a640643d3484c01f004f6dc44ff16a914f9eb",
+      "after": "e35da8a1ebcfd4814a1ba2b6686e1f8f103a6c15f93aed5b95db13b597f2ec80"
+    },
+    "tests/boot.spec.ts": {
+      "before": "8f7161e2ef75cabf38b9c22524934be62f2e3c90215ae432f2138e89c6b0ba0f",
+      "after": "a6d8ed0a276f0f06157e65b744e37a98a57e8987ff53b439baf3a83e4298e9eb"
+    },
+    "tests/engine-fit.spec.ts": {
+      "before": "a0896a8b634f496df7dd7e27028329b925c0dad0b05a83a37c3333ef9d3b16fe",
+      "after": "376956e4d30ddf457e85808c27c800e8e03631d3beba574fb777027666e3fedf"
+    },
+    "tests/layout.spec.ts": {
+      "before": "e438402da747138eca97c42067b0e0fbc04c329bc2a850b0fdbe4e8f81dce8ea",
+      "after": "7f40b2068e9a32fa76f5ea4b150791c56fa7fbc9adee993fc36135e68bd066ef"
+    },
+    "tests/run-progression.spec.ts": {
+      "before": "789b23b9dea173ad4ea49617e8ee6bf98c8ac874de20cf9c000a21614d7b2e78",
+      "after": "19182d751d5d58dc64c10d987b3963a8fa4db7aeab74196850dcda4bf30017b1"
+    },
+    "tests/unit/battlefieldCorpus.test.ts": {
+      "before": "63578f5f45d3be39c3159d32bd66e37ad8afcb7368b425f2daa1397f9cb0920e",
+      "after": "f0a70683cab080c31e33867d018070228b9a63faa212ec2b51d1c6722580eb20"
+    },
+    "tests/unit/battlefieldSimulation.test.ts": {
+      "before": "4b329c88e0d2f60b312f81637c99c401c97a68f38a18099d405b394df2bff32e",
+      "after": "02f415dd6bb3bccf91005988f63545d6eb3c7e6332821100269b943deafabb3a"
+    }
+  },
+  "reused": [
+    {
+      "stage": "fixtures",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 57,
+        "expected": 57,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "dc05b687c651765fa444-74ecd0847f39e88905b2",
+          "file": "ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9621,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9621,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:46:20.444Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-d910ef3d312ac3c06fc1",
+          "file": "ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9205,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9205,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:46:30.242Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-9e3b982b582faf2cec12",
+          "file": "ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9186,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9186,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:46:39.466Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-a07857301ff54dfecee9",
+          "file": "ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7179,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7179,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:46:48.665Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-c03dc48f09f49c95e22e",
+          "file": "ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5943,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5943,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:47:41.191Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-31c9ff023c7d473d3fdb",
+          "file": "ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5901,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5901,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:47:47.316Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-a36e481a98e9eb21e56c",
+          "file": "ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5805,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5805,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:47:53.237Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-ea2a4c0fa41133cce06c",
+          "file": "ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3835,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3835,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:47:59.055Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-7bc55a2308a9b71eb82f",
+          "file": "ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6552,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6552,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:48:44.118Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-83635aeae3a8296210c7",
+          "file": "ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6430,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6430,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:48:50.846Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-33e2ad792227d3c2e5da",
+          "file": "ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6580,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6580,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:48:57.290Z"
+            }
+          ]
+        },
+        {
+          "id": "dc05b687c651765fa444-6efa5c2117a73159a175",
+          "file": "ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4192,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4192,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:03.887Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-9643088a5f620243a38b",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9784,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9784,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:46:55.908Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-9ff734b579129eb73803",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9319,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9319,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:05.705Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-34f8a9d5b4a4e046a788",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9402,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9402,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:15.035Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-fda3e40ec7c2b7dc8711",
+          "file": "authored-encounters.spec.ts",
+          "title": "unknown encounter fails before board construction",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 717,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 717,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:24.448Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-2dd655cb8109a414f4da",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset missing produces controlled error",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 801,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 801,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:25.177Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-8b93cfb0a8dfe040a2f5",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset decode produces controlled error",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 799,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 799,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:25.989Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-21a88d2b2c650ac2bfff",
+          "file": "authored-encounters.spec.ts",
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2590,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2590,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:26.798Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-21b44cf2ba3ae9df1d8c",
+          "file": "authored-encounters.spec.ts",
+          "title": "representative generated layouts retain readable open desert terrain",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6065,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6065,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:29.404Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-b0b19289b4401df13b8a",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9570,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9570,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:02.938Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-527e6b18e95fb369ec72",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9035,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9035,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:12.519Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-50aa4cbabe0f417a004c",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9427,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9427,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:21.564Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-979ad4667d9d4a9fe390",
+          "file": "authored-encounters.spec.ts",
+          "title": "unknown encounter fails before board construction",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 696,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 696,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:31.003Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-60c89e26b0162a18bb8c",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset missing produces controlled error",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 748,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 748,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:31.714Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-5cc7a453d4e41c198892",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset decode produces controlled error",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 758,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 758,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:32.475Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-bacf93537f330cceda75",
+          "file": "authored-encounters.spec.ts",
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1544,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1544,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:33.245Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-74fe0a5a6b75aec4fea2",
+          "file": "authored-encounters.spec.ts",
+          "title": "representative generated layouts retain readable open desert terrain",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3435,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3435,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:34.798Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-4ce9f08a56a43b2c7eea",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9715,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9715,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:08.114Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-a8b1c09b0491d3825afb",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9232,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9232,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:17.841Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-16b3e953bed1a0d10db4",
+          "file": "authored-encounters.spec.ts",
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9258,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9258,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:27.084Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-40dbafe60c5df5e434e4",
+          "file": "authored-encounters.spec.ts",
+          "title": "unknown encounter fails before board construction",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 712,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 712,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:36.359Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-a437ee5d82cf7c40979a",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset missing produces controlled error",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 765,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 765,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:37.081Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-30835e28cba99db608b9",
+          "file": "authored-encounters.spec.ts",
+          "title": "required asset decode produces controlled error",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 741,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 741,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:37.860Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-d8e04c72ce95cbc9b1be",
+          "file": "authored-encounters.spec.ts",
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1813,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1813,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:38.614Z"
+            }
+          ]
+        },
+        {
+          "id": "860bfe54b51d0261c7e0-d51a43f1bda368d4679a",
+          "file": "authored-encounters.spec.ts",
+          "title": "representative generated layouts retain readable open desert terrain",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4173,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4173,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:40.439Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-4b43e12150cdf167bbed",
+          "file": "run-items.spec.ts",
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 511,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 511,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:35.506Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-aff8a23654e9715e9add",
+          "file": "run-items.spec.ts",
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 763,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 763,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:36.027Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-41b491a3296fe41d5e10",
+          "file": "run-items.spec.ts",
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 751,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 751,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:36.802Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-ac8214a2dd167286c7c2",
+          "file": "run-items.spec.ts",
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 870,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 870,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:37.564Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-c46a8e79569407231fd1",
+          "file": "run-items.spec.ts",
+          "title": "stale recovery review refuses changed bytes",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 360,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 360,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:38.447Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-1f192850f2e57adc6fad",
+          "file": "run-items.spec.ts",
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 556,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 556,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:38.817Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-6aaa3bf2f2c86783347c",
+          "file": "run-items.spec.ts",
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 727,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 727,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:47:39.386Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-6909c702fe87aa095708",
+          "file": "run-items.spec.ts",
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 561,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 561,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:38.272Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-df0bea338d29a40bdd74",
+          "file": "run-items.spec.ts",
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 785,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 785,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:38.843Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-d718d5bdaa70ca117dc3",
+          "file": "run-items.spec.ts",
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 746,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 746,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:39.637Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-4b8c7f3a87ac05834fb9",
+          "file": "run-items.spec.ts",
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 867,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 867,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:40.396Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-63d5391743fd950a12f8",
+          "file": "run-items.spec.ts",
+          "title": "stale recovery review refuses changed bytes",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 359,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 359,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:41.275Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-6b0b9deb196152bb1b4c",
+          "file": "run-items.spec.ts",
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 543,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 543,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:41.645Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-91acbb70a2fae9745589",
+          "file": "run-items.spec.ts",
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 754,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 754,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:48:42.201Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-072a6f0d752b90b0d84e",
+          "file": "run-items.spec.ts",
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 551,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 551,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:44.651Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-6a2375e872b88466098e",
+          "file": "run-items.spec.ts",
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 839,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 839,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:45.214Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-a7bc5b4b95442d71f79b",
+          "file": "run-items.spec.ts",
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 748,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 748,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:46.065Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-5dd15b966cdea33a92c7",
+          "file": "run-items.spec.ts",
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1055,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1055,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:46.826Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-d2d8e0c49c1458847c99",
+          "file": "run-items.spec.ts",
+          "title": "stale recovery review refuses changed bytes",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 368,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 368,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:47.892Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-8f9f231a224b9ed33df1",
+          "file": "run-items.spec.ts",
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 542,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 542,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:48.271Z"
+            }
+          ]
+        },
+        {
+          "id": "35a5e42f71eea10fcdba-6170ecdfe403c814acfb",
+          "file": "run-items.spec.ts",
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 749,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 749,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:49:48.823Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/fixtures/fixtures-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
+    },
+    {
+      "stage": "placement-dev",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+          "file": "overworld-map.spec.ts",
+          "title": "controlled placement failure preserves complete state and supports retry",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1184,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1184,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:50:27.171Z"
+            }
+          ]
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+          "file": "overworld-map.spec.ts",
+          "title": "controlled placement failure preserves complete state and supports retry",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1041,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1041,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:50:30.687Z"
+            }
+          ]
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+          "file": "overworld-map.spec.ts",
+          "title": "controlled placement failure preserves complete state and supports retry",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 846,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 846,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:50:33.714Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/overworld-map.spec.ts",
+        "-g",
+        "controlled placement failure preserves complete state and supports retry",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/placement-dev/placement-dev-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
+    },
+    {
+      "stage": "webkit-acceptance",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 52,
+        "expected": 52,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "5b20c66b090c902460b9-4f20302b25000cf5291f",
+          "file": "battle-audio.spec.ts",
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7111,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7111,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:51:18.935Z"
+            }
+          ]
+        },
+        {
+          "id": "5b20c66b090c902460b9-173f85ad291b12496c8b",
+          "file": "battle-audio.spec.ts",
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5706,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5706,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:51:26.162Z"
+            }
+          ]
+        },
+        {
+          "id": "5b20c66b090c902460b9-02f4a075870f33651dea",
+          "file": "battle-audio.spec.ts",
+          "title": "sound control uses real gestures, preserves previews, modal focus and restart preference",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7012,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7012,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:55:18.963Z"
+            }
+          ]
+        },
+        {
+          "id": "5b20c66b090c902460b9-6ae98fee22d890c62a09",
+          "file": "battle-audio.spec.ts",
+          "title": "mute, hidden and context interruptions discard active feedback while commands finish",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6189,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6189,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:55:26.092Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-3dca2731e08d9a5193d7",
+          "file": "battle-loop.spec.ts",
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2309,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2309,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:51:31.910Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-d4e7539308b7ce6a1a3f",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 48854,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 48854,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:51:34.234Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-fa6cb6effd02b4b79a63",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 25543,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 25543,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:52:23.099Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-977589b56f7422f67732",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4099,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4099,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:52:48.652Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-0da34193d07d4c350816",
+          "file": "battle-loop.spec.ts",
+          "title": "player HUD and preview cancellation preserve state and modal capture",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2309,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2309,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:55:32.327Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-7a829993be174950e4f9",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 50462,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 50462,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:55:34.648Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-1075065ce1d7f5ec0c1d",
+          "file": "battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 28141,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 28141,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:56:25.122Z"
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-87d87c96cb20116b5815",
+          "file": "battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4440,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4440,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T12:56:53.272Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-b7da2fcb5b4c80035c55",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6762,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6762,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:52:53.347Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-dc18859c01289303ba53",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10024,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10024,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:00.221Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-1a7a3c390346668e4c79",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8912,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8912,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:10.276Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-a1b9e1434886cb8fc38e",
+          "file": "battle-persistence.spec.ts",
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6664,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6664,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:19.225Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-de9ad2fca310cc3b25ea",
+          "file": "battle-persistence.spec.ts",
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4108,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4108,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:25.906Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-0d89862f2fe39ea49b99",
+          "file": "battle-persistence.spec.ts",
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4985,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4985,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:30.029Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-7bc08ea4bc4e449ee644",
+          "file": "battle-persistence.spec.ts",
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4353,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4353,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:35.030Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3b87b202defc6c737337",
+          "file": "battle-persistence.spec.ts",
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4894,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4894,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:39.392Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-d856acadd72dd3513a28",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2078,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2078,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:44.296Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-837e3e51240391504891",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1955,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1955,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T12:53:46.386Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-b0c1b1685f10268dc4e4",
+          "file": "battle-persistence.spec.ts",
+          "title": "startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6861,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6861,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:56:58.300Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-cc2ea1e99b15e7ff2a94",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal player presentation matches an uninterrupted browser",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9863,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9863,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:05.270Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-4c726e833e283dce0a15",
+          "file": "battle-persistence.spec.ts",
+          "title": "reload during legal enemy presentation matches an uninterrupted browser",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8868,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8868,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:15.150Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-0303c8bcc1aa992b4d28",
+          "file": "battle-persistence.spec.ts",
+          "title": "backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6242,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6242,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:24.034Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-b0744dba80b7344b2f80",
+          "file": "battle-persistence.spec.ts",
+          "title": "unknown storage blocks startup until retry; writes remain nonfatal during play",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4089,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4089,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:30.296Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-927158d1e726d330456d",
+          "file": "battle-persistence.spec.ts",
+          "title": "failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4920,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4920,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:34.393Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-7c343f6df9f78ae52f1a",
+          "file": "battle-persistence.spec.ts",
+          "title": "changed saved data refuses an old confirmation and requires fresh review",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3816,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3816,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:39.323Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-795e53df15811c214e8e",
+          "file": "battle-persistence.spec.ts",
+          "title": "successful reset with failed fresh save cannot recover an old battle on reload",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4454,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4454,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:43.150Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9c5a932dbae91627ed8e",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {broken",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1909,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1909,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:47.618Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-8b2d13ded779e48fdbec",
+          "file": "battle-persistence.spec.ts",
+          "title": "invalid startup requires explicit reset: {\"kind\":\"tac",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2054,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2054,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T12:57:49.540Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-c33455a82043e9970b06",
+          "file": "run-progression.spec.ts",
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 21096,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 21096,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:53:48.923Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-a2a84084cdf747aa3386",
+          "file": "run-progression.spec.ts",
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3265,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3265,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:10.135Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-c0c7b55ee8bf2c79b32c",
+          "file": "run-progression.spec.ts",
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10068,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10068,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:13.412Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-90c48e1fba4d37ab41bd",
+          "file": "run-progression.spec.ts",
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2825,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2825,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:23.494Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-19e780bd31f15a4df717",
+          "file": "run-progression.spec.ts",
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3185,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3185,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:26.335Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-d1027787ad546b5dc0a8",
+          "file": "run-progression.spec.ts",
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 20149,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 20149,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:29.533Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-e945013d243e69532fcc",
+          "file": "run-progression.spec.ts",
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3723,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3723,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:49.693Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-c760829ec3e03b026d56",
+          "file": "run-progression.spec.ts",
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19572,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19572,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:54:53.426Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-86d2d4e47ffdbf8996fa",
+          "file": "run-progression.spec.ts",
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2652,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2652,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:55:13.010Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-5a332911b1d18b111fda",
+          "file": "run-progression.spec.ts",
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2704,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2704,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T12:55:15.673Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-723c0a56826b227a7ca8",
+          "file": "run-progression.spec.ts",
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 21258,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 21258,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:57:52.190Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ebc2efd4b87e85786e5c",
+          "file": "run-progression.spec.ts",
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3366,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3366,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:13.560Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-3351c126c3d4da839e6b",
+          "file": "run-progression.spec.ts",
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10409,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10409,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:16.940Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-d76ae05a105eae65a8a1",
+          "file": "run-progression.spec.ts",
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2802,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2802,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:27.362Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-4e03e06c6d11a4f7a26a",
+          "file": "run-progression.spec.ts",
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3136,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3136,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:30.175Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-39c5fffb6cfa3b225dc9",
+          "file": "run-progression.spec.ts",
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 20292,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 20292,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:33.320Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-63c0360e27ab2d723fac",
+          "file": "run-progression.spec.ts",
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3751,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3751,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:53.625Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-a4a59a5a8f65a5a8fb05",
+          "file": "run-progression.spec.ts",
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19412,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19412,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:58:57.385Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-6db30e6cccc30620dc72",
+          "file": "run-progression.spec.ts",
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2644,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2644,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:59:16.806Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-9da9d9a49d775db06714",
+          "file": "run-progression.spec.ts",
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2712,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2712,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-10-23T12:59:19.461Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers, with four WebKit run-recovery executions replaced by issue-204 evidence",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.device-acceptance.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/webkit-acceptance/webkit-acceptance-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
+    },
+    {
+      "stage": "webkit-exploration",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 57,
+        "expected": 57,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "c3b0f9df64366ba0ccb6-8a42db886a0a6f972163",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4983,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4983,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T12:59:55.228Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-b25a3c40623686767f51",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2572,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2572,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:00.325Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-1b152ed7750103414601",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6514,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6514,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:02.909Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-4e36e405bf1ee4434c22",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "v1 Continue preserves raw bytes until a format-3 spatial save",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1245,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1245,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:09.435Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-2f585dbc067ae6fc7f99",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10812,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10812,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:10.695Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-88c050ba73dad6db3ccf",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1182,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1182,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:21.518Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-9072ef8682627634d9e4",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "records route transfer and map responsiveness against established budgets",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3388,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3388,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:22.709Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-9f963b1418c0aed9c855",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 16177,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 16177,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:26.109Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-c102b97a5fecca9413e2",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 15271,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 15271,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:42.296Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-b3dc15396a42c51da6c3",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 197213,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 197213,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:00:57.577Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-43e5f89eca05027d31c0",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8194,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8194,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:14.800Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-dde4d4ce1f57950affdc",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4200,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4200,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:12.478Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-94cf8020fe7792d0e218",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2179,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2179,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:16.797Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-fc74882dec830df71acc",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6838,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6838,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:18.986Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-9cc048cca1ba0b1953f1",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "v1 Continue preserves raw bytes until a format-3 spatial save",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1215,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1215,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:25.835Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-f53dd6b0ccfd658b681d",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10566,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10566,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:27.061Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-40a05054aedeaecad72f",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 985,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 985,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:37.640Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-7cfa3eada21fa9cee0e1",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "records route transfer and map responsiveness against established budgets",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3103,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3103,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:38.638Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-218df0b758834feafce5",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19195,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19195,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:05:41.752Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-3d9e40004d16768001f1",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 17777,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 17777,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:06:00.955Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-8479e29e5f8729cfd869",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 193791,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 193791,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:06:18.743Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-2d29df47977f3c2433d3",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8280,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8280,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:32.548Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-087a6327748674ce514e",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4797,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4797,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:28.076Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-beb080990c12ead06e3e",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2246,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2246,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:32.990Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-3185bc26a2ed5fdc7771",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6776,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6776,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:35.247Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-24516ec922cf91119c6e",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "v1 Continue preserves raw bytes until a format-3 spatial save",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1235,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1235,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:42.034Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-e6c15b231f3b60421653",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 10835,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 10835,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:43.282Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-4ed54d40d027e640734b",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1033,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1033,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:54.130Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-8f79198eeaf16a205881",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "records route transfer and map responsiveness against established budgets",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3188,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3188,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:55.174Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-ffe3cba426e800889844",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19565,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19565,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:10:58.373Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-e287c8d3d9ed8c5b02b2",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19034,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19034,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:11:17.948Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-f84ffffc64a80f8675ef",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 193741,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 193741,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:11:36.994Z"
+            }
+          ]
+        },
+        {
+          "id": "c3b0f9df64366ba0ccb6-d9356717df3b73fbd5c9",
+          "file": "dungeon-exploration.spec.ts",
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7414,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7414,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:14:50.745Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-1b423d12d787c46ec923",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3094,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3094,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:23.014Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-0f85422b99ba5f6aa530",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2990,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2990,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:26.119Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-dd2395fbc2ec08859ac6",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1228,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1228,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:29.119Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-b0402643173154b738b1",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2601,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2601,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:30.357Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-ae826d8ee87c238ed5a3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3158,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3158,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:40.849Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-4939693a3b634a4ea87c",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2644,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2644,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:44.017Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-efc68ba6300d4d3d843d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1125,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1125,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:46.670Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-2a962233fcb4d7cbb9c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2608,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2608,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:47.805Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-909bb2080f9ee77199c8",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3160,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3160,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:14:58.177Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-9568daca899b9f8cf86d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2811,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2811,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:01.348Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-150388b08c202f4419c5",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1177,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1177,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:04.170Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-f57dd11f651b1ff3e148",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2659,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2659,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:05.356Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-0cb5322cba211c298b03",
+          "file": "dungeon.spec.ts",
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6318,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6318,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:32.977Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-f1a134ad0ad2b47709e1",
+          "file": "dungeon.spec.ts",
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19785,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19785,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:39.305Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-9638d305518ab068e7e2",
+          "file": "dungeon.spec.ts",
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6328,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6328,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:04:59.099Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-cabba556d5014e70b17d",
+          "file": "dungeon.spec.ts",
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6404,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6404,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:05:05.437Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-c056b36fb79532b0e230",
+          "file": "dungeon.spec.ts",
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5972,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5972,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:50.429Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-f95bfd7ffc61e09a8430",
+          "file": "dungeon.spec.ts",
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19088,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19088,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:09:56.410Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-08550af8352d098c959f",
+          "file": "dungeon.spec.ts",
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6073,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6073,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:10:15.506Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-3f4594e6229b667b5ce9",
+          "file": "dungeon.spec.ts",
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5848,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5848,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:10:21.588Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-4455fe30842c975d1fa3",
+          "file": "dungeon.spec.ts",
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6381,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6381,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:08.030Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-8c7bc753e4ad2be03076",
+          "file": "dungeon.spec.ts",
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 19246,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 19246,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:14.423Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-be3369d1eecb4085d340",
+          "file": "dungeon.spec.ts",
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6378,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6378,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:33.681Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-7cfb5c081302dea3b116",
+          "file": "dungeon.spec.ts",
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5942,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5942,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:15:40.069Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.exploration.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/webkit-exploration/webkit-exploration-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
+    },
+    {
+      "stage": "health-bars",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 25,
+        "expected": 25,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "a24de51517fc506ec481-16fc771b7cf9c6193f13",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health bars are visible, attached and informational through mobile navigation",
+          "project": "health-desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9014,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9014,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:16:51.602Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-e6acc2b5b4e391c5f147",
+          "file": "unit-health-bars.spec.ts",
+          "title": "elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7902,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7902,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:17:00.732Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d124ad68160a182997d2",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows damage presentation, cancellation and save resume",
+          "project": "health-desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3819,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3819,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:17:08.652Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-a3c4b29f3f29def6d23d",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows defeat presentation, cancellation and save resume",
+          "project": "health-desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4191,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4191,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:17:12.482Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d26f3e7db213f4baddc8",
+          "file": "unit-health-bars.spec.ts",
+          "title": "real run reward healing carries into the next encounter without old bars",
+          "project": "health-desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 63066,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 63066,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:17:16.685Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-bdb99b6f0cbcf08aba6f",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health bars are visible, attached and informational through mobile navigation",
+          "project": "health-android-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5313,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5313,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:18:20.377Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-fb0979779774b1920769",
+          "file": "unit-health-bars.spec.ts",
+          "title": "elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-android-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5753,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5753,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:18:25.801Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-85c7a4b4af33621170a6",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows damage presentation, cancellation and save resume",
+          "project": "health-android-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2476,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2476,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:18:31.565Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-05ab8d996d7c85e267c9",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows defeat presentation, cancellation and save resume",
+          "project": "health-android-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2725,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2725,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:18:34.050Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-cdbb214d177f1c36fd3d",
+          "file": "unit-health-bars.spec.ts",
+          "title": "real run reward healing carries into the next encounter without old bars",
+          "project": "health-android-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 41531,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 41531,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:18:36.785Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-51536d0ca56142583ed9",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health bars are visible, attached and informational through mobile navigation",
+          "project": "health-android-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6017,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6017,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:19:18.885Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-c7178a85f6f10a6b7fc6",
+          "file": "unit-health-bars.spec.ts",
+          "title": "elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-android-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5657,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5657,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:19:25.015Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-aa4b4b92b5f7bb907da4",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows damage presentation, cancellation and save resume",
+          "project": "health-android-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2728,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2728,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:19:30.693Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-236dafe5233254754969",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows defeat presentation, cancellation and save resume",
+          "project": "health-android-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2754,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2754,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:19:33.440Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-6982833b894097a5e624",
+          "file": "unit-health-bars.spec.ts",
+          "title": "real run reward healing carries into the next encounter without old bars",
+          "project": "health-android-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 44786,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 44786,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:19:36.205Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-648209e1b21ea4727a54",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health bars are visible, attached and informational through mobile navigation",
+          "project": "health-iphone-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4200,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4200,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T13:20:21.667Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-05e3f4283bd7d7f1436b",
+          "file": "unit-health-bars.spec.ts",
+          "title": "elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-iphone-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6668,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6668,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T13:20:25.984Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-822bdd7a30a97c163173",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows damage presentation, cancellation and save resume",
+          "project": "health-iphone-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2908,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2908,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T13:20:32.665Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-36de82edd0a14df4f33f",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows defeat presentation, cancellation and save resume",
+          "project": "health-iphone-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3227,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3227,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T13:20:35.581Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d06ca95ec07ca440e967",
+          "file": "unit-health-bars.spec.ts",
+          "title": "real run reward healing carries into the next encounter without old bars",
+          "project": "health-iphone-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 37265,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 37265,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-10-23T13:20:38.818Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-fe5afa799dc07c822a86",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health bars are visible, attached and informational through mobile navigation",
+          "project": "health-iphone-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4240,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4240,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T13:21:16.682Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-606fd98eb325f81b56e0",
+          "file": "unit-health-bars.spec.ts",
+          "title": "elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-iphone-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5848,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5848,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T13:21:21.039Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-9b12dc7249611738af21",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows damage presentation, cancellation and save resume",
+          "project": "health-iphone-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2979,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2979,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T13:21:26.901Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-33f9d6a50eb0164d4339",
+          "file": "unit-health-bars.spec.ts",
+          "title": "health follows defeat presentation, cancellation and save resume",
+          "project": "health-iphone-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3225,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3225,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T13:21:29.892Z"
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-813348a30508ed9f2524",
+          "file": "unit-health-bars.spec.ts",
+          "title": "real run reward healing carries into the next encounter without old bars",
+          "project": "health-iphone-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 39348,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 39348,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-10-23T13:21:33.126Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.health-bars.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/health-bars/health-bars-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1"
+    },
+    {
+      "stage": "telemetry-production",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-c59e21b54097e333c0a0",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 158085,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 158085,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:23:14.521Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-15727ef568752b6fe964",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4343,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4343,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:25:52.788Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-753cec21c5199de80cb1",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1535,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1535,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:25:57.144Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-017f85568b0a5fdc1edc",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1534,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1534,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:25:58.706Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-67ad20915398e93ea3fe",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1576,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1576,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:00.258Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-f195aee5acd854e234b0",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1813,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1813,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:01.854Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-fa5fcbc4392db2d843d9",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3178,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3178,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:03.684Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-67b280e2ae6033c24303",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 497,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 497,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:06.880Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-7dc52ccf3cd16159ee42",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6195,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6195,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:07.390Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-27db45eb1bf69320697d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 606,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 606,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:13.601Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-fa45b1d238d9335d5e8b",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2505,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2505,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:14.232Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-b18dc41f81403d902434",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1560,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1560,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:26:16.748Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9553f6586681a031e281",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 100768,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 100768,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:26:20.342Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-ab9c51b757ebd2bd6a3d",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3085,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3085,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:01.293Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-762c4f224d234c2e28cc",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1232,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1232,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:04.393Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-acb158dd484b913eabf8",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1236,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1236,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:05.636Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-21b222ef5980dcdd82ab",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1202,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1202,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:06.887Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9a299e698d9ab57adf6b",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1256,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1256,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:08.102Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-918d9d9e928d3ec80950",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2429,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2429,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:09.370Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-4933525b6d09dc428da8",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 461,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 461,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:11.811Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-1b9ccc227bdd17810fcb",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4221,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4221,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:12.283Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-16f7163a0f308839d204",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 633,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 633,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:16.518Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-8c363a75b6eb089f4426",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2499,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2499,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:17.162Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-a68409b4202847a7d40f",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1834,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1834,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:28:19.672Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-1c48697e247731cc50af",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 109086,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 109086,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:28:23.103Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-f24ec1ef2d6c5a5a41d6",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3009,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3009,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:12.384Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-c2cd8e865e73a5d54372",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1174,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1174,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:15.407Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-938a787e359128508577",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1198,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1198,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:16.592Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-58a20705f23d62105675",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1169,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1169,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:17.801Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-21ddbe902e2450e864db",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1334,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1334,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:18.979Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-6d1568d9977abc60d725",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2382,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2382,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:20.324Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9655b50bc0c5d0c2c310",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 449,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 449,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:22.717Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-a6a65be3ad070d816f0d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4350,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4350,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:23.177Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-43f3d11826193e27d78d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 600,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 600,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:27.540Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-28851b612ff89ccdef56",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2443,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2443,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:28.149Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-3b63d4bba6329ba9b80e",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1747,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1747,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:30:30.604Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/telemetry-production/telemetry-production-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
+      "configuredBuild": "Dedicated playwright.telemetry.config.ts build/dev environment. ordinaryArtifactHash is only the batch downloaded ordinary bundle and is NOT the configured telemetry build identity or proof; the separate configured raw report is retained."
+    },
+    {
+      "stage": "telemetry-development",
+      "source": "fb7b7db34ba6bc278ca6ba7cf97dede506cf99f6",
+      "inputHash": "c825f966d4ff859a702f6365f772034eab2db866532674a3db239d91d18e08d1",
+      "environment": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "arch": "x64",
+        "release": "6.8.0-147-generic",
+        "cpuModel": "AMD Ryzen 7 2700X Eight-Core Processor",
+        "cpus": 6,
+        "memoryBytes": 8174170112,
+        "runner": "unraid-tactics-01",
+        "versions": {
+          "@playwright/test": "1.63.0",
+          "vite": "8.3.5",
+          "vitest": "5.0.3",
+          "typescript": "7.0.2"
+        }
+      },
+      "browsers": {
+        "chromium": {
+          "channel": "chromium",
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+          "version": "153.0.8010.12"
+        },
+        "webkit": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+          "version": "26.6"
+        },
+        "chromium-headless": {
+          "channel": null,
+          "executableOverride": null,
+          "executablePath": null,
+          "version": "153.0.8010.12"
+        }
+      },
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "cases": [
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-c59e21b54097e333c0a0",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 143985,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 143985,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:31:07.045Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-15727ef568752b6fe964",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4967,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4967,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:31.212Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-753cec21c5199de80cb1",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1801,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1801,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:36.191Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-017f85568b0a5fdc1edc",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1869,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1869,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:38.006Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-67ad20915398e93ea3fe",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1810,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1810,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:39.889Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-f195aee5acd854e234b0",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1999,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1999,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:41.717Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-fa5fcbc4392db2d843d9",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3420,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3420,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:43.729Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-67b280e2ae6033c24303",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1073,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1073,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:47.168Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-7dc52ccf3cd16159ee42",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7109,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7109,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:48.252Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-27db45eb1bf69320697d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1275,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1275,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:55.376Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-fa45b1d238d9335d5e8b",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3720,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3720,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:33:56.677Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-b18dc41f81403d902434",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2236,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2236,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-10-23T13:34:00.407Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9553f6586681a031e281",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 101845,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 101845,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:34:03.446Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-ab9c51b757ebd2bd6a3d",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3844,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3844,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:45.474Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-762c4f224d234c2e28cc",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1532,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1532,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:49.336Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-acb158dd484b913eabf8",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1551,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1551,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:50.878Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-21b222ef5980dcdd82ab",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1541,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1541,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:52.443Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9a299e698d9ab57adf6b",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1595,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1595,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:53.995Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-918d9d9e928d3ec80950",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2701,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2701,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:55.600Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-4933525b6d09dc428da8",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1083,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1083,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:58.316Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-1b9ccc227bdd17810fcb",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5406,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5406,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:35:59.415Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-16f7163a0f308839d204",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1277,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1277,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:36:04.842Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-8c363a75b6eb089f4426",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3495,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3495,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:36:06.133Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-a68409b4202847a7d40f",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2262,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2262,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-10-23T13:36:09.644Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-1c48697e247731cc50af",
+          "file": "telemetry.spec.ts",
+          "title": "mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 108373,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 108373,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:36:12.884Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-f24ec1ef2d6c5a5a41d6",
+          "file": "telemetry.spec.ts",
+          "title": "blocked ingestion leaves battle continue and save working",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3994,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3994,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:01.436Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-c2cd8e865e73a5d54372",
+          "file": "telemetry.spec.ts",
+          "title": "opt-out prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1538,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1538,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:05.442Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-938a787e359128508577",
+          "file": "telemetry.spec.ts",
+          "title": "DNT prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1566,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1566,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:06.992Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-58a20705f23d62105675",
+          "file": "telemetry.spec.ts",
+          "title": "GPC prevents parser loading and all collection",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1529,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1529,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:08.574Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-21ddbe902e2450e864db",
+          "file": "telemetry.spec.ts",
+          "title": "uncaught errors and rejections are sanitized and duplicate objects are reported once",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1682,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1682,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:10.119Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-6d1568d9977abc60d725",
+          "file": "telemetry.spec.ts",
+          "title": "failed parser loading preserves gameplay and saving without a reporting loop",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2734,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2734,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:11.814Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-9655b50bc0c5d0c2c310",
+          "file": "telemetry.spec.ts",
+          "title": "recovery inspections and retries report no raw data and no duplicate failure event",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1080,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1080,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:14.564Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-a6a65be3ad070d816f0d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy controls stop collection immediately, persist across routes, and allow future visits",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5497,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5497,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:15.660Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-43f3d11826193e27d78d",
+          "file": "telemetry.spec.ts",
+          "title": "privacy opt-out applies to another open tab without touching saves",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1263,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1263,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:21.180Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-28851b612ff89ccdef56",
+          "file": "telemetry.spec.ts",
+          "title": "production ingestion receives generation latency and resume metrics without layout identifiers",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3490,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3490,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:22.457Z"
+            }
+          ]
+        },
+        {
+          "id": "a7cf16ab6d0dd51a5bfe-3b63d4bba6329ba9b80e",
+          "file": "telemetry.spec.ts",
+          "title": "generated encounters still start with collection opted out",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2214,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2214,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-10-23T13:38:25.961Z"
+            }
+          ]
+        }
+      ],
+      "disposition": "reuse unchanged route/runtime/test consumers",
+      "command": [
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+        "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json,blob,./scripts/verification-playwright-reporter.mjs",
+        "--output",
+        "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/serial/jobs/telemetry-development/telemetry-development-artifacts"
+      ],
+      "ordinaryArtifactHash": "a4eca46a95bd6b211592b3448c27b5539c0c21d625a04229b5b8bf324d3369e1",
+      "configuredBuild": "Dedicated playwright.telemetry.config.ts build/dev environment. ordinaryArtifactHash is only the batch downloaded ordinary bundle and is NOT the configured telemetry build identity or proof; the separate configured raw report is retained."
+    }
+  ],
+  "scopeReason": "Only runtime delta from original capture is inside proof-only FitScene create/shutdown. These stages exercise battle/run/map/dungeon/fixture routes, not scene=proof. All other src, public assets, dependencies, stage scripts and their spec/helper bodies are byte-identical; config filters preserve every selected ID and effective use option. package.json changes only include the new Node selection contracts. Four run-progression recovery executions reuse the complete #204 post-refactor reports on unchanged runtime and assertion inputs. New base failure metadata is outside these stage selectors.",
+  "performanceDisposition": {
+    "recoveryRun": 39991089115,
+    "source": "5a161daa59c71e7929df20c574ee9cf3b723d98a",
+    "passedSamples": 18,
+    "scope": "Retained historical clean performance recovery, not a fresh #203 capture. #203 changes no runtime, assets, dependency/build options, collector or evaluator and does not affect measure:fit selection. No performance improvement or byte-identical later build is claimed."
+  },
+  "freshObligations": [
+    "all 670 default Chromium selections on self-hosted serial batches",
+    "root dev and prefix preview/dev asset modes on final implementation",
+    "CPU tooling, units/build integrations and both type scopes behind self-hosted preparation"
+  ],
+  "artifactRetention": "Original Actions reports expire 2026-11-22; aggregate source hashes and per-case outcomes are retained here in gzip. #204 replacement raw reports are already committed in docs/qa/issue-204/after-webkit.json.gz.",
+  "freshAssetModes": [
+    {
+      "mode": "assets-root-dev",
+      "startTime": "2026-10-23T19:49:44.916Z",
+      "duration": 140604.201,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    {
+      "mode": "assets-prefix-preview",
+      "startTime": "2026-10-23T19:52:11.194Z",
+      "duration": 138419.38700000002,
+      "expected": 69,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    {
+      "mode": "assets-prefix-dev",
+      "startTime": "2026-10-23T19:54:30.004Z",
+      "duration": 140265.38199999998,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  ],
+  "verifiedReuseIdentity": "All 266 special-mode selected IDs exactly match retained reports; four matching WebKit IDs are replaced by docs/qa/issue-204/after-webkit.json.gz (4 passes, zero retries).",
+  "finalContractRefinement": "5c73fb9 changes only discovery-control tooling tests and reports relative to 5bd5398. All 15 actual selections/effective project settings are deep-equal; browser specs/configs/runtime/assets/dependencies are identical. 27 final contracts pass locally. Self-hosted default reports are explicitly from 5bd5398, not a later commit.",
+  "issue204HashVerification": {
+    "matchingRelevantInputs": 170,
+    "scope": "All src/public paths plus run-progression spec, recovery/item helpers, lockfile and WebKit acceptance config match the committed #204 tested-inputs.json. Base Chromium filters changed, but WebKit replaces projects; exact effective discovery/use and four case IDs are unchanged."
+  },
+  "finalDefaultCapture": {
+    "run": 40014331247,
+    "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+    "all670SelectedIdsExecuted": true,
+    "passed": 666,
+    "skipped": 3,
+    "failed": 1,
+    "retries": 0,
+    "aggregateScope": "partial",
+    "aggregateComplete": false,
+    "aggregatePassed": false,
+    "baselineEligible": false
+  },
+  "startupDisposition": {
+    "run": 40026132069,
+    "baseCommit": "958bbd90546e1305aab10e370d5555a1d7c9a43a",
+    "candidateCommit": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+    "matchingRuntimeCaseAssetDependencyHashes": 167,
+    "baseStatus": "failed",
+    "candidateStatus": "passed",
+    "failedFullCaptureStatus": "failed",
+    "case": {
+      "id": "8352ba8e75a15b46318d-d795161be3b8712ee585",
+      "title": "default Move Continue is read-only and confirmed movement keeps the remaining-action flow",
+      "project": "mobile-landscape"
+    },
+    "sharedFailure": {
+      "helperLine": 15,
+      "caseLine": 41,
+      "expectedPhase": "player",
+      "timeoutMs": 5000
+    },
+    "retries": 0,
+    "tracing": "off",
+    "disposition": "Initial startup assertion reproduced on literal main base; candidate focused observation passed. Cause and reliability remain unresolved; full capture remains failed, not retry-qualified."
+  },
+  "finalToolingQualification": {
+    "run": 40026132069,
+    "source": "3197945cdcf79e2788d2271ac3f328ea9d3d577d",
+    "timingProcessContracts": 20,
+    "selectionBatchContracts": 27,
+    "fullRunnerContracts": 10,
+    "diagnosticsContracts": 1,
+    "realTimeoutRecoveryContracts": 2,
+    "enginePhaserSmokeCases": 2,
+    "passed": true,
+    "relevantInputHash": "6daebe28f8a855977f9da3b632b874dfadb791b2a2be51f332968e40a81e0bbe"
+  },
+  "temporaryWorkflow": "Comparison mode, job and exact branch allowance removed after evidence collection. Final workflow is byte-identical to literal main base."
+}

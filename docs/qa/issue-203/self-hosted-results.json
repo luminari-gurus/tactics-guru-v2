@@ -1,0 +1,253 @@
+{
+  "run": 40014331247,
+  "scope": "default-chromium",
+  "allSelectedIdsExecuted": true,
+  "expectedBatches": 9,
+  "expectedSelections": 670,
+  "aggregateDisposition": {
+    "scope": "partial",
+    "complete": false,
+    "passed": false,
+    "baselineEligible": false,
+    "errors": [
+      "chromium-mobile-landscape-1: failed",
+      "chromium-mobile-landscape-1: Browser failures/retries or invalid counts",
+      "chromium-mobile-landscape-1: latest Actions job failed, incomplete or lacks its matching receipt"
+    ]
+  },
+  "counts": {
+    "total": 670,
+    "expected": 666,
+    "unexpected": 1,
+    "flaky": 0,
+    "skipped": 3,
+    "retryAttempts": 0
+  },
+  "rows": [
+    {
+      "batch": "chromium-desktop-1",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 20386,
+      "jobWallMs": 735948,
+      "stages": [
+        {
+          "id": "chromium-desktop-1",
+          "status": "passed",
+          "wallMs": 710978.154346,
+          "counts": {
+            "total": 79,
+            "expected": 78,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 1,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-desktop-2",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 17174,
+      "jobWallMs": 730403,
+      "stages": [
+        {
+          "id": "chromium-desktop-2",
+          "status": "passed",
+          "wallMs": 708651.095414,
+          "counts": {
+            "total": 68,
+            "expected": 68,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-desktop-3",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 16583,
+      "jobWallMs": 698216,
+      "stages": [
+        {
+          "id": "chromium-desktop-3",
+          "status": "passed",
+          "wallMs": 676869.206872,
+          "counts": {
+            "total": 84,
+            "expected": 84,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-portrait-1",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 17355,
+      "jobWallMs": 523934,
+      "stages": [
+        {
+          "id": "chromium-mobile-portrait-1",
+          "status": "passed",
+          "wallMs": 502420.668735,
+          "counts": {
+            "total": 75,
+            "expected": 75,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-portrait-2",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 17511,
+      "jobWallMs": 514743,
+      "stages": [
+        {
+          "id": "chromium-mobile-portrait-2",
+          "status": "passed",
+          "wallMs": 492482.69071,
+          "counts": {
+            "total": 95,
+            "expected": 94,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 1,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-portrait-3",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 17295,
+      "jobWallMs": 489469,
+      "stages": [
+        {
+          "id": "chromium-mobile-portrait-3",
+          "status": "passed",
+          "wallMs": 467370.32182400004,
+          "counts": {
+            "total": 52,
+            "expected": 52,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-1",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": false,
+      "setupMs": 29969,
+      "jobWallMs": 562949,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-1",
+          "status": "failed",
+          "wallMs": 528335.8268180001,
+          "counts": {
+            "total": 71,
+            "expected": 70,
+            "unexpected": 1,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-2",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 21882,
+      "jobWallMs": 554253,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-2",
+          "status": "passed",
+          "wallMs": 528420.8858,
+          "counts": {
+            "total": 90,
+            "expected": 89,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 1,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-3",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 24181,
+      "jobWallMs": 527630,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-3",
+          "status": "passed",
+          "wallMs": 499665.523168,
+          "counts": {
+            "total": 56,
+            "expected": 56,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    }
+  ]
+}
