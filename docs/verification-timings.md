@@ -31,8 +31,8 @@ Empty `batches` selects the complete canonical plan; a comma-separated list sele
 only those jobs, after shared preparation, and remains partial. The workflow uses a unique run/attempt output
 path, a bounded foreground capture, failure-preserving artifact upload for 30 days,
 and an explicit conditions field. Never merge receipts from different hosts into
-one comparable performance baseline. Persistent npm/browser caches and pre-capture
-build/smoke/preflight warmup are recorded; coordinate unrelated host workloads.
+one comparable performance baseline. Persistent npm/browser caches and per-job
+setup/preflight conditions are recorded; coordinate unrelated host workloads.
 Setup/qualification duration is recorded separately from capture. Queue time is
 null in local reports; obtain it from the linked Actions run/job timestamps.
 
