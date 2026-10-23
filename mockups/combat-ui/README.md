@@ -89,28 +89,62 @@ duplicate selection copy.
 Desktop: wheel on the acting unit; chips on the board. Mobile: same, board
 keeps most of the 390×844 viewport; End turn is a full-width 44px control.
 
-### B — Persistent action bar + smart defaults (recommended)
+### B — Persistent action bar + smart defaults (owner-chosen)
 
-A bottom (mobile) / board-bottom (desktop) bar always shows Move, Attack,
-named signature, Wait, and one gold **Go**. Smart default: **Move** if no enemy
+A bottom (mobile) / board-bottom (desktop) bar always shows Move, Attack, the
+**shown special**, Wait, and one gold **Go**. Smart default: **Move** if no enemy
 is in the current verb’s range; **Attack** when an enemy is in melee (or the
-selected verb’s range) after a move. Hover/press on a target fills an on-board
-forecast. Go commits the previewed command. Go never changes location.
+selected verb’s range) after a move. Movement preview is Option A’s on-tile
+**Move here** chip, not a dropdown. Hover/press on a target fills an on-board
+forecast. Go commits. Go never changes location.
 
-**Removes / merges:** rail/dock, both dropdowns, Review, Confirm modal, heading,
-caption, inspect as a primary control (⋯ overflow), duplicate preview copy.
-Actor header becomes a compact overlapping chip.
+#### Special slot (no Ability dropdown)
+
+`ownedAbilities()` lists every catalog ability the active unit owns except
+`ability:basic_attack`, sorted by ID (`src/ui/battleActions.ts`). Production
+content gives each hero **exactly one** special:
+
+| Unit | Non-basic abilities |
+| --- | --- |
+| Fighter | Guarded Strike |
+| Ranger | High Shot |
+| Mage | Magic Missile |
+| Goblin grunt | none |
+| Goblin archer | Shortbow Shot (its ordinary attack, not a hero signature) |
+
+The validator already allows extra well-formed IDs (#162). Test fixtures clone
+each hero’s signature as `ability:zz_{hero}` (range 1–5). There is **no
+cooldown, charge, or level-gate field**. Availability is:
+
+- **Owned** — catalog `owners`
+- **Shared action budget** — `hasActed` greys every special (`alreadyActed`)
+- **Phase** — enemy / presenting / ended locks the bar
+- **Per-target preview** — `outOfRange`, `blockedLos`, `sameSide`, …
+
+The slot shows the **last-used** special, or the first owned special on a new
+actor. Main tap selects that special (same as Attack). **If the unit owns only
+one special, there is no chevron, long-press, or picker.** If it owns two or
+more, a 44px **▾** (or long-press on the slot) opens a compact picker above the
+slot. Rows are ≥44px. Unavailable rows stay visible and greyed with the
+authoritative reason (today: Action spent, Enemy turn, No target in range, …
+never invented cooldown numbers). Choosing a row selects it and closes the
+picker. Keyboard: **`S`** cycles owned specials (wraps; Shift+S previous). That
+cycle does not need the picker.
 
 | Action | Today | B |
 | --- | ---: | ---: |
-| Move | 3 | **1–2** (tile; Go if you want a second deliberate tap) |
+| Move | 3 | **1–2** (tile + path chip; Go) |
 | Basic attack | 4 | **1–2** (0 verb taps when Attack is the smart default) |
-| Signature | 4 | **2** (verb, target+Go) |
+| Shown / last-used special | 4 | **2** (tap slot, target+Go) |
+| A different special | 5* | **3** (▾, pick, target+Go) — **+1** vs the shown special |
 | Wait | 1 | **1** |
 
-The 2-tap reading (select target, tap Go) still satisfies “preview then
-explicit confirmation.” A 1-tap variant (release on the target commits) is
-possible later for mouse-out cancel; do not skip preview.
+\*Today: open Ability `<select>`, pick, tap Signature, target, Review, Confirm.
+
+**Removes / merges:** rail/dock, Ability dropdown, target dropdown, Review,
+Confirm modal, heading, caption, inspect as a primary control, duplicate
+preview copy. The chevron is not a second selector when there is nothing to
+select.
 
 ### C — Radial / hold gestures
 
@@ -135,19 +169,15 @@ parity unless a non-gesture path remains.
 
 ## Recommendation
 
-**Implement Option B**, and steal A’s on-tile path chip for movement preview.
+**Owner picked Option B**, with A’s on-tile path chip and the split special slot
+above. Implement that. Do not restore the Ability `<select>`.
 
-- Fewest taps that stay discoverable and meet the existing preview/confirm
-  contract, 44px targets, and keyboard parity (arrows select, Enter = Go).
-- One confirm control, always in the same place — important on a 390px phone
-  where Review today lives below a scroll fold.
-- Smart defaults remove the extra verb tap in the two most common cases
-  (walk somewhere; hit the adjacent goblin).
-- Does not teach a new hold gesture on a camera that already pans on drag.
-
-Do not make C the only path. Hold-to-inspect can land later as an accelerator.
-Keep Wait at one tap. Keep items out of the combat bar until a real in-combat
-item command exists.
+- Default special stays 2 steps; another owned special is one extra tap on ▾
+  then the row (the pick also selects, so it replaces the slot tap).
+- Production heroes hide ▾. Multi-ability catalogs (#162 fixtures, later
+  class skills) get the picker without a new dropdown.
+- `S` cycles specials for keyboard (Shift+S previous). Enter still confirms via Go.
+- Greyed picker rows use real rejection copy, not placeholder cooldowns.
 
 Spec note: `openspec/specs/battle-controls/spec.md` currently requires Review
 then Confirm. Adopting B is a **spec change** from two confirms to one, not a
@@ -160,7 +190,7 @@ CSS restyle of the rail.
 | `index.html` | Comparison, links |
 | `current.html` | Shipped HUD recreation |
 | `option-a.html` | Board + wheel |
-| `option-b.html` | Action bar + Go |
+| `option-b.html` | Action bar + Go. `?state=move` (default), `picker`, `single` |
 | `option-c.html` | Radial hold |
 | `styles.css` | Shared tokens (game colors) |
 | `export.js` | `?export=1` hides reviewer chrome |
@@ -176,7 +206,8 @@ Captured with headless Chrome at device scale 1:
 
 - `previews/current-desktop.png` / `previews/current-mobile.png`
 - `previews/option-a-desktop.png` / `previews/option-a-mobile.png`
-- `previews/option-b-desktop.png` / `previews/option-b-mobile.png`
+- `previews/option-b-desktop.png` / `previews/option-b-mobile.png` (move chip + ▾)
+- `previews/option-b-picker-desktop.png` / `previews/option-b-picker-mobile.png`
 - `previews/option-c-desktop.png` / `previews/option-c-mobile.png`
 
 Live app (Vite, this checkout, Mage first in initiative):

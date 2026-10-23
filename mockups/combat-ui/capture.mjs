@@ -22,11 +22,17 @@ async function shot(url, width, height, file, ready) {
   console.log('wrote', file);
 }
 
-const file = (name) => `file://${join(dir, name)}?export=1`;
+const file = (name) => {
+  const [path, query] = name.split('?');
+  const q = new URLSearchParams(query || '');
+  q.set('export', '1');
+  return `file://${join(dir, path)}?${q}`;
+};
 for (const [page, desk, mob] of [
   ['current.html', 'current-desktop.png', 'current-mobile.png'],
   ['option-a.html', 'option-a-desktop.png', 'option-a-mobile.png'],
-  ['option-b.html', 'option-b-desktop.png', 'option-b-mobile.png'],
+  ['option-b.html?state=move', 'option-b-desktop.png', 'option-b-mobile.png'],
+  ['option-b.html?state=picker', 'option-b-picker-desktop.png', 'option-b-picker-mobile.png'],
   ['option-c.html', 'option-c-desktop.png', 'option-c-mobile.png'],
 ]) {
   await shot(file(page), 1440, 900, desk);

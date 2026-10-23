@@ -10,10 +10,15 @@
   <header class="reviewer">
     <div>
       <h1>Option B · Persistent bar + smart defaults</h1>
-      <small>Recommended. One gold Go control. Move or Attack preselected from context.</small>
+      <small>Chosen design. Path chip for move. Special slot splits only when the unit owns 2+ non-basic abilities.</small>
     </div>
+    <nav>
+      <a href="option-b.html?state=move">Move chip</a>
+      · <a href="option-b.html?state=picker">Picker open</a>
+      · <a href="option-b.html?state=single">One special</a>
+    </nav>
     <a href="index.html">All options</a>
-    <a href="option-b.html?export=1">Export view</a>
+    <a id="export-link" href="option-b.html?state=move&amp;export=1">Export view</a>
   </header>
   <main class="stage b-stage">
     <section class="board-photo b-board" aria-label="Battlefield">
@@ -28,26 +33,88 @@
           <p class="meta">AC 14 · Accuracy +4 · Move ready · Action ready</p>
         </div>
       </div>
-      <div class="target-ring" aria-hidden="true"></div>
-      <aside class="forecast">
-        <strong>Basic attack → Goblin grunt</strong>
-        <span>Hit 65% · +4 vs AC 12 · 5 dmg (10 crit) · uses action</span>
-      </aside>
+      <div class="move-preview">
+        <span class="path-dot" style="left:42%;top:54%"></span>
+        <span class="path-dot" style="left:46%;top:58%"></span>
+        <button class="gold move-chip">Move here · 2 cost</button>
+      </div>
+      <div class="attack-preview">
+        <div class="target-ring" aria-hidden="true"></div>
+        <aside class="forecast">
+          <strong>Guarded Strike → Goblin grunt</strong>
+          <span>Hit 55% · +2 vs AC 12 · 5 dmg (10 crit) · −2 / +2 AC</span>
+        </aside>
+      </div>
     </section>
     <footer class="bar" aria-label="Combat actions">
       <div>
-        <p class="smart">Smart default: Attack — enemy in melee</p>
-        <p class="meta">Tap the enemy, then Go. Same Go location every time.</p>
+        <p class="smart" id="smart-line">Smart default: Move</p>
+        <p class="meta" id="help-line">Tap a teal tile, then Go. Path chip is the preview.</p>
+        <p class="hotkey" id="hotkey-line">S cycles specials</p>
       </div>
       <div class="verbs">
-        <button><strong>Move</strong><span>Reachable tiles</span></button>
-        <button aria-pressed="true"><strong>Attack</strong><span>Selected</span></button>
-        <button><strong>Guarded Strike</strong><span>−2 / +2 AC</span></button>
-        <button><strong>Wait</strong><span>Ends turn</span></button>
+        <button type="button" id="verb-move"><strong>Move</strong><span>Reachable tiles</span></button>
+        <button type="button" id="verb-attack"><strong>Attack</strong><span>Melee</span></button>
+        <div class="special" id="special">
+          <button type="button" class="special-main" id="special-main">
+            <strong id="special-name">Guarded Strike</strong>
+            <span id="special-hint">−2 / +2 AC</span>
+          </button>
+          <button type="button" class="special-more" id="special-more" aria-expanded="false" aria-controls="special-picker" aria-label="Choose another special">▾</button>
+        </div>
+        <button type="button" id="verb-wait"><strong>Wait</strong><span>Ends turn</span></button>
       </div>
       <button class="gold go">Go</button>
+      <div class="special-picker" id="special-picker" hidden role="listbox" aria-label="Specials">
+        <p>S cycles specials · greyed rows keep a readable reason</p>
+        <button type="button" role="option" aria-selected="true">
+          <strong>Guarded Strike</strong>
+          <span>Ready · range 1 · −2 attack / +2 AC</span>
+        </button>
+        <button type="button" role="option" aria-selected="false">
+          <strong>Extended Strike</strong>
+          <span>Ready · range 1–5 · fixture extra</span>
+        </button>
+        <button type="button" role="option" disabled>
+          <strong>Far Shot</strong>
+          <span class="picker-reason">No target in range</span>
+        </button>
+      </div>
     </footer>
   </main>
   <script src="export.js"></script>
+  <script>
+    const state = new URLSearchParams(location.search).get('state') || 'move';
+    const exportLink = document.getElementById('export-link');
+    exportLink.href = 'option-b.html?state=' + encodeURIComponent(state) + '&export=1';
+    const special = document.getElementById('special');
+    const more = document.getElementById('special-more');
+    const picker = document.getElementById('special-picker');
+    const moveBtn = document.getElementById('verb-move');
+    const attackBtn = document.getElementById('verb-attack');
+    const specialMain = document.getElementById('special-main');
+    document.querySelector('.move-preview').hidden = state === 'picker' || state === 'single';
+    document.querySelector('.attack-preview').hidden = state !== 'picker';
+    if (state === 'single') {
+      special.classList.add('single');
+      more.hidden = true;
+      picker.hidden = true;
+      moveBtn.setAttribute('aria-pressed', 'true');
+      document.getElementById('smart-line').textContent = 'Production Fighter: one special';
+      document.getElementById('help-line').textContent = 'No chevron. Guarded Strike is the only owned non-basic ability.';
+      document.getElementById('hotkey-line').hidden = true;
+    } else if (state === 'picker') {
+      more.hidden = false;
+      picker.hidden = false;
+      more.setAttribute('aria-expanded', 'true');
+      specialMain.setAttribute('aria-pressed', 'true');
+      document.getElementById('smart-line').textContent = 'Special selected · picker open';
+      document.getElementById('help-line').textContent = 'Tap the shown special (2 steps) or ▾ then another special (+1).';
+    } else {
+      more.hidden = false;
+      picker.hidden = true;
+      moveBtn.setAttribute('aria-pressed', 'true');
+    }
+  </script>
 </body>
 </html>

@@ -207,20 +207,51 @@ ul.pain li { margin: 6px 0; }
 .bar {
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: stretch;
   background: var(--panel); border: 1px solid var(--edge); border-radius: 8px; padding: 8px;
+  position: relative;
 }
-.verbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-.verbs button { display: flex; flex-direction: column; align-items: flex-start; min-height: 56px; padding: 8px 10px; }
-.verbs strong { font-size: .9rem; }
-.verbs span { font-size: .68rem; color: var(--muted); margin-top: 4px; }
+.verbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+.verbs > button, .special-main {
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+  min-height: 56px; padding: 8px 10px;
+}
+.verbs strong, .special-main strong { font-size: .9rem; }
+.verbs span, .special-main span { font-size: .68rem; color: var(--muted); margin-top: 4px; }
 .go { min-width: 132px; font-size: 1rem; }
 .smart { font-size: .72rem; color: var(--gold); padding: 0 4px 2px; }
+.hotkey { font-size: .68rem; color: var(--muted); padding: 0 4px; }
+
+.special { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 4px; position: relative; min-width: 0; }
+.special.single { grid-template-columns: minmax(0, 1fr); }
+.special-more {
+  min-width: 44px; min-height: 44px; height: 100%; padding: 0; font-size: 1.1rem; line-height: 1;
+}
+.special-more[aria-expanded="true"] { border-color: var(--gold); background: var(--pressed); }
+.special-picker {
+  position: absolute; right: 8px; bottom: calc(100% + 6px); width: 320px; max-width: min(320px, 92vw);
+  background: #101827f7; border: 1px solid var(--gold); border-radius: 8px; padding: 6px;
+  z-index: 6; box-shadow: 0 12px 40px #000a;
+}
+.special-picker p { font-size: .68rem; color: var(--muted); padding: 4px 8px 8px; }
+.special-picker button {
+  width: 100%; min-height: 44px; display: flex; flex-direction: column; align-items: flex-start;
+  text-align: left; padding: 8px 10px; margin: 0 0 4px;
+}
+.special-picker button:last-of-type { margin-bottom: 0; }
+.special-picker button[aria-selected="true"] { border-color: var(--gold); background: var(--pressed); }
+.special-picker button:disabled { color: var(--muted); opacity: 0.72; background: var(--panel); }
+.special-picker button:disabled strong { color: var(--warning); }
+.picker-reason { color: var(--warning) !important; }
 
 @media (max-width: 759px) {
   .b-stage { padding: 8px; }
   .bar { grid-template-columns: 1fr; }
   .go { width: 100%; min-height: 48px; }
-  .verbs button { min-height: 52px; padding: 7px 8px; }
+  .verbs { grid-template-columns: 1fr 1fr; }
+  .verbs > button, .special-main { min-height: 52px; padding: 7px 8px; }
+  .special { grid-column: 1; }
+  .special-picker { left: 8px; right: 8px; width: auto; max-width: none; }
   .forecast { left: 12px; right: 12px; top: auto; bottom: 12px; max-width: none; }
+  .b-stage:has(#special-picker:not([hidden])) .forecast { top: 92px; bottom: auto; }
   .float-chip { max-width: calc(100% - 24px); }
 }
 
