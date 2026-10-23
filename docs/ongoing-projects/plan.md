@@ -6,34 +6,30 @@ verification and review-ready publication. No merge or deployment is authorized.
 
 ## Current continuation state
 
-- Planning commit `34b7c72`; first tested unit chunk `d5f7a45` pushed on the
-  requested branch. [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229)
-  is open for review. Refreshed `origin/main` remains `b749ba4`; #228 is separate.
-- Using OpenSpec change `issue-205-audio-equivalence` (spec-driven, skip_specs:
-  true): [tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md).
-  The caller's explicit OpenSpec request supersedes the earlier no-ledger decision.
-- Original 54 audio selections confirmed. Chromium 153.0.8010.12 and WebKit 26.6
-  launch preflight passed locally under WSL/Node 24.15.0. Local qualification is
-  distinct from the registered `unraid-tactics-01` CI runner; no CI dispatched.
-- Locked Linux dependencies installed; build passed 221 content checks, both
-  type scopes and production bundling. Two-engine Phaser smoke passed 2/2;
-  original audio units passed. Preserve the two initial setup-failure logs.
-- Original browser baseline passed 54/54, including landscape: 780,826 ms runner,
-  797,196 ms wrapper wall; zero retries/skips/failures. Bundle unchanged. Only
-  the two non-executed unit files changed during that capture; browser inputs
-  were frozen. The raw receipt includes before/after hashes.
-- The mapper-only seeded loop is consolidated into the real-adapter fake-host
-  tests for both outcome seeds. Audio units pass 29/29; session/save compatibility
-  and both TypeScript scopes pass. Per-file audio unit cost added about 486 ms.
-- Browser reduction is implemented; both desktop short cases pass (13.5/13.4 s),
-  and final TypeScript checks pass. Discovery is 699 default IDs versus 693:
-  six old paired outcomes replaced with six audible outcomes plus six short pairs.
-  All 687 retained IDs (including 48 other audio IDs) are exact matches; the
-  complete WebKit selection is identical. Audio now has 60 default executions.
-- Next: commit/push the browser chunk, then final affected audio/WebKit/consumer qualification and matched comparison,
-  then update the same focused PR. No app/shared-helper/config changes. Raw receipts:
-  `tmp/verification/issue-205/`; durable mapping/results will live in
-  `docs/qa/issue-205-audio-equivalence.md`.
+- Requested branch; tested chunks `d5f7a45` (unit proof) and `5b36658` (browser
+  refactor) are pushed in [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229).
+  Main base remains `b749ba4`; #228 packaging stays separate.
+- OpenSpec `issue-205-audio-equivalence` is valid (spec-driven, skip_specs: true).
+  [Tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md): 6/7 complete;
+  only final publication/readback remains. The caller requested the ledger.
+- Refactor complete: 12 full UI battles become six audible journeys plus short
+  enabled/muted legal comparisons. Both original seeds have real-adapter proof
+  at every accepted boundary. No production/helper/dependency/config changes.
+- Qualification passed: 29 audio units, 43 session/save units, 221 content checks,
+  both type scopes and production build; 2 engine smokes. Original audio capture
+  54/54 in 780.826 s; refactor 60/60 in 608.309 s, **22.1% less**. Same exact bundle.
+- A diagnosed WebKit lost-click setup failure is repaired with a real keyboard
+  gesture in the clock-controlled case. Diagnostic fix 3/3; final affected
+  Chromium 3/3, WebKit 4/4 and persistence/run 15/15 pass, zero retries/skips.
+  Reuse the other 57 unchanged Chromium results; no later full-file rerun claimed.
+- Discovery 693 → 699; all 687 retained IDs and the full WebKit selection match.
+  All six outcome replays match the original capture exactly. Screenshots reviewed.
+- Raw receipts: `tmp/verification/issue-205/`; [QA mapping and detailed results](../qa/issue-205-audio-equivalence.md).
+  Original setup/WebKit/diagnostic failures are preserved. The detached base
+  worktree and temporary diagnostic source/config have been removed.
+- Next: commit/push the small gesture repair and qualified ledger, publish the
+  receipt archive/manifest and final PR description, then mark final delivery
+  complete after remote parity/readback. Do not merge or deploy; #199/#200 stay open.
 
 - Issue: [#205](https://github.com/luminari-gurus/tactics-guru-v2/issues/205), P1.
 - Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/205#issuecomment-6362068879).
@@ -112,7 +108,11 @@ Every open issue is accounted for:
 - **Adoption/destination decisions:** #178 rotation, #180 music/Settings and #182
   editor/practice retain explicit design choices and lower priority.
 
-## Source findings and affected consumers
+## Base audit and affected consumers
+
+These findings describe base `b749ba4` before implementation. The current
+continuation state above and [final QA mapping](../qa/issue-205-audio-equivalence.md)
+record the replacement and its evidence.
 
 - [battle-audio.spec.ts](../../tests/battle-audio.spec.ts) currently discovers
   **18 cases per default project, 54 selections total**. Its final two cases run
@@ -203,11 +203,13 @@ Expected implementation changes:
 
 - `tests/battle-audio.spec.ts`: retain complete audible outcomes; replace only
   repeated muted full battles with short paired integration checks.
-- `tests/unit/battleCues.test.ts`: cover both original outcome seeds and compare
-  all accepted state/events/commands, replay and canonical save bytes.
+- `tests/unit/battleCues.test.ts`: retain every pure cue policy case; remove the
+  mapper-only seed-2 session loop after consolidating its proof into the real
+  adapter tests for both seeds.
 - `tests/unit/battleAudio.test.ts`: exercise the real adapter with legal accepted
-  batches using its existing fake host; prove presentation cannot change the
-  paired session/save/replay results or resurrect suppressed batches.
+  batches for both original outcome seeds using its existing fake host; compare
+  every accepted session/save/replay boundary, callback ordering and frozen
+  events, and prove it cannot resurrect suppressed batches.
 - `docs/qa/issue-205-audio-equivalence.md` (create during implementation): concise
   old-assertion-to-retained-proof mapping, source/build identities, timings and
   retained result/artifact hashes. Update this plan with actual progress.

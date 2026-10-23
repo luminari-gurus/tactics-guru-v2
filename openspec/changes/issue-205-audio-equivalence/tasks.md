@@ -12,8 +12,9 @@
 ## 3. Browser reduction and integration
 
 - [x] 3.1 Retain complete audible win/loss journeys and add short paired legal sound-control/session/save comparisons; verify targeted browser cases and update assertion mapping.
-- [ ] 3.2 Execute the final affected audio matrix, four WebKit cases and required persistence/run consumers; verify build/type prerequisites, unchanged unrelated discovery, screenshots and matched before/after receipts.
-- [ ] 3.3 Publish timings, limitations and continuation state; verify OpenSpec, diff, clean tracking parity and a focused review-ready PR referencing #205.
+- [x] 3.2 Repair the diagnosed missing WebKit click in the clock-controlled setup; verify three diagnostic repetitions and the affected Chromium/WebKit cases, preserving original failures.
+- [x] 3.3 Qualify final audio, four WebKit cases and required persistence/run consumers; reuse unchanged captures, verify build/type prerequisites, exact discovery, screenshots and matched before/after receipts.
+- [ ] 3.4 Publish timings, limitations and continuation state; verify OpenSpec, diff, clean tracking parity and a focused review-ready PR referencing #205.
 
 ## Workflow follow-up
 

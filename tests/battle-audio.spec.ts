@@ -59,7 +59,10 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
 
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
   // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
-  const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);await enable(page);
+  const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);
+  // WebKit can omit the synthetic mouse click here; the gesture case owns pointer/touch proof.
+  await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
+  await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   await page.clock.pauseAt(start+60000);
   const before=(await session(page)).state.commandCount;

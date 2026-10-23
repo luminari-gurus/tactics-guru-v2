@@ -1,0 +1,599 @@
+{
+  "baseline": {
+    "source": "34b7c722add3d199658326678ee796d87621620e",
+    "dirty": true,
+    "counts": {
+      "total": 54,
+      "expected": 54,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 780826.358,
+    "wallMs": 797196,
+    "firstTestDelayMs": 9283,
+    "runnerOverheadMs": 13168.358000000007,
+    "wrapperMeasurementOverheadMs": 16369.641999999993,
+    "buildUnchanged": true,
+    "inputChangesDuring": [
+      "tests/unit/battleAudio.test.ts",
+      "tests/unit/battleCues.test.ts"
+    ],
+    "loadBefore": [
+      1.1,
+      1.25,
+      1.33
+    ],
+    "loadAfter": [
+      7.3,
+      8.42,
+      5.76
+    ],
+    "profiles": [
+      {
+        "project": "desktop",
+        "count": 18,
+        "testMs": 300713,
+        "outcomeMs": 198711,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-portrait",
+        "count": 18,
+        "testMs": 227081,
+        "outcomeMs": 149302,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-landscape",
+        "count": 18,
+        "testMs": 239864,
+        "outcomeMs": 157821,
+        "shortMs": 0
+      }
+    ]
+  },
+  "candidate": {
+    "source": "5b36658355f82d11b8d945de6382090275787fad",
+    "dirty": true,
+    "counts": {
+      "total": 60,
+      "expected": 60,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 608309.297,
+    "wallMs": 625901,
+    "firstTestDelayMs": 9594,
+    "runnerOverheadMs": 13544.29700000002,
+    "wrapperMeasurementOverheadMs": 17591.70299999998,
+    "buildUnchanged": true,
+    "inputChangesDuring": [],
+    "loadBefore": [
+      1.43,
+      3.85,
+      4.5
+    ],
+    "loadAfter": [
+      6.85,
+      7.53,
+      6.31
+    ],
+    "profiles": [
+      {
+        "project": "desktop",
+        "count": 20,
+        "testMs": 228188,
+        "outcomeMs": 102351,
+        "shortMs": 28515
+      },
+      {
+        "project": "mobile-portrait",
+        "count": 20,
+        "testMs": 191125,
+        "outcomeMs": 82973,
+        "shortMs": 26049
+      },
+      {
+        "project": "mobile-landscape",
+        "count": 20,
+        "testMs": 175452,
+        "outcomeMs": 76828,
+        "shortMs": 22697
+      }
+    ]
+  },
+  "initialWebkit": {
+    "source": "5b36658355f82d11b8d945de6382090275787fad",
+    "dirty": true,
+    "counts": {
+      "total": 4,
+      "expected": 3,
+      "unexpected": 1,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 72319.504,
+    "wallMs": 99967,
+    "firstTestDelayMs": 23512,
+    "runnerOverheadMs": 27047.504,
+    "wrapperMeasurementOverheadMs": 27647.496,
+    "buildUnchanged": true,
+    "inputChangesDuring": [],
+    "loadBefore": [
+      6.03,
+      7.33,
+      6.26
+    ],
+    "loadAfter": [
+      16.5,
+      10.67,
+      7.57
+    ],
+    "profiles": [
+      {
+        "project": "acceptance-webkit-portrait",
+        "count": 2,
+        "testMs": 24206,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "acceptance-webkit-landscape",
+        "count": 2,
+        "testMs": 21066,
+        "outcomeMs": 0,
+        "shortMs": 0
+      }
+    ]
+  },
+  "webkit": {
+    "source": "5b36658355f82d11b8d945de6382090275787fad",
+    "dirty": true,
+    "counts": {
+      "total": 4,
+      "expected": 4,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 33316.323000000004,
+    "wallMs": 44082,
+    "firstTestDelayMs": 10586,
+    "runnerOverheadMs": 12092.323000000004,
+    "wrapperMeasurementOverheadMs": 10765.676999999996,
+    "buildUnchanged": true,
+    "inputChangesDuring": [],
+    "loadBefore": [
+      1.94,
+      3.21,
+      5.02
+    ],
+    "loadAfter": [
+      1.81,
+      3.02,
+      4.87
+    ],
+    "profiles": [
+      {
+        "project": "acceptance-webkit-portrait",
+        "count": 2,
+        "testMs": 11194,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "acceptance-webkit-landscape",
+        "count": 2,
+        "testMs": 10030,
+        "outcomeMs": 0,
+        "shortMs": 0
+      }
+    ]
+  },
+  "repairedChromium": {
+    "source": "5b36658355f82d11b8d945de6382090275787fad",
+    "dirty": true,
+    "counts": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 31350.168,
+    "wallMs": 44004,
+    "firstTestDelayMs": 9531,
+    "runnerOverheadMs": 12908.168000000001,
+    "wrapperMeasurementOverheadMs": 12653.831999999999,
+    "buildUnchanged": true,
+    "inputChangesDuring": [],
+    "loadBefore": [
+      1.63,
+      3.39,
+      5.17
+    ],
+    "loadAfter": [
+      2.11,
+      3.28,
+      5.06
+    ],
+    "profiles": [
+      {
+        "project": "desktop",
+        "count": 1,
+        "testMs": 6100,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-portrait",
+        "count": 1,
+        "testMs": 5777,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-landscape",
+        "count": 1,
+        "testMs": 6565,
+        "outcomeMs": 0,
+        "shortMs": 0
+      }
+    ]
+  },
+  "consumers": {
+    "source": "5b36658355f82d11b8d945de6382090275787fad",
+    "dirty": true,
+    "counts": {
+      "total": 15,
+      "expected": 15,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerMs": 134133.037,
+    "wallMs": 146549,
+    "firstTestDelayMs": 13732,
+    "runnerOverheadMs": 23516.03700000001,
+    "wrapperMeasurementOverheadMs": 12415.962999999989,
+    "buildUnchanged": true,
+    "inputChangesDuring": [],
+    "loadBefore": [
+      1.76,
+      2.97,
+      4.83
+    ],
+    "loadAfter": [
+      6.71,
+      4.5,
+      5.12
+    ],
+    "profiles": [
+      {
+        "project": "desktop",
+        "count": 5,
+        "testMs": 41253,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-portrait",
+        "count": 5,
+        "testMs": 35042,
+        "outcomeMs": 0,
+        "shortMs": 0
+      },
+      {
+        "project": "mobile-landscape",
+        "count": 5,
+        "testMs": 34322,
+        "outcomeMs": 0,
+        "shortMs": 0
+      }
+    ]
+  },
+  "reusedChromiumCases": 57,
+  "repairInputChanges": [
+    "tests/battle-audio.spec.ts"
+  ],
+  "environment": {
+    "node": "v24.15.0",
+    "platform": "linux",
+    "release": "6.6.114.1-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "cpus": 16,
+    "memory": 50514128896,
+    "loadBefore": [
+      1.43,
+      3.85,
+      4.5
+    ],
+    "conditions": "Persistent local WSL workstation; warm installed browser/npm caches; one browser invocation and worker; no retries/traces. No other agent browser/build/test jobs during capture. Unrelated resident services remain; host-wide idleness is not independently established.",
+    "server": "ordinary production preview, root base, port 4173",
+    "loadAfter": [
+      6.85,
+      7.53,
+      6.31
+    ]
+  },
+  "buildIdentical": true,
+  "buildHash": "e0c7efea36a99a1152010da99536c389a1137255701d1eb88df3e329a8c36d87",
+  "inputChanges": [
+    "tests/battle-audio.spec.ts",
+    "tests/unit/battleAudio.test.ts",
+    "tests/unit/battleCues.test.ts"
+  ],
+  "discovery": {
+    "before": 693,
+    "after": 699,
+    "removed": [
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 1: sound on/off legal battles match with committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-848bdf93b27ce07dc738"
+      },
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 2: sound on/off legal battles match with committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-6415c0a405ae10710a09"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 1: sound on/off legal battles match with committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-996d508081fc5a1aff17"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 2: sound on/off legal battles match with committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-4c171f86497b2de4db29"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 1: sound on/off legal battles match with committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-75c3109e4038a2c90c4d"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 2: sound on/off legal battles match with committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-35508ddb0b28e135e722"
+      }
+    ],
+    "added": [
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 1: complete audible legal battle delivers committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-4744e650012882dd9454"
+      },
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 1: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-af5a209dd6d512d6045e"
+      },
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 2: complete audible legal battle delivers committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-3b0cad25e1e2d23f3b9e"
+      },
+      {
+        "key": "desktop | battle-audio.spec.ts | seed 2: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-6109ed4035fea1165395"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 1: complete audible legal battle delivers committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-a2eaf376c80a2140c912"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 1: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-5ee89f65919afcc1927b"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 2: complete audible legal battle delivers committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-27121037ae8ff89c5ab3"
+      },
+      {
+        "key": "mobile-landscape | battle-audio.spec.ts | seed 2: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-0dafd6114ebc61587051"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 1: complete audible legal battle delivers committed cues and playerLoss",
+        "id": "5b20c66b090c902460b9-908f70a9c1371b312472"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 1: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-1c8fd85e8b4446aeca81"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 2: complete audible legal battle delivers committed cues and playerWin",
+        "id": "5b20c66b090c902460b9-02d6c7064848d00599e8"
+      },
+      {
+        "key": "mobile-portrait | battle-audio.spec.ts | seed 2: short sound on/off legal checkpoints preserve session and saved bytes",
+        "id": "5b20c66b090c902460b9-1cdbb9b8d47c0811b0e7"
+      }
+    ],
+    "retained": 687,
+    "changedRetainedIds": [],
+    "webkitCountBefore": 52,
+    "webkitCountAfter": 52,
+    "webkitUnchanged": true,
+    "otherAudio": 48,
+    "passed": true
+  },
+  "originalAudioUnits": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "perFileMs": 305.241455078125,
+    "runnerMs": 2353.733154296875
+  },
+  "finalAudioUnits": {
+    "total": 29,
+    "passed": 29,
+    "failed": 0,
+    "perFileMs": 791.318115234375,
+    "runnerMs": 1873.057861328125
+  },
+  "sessionSaveUnits": {
+    "total": 43,
+    "passed": 43,
+    "failed": 0,
+    "perFileMs": 4316.076171875,
+    "runnerMs": 5181.78125
+  },
+  "replays": [
+    {
+      "key": "desktop:seed-1",
+      "commands": 85,
+      "beforeHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "afterHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ],
+      "afterCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ]
+    },
+    {
+      "key": "desktop:seed-2",
+      "commands": 38,
+      "beforeHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "afterHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ],
+      "afterCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ]
+    },
+    {
+      "key": "mobile-portrait:seed-1",
+      "commands": 85,
+      "beforeHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "afterHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ],
+      "afterCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ]
+    },
+    {
+      "key": "mobile-portrait:seed-2",
+      "commands": 38,
+      "beforeHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "afterHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ],
+      "afterCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ]
+    },
+    {
+      "key": "mobile-landscape:seed-1",
+      "commands": 85,
+      "beforeHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "afterHash": "019c9514042b7117edab14a24c3254a73ee0812272476bcdd616dff6978582b2",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ],
+      "afterCues": [
+        "move",
+        "magic",
+        "hit",
+        "critical",
+        "miss",
+        "unit-defeat",
+        "loss"
+      ]
+    },
+    {
+      "key": "mobile-landscape:seed-2",
+      "commands": 38,
+      "beforeHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "afterHash": "5dd2b9d92d77ff4a191c08ea605d9d1eddcce2079a3c67b4d9a68996fcc0a85a",
+      "sameReplay": true,
+      "beforeCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ],
+      "afterCues": [
+        "move",
+        "hit",
+        "magic",
+        "miss",
+        "unit-defeat",
+        "victory"
+      ]
+    }
+  ],
+  "runnerReductionMs": 172517.061,
+  "runnerReductionPercent": 22.094164628597234,
+  "notes": [
+    "Local WSL functional and focused timing qualification; not a registered CI runner capture or #200 full baseline.",
+    "Baseline dirty state was docs/ledger; only two non-executed unit files changed during capture. Candidate dirty state was the continuation plan; runtime/test inputs remained unchanged.",
+    "Unit proof ran as the dirty patch subsequently committed unchanged in d5f7a45; later test/build source comparisons justify reuse. The bundle was built before test-only edits and reused with identical application/build inputs.",
+    "The measured 60-case refactor capture precedes the local keyboard-gesture setup repair. Final acceptance combines 57 unchanged cases with three fresh Chromium cases, four fresh WebKit checks and 15 consumers; it is not a clean full-file rerun of the later repair.",
+    "Resident host services remain; host-wide idleness was not independently established. This is one matched capture per revision, not a universal performance estimate."
+  ],
+  "passed": true
+}
