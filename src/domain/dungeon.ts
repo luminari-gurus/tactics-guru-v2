@@ -1,3 +1,5 @@
+import { awardHero, progressHero, readProgressHero } from './progression';
+import { HERO_PROGRESSION } from '../content/progression';
 import { freshExploration, readExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
@@ -89,7 +91,7 @@ export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonE
   if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
   const descriptor = floorDescriptor(seed, 1, undefined, encounterPolicy);
   return { id, seed, encounterPolicy, revision: 0, depth: 1, floors: [{ descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs) }],
-    party: HERO_IDS.map(heroId => ({ heroId, hp: dungeonContent.catalog.heroes[heroId].stats.maxHp })),
+    party: HERO_IDS.map(heroId => progressHero(heroId, 0, dungeonContent.catalog.heroes[heroId].stats.maxHp, dungeonContent.catalog)),
     ownership: emptyItemOwnership(), phase: 'ready', offer: null, activeBattle: null, battlefield: null };
 }
 export function dungeonBoundary(s: DungeonState) {
@@ -185,8 +187,9 @@ function readDungeonValue(input: unknown, format: 1 | 2 | 3 = 3): DungeonResult 
   const party: RunHero[] = [];
   for (let i = 0; i < 3; i++) {
     const h = input.party[i], heroId = HERO_IDS[i];
-    if (!hasShape(h, ['heroId','hp']) || h.heroId !== heroId || !safeCount(h.hp) || h.hp > dungeonContent.catalog.heroes[heroId].stats.maxHp) return fail('invalidParty');
-    party.push({ heroId, hp: h.hp });
+    const checked = readProgressHero(h, heroId, dungeonContent.catalog);
+    if (!checked) return fail('invalidParty');
+    party.push(checked);
   }
   const owned = readItemOwnership(input.ownership, input.id, dungeonContent.items, id => {
     const m = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:([01]):option:[01]$`).exec(id);
@@ -262,7 +265,8 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
   if (battle.outcome === 'playerLoss') return advance(s, { party, phase: 'defeat', activeBattle: null, battlefield: null });
   floors[s.depth - 1] = { ...f, completed: f.completed + 1 };
   const next = { ...s, floors };
-  return advance(s, { floors, party, phase: f.completed === 2 ? 'ready' : 'reward', offer: f.completed === 2 ? null : dungeonOffer(next), activeBattle: null, battlefield: null });
+  const awarded = party.map(h => awardHero(h, HERO_PROGRESSION.awards[f.descriptor.encounters[f.completed].selection.kind], dungeonContent.catalog));
+  return advance(s, { floors, party: awarded, phase: f.completed === 2 ? 'ready' : 'reward', offer: f.completed === 2 ? null : dungeonOffer(next), activeBattle: null, battlefield: null });
 }
 export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & { readonly type: 'discardEquipment'; readonly instanceId: string });
 export function dungeonItem(s: DungeonState, command: DungeonItemCommand): DungeonResult {

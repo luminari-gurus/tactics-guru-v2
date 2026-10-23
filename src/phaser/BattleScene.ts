@@ -1,3 +1,4 @@
+import { progressionLabel } from '../domain/progression';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
@@ -144,7 +145,7 @@ export class BattleScene extends Phaser.Scene {
       const unit=session.state.units.find(u=>u.id===id);if(!unit)return;
       const {def,name,armorClass,accuracy,status}=unitFeedback(session,unit);
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
-        `HP ${unit.hp}/${def.stats.maxHp} · ${status}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
+        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
           {id:'inspection-close',label:'Close inspection',run:()=>{}},
         ],()=>{});

@@ -1,3 +1,4 @@
+import { levelUpFeedback } from '../domain/progression';
 import { track, reportFailure, setTelemetryContext } from '../telemetry/telemetry';
 import { applyItemCommand, type ItemCommand, type ItemFailure } from '../domain/items';
 import { BattleSession } from './BattleSession';
@@ -65,6 +66,7 @@ export class RunItemSession {
         : completeRunBattle(this.current, session.state, this.context);
       if (!next.ok) { reportFailure('run_boundary', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Run boundary rejected. Progress unchanged.'); return; }
       if (session.state.outcome !== 'ongoing') this.lastRecord = { entry, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
+      const feedback = levelUpFeedback(this.current.items.run.party, next.state.items.run.party);
       this.current = next.state; this.review = null;
       if (session.state.outcome !== 'ongoing') {
         const run = this.current.items.run;
@@ -72,13 +74,14 @@ export class RunItemSession {
         if (run.phase === 'victory' || run.phase === 'defeat') track('run_outcome', { route: 'run', phase: run.phase, encounter: run.encounterIndex, outcome: run.phase }, run.id);
       }
       this.save();
+      if (feedback) this.report(feedback);
     };
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog
       ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted, battlefield)
       : BattleSession.fromRun(this.current.items, this.context, accepted);
     if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
-    session = created.session; this.battle = session;
+    session = created.session; this.battle = session; session.progression = this.current.items.run.party;
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     this.current = { ...this.current, activeBattle: session.state, battlefield:battlefield }; this.review = null;
     if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.save(); } return session;

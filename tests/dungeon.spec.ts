@@ -1,3 +1,4 @@
+import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon } from './helpers/dungeonTraversal';
 import { atDownstairs } from './helpers/dungeonFixtures';
 import { expect,test,type Page } from '@playwright/test';
@@ -91,4 +92,25 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
+});
+
+test('hero progression commits once, heals at a threshold and survives inspection and reload',async({page})=>{
+ test.setTimeout(90000);
+ const f=fixture(1),built=dungeonBattle(f.snapshot)!;
+ const resolved=dispatch(f.snapshot.activeBattle!,f.command,built.catalog);if(!resolved.ok)throw Error(resolved.reason);
+ const completed=acceptDungeonBattle(f.snapshot,resolved.state);if(!completed.ok)throw Error(completed.reason);
+ const leveled=completed.state.party.filter((h,i)=>h.level>f.snapshot.party[i].level);
+ expect(leveled.length).toBeGreaterThan(0);for(const h of leveled)expect(h.hp).toBe(h.maxHp);
+ await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Level 1');await page.locator('#inspection-close').click();
+ await playCommand(page,f.command);
+ await expect(page.locator('#dungeon-screen')).toBeVisible();
+ expect((await snapshot(page)).party).toEqual(completed.state.party);
+ await expect(page.locator('section[aria-label="Party"]')).toContainText('Level 2');
+ await expect(page.locator('section[aria-label="Party"]')).toContainText('XP');
+ await page.screenshot({path:test.info().outputPath('hero-level-up.png'),fullPage:true});
+ const saved=await snapshot(page);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ expect((await snapshot(page)).party).toEqual(saved.party);
+ const offer=saved.offer!;await page.getByRole('button',{name:`Claim ${dungeonContent.items[offer.options[0].itemId].label}`,exact:true}).click();await page.locator('#dungeon-item-confirm').click();
+ expect((await snapshot(page)).party).toEqual(saved.party);
 });

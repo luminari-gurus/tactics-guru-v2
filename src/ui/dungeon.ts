@@ -1,3 +1,4 @@
+import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
@@ -34,14 +35,14 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     button('Descend',()=>session.travel('descend',s.revision),floor.completed!==3||s.phase!=='ready'||floor.position!==floor.descriptor.downstairs,'dungeon-descend'));root.append(travel);
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
-  for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}root.append(party);
+  for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}root.append(party);
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review('Claim this item and prepare the next encounter?',command)));}root.append(rewards);}
   const inventory=el('section');inventory.setAttribute('aria-label','Owned items');inventory.append(el('h2','Owned items'),el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
   for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
     const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
-    for(const h of s.party){const o=el('option',h.heroId);o.value=h.heroId;o.disabled=h.hp===0||!def.eligibleHeroes.includes(h.heroId)||def.kind==='consumable'&&h.hp===dungeonContent.catalog.heroes[h.heroId].stats.maxHp;select.append(o);}
+    for(const h of s.party){const o=el('option',h.heroId);o.value=h.heroId;o.disabled=h.hp===0||!def.eligibleHeroes.includes(h.heroId)||def.kind==='consumable'&&h.hp===h.maxHp;select.append(o);}
     select.value=[...select.options].find(o=>!o.disabled)?.value??'';
     row.append(el('p',`${def.label}${'quantity'in entry?` ×${entry.quantity}`:''}`),select);
     if('quantity'in entry){row.append(button(`Use ${def.label}`,()=>review(`Use ${def.label}?`,{...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:select.value as HeroId}),!select.value||!['ready','reward'].includes(s.phase)));}

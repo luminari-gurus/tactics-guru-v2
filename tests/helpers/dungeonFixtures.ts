@@ -11,7 +11,7 @@ import { dungeonContent } from '../../src/content/dungeon';
 export function priorDungeonPayload(s: DungeonState, format: 1 | 2) {
   if (s.encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw Error('Prior fixtures must use legacy opponents');
   const { encounterPolicy, ...state } = s;
-  return { ...state, floors: s.floors.map(f => {
+  return { ...state, party: s.party.map(({heroId,hp})=>({heroId,hp})), floors: s.floors.map(f => {
     const { encounters, ...descriptor } = f.descriptor;
     return format === 1 ? { descriptor, position: f.position === descriptor.downstairs ? f.position : descriptor.upstairs, completed: f.completed } : { ...f, descriptor };
   }) };
@@ -86,8 +86,8 @@ export function journeyPreparation(s: DungeonState): DungeonItemCommand | null {
   const hero = s.party.find(h=>h.hp>0&&!s.ownership.assignments.some(a=>a.heroId===h.heroId));
   const item = s.ownership.equipment.find(e=>!s.ownership.assignments.some(a=>a.instanceId===e.instanceId));
   if (hero && item) return {...boundary,type:'equipItem',instanceId:item.instanceId,heroId:hero.heroId,slot:'charm'};
-  const hurt = [...s.party].filter(h=>h.hp>0&&h.hp<dungeonContent.catalog.heroes[h.heroId].stats.maxHp)
-    .sort((a,b)=>a.hp/dungeonContent.catalog.heroes[a.heroId].stats.maxHp-b.hp/dungeonContent.catalog.heroes[b.heroId].stats.maxHp)[0];
+  const hurt = [...s.party].filter(h=>h.hp>0&&h.hp<h.maxHp)
+    .sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
   return hurt&&s.ownership.consumables.some(c=>c.itemId==='item:healing_draught')?{...boundary,type:'useItem',itemId:'item:healing_draught',heroId:hurt.heroId}:null;
 }
 

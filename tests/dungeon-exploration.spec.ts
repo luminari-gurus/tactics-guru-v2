@@ -124,15 +124,15 @@ test('real traversal, art independence, keyboard locks, active battle and exact 
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(await dungeonSnapshot(page)).toEqual(saved);
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
 });
-test('v1 Continue preserves raw bytes until a format-3 spatial save',async({page,isMobile})=>{
+test('pre-progression dungeon remains incompatible and exportable',async({page})=>{
  const raw=priorDungeonEnvelope(freshDungeon('legacy-browser',13,LEGACY_ENCOUNTER_POLICY),1);
- await page.goto('dungeon');await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:DUNGEON_KEYS.primary,raw});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ await page.goto('dungeon');await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:DUNGEON_KEYS.primary,raw});await page.reload();
+ await expect(page.getByRole('button',{name:'Continue saved dungeon',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export primary save',exact:true}).click();await download;
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(raw);
- const before=await dungeonSnapshot(page),f=before.floors[0],map=generateMap(f.descriptor.seed,'rooms'),n=neighbors(f.position).find(n=>map.cells[n])!;
- await walkDungeon(page,n,isMobile?'touch':'keyboard');expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.backup)).toBe(raw);
- const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);expect(JSON.parse(saved!).format).toBe(3);
- await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect((await dungeonSnapshot(page)).floors[0].position).toBe(n);
 });
+
 test('cold format-3 Continue retains a long saved history within the startup budget',async({page})=>{
  const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
   const descriptor=floorDescriptor(base.seed,i+1);
@@ -214,7 +214,7 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
 
 test('legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume',async({page,isMobile})=>{
  test.setTimeout(600000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const initial=freshDungeon('biome-journey',198),encoded=encodeDungeon(initial);if(!encoded.ok)throw Error(encoded.reason);
+ const initial=freshDungeon('biome-journey',190),encoded=encodeDungeon(initial);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
  const receipts:{depth:number;selection:{biome:string;kind:string}}[]=[];
  const playFloor=async(depth:number)=>{

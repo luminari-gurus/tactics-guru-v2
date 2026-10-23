@@ -1,6 +1,6 @@
 # Tasks
 
-Implementation is pending caller approval of proposal/design/specs. Record that approval here before starting. Issue #160; branch work/issue-160-hero-progression; base 5a8802753811663957ea38bb828773866b000f95. Browser/device emulation is sufficient; physical access none, required none.
+Caller approved proposal/design/specs in chat on 2026-10-23. Issue #160; branch work/issue-160-hero-progression; base 5a8802753811663957ea38bb828773866b000f95. Browser/device emulation is sufficient; physical access none, required none.
 
 ## 1. Progression definitions and pure rules
 

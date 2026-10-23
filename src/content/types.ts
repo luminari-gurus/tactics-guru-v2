@@ -8,6 +8,7 @@ export type EnemyId = typeof ENEMY_IDS[number];
 export type UnitId = HeroId | EnemyId;
 export type AbilityId = `ability:${string}`;
 interface AttackFields {
+  readonly requiredLevel?: number;
   readonly id: AbilityId;
   readonly owners: readonly UnitId[];
   readonly rangeMin: number;
@@ -20,6 +21,7 @@ export type AttackAbility = AttackFields & (
   | { readonly kind: 'guardedAttack'; readonly attackPenalty: 2; readonly armorClassBonus: 2 }
 );
 export interface MagicMissileAbility {
+  readonly requiredLevel?: number;
   readonly id: AbilityId; readonly kind: 'magicMissile'; readonly owners: readonly UnitId[];
   readonly casterLevel: number; readonly rangeMin: number; readonly rangeMax: number;
 }
