@@ -151,7 +151,36 @@ test('a resume() that never settles is reported as blocked with retry, then play
   expect(errors).toEqual([]);
 });
 
+test.afterEach(async ({ page }, info) => {
+  if (!info.title.startsWith('a stalled tone request')) return;
+  await info.attach('audio-request-events', { body: JSON.stringify(await page.evaluate(() =>
+    (window as unknown as { audioRequestEvents: unknown[] }).audioRequestEvents)), contentType: 'application/json' });
+});
+
 test('a stalled tone request never holds the board; the control reports unavailable after the load timeout', async ({ page }) => {
+  await page.addInitScript(() => {
+    const events: unknown[] = [];
+    (window as unknown as { audioRequestEvents: unknown[] }).audioRequestEvents = events;
+    const open = XMLHttpRequest.prototype.open;
+    const send = XMLHttpRequest.prototype.send;
+    const urls = new WeakMap<XMLHttpRequest, string>();
+    let sequence = 0;
+    XMLHttpRequest.prototype.open = function (method: string, url: string | URL) {
+      urls.set(this, String(url));
+      return open.call(this, method, url, true);
+    };
+    XMLHttpRequest.prototype.send = function (body) {
+      const url = urls.get(this) ?? '';
+      if (url.includes('unlock-tone')) {
+        const id = ++sequence;
+        const record = (event: string) => events.push({id, url, event, timeout: this.timeout,
+          at: performance.now(), run: document.querySelector<HTMLElement>('#game')?.dataset.run});
+        for (const event of ['load', 'error', 'timeout', 'abort', 'loadend']) this.addEventListener(event, () => record(event));
+        record('send');
+      }
+      return send.call(this, body);
+    };
+  });
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   // Never fulfilled, never aborted: the request neither completes nor errors on its own.

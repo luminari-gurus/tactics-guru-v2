@@ -8,7 +8,7 @@ on:
         default: f33e31a
       selection:
         type: choice
-        options: [reproduce, qualify]
+        options: [reproduce, diagnose, qualify]
         default: reproduce
 permissions:
   contents: read
@@ -47,6 +47,11 @@ jobs:
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/audio/reproduction.json
         run: npx --no-install playwright test tests/audio.spec.ts --project=mobile-landscape -g 'a stalled tone request' --repeat-each=3 --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/reproduction
+      - name: Diagnose preceding audio sequence in landscape
+        if: inputs.selection == 'diagnose'
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/audio/diagnosis.json
+        run: npx --no-install playwright test tests/audio.spec.ts --project=mobile-landscape --workers=1 --retries=0 --trace=retain-on-failure --reporter=list,json --output=verification-receipts/audio/diagnosis
       - name: Qualify affected audio consumers on all Chromium profiles
         if: inputs.selection == 'qualify'
         env:
