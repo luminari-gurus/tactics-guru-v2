@@ -5361,5 +5361,54 @@
   "issue204HashVerification": {
     "matchingRelevantInputs": 170,
     "scope": "All src/public paths plus run-progression spec, recovery/item helpers, lockfile and WebKit acceptance config match the committed #204 tested-inputs.json. Base Chromium filters changed, but WebKit replaces projects; exact effective discovery/use and four case IDs are unchanged."
-  }
+  },
+  "finalDefaultCapture": {
+    "run": 40014331247,
+    "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+    "all670SelectedIdsExecuted": true,
+    "passed": 666,
+    "skipped": 3,
+    "failed": 1,
+    "retries": 0,
+    "aggregateScope": "partial",
+    "aggregateComplete": false,
+    "aggregatePassed": false,
+    "baselineEligible": false
+  },
+  "startupDisposition": {
+    "run": 40026132069,
+    "baseCommit": "958bbd90546e1305aab10e370d5555a1d7c9a43a",
+    "candidateCommit": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+    "matchingRuntimeCaseAssetDependencyHashes": 167,
+    "baseStatus": "failed",
+    "candidateStatus": "passed",
+    "failedFullCaptureStatus": "failed",
+    "case": {
+      "id": "8352ba8e75a15b46318d-d795161be3b8712ee585",
+      "title": "default Move Continue is read-only and confirmed movement keeps the remaining-action flow",
+      "project": "mobile-landscape"
+    },
+    "sharedFailure": {
+      "helperLine": 15,
+      "caseLine": 41,
+      "expectedPhase": "player",
+      "timeoutMs": 5000
+    },
+    "retries": 0,
+    "tracing": "off",
+    "disposition": "Initial startup assertion reproduced on literal main base; candidate focused observation passed. Cause and reliability remain unresolved; full capture remains failed, not retry-qualified."
+  },
+  "finalToolingQualification": {
+    "run": 40026132069,
+    "source": "3197945cdcf79e2788d2271ac3f328ea9d3d577d",
+    "timingProcessContracts": 20,
+    "selectionBatchContracts": 27,
+    "fullRunnerContracts": 10,
+    "diagnosticsContracts": 1,
+    "realTimeoutRecoveryContracts": 2,
+    "enginePhaserSmokeCases": 2,
+    "passed": true,
+    "relevantInputHash": "6daebe28f8a855977f9da3b632b874dfadb791b2a2be51f332968e40a81e0bbe"
+  },
+  "temporaryWorkflow": "Comparison mode, job and exact branch allowance removed after evidence collection. Final workflow is byte-identical to literal main base."
 }

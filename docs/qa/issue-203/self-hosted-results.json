@@ -1,16 +1,26 @@
 {
   "run": 40014331247,
   "scope": "default-chromium",
+  "allSelectedIdsExecuted": true,
   "expectedBatches": 9,
   "expectedSelections": 670,
-  "complete": false,
-  "passed": false,
+  "aggregateDisposition": {
+    "scope": "partial",
+    "complete": false,
+    "passed": false,
+    "baselineEligible": false,
+    "errors": [
+      "chromium-mobile-landscape-1: failed",
+      "chromium-mobile-landscape-1: Browser failures/retries or invalid counts",
+      "chromium-mobile-landscape-1: latest Actions job failed, incomplete or lacks its matching receipt"
+    ]
+  },
   "counts": {
-    "total": 524,
-    "expected": 521,
+    "total": 670,
+    "expected": 666,
     "unexpected": 1,
     "flaky": 0,
-    "skipped": 2,
+    "skipped": 3,
     "retryAttempts": 0
   },
   "rows": [
@@ -90,31 +100,6 @@
       ]
     },
     {
-      "batch": "chromium-mobile-landscape-1",
-      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
-      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
-      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
-      "complete": true,
-      "passed": false,
-      "setupMs": 29969,
-      "jobWallMs": 562949,
-      "stages": [
-        {
-          "id": "chromium-mobile-landscape-1",
-          "status": "failed",
-          "wallMs": 528335.8268180001,
-          "counts": {
-            "total": 71,
-            "expected": 70,
-            "unexpected": 1,
-            "flaky": 0,
-            "skipped": 0,
-            "retryAttempts": 0
-          }
-        }
-      ]
-    },
-    {
       "batch": "chromium-mobile-portrait-1",
       "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
       "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
@@ -181,6 +166,81 @@
           "counts": {
             "total": 52,
             "expected": 52,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-1",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": false,
+      "setupMs": 29969,
+      "jobWallMs": 562949,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-1",
+          "status": "failed",
+          "wallMs": 528335.8268180001,
+          "counts": {
+            "total": 71,
+            "expected": 70,
+            "unexpected": 1,
+            "flaky": 0,
+            "skipped": 0,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-2",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 21882,
+      "jobWallMs": 554253,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-2",
+          "status": "passed",
+          "wallMs": 528420.8858,
+          "counts": {
+            "total": 90,
+            "expected": 89,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 1,
+            "retryAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch": "chromium-mobile-landscape-3",
+      "source": "5bd53985aa5f3ded04b6853e5ce718165e289094",
+      "inputHash": "498a8a28cc2c4ba570c9bd8f07791edcc34982c4b3ad089aabe15d9134a4f106",
+      "buildHash": "4a8f6cd07e21bcc67a0f42c74b76ee9a078fcbb3f6fe823980ae06ae842488a9",
+      "complete": true,
+      "passed": true,
+      "setupMs": 24181,
+      "jobWallMs": 527630,
+      "stages": [
+        {
+          "id": "chromium-mobile-landscape-3",
+          "status": "passed",
+          "wallMs": 499665.523168,
+          "counts": {
+            "total": 56,
+            "expected": 56,
             "unexpected": 0,
             "flaky": 0,
             "skipped": 0,
