@@ -222,7 +222,7 @@ jobs:
         run: |
           for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
           unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
-          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/base.json" 2> "$RECEIPTS/base.err"
+          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g 'default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/base.json" 2> "$RECEIPTS/base.err"
       - name: Retain base failure artifacts before the next checkout
         if: always() && env.RECEIPTS != ''
         run: test ! -d test-results || cp -R test-results "$RECEIPTS/base-artifacts"
@@ -245,7 +245,7 @@ jobs:
         run: |
           for comparison_key in "${!VITE_@}"; do unset "$comparison_key"; done
           unset FIT_URL POSTHOG_SOURCEMAPS PLAYWRIGHT_JSON_OUTPUT_FILE
-          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g '^default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/candidate.json" 2> "$RECEIPTS/candidate.err"
+          npx --no-install playwright test tests/battle-persistence.spec.ts --project=mobile-landscape -g 'default Move Continue is read-only and confirmed movement keeps the remaining-action flow$' --workers=1 --retries=0 --reporter=json > "$RECEIPTS/candidate.json" 2> "$RECEIPTS/candidate.err"
       - name: Retain candidate failure artifacts
         if: always() && env.RECEIPTS != ''
         run: test ! -d test-results || cp -R test-results "$RECEIPTS/candidate-artifacts"

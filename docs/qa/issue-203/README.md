@@ -156,3 +156,9 @@ The initial comparison dispatch was rejected during workflow parsing because
 browser ran. Its output path is now assigned in a step through `GITHUB_ENV`, and
 always-run copy/upload steps require a nonempty owned path. The rejected dispatch
 is a tooling setup error, separate from the real landscape assertion failure.
+
+Comparison command preflight also caught an over-anchored grep selecting zero
+tests: Playwright includes the project/file prefix in its grep input. The
+end-anchored exact-case filter now discovers exactly one landscape case. No
+browser was executed with the empty selection; final comparison validation
+requires one actual result per source.
