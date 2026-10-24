@@ -16,6 +16,57 @@ import { dungeonContent } from '../src/content/dungeon';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
+ const base=freshDungeon('marker-browser',1),floor=base.floors[0];
+ const load=async(state:DungeonState)=>{
+  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ };
+ const reload=async()=>{await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();};
+ const cell=(index:number)=>page.locator(`#dungeon-map [data-cell="${index}"]`);
+ const places=page.getByRole('list',{name:'Discovered places',exact:true});
+ // Structural saved-state fixtures isolate rendering; the complete journey below proves legal progression.
+ const revealed={...floor,exploration:{...floor.exploration,revealed:Array.from({length:400},(_,i)=>i)}};
+ await load({...base,floors:[{...revealed,position:floor.position}]});
+ await expect(places.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
+ await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
+ await expect(cell(floor.descriptor.downstairs)).toHaveText('');
+ for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('M');
+ await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
+ await expect(page.getByText('● Player · M encounter (including guardian)',{exact:false})).toBeVisible();
+ await expect(page.locator('#dungeon-descend')).toBeDisabled();
+ await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-uncleared-map.png')});
+ const firstMap=generateMap(floor.descriptor.seed,'rooms');
+ const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p)===n))!;
+ await walkDungeon(page,firstStep,isMobile?'touch':'keyboard');
+ await expect(cell(floor.descriptor.upstairs)).toHaveText('');
+ await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');await expect(places.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
+ // Completion alone cannot reveal an undiscovered staircase.
+ await load({...base,floors:[{...floor,completed:3}]});
+ await expect(cell(floor.descriptor.downstairs)).toHaveClass('explore-hidden');
+ await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
+ await load({...base,floors:[{...revealed,position:floor.position,completed:3}]});
+ await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
+ await expect(places.locator('[data-poi-id="stairs-down"]')).toContainText('Unlocked');
+ for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('✓');
+ await reload();await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
+ await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
+ await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-cleared-map.png')});
+ const descriptor=floorDescriptor(base.seed,2),exploration=freshExploration(descriptor.seed,descriptor.upstairs);
+ const second={descriptor,completed:0,position:descriptor.upstairs,exploration};
+ await load({...base,depth:2,floors:[{...floor,completed:3},second]});
+ await expect(places.locator('[data-poi-id="stairs-up"]')).toContainText('Upstairs');
+ await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
+ const map=generateMap(descriptor.seed,'rooms'),adjacent=neighbors(descriptor.upstairs).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p)===n))!;
+ await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await expect(cell(descriptor.upstairs)).toHaveText('↑');
+ await reload();await expect(cell(descriptor.upstairs)).toHaveText('↑');
+ await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
+ await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
+ if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();}
+ expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
+});
+
 test('diamond compass directions, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{
  const base=freshDungeon('compass-browser',1),floor=base.floors[0],map=generateMap(floor.descriptor.seed,'rooms');
  const directions=[['North',-20],['East',1],['South',20],['West',-1]] as const;
@@ -104,7 +155,7 @@ test('real traversal, art independence, keyboard locks, active battle and exact 
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  const initial=await dungeonSnapshot(page),f=initial.floors[0],map=generateMap(f.descriptor.seed,'rooms');
- await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('[aria-label="Discovered places"]')).toContainText('Upstairs');
+ await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('[aria-label="Discovered places"]')).not.toContainText('Upstairs');
  const adjacent=neighbors(f.position).find(n=>map.cells[n])!;
  await walkDungeon(page,adjacent,isMobile?'touch':'pointer');const stepped=await dungeonSnapshot(page);expect(stepped.revision).toBe(initial.revision+1);
  await page.locator('#dungeon-map').focus();await page.keyboard.down('ArrowUp');await page.keyboard.up('ArrowUp');const after=await dungeonSnapshot(page);
@@ -228,6 +279,8 @@ test('legal two-floor guardian journey covers both biomes and every kind through
   }
   await expect(page.locator('#dungeon-screen')).toBeVisible();const won=await dungeonSnapshot(page);
   expect(won.phase).toBe(slot===2?'ready':'reward');expect(won.floors[depth-1].completed).toBe(slot+1);
+  await expect(page.locator(`#dungeon-map [data-cell="${poiCell(won.floors[depth-1].exploration.pois[slot])}"]`)).toHaveText('●');
+  await expect(page.locator('[data-poi-id="stairs-down"]')).toHaveCount(slot===2&&won.floors[depth-1].exploration.revealed.includes(won.floors[depth-1].descriptor.downstairs)?1:0);
   receipts.push({depth,...JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!)});
   // Every choice below is made through the existing confirmed DOM controls.
   for(let i=0;i<20;i++){
@@ -252,6 +305,11 @@ test('legal two-floor guardian journey covers both biomes and every kind through
  const f=second.floors[1],map=generateMap(f.descriptor.seed,'rooms'),adjacent=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await walkDungeon(page,f.descriptor.upstairs,isMobile?'touch':'keyboard');const explored=await dungeonSnapshot(page);
  await page.locator('#dungeon-ascend').click();const back=await dungeonSnapshot(page);expect(back.floors[0]).toEqual(departed.floors[0]);expect(back.floors[0].completed).toBe(3);expect(back.ownership).toEqual(clear.ownership);
+ await expect(page.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
+ await expect(page.locator('[data-poi-id="stairs-down"]')).toContainText('Unlocked');
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ await expect(page.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
+ await expect(page.locator('[data-poi-id="stairs-down"]')).toContainText('Unlocked');
  await page.locator('#dungeon-descend').click();expect((await dungeonSnapshot(page)).floors).toEqual(explored.floors);
  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect((await dungeonSnapshot(page)).floors).toEqual(explored.floors);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

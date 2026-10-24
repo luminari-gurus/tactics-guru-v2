@@ -1,0 +1,76 @@
+{
+  "commands": [
+    {
+      "command": "npm run test:unit -- tests/unit/exploration.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonEncounters.test.ts",
+      "result": "91 passed"
+    },
+    {
+      "command": "npm run build",
+      "result": "221 content tests, both TypeScript scopes and production build passed"
+    },
+    {
+      "command": "npx --no-install playwright test tests/dungeon-exploration.spec.ts --output=tmp/verification/issue-227/chromium --reporter=line,json",
+      "result": "36 passed; no retries/skips"
+    },
+    {
+      "command": "npx --no-install playwright test tests/dungeon-exploration.spec.ts -g 'map markers' --output=tmp/verification/issue-227/markers-final --reporter=line,json",
+      "result": "3 passed; no retries/skips"
+    },
+    {
+      "command": "npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'map markers|real traversal' --output=tmp/verification/issue-227/webkit --reporter=line,json",
+      "result": "6 passed; no retries/skips"
+    }
+  ],
+  "reports": {
+    "chromium": {
+      "startTime": "2026-10-24T11:54:31.401Z",
+      "duration": 558335.99,
+      "expected": 36,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "markers-final": {
+      "startTime": "2026-10-24T12:05:33.931Z",
+      "duration": 7065.344999999999,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "webkit": {
+      "startTime": "2026-10-24T12:05:56.273Z",
+      "duration": 17951.388,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "sha256": {
+    "chromium-run.log.gz": "a3cd61e36b741120bd54a96f7b8827006aece26bc21612fd9ecce8312e3ca683",
+    "chromium.json.gz": "2c29926f667e3f2d8c0c4471a2cd246e83f050401c2f9bceadcfdee7a0407034",
+    "chromium.log.gz": "d2f153c621c6b90a3d78539613d4dee845eba1849e371002c93f22fedd3ea4dc",
+    "desktop-markers-cleared-map.png": "3a9446adf831644e62f69004c3a7bc5bee891aac255d03d09957527a63e72333",
+    "desktop-markers-uncleared-map.png": "817988205b5e858432762cce9c352497e697eee9090d97a2848e23fa3bea3fff",
+    "desktop-markers-upper-floor-map.png": "b4595132545b5176f2839204dd7a79cac312ddbf2eec22c811264abb518990de",
+    "dungeon-exploration-legal--6b3c6-h-ascent-revisit-and-resume-desktop-legal-multi-floor-journey.json.gz": "235356bbcdb28ad9c214f83dd93e0b03f22b4c69778a0a623e93237b5176fe9d",
+    "dungeon-exploration-legal--6b3c6-h-ascent-revisit-and-resume-mobile-landscape-legal-multi-floor-journey.json.gz": "235356bbcdb28ad9c214f83dd93e0b03f22b4c69778a0a623e93237b5176fe9d",
+    "dungeon-exploration-legal--6b3c6-h-ascent-revisit-and-resume-mobile-portrait-legal-multi-floor-journey.json.gz": "235356bbcdb28ad9c214f83dd93e0b03f22b4c69778a0a623e93237b5176fe9d",
+    "inputs.json": "202ed4d458062d9550afb86bcd9da93d8728ea56646b627ff07f50a9109b2b31",
+    "issue227-build.log.gz": "f328a3241863d7ef8f20c3eb6e8990293882d27801d8edba85c5e466cb1362d2",
+    "issue227-discovery.txt.gz": "05416e056ed1cf8502b008427c65769e3fb1d16855422c15c80bf98cc6c409bd",
+    "issue227-units.log.gz": "78e99023aacc733743b3c47671a0d2535818ed57e2c89705470be81880469e78",
+    "issue227-webkit-discovery.txt.gz": "1dfac6a9480392e9fa34543fafd4906b9b11e539695dbdaea40fae7528325695",
+    "markers-final.json.gz": "1b85ae04e3506ebecd8bf60d6d32d891516bd18fdd28761b578714e852b71a83",
+    "markers-final.log.gz": "8e73ad8eb334c0dc872808d104c1e74054a4c6632bdf53177379c23417b7a86d",
+    "mobile-landscape-markers-cleared-map.png": "83c63ef6548f17981817c5c90f98b7ff0568fa42a2b2fc667357c8b5a9abe3c8",
+    "mobile-landscape-markers-uncleared-map.png": "2cbf11530cabea40f242a65be8e8ed876dc314cff3fbddc7760e2d09f8b7ec18",
+    "mobile-landscape-markers-upper-floor-map.png": "26308f9a9d21962f28950535cc4d4ccd962a738edbcc851f3db1c5c24558824b",
+    "mobile-portrait-markers-cleared-map.png": "80b5a571981260ca5aa56a66cd7d20212883d90df66f1729c06654d28f9eb92e",
+    "mobile-portrait-markers-uncleared-map.png": "efb8e1fe71f19905f521ce27e6a5ad2b08e9b6264cc24c1b06d8844703a0701c",
+    "mobile-portrait-markers-upper-floor-map.png": "57349027fcd6f1670cd98f06ef144aafec3b616fdd33db283dcbe7a4a48370da",
+    "webkit.json.gz": "e2b3d62405ff9e096e56632a0feb3752ad48ce2f8673da9c2beff79eb9c1b468",
+    "webkit.log.gz": "6f77e86d8a685993cb2a47ea02dc992753c293da1da33a081075e66042032437"
+  }
+}
