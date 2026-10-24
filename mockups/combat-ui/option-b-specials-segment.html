@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Option B · Segmented specials</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>B · Segmented specials</h1>
+      <small>Every owned special is a first-class bar button. Greyed in place with a reason. One special → one button, no extra chrome.</small>
+    </div>
+    <nav class="b-alt-nav">
+      <a href="option-b.html?state=picker">Chevron</a> ·
+      <a href="option-b-specials-target.html">Target-first</a> ·
+      <a href="option-b-specials-segment.html" aria-current="page">Segment</a> ·
+      <a href="option-b-specials-chips.html">Board chips</a>
+    </nav>
+    <a href="index.html">All options</a>
+    <a href="option-b-specials-segment.html?export=1">Export view</a>
+  </header>
+  <main class="stage b-stage">
+    <section class="board-photo b-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="chip float-chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18</p>
+          <div class="health"><span style="width:100%"></span></div>
+          <p class="meta">AC 14 · Accuracy +4 · Move ready · Action ready</p>
+        </div>
+      </div>
+      <span class="path-dot" style="left:42%;top:54%"></span>
+      <span class="path-dot" style="left:46%;top:58%"></span>
+      <button class="gold move-chip">Move here · 2 cost</button>
+    </section>
+    <footer class="bar" aria-label="Combat actions">
+      <div>
+        <p class="smart">All owned specials stay in the bar</p>
+        <p class="meta">Switching is the same as tapping Attack — no menu. Arrow keys move within the segment.</p>
+        <p class="hotkey">Left / Right in the group · S cycles</p>
+      </div>
+      <div class="verbs-flex">
+        <button type="button" aria-pressed="true"><strong>Move</strong><span>Reachable</span></button>
+        <button type="button"><strong>Attack</strong><span>Melee</span></button>
+        <div class="segment-group" role="group" aria-label="Specials">
+          <button type="button"><strong>Guarded</strong><span>−2 / +2</span></button>
+          <button type="button"><strong>Extended</strong><span>1–5</span></button>
+          <button type="button" disabled><strong>Far Shot</strong><span class="picker-reason">No range</span></button>
+        </div>
+        <button type="button"><strong>Wait</strong><span>End turn</span></button>
+      </div>
+      <button class="gold go">Go</button>
+    </footer>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>

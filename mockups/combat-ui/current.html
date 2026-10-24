@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Current combat UI · Tactics Guru</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>Current combat UI</h1>
+      <small>Faithful recreation of the shipped rail/dock HUD (#108 / #111)</small>
+    </div>
+    <a href="index.html">All options</a>
+    <a href="current.html?export=1">Export view</a>
+  </header>
+  <main class="stage current-stage">
+    <section class="battlefield" aria-label="Battlefield">
+      <header class="board-heading">
+        <p class="eyebrow">Tactics Guru</p>
+        <h1>Forest Ruins</h1>
+      </header>
+      <div class="board-region">
+        <img class="scene" src="assets/board.png" alt="Forest Ruins isometric board with three heroes and goblins">
+      </div>
+      <p class="board-caption">Gold: active · White: selected · Teal: reachable · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin · Tap to select · Drag to pan</p>
+    </section>
+    <aside class="rail" aria-label="Battle controls">
+      <header class="actor">
+        <p class="eyebrow">Round 1 · Your turn</p>
+        <div class="identity">
+          <img src="assets/fighter.png" alt="Fighter portrait">
+          <div>
+            <h2>Fighter</h2>
+            <p class="hp">HP 18/18</p>
+            <div class="health" aria-hidden="true"><span style="width:100%"></span></div>
+            <p class="meta">AC 14 · Accuracy +4</p>
+            <p class="meta">No status effects</p>
+          </div>
+        </div>
+        <p class="meta" style="margin-top:11px">Move ready / Action ready</p>
+      </header>
+      <div class="scroll">
+        <p class="section">Choose your action</p>
+        <div class="actions">
+          <button aria-pressed="true"><strong>Move</strong><span>Uses movement</span></button>
+          <button><strong>Basic attack</strong><span>Uses action</span></button>
+          <button><strong>Guarded Strike</strong><span>Uses action</span></button>
+          <button><strong>Wait / End turn</strong><span>Ends turn immediately</span></button>
+        </div>
+        <label class="meta" for="ability" style="display:block;margin:10px 0 4px">Ability</label>
+        <select id="ability"><option>Guarded Strike</option></select>
+        <p class="meta" style="margin:6px 0">Range 1–1 · Hostile target · −2 attack / +2 AC until next turn · uses action</p>
+        <p class="avail">Choose an action, then a target. Wait ends the turn immediately.</p>
+        <section class="decision">
+          <label for="target">Target / destination</label>
+          <select id="target">
+            <option>Choose target</option>
+            <option selected>(3, 5) · cost 2</option>
+            <option>(4, 5) · cost 3</option>
+          </select>
+          <p class="sel">Selected (3, 5)</p>
+          <p class="sel">Target: empty tile</p>
+          <p class="preview">Move 2 steps · cost 2 · uses movement</p>
+          <div class="commit">
+            <button class="gold">Review action</button>
+            <button>Cancel action</button>
+          </div>
+        </section>
+        <nav class="tools">
+          <button>Inspect party</button>
+          <button>Battle log</button>
+          <button>Enable sound</button>
+        </nav>
+        <p class="meta" style="margin-top:10px">Sound off</p>
+        <p class="meta">Battle ready</p>
+        <button style="width:100%;margin-top:8px">Restart battle</button>
+      </div>
+    </aside>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>
