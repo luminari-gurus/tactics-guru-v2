@@ -1,10 +1,12 @@
 import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from '@playwright/test';
-import { session, playCommand, playerDecision } from './helpers/battlePolicy';
+import { readSession, session, playCommand, playerDecision } from './helpers/battlePolicy';
 import { battleCatalog as catalog } from '../src/content/catalog';
 import { replayBattle } from '../src/domain/turns';
 import { battleCues, type BattleCue } from '../src/audio/battleCues';
 import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';
+import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
+import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
 
 const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
 async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
@@ -57,7 +59,10 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
 
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
   // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
-  const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);await enable(page);
+  const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);
+  // WebKit can omit the synthetic mouse click here; the gesture case owns pointer/touch proof.
+  await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
+  await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   await page.clock.pauseAt(start+60000);
   const before=(await session(page)).state.commandCount;
@@ -270,41 +275,71 @@ test('late decode from a destroyed scene cannot alter replacement controls or pl
   expect(await audio(page)).toEqual(before);expect(found).toEqual([]);
 });
 
-for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`seed ${seed}: sound on/off legal battles match with committed cues and ${outcome}`,async({page})=>{
-  // Two full UI battles, each with the existing battle-loop suite's 180 s allowance.
-  test.setTimeout(360000);const found=errors(page);let silent:Awaited<ReturnType<typeof session>>|undefined;
-  const heard=new Set<BattleCue>();
-  for(const enabled of [false,true]) {
-    if(enabled)await page.evaluate(()=>{localStorage.removeItem('tactics-guru:phaser:battle:primary:v1');localStorage.removeItem('tactics-guru:phaser:battle:backup:v1');});
-    await page.goto('/');await ready(page);
-    if(enabled)await enable(page);
-    if(seed===2){await page.locator('#fit-restart').click();await confirmRestart(page);await expect.poll(async()=>(await session(page)).state.seed).toBe(2);}
-    for(let i=0;i<200;i++){
-      await expect.poll(async()=>(await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
-      (await audio(page)).recent.forEach(c=>heard.add(c));
-      const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
-      const command=playerDecision(s.state),previous=(await audio(page)).started;
-      await playCommand(page,command);
-      if(enabled && command.type!=='endTurn') {
-        const committed=(await session(page)).events.slice(s.events.length),expected=battleCues(committed,catalog),snapshot=await audio(page);
+async function startSeed(page:Page,seed:number,enabled:boolean) {
+  await page.goto('/');await ready(page);
+  if(enabled)await enable(page);
+  if(seed===2){await page.locator('#fit-restart').click();await confirmRestart(page);await expect.poll(async()=>(await session(page)).state.seed).toBe(2);await ready(page);}
+  if(enabled)await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
+}
+
+for(const seed of [1,2]) test(`seed ${seed}: short sound on/off legal checkpoints preserve session and saved bytes`,async({page})=>{
+  const found=errors(page),silent:{session:Awaited<ReturnType<typeof session>>;saved:{primary:string|null;backup:string|null}}[]=[];
+  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),BATTLE_STORAGE_KEYS);
+  for(const enabled of [false,true]){
+    if(enabled)await page.evaluate(keys=>Object.values(keys).forEach(key=>localStorage.removeItem(key)),BATTLE_STORAGE_KEYS);
+    await startSeed(page,seed,enabled);
+    for(let i=0;i<=2;i++){
+      const current=await session(page),saved=await stored(),checkpoint={session:current,saved};
+      const encoded=encodeBattleSave(current.state,catalog);expect(encoded.ok).toBe(true);
+      if(encoded.ok){expect(saved.primary).toBe(encoded.text);expect(decodeBattleSave(encoded.text,catalog)).toEqual({ok:true,state:current.state});}
+      const replay=replayBattle(current.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(current.state);
+      if(enabled)expect(checkpoint).toEqual(silent[i]);else {silent.push(checkpoint);expect((await audio(page)).started).toBe(0);}
+      if(i===2)break;
+      const command=playerDecision(current.state),previous=(await audio(page)).started;
+      await playCommand(page,command);await ready(page);
+      if(enabled && command.type!=='endTurn'){
+        const expected=battleCues((await session(page)).events.slice(current.events.length),catalog),snapshot=await audio(page);
         expect(snapshot.started).toBeGreaterThan(previous);
         expect(snapshot.recent.slice(-(snapshot.started-previous))).toContain(expected[0]);
       }
     }
-    const final=await session(page);expect(final.state.outcome).toBe(outcome);
-    const replay=replayBattle(final.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(final.state);
-    if(!enabled){silent=final;expect((await audio(page)).started).toBe(0);}
-    else {
-      expect(final).toEqual(silent);
-      await expect.poll(async()=>(await audio(page)).recent).toContain(seed===2?'victory':'loss');
-      (await audio(page)).recent.forEach(c=>heard.add(c));
-      expect([...heard]).toEqual(expect.arrayContaining(['move','hit','miss','unit-defeat',seed===2?'victory':'loss']));
-      if(seed===2){
-        expect([...heard]).toContain('magic');
-        expect(final.replay.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:basic_attack','ability:guarded_strike','ability:high_shot','ability:magic_missile']));
-      }
-      await test.info().attach('audio',{body:JSON.stringify({seed,heard:[...heard],snapshot:await audio(page),replay:final.replay}),contentType:'application/json'});
+    if(enabled){
+      expect((await audio(page)).started).toBeGreaterThan(0);
+      await page.screenshot({path:test.info().outputPath('audio-checkpoint.png')});
+      await page.reload();await page.locator('#save-continue').click();await ready(page);
+      expect((await readSession(page)).state).toEqual(silent[2].session.state);
+      await enable(page);expect((await audio(page)).started).toBe(0);
+      expect(await stored()).toEqual(silent[2].saved);
     }
   }
+  expect(found).toEqual([]);
+});
+
+for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`seed ${seed}: complete audible legal battle delivers committed cues and ${outcome}`,async({page})=>{
+  test.setTimeout(360000);const found=errors(page),heard=new Set<BattleCue>();
+  await startSeed(page,seed,true);
+  for(let i=0;i<200;i++){
+    await expect.poll(async()=>(await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
+    (await audio(page)).recent.forEach(c=>heard.add(c));
+    const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
+    const command=playerDecision(s.state),previous=(await audio(page)).started;
+    await playCommand(page,command);
+    if(command.type!=='endTurn'){
+      const committed=(await session(page)).events.slice(s.events.length),expected=battleCues(committed,catalog),snapshot=await audio(page);
+      expect(snapshot.started).toBeGreaterThan(previous);
+      expect(snapshot.recent.slice(-(snapshot.started-previous))).toContain(expected[0]);
+    }
+  }
+  const final=await session(page);expect(final.state.outcome).toBe(outcome);
+  const replay=replayBattle(final.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(final.state);
+  await expect.poll(async()=>(await audio(page)).recent).toContain(seed===2?'victory':'loss');
+  (await audio(page)).recent.forEach(c=>heard.add(c));
+  expect([...heard]).toEqual(expect.arrayContaining(['move','hit','miss','unit-defeat',seed===2?'victory':'loss']));
+  if(seed===2){
+    expect([...heard]).toContain('magic');
+    expect(final.replay.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:basic_attack','ability:guarded_strike','ability:high_shot','ability:magic_missile']));
+  }
+  await page.screenshot({path:test.info().outputPath('audio-outcome.png')});
+  await test.info().attach('audio',{body:JSON.stringify({seed,heard:[...heard],snapshot:await audio(page),replay:final.replay}),contentType:'application/json'});
   expect(found).toEqual([]);
 });

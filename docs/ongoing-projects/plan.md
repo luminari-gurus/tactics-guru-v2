@@ -1,136 +1,319 @@
-# Issue #220: reliable collector-owned preview startup
+# Issue #205: reduce repeated full-battle audio equivalence testing
 
-Date: 2026-10-22 (Asia/Jerusalem). Status: implementation and required qualification complete; both [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225) review findings are repaired, published and resolved. The PR is ready to merge. OpenSpec change: `issue-220-preview-readiness`, 8/8 tasks complete. No merge or production operation performed.
+Date: 2026-10-23 (Asia/Jerusalem). Status: implemented, qualified and ready for review.
+The caller requested end-to-end implementation, OpenSpec tracking, proportional
+verification and review-ready publication. No merge or deployment is authorized.
 
-- Issue: [#220](https://github.com/luminari-gurus/tactics-guru-v2/issues/220), DevOps: repair local performance collector preview readiness [P2].
-- Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/220#issuecomment-6346084262).
-- Base: `main` at `4f6614edee382def5f284a17e7f5872aafbbb02e`.
-- Work branch: [branch/issue-220-preview-readiness](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-220-preview-readiness), created from that base and natively linked in the issue's Development section. This planning commit publishes the plan on that branch.
-- Coordination: [#199](https://github.com/luminari-gurus/tactics-guru-v2/issues/199), [#200](https://github.com/luminari-gurus/tactics-guru-v2/issues/200) and [PR #209](https://github.com/luminari-gurus/tactics-guru-v2/pull/209). These remain separately owned/tracked; this branch claims only #220.
-- Previous root plan: [issue-221-desktop-timeouts-plan.md](issue-221-desktop-timeouts-plan.md), preserved byte-for-byte. Its historical open-PR statements remain historical; PR #223 is now merged. Its OpenSpec proposal points to the preserved plan.
+## Current continuation state
+
+- Requested branch; tested chunks `d5f7a45` (unit proof) and `5b36658` (browser
+  refactor) are pushed in [PR #229](https://github.com/luminari-gurus/tactics-guru-v2/pull/229).
+  Main base remains `b749ba4`; #228 packaging stays separate.
+- OpenSpec `issue-205-audio-equivalence` is valid (spec-driven, skip_specs: true).
+  [Tasks](../../openspec/changes/issue-205-audio-equivalence/tasks.md): 7/7 complete.
+  The caller requested the ledger; existing product specs remain unchanged.
+- Refactor complete: 12 full UI battles become six audible journeys plus short
+  enabled/muted legal comparisons. Both original seeds have real-adapter proof
+  at every accepted boundary. No production/helper/dependency/config changes.
+- Qualification passed: 29 audio units, 43 session/save units, 221 content checks,
+  both type scopes and production build; 2 engine smokes. Original audio capture
+  54/54 in 780.826 s; refactor 60/60 in 608.309 s, **22.1% less**. Same exact bundle.
+- A diagnosed WebKit lost-click setup failure is repaired with a real keyboard
+  gesture in the clock-controlled case. Diagnostic fix 3/3; final affected
+  Chromium 3/3, WebKit 4/4 and persistence/run 15/15 pass, zero retries/skips.
+  Reuse the other 57 unchanged Chromium results; no later full-file rerun claimed.
+- Discovery 693 → 699; all 687 retained IDs and the full WebKit selection match.
+  All six outcome replays match the original capture exactly. Screenshots reviewed.
+- Raw receipts: `tmp/verification/issue-205/`; [QA mapping and detailed results](../qa/issue-205-audio-equivalence.md).
+  Original setup/WebKit/diagnostic failures are preserved. The detached base
+  worktree and temporary diagnostic source/config have been removed.
+- Code/receipt publication: `3153e8d`, with verified archive/manifest and final PR
+  description. Local inputs exactly match the final focused captures (SHA-256
+  `f9c0e36b0fd07ed667eca4e472030e96df0421180b287c09ed0a57b8c31a6d59`).
+  Later handoff-only commits reuse that evidence; they were not re-executed.
+- Delivery is complete and PR #229 is ready for review. Main remained `b749ba4`,
+  checkout was clean and tracking parity was `0 0` at publication readback.
+  No implementation/acceptance work remains before review. Do not merge or
+  deploy; #199/#200 stay open. Archive OpenSpec after review if requested.
+
+- Issue: [#205](https://github.com/luminari-gurus/tactics-guru-v2/issues/205), P1.
+- Owner: `moshehbenavraham`; [kickoff comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/205#issuecomment-6362068879).
+- Base: `main` at `b749ba40f358cf6fa0e8e9acb96f535c6362e938`.
+- Work branch: [branch/issue-205-audio-equivalence](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-205-audio-equivalence),
+  published from that base and natively linked in the issue's Development section.
+- Coordination: [#199](https://github.com/luminari-gurus/tactics-guru-v2/issues/199)
+  is the parent; [#200](https://github.com/luminari-gurus/tactics-guru-v2/issues/200)
+  supplies partial timing evidence and stays open. [#208 / PR #228](https://github.com/luminari-gurus/tactics-guru-v2/pull/228)
+  owns serial execution packaging separately.
+- Previous root plan: [issue-220-preview-readiness-plan.md](issue-220-preview-readiness-plan.md),
+  preserved byte-for-byte. Its historical PR/status statements remain historical;
+  PRs #209, #224 and #225 have now merged. Its OpenSpec proposal links to that archive.
 
 ## Outcome
 
-Make `npm run measure:fit` start exactly one owned local Vite preview, recognize that preview within a bounded deadline independently of human-readable output, and await its cleanup on success or failure. Preserve actionable startup diagnostics, source/build identity, remote-origin behavior, strict port 4174 and all current measurement sampling and limits. Prove the startup/failure contract and one isolated local production capture without erasing prior failures or claiming the whole #200 baseline is complete.
+Reduce repeated browser work in `tests/battle-audio.spec.ts` while preserving every
+existing gameplay-equivalence, cue-delivery, permission, failure, lifecycle and
+save/replay obligation. Prove deterministic sound-on/off equivalence for both
+original legal win/loss seeds at the session/audio boundary. Retain complete
+audible browser win/loss journeys and focused real-browser comparisons. Measure
+the affected workload before/after on matching qualified capacity, including the
+currently incomplete landscape baseline. Report actual gains and remaining costs.
 
-The caller has now authorized implementation, focused tests, one capture, commits, pushes and review-ready PR publication. Use the existing OpenSpec root and [issue-220 change](../../openspec/changes/issue-220-preview-readiness/proposal.md) to track implementation. No merge or production operation is authorized.
+## Selection from the complete backlog
 
-## Continuation checkpoint
+Reviewed all **41 open issue bodies**, labels, assignees, native blocked-by links,
+Development links and project memberships; all **three open PRs**; and all **seven
+remote branches**. The issue inventory has `hasNextPage: false`. Repository,
+organization and authenticated-user Projects V2 inventories each contain zero
+projects, so there are no accessible project-only draft work-items to select.
+Relevant issue comments were checked. No readiness labels were changed.
 
-- Review repair: both P2 findings reproduced against `1882cec` (five failing regressions) and repaired in `47baafb1ebcff4a493482bb0a524a33f7c8756b1`. Preserve the initiating abort alongside secondary capture/cleanup errors; abort promptly on preview exit and defer its diagnostic snapshot until bounded close/pipe drain. Final affected contracts pass 67/67; both type scopes and two real Chromium browser-close checks pass. [Repair receipt](../qa/issue-220/review-repair.json) binds source/tests and compressed RED/GREEN/iteration/browser logs. Fourteen original input hashes and all app/assets are unchanged; reuse the earlier build/capture only for unchanged measurement behavior. No new sampling/build/full regression. Fix and replies are published, both threads resolved, and head/base/merge tree/parity verified. OpenSpec is complete at 8/8. Preserve existing history/capture provenance; no rebase, stack or tag is needed. Final tracking commit changes documentation only.
-- Clean starting branch/HEAD: `233970a8730d886fe4d0fbad05285e0d142dd3b4`; fetched main remains `4f6614edee382def5f284a17e7f5872aafbbb02e`. #220 still assigned to `moshehbenavraham`; no existing implementation PR. #209 remains separate and open.
-- Recovered original artifact to ignored `tmp/issue-220/original-failure.zip`; extract bounded relevant receipts for durable QA records.
-- Initial Windows probe at unchanged collector source failed before binding because installed dependencies lack the Windows Rolldown native binding. Raw normal/colored stderr and `reproduction.json` are retained under `tmp/issue-220/`; repair via lockfile install before useful startup reproduction. This is a local setup failure, not an explanation of the historical hosted failure.
-- Tool paths in this session: Node is bundled on PATH. npm CLI: `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/11.19.1/bin/npm-cli.js`; OpenSpec CLI: `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` (run both with Node). WSL also has npm/OpenSpec/gh available.
-- Scope remains minimal: private Vite IPC worker + lifecycle, collector integration, focused contracts, QA receipts. No shared harness, dependencies, runtime, assets or budgets need changing.
-- Reproduction and lifecycle implementation are complete. [QA reference](../qa/issue-220-preview-readiness.md) retains historical raw failure/metadata and actual normal/colored/chunked observations. Colored pinned Vite output deterministically misses the old predicate despite HTTP 200. Historical root cause remains unproved.
-- Focused final contracts: 62/62 pass (22 new + 40 existing). Production build passed 221 content cases, both type scopes and Vite; final helper/tests pass app TypeScript. Reuse unchanged content/domain evidence and bundle once after freezing HEAD to bake clean final identity. Default full-run discovery still has 19 stages; do not execute the full matrix.
-- Independent Windows orchestration assertion defect reproduced at exact main and repaired in [PR #224](https://github.com/luminari-gurus/tactics-guru-v2/pull/224), commit `39b7a7aefa5b7e96623415f955c31880d60660a8`; 10/10 portable contracts pass. This branch retains the unmodified test and its 9/10 Windows result. No collector dependency on that test-only PR.
-- Delivered collector implementation: `33f3595be96dd12a4cfc7fdb3e443352a5f4b30d`, pushed in [PR #225](https://github.com/luminari-gurus/tactics-guru-v2/pull/225), targeting main. This exact clean source was bundled and served throughout the one default production capture. Subsequent commits contain only evidence/docs/OpenSpec tracking, so reuse the recorded relevant input hashes without rerunning the app.
-- Qualification: local Windows/Node 24.19.0, Chromium 153.0.8010.12, Playwright 1.63.0; desktop/portrait/landscape screenshots inspected. No concurrent browser-test/collector/Vite job; existing desktop apps and 17.0% preflight CPU load are recorded limitations. Actual CLI launch-failure injection exits 1 and leaves no result file/listener.
-- **Capture complete, acceptance distinguished:** one capture retained 18/18 default samples in 43.3 seconds, exit 0, no browser/capture failure and no preview listener left. Evaluator exit 1 preserves two F1 budget-failing samples (desktop/warm/1 and portrait/warm/1, initial/current p50 16.8 ms > unchanged 16.7 ms), zero loading warnings. Do not rerun for greener numbers or claim #200/performance acceptance. Original historical failure also remains failed.
-- Durable [receipts](../qa/issue-220/receipts.json), [raw capture](../qa/issue-220/performance.json.gz), [evaluation](../qa/issue-220/evaluation.json.gz), screenshots and compressed logs live under `docs/qa/issue-220/`. The QA reference explains decompression, commands, provenance, limitations, original failures and follow-up ownership. No release tag is appropriate for this tooling repair.
-- Remaining work is review/integration of #225 and independent #224, with merges separately authorized. #199/#200's other coverage and performance acceptance and PR #209 remain independently tracked. Do not archive the OpenSpec change or close coordinating issues during this handoff.
-- Final delivery checks: #225 is open/non-draft against `main`, with published evidence at `2fbdba3c1ab54f7fb46938958005e0dd49e0baa3`; #224 is also open/non-draft and independent. Local/remote branch parity is `0 0`, worktree clean before this completion-marker commit. Strict OpenSpec validation, 31 local links, 23 raw receipt/hash checks and all 16 relevant input hashes pass. No PR-triggered hosted workflow runs are reported; local evidence is the qualification used here.
+#205 has no `ready for work` label, but its current body explicitly permits bounded
+work from #200's completed per-case evidence. #201 is closed/integrated. The parent
+epic and the incomplete monolithic baseline are not prerequisites to starting.
+It was unassigned, had no comments or linked branch and had no competing PR when
+claimed. Assignment and kickoff were read back. The selection considers all work,
+not just labeled issues.
 
-## Selection from the complete backlog (planning snapshot)
+The source-bound [#200 investigation](../qa/issue-200/chromium-timeout-investigation.md)
+records **611.3 seconds across 37 completed audio cases**, the second-largest file
+cost, including a **161.8-second** passed desktop sound-on/off case. These are
+historical measurements from a failed/incomplete aggregate, not fresh timings.
+Current source still performs two full UI battles per outcome seed per Chromium
+profile. This gives #205 a concrete reduction to test without changing the matrix
+or conflicting with #208's job packaging.
 
-Reviewed all **42 open issue bodies**, labels and assignees, all **three open PRs**, current remote branches, native blocked-by/Development links and repository/organization Projects V2. The GraphQL inventory reports 42 issues and `hasNextPage: false`; both project inventories report zero projects and all issue project memberships are empty. The initial review included issues without `ready for work`. Labels were not changed.
+Every open issue is accounted for:
 
-#220 was unassigned, had no linked branch, no comments and no implementation PR. It is independently actionable: #199 is a parent, not a prerequisite, and the collector sources are byte-identical between current main and PR #209's branch (`a0185e492d558c29ead872414ffebc6129516876`). #210 and #223 are merged; #219's cleanup is integrated into #209 but has not reached main.
+- **Selected:** #205, bounded P1 audio-equivalence work with measured cost.
+- **Owned:** #85 release operations, #123 / PR #139 HUD, #128 telemetry, #161
+  effects, #162 ability picker, #200 timing/baseline and #219 cleanup are assigned
+  to `dubstylee`. Some implementation is already on main; an open tracker does
+  not mean its work should be duplicated or its acceptance is complete.
+- **In flight:** #208 is unassigned but already covered by `dubstylee`'s PR #228.
+  PR #12 is a separately held deployment alternative. Neither is available to claim.
+- **Available alternatives:** #153 menu, #155 enemy movement, #160 progression,
+  #172 combat items/revival, #176 records, #177 planning/undo, #179 log export,
+  #181 presentation conveniences, #183 rules docs, #184 generators, #187 direct
+  confirmation, #218 Guarded badge and #227 dungeon markers. #155's native #154
+  blocker is closed. #160 is the strongest gameplay foundation but has broader
+  save/projection implications. #218/#227 are useful bounded UI work with less
+  measured feedback-loop impact.
+- **Other actionable P1 verification work:** #203 matrix selection and #204 legal
+  run fixtures now permit focused starts from partial #200 evidence. #203 changes
+  shared coverage selection and needs a wider coverage audit; #204's measured
+  file cost is 472.2 seconds. #205 has a larger observed file cost and narrower
+  ownership than matrix redesign. None requires a successful repeat monolith
+  just to begin planning.
+- **Dependent or awaiting settled contracts:** #163-#169, #171, #173-#175 and
+  #185 retain progression/effect/content or reward/currency requirements. Existing
+  primitives do not by themselves finish their issue-specific acceptance.
+- **Coordination epics:** #170 requires bounded biome-pack issues; #199 coordinates
+  separate verification tasks. Neither is one implementation patch.
+- **Adoption/destination decisions:** #178 rotation, #180 music/Settings and #182
+  editor/practice retain explicit design choices and lower priority.
 
-The judgment is to remove a concrete missing-baseline failure before expanding gameplay. #200 explicitly tracks #220 as missing work; #203, #204, #205 and #208 require the comparable #200 baseline. This repair removes one obstacle, not all of those prerequisites. #160 is the strongest gameplay alternative: the encounter-identity prerequisites are merged and progression supports later class/reward work, but it changes shared saves, combat projection and multiple routes. #220 is more bounded and directly improves confidence in subsequent work.
+## Base audit and affected consumers
 
-Every open item is accounted for:
+These findings describe base `b749ba4` before implementation. The current
+continuation state above and [final QA mapping](../qa/issue-205-audio-equivalence.md)
+record the replacement and its evidence.
 
-- **Owned/in flight:** #85 release operations, #123 / PR #139 mobile HUD, #128 telemetry, #161 effects, #162 ability picker, #200 / PR #209 timing and #219 process cleanup belong to `dubstylee`. PR #12 is a separately held deployment alternative. Do not duplicate or claim them.
-- **Selected:** #220 collector preview readiness.
-- **Available alternatives, with their own planning decisions:** #153 menu, #155 enemy movement, #160 progression, #172 consumables/revival, #176 records, #177 tactical planning/undo, #179 log export, #181 presentation conveniences, #183 rules docs, #184 generator profiles, #187 direct confirmation, #195 compass and #218 Guarded indicator. #155's only native blocker is already-closed #154. Small UI/docs tasks have less downstream verification value; the broader alternatives introduce more behavior or design work.
-- **Dependent or awaiting contracts:** #163-#169 and #171 require unfinished progression/effects/content contracts; #173 needs growth/effect ordering; #174 needs functioning upgrade consumers and currency decisions; #175 depends on #174; #185 explicitly awaits class-stat mapping and #160. #203/#204/#205/#208 still require incomplete #200. Some foundations already exist on main; absence of a native blocker does not settle the body-level prerequisites.
-- **Coordination epics:** #170 requires bounded biome implementation issues; #199 coordinates separate verification tasks. Neither is one implementation patch.
-- **Explicit adoption/destination decisions:** #178 rotation, #180 optional music/Settings and #182 editor/practice retain decisions or prerequisites. They do not outrank the demonstrated collector gap.
+- [battle-audio.spec.ts](../../tests/battle-audio.spec.ts) currently discovers
+  **18 cases per default project, 54 selections total**. Its final two cases run
+  seeds 1/loss and 2/win twice, muted then enabled: **12 full UI battles** across
+  desktop, portrait and landscape. They compare final session objects, replay
+  state, zero muted playback, committed cues and required win-seed abilities.
+- [battleCues.test.ts](../../tests/unit/battleCues.test.ts) already covers cue
+  mapping, criticals, grouping, truncation and a paired legal **seed-2 victory**
+  session loop. That loop calls the pure cue mapper, not the `BattleAudio`
+  adapter, and does not cover the seed-1 defeat pair. Extend this boundary rather
+  than presenting its current result as exhaustive adapter proof.
+- [battleAudio.test.ts](../../tests/unit/battleAudio.test.ts) has an existing
+  fake-host fixture for the real adapter, including muted/duplicate tokens,
+  ordering, unlock refusal/timeouts, media failures, visibility, late callbacks
+  and disposal. It can accept legal `BattleSession` presentation batches without
+  loading Phaser or creating a new general test harness.
+- [BattleSession](../../src/app/BattleSession.ts) resolves and freezes state/events
+  before presentation, records commands and uses a token to acknowledge it.
+  [BattleScene](../../src/phaser/BattleScene.ts) passes accepted events to audio
+  before animation; animation completion acknowledges the session independently.
+  [BattleAudio](../../src/phaser/BattleAudio.ts) has no command-dispatch callback.
+  These observations support the proposed split; browser integration still needs
+  real gesture/playback proof.
+- [saveEnvelope.ts](../../src/domain/saveEnvelope.ts) canonically encodes accepted
+  state. Compare encoded bytes, replay/events and command/RNG state at the legal
+  checkpoints rather than inventing snapshots or adding production test hooks.
+- [battlePolicy.ts](../../tests/helpers/battlePolicy.ts) and
+  [playerPolicy.ts](../../tests/helpers/playerPolicy.ts) supply existing legal
+  choices and real-control execution. Reuse them. Avoid invoking the entire
+  [saveFixtures()](../../tests/helpers/saveFixtures.ts) corpus for a short audio
+  checkpoint: it also constructs a 10,000-command maximum fixture.
+- [Default config](../../playwright.config.ts) uses three Chromium profiles and
+  one worker. Full current discovery is **693 selections**, distinct from the
+  historical 687. [WebKit acceptance](../../playwright.device-acceptance.config.ts)
+  selects **four audio executions**: gesture/focus/restart and interruption checks
+  on iPhone portrait and landscape. The complete audio outcome tests are not in
+  that WebKit grep. Preserve its existing selection; do not broaden it by accident.
+- Standalone, run and dungeon all use the shared scene/audio implementation.
+  This plan changes tests only. Existing run audio/reset and battle persistence
+  consumers remain acceptance coverage; touching a shared helper would expand
+  the required verification to all of that helper's consumers.
 
-The Actions API now reports [self-hosted run 39767156870, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39767156870/attempts/2) as completed/failure. Earlier issue/PR prose saying it is running is stale. Its raw failure artifact has not been independently audited in this planning pass; do not infer a new collector failure, a successful performance stage or the actual tested checkout from the workflow-head SHA alone.
-
-## Source findings
-
-- [measure-fit.ts](../../scripts/measure-fit.ts) spawns the pinned Vite CLI directly with Node, `127.0.0.1:4174` and `--strictPort`. It sets `previewListening` only when one stdout chunk contains the exact expected URL, and attempts HTTP only after that flag. Formatting, alternate display spelling or chunk boundaries can block a live endpoint. The nominal startup loop is 100 attempts separated by 100 ms, but each `fetch` has no explicit deadline, so it is not a hard total bound.
-- Spawn/exit errors append stderr or a message; the final startup timeout discards those details and stdout is not retained. The outer `finally` calls `server.kill()` without waiting for exit/port release. Early startup errors occur before a sample file is written. These are direct code observations, not proof of the historical host's exact startup cause.
-- A replacement that merely accepts any HTTP 200 while the new child is alive can race an unrelated listener: that listener may answer before Vite reports its strict-port failure. Ownership must be established before accepting HTTP readiness; an arbitrary sleep is insufficient.
-- Inspected the locally installed Vite 8.3.5 implementation and CLI: `preview()` awaits its own strict-port `httpServerStart()` before returning, exposes `httpServer` and an awaited `close()`, and the CLI prints URLs afterwards. This supplies an existing binding boundary without parsing formatted logs. Preserve its normal config/plugin loading and production `dist` behavior.
-- [measure-fit-options.ts](../../scripts/measure-fit-options.ts) owns local/remote selection, prefixed URLs, scene/route handling and identity checks. An explicit `--url` or `FIT_URL`, even a loopback URL, is remote mode and must not start, stop or inventory a local preview. Keep this distinction.
-- [measure-fit-controls.ts](../../scripts/measure-fit-controls.ts) supplies legal proof/battle/run navigation; [measure-fit-evaluate.ts](../../scripts/measure-fit-evaluate.ts) and [evaluate-fit.ts](../../scripts/evaluate-fit.ts) own acceptance evaluation. Preserve all three.
-- [verify-full.mjs](../../scripts/verify-full.mjs) calls the same collector for its performance stage, requires the successful root build, clears inherited `FIT_URL` and writes `performance.json`. PR #209's unmerged timing wrapper is another consumer of the same command, not a new dependency of this repair.
-- [measureFitOptions.test.ts](../../tests/unit/measureFitOptions.test.ts), [measurements.test.ts](../../tests/unit/measurements.test.ts) and [verify-full.test.mjs](../../tests/tooling/verify-full.test.mjs) already protect parsing, identity/evaluation and stage isolation. None directly proves preview startup and cleanup.
-
-The [original failed run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665) is issue-reported evidence: performance failed after 10.58 seconds, emitted `Preview failed to start` and produced no performance.json at source `73d34dba1620174837cf15a93812d393abe690aa`. Its [retained artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39700595665/artifacts/12396082054) has bounded retention. Recover relevant logs/metadata during implementation before they expire. Do not replace that failed observation with an assumed stdout cause.
+The six inspected audio/session/policy files are unchanged between historical
+source `6f20a3d6a8087e40777cccb6ee7c2cf4a09ece89` and this plan's base. This supports
+using that report to identify cost, not claiming identical full build or host
+conditions. Raw artifact availability and the remaining relevant inputs must be
+verified before reusing any runtime result for acceptance.
 
 ## Non-goals
 
-No gameplay, save schema, assets, dependency updates, product budgets, sample counts, viewport projects, renderer diagnostics, action UX or remote deployment changes. Do not incorporate PR #209, build a generic process manager, redo #219 descendant containment, change full-matrix selection, provision runners or add a workflow merely for this repair. Do not run a new full regression or baseline for cleaner numbers. Leave #199/#200 and all unrelated issues open. This plan does not authorize merging or production operations.
+No application, gameplay, RNG, save-format, animation, audio-media, dependency,
+timeout, retry, worker or performance-budget changes. No device/profile reduction,
+shared coverage framework, generic fixture API, new workflow, runner provisioning
+or #208 packaging changes. Do not refactor run recovery under #204, alter the
+confirmation UX under #187, complete #200, merge or deploy during this task.
 
-Physical-device access in the caller checkout is `android`; it is capability information, not completed testing. Physical devices are not required for this issue. AGENTS.md accepts Playwright/browser-device emulation; retain desktop, portrait and landscape collector profiles and describe them accurately.
+No physical devices are required. The caller checkout declares Android access;
+that is availability, not testing. Playwright emulation satisfies AGENTS.md.
 
 ## Ablation decisions
 
-- **Keep** exact-base reproduction and raw output/HTTP observations: otherwise the reported failure would be assumed rather than dispositioned. Use one bounded startup probe, not another whole baseline.
-- **Keep** a positive bind acknowledgement plus live-child and bounded HTTP checks: removing bind ownership can accept an unrelated server; removing HTTP can accept a bound but unusable endpoint; removing liveness can accept a dying preview.
-- **Simplify** ownership to one private collector-specific lifecycle module/worker using Vite's existing awaited `preview()` binding boundary. The worker sends a structured IPC bound/error message; stdout/stderr remain diagnostic only. This small handshake replaces log parsing and avoids a general orchestration layer. Preserve the current separate preview process; no detached subprocess tree or npm shell wrapper.
-- **Keep** explicit bounded cleanup and diagnostics: sending a signal alone does not prove release of the preview port. Scope escalation to the exact owned child; unrelated processes must survive.
-- **Keep** the collector's source/build checks. If the private helper contains collector behavior, include its bytes in `collectorSha256` so the recorded provenance still covers all loaded collector sources.
-- **Drop** a new public timeout/configuration surface, new dependencies, generic retry policy, unrelated browser matrices, timing-tool integration and speculative process abstractions. None is needed to satisfy #220.
-- **Simplify** verification to the collector lifecycle, existing parsing/evaluation/orchestration contracts, the ordinary build and one isolated production capture. The full application's gameplay matrix has unchanged inputs.
+- **Keep** deterministic comparison at every accepted command for both original
+  seeds and their established outcomes. Removing a seed loses win/loss coverage;
+  comparing only the final state loses event/order and transient-state failures.
+- **Simplify** exhaustive sound-on/off work to existing session/cue/adapter unit
+  tests. Cover frozen event batches, token suppression and late callbacks using
+  the existing adapter fixture; label its fake backend honestly.
+- **Keep** complete audible seed-1 loss and seed-2 win journeys on all three
+  current Chromium profiles, with real controls, committed cues, replay checks
+  and all approved win-seed abilities. No profile reduction belongs to #205.
+- **Replace** each full muted-browser repetition with short paired legal-command
+  comparisons using real sound controls. They must prove enabled/muted browser
+  integration leaves session and save bytes identical while playback differs.
+  Retain preview/cancel purity and no historical playback on Continue.
+- **Keep** every existing non-outcome audio case and the four selected WebKit
+  checks: fake-backend units cannot establish playback/permission behavior.
+- **Drop** a new fixture framework, broad seed sweep, 10,000-command fixture
+  generation, configuration changes and another monolithic baseline. None is
+  required by the identified invariant. Add a small legal checkpoint helper only
+  if a retained assertion cannot be reached cheaply through existing controls.
+- **Keep** this file as the continuation reference and a short OpenSpec ledger
+  requested by the caller. Existing behavior is the contract; skip spec deltas
+  for this test-only refactor rather than inventing product requirements.
 
 ## Files
 
-Implementation files used, with completed proof in the QA reference:
+Expected implementation changes:
 
-- `scripts/measure-fit.ts`: integrate owned-preview lifecycle, bound startup, retain diagnostic failures, await cleanup and extend source hashing if a helper is added.
-- `scripts/measure-fit-preview.ts` (new): one private collector lifecycle boundary, including the child entry that starts the existing Vite preview and acknowledges its own bind. Use the current config, host/strict port and production output; explicitly reject missing build output rather than relying on the CLI-only missing-dist check.
-- `tests/unit/measureFitPreview.test.ts` (new): focused real process/HTTP contracts; reuse the existing Vitest selection. Temporary fixture roots/processes belong to each test and are cleaned up. Do not build the game in fast-unit contracts.
-- Existing `tests/unit/measureFitOptions.test.ts` or `tests/tooling/verify-full.test.mjs` only if an uncovered changed boundary needs proof; preserve current mode/identity assertions.
-- `docs/qa/issue-220-preview-readiness.md` and bounded source-bound receipts under `docs/qa/issue-220/`: reproduction, changes, commands, startup/cleanup and capture results, original failures and limits. Keep bulky raw logs in durable receipt storage with hashes/retrievable locations.
-- `docs/ongoing-projects/plan.md`: update progress/evidence during implementation. Update current collector usage documentation only if observable command/failure guidance changes.
+- `tests/battle-audio.spec.ts`: retain complete audible outcomes; replace only
+  repeated muted full battles with short paired integration checks.
+- `tests/unit/battleCues.test.ts`: retain every pure cue policy case; remove the
+  mapper-only seed-2 session loop after consolidating its proof into the real
+  adapter tests for both seeds.
+- `tests/unit/battleAudio.test.ts`: exercise the real adapter with legal accepted
+  batches for both original outcome seeds using its existing fake host; compare
+  every accepted session/save/replay boundary, callback ordering and frozen
+  events, and prove it cannot resurrect suppressed batches.
+- `docs/qa/issue-205-audio-equivalence.md` (create during implementation): concise
+  old-assertion-to-retained-proof mapping, source/build identities, timings and
+  retained result/artifact hashes. Update this plan with actual progress.
 
-Application code, `package.json`, lockfile, Vite config, browser projects and full/timing runners should remain unchanged. If actual reach expands, record the demonstrated cause and revise the affected-consumer proof before continuing.
+Read-only consumers include `tests/helpers/battlePolicy.ts`,
+`tests/helpers/playerPolicy.ts`, `tests/helpers/saveFixtures.ts`,
+`tests/battle-persistence.spec.ts`, `tests/run-progression.spec.ts`, both Playwright
+configs and all production sources. Prefer file-local test changes; a helper
+extraction needs an actual second caller and an explicit consumer audit.
 
-## Implementation sequence (completed; see continuation checkpoint)
+## Implementation sequence and proof
 
-1. **Rebind and reproduce.** Refresh main, #220 ownership/comments, PR #209 and active captures; preserve this branch and plan. Record literal base/current inputs, Node/Vite/OS and child PID. Retain the original failure record. Run the existing pinned CLI startup with piped normal/colored output and controlled chunk splitting; record complete raw stdout/stderr, the old URL predicate and independent HTTP outcomes. Distinguish a deterministic reproduction of the fragile predicate from a proven explanation of the historical run.
-2. **Make owned readiness explicit.** Start one direct Node child for the private Vite worker. Await Vite's strict `127.0.0.1:4174` bind before its structured acknowledgement, then poll the existing local document endpoint while the child is alive. Preserve config/plugin and `dist` semantics. Use the existing nominal 10-second startup allowance as a hard monotonic total deadline, with per-request cancellation bounded by the remaining time. Spawn failure, child exit, bind failure, timeout and persistent non-OK/hanging HTTP must fail with bounded stdout/stderr tails, PID/exit/signal and last HTTP error/status. Do not inflate measurement or startup limits, shift to another port or accept a foreign listener.
-3. **Make lifecycle completion observable.** Wrap startup and the complete capture in the same owned-resource lifetime. On normal completion, startup/capture/browser-launch failure or catchable interruption, request graceful close, await child exit and bound forced termination of that exact child if needed. Remove temporary signal/listener/timer state. Keep failures nonzero and preserve the original error alongside any cleanup error. No guarantee of cleanup after SIGKILL/host crash is claimed. Remote mode must create no owned preview and kill no process.
-4. **Prove the boundaries.** Add the focused contracts below. Use ephemeral ports/static fixture roots internally to isolate tests; production port stays fixed. Exercise the actual pinned Vite path for successful bind and occupied-port rejection. Avoid a permanent fake preview path in production. Include a child that ignores graceful termination so the bounded cleanup path is proven.
-5. **Qualify one real capture and hand off.** Commit/freeze implementation before building/capturing so the served build can match source HEAD. Run only the affected checks below and the one default local production capture. Preserve any budget/capture failure and stop rather than repeatedly sampling for a pass. Publish one focused implementation PR later, referencing only #220 for completion; do not merge or close coordinating work in this task.
+1. **Freeze the comparison scope.** Refresh main, #205 and PR #228. Inventory
+   current audio IDs and map every assertion in both paired outcome tests to
+   its retained unit or browser owner, including all cues, win/loss, each approved
+   ability, replay, muted suppression and session equality. Preserve all other
+   audio IDs and the four WebKit selections. Obtain the original raw receipts if
+   reusing their per-case data; otherwise capture a focused base result.
+2. **Capture the focused before result.** On qualified, otherwise idle self-hosted
+   capacity, run this file on all three existing profiles against the exact base
+   and its production build. This fills missing landscape evidence. Reuse a
+   completed profile only after checking artifact availability and relevant
+   inputs/conditions; the historical aggregate remains failed/incomplete.
+   Preserve durations, counts, skips/retries, failures and setup overhead.
+3. **Strengthen existing unit boundaries.** Drive both original seeded legal
+   battles through `prepare/confirm`, `nextEnemy` and `finishPresentation`.
+   Compare each accepted batch and resulting state, command log, RNG, events,
+   canonical save bytes and decoded/replayed continuation. Invoke the real audio
+   adapter with enabled/muted fake backends; settle callbacks and prove they
+   cannot affect gameplay. Retain existing suppression/disposal contracts.
+4. **Remove only redundant browser work.** Keep one complete audible win and loss
+   per profile, exact cue/ability/error and replay assertions included. Add short
+   enabled-versus-muted legal-command comparisons from equal states through
+   actual HUD controls; compare resulting session and saved bytes. Existing
+   sound-control/Continue tests retain cancellation and no-old-cue behavior.
+   If an invariant lacks equivalent proof, keep its browser execution.
+5. **Qualify final affected inputs.** Run the unit files below, both TypeScript
+   scopes and one production build. Execute all audio cases on all three default
+   profiles and all four selected WebKit cases. Discover the full default matrix
+   before/after to prove unrelated IDs did not change. Bind retained persistence
+   and run/lifecycle results to unchanged inputs; run the relevant cases below
+   where receipts are unavailable or invalidated.
+6. **Compare and deliver one focused PR.** Use the same host, browser/runtime,
+   worker/retry settings, server/base mode and cache/load conditions. Report total
+   affected wall/test/setup time, added unit cost, per-profile counts and any
+   failures. Reduced complete-battle count is a design expectation, not a claimed
+   50% wall-time gain. Coordinate changed IDs with #208's discovery/aggregation;
+   do not rewrite its manifest or workflow here. Leave #199/#200 open.
 
-## Proof and acceptance
-
-Follow [verification-policy.md](../verification-policy.md). The initial planning publication was documentation-only. Implementation and the proof below have now executed; the QA reference and machine-readable receipts give exact results and limitations. Final evidence/docs changes reuse the unchanged collector/app/build inputs instead of repeating the capture or full application suites.
-
-Iteration contracts must prove:
-
-- Ready owned HTTP is accepted with colored, split, URL-free or silent stdout; formatting never controls readiness. Slow startup within the unchanged allowance succeeds.
-- Spawn error, child exit before/during probing, strict-port collision, missing `dist`, non-OK HTTP, hanging response and total timeout fail promptly with useful bounded diagnostic output. An already-listening unrelated server may respond 200 before the new child exits; it must never be measured, stopped or signaled.
-- Graceful success/failure cleanup releases the owned process/port before returning. Failed browser launch/capture and catchable SIGINT/SIGTERM also clean up; forced termination is bounded and does not mask the original failure. An unrelated sibling survives. A second start can reuse the released owned port.
-- Remote mode remains independent, including explicit loopback `--url`/`FIT_URL`; no local process or local dist inventory is used. Existing scene, prefix, source/build and mixed-build checks remain intact. No samples or missing result file are converted into a passing result.
-
-Proposed final commands, from the implementation checkout with lockfile-matched dependencies:
+Commands for implementation (from the repository root):
 
 ```sh
-npm ci
-npm run test:unit -- tests/unit/measureFitPreview.test.ts tests/unit/measureFitOptions.test.ts tests/unit/measurements.test.ts
-npm run test:verification
-node scripts/verify-full.mjs --list
+npm run test:unit -- tests/unit/battleCues.test.ts tests/unit/battleAudio.test.ts tests/unit/battleSession.test.ts tests/unit/saveEnvelope.test.ts
 npm run build
-# After the successful build, with FIT_URL unset and no competing browser workload:
-npm run measure:fit -- tmp/issue-220/performance.json
-node --experimental-strip-types scripts/evaluate-fit.ts tmp/issue-220/performance.json tmp/issue-220/evaluation.json
+npx --no-install playwright test tests/battle-audio.spec.ts --list
+npx --no-install playwright test tests/battle-audio.spec.ts
+npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-audio.spec.ts --list
+npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-audio.spec.ts
+npx --no-install playwright test --list --reporter=json
 git diff --check
 ```
 
-The new preview contract path becomes valid only when implemented; the other command paths/scripts were checked in current main. `npm run build` includes content validation and both TypeScript scopes, so do not repeat them separately. The orchestration list is discovery only; do not execute `verify:full`. The evaluator requires distinct paths and refuses to overwrite its output; choose a unique receipt directory for an intentional later run.
+Save before/after JSON results and command/environment receipts in distinct ignored
+`tmp/verification/issue-205/<base-or-head>/` directories, with a durable QA receipt
+and artifact hashes. Use existing reporters; do not introduce timing infrastructure.
+`npm run build` already runs content validation and both TypeScript scopes.
 
-Use qualified, otherwise idle local/self-hosted capacity for the single capture, with no automatic GitHub-hosted fallback and no overlapping GPU workloads. If a runner dispatch is genuinely needed later, reuse authorized trusted-code execution and `tactics-browser-exclusive`; do not add an ad hoc branch-code trigger. Record Node/OS/browser/CPU, cache/background-load limitations, exact collector source/hash set, served build commit/dirty flag, build inventory and raw exit/output. The default proof capture must retain all **18 samples** (three profiles, three repetitions, cold/warm) and unchanged evaluator limits. Preserve nonzero results and distinguish successful collection from budget acceptance.
+Existing persistence/route consumers, when fresh execution is required:
 
-No battle/run/dungeon gameplay, WebKit, telemetry or full regression rerun is selected for the bounded collector lifecycle change. Their implementation/config inputs are unchanged. If any of those inputs changes, or lifecycle reach becomes shared/unbounded, expand according to the policy and document why. Neither focused contracts nor a completed 18-sample capture constitutes a complete #200 baseline, a claimed speedup, physical-device proof or production acceptance.
+```sh
+npx --no-install playwright test tests/battle-persistence.spec.ts --grep 'startup is read-only|reload during legal'
+npx --no-install playwright test tests/run-progression.spec.ts --grep 'accepted player presentation reload|run preparation and dialogs'
+```
 
-Every #220 implementation acceptance bullet now has an evidence-backed disposition in the QA reference: reproduction, bounded owned HTTP readiness/diagnostics, preserved identity/modes/strict port/limits, awaited cleanup/foreign survival, focused contracts and one retained isolated production capture. The 10.58-second historical failure and current evaluator budget failures remain preserved. Review PRs and final Git parity are the handoff boundaries; no full-baseline or performance-budget pass is claimed.
+Verify each final filter with `--list` first. Preserve all currently selected
+projects/modes. If a shared helper changes, inventory and execute its affected
+consumers, including WebKit owners, instead of assuming these filters suffice.
+
+Follow [verification-policy.md](../verification-policy.md): this bounded test-only
+change requires full execution of the changed audio coverage, not an unrelated
+complete game baseline. Broaden only for concrete shared reach. No fresh
+`measure:fit`, telemetry matrix or full `verify:full` run is justified while
+production, shared helpers and config remain unchanged. Reuse is conditional on
+available receipts and relevant input equivalence; a missing receipt is missing
+proof, and focused passes do not erase historical failed captures.
+
+## Planning validation and handoff
+
+Read-only discovery on the recorded base found 54 default audio selections,
+four WebKit audio selections and 693 complete default selections, with no discovery
+errors. The two documented persistence/run filters select nine and six executions,
+respectively. All 33 relative links across the planning files resolve; the prior
+plan's archived Git blob is unchanged (`d1c1c66f13046d1691ab6363be268e3bc524cdda`),
+and `git diff --check` passes. No browsers, app build or implementation tests were
+executed for planning. Commit/push only this plan, the preserved prior plan and
+its corrected inbound proposal link. Final readback must confirm issue
+assignment/comment, native Development linkage, remote commit/plan identity,
+clean checkout and `0 0` tracking parity.
+
+The paragraph above records the completed planning-only pass. The later caller
+instruction now authorizes implementation and affected baseline execution; track
+actual completion and remaining acceptance in Current continuation state above.
