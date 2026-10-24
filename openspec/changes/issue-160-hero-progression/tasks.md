@@ -20,14 +20,14 @@ Caller approved proposal/design/specs in chat on 2026-10-23. Issue #160; branch 
 
 ## 4. Player feedback and browser behavior
 
-- [ ] 4.1 Show level, XP/next or MAX, learned actions and current/max HP through existing run/dungeon party and inspection views; add accepted-only level-up feedback. Verify accessible labels, no duplicate reload announcements and unchanged targeting/modal locks in UI/session tests; update gameplay docs.
-- [ ] 4.2 Add focused legal-boundary Playwright journeys for real victory advancement, threshold healing, all responsive layouts, inspection/picker, reload/floor travel, defeated hero, terminal award and duplicate prevention. Verify discovered case IDs and retain desktop/portrait/landscape screenshots and source-bound reports.
-- [ ] 4.3 Cover pre-progression recovery/export and progressed active-battle restoration using existing legal fixtures, including required-level fixture abilities; verify dev fixture selection plus focused WebKit resume/keyboard/touch and representative standalone battle/engine smokes. Keep unimplemented production abilities absent.
+- [x] 4.1 Show level, XP/next or MAX, learned actions and current/max HP through existing run/dungeon party and inspection views; add accepted-only level-up feedback. Verify accessible labels, no duplicate reload announcements and unchanged targeting/modal locks in UI/session tests; update gameplay docs.
+- [x] 4.2 Add focused legal-boundary Playwright journeys for real victory advancement, threshold healing, all responsive layouts, inspection/picker, reload/floor travel, defeated hero, terminal award and duplicate prevention. Verify discovered case IDs and retain desktop/portrait/landscape screenshots and source-bound reports.
+- [x] 4.3 Cover pre-progression recovery/export and progressed active-battle restoration using existing legal fixtures, including required-level fixture abilities; verify dev fixture selection plus focused WebKit resume/keyboard/touch and representative standalone battle/engine smokes. Keep unimplemented production abilities absent.
 
 ## 5. Integrated PR qualification
 
-- [ ] 5.1 Map affected consumers and discover the exact PR-readiness selections under docs/verification-policy.md; run full units, content validation, both TypeScript scopes and production build, plus affected run/dungeon/item/save/picker browser suites on exclusive self-hosted capacity. Include telemetry-specific checks only if relevant inputs changed; preserve failures/skips and reuse only input-bound evidence.
-- [ ] 5.2 Deliver docs/qa/issue-160 evidence with acceptance mapping, source/build identities, commands/results and actual limits; compare against all issue acceptance criteria, validate OpenSpec strictly and run git diff --check. Open a ready PR only when acceptance is verified, otherwise draft with explicit gaps.
+- [x] 5.1 Map affected consumers and discover the exact PR-readiness selections under docs/verification-policy.md; run full units, content validation, both TypeScript scopes and production build, plus affected run/dungeon/item/save/picker browser suites on exclusive self-hosted capacity. Include telemetry-specific checks only if relevant inputs changed; preserve failures/skips and reuse only input-bound evidence.
+- [x] 5.2 Deliver docs/qa/issue-160 evidence with acceptance mapping, source/build identities, commands/results and actual limits; compare against all issue acceptance criteria, validate OpenSpec strictly and run git diff --check. Open a ready PR only when acceptance is verified, otherwise draft with explicit gaps.
 
 ## Workflow follow-up
 

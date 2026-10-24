@@ -1,0 +1,31 @@
+{
+  "base": "5a8802753811663957ea38bb828773866b000f95",
+  "finalRuntimeSource": "2e2362cf14a9b20c43bb547aa82f9c36db55ab47",
+  "sha256": {
+    "src/domain/battle.ts": "20db578de7e530e87385b41594627700ec7be3eb3caeaa6b068f0d48ef3bb9b2",
+    "src/domain/turns.ts": "300be722e2dbd097199c384965b2736c73ccd7a90bdbc41643d8119707b55e9b",
+    "src/domain/combat.ts": "524a95c643b46b4911864362b70c16fc7030760a9a8ff248171838e8fb7a8a7a",
+    "src/domain/grid.ts": "50313fc6c880b0ad519ca47059a2bd153cfde5f9bd47f6dc9c7751912941aee5",
+    "src/domain/ai.ts": "df1d2e160595176441ef4bc26e3a4c29bc90a7398c737816d3e19e9ef7b7043b",
+    "src/domain/rng.ts": "1a9121e116a1c5a1e2ff176cfbf54186e2ab00672e1c9d84dfecbcb09380ecb0",
+    "src/domain/effects.ts": "6360606a292a789834ff75ce42c1474d30aacdc1d4d2e11ea70749218dc47409",
+    "src/domain/saveEnvelope.ts": "49d2fd2971c210c437d649b5fa55e6403c813150d5a9a69397cbaff3dcf218e6",
+    "src/app/BattlePersistence.ts": "473e45ff40466a468465df28cefb5e6ce8f66d8c04ce08f8d9dc37ee08e049a2",
+    "src/phaser/FitScene.ts": "93217a3cc43c15dde47d50b991b53f2076d073b4f16c390d97cae9ff32ed5f24",
+    "src/phaser/BoardInput.ts": "2333755ca87e08ddfd8d1b7e6e213ab490ad660eaf92940732ef69de167768c9",
+    "src/ui/hud.ts": "6a0be8d971bc95851d80371771881a38358aa4f5ed8332a90a7e9f3eb9366cb3",
+    "src/ui/dialogs.ts": "9e540c5f80ce24c9e0ecf95fc44dd4d6516a9c945ead20ced00a6bb8964ec969",
+    "src/ui/battleLayout.ts": "94f05277a3cb98474735530951aa9c3427611290916792c3c10221d6ad4e4947",
+    "src/content/catalog.ts": "ee87bde89144f33047438ffd6f32699c78bc8368136ef2247f2b4ef65acc7a50",
+    "src/content/abilities.ts": "f38ce59b72808487d334f04545ad63f5e241d0940e26b9cd251fc89fe6bdbf25",
+    "src/content/assets.ts": "acfee3a0cd30fe148f84da041dc1456b2dcba43ac920fcd342be0bc09da27f27",
+    "src/content/desertAssets.ts": "29d37b9c049245aa6e102ac3c25a451b40dc871e2159ef1283375b5b2ff1f809",
+    "src/persistence/runStorage.ts": "c217c052382c87a1935761ba3611c6f25c5dbe6bd60ba1ba11911e8fa212feac",
+    "src/persistence/dungeonStorage.ts": "f3b7029ee0a8d75893c0b408d79eb3b3f1807e8eef23c288194177defd5adaee",
+    "src/telemetry/telemetry.ts": "d7577cb162ca00324216b85ab85f4f6415b94eb095e93c17e6e20ba2db015f8f",
+    "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae",
+    "package.json": "b28b6e3cb02f2ea14ec1546635b0f6e53ad1508d0412e18decfdcc925a35e7e7",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d"
+  },
+  "qualification": "Scope-specific behavior reuse only; changed session metadata, projection and save paths are qualified fresh. Not proof of byte-identical emitted builds or unchanged loading timings."
+}

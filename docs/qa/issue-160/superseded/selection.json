@@ -1,0 +1,2431 @@
+{
+  "config": {
+    "argv": [
+      "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+      "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "tests/dungeon.spec.ts",
+      "tests/dungeon-exploration.spec.ts",
+      "tests/dungeon-lifecycle.spec.ts",
+      "tests/run-progression.spec.ts",
+      "--list",
+      "--reporter=json"
+    ],
+    "configFile": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/playwright.config.ts",
+    "rootDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "dungeon-exploration.spec.ts",
+      "file": "dungeon-exploration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-b532c1e8c24fddedb907",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 19,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d888f02279edd4d22047",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 85,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-ede73592a8fb55c48c78",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 103,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-5805fc5796be02c7e447",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-4fc08ec1745e90528924",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 136,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-e07ed0373f2c34be867d",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 152,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-57d43b323b66a905b8ca",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-e7b29c99932e46c9738b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-aff9866d33b94f326681",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-30196fd6aa91c22219fd",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 215,
+          "column": 1
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-0dcb9ca89759c57c9347",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 276,
+          "column": 2
+        },
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-55c3475b8e108b21c5aa",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 19,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-85740a838208415b9446",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 85,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-57a6340159f2bddc2923",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 103,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-da32505e0d44b05d8da0",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-a846de2388afbe671b21",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 136,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-688582f26a470887b18c",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 152,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-0337a51eebdcb38a56d3",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-9d1ce10cc39b07cd7be6",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-c08126546fcd9e641599",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d25f29e2365a21dd6c87",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 215,
+          "column": 1
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-9c8483722a898bfa3943",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 276,
+          "column": 2
+        },
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-b19e2cc7742df590bbd1",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 19,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-0686bed4c9c2e2ddf2df",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 85,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-96e0eb933243fadc6b93",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 103,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-5acf66fcf399165131ea",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "cold format-3 Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-368eba25decca492eb51",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 136,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-2fa38af8a08fe2b63efc",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 152,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-a0b01250ea7ebf5721ce",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 159,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-99968e782f1d11225e55",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-6d8019e9aebe3c3e7a6e",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 179,
+          "column": 49
+        },
+        {
+          "title": "legal two-floor guardian journey covers both biomes and every kind through ascent, revisit and resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-71f004f00d62530feb15",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 215,
+          "column": 1
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d96882e6b61784eb6cb3",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 276,
+          "column": 2
+        }
+      ]
+    },
+    {
+      "title": "dungeon-lifecycle.spec.ts",
+      "file": "dungeon-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-c54412077c6fed182277",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-02db78f88a13d90da9d4",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-82536302229eae09119d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 35,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-f20d5db5b7f79c7ba9c8",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-d47311d85069ad676a40",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-0fbc14f83b036a3e0363",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-22ffbf56cba97d3ea781",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 35,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-dabc8bd6d377cf241eb1",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-b3a744b335ed673c7fdd",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-7428f0a8276fb9b3a2fe",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-6cd710728ef7b747c05c",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 35,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-530af5340be5704ebc81",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 41,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "dungeon.spec.ts",
+      "file": "dungeon.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-27c1df265c4e331f7ca3",
+          "file": "dungeon.spec.ts",
+          "line": 16,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-b1f558b26fddbee05add",
+          "file": "dungeon.spec.ts",
+          "line": 32,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-903e7f51d3bc8ffebfed",
+          "file": "dungeon.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-756d6a8aeb53b4df7e2c",
+          "file": "dungeon.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-1c45e140201097728189",
+          "file": "dungeon.spec.ts",
+          "line": 97,
+          "column": 1
+        },
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-924fc7f6e313c6ef7717",
+          "file": "dungeon.spec.ts",
+          "line": 16,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-478ef942227c55980774",
+          "file": "dungeon.spec.ts",
+          "line": 32,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-1582d9f4488c69670872",
+          "file": "dungeon.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-a62365266fe83c1de87a",
+          "file": "dungeon.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-46a5d6d50ce86d9fca0c",
+          "file": "dungeon.spec.ts",
+          "line": 97,
+          "column": 1
+        },
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-50c03233c18e4a14a4ff",
+          "file": "dungeon.spec.ts",
+          "line": 16,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-eaa04c6723a5c2afa9f3",
+          "file": "dungeon.spec.ts",
+          "line": 32,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-9321d72d8dafef51a6d9",
+          "file": "dungeon.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-e02e510261f5259ae271",
+          "file": "dungeon.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-da14e87b7e0c84074fc3",
+          "file": "dungeon.spec.ts",
+          "line": 97,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "run-progression.spec.ts",
+      "file": "run-progression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-471d9897f80fdb516c2b",
+          "file": "run-progression.spec.ts",
+          "line": 57,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-ce3b462773c6d2637788",
+          "file": "run-progression.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1c4ef7c00c455fe2810b",
+          "file": "run-progression.spec.ts",
+          "line": 108,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-67a33fb6854ff09ee1d2",
+          "file": "run-progression.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b6cbe4c445e878a865f7",
+          "file": "run-progression.spec.ts",
+          "line": 138,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-92de3229fc9cc3c60d06",
+          "file": "run-progression.spec.ts",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-e30fd4031da28f42a065",
+          "file": "run-progression.spec.ts",
+          "line": 171,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5cc35e5db4c3618f2e08",
+          "file": "run-progression.spec.ts",
+          "line": 183,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-8409d2453425b61ac9af",
+          "file": "run-progression.spec.ts",
+          "line": 200,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-16c936faa42bc226ff18",
+          "file": "run-progression.spec.ts",
+          "line": 216,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c5b946ea4c61fd567b11",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-7497d7ea84fbc182de50",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-22983cc1ad0236740d33",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2d9fd325406679938589",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-86c96542030150750f02",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-250819ad071425ed66f0",
+          "file": "run-progression.spec.ts",
+          "line": 268,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-5f292dcdd3b24b4ce3fa",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0b54aab0e6586b3b5d83",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        },
+        {
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-f975335c46ddd687e2ab",
+          "file": "run-progression.spec.ts",
+          "line": 57,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3cb1da4fd4f243c22e69",
+          "file": "run-progression.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-272680e084cbdda91393",
+          "file": "run-progression.spec.ts",
+          "line": 108,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-776ce8b4ecc25a1958c6",
+          "file": "run-progression.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-73a5992ad6946b004097",
+          "file": "run-progression.spec.ts",
+          "line": 138,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-1aaaf727a292259b183c",
+          "file": "run-progression.spec.ts",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9609366939035932f595",
+          "file": "run-progression.spec.ts",
+          "line": 171,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2c46757a28226a2deb1c",
+          "file": "run-progression.spec.ts",
+          "line": 183,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c0dd991c1962a2c88b33",
+          "file": "run-progression.spec.ts",
+          "line": 200,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d7747b64296743427310",
+          "file": "run-progression.spec.ts",
+          "line": 216,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-61961a59ea234f715443",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-8f31cef9a99deca5d83e",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-74870bd2a19de0e0cd11",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-bb7d723257cba36ba297",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-681490cd5b4b300fc70a",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-eba13c11f5b9663da36a",
+          "file": "run-progression.spec.ts",
+          "line": 268,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c8da709630ecf309fb00",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-9cf21bec81de95499156",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        },
+        {
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-004e4d531227795b4a31",
+          "file": "run-progression.spec.ts",
+          "line": 57,
+          "column": 1
+        },
+        {
+          "title": "legal defeat reload, native keyboard restart and isolated single-battle save",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-285aec39eaa2c8df3983",
+          "file": "run-progression.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "accepted player presentation reload preserves exact boundary without old cues",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a09108363ce0e6f0f27b",
+          "file": "run-progression.spec.ts",
+          "line": 108,
+          "column": 1
+        },
+        {
+          "title": "enemy presentation reload resumes the same commands and RNG as an uninterrupted run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-7fb8a49f20939e14cef7",
+          "file": "run-progression.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-0f4859e904e32f44de24",
+          "file": "run-progression.spec.ts",
+          "line": 138,
+          "column": 1
+        },
+        {
+          "title": "run preparation and dialogs retain 44px controls, native touch and narrow layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-3ec2cb6d12e2f40aa61d",
+          "file": "run-progression.spec.ts",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-d88f255c5e2f97f01190",
+          "file": "run-progression.spec.ts",
+          "line": 171,
+          "column": 1
+        },
+        {
+          "title": "review: in-flow Continue resumes an ongoing backup battle after legal defeat",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2b753526a279b3a47ba0",
+          "file": "run-progression.spec.ts",
+          "line": 183,
+          "column": 1
+        },
+        {
+          "title": "review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-208840648e736a7286be",
+          "file": "run-progression.spec.ts",
+          "line": 200,
+          "column": 1
+        },
+        {
+          "title": "review: reopened outcome recovery exports the exact retained backup after partial reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c80078ddc9851f871bf1",
+          "file": "run-progression.spec.ts",
+          "line": 216,
+          "column": 1
+        },
+        {
+          "title": "review: recovery dismissal via Escape retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-34ce60fb2789c5f75c4c",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review: recovery dismissal via Close retains connected visible keyboard focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-a88ad030e7a9af23e8b2",
+          "file": "run-progression.spec.ts",
+          "line": 228,
+          "column": 50
+        },
+        {
+          "title": "review repair: startup Continue survives Cancel",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-cae82cbb2116f79bc190",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Escape",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-b5f6d3cf02b9807c1d35",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: startup Continue survives Export",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-c0aa4a8cd39668aff918",
+          "file": "run-progression.spec.ts",
+          "line": 249,
+          "column": 57
+        },
+        {
+          "title": "review repair: deleting both loaded slots starts a fresh playable run",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-2e7e4f27a9c67b5d2a56",
+          "file": "run-progression.spec.ts",
+          "line": 268,
+          "column": 1
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit continue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-cf2936b7d10aa4bef517",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        },
+        {
+          "title": "review repair: recovered storage preserves unsaved bytes until explicit replace",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "56e8b196f7ac6aaa7059-dd7c4a4c194b8be3f504",
+          "file": "run-progression.spec.ts",
+          "line": 281,
+          "column": 53
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-23T22:31:39.112Z",
+    "duration": 730.9389999999999,
+    "expected": 0,
+    "skipped": 114,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,22 @@
+
+> tactics-guru-v2@0.0.0 test:verification
+> node --test tests/tooling/verify-full.test.mjs
+
+✔ required failures do not suppress later suites and fail the aggregate (0.573542ms)
+✔ failed build blocks stale preview but still runs dev fixtures and restoration (0.13675ms)
+✔ signals, spawn errors and exceptions remain failures; results are checkpointed (0.081417ms)
+✔ all successful stages pass and fixture selection is combined exactly once (0.053084ms)
+✔ ordinary bundles reuse one unit/content pass and both type scopes (0.091834ms)
+✔ failed units or types block unchecked bundles while independent coverage continues (0.09975ms)
+✔ explicit modes isolate inherited build/report flags but preserve browser selection (0.067875ms)
+✔ aggregate refuses filters that could silently narrow required coverage (0.145167ms)
+✔ full verification captures the local build despite an inherited remote FIT_URL (84.713709ms)
+✔ actual child process exit codes preserve later execution and separate logs (133.158417ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 295.352042

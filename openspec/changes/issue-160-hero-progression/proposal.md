@@ -27,4 +27,4 @@ Content progression definitions/validation; domain run/dungeon, item projection 
 
 Issue assigned to `dubstylee`; branch `work/issue-160-hero-progression` published from main `5a8802753811663957ea38bb828773866b000f95` (merged #236). #157/#159 are closed and merged; #162 picker is integrated. Other assigned/active backlog work is excluded. No new readiness promotions were justified in this pass. Local `.env` is absent: physical capability is `none`; physical testing is not required, and browser/device emulation is sufficient.
 
-Planning only; implementation awaits explicit approval of these artifacts.
+Caller approved these artifacts on 2026-10-23. Implementation and qualification are tracked in tasks.md and docs/qa/issue-160/README.md.

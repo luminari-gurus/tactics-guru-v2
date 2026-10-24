@@ -1,0 +1,1272 @@
+{
+  "config": {
+    "argv": [
+      "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+      "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "playwright.fixtures.config.ts",
+      "--list",
+      "--reporter=json"
+    ],
+    "configFile": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/playwright.fixtures.config.ts",
+    "rootDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts",
+          "**/ability-picker.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts",
+          "**/ability-picker.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts",
+          "**/ability-picker.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "ability-picker.spec.ts",
+      "file": "ability-picker.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-74ecd0847f39e88905b2",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-d910ef3d312ac3c06fc1",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-9e3b982b582faf2cec12",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-a07857301ff54dfecee9",
+          "file": "ability-picker.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-c03dc48f09f49c95e22e",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-31c9ff023c7d473d3fdb",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-a36e481a98e9eb21e56c",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-ea2a4c0fa41133cce06c",
+          "file": "ability-picker.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-7bc55a2308a9b71eb82f",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-83635aeae3a8296210c7",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-33e2ad792227d3c2e5da",
+          "file": "ability-picker.spec.ts",
+          "line": 2,
+          "column": 47
+        },
+        {
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "dc05b687c651765fa444-6efa5c2117a73159a175",
+          "file": "ability-picker.spec.ts",
+          "line": 46,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "authored-encounters.spec.ts",
+      "file": "authored-encounters.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-9643088a5f620243a38b",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-9ff734b579129eb73803",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-34f8a9d5b4a4e046a788",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-fda3e40ec7c2b7dc8711",
+          "file": "authored-encounters.spec.ts",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-2dd655cb8109a414f4da",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-8b93cfb0a8dfe040a2f5",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-21a88d2b2c650ac2bfff",
+          "file": "authored-encounters.spec.ts",
+          "line": 80,
+          "column": 1
+        },
+        {
+          "title": "representative generated layouts retain readable open desert terrain",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-21b44cf2ba3ae9df1d8c",
+          "file": "authored-encounters.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-b0b19289b4401df13b8a",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-527e6b18e95fb369ec72",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-50aa4cbabe0f417a004c",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-979ad4667d9d4a9fe390",
+          "file": "authored-encounters.spec.ts",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-60c89e26b0162a18bb8c",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-5cc7a453d4e41c198892",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-bacf93537f330cceda75",
+          "file": "authored-encounters.spec.ts",
+          "line": 80,
+          "column": 1
+        },
+        {
+          "title": "representative generated layouts retain readable open desert terrain",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-74fe0a5a6b75aec4fea2",
+          "file": "authored-encounters.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "encounter:forest_ruins: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-4ce9f08a56a43b2c7eea",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:woodland_crossing: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-a8b1c09b0491d3825afb",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "encounter:ruined_approach: render, resize and transformed picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-16b3e953bed1a0d10db4",
+          "file": "authored-encounters.spec.ts",
+          "line": 34,
+          "column": 36
+        },
+        {
+          "title": "unknown encounter fails before board construction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-40dbafe60c5df5e434e4",
+          "file": "authored-encounters.spec.ts",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "required asset missing produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-a437ee5d82cf7c40979a",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "required asset decode produces controlled error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-30835e28cba99db608b9",
+          "file": "authored-encounters.spec.ts",
+          "line": 72,
+          "column": 43
+        },
+        {
+          "title": "forced desert fallback uses production assets and pointer picking",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-d8e04c72ce95cbc9b1be",
+          "file": "authored-encounters.spec.ts",
+          "line": 80,
+          "column": 1
+        },
+        {
+          "title": "representative generated layouts retain readable open desert terrain",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "860bfe54b51d0261c7e0-d51a43f1bda368d4679a",
+          "file": "authored-encounters.spec.ts",
+          "line": 93,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "run-items.spec.ts",
+      "file": "run-items.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-4b43e12150cdf167bbed",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-aff8a23654e9715e9add",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-41b491a3296fe41d5e10",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-ac8214a2dd167286c7c2",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-c46a8e79569407231fd1",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-1f192850f2e57adc6fad",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6aaa3bf2f2c86783347c",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        },
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6909c702fe87aa095708",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-df0bea338d29a40bdd74",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-d718d5bdaa70ca117dc3",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-4b8c7f3a87ac05834fb9",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-63d5391743fd950a12f8",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6b0b9deb196152bb1b4c",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-91acbb70a2fae9745589",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        },
+        {
+          "title": "reward claim advances exactly once and survives pending/claimed reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-072a6f0d752b90b0d84e",
+          "file": "run-items.spec.ts",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "real item use, equip and unequip preserve ownership/stats across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6a2375e872b88466098e",
+          "file": "run-items.spec.ts",
+          "line": 33,
+          "column": 1
+        },
+        {
+          "title": "keyboard cancel, held activation, native modal capture and layout",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-a7bc5b4b95442d71f79b",
+          "file": "run-items.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "corruption preserves bytes, exports raw data and requires reviewed removal before saving",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-5dd15b966cdea33a92c7",
+          "file": "run-items.spec.ts",
+          "line": 93,
+          "column": 1
+        },
+        {
+          "title": "stale recovery review refuses changed bytes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-d2d8e0c49c1458847c99",
+          "file": "run-items.spec.ts",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "unavailable storage is nonfatal and active battle prevents item controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-8f9f231a224b9ed33df1",
+          "file": "run-items.spec.ts",
+          "line": 127,
+          "column": 1
+        },
+        {
+          "title": "rejected reward capacity and active snapshot reload leave state and RNG intact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "35a5e42f71eea10fcdba-6170ecdfe403c814acfb",
+          "file": "run-items.spec.ts",
+          "line": 142,
+          "column": 2
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-23T22:31:40.680Z",
+    "duration": 118.21300000000008,
+    "expected": 0,
+    "skipped": 57,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

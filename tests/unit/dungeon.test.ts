@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
-import { dungeonContent } from '../../src/content/dungeon';
+import { dungeonContent, dungeonIdentity } from '../../src/content/dungeon';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
@@ -162,7 +162,9 @@ describe('dungeon recovery limits',()=>{
 describe('pre-progression save preservation',()=>{
   it.each([1,2,3] as const)('rejects old format %i without changing raw storage',format=>{
     const base=freshDungeon('old-progress',13,LEGACY_ENCOUNTER_POLICY);
-    const raw=format===3?JSON.stringify({...JSON.parse(priorDungeonEnvelope(base,2)),format:3}):priorDungeonEnvelope(base,format);
+    // Exact old format-3 wire shape: keep its policy/plans, strip only new hero fields.
+    const oldBody={kind:'tactics-guru:dungeon',format:3,identity:dungeonIdentity,payload:{...base,party:base.party.map(({heroId,hp})=>({heroId,hp}))}};
+    const raw=format===3?canonical({...oldBody,digest:hashJson(oldBody)}):priorDungeonEnvelope(base,format);
     expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
     const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
     expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('invalid');

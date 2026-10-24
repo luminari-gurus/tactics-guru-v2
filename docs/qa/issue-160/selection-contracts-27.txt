@@ -1,0 +1,39 @@
+
+> tactics-guru-v2@0.0.0 test:verification-batches
+> node --test tests/tooling/verification-batches.test.mjs tests/tooling/verification-selection.test.mjs
+
+✔ whole-file batches partition canonical Chromium and preserve every remaining stage (1.172625ms)
+✔ selection drift, missing and duplicate IDs fail closed (0.326042ms)
+✔ targeted runs and pilot cannot claim full coverage; unknown batch filters fail (0.55675ms)
+✔ real Playwright pilot discovery matches full titles in all intended projects (534.151666ms)
+✔ performance acceptance requires complete source-bound samples and successful evaluation (0.201083ms)
+✔ artifact validation rejects altered files, missing files, wrong source and wrong plan (1.3795ms)
+✔ failed prerequisites block only consumers; prefix failure still restores root (0.499792ms)
+✔ interrupt stops later work and checkpoints already recorded failures (0.072792ms)
+✔ aggregate accepts exact complete receipts and records attempts/compute (0.341875ms)
+✔ cleanup failure quarantines stage and evaluator processes before continuing (0.752459ms)
+✔ serial timing reports preserve canonical rows, exact IDs and comparison compatibility (1.106083ms)
+✔ aggregate rejects mismatched planHash (0.069542ms)
+✔ aggregate rejects mismatched buildHash (0.063125ms)
+✔ aggregate rejects mismatched runId (0.052417ms)
+✔ aggregate rejects mismatched environment (0.0445ms)
+✔ aggregate rejects mismatched browsers (0.029208ms)
+✔ missing, malformed, unexpected and duplicate-attempt receipts cannot pass (0.102083ms)
+✔ targeted rerun replaces only the selected current outcome and retains earlier failure (0.078292ms)
+✔ a failed setup/upload on a newer Actions attempt cannot reuse an older passing receipt (0.13875ms)
+✔ Actions copied successful snapshots can reuse old receipts without double-counting compute (0.100958ms)
+✔ partial, dirty or budget-failing evidence never qualifies a full baseline (0.057375ms)
+✔ browser acceptance rejects missing final reports, narrowed coverage, skips masquerading as missing tests, retries and changed workers (0.10375ms)
+✔ workflow stays manual, exclusive, serial, failure-preserving and pinned to the dispatched SHA (33.278583ms)
+✔ real discoveries preserve every retained ID and special mode, with exactly 23 mapped reductions (8850.108917ms)
+✔ selection contract rejects missing, extra, duplicate, wrong-profile and device configuration drift (15.655ms)
+✔ new unclassified cases keep all existing profiles without rewriting historical captures (3.867459ms)
+✔ real nine-batch discovery partitions the entire reduced default selection (8235.263042ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17188.8205

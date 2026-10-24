@@ -1,4 +1,4 @@
-name: Issue 160 progression qualification
+name: Browser setup smoke
 on:
   workflow_dispatch:
 permissions:
@@ -7,12 +7,12 @@ concurrency:
   group: tactics-browser-exclusive
   cancel-in-progress: false
 jobs:
-  validate:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-160-hero-progression'
+  browser-setup:
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 85
+    timeout-minutes: 20
     steps:
-      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - name: Check host disposition before browser setup
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -21,69 +21,18 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run setup:browsers && npm run check:browsers
-      - name: Focused healing-consumer checks and build
-        run: |
-          mkdir -p tmp/issue160-ci
-          git rev-parse HEAD > tmp/issue160-ci/source.txt
-          node --version > tmp/issue160-ci/node.txt
-          npx vitest run tests/unit/dungeonBattle.test.ts tests/unit/progression.test.ts > tmp/issue160-ci/unit.txt 2>&1
-          npm run build > tmp/issue160-ci/build.txt 2>&1
-      - name: Progressed health bars and learned-ability fixtures
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/fixtures.json
-        run: npm run test:fixtures -- --grep 'progression XP' --reporter=line,json --output=tmp/issue160-ci/fixture-artifacts > tmp/issue160-ci/fixtures.txt 2>&1
-      - name: Repaired production telemetry journeys on all profiles
-        if: always()
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry-production.json
-        run: npm run test:telemetry -- --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-production-artifacts > tmp/issue160-ci/telemetry-production.txt 2>&1
+      # OS libraries are provisioned once by the runner administrator.
+      - run: npm run setup:browsers
+      - run: npm run check:browsers
+      - run: node --test tests/tooling/browser-diagnostics.test.mjs
+      - run: npm run build
+      - run: npm run test:browser-smoke -- --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue160-telemetry-production-checkpoint
-          path: tmp/issue160-ci/
-          retention-days: 30
-      - name: Repaired development telemetry journeys on all profiles
-        if: always()
-        env:
-          PLAYWRIGHT_TELEMETRY_DEV: 'true'
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/telemetry-development.json
-        run: npm run test:telemetry -- --grep 'mocked ingestion sees accepted run' --reporter=line,json --output=tmp/issue160-ci/telemetry-development-artifacts > tmp/issue160-ci/telemetry-development.txt 2>&1
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue160-telemetry-development-checkpoint
-          path: tmp/issue160-ci/
-          retention-days: 30
-      - name: Complete WebKit exploration and progressed floor journeys
-        if: always()
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/webkit-exploration.json
-        run: npx playwright test -c playwright.exploration.config.ts --reporter=line,json --output=tmp/issue160-ci/webkit-artifacts > tmp/issue160-ci/webkit-exploration.txt 2>&1
-      - name: Guarded preservation across standalone run and dungeon saves
-        if: always()
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_FILE: tmp/issue160-ci/guarded.json
-        run: npx playwright test tests/guarded-effects.spec.ts --reporter=line,json --output=tmp/issue160-ci/guarded-artifacts > tmp/issue160-ci/guarded.txt 2>&1
-      - name: Retain environment and exact source/build manifests
-        if: always()
-        run: |
-          if test -d verification-receipts; then cp -R verification-receipts tmp/issue160-ci/browser-receipts; fi
-          node --input-type=module <<'JS' > tmp/issue160-ci/inputs.json
-          import fs from 'node:fs';
-          import os from 'node:os';
-          import crypto from 'node:crypto';
-          import {execFileSync} from 'node:child_process';
-          const files=execFileSync('git',['ls-files','-z','--','src','tests','package.json','package-lock.json','*config*.ts'],{encoding:'utf8'}).split(String.fromCharCode(0)).filter(Boolean);
-          const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
-          const tree=root=>fs.existsSync(root)?Object.fromEntries(fs.readdirSync(root,{recursive:true}).map(p=>root+'/'+p).filter(p=>fs.statSync(p).isFile()).sort().map(p=>[p,hash(p)])):{};
-          console.log(JSON.stringify({source:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch,release:os.release(),cpuCount:os.cpus().length,files:Object.fromEntries(files.map(p=>[p,hash(p)])),ordinaryBuild:tree('dist'),telemetryBuild:tree('tmp/issue128-dist')},null,2));
-          JS
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue160-${{ github.run_id }}-${{ github.run_attempt }}
-          path: tmp/issue160-ci/
-          retention-days: 30
-          if-no-files-found: warn
+          name: browser-setup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            verification-receipts/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
