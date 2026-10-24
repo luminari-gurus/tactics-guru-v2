@@ -1,5 +1,15 @@
 # Issue 227 dungeon markers
 
+## Follow-up: six-battle browser journeys removed
+
+At the caller's request, the `legal two-floor guardian journey` browser test was removed, including its desktop, mobile-portrait and mobile-landscape instances. Its now-unused imports were removed; shared policy/fixture helpers remain for their other consumers. Runtime behavior and all remaining marker, traversal, active-battle reload, biome inspection, input and layout tests are unchanged. The exploration file now discovers 33 Chromium cases rather than 36.
+
+This deliberately removes the browser proof of six consecutive victories, legal two-floor return travel and party/inventory continuity. Saved-state marker fixtures remain presentation checks, not substitutes for that end-to-end coverage. The reports, hashes and receipts below describe the **historical pre-removal runs** and are retained unchanged; they are not claims about the updated test file.
+
+Post-removal validation: all 33 remaining Chromium exploration cases passed with zero failures, retries or skips (desktop and native-touch portrait/landscape emulation). All 941 unit tests, 221 content checks, both TypeScript scopes, production build, two build-integration tests, 45 strict OpenSpec items and whitespace validation passed. Local browser execution used Chromium 149.0.7827.55 via executable override with Playwright 1.63.0; matching-browser/WebKit reruns are not claimed. No runtime or domain rules changed.
+
+## Historical implementation evidence
+
 Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/227
 
 Caller `dubstylee` approved the concrete small-change chat plan with “Yes” on 2026-10-24. Branch `work/issue-227-dungeon-markers` starts at main `852e9d5a5a6b23fb5b986f2d555fcf000c70a70f`. No OpenSpec artifacts were needed for this localized presentation change.
