@@ -5,15 +5,15 @@
 The shared standalone/run battle HUD lists every owned non-basic ability in the
 **Ability** selector, ordered by ID. Changing the selector activates that exact
 ability; its named action button reactivates the selected ability after Move,
-Basic attack or cancellation. Selection prepares a preview only. Review action
-then Confirm executes the authoritative command. Move, Basic attack and Wait
+Basic attack or cancellation. Selection prepares a preview only. **Confirm action**
+executes the authoritative command immediately, without an additional modal. Move, Basic attack and Wait
 remain directly available, and spent budgets and locked phases disable actions
 with readable reasons.
 
 Range and target guidance come from the selected profile; hit/damage previews
 come from shared domain evaluation. Ordinary attacks target living enemies.
 Magic Missile may deliberately target a living ally within range and LOS, with a
-named **Friendly fire** warning in preview and confirmation. Its current minimum
+named **Friendly fire** warning in the preview before direct confirmation. Its current minimum
 range excludes self-targeting. The HUD sends all missiles to the chosen creature;
 the domain's per-missile allocation API and spread rules are unchanged.
 

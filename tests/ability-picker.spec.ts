@@ -32,8 +32,7 @@ for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later abili
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe('{}');
   if(isMobile)await button.tap();else await button.click();
   await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
-  await expect(page.locator('#battle-dialog-message')).toContainText(`Zz ${hero[0].toUpperCase()+hero.slice(1)}`);
-  await page.locator('#dialog-confirm').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(picker).toBeDisabled();
   const accepted=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   expect(accepted.replay.commands).toHaveLength(1);expect(accepted.replay.commands[0].abilityId).toBe(`ability:zz_${hero}`);
@@ -51,14 +50,13 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
     await page.locator('#battle-ability').selectOption('ability:zz_mage');await page.locator('[data-action=signature]').click();
     await page.locator('#battle-target').selectOption('4,0');
     await expect(page.locator('#battle-preview')).toContainText('Friendly fire');
-    await page.locator('#battle-review').click();await expect(page.locator('#battle-dialog-message')).toContainText('Friendly fire: this damages');
-    if(dismissal==='cancel')await page.locator('#dialog-cancel').click();else await page.keyboard.press('Escape');
+    if(dismissal==='cancel')await page.locator('#battle-cancel').click();else await page.keyboard.press('Escape');
     const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
     expect(after.state).toEqual(before.state);expect(after.replay).toEqual(before.replay);expect(after.pending).toBeNull();
     expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe('{}');
   }
   await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('4,0');
-  await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await page.locator('#battle-review').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   expect(after.replay.commands).toHaveLength(1);
@@ -74,7 +72,7 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19],[600
  const picker=page.locator('#battle-ability');await expect(picker.locator('option')).toHaveCount(level===1?1:2);
  await expect(picker.locator('option[value="ability:zz_mage"]')).toHaveCount(level===1?0:1);
  await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
- await picker.selectOption('ability:magic_missile');await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+ await picker.selectOption('ability:magic_missile');await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state).toEqual(before.state);

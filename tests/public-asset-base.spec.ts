@@ -112,7 +112,6 @@ for (const route of ['battle', 'run']) for (const backend of ['Web Audio', 'HTML
   await page.locator('#battle-move').click();
   await page.locator('#battle-target').selectOption({ index: 1 });
   await page.locator('#battle-review').click();
-  await page.locator('#dialog-confirm').click();
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.completed)).toBeGreaterThan(0);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
 });

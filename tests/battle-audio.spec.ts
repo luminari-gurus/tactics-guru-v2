@@ -41,9 +41,9 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready',started:0});
   expect((await session(page)).state).toEqual(before.state);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
-  await page.locator('#battle-review').click();await page.keyboard.press('Tab');
+  await page.locator('#battle-party').click();await page.keyboard.press('Tab');
   expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
-  await page.keyboard.press('Escape');expect((await audio(page)).started).toBe(0);
+  await page.keyboard.press('Escape');await page.locator('#battle-cancel').click();expect((await audio(page)).started).toBe(0);
   expect((await session(page)).state).toEqual(before.state);
   for(let run=2;run<=6;run++){
     if(run===4)await page.locator('#battle-sound').click();
@@ -58,10 +58,10 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
   // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
   const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('/');await ready(page);await enable(page);
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
   await page.clock.pauseAt(start+60000);
   const before=(await session(page)).state.commandCount;
-  await page.locator('#dialog-confirm').click({force:true});
+  await page.locator('#battle-review').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   expect((await audio(page)).recent).toContain('move');
   await page.locator('#battle-sound').click({force:true});expect((await audio(page)).active).toBeNull();
@@ -184,7 +184,7 @@ for(const early of [true,false]) test(`HTML5 per-element permission survives ${e
   expect((await audio(page)).started).toBe(0);
   await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
   expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed:primed+8,rejected:0});
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   await expect.poll(async()=>(await audio(page)).completed).toBeGreaterThan(0);
   expect(await page.evaluate(()=>window.__mediaPolicy!.rejected)).toBe(0);expect(found).toEqual([]);
 });
@@ -213,8 +213,8 @@ for(const mode of ['missing','corrupt','stalled','decode-stalled'] as const) tes
   }
   await expect.poll(()=>audio(page),{timeout:LOAD_TIMEOUT_MS+3000}).toMatchObject({load:'unavailable',started:0});
   await expect(page.locator('#battle-sound-status')).toContainText('Sound unavailable');
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
-  const before=(await session(page)).state.commandCount;await page.locator('#dialog-confirm').click();await ready(page);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+  const before=(await session(page)).state.commandCount;await page.locator('#battle-review').click();await ready(page);
   expect((await session(page)).state.commandCount).toBe(before+1);expect(found).toEqual([]);
 });
 
@@ -226,14 +226,14 @@ test('HTML5 fallback loads and plays future cues after a gesture',async({page})=
     HTMLMediaElement.prototype.play=function(){window.__mediaPlays!++;return original.call(this);};
   });
   await page.goto('/');await ready(page);await enable(page);
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   await expect.poll(()=>audio(page)).toMatchObject({started:1,completed:1,active:null});
   await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);expect((await audio(page)).enabled).toBe(true);
   await expect.poll(()=>audio(page)).toMatchObject({load:'ready',status:'blocked'});
   await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready'});
   // Blur in the same event after the real Confirm handler starts the cue, before it can finish.
-  await page.evaluate(()=>document.addEventListener('click',e=>{if((e.target as HTMLElement).id==='dialog-confirm')window.dispatchEvent(new Event('blur'));}));
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await page.evaluate(()=>document.addEventListener('click',e=>{if((e.target as HTMLElement).id==='battle-review')window.dispatchEvent(new Event('blur'));}));
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   expect(await audio(page)).toMatchObject({status:'blocked',active:null});
   const plays=await page.evaluate(()=>window.__mediaPlays);
   await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.waitForTimeout(200);

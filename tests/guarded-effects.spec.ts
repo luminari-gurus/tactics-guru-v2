@@ -69,7 +69,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) test(`shared Guard
   const target = f.before.units.find(u => u.id === ('unitId' in f.command.target ? f.command.target.unitId : -1))!;
   await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
   await expect(page.locator('#battle-preview')).toContainText('uses action');
-  await page.locator('#battle-review').click(); await page.locator('#dialog-cancel').click();
+  await page.locator('#battle-cancel').click();
   expect((await readSession(page)).state).toEqual(f.before);
   expect(await page.evaluate(key => localStorage.getItem(key), key)).toBe(bytes);
   await playCommand(page, f.command);
