@@ -1,0 +1,26 @@
+{
+  "createdAt": "2026-10-23T23:33:50.662Z",
+  "commit": "88d52222a32082fae292e6f7c9438fb372bb545e",
+  "node": "v24.22.1",
+  "playwright": "1.63.0",
+  "platform": "linux",
+  "release": "6.8.0-147-generic",
+  "arch": "x64",
+  "browsers": {
+    "chromium": {
+      "executable": "/home/actions/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+      "override": false,
+      "channel": "chromium",
+      "version": "153.0.8010.12",
+      "passed": true
+    },
+    "webkit": {
+      "executable": "/home/actions/.cache/ms-playwright/webkit-2359/pw_run.sh",
+      "override": false,
+      "channel": null,
+      "version": "26.6",
+      "passed": true
+    }
+  },
+  "passed": true
+}

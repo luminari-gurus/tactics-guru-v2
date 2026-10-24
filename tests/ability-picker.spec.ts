@@ -66,3 +66,17 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
   const target=before.state.units.find((u:{cell:{x:number;y:number}})=>u.cell.x===4&&u.cell.y===0);
   expect(after.state.units.find((u:{id:number})=>u.id===target.id).hp).toBeLessThan(target.hp);
 });
+
+for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19],[600,5,3,27]])test(`progression XP ${xp} gates learned fixture actions and resumes caster level`,async({page})=>{
+ await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}`);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))??'null')?.units.find((u:{unitId:string})=>u.unitId==='mage')?.health.maxHp).toBe(maxHp);
+ const health=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).units.find((u:{unitId:string})=>u.unitId==='mage').health;expect(health.hp).toBe(maxHp);expect(health.ratio).toBe(1);
+ const picker=page.locator('#battle-ability');await expect(picker.locator('option')).toHaveCount(level===1?1:2);
+ await expect(picker.locator('option[value="ability:zz_mage"]')).toHaveCount(level===1?0:1);
+ await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
+ await picker.selectOption('ability:magic_missile');await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
+ await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state).toEqual(before.state);
+ await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.screenshot({path:test.info().outputPath(`progression-level-${level}.png`)});
+});

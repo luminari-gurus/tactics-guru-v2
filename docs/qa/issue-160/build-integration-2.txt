@@ -1,0 +1,15 @@
+
+> tactics-guru-v2@0.0.0 test:build
+> vitest run --config vitest.build.config.ts
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./vitest.config" without a file extension (vitest.build.config.ts:2:18). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.3 /Users/brian/Code/tactics-guru-v2
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:21:22
+   Duration  1.73s (tests 96%, import 3%, transform 1%)

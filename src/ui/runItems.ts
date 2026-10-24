@@ -1,6 +1,7 @@
 import type { HeroId } from '../content/types';
 import type { ItemDef } from '../content/itemTypes';
 import type { ItemCommand } from '../domain/items';
+import { progressionLabel } from '../domain/progression';
 import { projectItemCatalog } from '../domain/items';
 import type { RunItemSession } from '../app/RunItemSession';
 import type { RunLoadResult } from '../persistence/runStorage';
@@ -89,7 +90,7 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       const assignment = ownership.assignments.find(a => a.heroId === hero.heroId);
       const owned = ownership.equipment.find(i => i.instanceId === assignment?.instanceId);
       const displayedHp = activeBattle ? activeBattle.units.find(u => u.side === 'player' && u.defId === hero.heroId)?.hp ?? 0 : hero.hp;
-      party.append(element('p', `${heroLabel(hero.heroId)}: ${displayedHp}/${def.stats.maxHp} HP${displayedHp === 0 ? ' · Defeated' : ''} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass} · Charm: ${owned ? session.context.items[owned.itemId].label : 'none'}`));
+      party.append(element('p', `${heroLabel(hero.heroId)}: ${displayedHp}/${stats.maxHp} HP · ${progressionLabel(hero)}${displayedHp === 0 ? ' · Defeated' : ''} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass} · Charm: ${owned ? session.context.items[owned.itemId].label : 'none'}`));
     }
     const rewards = element('section'); rewards.setAttribute('aria-label', 'Rewards');
     if (items.offer) {
@@ -107,7 +108,7 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     const targets = (def: ItemDef, id: string) => {
       const select = element('select'); select.id = id; select.setAttribute('aria-label', `${def.label} target`);
       for (const hero of run.party) {
-        const max = session.context.catalog.heroes[hero.heroId].stats.maxHp;
+        const max = hero.maxHp;
         const reason = hero.hp === 0 ? 'defeated' : !def.eligibleHeroes.includes(hero.heroId) ? 'ineligible' :
           def.kind === 'consumable' && hero.hp === max ? 'full HP' : '';
         const option = element('option', `${heroLabel(hero.heroId)}${reason ? ` (${reason})` : ''}`);

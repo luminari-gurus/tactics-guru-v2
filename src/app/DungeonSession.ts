@@ -1,3 +1,4 @@
+import { levelUpFeedback } from '../domain/progression';
 import { BattleSession } from './BattleSession';
 import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
@@ -63,14 +64,16 @@ export class DungeonSession {
       if (this.disposed || this.battle !== session || this.current.phase !== 'battle') return;
       const next = acceptDungeonBattle(this.current, session.state);
       if (!next.ok) { this.report(`Dungeon boundary rejected: ${next.reason}`); return; }
+      const feedback = levelUpFeedback(this.current.party, next.state.party);
       this.current = next.state; this.review = null;
       if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
       this.save();
+      if (feedback) this.report(`${this.status}. ${feedback}`);
     };
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.
     session = new BattleSession(source.catalog, this.current.activeBattle, this.current.activeBattle.seed, accepted,
       entry.activeBattle!.commandCount === 0, source.battlefield);
-    this.battle = session;
+    this.battle = session; session.progression = structuredClone(this.current.party);
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     return session;
   }

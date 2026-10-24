@@ -1,16 +1,18 @@
+import { awardHero, progressHero, readProgressHero, type ProgressHero } from './progression';
+import { HERO_PROGRESSION, SHORT_RUN_KINDS } from '../content/progression';
 import { HERO_IDS } from '../content/constants';
-import type { ContentCatalog, HeroId } from '../content/types';
+import type { ContentCatalog } from '../content/types';
 import { contentVersion } from './battle';
 import { RULE_BOUNDS, RNG_VERSION, RULES_VERSION } from './constants';
 import { isIntegerIn, nextUint32, seedRng } from './rng';
 import type { Versions } from './types';
 import { hasShape, isDenseArray } from './validation';
 
-export const RUN_FORMAT_VERSION = 1;
+export const RUN_FORMAT_VERSION = 2;
 export const RUN_MAX_REVISION = 16;
 export type EncounterId = `encounter:${string}`;
 export interface RunDefinition { readonly encounters: readonly [EncounterId, EncounterId, EncounterId] }
-export interface RunHero { readonly heroId: HeroId; readonly hp: number }
+export type RunHero = ProgressHero;
 export interface PendingReward { readonly id: string; readonly seed: number }
 type RunPhase =
   | { readonly phase: 'battle'; readonly pendingReward: null }
@@ -56,9 +58,9 @@ function readParty(input: unknown, catalog: ContentCatalog): RunHero[] | null {
   const party: RunHero[] = [];
   for (let i = 0; i < HERO_IDS.length; i++) {
     const hero = input[i], heroId = HERO_IDS[i];
-    if (!hasShape(hero, ['heroId', 'hp']) || hero.heroId !== heroId ||
-      !isIntegerIn(hero.hp, { min: 0, max: catalog.heroes[heroId].stats.maxHp })) return null;
-    party.push({ heroId, hp: hero.hp });
+    const checked = readProgressHero(hero, heroId, catalog);
+    if (!checked) return null;
+    party.push(checked);
   }
   return party;
 }
@@ -113,12 +115,12 @@ export function createRun(id: string, seed: number, definition: RunDefinition, c
   if (!isDefinition(definition)) return { ok: false, reason: 'invalidRun' };
   return readRunState({ format: RUN_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: RNG_VERSION, content: contentVersion(catalog) },
     id, seed, encounters: [...definition.encounters], encounterIndex: 0, revision: 0,
-    party: HERO_IDS.map(heroId => ({ heroId, hp: catalog.heroes[heroId].stats.maxHp })), phase: 'battle', pendingReward: null }, definition, catalog);
+    party: HERO_IDS.map(heroId => progressHero(heroId, 0, catalog.heroes[heroId].stats.maxHp, catalog)), phase: 'battle', pendingReward: null }, definition, catalog);
 }
 /** Pure previews of an already validated state; no draws or state changes. */
 export function describeRunBattle(state: RunState): RunBattleDescriptor | null {
   return state.phase !== 'battle' ? null : { encounterId: state.encounters[state.encounterIndex], seed: deriveRunSeed(state.seed, 'encounter', state.encounterIndex),
-    boundaryId: runBoundaryId(state), party: state.party.filter(h => h.hp > 0).map(h => ({ ...h })) };
+    boundaryId: runBoundaryId(state), party: state.party.filter(h => h.hp > 0).map(h => ({ ...h, learned: [...h.learned] })) };
 }
 
 /** Reference boundary reducer. Reward acknowledgement is NOT an inventory grant. */
@@ -137,7 +139,10 @@ export function transitionRun(input: unknown, command: unknown, definition: RunD
     if (!party || party.some((hero, i) => hero.hp > state.party[i].hp) ||
       (command.outcome !== 'victory' && command.outcome !== 'defeat') || (command.outcome === 'victory') !== party.some(h => h.hp > 0))
       return { ok: false, reason: 'invalidCommand' };
-    const base = { ...state, party, revision: state.revision + 1 };
+    // Command progression must equal entry facts; completion only supplies final combat HP.
+    if (party.some((h,i) => h.xp !== state.party[i].xp)) return { ok: false, reason: 'invalidCommand' };
+    const awarded = command.outcome === 'victory' ? party.map(h => awardHero(h, HERO_PROGRESSION.awards[SHORT_RUN_KINDS[state.encounterIndex]], catalog)) : party;
+    const base = { ...state, party: awarded, revision: state.revision + 1 };
     if (command.outcome === 'defeat' || state.encounterIndex === 2) {
       const outcome = command.outcome;
       return { ok: true, state: { ...base, phase: outcome, pendingReward: null }, events: [{ type: 'runEnded', outcome }] };

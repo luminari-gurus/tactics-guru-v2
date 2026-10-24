@@ -1,3 +1,4 @@
+import { HERO_PROGRESSION } from '../content/progression';
 import type { BattlefieldEncounter } from '../content/battlefieldTypes';
 import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
 import type { ContentCatalog } from '../content/types';
@@ -12,7 +13,7 @@ import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
-export const RUN_SAVE_FORMAT = 2;
+export const RUN_SAVE_FORMAT = 3;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -65,7 +66,7 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
 }
 
 function identity(context: RunSaveContext) {
-  return { content: contentVersion(context.catalog), items: itemCatalogIdentity(context.items),
+  return { content: hashJson({ content: contentVersion(context.catalog), progression: HERO_PROGRESSION }), items: itemCatalogIdentity(context.items),
     encounters: hashJson({ definition: context.definition, encounters: context.encounters }) };
 }
 export function encodeRunSave(input: unknown, context: RunSaveContext): { readonly ok: true; readonly text: string } | SaveFailure {

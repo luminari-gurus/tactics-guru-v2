@@ -1,3 +1,5 @@
+import { HERO_IDS } from '../../../src/content/constants';
+import { progressHero, projectProgression } from '../../../src/domain/progression';
 import Phaser from 'phaser';
 import '../../../src/style.css';
 import { abilityCatalog,abilitySession } from '../../helpers/abilityCatalog';
@@ -7,12 +9,16 @@ import { BattleScene,type RunBattleHost } from '../../../src/phaser/BattleScene'
 import { BattleDialogs } from '../../../src/ui/dialogs';
 import { mountBattleLayout } from '../../../src/ui/battleLayout';
 const hero=(new URLSearchParams(location.search).get('hero')??'mage') as HeroId;
-const catalog=abilityCatalog();
-const saveKey=`ability-fixture-${hero}`;
+const base=abilityCatalog(),xp=new URLSearchParams(location.search).get('xp');
+if(xp!==null)for(const id of Object.keys(base.abilities).filter(id=>id.startsWith('ability:zz_'))) (base.abilities as Record<string,typeof base.abilities[keyof typeof base.abilities]>)[id]={...base.abilities[id as keyof typeof base.abilities],requiredLevel:2};
+const party=xp===null?[]:HERO_IDS.map(id=>progressHero(id,Number(xp),1,base));
+const catalog=xp===null?base:projectProgression(party,base);
+const saveKey=`ability-fixture-${hero}${xp===null?'':`-xp-${xp}`}`;
 const saved=localStorage.getItem(saveKey);
 const accepted=(state:import('../../../src/domain/types').BattleState)=>localStorage.setItem(saveKey,JSON.stringify(state));
 const resumed=saved?BattleSession.fromSnapshot(catalog,JSON.parse(saved),accepted):null;
 const session=resumed?.ok?resumed.session:new BattleSession(catalog,abilitySession(hero,catalog).state,2,accepted,true);
+session.progression=party;
 const host:RunBattleHost={catalog,session,sound:{enabled:false},modalTransition:()=>{},ended:()=>{},restart:()=>location.reload(),dialogs:null!};
 host.dialogs=new BattleDialogs(()=>host.modalTransition(),host.restart);
 document.querySelector<HTMLElement>('#battle-controls')!.hidden=false;

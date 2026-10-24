@@ -1,3 +1,4 @@
+import { progressHero } from '../../src/domain/progression';
 import { describe, expect, it } from 'vitest';
 import { HERO_IDS } from '../../src/content/constants';
 import { createRun, deriveRunSeed, describeRunBattle, readRunState, runBoundaryId, transitionRun,
@@ -36,7 +37,7 @@ function trace() {
 describe('run identity and validation', () => {
   it('creates the fixed full-HP party and owns all returned arrays', () => {
     const state = fresh();
-    expect(state.party).toEqual(['fighter', 'ranger', 'mage'].map(heroId => ({ heroId, hp: 18 })));
+    expect(state.party).toEqual(HERO_IDS.map(heroId => progressHero(heroId,0,18,catalog)));
     expect(state).toMatchObject({ encounterIndex: 0, revision: 0, phase: 'battle', pendingReward: null });
     expect(state.encounters).not.toBe(definition.encounters);
     const restored = accepted(readRunState(JSON.parse(JSON.stringify(state)), definition, catalog));
@@ -60,7 +61,7 @@ describe('run identity and validation', () => {
   it.each([1, 2])('accepts damaged survivor entry HP at later encounter %s', index => {
     const state = trace()[index * 2];
     expect(state.party.some(hero => hero.hp === 0)).toBe(true);
-    expect(state.party.some(hero => hero.hp > 0 && hero.hp < catalog.heroes[hero.heroId].stats.maxHp)).toBe(true);
+    expect(state.party.some(hero => hero.hp > 0 && hero.hp <= hero.maxHp)).toBe(true);
     expect(accepted(readRunState(JSON.parse(JSON.stringify(state)), definition, catalog))).toEqual(state);
   });
   it.each([-1, 2 ** 32, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER])('rejects seed %s', seed => {
@@ -77,7 +78,7 @@ describe('run identity and validation', () => {
     expect(createRun('x', 0, { encounters: ['encounter:a', 'encounter:b', 'bad'] } as unknown as RunDefinition, catalog).ok).toBe(false);
   });
   const mutations: [string, (s: any) => void][] = [
-    ['extra field', s => { s.guarded = true; }], ['future format', s => { s.format = 2; }],
+    ['extra field', s => { s.guarded = true; }], ['future format', s => { s.format = 99; }],
     ['future rules', s => { s.versions.rules++; }], ['future RNG', s => { s.versions.rng++; }],
     ['different content', s => { s.versions.content = 'unknown'; }], ['extra version', s => { s.versions.extra = 1; }],
     ['unknown encounter', s => { s.encounters[0] = 'encounter:unknown'; }], ['fourth encounter', s => { s.encounters.push('encounter:fourth'); }],
@@ -152,8 +153,8 @@ describe('atomic run progression', () => {
     expect(states.map(s => s.revision)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(states.map(s => s.encounterIndex)).toEqual([0, 0, 1, 1, 2, 2]);
     const descriptor = describeRunBattle(states[2]);
-    expect(descriptor!.party).toEqual([{ heroId: 'fighter', hp: 12 }, { heroId: 'mage', hp: 9 }]);
-    expect(descriptor!.party.every(h => Object.keys(h).sort().join() === 'heroId,hp')).toBe(true);
+    expect(descriptor!.party).toEqual([progressHero('fighter',30,12,catalog),progressHero('mage',30,9,catalog)]);
+    expect(descriptor!.party.every(h => Object.keys(h).sort().join() === 'heroId,hp,learned,level,maxHp,xp')).toBe(true);
     expect(describeRunBattle(states[1])).toBeNull();
     for (const state of states) expect(accepted(readRunState(state, definition, catalog))).toEqual(state);
   });

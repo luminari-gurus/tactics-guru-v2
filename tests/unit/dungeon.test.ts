@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
-import { dungeonContent } from '../../src/content/dungeon';
+import { dungeonContent, dungeonIdentity } from '../../src/content/dungeon';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
@@ -159,8 +159,20 @@ describe('dungeon recovery limits',()=>{
   },60000);
 });
 
+describe('pre-progression save preservation',()=>{
+  it.each([1,2,3] as const)('rejects old format %i without changing raw storage',format=>{
+    const base=freshDungeon('old-progress',13,LEGACY_ENCOUNTER_POLICY);
+    // Exact old format-3 wire shape: keep its policy/plans, strip only new hero fields.
+    const oldBody={kind:'tactics-guru:dungeon',format:3,identity:dungeonIdentity,payload:{...base,party:base.party.map(({heroId,hp})=>({heroId,hp}))}};
+    const raw=format===3?canonical({...oldBody,digest:hashJson(oldBody)}):priorDungeonEnvelope(base,format);
+    expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
+    const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
+    expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('invalid');
+    expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
+  });
+});
 describe('durable encounter policies', () => {
-  it('cold-decodes a bounded format-3 history by resolving only the current floor', async () => {
+  it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
     const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
       return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
@@ -172,7 +184,7 @@ describe('durable encounter policies', () => {
     const resolver=vi.spyOn(coldFields,'resolveBattlefield');
     try {
       const begin=performance.now(),decoded=coldEnvelope.decodeDungeon(encoded.text);
-      console.info(JSON.stringify({format:3,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
+      console.info(JSON.stringify({format:JSON.parse(encoded.text).format,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
       expect(decoded).toEqual({ok:true,state});expect(resolver).toHaveBeenCalledTimes(3);
       expect(encodeDungeon(decoded.ok?decoded.state:null)).toEqual(encoded);
     } finally {resolver.mockRestore();}
@@ -194,26 +206,7 @@ describe('durable encounter policies', () => {
     expect(session.travel('ascend',before.revision)).toBe(false);expect(session.snapshot).toEqual(before);
     expect(m.getItem(DUNGEON_KEYS.primary)).toBe(encoded.text);
   });
-  it.each([1,2] as const)('normalizes a long format-%i history without resolving inactive legacy battlefields', format => {
-    const base=freshDungeon('long-prior',13,LEGACY_ENCOUNTER_POLICY);
-    const floors=Array.from({length:300},(_,i)=>{
-      const descriptor=floorDescriptor(base.seed,i+1,undefined,LEGACY_ENCOUNTER_POLICY);
-      return {descriptor,completed:i===299?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
-    });
-    const raw=priorDungeonEnvelope({...base,depth:300,floors},format),resolver=vi.spyOn(battlefields,'resolveBattlefield');
-    try {
-      const begin=performance.now(),decoded=good(decodeDungeon(raw));
-      console.info(JSON.stringify({format,bytes:utf8Bytes(raw),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
-      expect(resolver).not.toHaveBeenCalled();
-      expect(decoded.floors).toHaveLength(300);expect(decoded.party).toEqual(base.party);
-      expect(decoded.floors.every(f=>f.descriptor.encounters.every(p=>p.battlefield===null))).toBe(true);
-      const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
-      expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('valid');expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
-      expect(resolver).not.toHaveBeenCalled();
-      const built=dungeonBattle(decoded)!;expect(built.catalog.enemies).toEqual(dungeonContent.catalog.enemies);
-      expect(built.state.seed).toBe(dungeonSeed(base.seed,300,'battle',0));expect(resolver).toHaveBeenCalledTimes(1);
-    } finally {resolver.mockRestore();}
-  },60000);
+
   it('reuses admitted facts across a long retained floor history', () => {
     const base=fresh(),floors=Array.from({length:44},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
@@ -238,7 +231,7 @@ describe('durable encounter policies', () => {
     const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
     expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);
   });
-  it('keeps fully resolved legacy format-3 descriptors compatible with deferred legacy entry', () => {
+  it('keeps fully resolved legacy-policy descriptors compatible with deferred legacy entry', () => {
     const base=freshDungeon('resolved-legacy',13,LEGACY_ENCOUNTER_POLICY),floor=base.floors[0];
     const encounters=floor.descriptor.encounters.map((plan,slot)=>{
       const resolved=resolveBattlefield(plan.selection.encounter,dungeonSeed(base.seed,1,'battle',slot),dungeonContent.catalog);
@@ -272,32 +265,6 @@ describe('durable encounter policies', () => {
     expect(inspected.status).toBe('invalid'); expect(inspected.text).toBe(raw); expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
   });
 
-  it.each([1, 2] as const)('normalizes format %i across prior phases and keeps later floors fixed/unscaled', format => {
-    const base = freshDungeon('prior-policy', 13, LEGACY_ENCOUNTER_POLICY), active = good(startDungeonBattle(atEncounter(base))), reward = win(base);
-    const dead = good(acceptDungeonBattle(active, { ...active.activeBattle!, outcome: 'playerLoss', units: active.activeBattle!.units.map(u => u.side === 'player' ? { ...u, hp: 0 } : u) }));
-    const cleared = clearFloor(base), second = good(travelDungeon(cleared, 'descend', cleared.revision));
-    const backtracked = good(travelDungeon(second, 'ascend', second.revision));
-    for (const original of [base, active, reward, dead, second, backtracked]) {
-      const raw = priorDungeonEnvelope(original, format), decoded = good(decodeDungeon(raw));
-      expect(decoded.encounterPolicy).toBe(LEGACY_ENCOUNTER_POLICY);
-      for (const field of ['party', 'ownership', 'activeBattle', 'offer', 'revision', 'phase', 'depth'] as const) expect(decoded[field]).toEqual(original[field]);
-      expect(decoded.floors.map(f => f.completed)).toEqual(original.floors.map(f => f.completed));
-      if (format === 2) expect(decoded).toEqual(original);
-      if (original.activeBattle) {
-        const command = { type: 'endTurn' as const, unitId: original.activeBattle.initiative[original.activeBattle.activeIndex] };
-        expect(dispatch(decoded.activeBattle!, command, dungeonBattle(decoded)!.catalog)).toEqual(dispatch(original.activeBattle, command, dungeonBattle(original)!.catalog));
-      }
-      const values = memory(); values.setItem(DUNGEON_KEYS.primary, raw); const store = createDungeonStorage(() => values);
-      expect(store.inspect().primary.status).toBe('valid'); expect(values.getItem(DUNGEON_KEYS.primary)).toBe(raw);
-      expect(store.save(decoded).ok).toBe(true); expect(values.getItem(DUNGEON_KEYS.backup)).toBe(raw);
-      expect(JSON.parse(values.getItem(DUNGEON_KEYS.primary)!).format).toBe(3);
-    }
-    const decoded = good(decodeDungeon(priorDungeonEnvelope(cleared, format))), next = good(travelDungeon(decoded, 'descend', decoded.revision));
-    expect(next.floors[1].descriptor.biome).toBe('grassland-v1');
-    const built = dungeonBattle(next)!;
-    expect(built.catalog.enemies).toEqual(dungeonContent.catalog.enemies);
-    expect(built.selection.policy).toBe(LEGACY_ENCOUNTER_POLICY);
-  });
 
   it('retains all floor choices through travel, revisit and damage without compounding', () => {
     const first = clearFloor(fresh()), next = good(travelDungeon(first, 'descend', first.revision));

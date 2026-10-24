@@ -4,9 +4,9 @@
 
 ## Reviewed gameplay decisions
 
-The caller approved retaining survivors' remaining HP between encounters with no automatic healing. Fighter, Ranger and Mage are the initial party. A hero at zero HP stays defeated and does not participate again during this run. Revival is a future feature, outside this contract. One reward choice follows each of the first two victories; the third victory completes the run without another reward. Wiping the party ends the run immediately.
+The caller approved retaining survivors' remaining HP between encounters; [hero progression](hero-progression.md) now heals living heroes only when a victory award crosses a level. Fighter, Ranger and Mage are the initial party. A hero at zero HP stays defeated and does not participate again during this run. Revival is a future feature, outside this contract. One reward choice follows each of the first two victories; the third victory completes the run without another reward. Wiping the party ends the run immediately.
 
-Both final victory and defeat screens will contain **Start new run**. It resets to encounter 1 with the original full-HP party, empty inventory/equipment, and a fresh externally supplied seed and run identity. No separate restart modal is required. The actual outcome screen is #80 work; this issue provides its pure intent. Healing item definitions, balance, choice count and effects belong to #77; owned effects/commands belong to #78. Neither revival nor automatic healing is inferred from legacy code.
+Both final victory and defeat screens will contain **Start new run**. It resets to encounter 1 with the original full-HP party, empty inventory/equipment, and a fresh externally supplied seed and run identity. No separate restart modal is required. The actual outcome screen is #80 work; this issue provides its pure intent. Healing item definitions, balance, choice count and effects belong to #77; owned effects/commands belong to #78. Revival remains unavailable; level-up healing is explicitly defined by #160.
 
 ## State and ownership
 
@@ -14,14 +14,14 @@ Both final victory and defeat screens will contain **Start new run**. It resets 
 
 | Field | Contract |
 | --- | --- |
-| `format` | `RUN_FORMAT_VERSION = 1` |
+| `format` | `RUN_FORMAT_VERSION = 2` |
 | `versions` | Exact current battle rules/RNG and computed catalog content identity |
 | `id` | Caller-provided unique attempt identity, 1–64 ASCII letters/digits/hyphens |
 | `seed` | Integer 0–4294967295 |
 | `encounters` | Exactly three distinct known IDs, in trusted definition order |
 | `encounterIndex` | Integer 0–2; retained at the completed encounter during reward/outcome |
 | `revision` | Integer 0–16, additionally constrained by the phase/index table below |
-| `party` | Exactly three `{ heroId, hp }` records in Fighter/Ranger/Mage order; HP integer 0–catalog maxHp |
+| `party` | Exactly three validated `{ heroId, hp, xp, level, maxHp, learned }` records in Fighter/Ranger/Mage order; HP integer 0–derived maxHp |
 | `phase` | `battle`, `reward`, `victory`, or `defeat` |
 | `pendingReward` | Exactly `{ id, seed }` in reward phase; null otherwise |
 

@@ -1,3 +1,4 @@
+import { projectProgression } from './progression';
 import { HERO_IDS } from '../content/constants';
 import { ITEM_BOUNDS, type ItemCatalog, type ItemId, type ItemOwnership, type EquipmentSlot, type ItemDef } from '../content/itemTypes';
 import type { ContentCatalog, HeroId } from '../content/types';
@@ -142,7 +143,7 @@ export function changePreparation(ownership: ItemOwnership, party: RunState['par
     const def = items[command.itemId], stack = ownership.consumables.find(s => s.itemId === command.itemId);
     if (def.kind !== 'consumable' || !def.eligibleHeroes.includes(target.heroId)) return failure('invalidTarget');
     if (!stack) return failure('notOwned');
-    const maxHp = base.heroes[target.heroId].stats.maxHp;
+    const maxHp = target.maxHp;
     if (target.hp === maxHp) return failure('invalidTarget');
     const nextRun = { party: party.map(h => h.heroId === target.heroId ? { ...h, hp: Math.min(maxHp, h.hp + def.effect.amount) } : h) };
     const consumables = ownership.consumables.flatMap(s => s.itemId !== def.id ? [s] : s.quantity === 1 ? [] : [{ ...s, quantity: s.quantity - 1 }]);
@@ -173,6 +174,7 @@ export function projectItemCatalog(input: unknown, definition: RunDefinition, ba
 }
 
 export function projectOwnedCatalog(ownership: ItemOwnership, party: RunState['party'], base: ContentCatalog, items: ItemCatalog): ContentCatalog {
+  base = projectProgression(party, base);
   const heroes = { ...base.heroes };
   for (const id of HERO_IDS) {
     const stats = { ...base.heroes[id].stats };

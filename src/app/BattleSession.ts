@@ -1,3 +1,4 @@
+import type { ProgressHero } from '../domain/progression';
 import { reportFailure, setTelemetryContext } from '../telemetry/telemetry';
 import type { BattlefieldDescriptor } from '../domain/battlefield';
 import { createRunBattle } from '../domain/runBattle';
@@ -32,6 +33,7 @@ export class BattleSession {
   phase: SessionPhase;
   error: string | null = null;
   readonly resumed: boolean;
+  progression: readonly ProgressHero[] = [];
   constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState, fresh = false, readonly battlefield?: BattlefieldDescriptor) {
     this.resumed = typeof mapId !== 'string' && !fresh;
     const created = typeof mapId === 'string' ? createBattle(mapId, seed, catalog) : readBattleState(mapId, catalog);

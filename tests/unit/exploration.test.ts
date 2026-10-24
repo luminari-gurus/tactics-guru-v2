@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { freshDungeon, stepDungeon, readDungeon, readLegacyDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
+import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
 import { encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -57,21 +57,11 @@ describe('accepted steps and battle ownership',()=>{
  });
  it('permits explicit unsaved entry and disposes stale movement',()=>{const s=atEncounter(fresh()),session=new DungeonSession(s,createDungeonStorage(()=>null));session.playUnsaved();expect(session.startEncounter()).not.toBeNull();session.dispose();expect(session.step(command(s,0))).toBe(false);});
 });
-describe('v1 migration and format-3 recovery',()=>{
- const fresh=()=>freshDungeon('exploration-test',13,LEGACY_ENCOUNTER_POLICY);
- it('converts ready/reward/active/defeat with exact party, ownership and battle RNG',()=>{
-  const s=fresh(),b=startDungeonBattle(atEncounter(s));if(!b.ok)throw Error(b.reason);
-  const dead={...b.state.activeBattle!,outcome:'playerLoss' as const,units:b.state.activeBattle!.units.map(u=>u.side==='player'?{...u,hp:0}:u)};
-  const loss=acceptDungeonBattle(b.state,dead);if(!loss.ok)throw Error(loss.reason);
-  for(const original of [s,b.state,dungeonCapacityFixture(LEGACY_ENCOUNTER_POLICY),loss.state]){
-   const raw=envelope(legacy(original)),decoded=decodeDungeon(raw);expect(decoded.ok).toBe(true);if(!decoded.ok)throw Error(decoded.reason);
-   expect(decoded.state.party).toEqual(original.party);expect(decoded.state.ownership).toEqual(original.ownership);expect(decoded.state.activeBattle).toEqual(original.activeBattle);expect(decoded.state.offer).toEqual(original.offer);expect(decoded.state.revision).toBe(original.revision);
-   const encoded=encodeDungeon(decoded.state);expect(encoded.ok).toBe(true);if(encoded.ok){expect(JSON.parse(encoded.text).format).toBe(3);expect(decodeDungeon(encoded.text)).toEqual(decoded);}
-  }
- });
- it('preserves exact legacy primary in backup on first format-3 write and rejects foreign/tampered legacy',()=>{
-  const raw=envelope(legacy(fresh())),values=new Map([[DUNGEON_KEYS.primary,raw]]),provider=()=>({getItem:(k:string)=>values.get(k as typeof DUNGEON_KEYS.primary)??null,setItem:(k:string,v:string)=>values.set(k as typeof DUNGEON_KEYS.primary,v),removeItem:(k:string)=>values.delete(k as typeof DUNGEON_KEYS.primary)});
-  const store=createDungeonStorage(provider),read=store.inspect().primary;if(read.status!=='valid')throw Error('legacy invalid');expect(values.get(DUNGEON_KEYS.primary)).toBe(raw);expect(store.save(read.state).ok).toBe(true);expect(values.get(DUNGEON_KEYS.backup as typeof DUNGEON_KEYS.primary)).toBe(raw);
-  expect(decodeDungeon(raw.replace(legacyDungeonIdentity,'foreign')).ok).toBe(false);expect(readLegacyDungeon({...legacy(fresh()),floors:[{...legacy(fresh()).floors[0],position:200}]}).ok).toBe(false);
+describe('pre-progression exploration recovery',()=>{
+ it('rejects legacy data while preserving the recovery source',()=>{
+  const original=freshDungeon('exploration-test',13,LEGACY_ENCOUNTER_POLICY),raw=envelope(legacy(original));
+  expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
+  const values=new Map<string,string>([[DUNGEON_KEYS.primary,raw]]),store=createDungeonStorage(()=>({getItem:k=>values.get(k)??null,setItem:(k,v)=>{values.set(k,v);},removeItem:k=>{values.delete(k);}}));
+  expect(store.inspect().primary.status).toBe('invalid');expect(values.get(DUNGEON_KEYS.primary)).toBe(raw);
  });
 });

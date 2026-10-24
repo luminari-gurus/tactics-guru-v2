@@ -49,7 +49,7 @@ async function prepare(page:Page){
   if(hero){await page.locator(`[id="target-${equipment.instanceId}"]`).selectOption(hero.heroId);await page.getByRole('button',{name:`Equip ${def.label}`,exact:true}).click();await page.locator('#item-confirm').click();}
  }
  for(const hero of (await snapshot(page)).items.run.party){
-  const now=await snapshot(page);if(hero.hp===0 || hero.hp===runContext.catalog.heroes[hero.heroId].stats.maxHp || !now.items.ownership.consumables.length)continue;
+  const now=await snapshot(page);if(hero.hp===0 || hero.hp===hero.maxHp || !now.items.ownership.consumables.length)continue;
   await page.locator('[id="target-item:healing_draught"]').selectOption(hero.heroId);
   await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();await page.locator('#item-confirm').click();
  }

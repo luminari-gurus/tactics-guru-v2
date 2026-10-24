@@ -1,0 +1,30 @@
+{
+  "run": 40033808531,
+  "artifactId": 12536506051,
+  "result": "cancelled partial; fixture server port conflict retained",
+  "files": {
+    "build.log": "4b129b817b4fee5b7d8fc3947c60f9c286a0424d89c8ce2b98ecec0127ae9328",
+    "chromium-artifacts/dungeon-exploration-cold-f-4fff9-y-within-the-startup-budget-desktop/cold-current-history.json": "9cddc523d5b3c2ac94e063453445828c8f411a326c605f70401414d20fc4095d",
+    "chromium-artifacts/dungeon-exploration-cold-f-4fff9-y-within-the-startup-budget-desktop/cold-current-history.png": "8442c39be382b2fd1fb7d9e016ef054be0f8b6dce11b13c7646f9c7698b55960",
+    "chromium-artifacts/dungeon-exploration-compas-cc2e2-les-the-activated-direction-desktop/compass-focus-fallback-Enter.png": "382a84e69448055b48099f67469b1530205b4b02b6d011cefb17bebfb5f2ebe5",
+    "chromium-artifacts/dungeon-exploration-compas-cc2e2-les-the-activated-direction-desktop/compass-focus-fallback-Space.png": "382a84e69448055b48099f67469b1530205b4b02b6d011cefb17bebfb5f2ebe5",
+    "chromium-artifacts/dungeon-exploration-diamon-4333c-gets-and-unavailable-states-desktop/compass-focus.png": "84d16abaaa795d64cd2ba2456ce6ebb9b0b4197216c8eb12b0b13ab0f2162a79",
+    "chromium-artifacts/dungeon-exploration-diamon-4333c-gets-and-unavailable-states-desktop/compass-pressed.png": "fd08686a776782b2b575917c482d346dadc745f18af111bd9b90009f5f223e75",
+    "chromium-artifacts/dungeon-exploration-diamon-4333c-gets-and-unavailable-states-desktop/compass-unavailable.png": "bf44d8de550ffa4a28bc5d07769e2100e184021978ae29706d96d760a201ccb9",
+    "chromium-artifacts/dungeon-exploration-forest-e801f-actual-selected-definitions-desktop/forest-elite-scaled-inspection.png": "a470e6339bf0732550a1ac96fd9ebb5f4f1754e1ab312345f2991815a27898db",
+    "chromium-artifacts/dungeon-exploration-forest-e801f-actual-selected-definitions-desktop/forest-normal-scaled-inspection.png": "fc3d2000075b81f33437cf10f90b5fc5fe3e7e3e02c1769d61e6c404e68c0a02",
+    "chromium-artifacts/dungeon-exploration-map-in-4ae04-rough-resize-and-failed-art-desktop/exploration-rotated-fallback.png": "534b034da58c56a6667c18bf2c9470508a0ef832025c4152bea63261681ed4dd",
+    "chromium-artifacts/dungeon-exploration-real-t-7968d-ive-battle-and-exact-reload-desktop/exploration-revealed.png": "1799d0ca6339267d0f210d940e7f689b61d75a3d7abd9aeb392d5eeb79eeb005",
+    "chromium-artifacts/dungeon-exploration-real-t-7968d-ive-battle-and-exact-reload-desktop/spatial-battle-receipt.json": "7ae92b17c98015bbf64e8da88d1ad67d950af211749543014f5f7fa29bf7608c",
+    "chromium-artifacts/dungeon-exploration-record-a8ea7-against-established-budgets-desktop/exploration-performance.json": "cad98a2b16e16ccce43926edefb0535fb9670c2c10849b04296db3a47668f76c",
+    "chromium.log": "9c7cedc8ae307196a1a1b5dc60f4c8a09e5cf12d1f98d1637658bbece84cfcf8",
+    "engine.log": "35f5d82a50a9499f7ca81aa329c0b81ca04e3223a0295bb619ad672c757c9362",
+    "fixtures-selection.json": "134d083569ba90233797743b63cd8e96cebe24a8e543f7caf5a56b14c0d69573",
+    "fixtures.json": "35ed58a294e01030ab0f974c145df7a8f0bd8020c9b29b96254fc48920841bdf",
+    "fixtures.log": "bd3aff7f3b64fef3d49f026df54e3867b8a59f238be1815eaf80bb407c730637",
+    "node.txt": "249baf635bb43877fcb9422efa1a4904b702d0ddf14d3949b7cd0950d5229c81",
+    "selection.json": "039aa09b04db8d7c12d9008919908c948fb534afba3d194a521bc8100e3c83ee",
+    "source.txt": "a110418d74b53c7dda5a8830929330de9d348dae949ec86170120fdb72239261",
+    "unit.log": "1f1f0c3f9c672d359c49678f38d37379857d0222e2c7fbd51c238b1f640a7792"
+  }
+}
