@@ -483,9 +483,9 @@ export class BoardRenderer {
     // A recognizable shield stays at least 12 CSS pixels wide at fitted mobile scale.
     const scale=Math.max(1,12/(14*this.view.scale));
     const x=point.x-UNIT_ART.width/2-9*scale;
-    const margin=9*scale;
+    // Stay attached in board space; the canvas clip hides offscreen annotations.
     this.guardBadges.get(id)!.setPosition(
-      Math.max((this.region.x-this.view.x)/this.view.scale+margin,x),
+      x,
       point.y-Math.max(28,8*scale+8/this.view.scale-HEALTH_BAR.offsetY))
       .setScale(scale).setDepth(9001+depth/10000);
   }

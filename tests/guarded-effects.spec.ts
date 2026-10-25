@@ -256,3 +256,64 @@ for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal $
     await page.screenshot({path:test.info().outputPath('guarded-defeated.png')});
   }
 });
+
+test('Guarded badge stays attached when panning the Fighter offscreen and back',async({page,browserName},info)=>{
+  const fixture=boundary('standalone',false), cast=dispatch(fixture.before,fixture.command,fixture.catalog);
+  if(!cast.ok)throw Error(cast.reason);
+  const state=cast.state, encoded=encodeBattleSave(state,battleCatalog);
+  if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('/');
+  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:BATTLE_STORAGE_KEYS.primary,text:encoded.text});
+  await page.reload();await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  let initial=await boardReport(page);const region=initial.region;
+  const center={x:initial.units.find((u:any)=>u.id===1).health.screen.x,y:initial.units.find((u:any)=>u.id===1).health.screen.y};
+  if(browserName==='chromium') {
+    const cdp=await page.context().newCDPSession(page);
+    const points=(spread:number)=>[{x:center.x-spread,y:center.y,id:1},{x:center.x+spread,y:center.y,id:2}];
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(10)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(20)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+  } else {
+    // Same WebKit multipointer technique as the existing Guarded move case.
+    await page.locator('canvas').evaluate((node,p)=>{
+      const canvas=node as HTMLCanvasElement,capture=canvas.setPointerCapture;
+      canvas.setPointerCapture=()=>{};
+      try {
+        for(const [type,id,x] of [['pointerdown',91,-10],['pointerdown',92,10],['pointermove',92,30],['pointerup',92,30],['pointerup',91,-10]] as const)
+          canvas.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',button:0,clientX:p.x+x,clientY:p.y,bubbles:true}));
+      } finally {canvas.setPointerCapture=capture;}
+    },center);
+  }
+  await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(initial.transform.scale*1.5);
+  initial=await boardReport(page);
+  const offset=initial.units.find((u:any)=>u.id===1).guard.position.x-initial.units.find((u:any)=>u.id===1).position.x;
+  const pan=async(dx:number)=>{
+    const from={x:region.x+region.width*(dx>0?.1:.85),y:region.y+region.height*.55};
+    const to={x:from.x+dx,y:from.y};
+    if(browserName==='chromium' && info.project.use.hasTouch) {
+      const cdp=await page.context().newCDPSession(page);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...from,id:1}]});
+      for(let i=1;i<=10;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:from.x+(to.x-from.x)*i/10,y:from.y,id:1}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+    } else {
+      await page.mouse.move(from.x,from.y);await page.mouse.down();
+      await page.mouse.move(to.x,to.y,{steps:10});await page.mouse.up();
+    }
+  };
+  for(let i=0;i<5;i++)await pan(-region.width*.7);
+  const panned=await boardReport(page), fighter=panned.units.find((u:any)=>u.id===1);
+  expect(fighter.health.screen.x+20*panned.transform.scale).toBeLessThan(region.x);
+  expect(fighter.guard.position.x-fighter.position.x).toBeCloseTo(offset,5);
+  expect(fighter.guard.screen.x+fighter.guard.width/2).toBeLessThan(region.x);
+  await page.screenshot({path:info.outputPath('guarded-panned-offscreen.png')});
+  // Reverse the actual pan distance to return to the original camera position.
+  const dx=initial.transform.x-panned.transform.x;
+  for(let remaining=dx;remaining>0;) {
+    const step=Math.min(remaining,region.width*.7);
+    await pan(step);remaining-=step;
+  }
+  await checkBadges(page);
+  expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);
+  expect((await readSession(page)).state).toEqual(state);
+});
