@@ -81,7 +81,7 @@ async function press(page:Page,selector:string,keyboard=false) {
   else if(test.info().project.name.startsWith('mobile'))await element.tap();
   else await element.click();
 }
-async function review(page:Page,fixture:Boundary,keyboard=false) {
+async function prepareSignature(page:Page,fixture:Boundary,keyboard=false) {
   await press(page,'[data-action="signature"]',keyboard);
   const view=abilityPresentation(fixture.events).signature!,target=fixture.before.units.find(u=>u.id===view.targetId)!;
   if(keyboard){
@@ -97,13 +97,12 @@ async function review(page:Page,fixture:Boundary,keyboard=false) {
   expect(targeting.targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
   await page.clock.runFor(48);
   await page.screenshot({path:test.info().outputPath(`${view.kind}-target-preview.png`)});
-  await press(page,'#battle-review',keyboard);
-  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('#battle-review')).toBeEnabled();
   expect((await report(page)).targets).toEqual(targeting.targets);
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.locator('#dialog-confirm').focus();await page.keyboard.press('Enter');
+  await page.locator('#battle-review').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   expect((await report(page)).targets).toEqual([]);
 }
@@ -131,7 +130,7 @@ test('target overlays follow invalid selection, action changes, keyboard, cancel
   if(info.project.name.startsWith('mobile'))await page.touchscreen.tap(screen.x,screen.y);
   else await page.mouse.click(screen.x,screen.y);
   expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
-  await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();
+  await page.locator('#battle-cancel').click();
   expect((await report(page)).targets).toEqual([]);await expect(page.locator('#battle-review')).toBeDisabled();
   await press(page,'[data-action="signature"]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
   await press(page,'[data-action="move"]');expect((await report(page)).targets).toEqual([]);
@@ -167,8 +166,6 @@ test('shared corpse cell keeps living target identity through inspection, confir
   await page.locator('#inspection-close').click();expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);expect(await stored(page)).toEqual(saved);
   // Confirmation must use the prepared command, even if the rendered panel is stale.
   await page.locator('#battle-target-info').evaluate(el=>{el.textContent='Target: Ranger #2 · Defeated';});
-  await page.locator('#battle-review').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Target: ${label}`);
-  await expect(page.locator('#battle-dialog-message')).not.toContainText('Ranger #2');
   await page.screenshot({path:info.outputPath('living-target-confirmation.png')});
   await confirmFrozen(page);
   const accepted=await readSession(page);expect(accepted.continuation!.commands).toEqual([fixture.command]);
@@ -187,7 +184,7 @@ for(const outcome of ['miss','defeat'] as const)test(`guarded strike ${outcome}:
     await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx*r.width*.8,y+dy*r.height*.8,{steps:8});await page.mouse.up();
   };
   // Reproduce the review: pan before the command, with no mid-animation gesture.
-  await drag(0,-1);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
+  await drag(0,-1);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
   const saved=await stored(page);
   const check=async()=>{
     const frame=await report(page),labels=frame.feedbackBounds;
@@ -219,12 +216,12 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   await expect(page.locator('#battle-preview')).toContainText('Unavailable');await expect(page.locator('#battle-review')).toBeDisabled();
   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
   await press(page,'#battle-cancel',keyboard);
-  await review(page,fixture,keyboard);await page.keyboard.press('Escape');
+  await prepareSignature(page,fixture,keyboard);await page.keyboard.press('Escape');
   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
   // Transform before the effect through real board gestures.
   const point=await page.evaluate(()=>{const r=document.querySelector('#battle-board-region')!.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height*0.6};});
   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-80);
-  await review(page,fixture,keyboard);await confirmFrozen(page);
+  await prepareSignature(page,fixture,keyboard);await confirmFrozen(page);
   const accepted=await readSession(page),saved=await stored(page);
   expect(accepted.state).toEqual(fixture.after);expect(accepted.events).toEqual(fixture.events);
   expect(accepted.continuation!.commands).toEqual([fixture.command]);
@@ -257,7 +254,7 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
 
 for(const [kind,outcome] of [['guarded_strike','miss'],['high_shot','miss'],['high_shot','critical'],['magic_missile','defeat']] as const)
 test(`${kind}: ${outcome} feedback matches resolved events`,async({page},info)=>{
-  const fixture=boundary(kind,outcome);await boot(page,fixture);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
+  const fixture=boundary(kind,outcome);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
   const r=await report(page);aligned(r,fixture);
   const feedback=abilityPresentation(fixture.events).feedback;
   expect(r.effect.feedback.map((f:any)=>({unitId:f.unitId,text:f.text}))).toEqual(feedback.map(f=>({unitId:f.unitId,text:f.text})));
@@ -271,7 +268,7 @@ test(`${kind}: ${outcome} feedback matches resolved events`,async({page},info)=>
 
 for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, resize and restart during travel and impact`,async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  const fixture=boundary(kind);await boot(page,fixture);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
+  const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
   const saved=await stored(page);
   await page.locator('#fit-restart').click({force:true});await page.locator('#save-cancel-reset').click({force:true});
   aligned(await report(page),fixture);
@@ -289,7 +286,7 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
     const encoded=encodeBattleSave(fixture.before,catalog);if(!encoded.ok)throw Error(encoded.reason);
     await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
     await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
-    await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
+    await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
     const replacementSeed=((await readSession(page)).state.seed+1)>>>0;
     await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
     await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
@@ -301,7 +298,7 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
 });
 
 for(const kind of kinds)test(`${kind}: reload resumes accepted save without historical effects`,async({page})=>{
-  const fixture=boundary(kind);await boot(page,fixture);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
+  const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
   const saved=await stored(page);await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
   expect(await stored(page)).toEqual(saved);await page.locator('#save-continue').click();await ready(page);
   expect((await readSession(page)).state).toEqual(fixture.after);expect((await readSession(page)).events).toEqual([]);
@@ -309,7 +306,7 @@ for(const kind of kinds)test(`${kind}: reload resumes accepted save without hist
 });
 
 test('elevated target remains anchored through rotation during impact',async({page},info)=>{
-  const fixture=boundary('high_shot','any',true);await boot(page,fixture);await review(page,fixture);await confirmFrozen(page);
+  const fixture=boundary('high_shot','any',true);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);
   await page.clock.runFor(288);const before=await report(page);aligned(before,fixture);
   const unit=fixture.before.units.find(u=>u.id===before.effect.targetId)!;
   expect(before.tiles.find((t:any)=>t.x===unit.cell.x && t.y===unit.cell.y).elevation).toBeGreaterThan(0);
@@ -329,7 +326,7 @@ test.describe('ability departure through real browser history',()=>{
   for(const kind of kinds)test(`${kind}: cached return preserves exact accepted slots until Continue`,async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
     await page.addInitScript(()=>window.addEventListener('pageshow',event=>{if(event.persisted)sessionStorage.setItem('test:animation-cached-return','yes');}));
-    const fixture=boundary(kind);await boot(page,fixture);await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
+    const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
     const saved=await stored(page),map=new URL('map',baseURL).href;
     await page.evaluate(map=>location.assign(map),map);await expect(page.locator('#map-grid span')).toHaveCount(400);
     await page.goBack({waitUntil:'commit'});await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
@@ -353,9 +350,7 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
   await page.locator('#battle-inspect-target').click();await expect(page.locator('#battle-dialog-title')).toContainText(`#${targetId}`);
   await page.locator('#inspection-close').click();await expect(page.locator('#battle-inspect-target')).toBeFocused();
   expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);expect(await page.locator('#battle-preview').textContent()).toBe(preview);
-  await page.locator('#battle-review').click();await expect(page.locator('#battle-dialog-message')).toContainText('Fighter');
-  await expect(page.locator('#battle-dialog-message')).toContainText('Target:');
-  await page.locator('#dialog-confirm').click();await ready(page);
+  await page.locator('#battle-review').click();await expect(page.getByRole('dialog')).not.toBeVisible();await ready(page);
   const state=(await readSession(page)).state,actor=state.units.find(u=>u.id===command.unitId)!;
   expect(actor.hasActed).toBe(true);expect(!!actor.guarded).toBe(ability==='ability:guarded_strike');
   const ac=catalog.heroes.fighter.stats.armorClass+(actor.guarded?2:0);
@@ -375,7 +370,7 @@ test('visible action feedback stays inside the drawable board at small sizes and
     const encoded=encodeBattleSave(fixture.before,catalog);if(!encoded.ok)throw Error(encoded.reason);
     await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
     await page.setViewportSize(size);await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
-    await review(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
+    await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
     const initial=await report(page),r=initial.region;
     const x=r.x+r.width/2,y=r.y+r.height/2;
     await page.mouse.move(x,y);for(let i=0;i<3;i++)await page.mouse.wheel(0,-1000);
@@ -462,7 +457,7 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.emulateMedia({reducedMotion: 'no-preference'});
   const fixture = boundary('magic_missile'); await boot(page, fixture);
-  await review(page, fixture); await confirmFrozen(page);
+  await prepareSignature(page, fixture); await confirmFrozen(page);
   await page.clock.runFor(288);
   const during = await report(page);
   expect(during.units.every((unit: any) => unit.bobOffset === 0)).toBe(true);

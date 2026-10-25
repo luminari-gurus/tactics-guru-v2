@@ -1,0 +1,21 @@
+{
+  "pr": 240,
+  "pr_parent": "dce0903fa8a0217f9476e81f77b80962983fe400",
+  "main_parent": "f2b8b95df128d6936d405eacdc235834c575a207",
+  "tested_combined_tree": "4426fccf6242687c4de7180f676465c24d6eccac",
+  "resolution": "Retain main keyboard audio unlock and prepare movement without submitting until after clock pause; use the direct HUD confirmation.",
+  "results": {
+    "build": "passed (content and both TypeScript scopes included)",
+    "audio_units": 29,
+    "chromium_audio": 60,
+    "webkit_audio_acceptance": 4
+  },
+  "sha256": {
+    "units.log.gz": "a9bf5882d5d2505a243f6b92a8170edf262fc03e16d8115f51b887b0307d87f7",
+    "build.log.gz": "8f712c791f8472b7543cf9ed4583a6988aee6e380058b90d02bffa8745efb2be",
+    "chromium.json.gz": "5e94d5147a309c1f351f01dbdc03b43bdcf43bbfda6c72adde15c5d21ae80890",
+    "webkit.json.gz": "75c944bebd9d6550244fd17ebdf473801d89c73cff9039c398a45105ed1a1559",
+    "webkit.log.gz": "2c7fae2c74ee51971a3fa4ff23fb9a1d58700ae1dbe8741a1f474a4aeaa6d71a",
+    "chromium.log.gz": "b920c0d6e76596d0f66a549af1fde71f72ef6ce010d398de57c8032440fdf710"
+  }
+}

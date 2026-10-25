@@ -12,8 +12,8 @@ test('restart during accepted presentation discards old callbacks and history',a
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
  await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
- await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);await page.getByRole('button',{name:'Review action'}).click();
- await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#dialog-confirm').click({force:true});
+ await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+ await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});
  expect((await snapshot(page)).phase).toBe('reward');
  const accepted=await snapshot(page);
  await page.locator('#fit-restart').click({force:true});await page.locator('#dungeon-confirm-new').click({force:true});await page.clock.resume();
@@ -42,8 +42,8 @@ test('visibility interruption finishes an accepted terminal presentation exactly
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected attack');
  await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
- await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);await page.getByRole('button',{name:'Review action'}).click();
- await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#dialog-confirm').click({force:true});const committed=await snapshot(page);expect(committed.phase).toBe('reward');
+ await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+ await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});const committed=await snapshot(page);expect(committed.phase).toBe('reward');
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});await page.clock.resume();
  await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(committed);

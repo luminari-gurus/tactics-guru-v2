@@ -52,15 +52,15 @@ async function bootBoundary(page:Page,state:BattleState) {
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.locator('#dialog-confirm').focus();await page.keyboard.press('Enter');
+  await page.locator('#battle-review').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
 }
-async function reviewCommand(page:Page,fixture:ReturnType<typeof damageBoundary>) {
+async function prepareCommand(page:Page,fixture:ReturnType<typeof damageBoundary>) {
   await page.locator('[data-action="signature"]').click();
   const target=fixture.command.target;
   const id='unitId' in target?target.unitId:'missileTargets' in target?target.missileTargets[0]:-1;
   const cell=fixture.before.units.find(u=>u.id===id)!.cell;
-  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);await page.locator('#battle-review').click();
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
 }
 
 test('health bars are visible, attached and informational through mobile navigation',async({page,browserName},info)=>{
@@ -112,7 +112,7 @@ test('health bars are visible, attached and informational through mobile navigat
 test('elevated movement keeps bars attached through refresh, rotation and restart',async({page},info)=>{
   await page.clock.install();await page.goto('./');await ready(page);const initial=await settled(page),objects=initial.objectCount;
   const to=initial.reachable.find((c:any)=>initial.tiles.find((t:any)=>t.x===c.x && t.y===c.y).elevation===1);expect(to).toBeDefined();
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption(`${to.x},${to.y}`);await page.locator('#battle-review').click();await confirmFrozen(page);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption(`${to.x},${to.y}`);await confirmFrozen(page);
   await page.clock.runFor(48);const moving=await report(page);check(moving);
   const actor=moving.units.find((u:any)=>u.id===initial.activeId);expect(actor.position).not.toEqual(initial.units.find((u:any)=>u.id===initial.activeId).position);
   await page.screenshot({path:info.outputPath('health-moving.png')});
@@ -131,7 +131,7 @@ test('elevated movement keeps bars attached through refresh, rotation and restar
 for(const defeat of [false,true])test(`health follows ${defeat?'defeat':'damage'} presentation, cancellation and save resume`,async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   const fixture=damageBoundary(defeat);await bootBoundary(page,fixture.before);const baseline=(await report(page)).objectCount;
-  check(await report(page),fixture.before);await reviewCommand(page,fixture);
+  check(await report(page),fixture.before);await prepareCommand(page,fixture);
   const count=(await report(page)).selectionEvents;await page.mouse.click(3,3);expect((await report(page)).selectionEvents).toBe(count);
   await confirmFrozen(page);await page.clock.runFor(288);check(await report(page),fixture.before);
   expect((await readSession(page)).state).toEqual(fixture.after);
