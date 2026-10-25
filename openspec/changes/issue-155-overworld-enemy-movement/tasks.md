@@ -17,7 +17,7 @@ Caller explicitly approved this published plan in chat on 2026-10-25 ("Approved"
 
 ## 3. Final acceptance and delivery
 
-- [ ] 3.1 Run final affected map units, content/type/production build and discovered map browser coverage on desktop and emulated portrait/landscape, including 320px keyboard/touch screenshots; run explicit dev placement and root/prefix route checks from design, retain source/build-bound results and visually review images in docs/qa/issue-155-overworld-movement.md. Preserve failures/skips/retries and explain excluded unrelated suites.
+- [x] 3.1 Run final affected map units, content/type/production build and discovered map browser coverage on desktop and emulated portrait/landscape, including 320px keyboard/touch screenshots; run explicit dev placement and root/prefix route checks from design, retain source/build-bound results and visually review images in docs/qa/issue-155-overworld-movement.md. Preserve failures/skips/retries and explain excluded unrelated suites.
 - [ ] 3.2 Compare every issue criterion and spec scenario against final evidence, verify strict OpenSpec and git diff checks, commit only issue changes and push; create/reuse and attach a PR with approval and evidence links, using Closes #155 only if all acceptance gates pass, otherwise a draft with Refs #155 and remaining work.
 
 ## Workflow follow-up
