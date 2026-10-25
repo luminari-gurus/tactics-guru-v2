@@ -1,5 +1,9 @@
 # Issue 218: persistent Guarded badge
 
+> PR review found a pan attachment defect after the original acceptance runs below.
+> The [pan fix follow-up](pan-fix.md) supersedes the original pan/attachment conclusion;
+> historical runs and screenshots remain unchanged.
+
 Issue: https://github.com/luminari-gurus/tactics-guru-v2/issues/218
 Branch: `work/issue-218-guarded-indicator`; base `87a80366686edd897affa1ec7053c0ac32609615`.
 The caller explicitly approved the small-change chat plan on 2026-10-25. No OpenSpec change was needed.
