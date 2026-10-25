@@ -12,7 +12,9 @@ import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPr
 import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
 
 // Include real cached-document return, matching the persistence regression suite.
-test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+test.use({launchOptions:async({browserName},use)=>{
+  await use({executablePath:browserName==='chromium'?process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE:undefined,ignoreDefaultArgs:['--disable-back-forward-cache']});
+}});
 
 const kinds = ['guarded_strike','high_shot','magic_missile'] as const;
 type Outcome = 'any'|'miss'|'critical'|'defeat';

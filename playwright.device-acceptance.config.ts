@@ -5,7 +5,7 @@ import base from './playwright.config';
 // current WebKit persistence, legal outcomes/restarts, audio and full-run evidence.
 export default defineConfig({ ...base,
   testMatch: ['**/battle-loop.spec.ts','**/battle-persistence.spec.ts','**/run-progression.spec.ts','**/battle-audio.spec.ts'],
-  grep: /startup is read-only|complete legal authored|player HUD|keyboard-only|sound control uses|mute, hidden|reload during legal|backup recovery retains|unknown storage blocks|failed partial reset|changed saved data|successful reset|invalid startup|legal three encounter run|legal defeat reload|accepted player presentation reload|enemy presentation reload|run startup preserves|run preparation and dialogs|review: recovery dismissal|review: read-level|review: reopened|review: in-flow/,
+  grep: /startup is read-only|complete legal authored|player HUD|keyboard-only|sound control uses|mute, hidden|reload during legal|backup recovery retains|unknown storage blocks|failed partial reset|changed saved data|successful reset|invalid startup|legal run outcomes|legal defeat reload|accepted player presentation reload|enemy presentation reload|run startup preserves|run preparation and dialogs|review: recovery dismissal|review: read-level|review: reopened|review: in-flow/,
   projects: [
     {name:'acceptance-webkit-portrait',use:{...devices['iPhone 13'],launchOptions:{}}},
     {name:'acceptance-webkit-landscape',use:{...devices['iPhone 13 landscape'],launchOptions:{}}},
