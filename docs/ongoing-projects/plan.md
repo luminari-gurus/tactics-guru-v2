@@ -1,12 +1,19 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; rules/persistence and production journeys complete, UI fixture requalification pending, 6/9 tasks).
+`issue-163-fighter-abilities` (spec-driven; gameplay and UI qualification complete, final evidence/delivery pending, 7/9 tasks).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
 
 ## Current continuation checkpoint
+
+- Main advanced to `d5b1927` (#243 automatic stairs) during qualification. Earlier
+  qualification is fully reconciled in [QA](../qa/issue-163/README.md); current
+  completion now includes integrating this bounded stair delta through the PR
+  stack. Adapt the new Fighter journey to automatic descent, reuse unchanged
+  combat evidence, and qualify healed-party/resource carry at the new transition.
+  Do not restart the full matrix for the stair-only integration.
 
 - Current feature source: both profiles, atomic effects, authoritative Taunt/AI,
   bounded state/readers and versioned run/dungeon healing are implemented.

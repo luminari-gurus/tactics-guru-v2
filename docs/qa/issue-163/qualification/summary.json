@@ -1,0 +1,84 @@
+{
+  "original": {
+    "total": 1194,
+    "passed": 1120,
+    "failed": 65,
+    "skipped": 9
+  },
+  "failuresAccounted": 65,
+  "skipsAccounted": 9,
+  "focused": {
+    "integration": {
+      "total": 15,
+      "expected": 15,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "fixtures": {
+      "total": 27,
+      "expected": 27,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "webkit": {
+      "total": 54,
+      "expected": 54,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "animation": {
+      "total": 2,
+      "expected": 2,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "assets-root-preview": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "assets-root-dev": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "assets-prefix-preview": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "assets-prefix-dev": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    }
+  },
+  "finalServedBuild": {
+    "commit": "fbca57b841c8d0496028f12027fc28e037933a7f",
+    "dirty": false
+  },
+  "performance": {
+    "samples": 18,
+    "failures": []
+  }
+}
