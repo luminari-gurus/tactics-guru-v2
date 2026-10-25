@@ -1,0 +1,18 @@
+{
+  "chromium": {
+    "startTime": "2026-10-25T13:44:48.407Z",
+    "duration": 173044.568,
+    "expected": 72,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "webkit": {
+    "startTime": "2026-10-25T13:48:00.820Z",
+    "duration": 175093.984,
+    "expected": 72,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

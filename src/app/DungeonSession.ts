@@ -1,6 +1,6 @@
 import { levelUpFeedback } from '../domain/progression';
 import { BattleSession } from './BattleSession';
-import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, travelDungeon, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
+import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
 import { createDungeonStorage, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 export class DungeonSession {
@@ -27,24 +27,16 @@ export class DungeonSession {
     return result.ok;
   }
   playUnsaved() { this.unsaved = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
-  travel(direction: 'ascend' | 'descend', revision: number) {
-    if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;
-    const candidate = travelDungeon(this.current, direction, revision);
-    if (!candidate.ok) { this.report(`Travel refused: ${candidate.reason}. Nothing changed.`); return false; }
-    if (this.unsaved) { this.report('Travel requires saving. Open Save recovery to retry or export.'); return false; }
-    const saved = this.storage.save(candidate.state);
-    if (!saved.ok) { this.report(`Travel not published: ${saved.reason}. Current floor retained; review recovery before retrying.`); return false; }
-    this.battle?.dispose(); this.battle = null; this.current = candidate.state; this.review = null;
-    this.report('Travel saved on this device'); return true;
-  }
   private publishSpatial(candidate: ReturnType<typeof stepDungeon>) {
     if (!candidate.ok) { this.report(`Movement refused: ${{blockedStep:'Choose an adjacent walkable cell',staleBoundary:'The floor changed; choose again',wrongPhase:'Finish the current encounter or reward first',remoteEncounter:'Walk onto the available encounter marker',resourceLimit:'Progress has reached a storage or counter limit'}[candidate.reason] ?? 'This step is unavailable'}. Nothing changed.`); return false; }
+    const traveling = candidate.state.depth !== this.current.depth;
+    if (traveling && this.unsaved) { this.report('Travel requires saving. Open Save recovery to retry or export.'); return false; }
     if (!this.unsaved) {
       const saved = this.storage.save(candidate.state);
-      if (!saved.ok) { this.report(`Movement not published: ${saved.reason}. Open Save recovery to retry or export.`); return false; }
+      if (!saved.ok) { this.report(`${traveling ? 'Travel' : 'Movement'} not published: ${saved.reason}. Current floor retained; open Save recovery to retry or export.`); return false; }
     }
     this.battle?.dispose(); this.battle = null; this.current = candidate.state; this.review = null;
-    this.report(this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' : 'Exploration saved on this device');
+    this.report(this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device');
     return true;
   }
   step(command: ExplorationCommand) {

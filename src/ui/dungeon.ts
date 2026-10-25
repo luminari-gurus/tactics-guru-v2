@@ -30,9 +30,7 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.position===poiCell(floor.exploration.pois[floor.completed]);
   if(canEnter)root.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=el('section');travel.setAttribute('aria-label','Stairs');
-  travel.append(el('h2','Stairs'),el('p','Walk onto the matching stair to use it. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'Guardian defeated. Descent is unlocked.':'Defeat the guardian and claim pending rewards to unlock descent.'),
-    button('Ascend',()=>session.travel('ascend',s.revision),s.depth===1||s.phase!=='ready'||floor.position!==floor.descriptor.upstairs,'dungeon-ascend'),
-    button('Descend',()=>session.travel('descend',s.revision),floor.completed!==3||s.phase!=='ready'||floor.position!==floor.descriptor.downstairs,'dungeon-descend'));root.append(travel);
+  travel.append(el('h2','Stairs'),el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, move off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'Guardian defeated. Descent is unlocked.':'Defeat the guardian and claim pending rewards to unlock descent.'));root.append(travel);
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
   for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}root.append(party);
