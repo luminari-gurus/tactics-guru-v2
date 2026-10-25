@@ -33,7 +33,7 @@ export function removeTaunt(unit: UnitState): UnitState {
   const { tauntedBy, ...rest } = unit;
   return rest;
 }
-/** Accepted damage commits clear references immediately, including missiles hitting their own caster. */
+/** Accepted damage clears references immediately, including friendly missiles defeating the taunter. */
 export function clearDefeatedTaunts(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
   return units.map(u=>{
     if (u.tauntedBy===undefined || tauntSource(u,units)) return u;

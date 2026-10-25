@@ -11,7 +11,9 @@ import { mountBattleLayout } from '../../../src/ui/battleLayout';
 const hero=(new URLSearchParams(location.search).get('hero')??'mage') as HeroId;
 const xp=new URLSearchParams(location.search).get('xp'),base=abilityCatalog(xp===null?undefined:2);
 const party=HERO_IDS.map(id=>progressHero(id,Number(xp??0),1,base));
-const catalog=projectProgression(party,base);
+const projected=projectProgression(party,base);
+// The default picker fixture deliberately authors two missiles; XP fixtures use canonical caster progression.
+const catalog=xp===null?{...projected,abilities:{...projected.abilities,'ability:zz_mage':base.abilities['ability:zz_mage']}}:projected;
 const saveKey=`ability-fixture-${hero}${xp===null?'':`-xp-${xp}`}`;
 const saved=localStorage.getItem(saveKey);
 const accepted=(state:import('../../../src/domain/types').BattleState)=>localStorage.setItem(saveKey,JSON.stringify(state));
