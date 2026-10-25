@@ -1,5 +1,6 @@
-import { freshExploration, poiCell, visit } from '../../src/domain/exploration';
+import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
@@ -74,6 +75,14 @@ export function atCell(s: DungeonState, position: number): DungeonState {
 }
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
   return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot]));
+}
+/** Structural adjacent position for exercising the real stair-entry command. */
+export function atStairApproach(s: DungeonState, direction: 'ascend' | 'descend' = 'descend') {
+  const f = s.floors[s.depth-1], stair = direction === 'ascend' ? f.descriptor.upstairs : f.descriptor.downstairs;
+  const map = generateMap(f.descriptor.seed, 'rooms');
+  const cell = neighbors(stair).find(n => map.cells[n] && !f.exploration.pois.some(p => poiCell(p) === n));
+  if (cell === undefined) throw Error('No safe stair approach');
+  return atCell(s, cell);
 }
 export const atDownstairs = (s: DungeonState) => atCell(s,s.floors[s.depth-1].descriptor.downstairs);
 

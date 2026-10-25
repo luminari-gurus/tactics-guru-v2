@@ -5,7 +5,7 @@ import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { legacyDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { atEncounter, atCell, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
+import { atEncounter, atCell, atStairApproach, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -63,5 +63,54 @@ describe('pre-progression exploration recovery',()=>{
   expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
   const values=new Map<string,string>([[DUNGEON_KEYS.primary,raw]]),store=createDungeonStorage(()=>({getItem:k=>values.get(k)??null,setItem:(k,v)=>{values.set(k,v);},removeItem:k=>{values.delete(k);}}));
   expect(store.inspect().primary.status).toBe('invalid');expect(values.get(DUNGEON_KEYS.primary)).toBe(raw);
+ });
+});
+
+describe('movement onto stairs',()=>{
+ const cleared=()=>{const s=fresh();return {...s,floors:[{...currentFloor(s),completed:3}]};};
+ const good=(result:ReturnType<typeof stepDungeon>)=>{if(!result.ok)throw Error(result.reason);return result.state;};
+ it('descends and ascends once per entry, preserving arrival, party and ownership',()=>{
+  const before=atStairApproach(cleared()),original=canonical(before);
+  const down=command(before,currentFloor(before).descriptor.downstairs),second=good(stepDungeon(before,down));
+  expect(second.depth).toBe(2);expect(second.revision).toBe(before.revision+1);
+  expect(currentFloor(second).position).toBe(currentFloor(second).descriptor.upstairs);
+  expect(second.party).toEqual(before.party);expect(second.ownership).toEqual(before.ownership);
+  expect(stepDungeon(second,down)).toEqual({ok:false,reason:'staleBoundary'});
+  const encoded=encodeDungeon(second);if(!encoded.ok)throw Error(encoded.reason);
+  expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:second});
+  expect(new DungeonSession(second).snapshot).toEqual(second);
+  const approach=atStairApproach(second,'ascend');
+  const off=good(stepDungeon(second,command(second,currentFloor(approach).position)));
+  expect(off.depth).toBe(2);
+  const first=good(stepDungeon(off,command(off,currentFloor(off).descriptor.upstairs)));
+  expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
+  expect(currentFloor(first).position).toBe(currentFloor(first).descriptor.downstairs);
+  expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
+  const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));
+  const revisit=good(stepDungeon(reentered,command(reentered,currentFloor(reentered).descriptor.downstairs)));
+  expect(revisit.depth).toBe(2);expect(currentFloor(revisit)).toEqual({...currentFloor(off),position:currentFloor(off).descriptor.upstairs});
+  expect(canonical(before)).toBe(original);
+ });
+ it('allows movement onto unavailable stairs without traveling, and rejects phase and counter boundaries',()=>{
+  const initial=fresh(),upApproach=atStairApproach(initial,'ascend');
+  const atUp=good(stepDungeon(upApproach,command(upApproach,currentFloor(initial).descriptor.upstairs)));
+  expect(atUp.depth).toBe(1);
+  const locked=atStairApproach(initial),atDown=good(stepDungeon(locked,command(locked,currentFloor(locked).descriptor.downstairs)));
+  expect(atDown.depth).toBe(1);expect(currentFloor(atDown).completed).toBe(0);
+  const ready=atStairApproach(cleared()),entry=command(ready,currentFloor(ready).descriptor.downstairs);
+  for(const phase of ['battle','reward','defeat'] as const)expect(stepDungeon({...ready,phase},entry)).toEqual({ok:false,reason:'wrongPhase'});
+  const limited={...ready,revision:Number.MAX_SAFE_INTEGER};
+  expect(stepDungeon(limited,command(limited,entry.destination))).toEqual({ok:false,reason:'resourceLimit'});
+ });
+ it('does not publish automatic travel in unsaved play, then recovers and restores without bouncing',()=>{
+  const before=atStairApproach(cleared()),values=new Map<string,string>();
+  const store=createDungeonStorage(()=>({getItem:k=>values.get(k)??null,setItem:(k,v)=>{values.set(k,v);},removeItem:k=>{values.delete(k);}}));
+  const session=new DungeonSession(before,store);session.playUnsaved();
+  const entry=command(before,currentFloor(before).descriptor.downstairs);
+  expect(session.step(entry)).toBe(false);expect(session.snapshot).toEqual(before);expect(values.size).toBe(0);
+  expect(session.retry(session.inspect())).toBe(true);expect(session.step(entry)).toBe(true);
+  const arrival=session.snapshot;expect(arrival.depth).toBe(2);
+  expect(session.continue(session.inspect())).toBe(true);expect(session.snapshot).toEqual(arrival);
+  session.save();expect(session.snapshot).toEqual(arrival);session.dispose();expect(session.step(entry)).toBe(false);
  });
 });
