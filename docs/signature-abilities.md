@@ -2,6 +2,10 @@
 
 ## Current ability controls (#162)
 
+Standalone battles project the validated raw catalog to the starting party's
+level-1 learned abilities before loading, session creation and persistence.
+Run and dungeon battles use their own earned progression projection.
+
 The shared standalone/run/dungeon battle HUD lists every owned non-basic ability in the
 **Ability** selector, ordered by ID. Changing the selector activates that exact
 ability; its named action button reactivates the selected ability after Move,

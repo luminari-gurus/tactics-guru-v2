@@ -1,7 +1,38 @@
 # Issue #163: Fighter Second Wind and Taunt
 
-Date: 2026-10-25 (Asia/Jerusalem). Status: plan ready; branch published and
-natively linked to #163. Implementation and runtime qualification remain to be done.
+Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
+`issue-163-fighter-abilities` (spec-driven; initially 0/9 tasks complete).
+The branch was clean at handoff. Main `e489a30` was merged without conflict,
+including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
+Do not restore the old confirmation modal or overwrite those indicators.
+
+## Current continuation checkpoint
+
+- OpenSpec: [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
+  [design](../../openspec/changes/issue-163-fighter-abilities/design.md),
+  [spec](../../openspec/changes/issue-163-fighter-abilities/specs/fighter-abilities/spec.md),
+  [tasks](../../openspec/changes/issue-163-fighter-abilities/tasks.md).
+- First chunk: standalone level-1 projection after raw validation, before asset
+  loading, session and persistence. Raw definitions remain available for progression.
+  Focused verification/publication underway. Full Fighter feature remains pending.
+- Next chunk: validated profiles + atomic rules/lifecycle/AI + save admission/versions
+  + shared previews/UI, with existing unit and browser tests extended together.
+- Runtime: bundled Windows Node v24.19.0; npm is available at
+  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd` (prepend that directory to PATH
+  per shell call). `npm ci --ignore-scripts --no-audit --no-fund` restored Windows
+  dependencies from the unchanged lockfile after inherited shims/native bindings failed.
+  Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to
+  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`;
+  the default installed Chromium failed to launch (`spawn UNKNOWN`). Fresh pinned
+  Chromium 153.0.8010.12 and installed WebKit 26.6 launch checks passed.
+  OpenSpec CLI is cached at
+  `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`;
+  run with Node. No application dependencies changed.
+- Retain this checkpoint, exact tested source identities and any failures as work advances.
+- Prerequisite proof: 48 tests in progression/battlePersistence, 221 build content
+  tests, both type scopes and production build passed. Focused default-Move Continue
+  browser case passed desktop/native-touch portrait/native-touch landscape (3/3,
+  no skips/retries). See [prerequisite evidence](../qa/issue-163/prerequisite.md).
 
 - Issue: [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
 - Assignee: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/163#issuecomment-6396849340).
