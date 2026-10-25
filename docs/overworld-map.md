@@ -34,8 +34,8 @@ The same layout and seed reproduce positions. Biome and artwork never affect the
 All terrain versions and outputs are preserved; placement changes require their own version.
 Modulo bias is accepted for these prototype spawns, with no distance or center-spawn rule.
 
-The view retains this complete state. A cyan circle marks the player; coral diamonds mark
-enemies, with dark borders and light edging above the existing terrain. The matching legend
+The view retains this complete state. A cyan circle marks the player; coral diamonds numbered 1–3 mark
+individual enemies with matching numbered legend keys, with dark borders and light edging above the existing terrain. The matching legend
 wraps on narrow displays. The grid's accessible name includes occupant counts and its associated
 description lists IDs at one-based row/column. Markers are noninteractive and add no tab stops.
 See [issue #154 acceptance evidence](qa/issue-154-overworld-markers.md) for placement,
@@ -113,10 +113,17 @@ the previous simulation at the operation boundary; its scheduled movement contin
 Visibility loss/pagehide cancels the timer. Visibility return or cached-document restoration
 refreshes presentation and schedules a fresh full delay, without duplicate loops. Cached
 pages retain restoration listeners; final disposal aborts all view-owned listeners and timers.
-`startMap` returns an idempotent disposer used by map-entry hot disposal. Late image callbacks
+`startMap` returns an idempotent disposer used by the map entry on `vite:beforeFullReload`; the entry has no hot-accept boundary. Late image callbacks
 cannot render while page-hidden, disposed or detached. A detached timer stops and disposes
 its view; an unexpected step failure stops movement with an explicit Generate-to-retry message.
 
 This adds no player controls, combat triggers, persistence, new terrain or dungeon simulation.
 Current feature evidence is recorded in [issue 155 QA](qa/issue-155-overworld-movement.md);
 prior marker/art QA records remain historical evidence for their original revisions.
+
+
+A visible **Pause movement / Resume movement** button supports keyboard and touch, exposes
+its paused state and stops the timer without changing movement RNG, positions or step count.
+The choice is local to this view: artwork, successful/failed regeneration, visibility changes
+and cached-document return do not resume it. Regeneration still resets the simulation while
+paused. Resume schedules the first step after a fresh full second; reloading starts unpaused.

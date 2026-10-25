@@ -331,13 +331,32 @@ describe('independent overworld enemy movement', () => {
     const enclosed = createMovement(fixture(undefined,[190,211,230,209]),profiles);
     expect(position(stepMovement(enclosed))).toEqual(position(enclosed));
   });
-  it('resolves contested destinations in ID order against current occupancy', () => {
+  it('resolves a genuinely contested only-exit cell in ID order', () => {
     const profiles = DEFAULT_BEHAVIORS.map(b => ({id:b.id,kind:'aggressive' as const,range:38}));
-    const state = createMovement(fixture([[5,5],[3,4],[4,3],[17,17]]),profiles);
+    // Both enemies have only (4,4) as a legal exit. It is initially free.
+    const walls = [63,82,103,44,65];
+    const state = createMovement(fixture([[5,5],[3,4],[4,3],[17,17]],walls),profiles);
     const next = stepMovement(state);
     expect(position(next,'enemy-1')).toMatchObject({x:4,y:4});
-    expect(position(next,'enemy-2')).toMatchObject({x:5,y:3});
+    expect(position(next,'enemy-2')).toMatchObject({x:4,y:3});
+    // Without the earlier claim, enemy-2 really does choose that same cell.
+    const unclaimed = createMovement(fixture([[5,5],[2,2],[4,3],[17,17]],walls),profiles);
+    expect(position(stepMovement(unclaimed),'enemy-2')).toMatchObject({x:4,y:4});
     expect(next.rng).toEqual(state.rng);
+  });
+  it('takes the shortest escape from a dead-end instead of moving greedily toward the player', () => {
+    // East gets closer but ends at x=7. North/south are walled off; the
+    // shortest path must first go west, then around the end of the U.
+    const walls = [207,...[3,4,5,6,7].flatMap(x => [180+x,220+x])];
+    const profiles: readonly EnemyBehavior[] = [idle[0],{id:'enemy-2',kind:'aggressive',range:38},idle[2]];
+    let state = createMovement(fixture([[10,10],[3,3],[5,10],[17,17]],walls),profiles);
+    state = stepMovement(state);
+    expect(position(state)).toMatchObject({x:4,y:10});
+    for (let i = 1; i < 13; i++) state = stepMovement(state);
+    const distance = (s: OverworldMovement) => Math.abs(position(s).x-10)+Math.abs(position(s).y-10);
+    expect(distance(state)).toBeGreaterThan(1);
+    state = stepMovement(state);
+    expect(distance(state)).toBe(1); // shortest route is 14 steps
   });
   it('never swaps occupied cells and later enemies can use vacated cells', () => {
     // A one-cell-wide corridor. First passive has only its western exit;

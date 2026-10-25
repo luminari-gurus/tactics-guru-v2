@@ -13,7 +13,7 @@ try {
   } else if (path === `${basePath}/map`) {
     const { startMap } = await import('./map/view');
     const disposeMap = startMap();
-    import.meta.hot?.dispose(disposeMap);
+    import.meta.hot?.on('vite:beforeFullReload', disposeMap);
   } else {
     await import('./app/startBattleApp');
   }

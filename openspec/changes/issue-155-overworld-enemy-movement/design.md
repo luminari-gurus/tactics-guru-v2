@@ -38,11 +38,11 @@ Alternative: terrain LOS adds a separate occlusion/corner rule without helping t
 
 Own one cancellable recursive 1000ms timeout in the map view. Start after successful initial placement. Each callback checks disposal, visibility and current view ownership, steps once, updates only marker projection, then schedules the next delay. Hidden state and `pagehide` cancel the timeout; `visibilitychange`/`pageshow` resume only if visible and not already scheduled. Successful regeneration resets the simulation and full delay; failure retains the previous simulation and existing cadence. No world means no timer. Unexpected step failure stops the loop with explicit feedback rather than retrying indefinitely.
 
-Make `startMap` return an idempotent disposer that clears the timer and removes its lifecycle listeners. Wire it into the map branch's Vite hot-disposal path; document departure uses `pagehide`. BFCache suspension is reversible and distinct from final disposal: retain only the listeners needed for restoration while the document is cached; noncached document destruction releases them. Guard asynchronous art-triggered render calls while page-hidden, after disposal or after view replacement; refresh presentation from retained state on restoration. Avoid adding a scheduler library or app-wide lifecycle abstraction.
+Make `startMap` return an idempotent disposer that clears the timer and removes its lifecycle listeners. Wire it into the map branch's `vite:beforeFullReload` event; document departure uses `pagehide`. The entry has no HMR accept boundary, so a bare hot-dispose registration would not run on its normal full reload. BFCache suspension is reversible and distinct from final disposal: retain only the listeners needed for restoration while the document is cached; noncached document destruction releases them. Guard asynchronous art-triggered render calls while page-hidden, after disposal or after view replacement; refresh presentation from retained state on restoration. Avoid adding a scheduler library or app-wide lifecycle abstraction.
 
 ### Update markers without rebuilding controls or terrain each tick
 
-Keep existing full terrain render for generation/art changes, then project markers from current simulation. Ordinary ticks update marker attributes and the accessible position description without replacing the form, terrain cells or native selects. Display a compact visible text list of enemy IDs/profiles/ranges beside the existing legend; mirror it in accessible description. Do not announce every tick through the status live region. A single per-step count attribute can support deterministic browser assertions without putting authoritative state in the DOM. No production test-only movement API.
+Keep existing full terrain render for generation/art changes, then project markers from current simulation. Ordinary ticks update marker attributes and the accessible position description without replacing the form, terrain cells or native selects. Render an enemy number with a CSS pseudo-element above each existing diamond and matching numbered legend key, including narrow layouts. Display a compact visible text list of enemy IDs/profiles/ranges beside the existing legend; mirror it in accessible description. Do not announce every tick through the status live region. A single per-step count attribute can support deterministic browser assertions without putting authoritative state in the DOM. No production test-only movement API.
 
 Preserve pending valid/invalid seed edits and existing error messages. Failed regeneration preserves state at the action boundary; later scheduled movement is expected and must not be mistaken for regeneration mutation. Art completion may rerender the latest world but cannot reinitialize it or change its timer.
 
@@ -50,7 +50,7 @@ Preserve pending valid/invalid seed edits and existing error messages. Failed re
 
 Select PR-readiness coverage under `docs/verification-policy.md`. This is isolated `/map` behavior, not shared battle turn/RNG/save/input behavior. No full battle, telemetry or dungeon matrix is required while imports and shared marker shapes remain unchanged. If implementation crosses those boundaries, reassess coverage before proceeding.
 
-Expected files are listed in the proposal. Extend existing map units/browser tests instead of adding fixture infrastructure. Freeze or explicitly advance browser time for old static placement/art assertions; keep a real-time smoke to prove automatic scheduling without clock control. Do not tag away existing device coverage or relax assertions. Browser discovery must confirm all named cases/projects before execution.
+Expected files are listed in the proposal. Extend existing map units/browser tests instead of adding fixture infrastructure. Choose native-clock cases with an explicit test tag, and capture compared marker/step/description fields atomically in one browser evaluation. Use monotonic advancement assertions for the native BFCache case. Freeze or explicitly advance browser time for old static placement/art assertions; keep a real-time smoke to prove automatic scheduling without clock control. Do not tag away existing device coverage or relax assertions. Browser discovery must confirm all named cases/projects before execution.
 
 Commands after implementation:
 
@@ -100,3 +100,12 @@ No saves, content identities, placement versions or dependencies change. Deliver
 ## Scope review
 
 The ablation pass keeps one pure module and the existing map view/test paths. It omits settings UI, a reusable scheduler framework, new fixture services and dungeon integration because no acceptance item needs them. No required outcome is deferred.
+
+
+## Caller-authorized review repairs (2026-10-25)
+
+The caller requested implementation of the first five grouped review recommendations after PR #246's feedback was assessed. This explicitly authorizes the visible marker/legend IDs, stronger contention and U-shaped shortest-path tests, deterministic browser clock handling, Pause/Resume control, direct disposer/hidden-art tests and corrected development full-reload cleanup. It does not authorize unrelated review nits or general validation frameworks.
+
+Pause is a view-local choice, initially false. The existing scheduler checks it; the control cancels the outstanding timeout, exposes its state, and resumes with a new full delay. It preserves the choice through regeneration, artwork, visibility and BFCache. No preference storage or new simulation state is needed. Ordinary unpaused behavior stays as approved. Hidden-time and artwork callbacks do not change the choice.
+
+Use the full affected map browser file after final runtime changes, then run both source-interception cases explicitly in dev mode (placement failure and direct disposer), plus root/prefix route checks. Preserve prior failed runs and add new source-bound receipts and reviewed screenshots separately. No full project regression is selected for these bounded map/view/test changes.

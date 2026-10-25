@@ -10,34 +10,42 @@ test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXEC
 // Placement/artwork contracts examine a specific simulation instant. Movement tests
 // advance this clock explicitly; the real-time smoke deliberately uses the native clock.
 test.beforeEach(async ({ page }, info) => {
-  if (info.title.includes('real-time') || info.title.includes('BFCache') || info.title.includes('failed route import') || info.title.includes('art uses configured base')) return;
+  if (info.tags.includes('@native-clock')) return;
   await page.clock.install({ time: new Date('2026-10-25T12:00:00Z') });
   await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
 });
 
 async function expectMarkers(page: Page) {
   const grid = page.locator('#map-grid');
-  const seed = Number(await grid.getAttribute('data-seed'));
-  const type = await grid.getAttribute('data-type') as MapType;
-  const biome = await grid.getAttribute('data-biome') as Biome;
-  const expected = createOverworld(applyBiome(generateMap(seed, type), biome));
-  if (!expected.ok) throw Error(expected.reason);
-  const markers = await grid.evaluate(element => [...element.querySelectorAll('[data-marker-id]')].map(cell => {
-    const { markerId: id, markerKind: kind, markerX: x, markerY: y } = (cell as HTMLElement).dataset;
-    return { id, kind, x: Number(x), y: Number(y), index: [...element.children].indexOf(cell), floor: cell.className };
+  await expect(grid).toHaveAttribute('data-movement-step', /\d+/);
+  // Native timers can fire between protocol calls. Capture all compared state
+  // in one task, including the accessible description, instead of mixing ticks.
+  const snapshot = await grid.evaluate(element => ({
+    seed: Number(element.dataset.seed), type: element.dataset.type, biome: element.dataset.biome,
+    step: Number(element.dataset.movementStep), placement: element.dataset.placementVersion,
+    label: element.getAttribute('aria-label'), describedBy: element.getAttribute('aria-describedby'),
+    description: document.querySelector('#map-markers')!.textContent,
+    markers: [...element.querySelectorAll<HTMLElement>('[data-marker-id]')].map(cell => ({
+      id: cell.dataset.markerId, kind: cell.dataset.markerKind,
+      x: Number(cell.dataset.markerX), y: Number(cell.dataset.markerY),
+      index: [...element.children].indexOf(cell), floor: cell.className,
+    })),
   }));
+  const expected = createOverworld(applyBiome(generateMap(snapshot.seed, snapshot.type as MapType), snapshot.biome as Biome));
+  if (!expected.ok) throw Error(expected.reason);
+  const {markers} = snapshot;
   expect(markers).toHaveLength(4);
   let simulation = createMovement(expected.state);
-  const step = Number(await grid.getAttribute('data-movement-step'));
-  for (let i = 0; i < step; i++) simulation = stepMovement(simulation);
+  for (let i = 0; i < snapshot.step; i++) simulation = stepMovement(simulation);
   for (const marker of simulation.world.markers) {
     expect(markers.find(({ id }) => id === marker.id)).toEqual({
       ...marker, index: marker.y * 20 + marker.x, floor: 'map-floor',
     });
   }
-  await expect(grid).toHaveAttribute('data-placement-version', 'markers-v1');
-  await expect(grid).toHaveAccessibleName(/1 player and 3 enemies/);
-  await expect(grid).toHaveAccessibleDescription(simulation.world.markers.map(marker =>
+  expect(snapshot.placement).toBe('markers-v1');
+  expect(snapshot.label).toMatch(/1 player and 3 enemies/);
+  expect(snapshot.describedBy).toBe('map-markers');
+  expect(snapshot.description).toBe(simulation.world.markers.map(marker =>
     `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ') + ' ' + DEFAULT_BEHAVIORS.map(profile => `${profile.id}: ${describeBehavior(profile)}.`).join(' '));
   await expect(grid.locator('[tabindex], button, a')).toHaveCount(0);
   return markers;
@@ -47,7 +55,7 @@ for (const { path, chunk, otherChunk } of [
   { path: '/map', chunk: 'view-', otherChunk: 'startBattleApp-' },
   { path: '/', chunk: 'startBattleApp-', otherChunk: 'view-' },
 ]) {
-  test(`failed route import at ${path} shows a reload instruction`, async ({ page }) => {
+  test(`failed route import at ${path} shows a reload instruction`, { tag: '@native-clock' }, async ({ page }) => {
     const errors: string[] = [];
     const scripts: string[] = [];
     let aborted = false;
@@ -672,7 +680,7 @@ test('controlled placement failure preserves complete state and supports retry',
   await expect(status).not.toContainText('Marker placement failed');
 });
 
-test('art uses configured base, bounded transfers and no battle requests', async ({ page }, testInfo) => {
+test('art uses configured base, bounded transfers and no battle requests', { tag: '@native-clock' }, async ({ page }, testInfo) => {
   const requests: string[] = [];
   page.on('request', request => { if (request.url().includes('/map-art/')) requests.push(request.url()); });
   await page.goto('map');
@@ -711,6 +719,15 @@ test('enemy movement preserves controls, shows both profiles and resets reproduc
   await expect(page.locator('#map-behaviors')).toContainText('enemy-1: passive wandering');
   await expect(page.locator('#map-behaviors')).toContainText('enemy-2: aggressive pursuit · range 6');
   await expect(page.locator('#map-behaviors')).toContainText('enemy-3: aggressive pursuit · range 10');
+  for (const id of ['1','2','3']) {
+    const marker = grid.locator(`[data-marker-id="enemy-${id}"]`);
+    const key = page.locator(`figcaption [data-marker-label="${id}"]`);
+    await expect(key.locator('..')).toHaveText(`Enemy ${id}`);
+    for (const glyph of [marker,key]) {
+      expect(await glyph.evaluate(el => getComputedStyle(el,'::before').content)).toBe(`"${id}"`);
+      expect(await glyph.evaluate(el => getComputedStyle(el,'::before').display)).not.toBe('none');
+    }
+  }
   const initial = await expectMarkers(page);
   const terrain = await grid.locator('span').evaluateAll(cells => cells.map(c => c.getAttribute('data-terrain')));
   const seed = page.getByLabel('Seed', {exact:true});
@@ -774,17 +791,17 @@ test('movement pauses hidden time and resumes one full interval without duplicat
   await page.clock.runFor(1000); await expect(grid).toHaveAttribute('data-movement-step','3'); await expectMarkers(page);
 });
 
-test('real-time enemy movement advances automatically and departure starts a fresh world', async ({ page }) => {
+test('real-time enemy movement advances automatically and departure starts a fresh world', { tag: '@native-clock' }, async ({ page }) => {
   const errors: string[] = []; page.on('pageerror',e => errors.push(e.message));
   await page.goto('map');
   await expect.poll(async () => Number(await page.locator('#map-grid').getAttribute('data-movement-step'))).toBeGreaterThanOrEqual(2);
-  // Exact model comparisons use a paused instant even in the otherwise real-time smoke.
-  await page.clock.install(); await page.clock.pauseAt(new Date(Date.now()+50));
+  // expectMarkers captures a coherent instant without replacing native timers.
   await expectMarkers(page);
   await page.goto('run'); await expect(page.locator('#run-start')).toBeVisible();
   await expect(page.locator('#map-grid')).toHaveCount(0);
-  await page.goto('map'); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
-  await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
+  await page.goto('map');
+  await expect.poll(async () => Number(await page.locator('#map-grid').getAttribute('data-movement-step'))).toBeGreaterThanOrEqual(1);
+  await expectMarkers(page);
   expect(errors).toEqual([]);
 });
 
@@ -823,7 +840,7 @@ test('disposal cancels movement and ignores late artwork and control callbacks',
   await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
 });
 
-test('BFCache restores the retained movement world without hidden-time catch-up', async ({ page, baseURL }) => {
+test('BFCache restores the retained movement world without hidden-time catch-up', { tag: '@native-clock' }, async ({ page, baseURL }) => {
   await page.addInitScript(() => window.addEventListener('pageshow',event => {
     if(event.persisted) Object.assign(window,{mapRestoredStep:document.querySelector<HTMLElement>('#map-grid')?.dataset.movementStep});
   }));
@@ -842,5 +859,116 @@ test('BFCache restores the retained movement world without hidden-time catch-up'
   }));
   expect(restored.step, 'actual persisted pageshow is required').toBeDefined();
   expect(restored.step).toBe(restored.departed);
-  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step',String(Number(restored.step)+1));
+  await expect.poll(async () => Number(await page.locator('#map-grid').getAttribute('data-movement-step'))).toBeGreaterThanOrEqual(Number(restored.step)+1);
+});
+
+test('Pause and Resume preserve the world across edits, art, regeneration and visibility', async ({ page, isMobile }, info) => {
+  await page.goto('map');
+  const grid = page.locator('#map-grid');
+  await page.clock.runFor(1000);
+  const before = await expectMarkers(page);
+  const pause = page.getByRole('button',{name:'Pause movement',exact:true});
+  const box = await pause.boundingBox();
+  expect(box!.width).toBeGreaterThanOrEqual(44); expect(box!.height).toBeGreaterThanOrEqual(44);
+  if (isMobile) await pause.tap(); else { await pause.focus(); await pause.press('Enter'); }
+  const resume = page.getByRole('button',{name:'Resume movement',exact:true});
+  await expect(resume).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#map-motion-state')).toHaveText('Movement paused.');
+  await page.clock.runFor(60000);
+  await expect(grid).toHaveAttribute('data-movement-step','1');
+  expect(await expectMarkers(page)).toEqual(before);
+  await page.getByLabel('Seed',{exact:true}).fill('12345');
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art-fallback','false');
+  await expect(page.getByLabel('Seed',{exact:true})).toHaveValue('12345');
+  await expect(resume).toHaveAttribute('aria-pressed','true');
+  expect(await expectMarkers(page)).toEqual(before);
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.clock.runFor(60000);
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.getByRole('button',{name:'Generate',exact:true}).click();
+  await expect(grid).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(5000);
+  await expect(grid).toHaveAttribute('data-movement-step','0');
+  await expect(resume).toHaveAttribute('aria-pressed','true');
+  await page.screenshot({path:info.outputPath('movement-paused.png'),fullPage:true});
+  if (isMobile) await resume.tap(); else { await resume.focus(); await resume.press('Space'); }
+  await expect(page.getByRole('button',{name:'Pause movement',exact:true})).toHaveAttribute('aria-pressed','false');
+  await page.clock.runFor(999); await expect(grid).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1); await expect(grid).toHaveAttribute('data-movement-step','1');
+  await expectMarkers(page);
+});
+
+test('art completion while hidden defers DOM updates and preserves movement and pending edits', async ({ page }) => {
+  await page.addInitScript(() => {
+    const decode = HTMLImageElement.prototype.decode;
+    Object.assign(window,{hiddenArtCompletions:0});
+    HTMLImageElement.prototype.decode = async function () {
+      try {return await decode.call(this);}
+      finally {(window as unknown as {hiddenArtCompletions:number}).hiddenArtCompletions++;}
+    };
+  });
+  let release!: () => void;
+  const held = new Promise<void>(resolve => {release=resolve;});
+  await page.route('**/map-art/**',async route => {await held;await route.continue();});
+  await page.goto('map');
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await page.getByLabel('Seed',{exact:true}).fill('12345');
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  release();
+  await expect.poll(() => page.evaluate(() => (window as unknown as {hiddenArtCompletions:number}).hiddenArtCompletions)).toBe(2);
+  await page.clock.runFor(60000);
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback','false');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
+  await expect(page.getByLabel('Seed',{exact:true})).toHaveValue('12345');
+  await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
+  await expectMarkers(page);
+});
+
+test('direct map disposer is idempotent and detaches scheduling and listeners', async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SERVER_MODE !== 'dev','Captures the ordinary return value through a dev source-module wrapper.');
+  await page.route(/\/src\/map\/view\.ts(?:\?|$)/,route => {
+    if (route.request().url().includes('?actual')) return route.continue();
+    return route.fulfill({contentType:'application/javascript',body:`
+      import {startMap as mount} from '/src/map/view.ts?actual';
+      export function startMap() {
+        const dispose = mount();
+        window.reviewDisposeMap = dispose;
+        return dispose;
+      }
+    `});
+  });
+  await page.goto('map');
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1000);
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    const dispose = (window as unknown as {reviewDisposeMap:()=>void}).reviewDisposeMap;
+    dispose(); dispose();
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));
+    document.querySelector<HTMLButtonElement>('#map-motion')!.click();
+    document.querySelector<HTMLFormElement>('#map-controls')!.dispatchEvent(new Event('submit',{cancelable:true}));
+  });
+  await page.clock.runFor(60000);
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.reload();
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
 });

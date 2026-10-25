@@ -11,7 +11,7 @@ The map SHALL retain one stationary player and three enemies with explicit confi
 
 #### Scenario: Both profiles are discoverable
 - **WHEN** a map is successfully generated on desktop or mobile
-- **THEN** its three enemy IDs, profiles and aggressive ranges are inspectable, all four markers remain distinct and walkable, and no marker becomes an interactive combat control
+- **THEN** each enemy has a visible numbered marker matched by its legend key, and its ID, profile and aggressive range are inspectable, all four markers remain distinct and walkable, and no marker becomes an interactive combat control
 
 ### Requirement: Passive legal wandering
 Each passive enemy SHALL move at most one cardinal cell per simulation step, selecting reproducibly among currently unoccupied walkable neighbors in north/east/south/west order. With no legal neighbor it SHALL stay in place.
@@ -66,3 +66,11 @@ Successful Generate, New seed, type or biome changes SHALL atomically recreate p
 #### Scenario: Editing during movement
 - **WHEN** the user edits the seed, focuses a native control or changes artwork while scheduled movement proceeds
 - **THEN** movement does not replace their pending input, steal focus, dismiss controls, clear validation/errors or respawn enemies
+
+
+### Requirement: Player-controlled movement pause
+The map SHALL provide an accessible Pause/Resume control that stops simulation without changing positions, random state or step count. The pause choice SHALL survive artwork changes, regeneration and hidden/cached-page restoration within the view. Resume SHALL wait a full interval before stepping.
+
+#### Scenario: Pause survives other map operations
+- **WHEN** a player pauses with keyboard or touch, changes artwork or regenerates, and hides/restores the view
+- **THEN** movement remains paused, regeneration resets only the simulation, and Resume advances only after a fresh full second
