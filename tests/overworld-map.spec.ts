@@ -77,7 +77,7 @@ for (const { path, chunk, otherChunk } of [
 test('map direct entry, refresh, seeds and responsive inspection', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/map');
+  await page.goto('map');
   const grid = page.locator('#map-grid');
   await expect(grid.locator('span')).toHaveCount(400);
   await expect(grid).toHaveAttribute('data-seed', '1');
