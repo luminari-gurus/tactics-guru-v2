@@ -10,7 +10,7 @@ test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXEC
 // Placement/artwork contracts examine a specific simulation instant. Movement tests
 // advance this clock explicitly; the real-time smoke deliberately uses the native clock.
 test.beforeEach(async ({ page }, info) => {
-  if (info.title.includes('real-time') || info.title.includes('BFCache') || info.title.includes('failed route import')) return;
+  if (info.title.includes('real-time') || info.title.includes('BFCache') || info.title.includes('failed route import') || info.title.includes('art uses configured base')) return;
   await page.clock.install({ time: new Date('2026-10-25T12:00:00Z') });
   await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
 });
@@ -699,7 +699,6 @@ test('art uses configured base, bounded transfers and no battle requests', async
   await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
   requests.length = 0;
-  await page.clock.resume();
   await page.goto('./');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   expect(requests).toEqual([]);

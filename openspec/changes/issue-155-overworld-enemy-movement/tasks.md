@@ -11,9 +11,9 @@ Caller explicitly approved this published plan in chat on 2026-10-25 ("Approved"
 
 ## 2. Real map integration and lifecycle
 
-- [ ] 2.1 Retain simulation in the view, project moving markers without rebuilding controls, and show behavior/range labels visibly and accessibly; extend real-route tests for both profiles, correct positions, unchanged counts, pending seed edits, keyboard focus and native touch, and update the map contract.
-- [ ] 2.2 Add one visible-only 1000ms scheduling loop, reversible pagehide/pageshow suspension, idempotent disposal and map-only hot-disposal wiring; verify hidden-time pause, full-delay resume, no catch-up/double scheduling, departure/remount, late callbacks and actual BFCache restoration where available; document any unverified restoration gate.
-- [ ] 2.3 Reset simulation atomically on successful Generate/New seed/type/biome actions while preserving failed-regeneration state, art selection and pending input; adapt existing static-marker checks with controlled time and verify delayed art success/network/decode, invalid seed and dev placement failure without resets/draws; retain an independent real-time movement smoke and document reset semantics.
+- [x] 2.1 Retain simulation in the view, project moving markers without rebuilding controls, and show behavior/range labels visibly and accessibly; extend real-route tests for both profiles, correct positions, unchanged counts, pending seed edits, keyboard focus and native touch, and update the map contract.
+- [x] 2.2 Add one visible-only 1000ms scheduling loop, reversible pagehide/pageshow suspension, idempotent disposal and map-only hot-disposal wiring; verify hidden-time pause, full-delay resume, no catch-up/double scheduling, departure/remount, late callbacks and actual BFCache restoration where available; document any unverified restoration gate.
+- [x] 2.3 Reset simulation atomically on successful Generate/New seed/type/biome actions while preserving failed-regeneration state, art selection and pending input; adapt existing static-marker checks with controlled time and verify delayed art success/network/decode, invalid seed and dev placement failure without resets/draws; retain an independent real-time movement smoke and document reset semantics.
 
 ## 3. Final acceptance and delivery
 
