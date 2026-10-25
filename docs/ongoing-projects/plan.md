@@ -1,157 +1,67 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; gameplay and UI qualification complete, final evidence/delivery pending, 7/9 tasks).
+`issue-163-fighter-abilities` (spec-driven; implementation/qualification complete, delivery pending, 8/9 tasks).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
 
 ## Current continuation checkpoint
 
-- Main advanced to `d5b1927` (#243 automatic stairs) during qualification. Earlier
-  qualification is fully reconciled in [QA](../qa/issue-163/README.md); current
-  completion now includes integrating this bounded stair delta through the PR
-  stack. Adapt the new Fighter journey to automatic descent, reuse unchanged
-  combat evidence, and qualify healed-party/resource carry at the new transition.
-  Do not restart the full matrix for the stair-only integration.
-
-- Current feature source: both profiles, atomic effects, authoritative Taunt/AI,
-  bounded state/readers and versioned run/dungeon healing are implemented.
-  Short-run completion also required an exact spent-use command fact; this is
-  validated and never persists in party data. Raw host catalogs are validated
-  before trusted progression/equipment projection.
-- Final unit run: 968/968 in 55 files, no skips, 21.06 seconds; both type scopes pass.
-  Earlier failures are retained in QA logs: version literals, old catalog identity
-  snapshot, additive status text and policy callers using raw catalogs. Browser
-  standalone consumers now share a level-one projected test catalog; explicit
-  raw unit consumers pass their own catalog. No pre-existing assertions were removed.
-- Fighter fixture browser: 3/3 desktop/Pixel touch portrait/landscape pass, including
-  320px preview, cancel/resize, legal approach, heal, Taunt, inspection/logs/reload.
-  Six retained PNGs were visually inspected for readable feedback.
-- Production journey: first desktop attempt played all six encounters from a
-  canonical fresh seed-190 save, earned level 3, used/reloaded both abilities,
-  then reached terminal defeat at floor-2 guardian. The initial test incorrectly
-  required two-floor victory, which #163 does not require. It now asserts the
-  deterministic terminal defeat after both milestones, retaining the failed run.
-  The final desktop, Pixel portrait and Pixel landscape production journeys all
-  passed; their complete traces are identical (canonical SHA-256
-  `ecee36ea8c28011e6ac191e53e6d6958e578221caa943d686f7dd8fe0e0d2f00`).
-  Each plays 6 encounters/365 accepted commands, earns Fighter level 3 and ends
-  with five wins then the second-guardian defeat. Encounter 6 proves legal healing
-  above entry HP (24 → 30). Traces and representative PNGs are in `docs/qa/issue-163/`.
-  Remaining browser stages, focused repairs and final receipts are still pending.
-- WebKit exploration/dungeon stage passed 63/63; health bars passed 25/25.
-  All three Windows WebKit production traces also match the Chromium trace exactly,
-  giving 6 engine/device journeys with the same 365 commands and terminal state.
-  Source-bound traces and representative screenshots are copied under QA. This
-  completes OpenSpec 3.2; 3.1 stays reopened until the default Mage fixture repair.
-- Continue by running the 19-stage policy inventory with reused valid unit/type
-  evidence, serial browser jobs/one worker and pinned task-local Chromium. No
-  CI/physical-device or release claim. Open the dependent feature PR after checks,
-  targeting `branch/issue-163-standalone-level` while PR #242 is open.
-
-- OpenSpec: [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
+- Implementation and acceptance are complete. Publish the focused feature PR,
+  verify remote parity/review readiness, and finish the final delivery checkbox.
+  The requested branch remains `branch/issue-163-fighter-abilities`.
+- Review stack, all open and ready: [#242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242)
+  standalone level-one boundary → [#244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244)
+  carried-party/Guarded assertions → [#245](https://github.com/luminari-gurus/tactics-guru-v2/pull/245)
+  engine-aware fixtures/complete-run selector → Fighter feature PR (publication pending).
+- Main `d5b1927` (#243 automatic stairs) was merged normally through every
+  dependency branch and the feature. The new journey follows automatic descent.
+  Test/build source `a74d85e` is clean; later evidence commits reuse its unchanged
+  inputs. No history rewriting or GitHub PR merge was performed.
+- Current proof: 971/971 unit tests in 55 files, both TypeScript scopes, two build
+  integrations and root bundle pass. Before the bounded main update, the full
+  19-stage inventory had 1,194 browser executions; all 65 failures and 9 skips
+  are explicitly reconciled in [QA](../qa/issue-163/README.md), preserving failed
+  aggregates and literal-base comparisons. Focused repairs pass 15 Chromium,
+  27 picker, 54 Linux WebKit acceptance, 2 extra WebKit animation and 12 root/prefix
+  asset cases. Existing dungeon WebKit 63, health 25 and both telemetry 36 pass.
+- Six earlier full production journeys (Chromium/WebKit desktop/portrait/landscape)
+  have identical complete traces: seed 190, 6 encounters, 365 combat commands,
+  earned Fighter level 3, both abilities used/reloaded, five wins then terminal
+  second-guardian defeat. Encounter 6 heals above entry HP (24 → 30). These traces
+  are retained; no two-floor victory is claimed.
+- Current-main delta: 9 Chromium + 9 WebKit stair/healed-party/recovery cases pass,
+  plus the complete updated desktop journey. Every battle state/event/RNG and
+  final party matches the earlier evidence; world revision 431 → 430 is the
+  intended one-revision stair travel. Unchanged combat/device coverage is reused;
+  the changed stair boundary is exercised in all six profiles. See
+  [the integration addendum](../qa/issue-163/main-integration/README.md).
+- Final isolated proof capture: 18 cold/warm samples, no failures, served build
+  `a74d85e`. It is local proof-scene qualification, not a new #200 baseline.
+- Rules/save boundary: Second Wind level 2, self, action + one battle use,
+  `min(missing HP, 4 + projected power)`; Taunt level 3, adjacent hostile, no roll,
+  restrict offensive targets through target endTurn; source/target defeat clears.
+  Battle state 2 / rules 3, run envelope 4, dungeon envelope 5. RNG remains 1 and
+  standalone wrapper remains 1. Old saves retain recovery/export bytes.
+- OpenSpec [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
   [design](../../openspec/changes/issue-163-fighter-abilities/design.md),
   [spec](../../openspec/changes/issue-163-fighter-abilities/specs/fighter-abilities/spec.md),
   [tasks](../../openspec/changes/issue-163-fighter-abilities/tasks.md).
-- First chunk: standalone level-1 projection after raw validation, before asset
-  loading, session and persistence. Raw definitions remain available for progression.
-  Published ready for review as [PR #242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242),
-  commit `bad8f19`, branch `branch/issue-163-standalone-level`, base main.
-  Feature work continues on the requested `branch/issue-163-fighter-abilities`,
-  targeting the prerequisite branch while #242 is open. Full feature remains pending.
-- The 19-stage qualification finished against clean feature source `d208a6b` and
-  its production build. Reused unit/type results have matching
-  input hash `405039eaba83caeb6484dca3a8310885bb817f49b8f51ad10a6e4fca6aa57dbc`.
-  Live reports: `tmp/issue-163-full/qualification/summary.json` and per-stage logs.
-  Runner: `node tmp/issue-163-full/run.mjs`, a temporary wrapper over the existing
-  19-stage manifest. Keep its failed aggregates; reconcile focused repairs without
-  rerunning unaffected checks. Both telemetry stages passed 36/36; performance
-  passed all 18 proof cold/warm samples with no failures. Prefix/root builds passed.
-  Asset modes retain the known expectation failures pending focused repair runs.
-- Known qualification repairs to finish after frozen-input coverage: the battle
-  case in `tests/public-asset-base.spec.ts` still constructs its expected session
-  with the raw catalog; use the existing level-one test catalog. The authored-final
-  case in `tests/procedural-grids.spec.ts` compares HP-only projections to complete
-  progression records. `tests/battle-animations.spec.ts` still expects the obsolete
-  short Guarded status in both actor and inspection; preserve the current full
-  penalty/expiry explanation in its assertion. An exact-base worktree at
-  `C:/Users/apexw/.codex/tmp/issue163-base-e489a30` is built with the same lockfile,
-  Node and browser versions for a focused literal-base comparison. Do not run it
-  concurrently with the active browser matrix. Retain failures, repair the carried
-  party assertion as a separate focused PR, and rerun only affected cases/modes.
-- Original qualification shell `68827` finished. Its base comparisons also ran:
-  both stale Chromium assertions and representative WebKit launch/media failures
-  reproduced on literal `e489a30`. The standalone assertion repair passed 9/9 on
-  `c4eed28` and is published ready for review as
-  [PR #244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244), branch
-  `branch/issue-163-battle-assertions`, head `95e1a6a`, stacked on #242. The notes
-  below describe the repair sequence; do not repeat the completed base work.
-  use the same pinned Chromium and desktop filter
-  `authored final entry|ability:guarded_strike: spent action` on the literal base.
-  Correct the HP comparison at the proper boundary and retain a separate full
-  party metadata assertion; expect the complete current Guarded explanation in
-  both actor and inspection. Qualify both repairs on all three Chromium profiles,
-  publish their focused dependency PR, merge that dependency into the feature
-  branch, and fix the feature's raw-catalog asset assertion with its affected
-  root/prefix preview/dev cases only. Do not rerun unaffected passing suites.
-- Chromium aggregate finished at `d208a6b`: 688 passed, 9 assertion failures
-  (the three known titles across all three profiles), 3 expected preview skips,
-  no retries/flakiness. The separate dev placement stage passed all 3 skipped
-  obligations. Fixtures: 69/72 passed; the three friendly-Missile failures expose
-  a task-owned fixture regression: default XP-null projection replaced its custom
-  `zz_mage` caster level 3 with level 1. Keep the level-one Fighter gating but
-  restore that explicitly authored default Mage fixture profile; XP fixtures must
-  still use canonical progression. Rerun the friendly-Missile and later-Mage cases
-  on all three profiles. This is a fixture repair, not a production ability change.
-  The original WebKit acceptance aggregate and all other stages are now finished.
-- WebKit acceptance on Windows finished 8/52 passed. Of 44 failures, 40 are
-  launch setup: file-level overrides in battle-persistence/run-progression pass
-  the Chromium executable to WebKit (`--inspector-pipe` against Chrome). Four audio
-  cases report unavailable load/decode on Windows WebKit. Keep both failure kinds
-  explicit. Fix engine-aware launch overrides in their own focused dependency PR
-  (the same pattern also exists in battle-animations). Compare representative
-  cases on literal base, then rerun WebKit acceptance on the existing WSL Linux
-  WebKit 2359 runtime with a deliberately unusable Chromium override to prove
-  that WebKit ignores it. Keep test IDs, workers, retries and selection intact.
-- WSL preparation only: isolated clone
-  `/home/aiwithapex/.cache/issue163-webkit-linux`, shared Git objects from primary,
-  detached at `d208a6b`, locked Linux dependencies installed. The ordinary Windows
-  production `dist` was copied; `pin-wsl-node.sh` verifies every file against the
-  root build inventory and pins task-local Node 24.19.0 / npm 12.2.1 (the initial
-  system Node 24.14.0 produced an npm engine warning). No WSL browser has launched.
-  Do not overlap WSL and Windows browser jobs. After committing repairs, check out
-  their exact feature SHA in the WSL clone; retain its source and runtime receipt.
-- Current source commits: `b45a011` repairs the feature's asset expectation and
-  preserves the explicit default `zz_mage` caster profile; `64adcdb` is the
-  separate browser-fixture dependency, merged into the feature at `9157214`.
-  Both type scopes pass. The browser fixture repair also corrects an obsolete
-  WebKit grep: 52 retained IDs are unchanged and exactly two complete authored-run
-  cases are added (54 total), with no omissions or altered assertions/workers/retries.
-- Active browser job is now **WSL acceptance**, shell session `78045`, exact
-  integration source `9157214`, verified ordinary `d208a6b` build. Its invalid
-  Chromium override sentinel must never reach WebKit. Parent Windows WebKit
-  startup/run-reload checks passed 2/2 with the fixed engine selection. Finish WSL
-  acceptance, publish the browser-fixture dependency, then run the feature's
-  focused Chromium assertion/launch, full ability-picker fixture and root/prefix
-  asset cases. Serialize all browsers across Windows/WSL. Keep raw reports and
-  finish the source-bound reconciliation, PR and cleanup.
-- Runtime: bundled Windows Node v24.19.0; npm is available at
-  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd` (prepend that directory to PATH
-  per shell call). `npm ci --ignore-scripts --no-audit --no-fund` restored Windows
-  dependencies from the unchanged lockfile after inherited shims/native bindings failed.
-  Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to
-  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`;
-  the default installed Chromium failed to launch (`spawn UNKNOWN`). Fresh pinned
-  Chromium 153.0.8010.12 and installed WebKit 26.6 launch checks passed.
-  OpenSpec CLI is cached at
-  `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`;
-  run with Node. No application dependencies changed.
-- Retain this checkpoint, exact tested source identities and any failures as work advances.
-- Prerequisite proof: 48 tests in progression/battlePersistence, 221 build content
-  tests, both type scopes and production build passed. Focused default-Move Continue
-  browser case passed desktop/native-touch portrait/native-touch landscape (3/3,
-  no skips/retries). See [prerequisite evidence](../qa/issue-163/prerequisite.md).
+- No browser jobs remain active. Compressed reports, source/build hashes,
+  screenshots and traces are committed under `docs/qa/issue-163/`. Raw originals
+  are retained at `verification-receipts/issue-163-2026-10-25/`; their historical
+  report paths still say `tmp/issue-163-full/`. Task-owned comparison worktree and
+  WSL clone were removed after preserving evidence. All published unmerged branches
+  and qualified runtime/browser caches remain.
+- Runtime: Windows/WSL Node 24.19.0, npm 12.2.1, Playwright 1.63.0, Chromium
+  153.0.8010.12, WebKit 26.6. Windows npm wrapper:
+  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd`; Chromium executable:
+  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`.
+  Windows WebKit's base-reproduced media decode limitation was requalified with
+  real media on Linux WebKit; no codec mocking or engine substitution. WSL used
+  an invalid Chromium override sentinel to prove engine isolation. Device profiles
+  are emulation, with no physical-device or CI execution claim.
 
 - Issue: [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
 - Assignee: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/163#issuecomment-6396849340).
@@ -381,7 +291,7 @@ acceptance and delivery below are checked only when their whole proof is complet
   pending-action read-only behavior and old-save byte preservation. Compare
   uninterrupted, replayed and resumed state/events/RNG; accepted encounter/floor
   transitions retain HP and reset battle effects/uses once.
-- [ ] **Reachable UI (criterion 4):** expose self heal and hostile taunt in the
+- [x] **Reachable UI (criterion 4):** expose self heal and hostile taunt in the
   real picker with accurate availability, status and logs. Exercise keyboard and
   touch, narrow portrait/short landscape, inspection, cancel, repeated activation,
   resize and presentation locks. Retain screenshots. Use existing level fixtures

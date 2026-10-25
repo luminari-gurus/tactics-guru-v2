@@ -3,10 +3,11 @@
 Issue [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
 The requested branch is `branch/issue-163-fighter-abilities`.
 Implementation: `d208a6b`; fixture repairs: `b45a011`; browser dependency
-integration: `9157214`; final served application build: `fbca57b`.
-Later commits carry evidence and handoff documentation. The only `src/` change
-after the implementation is a comment correction in `effects.ts`; application
-logic, dependencies and assets are unchanged. Changed test fixtures/configuration
+integration: `9157214`; first qualified application build: `fbca57b`; current-main integration build: `a74d85e`.
+Before current-main integration, later commits carry evidence, fixtures and a
+comment correction in `effects.ts`; Fighter application logic, dependencies and
+assets remain unchanged. The subsequent bounded automatic-stair merge and its
+qualification are detailed in [the current-main addendum](main-integration/README.md). Changed test fixtures/configuration
 were requalified below. Earlier tests are explicitly reused, not claimed to have
 executed later documentation commits.
 
@@ -57,7 +58,8 @@ The shared command/turn/save contracts select policy full regression. The existi
 were reused only after matching the recorded verification input hash
 `405039eaba83caeb6484dca3a8310885bb817f49b8f51ad10a6e4fca6aa57dbc`.
 
-- `npm run test:unit`: **968 passed in 55 files**, no skips; both TypeScript scopes
+- `npm run test:unit`: **968 passed in 55 files** at the original freeze and
+  **971 passed** after current-main integration, no skips; both TypeScript scopes
   passed, including after repairs. Content validation is included in units.
 - Tooling: **10 passed**. Build integration: **2 passed**. Ordinary root/prefix
   bundles and final root restoration passed, with per-file build inventories.
@@ -80,8 +82,8 @@ were reused only after matching the recorded verification input hash
 - Asset repair: **3 passed in each of four modes**: root preview, root dev, prefix
   preview and prefix dev. Unchanged cases retain their original mode-specific
   passes. Source discovery selected exactly the affected three-profile case.
-- Final isolated performance capture: **18 proof cold/warm samples**, no failures,
-  served build `fbca57b`. The original 18-sample capture also passed. These are
+- Original final proof capture: **18 cold/warm samples**, no failures,
+  served build `fbca57b`; current-main build `a74d85e` also passes 18 samples. The original 18-sample capture also passed. These are
   local proof-scene measurements, not a new #200 comparable baseline.
 
 Actual commands, selected IDs, statuses, source/build inventories, attempts and
@@ -117,3 +119,8 @@ change is part of this review handoff.
 Battle state 2 / rules 3, run envelope 4 and dungeon envelope 5 deliberately reject
 earlier saves. The standalone wrapper remains 1 and RNG remains 1. Existing
 recovery/export preserves original bytes; no silent migration or reset is added.
+
+Local raw originals and their complete screenshot directories are retained at
+`verification-receipts/issue-163-2026-10-25/`. Historical paths inside those reports
+still identify the executed `tmp/issue-163-full/` location. Temporary comparison
+checkouts were removed after evidence capture; published branches remain.

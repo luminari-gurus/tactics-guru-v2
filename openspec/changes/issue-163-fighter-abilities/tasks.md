@@ -18,5 +18,5 @@
 
 ## 4. Integration and delivery
 
-- [ ] 4.1 Account for policy full regression across affected consumers using valid source-bound reuse; resolve discovered failures proportionately, retain limitations and final source/build identity in QA evidence.
+- [x] 4.1 Account for policy full regression across affected consumers using valid source-bound reuse; resolve discovered failures proportionately, retain limitations and final source/build identity in QA evidence. The complete reconciliation and current-main integration addendum retain all failures/skips, focused repairs, 971 units, six-profile combat evidence and final a74d85e build identity.
 - [ ] 4.2 Reconcile all issue criteria and OpenSpec validation with the final diff; update plan.md for continuation, commit/push and publish the dependent feature PR ready for review without merge/deployment.

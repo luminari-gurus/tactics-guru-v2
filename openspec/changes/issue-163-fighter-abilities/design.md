@@ -30,4 +30,11 @@ See [proposal.md](proposal.md) and [the human handoff](../../../docs/ongoing-pro
 
 ## Migration Plan
 
+Main `d5b1927` integrated automatic stairs during qualification. It was merged through
+the stack; the new journey follows automatic descent. Spatial publication is checked
+with healed-party/fresh-resource boundaries on all six profiles and a complete updated
+desktop journey. Combat states/events/RNG remain identical; world revision decreases
+once as intended. Unchanged combat, telemetry, asset and engine coverage is reused with
+the dependency-aware reconciliation rather than repeating the full matrix.
+
 No automatic migration or release action. Changed saves deliberately enter existing incompatible recovery with exportable original bytes. Publish focused prerequisite and dependent feature PRs, leaving them open for review.
