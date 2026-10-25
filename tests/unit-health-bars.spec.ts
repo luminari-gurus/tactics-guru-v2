@@ -19,7 +19,11 @@ async function settled(page:Page) {
 function check(r:any,state?:BattleState) {
   for(const u of r.units) {
     const h=u.health, definition=u.side==='player'?catalog.heroes[u.unitId as keyof typeof catalog.heroes]:catalog.enemies[u.unitId as keyof typeof catalog.enemies];
-    if(state)expect(h.hp).toBe(state.units.find(v=>v.id===u.id)!.hp);
+    if(state) {
+      const source=state.units.find(v=>v.id===u.id)!;
+      expect(h.hp).toBe(source.hp);
+      expect(u.guard.visible).toBe(source.hp>0 && !!source.guarded);
+    }
     expect(h.maxHp).toBe(definition.stats.maxHp);expect(h.ratio).toBe(healthFraction(h.hp,h.maxHp));
     expect(h.color).toBe(healthColor(h.ratio));expect(h.visible).toBe(h.hp>0);expect(h.interactive).toBe(false);
     expect(h.position.x).toBeCloseTo(u.position.x,5);expect(h.position.y).toBeCloseTo(u.position.y-u.bobOffset+HEALTH_BAR.offsetY,5);
@@ -165,6 +169,7 @@ test('real run reward healing carries into the next encounter without old bars',
   const healed:RunSnapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
   expect(healed.items.run.party.find(h=>h.heroId===hero.heroId)!.hp).toBeGreaterThan(hero.hp);
   await page.locator('#run-start-encounter').click();await ready(page);const state=(await readSession(page)).state,r=await settled(page);check(r,state);
+  expect(r.units.every((u:any)=>!u.guard.visible)).toBe(true);
   expect(state.mapId).toBe('map:desert_woodland_crossing');expect(r.units.filter((u:any)=>u.health.visible).length).toBe(state.units.filter(u=>u.hp>0).length);
   await expect(page.locator('#battle-heading h1')).toHaveText('Encounter 2 of 3 · woodland crossing');
   await expect(page.locator('#run-progress')).toHaveText('Encounter 2 of 3 · woodland crossing');

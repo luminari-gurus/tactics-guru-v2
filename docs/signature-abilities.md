@@ -79,6 +79,11 @@ turn transitions remove it and emit expiry before `turnStarted`. Shared effect p
 supplies HUD/inspection and the attack previews used by AI. Defeat removes guard; historical
 saves with inert defeated-unit guard remain readable. See [combat effects](combat-effects.md).
 
+A persistent shield badge beside the living Fighter marks active Guarded on the battle
+board, including after a missed strike and when resuming a save. It follows the snapshot
+rather than replaying the activation animation. Status and touch-accessible inspection
+explain both modifiers and next-turn expiry; the badge clears on expiry or defeat.
+
 ## Magic Missile replaces Ember Burst
 
 Approved plan change (2026-10-09): the Mage's signature is **Magic Missile**, not Ember Burst.

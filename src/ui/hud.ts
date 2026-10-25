@@ -41,7 +41,7 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
   return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
-    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC)`:'No status effects'};
+    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`:'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {
   const {def,name,status}=unitFeedback(session,unit);

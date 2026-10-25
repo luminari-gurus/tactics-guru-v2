@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
+import { guardedEffect } from '../domain/effects';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
@@ -25,6 +26,7 @@ export class BoardRenderer {
   private readonly highlights = new Map<string, Phaser.GameObjects.Image>();
   private readonly images = new Map<number, Phaser.GameObjects.Image>();
   private readonly healthBars = new Map<number, Phaser.GameObjects.Graphics>();
+  private readonly guardBadges = new Map<number, Phaser.GameObjects.Graphics>();
   private moving: { unitId: number; point: Point; depth: number } | null = null;
   private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
@@ -162,13 +164,19 @@ export class BoardRenderer {
       this.rings.set(occupant.id, ring);
       const health = scene.add.graphics();
       this.healthBars.set(occupant.id, health);
-      this.root.add([ring, image, health]);
+      const badge = scene.add.graphics().setVisible(false);
+      const shield = [[-7,-8],[7,-8],[6,2],[0,8],[-6,2]].map(([x,y])=>new Phaser.Math.Vector2(x,y));
+      badge.fillStyle(0x172033).fillPoints(shield,true);
+      badge.lineStyle(2,0xa9f3e6).strokePoints(shield,true);
+      badge.lineStyle(2,0xffffff).lineBetween(0,-4,0,4).lineBetween(-3,0,3,0);
+      this.guardBadges.set(occupant.id, badge);
+      this.root.add([ring, image, health, badge]);
     }
     // Reserve sprite space on every cell so moving never escapes the fitted bounds.
     // Reserve the maximum bounded bar extent on every cell (also during movement).
     const rectangles = [boardBounds(this.board.tiles), ...this.board.tiles.map(tile => {
       const p = projectTile(tile);
-      return {left:p.x-24, right:p.x+24, top:p.y+7, bottom:p.y+19};
+      return {left:p.x-48, right:p.x+24, top:p.y-46, bottom:p.y+19};
     }), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
       ...this.board.tiles.flatMap(tile => this.board.occupants.map(occupant => {
         const asset = catalog.assets[occupant.assetId];
@@ -277,6 +285,8 @@ export class BoardRenderer {
       const definition = unit.side === 'player' ? this.catalog.heroes[unit.defId] : this.catalog.enemies[unit.defId];
       this.drawHealth(unit.id, healthFraction(unit.hp, definition.stats.maxHp), unit.hp > 0);
       this.placeHealth(unit.id, position, unitDepth);
+      this.guardBadges.get(unit.id)!.setVisible(guardedEffect(unit) !== null);
+      this.placeGuard(unit.id, position, unitDepth);
       const ring = this.rings.get(unit.id)!.clear().setDepth(depth + 2.25).setVisible(unit.hp > 0);
       ring.lineStyle(unit.id === activeId ? 3 : 2, unit.id === activeId ? ACTIVE_COLOR : unit.side === 'player' ? 0x6ddbf5 : 0xf17a73)
         .strokeEllipse(point.x, point.y, 26, 12);
@@ -404,6 +414,7 @@ export class BoardRenderer {
       this.moving = {unitId:move.unitId,point,depth};
       this.images.get(move.unitId)!.setPosition(point.x,point.y).setDepth(depth+OCCUPANT_LAYER);
       this.placeHealth(move.unitId,point,depth);
+      this.placeGuard(move.unitId,point,depth);
       const movingTile={x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,elevation:a.elevation+(b.elevation-a.elevation)*t};
       for(const canopy of this.canopies){
         const overlaps=before.units.some(unit=>{
@@ -423,6 +434,7 @@ export class BoardRenderer {
       unit.health.position={x:bar.x,y:bar.y};unit.health.depth=bar.depth;
       const screen=this.root.getWorldTransformMatrix().transformPoint(bar.x,bar.y);
       unit.health.screen={x:screen.x,y:screen.y};
+      unit.guard=this.guardReport(move.unitId);
       game.dataset.battleReport=JSON.stringify(report);
     },onComplete:finish});
     return {done,cancel:finish};
@@ -459,7 +471,31 @@ export class BoardRenderer {
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
     for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
+    if(this.snapshot) for(const unit of this.snapshot.units) {
+      const tile=this.byCell.get(cellKey(unit.cell))!;
+      const moving=this.moving?.unitId===unit.id?this.moving:null;
+      this.placeGuard(unit.id,moving?.point??projectTile(tile),moving?.depth??tile.depth);
+    }
     this.publish();
+  }
+
+  private placeGuard(id:number, point:Point, depth:number):void {
+    // A recognizable shield stays at least 12 CSS pixels wide at fitted mobile scale.
+    const scale=Math.max(1,12/(14*this.view.scale));
+    const x=point.x-UNIT_ART.width/2-9*scale;
+    const margin=9*scale;
+    this.guardBadges.get(id)!.setPosition(
+      Math.max((this.region.x-this.view.x)/this.view.scale+margin,x),
+      point.y-Math.max(28,8*scale+8/this.view.scale-HEALTH_BAR.offsetY))
+      .setScale(scale).setDepth(9001+depth/10000);
+  }
+
+  private guardReport(id:number) {
+    const badge=this.guardBadges.get(id)!;
+    const screen=this.root.getWorldTransformMatrix().transformPoint(badge.x,badge.y);
+    return {visible:badge.visible,position:{x:badge.x,y:badge.y},screen:{x:screen.x,y:screen.y},
+      width:14*badge.scaleX*this.view.scale,height:16*badge.scaleY*this.view.scale,
+      depth:badge.depth,interactive:!!badge.input};
   }
 
   // Informational annotations must clear foreground tiles; combat effects start at 10000.
@@ -610,6 +646,7 @@ export class BoardRenderer {
       const base = matrix.transformPoint(projected.x, projected.y);
       const actual = image.getWorldTransformMatrix().transformPoint(0, 0);
       return { id: unit.id, unitId: unit.defId, side: unit.side, tile: { ...unit.cell, elevation: tile.elevation },
+        guard:this.guardReport(unit.id),
         health: (()=>{
           const bar=this.healthBars.get(unit.id)!;
           const definition=unit.side==='player'?this.catalog.heroes[unit.defId]:this.catalog.enemies[unit.defId];
