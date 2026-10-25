@@ -1,4 +1,4 @@
-import { atEncounter, atDownstairs } from '../helpers/dungeonFixtures';
+import { atEncounter, atDownstairs, atStairApproach } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
@@ -27,6 +27,10 @@ export function clearFloor(s: DungeonState) {
     if (s.offer) s = good(dungeonItem(s, { ...dungeonBoundary(s), type: 'claimReward', offerId: s.offer.id, itemId: s.offer.options[0].itemId }));
   }
   return atDownstairs(s);
+}
+function enterStairs(session: DungeonSession, direction: 'ascend' | 'descend' = 'descend') {
+  const s = session.snapshot, f = s.floors[s.depth-1];
+  return session.step({id:s.id,depth:s.depth,revision:s.revision,destination:direction === 'ascend' ? f.descriptor.upstairs : f.descriptor.downstairs});
 }
 function memory() {
   const values = new Map<string,string>();
@@ -114,24 +118,24 @@ describe('dungeon persistence',()=>{
     expect(m.getItem('tactics-guru:phaser:run:primary:v1')).toBe('old-run');
   });
   it('does not publish travel on quota failure and can explicitly recover',()=>{
-    const m=memory(),store=createDungeonStorage(()=>m),s=clearFloor(fresh());expect(store.save(s).ok).toBe(true);
+    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));expect(store.save(s).ok).toBe(true);
     const session=new DungeonSession(s,store),before=session.snapshot;const write=m.setItem;
     m.setItem=()=>{throw Object.assign(Error('full'),{name:'QuotaExceededError'});};
-    expect(session.travel('descend',s.revision)).toBe(false);expect(session.snapshot).toEqual(before);expect(store.inspect().primary.status).toBe('valid');
-    m.setItem=write;expect(session.retry(session.inspect())).toBe(true);expect(session.travel('descend',s.revision)).toBe(true);expect(session.snapshot.depth).toBe(2);
+    expect(enterStairs(session)).toBe(false);expect(session.snapshot).toEqual(before);expect(store.inspect().primary.status).toBe('valid');
+    m.setItem=write;expect(session.retry(session.inspect())).toBe(true);expect(enterStairs(session)).toBe(true);expect(session.snapshot.depth).toBe(2);
   });
   it('requires explicit recovery after uncertain primary writes',()=>{
-    const m=memory(),store=createDungeonStorage(()=>m),s=clearFloor(fresh());store.save(s);const session=new DungeonSession(s,store);
+    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));store.save(s);const session=new DungeonSession(s,store);
     const read=m.getItem;let failRead=false;
     m.setItem=(k,v)=>{m.values.set(k,v);if(k===DUNGEON_KEYS.primary)failRead=true;};
     m.getItem=k=>{if(failRead&&k===DUNGEON_KEYS.primary)throw Error('readback');return read(k);};
-    expect(session.travel('descend',s.revision)).toBe(false);expect(session.snapshot.depth).toBe(1);
-    failRead=false;expect(session.travel('descend',s.revision)).toBe(false);
+    expect(enterStairs(session)).toBe(false);expect(session.snapshot.depth).toBe(1);
+    failRead=false;expect(enterStairs(session)).toBe(false);
     expect(session.continue(session.inspect())).toBe(true);expect(session.snapshot.depth).toBe(2);
   });
   it('allows explicit unsaved battles but blocks travel and disposes stale sessions',()=>{
-    const session=new DungeonSession(clearFloor(fresh()),createDungeonStorage(()=>null));session.playUnsaved();
-    expect(session.travel('descend',session.snapshot.revision)).toBe(false);
+    const session=new DungeonSession(atStairApproach(clearFloor(fresh())),createDungeonStorage(()=>null));session.playUnsaved();
+    expect(enterStairs(session)).toBe(false);
     const playing=new DungeonSession(atEncounter(fresh()),createDungeonStorage(()=>memory())),battle=playing.startEncounter()!;playing.dispose();
     expect(battle.phase).toBe('disposed');expect(playing.startEncounter()).toBe(null);
   });
@@ -202,8 +206,8 @@ describe('durable encounter policies', () => {
     const historical=JSON.parse(JSON.stringify(state));historical.floors[0].descriptor.encounters[0].battlefield.mapHash='sha256:'+'0'.repeat(64);
     const checked=good(readDungeon(historical)),encoded=encodeDungeon(checked);if(!encoded.ok)throw Error(encoded.reason);
     const m=memory();m.setItem(DUNGEON_KEYS.primary,encoded.text);
-    const session=new DungeonSession(checked,createDungeonStorage(()=>m)),before=session.snapshot;
-    expect(session.travel('ascend',before.revision)).toBe(false);expect(session.snapshot).toEqual(before);
+    const session=new DungeonSession(atStairApproach(checked,'ascend'),createDungeonStorage(()=>m)),before=session.snapshot;
+    expect(enterStairs(session,'ascend')).toBe(false);expect(session.snapshot).toEqual(before);
     expect(m.getItem(DUNGEON_KEYS.primary)).toBe(encoded.text);
   });
 

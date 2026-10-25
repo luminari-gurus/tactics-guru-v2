@@ -289,5 +289,8 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination) };
   const candidate = { ...s, floors };
   if (f.completed < 3 && command.destination === poiCell(f.exploration.pois[f.completed])) return startDungeonBattle(candidate);
+  // Only accepted movement enters stairs; arrival, rendering and restore never travel.
+  if (command.destination === f.descriptor.upstairs && s.depth > 1) return travelDungeon(candidate, 'ascend', s.revision);
+  if (command.destination === f.descriptor.downstairs && f.completed === 3) return travelDungeon(candidate, 'descend', s.revision);
   return advance(s, { floors });
 }

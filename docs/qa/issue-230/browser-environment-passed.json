@@ -1,0 +1,26 @@
+{
+  "createdAt": "2026-10-25T13:43:25.630Z",
+  "commit": "e489a3077b5571874ad7352e0511035403a30813",
+  "node": "v26.11.0",
+  "playwright": "1.63.0",
+  "platform": "darwin",
+  "release": "27.0.0",
+  "arch": "arm64",
+  "browsers": {
+    "chromium": {
+      "executable": "/Users/brian/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+      "override": false,
+      "channel": "chromium",
+      "version": "153.0.8010.12",
+      "passed": true
+    },
+    "webkit": {
+      "executable": "/Users/brian/Library/Caches/ms-playwright/webkit-2359/pw_run.sh",
+      "override": false,
+      "channel": null,
+      "version": "26.6",
+      "passed": true
+    }
+  },
+  "passed": true
+}

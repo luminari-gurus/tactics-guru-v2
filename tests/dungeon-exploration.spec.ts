@@ -11,7 +11,7 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { atCell, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
+import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -34,7 +34,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('M');
  await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
  await expect(page.getByText('● Player · M encounter (including guardian)',{exact:false})).toBeVisible();
- await expect(page.locator('#dungeon-descend')).toBeDisabled();
+ await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-uncleared-map.png')});
  const firstMap=generateMap(floor.descriptor.seed,'rooms');
  const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p)===n))!;
@@ -64,6 +64,50 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
  if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();}
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
+});
+
+for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs travel once per entry with ${control}, stay on arrival and restore, and respect locks`,async({page,isMobile})=>{
+ const base=freshDungeon('stairs-browser',1),cleared={...base,floors:[{...base.floors[0],completed:3}]};
+ const load=async(state:DungeonState)=>{
+  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ };
+ const reload=async()=>{await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();};
+ const move=async(destination:number)=>{
+  const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position;
+  const direction=delta===-20?'north':delta===20?'south':delta===1?'east':'west';
+  if(control==='arrows'||control==='wasd'){
+   await page.locator('#dungeon-map').focus();
+   const key=control==='arrows'?{north:'ArrowUp',south:'ArrowDown',east:'ArrowRight',west:'ArrowLeft'}[direction]:{north:'w',south:'s',east:'d',west:'a'}[direction];
+   await page.keyboard.press(key);
+  }else{
+   const target=control==='compass'?page.locator(`#dungeon-step-${direction}`):page.locator(`#dungeon-map [data-cell="${destination}"]`);
+   if(isMobile)await target.tap();else await target.click();
+  }
+ };
+ // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
+ const approach=atStairApproach(cleared);await load(approach);
+ await move(approach.floors[0].descriptor.downstairs);
+ const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
+ expect(upper.position).toBe(upper.descriptor.upstairs);expect(second.party).toEqual(approach.party);expect(second.ownership).toEqual(approach.ownership);
+ await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
+ await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
+ await reload();expect(await dungeonSnapshot(page)).toEqual(second);
+ const off=atStairApproach(second,'ascend').floors[1].position;
+ await move(off);expect((await dungeonSnapshot(page)).depth).toBe(2);
+ await move(upper.descriptor.upstairs);
+ const first=await dungeonSnapshot(page);expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
+ expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
+ await reload();expect(await dungeonSnapshot(page)).toEqual(first);
+ await page.screenshot({path:test.info().outputPath(`stairs-${control}-arrival.png`),fullPage:true});
+ // Floor-one upstairs and uncleared downstairs remain ordinary walkable cells.
+ for(const direction of ['ascend','descend'] as const){
+  const locked=atStairApproach(base,direction);await load(locked);
+  const cell=direction==='ascend'?base.floors[0].descriptor.upstairs:base.floors[0].descriptor.downstairs;
+  await move(cell);const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
+  await reload();expect(await dungeonSnapshot(page)).toEqual(after);
+ }
 });
 
 test('diamond compass directions, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{
