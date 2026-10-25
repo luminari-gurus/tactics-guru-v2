@@ -32,9 +32,9 @@ Delivery: [PR #246](https://github.com/luminari-gurus/tactics-guru-v2/pull/246).
 
 The caller explicitly requested the first five grouped fixes from the feedback assessment on 2026-10-25; no additional approval is pending.
 
-- [ ] 4.1 Add visible numbered enemy markers and matching legend keys; verify rendered glyphs/legend correspondence in the browser and review updated desktop/mobile/320px screenshots.
+- [x] 4.1 Add visible numbered enemy markers and matching legend keys; verify rendered glyphs/legend correspondence in the browser and review updated desktop/mobile/320px screenshots.
 - [x] 4.2 Replace the weak contention fixture and add a dead-end/U-shaped shortest-path fixture; verify both enemies really choose the same only exit when free and that the shortest escape initially increases distance and arrives in 14 steps.
 - [x] 4.3 Select native clock via explicit tags, atomically capture marker/step/description state and assert monotonic cached-page advancement; verify the native smoke and real BFCache checks without installing a fake clock after navigation.
-- [ ] 4.4 Add keyboard/touch Pause/Resume, preserve pause through regeneration/art/visibility and resume after a full interval; verify no hidden RNG/position/step advancement and accessible control state/size.
+- [x] 4.4 Add keyboard/touch Pause/Resume, preserve pause through regeneration/art/visibility and resume after a full interval; verify no hidden RNG/position/step advancement and accessible control state/size.
 - [x] 4.5 Directly invoke the returned disposer twice and test hidden artwork completion; correct the main entry's full-reload cleanup hook and documentation, verifying idempotence, detached listeners and deferred DOM updates.
 - [ ] 4.6 Run affected units, build/type/content, full map preview and explicit dev interception cases plus root/prefix routing on final relevant inputs; retain failures and new receipts/screenshots, update PR #246 and confirm published branch parity without merge.

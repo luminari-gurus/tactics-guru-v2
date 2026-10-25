@@ -46,10 +46,10 @@ Simulation SHALL be a pure retained-state transition with its own seeded random 
 - **THEN** resulting positions, movement random state and step count match, with terrain and unrelated session state unchanged
 
 ### Requirement: Visible cadence and disposal
-The map SHALL advance at most once per 1000 milliseconds while visible, without catch-up bursts. Hidden/page-hidden views SHALL stop scheduling and DOM updates. Return to visibility or BFCache restoration SHALL resume with a fresh full delay. Final disposal SHALL release timers/listeners and make late artwork callbacks harmless.
+The unpaused map SHALL advance at most once per 1000 milliseconds while visible, without catch-up bursts. Hidden/page-hidden views SHALL stop scheduling and DOM updates. Return to visibility or BFCache restoration SHALL resume unpaused movement with a fresh full delay. Final disposal SHALL release timers/listeners and make late artwork callbacks harmless.
 
 #### Scenario: Hidden time and restored pages
-- **WHEN** the page hides across many intervals and is then restored
+- **WHEN** the unpaused page hides across many intervals and is then restored
 - **THEN** no hidden-time steps occur and only one step occurs after the next full visible delay, without duplicate loops
 
 #### Scenario: Disposed view
