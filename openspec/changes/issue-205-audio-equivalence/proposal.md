@@ -22,4 +22,4 @@ None. The existing `battle-audio` requirements and scenarios remain unchanged. A
 
 ## Impact
 
-Only `tests/battle-audio.spec.ts`, existing audio unit files, this OpenSpec ledger and the issue plan/QA receipts. No production, dependencies, shared helpers, matrix configuration, CI, merge or deployment changes. See [the continuation plan](../../../docs/ongoing-projects/plan.md) for outcome, files, non-goals and proof.
+Only `tests/battle-audio.spec.ts`, existing audio unit files, this OpenSpec ledger and the issue plan/QA receipts. No production, dependencies, shared helpers, matrix configuration, CI, merge or deployment changes. See [the continuation plan](../../../docs/ongoing-projects/issue-205-audio-equivalence-plan.md) for outcome, files, non-goals and proof.
