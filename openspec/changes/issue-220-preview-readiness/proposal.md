@@ -22,4 +22,4 @@ None.
 
 ## Impact
 
-Only `scripts/measure-fit.ts`, a private preview helper, focused tests and continuation/QA records. `verify-full.mjs` consumes the unchanged command; PR #209 remains independent. No application, dependency, browser configuration, full-regression, merge or production change. Detailed acceptance and ablation decisions remain in [the plan](../../../docs/ongoing-projects/plan.md).
+Only `scripts/measure-fit.ts`, a private preview helper, focused tests and continuation/QA records. `verify-full.mjs` consumes the unchanged command; PR #209 remains independent. No application, dependency, browser configuration, full-regression, merge or production change. Detailed acceptance and ablation decisions remain in [the preserved plan](../../../docs/ongoing-projects/issue-220-preview-readiness-plan.md).
