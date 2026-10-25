@@ -1,20 +1,21 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; implementation/qualification complete, delivery pending, 8/9 tasks).
+`issue-163-fighter-abilities` (spec-driven; 9/9 tasks complete, all work published ready for review).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
 
 ## Current continuation checkpoint
 
-- Implementation and acceptance are complete. Publish the focused feature PR,
-  verify remote parity/review readiness, and finish the final delivery checkbox.
+- Implementation, acceptance and delivery are complete. All four PRs are open,
+  non-draft and mergeable; remote parity and final review readiness were verified.
   The requested branch remains `branch/issue-163-fighter-abilities`.
 - Review stack, all open and ready: [#242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242)
   standalone level-one boundary → [#244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244)
   carried-party/Guarded assertions → [#245](https://github.com/luminari-gurus/tactics-guru-v2/pull/245)
-  engine-aware fixtures/complete-run selector → Fighter feature PR (publication pending).
+  engine-aware fixtures/complete-run selector →
+  [#247](https://github.com/luminari-gurus/tactics-guru-v2/pull/247) Fighter abilities.
 - Main `d5b1927` (#243 automatic stairs) was merged normally through every
   dependency branch and the feature. The new journey follows automatic descent.
   Test/build source `a74d85e` is clean; later evidence commits reuse its unchanged
@@ -297,7 +298,7 @@ acceptance and delivery below are checked only when their whole proof is complet
   resize and presentation locks. Retain screenshots. Use existing level fixtures
   for boundary cases, plus a complete legal production dungeon journey that
   earns level 3 and uses both abilities; fixtures alone are not reachability proof.
-- [ ] **Preservation and delivery (all criteria):** retain Guarded and Magic
+- [x] **Preservation and delivery (all criteria):** retain Guarded and Magic
   Missile numeric, targeting, event, AI, replay and resume regressions. Reconcile
   every acceptance criterion with source-bound results, update rule/compatibility
   docs, inspect the final diff, commit/push only issue work and prepare the PR

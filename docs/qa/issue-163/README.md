@@ -1,7 +1,7 @@
 # Fighter Second Wind and Taunt qualification
 
 Issue [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
-The requested branch is `branch/issue-163-fighter-abilities`.
+The requested branch is `branch/issue-163-fighter-abilities`; [PR #247](https://github.com/luminari-gurus/tactics-guru-v2/pull/247) is ready for review atop #242 → #244 → #245.
 Implementation: `d208a6b`; fixture repairs: `b45a011`; browser dependency
 integration: `9157214`; first qualified application build: `fbca57b`; current-main integration build: `a74d85e`.
 Before current-main integration, later commits carry evidence, fixtures and a
