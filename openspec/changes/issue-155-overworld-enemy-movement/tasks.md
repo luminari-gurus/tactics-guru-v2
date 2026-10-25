@@ -1,13 +1,13 @@
 # Tasks
 
-Implementation is not approved yet. Issue #155; caller `dubstylee`; branch `work/issue-155-overworld-enemy-movement`; base `d5b19279a869501205e98856ebd5e5f91f8c287d`. Follow the design's acceptance mapping and proportional verification selection. Physical platforms available/required: none/none; browser/device emulation is sufficient.
+Caller explicitly approved this published plan in chat on 2026-10-25 ("Approved"). Issue #155; caller `dubstylee`; branch `work/issue-155-overworld-enemy-movement`; base `d5b19279a869501205e98856ebd5e5f91f8c287d`. Follow the design's acceptance mapping and proportional verification selection. Physical platforms available/required: none/none; browser/device emulation is sufficient.
 
 ## 1. Pure movement and reproducibility
 
-- [ ] 1.1 Verify explicit approval of this exact published plan, record it here, and recheck branch/base/issue identity before implementation; confirm only approved task work is present.
-- [ ] 1.2 Add the readonly movement wrapper and validated per-enemy configuration without altering OverworldMarker, markers-v1 placement or terrain; extend existing map units for valid/invalid profiles, immutable inputs, default assignments and independent seeded RNG, and document configuration in docs/overworld-map.md.
-- [ ] 1.3 Implement passive neighbor selection and aggressive inclusive Manhattan detection/idle/loss rules; verify enclosed and free wandering, exact-range/beyond-range, no-occlusion and moved-player model fixtures, deterministic draws and no mutation; document the selected visibility rule.
-- [ ] 1.4 Implement bounded BFS toward free player-adjacent cells and fixed ID occupancy updates; verify detours, unreachable/occupied approaches, adjacency, collision conflicts, no swaps and tie breaks across repeated-step seed/type/biome corpora; retain untouched terrain/placement and battle-RNG assertions and document path rules.
+- [x] 1.1 Verify explicit approval of this exact published plan, record it here, and recheck branch/base/issue identity before implementation; confirm only approved task work is present.
+- [x] 1.2 Add the readonly movement wrapper and validated per-enemy configuration without altering OverworldMarker, markers-v1 placement or terrain; extend existing map units for valid/invalid profiles, immutable inputs, default assignments and independent seeded RNG, and document configuration in docs/overworld-map.md.
+- [x] 1.3 Implement passive neighbor selection and aggressive inclusive Manhattan detection/idle/loss rules; verify enclosed and free wandering, exact-range/beyond-range, no-occlusion and moved-player model fixtures, deterministic draws and no mutation; document the selected visibility rule.
+- [x] 1.4 Implement bounded BFS toward free player-adjacent cells and fixed ID occupancy updates; verify detours, unreachable/occupied approaches, adjacency, collision conflicts, no swaps and tie breaks across repeated-step seed/type/biome corpora; retain untouched terrain/placement and battle-RNG assertions and document path rules.
 
 ## 2. Real map integration and lifecycle
 

@@ -12,7 +12,8 @@ try {
     await import('./app/startRunApp');
   } else if (path === `${basePath}/map`) {
     const { startMap } = await import('./map/view');
-    startMap();
+    const disposeMap = startMap();
+    import.meta.hot?.dispose(disposeMap);
   } else {
     await import('./app/startBattleApp');
   }

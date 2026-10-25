@@ -2,6 +2,18 @@ import { expect, test, type Page } from '@playwright/test';
 import { createOverworld } from '../src/map/state';
 import { generateMap, type MapType } from '../src/map/generate';
 import { applyBiome, type Biome } from '../src/map/biomes';
+import { createMovement, stepMovement, DEFAULT_BEHAVIORS, describeBehavior } from '../src/map/movement';
+
+// Match existing persistence suites: exercise real cached documents when requested.
+test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, ignoreDefaultArgs: ['--disable-back-forward-cache'] } });
+
+// Placement/artwork contracts examine a specific simulation instant. Movement tests
+// advance this clock explicitly; the real-time smoke deliberately uses the native clock.
+test.beforeEach(async ({ page }, info) => {
+  if (info.title.includes('real-time') || info.title.includes('BFCache') || info.title.includes('failed route import')) return;
+  await page.clock.install({ time: new Date('2026-10-25T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
+});
 
 async function expectMarkers(page: Page) {
   const grid = page.locator('#map-grid');
@@ -15,15 +27,18 @@ async function expectMarkers(page: Page) {
     return { id, kind, x: Number(x), y: Number(y), index: [...element.children].indexOf(cell), floor: cell.className };
   }));
   expect(markers).toHaveLength(4);
-  for (const marker of expected.state.markers) {
+  let simulation = createMovement(expected.state);
+  const step = Number(await grid.getAttribute('data-movement-step'));
+  for (let i = 0; i < step; i++) simulation = stepMovement(simulation);
+  for (const marker of simulation.world.markers) {
     expect(markers.find(({ id }) => id === marker.id)).toEqual({
       ...marker, index: marker.y * 20 + marker.x, floor: 'map-floor',
     });
   }
   await expect(grid).toHaveAttribute('data-placement-version', 'markers-v1');
   await expect(grid).toHaveAccessibleName(/1 player and 3 enemies/);
-  await expect(grid).toHaveAccessibleDescription(expected.state.markers.map(marker =>
-    `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' '));
+  await expect(grid).toHaveAccessibleDescription(simulation.world.markers.map(marker =>
+    `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ') + ' ' + DEFAULT_BEHAVIORS.map(profile => `${profile.id}: ${describeBehavior(profile)}.`).join(' '));
   await expect(grid.locator('[tabindex], button, a')).toHaveCount(0);
   return markers;
 }
@@ -140,6 +155,7 @@ test('map isolates battle storage and never initializes battle, audio or diagnos
   await expect(page.locator('canvas, audio, #fit-panel')).toHaveCount(0);
   expect(await page.evaluate(() => typeof window.fitDiagnostics)).toBe('undefined');
   scripts.length = 0;
+  await page.clock.resume();
   await page.goto('/');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   await expect(page.locator('canvas')).toHaveCount(1);
@@ -628,6 +644,9 @@ test('controlled placement failure preserves complete state and supports retry',
   await expect(status).toContainText('retry Generate');
   await page.getByRole('button', { name: 'Generate', exact: true }).click();
   const original = await expectMarkers(page);
+  await page.clock.runFor(1000);
+  await expect(grid).toHaveAttribute('data-movement-step','1');
+  const moving = await expectMarkers(page);
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/map-art/**', async route => { await held; await route.continue(); });
@@ -639,12 +658,12 @@ test('controlled placement failure preserves complete state and supports retry',
     await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('rooms');
     await expect(page.getByLabel('Biome', { exact: true })).toHaveValue('grassland');
     await expect(status).toContainText('The previous world is unchanged');
-    expect(await expectMarkers(page)).toEqual(original);
+    expect(await expectMarkers(page)).toEqual(moving);
   }
   release();
   await expect(grid).toHaveAttribute('data-art-fallback', 'false');
   await expect(status).toContainText('Controlled placement failure');
-  expect(await expectMarkers(page)).toEqual(original);
+  expect(await expectMarkers(page)).toEqual(moving);
   await page.getByLabel('Art style', { exact: true }).selectOption('simple');
   await expect(status).toContainText('The previous world is unchanged');
   await page.getByLabel('Seed', { exact: true }).fill('2');
@@ -680,7 +699,149 @@ test('art uses configured base, bounded transfers and no battle requests', async
   await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
   requests.length = 0;
+  await page.clock.resume();
   await page.goto('./');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   expect(requests).toEqual([]);
+});
+
+test('enemy movement preserves controls, shows both profiles and resets reproducibly', async ({ page, isMobile }, info) => {
+  await page.goto('map');
+  const grid = page.locator('#map-grid');
+  await expect(grid).toHaveAttribute('data-movement-step','0');
+  await expect(page.locator('#map-behaviors')).toContainText('enemy-1: passive wandering');
+  await expect(page.locator('#map-behaviors')).toContainText('enemy-2: aggressive pursuit · range 6');
+  await expect(page.locator('#map-behaviors')).toContainText('enemy-3: aggressive pursuit · range 10');
+  const initial = await expectMarkers(page);
+  const terrain = await grid.locator('span').evaluateAll(cells => cells.map(c => c.getAttribute('data-terrain')));
+  const seed = page.getByLabel('Seed', {exact:true});
+  await seed.fill('12345');
+  if (isMobile) await seed.tap(); else await seed.focus();
+  await page.evaluate(() => Object.assign(window, { originalMapCell: document.querySelector('#map-grid > span') }));
+  await page.clock.runFor(1000);
+  await expect(grid).toHaveAttribute('data-movement-step','1');
+  const moving = await expectMarkers(page);
+  expect(moving.find(m => m.id === 'player')).toEqual(initial.find(m => m.id === 'player'));
+  expect(moving.find(m => m.id === 'enemy-1')).not.toEqual(initial.find(m => m.id === 'enemy-1'));
+  expect(moving.find(m => m.id === 'enemy-3')).not.toEqual(initial.find(m => m.id === 'enemy-3'));
+  await expect(seed).toBeFocused(); await expect(seed).toHaveValue('12345');
+  expect(await page.evaluate(() => (window as unknown as {originalMapCell:Element}).originalMapCell === document.querySelector('#map-grid > span'))).toBe(true);
+  expect(await grid.locator('span').evaluateAll(cells => cells.map(c => c.getAttribute('data-terrain')))).toEqual(terrain);
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art-fallback','false');
+  expect(await expectMarkers(page)).toEqual(moving);
+  await seed.fill('abc'); await seed.press('Enter');
+  await page.clock.runFor(1000);
+  await expect(grid).toHaveAttribute('data-movement-step','2');
+  await expect(seed).toHaveValue('abc'); await expect(seed).toHaveAttribute('aria-invalid','true');
+  await expect(page.locator('#map-status')).toContainText('The map is unchanged');
+  await expectMarkers(page);
+  await seed.fill('1');
+  const generate = page.getByRole('button',{name:'Generate',exact:true});
+  if (isMobile) await generate.tap(); else { await generate.focus(); await generate.press('Enter'); }
+  await expect(grid).toHaveAttribute('data-movement-step','0');
+  expect(await expectMarkers(page)).toEqual(initial);
+  await page.clock.runFor(999); await expect(grid).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1); await expect(grid).toHaveAttribute('data-movement-step','1');
+  expect(await expectMarkers(page)).toEqual(moving);
+  for (const [label,option] of [['Map type','cellular'],['Biome','forest']] as const) {
+    await page.getByLabel(label,{exact:true}).selectOption(option);
+    await expect(grid).toHaveAttribute('data-movement-step','0'); await expectMarkers(page);
+    await page.clock.runFor(1000); await expect(grid).toHaveAttribute('data-movement-step','1'); await expectMarkers(page);
+  }
+  await page.getByRole('button',{name:'New seed',exact:true}).click();
+  await expect(grid).toHaveAttribute('data-movement-step','0'); await expectMarkers(page);
+  await page.screenshot({path:info.outputPath('enemy-movement.png'),fullPage:true});
+});
+
+test('movement pauses hidden time and resumes one full interval without duplicate loops', async ({ page }) => {
+  await page.goto('map');
+  const grid = page.locator('#map-grid');
+  await page.clock.runFor(1000); await expect(grid).toHaveAttribute('data-movement-step','1');
+  const before = await grid.innerHTML();
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.clock.runFor(60000);
+  expect(await grid.innerHTML()).toBe(before); await expect(grid).toHaveAttribute('data-movement-step','1');
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));
+  });
+  await page.clock.runFor(999); await expect(grid).toHaveAttribute('data-movement-step','1');
+  await page.clock.runFor(1); await expect(grid).toHaveAttribute('data-movement-step','2');
+  await page.clock.runFor(1000); await expect(grid).toHaveAttribute('data-movement-step','3'); await expectMarkers(page);
+});
+
+test('real-time enemy movement advances automatically and departure starts a fresh world', async ({ page }) => {
+  const errors: string[] = []; page.on('pageerror',e => errors.push(e.message));
+  await page.goto('map');
+  await expect.poll(async () => Number(await page.locator('#map-grid').getAttribute('data-movement-step'))).toBeGreaterThanOrEqual(2);
+  // Exact model comparisons use a paused instant even in the otherwise real-time smoke.
+  await page.clock.install(); await page.clock.pauseAt(new Date(Date.now()+50));
+  await expectMarkers(page);
+  await page.goto('run'); await expect(page.locator('#run-start')).toBeVisible();
+  await expect(page.locator('#map-grid')).toHaveCount(0);
+  await page.goto('map'); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
+  expect(errors).toEqual([]);
+});
+
+test('disposal cancels movement and ignores late artwork and control callbacks', async ({ page }) => {
+  let release!: () => void;
+  const held = new Promise<void>(resolve => {release=resolve;});
+  await page.addInitScript(() => {
+    const decode = HTMLImageElement.prototype.decode;
+    Object.assign(window,{disposedArtCompletions:0});
+    HTMLImageElement.prototype.decode = async function () {
+      try { return await decode.call(this); }
+      finally { (window as unknown as {disposedArtCompletions:number}).disposedArtCompletions++; }
+    };
+  });
+  await page.route('**/map-art/**',async route => {await held;await route.continue();});
+  await page.goto('map');
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await expect(page.locator('#map-status')).toContainText('Loading artwork');
+  await page.clock.runFor(1000);
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
+    window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
+  });
+  release();
+  await expect.poll(() => page.evaluate(() => (window as unknown as {disposedArtCompletions:number}).disposedArtCompletions)).toBe(2);
+  await page.clock.runFor(60000);
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));
+    document.dispatchEvent(new Event('visibilitychange'));
+    document.querySelector<HTMLFormElement>('#map-controls')!.dispatchEvent(new Event('submit',{cancelable:true}));
+  });
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.unrouteAll(); await page.reload();
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','0');
+  await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');
+});
+
+test('BFCache restores the retained movement world without hidden-time catch-up', async ({ page, baseURL }) => {
+  await page.addInitScript(() => window.addEventListener('pageshow',event => {
+    if(event.persisted) Object.assign(window,{mapRestoredStep:document.querySelector<HTMLElement>('#map-grid')?.dataset.movementStep});
+  }));
+  await page.goto('map');
+  await expect.poll(async () => Number(await page.locator('#map-grid').getAttribute('data-movement-step'))).toBeGreaterThanOrEqual(1);
+  // Observe the actual departure boundary without controlling browser time.
+  await page.evaluate(() => window.addEventListener('pagehide',event => {
+    if(event.persisted) sessionStorage.setItem('test:map-departed-step',document.querySelector<HTMLElement>('#map-grid')!.dataset.movementStep!);
+  }));
+  await page.goto(new URL('run',baseURL).href);
+  await expect(page.locator('#run-start')).toBeVisible();
+  await page.goBack({waitUntil:'commit'});
+  const restored = await page.evaluate(() => ({
+    step:(window as unknown as {mapRestoredStep?:string}).mapRestoredStep,
+    departed:sessionStorage.getItem('test:map-departed-step'),
+  }));
+  expect(restored.step, 'actual persisted pageshow is required').toBeDefined();
+  expect(restored.step).toBe(restored.departed);
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step',String(Number(restored.step)+1));
 });

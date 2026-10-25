@@ -1,6 +1,6 @@
 # Overworld map contract
 
-Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
+Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls plus moving enemies; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
 
 ## Layout and biome
 
@@ -23,7 +23,7 @@ and `createOverworld(map: BiomeMap)`. The result is `{ ok: true, state }` or
 `{ ok: false, reason }`, with no partial world on failure. A complete state retains the map,
 `placementVersion: 'markers-v1'` and four ordered markers: `player`, `enemy-1`, `enemy-2`,
 `enemy-3`. Each has a `player`/`enemy` kind and zero-based integer `x`/`y`.
-Issue #155 can transform this model directly; DOM attributes are only its projection.
+The movement model wraps this state without changing the shared marker shape; DOM attributes are only its projection.
 
 Placement validates the existing connected 20×20 layout and matching terrain, then samples
 four distinct row-major walkable indices without replacement. A fresh local RNG is seeded
@@ -70,3 +70,53 @@ Reference revision: [`e9433f6b608ae6b2d95418615cce9cf17dadcf74`](https://github.
 - The pinned inventory contains [grass/forest/mountain overworld files](https://github.com/luminari-gurus/tactics-guru/tree/e9433f6b608ae6b2d95418615cce9cf17dadcf74/art/overworld/8bit/generated/individual_32), corresponding 48px exports, and grass/forest tiles. File presence does not establish verified style coverage, licensing or suitable desert overworld art. Desert is an approved Simple treatment, not a claim of existing imported assets. #98 owns exact style/provenance/export verification.
 
 See [issue #99](https://github.com/luminari-gurus/tactics-guru-v2/issues/99), [approved plan](../openspec/changes/issue-99-map-biomes/design.md), and [map algorithm evidence](qa/issue-97-map-algorithms.md).
+
+
+## Enemy movement
+
+`src/map/movement.ts` wraps a complete placement state with readonly behavior assignments,
+a local movement RNG and a step count. `createMovement(world, behaviors)` accepts exactly
+one typed profile per enemy ID; invalid/missing/duplicate IDs or noninteger aggressive
+ranges outside 1–38 reject before initialization. It copies the configuration. Defaults:
+
+| Enemy | Profile | Detection |
+| --- | --- | --- |
+| enemy-1 | Passive wandering | Not applicable |
+| enemy-2 | Aggressive pursuit | Manhattan distance ≤6 |
+| enemy-3 | Aggressive pursuit | Manhattan distance ≤10 |
+
+The visible description and grid's accessible description identify these assignments.
+Detection is range-based on the fully revealed prototype: **terrain does not occlude sight**.
+Aggressive enemies outside range stay still and forget pursuit immediately; there is no
+last-seen memory. This is not battle LOS or dungeon enemy behavior.
+
+`stepMovement` is a pure transition. Each enemy moves at most one cardinal walkable cell,
+resolved in stable enemy-1, enemy-2, enemy-3 order against updated occupancy. North, east,
+south, west is the fixed neighbor/tie order. Passive enemies pick among free neighbors,
+or wait if enclosed. They draw once per step even when enclosed, from movement-only
+`seedRng((map.seed ^ 0x4d4f5645) >>> 0)`; modulo bias is accepted for prototype wandering.
+Aggressive enemies use no RNG. They take the first step of a shortest legal BFS route to
+a free cell adjacent to the detected player. Each search visits at most 400 cells. Adjacent
+or unreachable enemies wait. The player, blocked cells and currently occupied cells are
+never entered; earlier enemies claim contested destinations and later enemies can enter
+vacated cells, without direct swaps. Terrain generation, markers-v1 placement and battle
+RNG remain unchanged. Identical initial worlds/configuration and step counts reproduce motion.
+
+The view advances once per 1000ms while visible, with no elapsed-time catch-up. Ordinary
+ticks update marker projection only, retaining terrain elements, controls, focus, pending
+seed input and validation/failure text. Position updates are not live-region announcements.
+Art selection and late image success/failure may redraw the retained world but do not step,
+reset, reseed or reschedule movement. Successful generation resets placement, movement RNG,
+step count and the full timer delay together. Invalid input or placement failure preserves
+the previous simulation at the operation boundary; its scheduled movement continues normally.
+
+Visibility loss/pagehide cancels the timer. Visibility return or cached-document restoration
+refreshes presentation and schedules a fresh full delay, without duplicate loops. Cached
+pages retain restoration listeners; final disposal aborts all view-owned listeners and timers.
+`startMap` returns an idempotent disposer used by map-entry hot disposal. Late image callbacks
+cannot render while page-hidden, disposed or detached. A detached timer stops and disposes
+its view; an unexpected step failure stops movement with an explicit Generate-to-retry message.
+
+This adds no player controls, combat triggers, persistence, new terrain or dungeon simulation.
+Current feature evidence is recorded in [issue 155 QA](qa/issue-155-overworld-movement.md);
+prior marker/art QA records remain historical evidence for their original revisions.

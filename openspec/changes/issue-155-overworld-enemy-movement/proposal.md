@@ -27,4 +27,4 @@ Expected implementation files: new `src/map/movement.ts`, `src/map/view.ts`, `sr
 
 Issue owner/caller: `dubstylee`. Branch: `work/issue-155-overworld-enemy-movement`, published from `origin/main` at `d5b19279a869501205e98856ebd5e5f91f8c287d`. Prerequisite #154 / PR #156 is merged into that base. Physical availability: none (local CAN_TEST_MOBILE missing/invalid); required physical platforms: none. Browser/device emulation satisfies acceptance.
 
-Planning only. Implementation awaits explicit caller approval of this proposal, design, specification and tasks.
+Caller explicitly approved this published proposal, design, specification and tasks in chat on 2026-10-25.
