@@ -112,9 +112,9 @@ test('repeated map selection reaches a legal ground destination behind the same 
   await page.locator('#battle-target').selectOption('3,5'); // Native control clears overlap history.
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   await select();
-  await page.locator('#battle-review').click();
+  await page.locator('#battle-party').click();
   const locked=await report(page);await select();expect((await report(page)).selectionEvents).toBe(locked.selectionEvents);
-  await page.locator('#dialog-cancel').click();
+  await page.locator('#inspection-close').click();
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   await select();await page.locator('canvas').focus();await page.keyboard.press('Enter');
   expect((await report(page)).selected).toEqual({x:3,y:5,elevation:0});
@@ -138,7 +138,7 @@ test('repeated map selection reaches a legal ground destination behind the same 
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual(expected);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   // Only explicit confirmation commits the selected legal move.
-  await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();
+  await page.locator('#battle-review').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const moved=JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
   expect(moved.commandCount).toBe(expected.state.commandCount+1);
@@ -186,10 +186,10 @@ test('right-click cancels a prepared move through the existing action path and r
     const r=await settledReport(page);
     await page.mouse.click(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale,{button:'right'});
   };
-  await page.locator('#battle-review').click();const locked=await page.locator('#game').getAttribute('data-session');
+  await page.locator('#battle-party').click();const locked=await page.locator('#game').getAttribute('data-session');
   await rightClick();await expect(page.getByRole('dialog')).toBeVisible();
   expect(await page.locator('#game').getAttribute('data-session')).toBe(locked);
-  await page.locator('#dialog-cancel').click();
+  await page.locator('#inspection-close').click();
   await page.locator('#battle-target').selectOption('3,5');
   await rightClick();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!)).toEqual({...prepared,pending:null});
@@ -273,10 +273,9 @@ test('hovered origins show only ability reach without changing selection, pendin
   await hover(origin);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(origin);
   expect(await page.locator('#game').getAttribute('data-session')).toBe(prepared);
   await page.mouse.move(1,1);await expect.poll(async()=>(await report(page)).hover?.origin).toEqual(destination);
-  await page.locator('#battle-review').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
-  await page.locator('#dialog-cancel').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
+  await page.locator('#battle-cancel').click();await expect.poll(async()=>(await report(page)).hover).toBeNull();
   // Native destination controls and keyboard navigation expose the same hypothetical-origin query.
-  await page.locator('#battle-target').selectOption({index:1});
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
   await expect.poll(async()=>(await report(page)).hover).not.toBeNull();
   const selected=(await report(page)).selected;
   const next=[{key:'ArrowRight',x:selected.x+1,y:selected.y},{key:'ArrowDown',x:selected.x,y:selected.y+1},
@@ -587,8 +586,7 @@ test('legal player movement updates elevation, reachability and canopy occlusion
   expect(elevated).toBeDefined();
   await page.getByRole('button',{name:'Move',exact:true}).click();
   await page.locator('#battle-target').selectOption(`${elevated.x},${elevated.y}`);
-  await page.getByRole('button',{name:'Review action'}).click();
-  await page.getByRole('button',{name:'Confirm',exact:true}).click();
+  await page.getByRole('button',{name:'Confirm action'}).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after = await settledReport(page);
   const moved = after.units.find((u:any)=>u.id===initial.activeId);

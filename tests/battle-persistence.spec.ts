@@ -19,7 +19,7 @@ async function seedTwo(page:Page) {
 }
 async function freeze(page:Page) {await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));}
 async function chooseMove(page:Page) {
-  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
 }
 async function touch(page:Page,selector:string) {
   const element=page.locator(selector);await element.scrollIntoViewIfNeeded();const box=(await element.boundingBox())!;
@@ -43,10 +43,10 @@ test('default Move Continue is read-only and confirmed movement keeps the remain
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#fit-restart')).toBeFocused();
   expect((await readSession(page)).state).toEqual(before.state);expect(await stored(page)).toEqual(saved);
-  await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-cancel').click();
-  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-cancel').click();
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#battle-review')).toBeDisabled();expect(await stored(page)).toEqual(saved);
-  await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await page.locator('#dialog-confirm').click();await ready(page);
+  await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();await ready(page);
   const moved=await readSession(page);expect(moved.state.commandCount).toBe(before.state.commandCount+1);
   expect(moved.continuation!.commands).toHaveLength(1);expect(moved.continuation!.commands[0].type).toBe('move');
   expect(moved.state.units.find(u=>u.id===moved.state.initiative[moved.state.activeIndex])).toMatchObject({hasMoved:true,hasActed:false});
@@ -135,7 +135,7 @@ test('startup is read-only, keyboard Continue rebuilds no historical presentatio
 test('held confirmation Enter cannot flow through Restart and replace either saved slot',async({page})=>{
   await page.goto('/');await ready(page);
   const before=await readSession(page),old=await stored(page);
-  await chooseMove(page);await page.locator('#dialog-confirm').focus();
+  await chooseMove(page);await page.locator('#battle-review').focus();
   await page.keyboard.down('Enter');
   const accepted=await stored(page);
   expect(accepted.primary).not.toBe(old.primary);expect(accepted.backup).toBe(old.primary);
@@ -165,7 +165,7 @@ for(const side of ['player','enemy'] as const)test(`reload during legal ${side} 
     for(const p of [page,control]){await p.clock.install();await seedTwo(p);}
     expect(await control.evaluate(()=>window.fitDiagnostics().build)).toEqual(await page.evaluate(()=>window.fitDiagnostics().build));
     if(side==='player'){
-      for(const p of [page,control]){await chooseMove(p);await freeze(p);await p.locator('#dialog-confirm').click({force:true});}
+      for(const p of [page,control]){await chooseMove(p);await freeze(p);await p.locator('#battle-review').click({force:true});}
     }else {
       // Wait through actual player controls and advance just enough to reach an enemy's accepted command.
       for(const p of [page,control]){

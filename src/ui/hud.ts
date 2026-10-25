@@ -41,7 +41,7 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
   return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
-    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC)`:'No status effects'};
+    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`:'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {
   const {def,name,status}=unitFeedback(session,unit);
@@ -55,7 +55,7 @@ export class BattleHud {
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;review:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;log:(lines:readonly string[])=>void}) {
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -69,7 +69,7 @@ export class BattleHud {
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
-      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Review action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
+      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
@@ -85,7 +85,7 @@ export class BattleHud {
     },{signal}));
     this.target=this.root.querySelector('#battle-target')!;
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}else callbacks.target(null);},{signal});
-    this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.review,{signal});
+    this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.confirm,{signal});
     this.root.querySelector('#battle-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
   }

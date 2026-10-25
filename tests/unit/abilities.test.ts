@@ -348,7 +348,7 @@ it('shares Guarded projection with inspection on an already projected equipment 
   const fighter = state.units.find(u => u.id === 1)!;
   const session = new BattleSession(catalog, state, state.seed);
   expect(guardedEffect(fighter)).toEqual({ kind: 'guarded', sourceId: 1, targetId: 1 });
-  expect(unitFeedback(session, fighter)).toMatchObject({ accuracy: 3, armorClass: 17, status: 'Guarded (+2 AC)' });
+  expect(unitFeedback(session, fighter)).toMatchObject({ accuracy: 3, armorClass: 17, status: 'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)' });
   for (const abilityId of ['ability:basic_attack', 'ability:guarded_strike'] as const)
     expect(previewAttack(state, { ...guardedStrike, abilityId }, catalog)).toMatchObject({ ok: true, bonus: 3 });
   const before = structuredClone(state);

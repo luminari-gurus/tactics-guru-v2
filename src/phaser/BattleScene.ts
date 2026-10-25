@@ -8,7 +8,7 @@ import { previewMove, previewMovement } from '../domain/grid';
 import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import type { Point, BoardRegion } from '../geometry/iso';
 import { friendlyFire, actionCommand, type Action } from '../ui/battleActions';
-import { BattleHud, previewText, displayName, unitFeedback, unitLabel } from '../ui/hud';
+import { BattleHud, previewText, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
 import { targetOverlays, hoverPreview } from '../ui/targetPreview';
@@ -130,15 +130,11 @@ export class BattleScene extends Phaser.Scene {
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
     setModalTransition(()=>{removeInput.reset();queueMicrotask(()=>{if(live){refresh();pump();}});});
-    const review=()=>{
+    const confirm=()=>{
       if(session.phase!=='player' || !session.pending || dialogs.open)return;
-      const command=session.pending,preview=session.preview(command);
-      const name=command.type==='useAbility'?displayName(command.abilityId):command.type==='move'?'Move':'Wait';
-      const targetIds=command.type==='useAbility' ? 'unitId' in command.target ? [command.target.unitId]
-        : 'missileTargets' in command.target ? [...new Set(command.target.missileTargets)] : [] : [];
-      const target=command.type==='move'?`Destination (${command.to.x}, ${command.to.y})`
-        :targetIds.map(id=>`Target: ${unitLabel(session,session.state.units.find(u=>u.id===id)!)}`).join('\n');
-      dialogs.show('Confirm action',`${unitFeedback(session,session.active).name} · ${name}\n${target}\n${friendlyFire(session,command)}${previewText(preview)}`,()=>void present(session.confirm()),()=>{session.cancel();if(command.type==='move'){selected=null;hovered=null;}if(command.type==='useAbility')action=null;message='Cancelled';refresh();});
+      const focused=document.activeElement===hud.root.querySelector('#battle-review');
+      void present(session.confirm());
+      if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{
@@ -152,7 +148,7 @@ export class BattleScene extends Phaser.Scene {
     };
     const hud=new BattleHud(session,{
       action:a=>{board.resetPicking();session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
-      target:cell=>{board.resetPicking();hovered=null;select(cell);},review,cancel,inspect,inspectTarget:inspect,
+      target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
         const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');

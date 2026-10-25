@@ -1,0 +1,115 @@
+{
+  "issue": 187,
+  "approval": "Caller approved the concrete small-change chat plan with Approved on 2026-10-24",
+  "testedCommit": "995d5f51b0430bf4647e95de445ac5140b80c89e",
+  "base": "98d872d1a02fa1907e303004b416340da5c6df53",
+  "browserVersions": {
+    "chromium": {
+      "version": "153.0.8010.12",
+      "executable": "/Users/brian/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+    },
+    "webkit": {
+      "version": "26.6",
+      "executable": "/Users/brian/Library/Caches/ms-playwright/webkit-2359/pw_run.sh"
+    }
+  },
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "architecture": "arm64",
+  "node": "v26.11.0",
+  "workers": 1,
+  "retries": 0,
+  "stages": {
+    "chromium": {
+      "startTime": "2026-10-24T23:02:10.588Z",
+      "duration": 1754650.427,
+      "expected": 501,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "health-bars": {
+      "startTime": "2026-10-24T23:39:43.353Z",
+      "duration": 161340.133,
+      "expected": 25,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "webkit-exploration": {
+      "startTime": "2026-10-24T23:37:03.478Z",
+      "duration": 159475.621,
+      "expected": 60,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "webkit-acceptance": {
+      "startTime": "2026-10-24T23:32:25.999Z",
+      "duration": 277077.4,
+      "expected": 48,
+      "skipped": 0,
+      "unexpected": 4,
+      "flaky": 0
+    },
+    "assets-prefix-dev": {
+      "startTime": "2026-10-24T23:54:28.441Z",
+      "duration": 139988.16100000002,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "assets-prefix-preview": {
+      "startTime": "2026-10-24T23:52:09.867Z",
+      "duration": 138174.647,
+      "expected": 69,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "assets-root-dev": {
+      "startTime": "2026-10-24T23:49:44.040Z",
+      "duration": 140079.116,
+      "expected": 66,
+      "skipped": 3,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "fixtures": {
+      "startTime": "2026-10-24T23:31:25.609Z",
+      "duration": 59991.119999999995,
+      "expected": 69,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "telemetry-production": {
+      "expected": 36,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "report": "derived list stdout + unchanged discovery"
+    },
+    "telemetry-development": {
+      "expected": 36,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "report": "derived list stdout + unchanged discovery"
+    }
+  },
+  "total": {
+    "expected": 976,
+    "unexpected": 7,
+    "flaky": 0,
+    "skipped": 6
+  },
+  "sourceInputsUnchanged": true,
+  "baseComparison": "baseline-comparison.json.gz",
+  "limitations": [
+    "Registered Actions runner offline; all browser evidence is local emulation.",
+    "No physical hardware or full release/performance qualification.",
+    "Seven failed broader cases remain failed and reproduce on literal base.",
+    "Telemetry has retained list output and discovery-bound derived results; optional npm reporter/output flags were ignored."
+  ]
+}

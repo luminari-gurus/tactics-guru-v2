@@ -106,8 +106,8 @@ test('legal defeat reload, native keyboard restart and isolated single-battle sa
  await page.getByRole('link',{name:'Play three-encounter run'}).click();await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
 });
 test('accepted player presentation reload preserves exact boundary without old cues',async({page})=>{
- await start(page);await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
- await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#dialog-confirm').click({force:true});
+ await start(page);await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
+ await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});
  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');const committed=await snapshot(page);
  await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(committed.activeBattle);expect((await readSession(page)).events).toEqual([]);expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
