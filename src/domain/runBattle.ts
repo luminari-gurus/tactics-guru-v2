@@ -56,6 +56,7 @@ export function completeRunBattle(snapshot: RunSnapshot, battle: BattleState, co
   const next = transitionRun(run, { type: 'completeBattle', runId: run.id, revision: run.revision,
     encounterId: run.encounters[run.encounterIndex], boundaryId: runBoundaryId(run),
     outcome: battle.outcome === 'playerWin' ? 'victory' : 'defeat',
+    ...(battle.units.some(u=>u.secondWindUsed)?{secondWindUsed:true as const}:{}),
     party: run.party.map(hero => ({ ...hero, hp: battle.units.find(u => u.side === 'player' && u.defId === hero.heroId)?.hp ?? 0 })) },
     context.definition, context.catalog);
   if (!next.ok) return next;

@@ -60,7 +60,10 @@ export function validateContent(input: unknown): ContentValidation {
   };
   for (const [id, ability] of entries('abilities')) {
     const path = `abilities.${id}`;
-    const keys = ability.kind === 'magicMissile' ? ['id','kind','owners','casterLevel','rangeMin','rangeMax'] : ['id','kind','owners','rangeMin','rangeMax','baseDamage','uphillDamage'];
+    const fighterEffect = ability.kind === 'secondWind' || ability.kind === 'taunt';
+    const keys = ability.kind === 'secondWind' ? ['id','kind','owners','rangeMin','rangeMax','target','healBase','usesPerBattle'] :
+      ability.kind === 'taunt' ? ['id','kind','owners','rangeMin','rangeMax','target','duration'] :
+      ability.kind === 'magicMissile' ? ['id','kind','owners','casterLevel','rangeMin','rangeMax'] : ['id','kind','owners','rangeMin','rangeMax','baseDamage','uphillDamage'];
     if (Object.hasOwn(ability,'requiredLevel')) {
       keys.push('requiredLevel');
       if (typeof ability.requiredLevel !== 'number' || !Number.isInteger(ability.requiredLevel) || ability.requiredLevel < 1 || ability.requiredLevel > 5 || !isDenseArray(ability.owners) || ability.owners.some(id => !HERO_IDS.includes(id as typeof HERO_IDS[number]))) fail('number', `${path}.requiredLevel`, 'Expected hero ability level 1–5.');
@@ -68,14 +71,19 @@ export function validateContent(input: unknown): ContentValidation {
     if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
     if (!shape(ability, keys, path)) continue;
     const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
-    if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile','secondWind','taunt'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (fighterEffect) {
+      const approved = ability.kind === 'secondWind' ? attackAbilities['ability:second_wind'] : attackAbilities['ability:taunt'];
+      for (const [field,value] of Object.entries(approved).filter(([k])=>!['id','kind','owners'].includes(k)))
+        if (ability[field] !== value) fail('shape', `${path}.${field}`, 'Expected the approved Fighter effect rules.');
+    }
     if (ability.kind === 'guardedAttack') for (const field of ['attackPenalty','armorClassBonus'] as const)
       if (ability[field] !== GUARDED_STRIKE_TRADEOFF[field]) fail('number', `${path}.${field}`, `Expected ${GUARDED_STRIKE_TRADEOFF[field]}.`);
     if (ability.kind === 'magicMissile') {
       for (const [field, max] of [['casterLevel',20],['rangeMin',20],['rangeMax',20]] as const)
         if (typeof ability[field] !== 'number' || !Number.isSafeInteger(ability[field]) || ability[field] < 1 || ability[field] > max)
           fail('number', `${path}.${field}`, `Expected an integer in [1,${max}].`);
-    } else for (const field of ['rangeMin','rangeMax','baseDamage','uphillDamage'] as const) {
+    } else if (!fighterEffect) for (const field of ['rangeMin','rangeMax','baseDamage','uphillDamage'] as const) {
       const value = ability[field];
       const { min, max } = ATTACK_BOUNDS[field];
       if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max)
@@ -84,7 +92,7 @@ export function validateContent(input: unknown): ContentValidation {
     if (typeof ability.rangeMin === 'number' && typeof ability.rangeMax === 'number' && ability.rangeMin > ability.rangeMax)
       fail('number', path, 'Minimum range must not exceed maximum range.');
     if (array(ability.owners, `${path}.owners`)) {
-      if (ability.kind === 'guardedAttack' && ability.owners.some(owner=>owner!=='fighter'))
+      if ((ability.kind === 'guardedAttack' || fighterEffect) && ability.owners.some(owner=>owner!=='fighter'))
         fail('reference', `${path}.owners`, 'Guarded attacks require the Fighter effect lifecycle.');
       if (expected) {
         if (ability.owners.length !== expected.owners.length || ability.owners.some((owner, i) => owner !== expected.owners[i]))

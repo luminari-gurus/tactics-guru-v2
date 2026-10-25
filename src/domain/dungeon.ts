@@ -17,6 +17,7 @@ import type { BattleState } from './types';
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
 import { readBattlefieldDescriptor } from './battlefield';
+import { encounterHpLimit } from './effects';
 import { dungeonBattleCatalog } from '../content/dungeonEncounters';
 
 export interface FloorDescriptor {
@@ -203,7 +204,7 @@ function readDungeonValue(input: unknown): DungeonResult {
     const battle = dungeonBattle(state);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
     if (!battle || !read?.ok || !sameBattlefield(state.battlefield, battle.battlefield) || read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
-      read.state.units.some(u => u.side === 'player' && u.hp > party.find(h => h.heroId === u.defId)!.hp)) return fail('invalidBattle');
+      read.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,party.find(h => h.heroId === u.defId)!.hp,battle.catalog))) return fail('invalidBattle');
     return { ok: true, state: { ...state, activeBattle: read.state, battlefield: battle.battlefield } };
   }
   if (state.activeBattle !== null || state.battlefield !== null) return fail('invalidBattle');

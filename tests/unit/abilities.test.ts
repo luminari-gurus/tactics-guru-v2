@@ -1,10 +1,11 @@
+import { STATE_FORMAT_VERSION } from '../../src/domain/constants';
 import { guardedEffect, combatStats } from '../../src/domain/effects';
 import { unitFeedback } from '../../src/ui/hud';
 import { BattleSession } from '../../src/app/BattleSession';
 import { assert, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
-import { previewAttack, previewMagicMissile } from '../../src/domain/combat';
+import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility } from '../../src/domain/combat';
 import { createBattle, dispatch, endTurn, replayBattle } from '../../src/domain/turns';
 import { validateContent } from '../../src/content/validate';
 import { rollDie, seedRng } from '../../src/domain/rng';
@@ -73,6 +74,92 @@ it('High Shot uses the real Ranger stats and elevation in shared preview and dis
   }
 });
 const guardedStrike = { type: 'useAbility', unitId: 1, abilityId: 'ability:guarded_strike', target: { unitId: 4 } } as const;
+const secondWind = {type:'useAbility',unitId:1,abilityId:'ability:second_wind',target:{unitId:1}} as const;
+const taunt = {...guardedStrike,abilityId:'ability:taunt'} as const;
+
+it('heals projected missing HP atomically once with no RNG and resets only in a fresh battle',()=>{
+  for(const missing of [1,7,12]) {
+    const base=guardSetup(1),catalog={...base.catalog,heroes:{...base.catalog.heroes,fighter:{...base.catalog.heroes.fighter,stats:{...base.catalog.heroes.fighter.stats,maxHp:30,power:5}}}};
+    const state=freeze({...base.state,versions:{...base.state.versions,content:contentVersion(catalog)},units:base.state.units.map(u=>u.id===1?{...u,hp:30-missing}:u)});
+    const before=structuredClone(state),preview=previewAbility(state,secondWind,catalog);assert(preview.ok && 'healing' in preview);
+    expect(preview.healing).toBe(Math.min(missing,9));expect(state).toEqual(before);
+    const session=new BattleSession(catalog,state,state.seed);
+    for(let i=0;i<3;i++){expect(session.prepare(secondWind)).toEqual(preview);session.cancel();expect(session.state).toEqual(state);}
+    session.prepare(secondWind);const used=session.confirm();assert(used);expect(session.confirm()).toBeNull();
+    expect(used.after.units.find(u=>u.id===1)).toMatchObject({hp:30-missing+Math.min(missing,9),hasActed:true,secondWindUsed:true});
+    expect(used.after.rng).toEqual(state.rng);expect(used.events).toContainEqual({type:'healed',unitId:1,healing:Math.min(missing,9),hp:preview.hp});
+    expect(abilityPresentation(used.events).feedback).toContainEqual({unitId:1,kind:'result',text:`+${preview.healing} HP`});
+    const resumed=BattleSession.fromSnapshot(catalog,used.after);assert(resumed.ok);expect(resumed.session.state).toEqual(used.after);
+    let next=used.after;
+    do {const ended=endTurn(next,{type:'endTurn',unitId:next.initiative[next.activeIndex]},catalog);assert(ended.ok);next=ended.state;}while(next.initiative[next.activeIndex]!==1);
+    expect(next.units.find(u=>u.id===1)?.secondWindUsed).toBe(true);
+    expect(dispatch(next,secondWind,catalog)).toEqual({ok:false,reason:'useExhausted'});
+    const fresh=createBattle(state.mapId,2,catalog);assert(fresh.ok);expect(fresh.state.units.find(u=>u.id===1)?.secondWindUsed).toBeUndefined();
+    expect(state).toEqual(before);
+  }
+});
+
+it('rejects invalid healing without partial mutation, including defeated, foreign and spent targets',()=>{
+  const {catalog,state}=guardSetup(1);
+  const hurt={...state,units:state.units.map(u=>u.id===1?{...u,hp:2}:u)};
+  for(const [snapshot,command,reason] of [
+    [state,secondWind,'fullHealth'],[hurt,{...secondWind,target:{unitId:2}},'selfTargetRequired'],
+    [hurt,{...secondWind,target:{unitId:64}},'missingTarget'],[hurt,{...secondWind,target:{cell:{x:2,y:0}}},'wrongTargetKind'],
+    [{...hurt,units:hurt.units.map(u=>u.id===1?{...u,hasActed:true}:u)},secondWind,'alreadyActed'],
+    [{...hurt,units:hurt.units.map(u=>u.id===2?{...u,hp:0}:u)},{...secondWind,target:{unitId:2}},'targetDefeated'],
+    [{...hurt,activeIndex:hurt.initiative.indexOf(2)},{...secondWind,unitId:2,target:{unitId:2}},'abilityNotOwned'],
+  ] as const) {
+    const before=structuredClone(snapshot);expect(dispatch(freeze(snapshot),command,catalog)).toEqual({ok:false,reason});expect(snapshot).toEqual(before);
+  }
+});
+
+it('applies no-roll Taunt irrespective of accuracy and expires only after the target turn ends',()=>{
+  for(const natural of [1,20]) {
+    const {catalog,state}=guardSetup(natural),before=structuredClone(state);
+    const preview=previewFighterAbility(freeze(state),taunt,catalog);assert(preview.ok);
+    const used=dispatch(state,taunt,catalog);assert(used.ok);
+    expect(used.state.rng).toEqual(state.rng);expect(used.events).toEqual([
+      {type:'abilityUsed',unitId:1,abilityId:'ability:taunt',target:{unitId:4}},{type:'taunted',unitId:4,sourceId:1}]);
+    expect(used.state.units.find(u=>u.id===4)).toMatchObject({tauntedBy:1,hp:9});
+    let next=used.state;
+    while(next.initiative[next.activeIndex]!==4) {
+      const ended=endTurn(next,{type:'endTurn',unitId:next.initiative[next.activeIndex]},catalog);assert(ended.ok);next=ended.state;
+      expect(next.units.find(u=>u.id===4)?.tauntedBy).toBe(1);
+    }
+    const bad={type:'useAbility',unitId:4,abilityId:'ability:basic_attack',target:{unitId:2}} as const;
+    expect(previewAttack(next,bad,catalog)).toEqual({ok:false,reason:'tauntedTargetRequired'});
+    expect(dispatch(next,bad,catalog)).toEqual({ok:false,reason:'tauntedTargetRequired'});
+    const ended=endTurn(next,{type:'endTurn',unitId:4},catalog);assert(ended.ok);
+    expect(ended.state.units.find(u=>u.id===4)?.tauntedBy).toBeUndefined();expect(ended.events).toContainEqual({type:'tauntExpired',unitId:4,sourceId:1});
+    expect(state).toEqual(before);
+  }
+});
+
+it('rejects invalid Taunt targets and malformed saved resources/source references',()=>{
+  const {catalog,state}=guardSetup(1);
+  for(const [command,reason] of [[{...taunt,target:{unitId:1}},'sameSide'],[{...taunt,target:{unitId:2}},'sameSide'],
+    [{...taunt,target:{unitId:5}},'outOfRange'],[{...taunt,target:{unitId:64}},'missingTarget']] as const)
+    expect(dispatch(freeze(state),command,catalog)).toEqual({ok:false,reason});
+  for(const patch of [{secondWindUsed:0},{secondWindUsed:2},{secondWindUsed:false},{tauntedBy:4}])
+    expect(readBattleState({...state,units:state.units.map(u=>u.id===1?{...u,...patch}:u)},catalog).ok).toBe(false);
+  for(const source of [0,2,4,64,1.5])expect(readBattleState({...state,units:state.units.map(u=>u.id===4?{...u,tauntedBy:source}:u)},catalog).ok).toBe(false);
+  const applied=dispatch(state,taunt,catalog);assert(applied.ok);
+  const deadSource={...applied.state,activeIndex:applied.state.initiative.indexOf(4),units:applied.state.units.map(u=>u.id===1?{...u,hp:0}:u)};
+  expect(readBattleState(deadSource,catalog).ok).toBe(false);
+});
+
+it('replaces a Taunt source without stacking and clears it when a friendly missile defeats that source',()=>{
+  const base=guardSetup(1),map=base.catalog.maps['map:forest_ruins'];
+  const catalog={...base.catalog,maps:{[map.id]:{...map,spawns:map.spawns.map(s=>s.id===2?{...s,side:'heroes' as const,unitId:'fighter' as const}:s)}}};
+  const state={...base.state,versions:{...base.state.versions,content:contentVersion(catalog)},units:base.state.units.map(u=>u.id===2?{...u,side:'player' as const,defId:'fighter' as const,cell:{x:4,y:0}}:u)};
+  const first=dispatch(state,taunt,catalog);assert(first.ok);
+  const second=dispatch({...first.state,activeIndex:first.state.initiative.indexOf(2)},{...taunt,unitId:2},catalog);assert(second.ok);
+  expect(second.state.units.find(u=>u.id===4)?.tauntedBy).toBe(2);
+  expect(readBattleState(second.state,catalog).ok).toBe(true);
+  const mage={...second.state,activeIndex:second.state.initiative.indexOf(3),units:second.state.units.map(u=>u.id===2?{...u,hp:1}:u.id===3?{...u,cell:{x:1,y:0}}:u)};
+  const killed=dispatch(mage,{type:'useAbility',unitId:3,abilityId:'ability:magic_missile',target:{unitId:2}},catalog);assert(killed.ok);
+  expect(killed.state.units.find(u=>u.id===4)?.tauntedBy).toBeUndefined();expect(readBattleState(killed.state,catalog).ok).toBe(true);
+});
 function guardSetup(natural: number) {
   const { catalog, state } = setup();
   let seed = 0; while (rollDie(seedRng(seed), 20).value !== natural) seed++;
@@ -164,7 +251,7 @@ it('replays Guarded Strike and expiry deterministically through actual commands'
     const command = { type: 'endTurn', unitId: state.initiative[state.activeIndex] } as const; commands.push(command);
     const next = dispatch(state, command, catalog); assert(next.ok); state = next.state;
   } while (state.initiative[state.activeIndex] !== 1);
-  const replay = { format: 1, versions: initial.versions, initial, commands };
+  const replay = { format: STATE_FORMAT_VERSION, versions: initial.versions, initial, commands };
   const replayed = replayBattle(replay, catalog); assert(replayed.ok);
   expect(replayed.state).toEqual(state);
   expect(replayBattle(replay, catalog)).toEqual(replayed);
@@ -335,7 +422,7 @@ it('Guarded Strike tradeoff changes content identity and rejects old snapshots/r
   expect(contentVersion(legacy)).not.toBe(contentVersion(battleCatalog));
   const old = { ...created.state, versions: { ...created.state.versions, content: contentVersion(legacy) } };
   expect(readBattleState(old, battleCatalog)).toEqual({ ok: false, reason: 'invalidState' });
-  expect(replayBattle({ format: 1, versions: old.versions, initial: old, commands: [] }, battleCatalog).ok).toBe(false);
+  expect(replayBattle({ format: STATE_FORMAT_VERSION, versions: old.versions, initial: old, commands: [] }, battleCatalog).ok).toBe(false);
 });
 
 it('shares Guarded projection with inspection on an already projected equipment catalog', () => {
@@ -348,7 +435,7 @@ it('shares Guarded projection with inspection on an already projected equipment 
   const fighter = state.units.find(u => u.id === 1)!;
   const session = new BattleSession(catalog, state, state.seed);
   expect(guardedEffect(fighter)).toEqual({ kind: 'guarded', sourceId: 1, targetId: 1 });
-  expect(unitFeedback(session, fighter)).toMatchObject({ accuracy: 3, armorClass: 17, status: 'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)' });
+  expect(unitFeedback(session, fighter)).toMatchObject({ accuracy: 3, armorClass: 17, status: 'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn) · Second Wind 1/1 use this battle' });
   for (const abilityId of ['ability:basic_attack', 'ability:guarded_strike'] as const)
     expect(previewAttack(state, { ...guardedStrike, abilityId }, catalog)).toMatchObject({ ok: true, bonus: 3 });
   const before = structuredClone(state);

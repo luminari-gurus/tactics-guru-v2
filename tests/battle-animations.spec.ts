@@ -2,7 +2,7 @@ import type { Command } from '../src/domain/types';
 import { expect, test, type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { dispatch } from '../src/domain/turns';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';

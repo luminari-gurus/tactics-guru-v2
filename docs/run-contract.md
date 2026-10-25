@@ -1,5 +1,15 @@
 # Three-encounter run contract
 
+Current #163 extension: level-2 Fighter Second Wind can increase battle HP above
+encounter entry. The active-snapshot reader requires its spent-use flag and bounds
+HP by entry HP plus one `4 + projected power` heal, capped at projected max HP.
+Completion supplies an exact optional `secondWindUsed: true` fact from that
+validated battle to the reducer, which applies the same bound; other heroes and
+unspent state retain entry-HP bounds. The fact does not enter party data and cannot
+revive a defeated hero. Current equipment modifies accuracy/AC, preserving the
+reducer's healing-power equivalence. Battle state 2/rules 3 and run envelope 4
+reject prior saves while retaining original bytes for recovery/export.
+
 [Issue #75](https://github.com/luminari-gurus/tactics-guru-v2/issues/75), branch `work/issue-75-run-contract`, base `79f7d983ff3a12ca38e93efdc72f3f317dfb789c`. Caller `dubstylee` approved the published OpenSpec implementation plan on 2026-10-13. The executable contract is [run.ts](../src/domain/run.ts), with [fixtures](../tests/unit/run.test.ts) and [plan](../openspec/changes/issue-75-run-contract/proposal.md).
 
 ## Reviewed gameplay decisions

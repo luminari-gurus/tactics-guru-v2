@@ -1,5 +1,37 @@
 # Signature abilities (#8)
 
+## Fighter progression (#163)
+
+Second Wind unlocks at level 2. It targets the living active Fighter itself at
+range 0, heals `min(missing HP, 4 + projected power)`, and spends an action and
+the single battle use atomically. It makes no roll or RNG draw. Full HP, a spent
+use/action, a foreign/dead target or unavailable ability rejects without mutation.
+The picker and inspection show 0/1 or 1/1 use; the preview shows actual healing.
+Turn changes and reload retain spent use; fresh encounters/restart reset it.
+
+Taunt unlocks at level 3. It spends one action, targeting a living hostile at
+Manhattan range 1 with ordinary LOS. No hit/save roll, damage, cooldown or use
+limit applies. All current enemies are eligible; no current enemy has immunity.
+Unsupported immunity fields reject through exact content/state readers.
+One source instance replaces the previous source without stacking. The target's
+next accepted endTurn expires it, including an idle turn across initiative wrap;
+source/target defeat clears it immediately. A defeated source never restricts attacks.
+Shared offensive previews/resolution and AI enforce the living source exclusively.
+AI attacks from a legal position, approaches a reachable firing position or Waits,
+respecting bow minimum range, terrain, LOS, occupancy and spent budgets.
+
+Healing and Taunt use the existing native picker, board/self targets, direct
+confirmation, inspection, accepted-event log and floating feedback. Guarded Strike
+and Magic Missile retain their approved rules and Guarded retains its board shield.
+
+Battle state format 2/rules 3, run envelope 4 and dungeon envelope 5 deliberately
+reject earlier versions as incompatible while preserving original bytes through
+existing recovery/export. The standalone wrapper remains format 1 and RNG stays 1.
+Run/dungeon readers admit healing above entry HP only within the spent Fighter's
+single heal bound and projected max HP. Short-run completion carries the spent-use
+fact from the validated battle into its reducer; it is never stored in party data.
+Dead heroes stay dead and new encounters carry HP while resetting battle-local flags.
+
 ## Current ability controls (#162)
 
 Standalone battles project the validated raw catalog to the starting party's

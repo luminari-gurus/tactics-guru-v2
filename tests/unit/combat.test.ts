@@ -1,3 +1,4 @@
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
 import type { CellPosition, ContentCatalog, MapRecord, TerrainId, UnitId, UnitStats } from '../../src/content/types';
@@ -42,13 +43,21 @@ function setup(o: Setup = {}): { catalog: ContentCatalog; state: BattleState } {
   const seed = seedFor(o.natural ?? 10);
   const units = [unit(1, 'player', 'fighter', 1, 1), unit(2, 'player', 'ranger', 0, 0), unit(3, 'enemy', 'goblin_grunt', 2, 1), unit(4, 'enemy', 'goblin_archer', 4, 1)];
   const livingPlayer = units.some(u => u.side === 'player' && u.hp > 0), livingEnemy = units.some(u => u.side === 'enemy' && u.hp > 0);
-  const state: BattleState = { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed, rng: seedRng(seed), mapId: map.id,
+  const state: BattleState = { format: STATE_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: 1, content: contentVersion(catalog) }, seed, rng: seedRng(seed), mapId: map.id,
     units, initiative: [1, 2, 3, 4], activeIndex: o.activeIndex ?? 0, round: 1,
     outcome: !livingPlayer ? 'playerLoss' : !livingEnemy ? 'playerWin' : 'ongoing', commandCount: 0 };
   return { catalog, state };
 }
 const attack = (unitId: number, targetId: number, ability = 'basic_attack') =>
   ({ type: 'useAbility' as const, unitId, abilityId: `ability:${ability}` as const, target: { unitId: targetId } });
+
+it.each(['source','target'])('clears Taunt immediately on accepted %s defeat',defeated=>{
+  const {catalog,state}=setup({natural:20,activeIndex:defeated==='source'?2:0,units:{
+    1:{hp:defeated==='source'?1:18},3:{hp:defeated==='target'?1:18,tauntedBy:1}}});
+  const result=resolveAttack(state,defeated==='source'?attack(3,1):attack(1,3),catalog);assert(result.ok);
+  expect(result.state.units.find(u=>u.id===3)?.tauntedBy).toBeUndefined();expect(readBattleState(result.state,catalog).ok).toBe(true);
+  expect(result.events).toContainEqual({type:'tauntExpired',unitId:3,sourceId:1});
+});
 function rolled(o: Setup, command = attack(1, 3)) {
   const { catalog, state } = setup(o);
   const result = resolveAttack(state, command, catalog);

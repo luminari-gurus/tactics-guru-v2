@@ -1,4 +1,4 @@
-import { clearDefeatedGuard, combatStats, grantGuard } from './effects';
+import { clearDefeatedGuard, clearDefeatedTaunts, combatStats, grantGuard, tauntSource } from './effects';
 import type { ContentCatalog } from '../content/types';
 import { MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
@@ -22,7 +22,7 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   if (actor.hasActed) return { ok: false, reason: 'alreadyActed' };
   if (!Object.hasOwn(catalog.abilities, command.abilityId)) return { ok: false, reason: 'unknownAbility' };
   const profile = catalog.abilities[command.abilityId];
-  if (profile.kind === 'magicMissile') return { ok: false, reason: 'wrongTargetKind' };
+  if (profile.kind !== 'attack' && profile.kind !== 'guardedAttack') return { ok: false, reason: 'wrongTargetKind' };
   if (!profile.owners.includes(actor.defId)) return { ok: false, reason: 'abilityNotOwned' };
   if (!('unitId' in command.target)) return { ok: false, reason: 'wrongTargetKind' };
   const targetId = command.target.unitId;
@@ -30,6 +30,8 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   if (!target) return { ok: false, reason: 'missingTarget' };
   if (target.hp === 0) return { ok: false, reason: 'targetDefeated' };
   if (target.side === actor.side) return { ok: false, reason: 'sameSide' };
+  const source = tauntSource(actor, snapshot.units);
+  if (source && target.id !== source.id) return { ok: false, reason: 'tauntedTargetRequired' };
   const distance = manhattanDistance(actor.cell, target.cell);
   if (distance < profile.rangeMin || distance > profile.rangeMax) return { ok: false, reason: 'outOfRange' };
   if (lineOfSightBlocked(catalog, snapshot.mapId, actor.cell, target.cell)) return { ok: false, reason: 'blockedLos' };
@@ -46,6 +48,8 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   if (!intent.ok) return intent;
   if (intent.command.type === 'useAbility' && catalog.abilities[intent.command.abilityId]?.kind === 'magicMissile')
     return resolveMagicMissile(state, input, catalog);
+  if (intent.command.type === 'useAbility' && ['secondWind','taunt'].includes(catalog.abilities[intent.command.abilityId]?.kind))
+    return resolveFighterAbility(state, input, catalog);
   const preview = previewAttack(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state; const { command, targetId } = preview;
@@ -57,7 +61,7 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   const damage = result === 'critical' ? preview.criticalDamage : result === 'hit' ? preview.damage : 0;
   const hp = Math.max(RULE_BOUNDS.hp.min, snapshot.units.find(u => u.id === targetId)!.hp - damage);
   const grantsGuard = catalog.abilities[command.abilityId].kind === 'guardedAttack';
-  const units = snapshot.units.map(u => clearDefeatedGuard(u.id === command.unitId
+  let units = snapshot.units.map(u => clearDefeatedGuard(u.id === command.unitId
     ? (grantsGuard ? grantGuard({ ...u, hasActed: true }) : { ...u, hasActed: true })
     : u.id === targetId ? { ...u, hp } : u));
   const outcome = !units.some(u => u.side === 'player' && u.hp > 0) ? 'playerLoss' : !units.some(u => u.side === 'enemy' && u.hp > 0) ? 'playerWin' : 'ongoing';
@@ -66,6 +70,7 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   if (damage > 0) events.push({ type: 'damaged', unitId: targetId, damage, hp });
   if (hp === 0) events.push({ type: 'defeated', unitId: targetId });
   if (grantsGuard) events.push({ type: 'guarded', unitId: command.unitId });
+  units = clearDefeatedTaunts(units, events);
   if (outcome !== 'ongoing') events.push({ type: 'battleEnded', outcome });
   return { ok: true, state: { ...snapshot, rng: roll.rng, units, outcome, commandCount: snapshot.commandCount + 1 }, events };
 }
@@ -94,6 +99,8 @@ export function previewMagicMissile(state: unknown, input: unknown, catalog: Con
     const target = snapshot.units.find(u => u.id === id);
     if (!target) return { ok: false, reason: 'missingTarget' };
     if (target.hp === 0) return { ok: false, reason: 'targetDefeated' };
+    const source = tauntSource(actor, snapshot.units);
+    if (source && target.id !== source.id) return { ok: false, reason: 'tauntedTargetRequired' };
     const distance = manhattanDistance(actor.cell, target.cell);
     if (distance < profile.rangeMin || distance > profile.rangeMax)
       return { ok: false, reason: 'outOfRange' };
@@ -126,8 +133,62 @@ export function resolveMagicMissile(state: unknown, input: unknown, catalog: Con
       if (hp === 0) events.push({ type: 'defeated', unitId: targetId });
     }
   });
+  units = clearDefeatedTaunts(units, events);
   const outcome = !units.some(u => u.side === 'player' && u.hp > 0) ? 'playerLoss' :
     !units.some(u => u.side === 'enemy' && u.hp > 0) ? 'playerWin' : 'ongoing';
   if (outcome !== 'ongoing') events.push({ type: 'battleEnded', outcome });
   return { ok: true, state: { ...snapshot, units, rng, outcome, commandCount: snapshot.commandCount + 1 }, events };
+}
+
+export type FighterPreview = { readonly ok: true; readonly command: Extract<Command,{type:'useAbility'}>; readonly targetId: number } & (
+  | { readonly kind: 'secondWind'; readonly healing: number; readonly hp: number }
+  | { readonly kind: 'taunt'; readonly sourceId: number }
+);
+/** Both effects preflight fully without rolls; resolution adopts HP, action and use/status together. */
+export function previewFighterAbility(state: unknown, input: unknown, catalog: ContentCatalog): FighterPreview | Rejection {
+  const intent=previewCommand(state,input,catalog);if(!intent.ok)return intent;
+  if(intent.command.type!=='useAbility')return {ok:false,reason:'malformedCommand'};
+  const checked=readBattleState(state,catalog);if(!checked.ok)return checked;
+  const snapshot=checked.state,command=intent.command,actor=snapshot.units.find(u=>u.id===command.unitId)!;
+  if(actor.hasActed)return {ok:false,reason:'alreadyActed'};
+  const profile=Object.hasOwn(catalog.abilities,command.abilityId)?catalog.abilities[command.abilityId]:undefined;
+  if(!profile)return {ok:false,reason:'unknownAbility'};
+  if(profile.kind!=='secondWind' && profile.kind!=='taunt')return {ok:false,reason:'wrongTargetKind'};
+  if(!profile.owners.includes(actor.defId))return {ok:false,reason:'abilityNotOwned'};
+  if(!('unitId' in command.target))return {ok:false,reason:'wrongTargetKind'};
+  const targetId=command.target.unitId;
+  const target=snapshot.units.find(u=>u.id===targetId);
+  if(!target)return {ok:false,reason:'missingTarget'};
+  if(target.hp===0)return {ok:false,reason:'targetDefeated'};
+  if(profile.kind==='secondWind') {
+    if(target.id!==actor.id)return {ok:false,reason:'selfTargetRequired'};
+    if(actor.secondWindUsed)return {ok:false,reason:'useExhausted'};
+    const maxHp=stats(catalog,actor).maxHp;
+    if(actor.hp===maxHp)return {ok:false,reason:'fullHealth'};
+    const healing=Math.min(maxHp-actor.hp,profile.healBase+stats(catalog,actor).power);
+    return {ok:true,kind:'secondWind',command,targetId:target.id,healing,hp:actor.hp+healing};
+  }
+  if(target.side===actor.side)return {ok:false,reason:'sameSide'};
+  if(manhattanDistance(actor.cell,target.cell)!==profile.rangeMax)return {ok:false,reason:'outOfRange'};
+  if(lineOfSightBlocked(catalog,snapshot.mapId,actor.cell,target.cell))return {ok:false,reason:'blockedLos'};
+  return {ok:true,kind:'taunt',command,targetId:target.id,sourceId:actor.id};
+}
+export function previewAbility(state: unknown, input: Command, catalog: ContentCatalog) {
+  const kind=input.type==='useAbility'?catalog.abilities[input.abilityId]?.kind:undefined;
+  return kind==='magicMissile'?previewMagicMissile(state,input,catalog):
+    kind==='secondWind'||kind==='taunt'?previewFighterAbility(state,input,catalog):previewAttack(state,input,catalog);
+}
+function resolveFighterAbility(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
+  const preview=previewFighterAbility(state,input,catalog);if(!preview.ok)return preview;
+  const checked=readBattleState(state,catalog);if(!checked.ok)return checked;
+  const snapshot=checked.state,command=preview.command;
+  const units=snapshot.units.map(u=>{
+    if(preview.kind==='secondWind' && u.id===command.unitId)return {...u,hp:preview.hp,hasActed:true,secondWindUsed:true as const};
+    if(u.id===command.unitId)return {...u,hasActed:true};
+    return preview.kind==='taunt' && u.id===preview.targetId?{...u,tauntedBy:preview.sourceId}:u;
+  });
+  const event:BattleEvent=preview.kind==='secondWind'?{type:'healed',unitId:command.unitId,healing:preview.healing,hp:preview.hp}:
+    {type:'taunted',unitId:preview.targetId,sourceId:preview.sourceId};
+  return {ok:true,state:{...snapshot,units,commandCount:snapshot.commandCount+1},events:[
+    {type:'abilityUsed',unitId:command.unitId,abilityId:command.abilityId,target:command.target},event]};
 }

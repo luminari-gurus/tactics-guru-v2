@@ -1,12 +1,36 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; initially 0/9 tasks complete).
+`issue-163-fighter-abilities` (spec-driven; rules, persistence and focused UI complete, 6/9 tasks).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
 
 ## Current continuation checkpoint
+
+- Current feature source: both profiles, atomic effects, authoritative Taunt/AI,
+  bounded state/readers and versioned run/dungeon healing are implemented.
+  Short-run completion also required an exact spent-use command fact; this is
+  validated and never persists in party data. Raw host catalogs are validated
+  before trusted progression/equipment projection.
+- Final unit run: 968/968 in 55 files, no skips, 21.06 seconds; both type scopes pass.
+  Earlier failures are retained in QA logs: version literals, old catalog identity
+  snapshot, additive status text and policy callers using raw catalogs. Browser
+  standalone consumers now share a level-one projected test catalog; explicit
+  raw unit consumers pass their own catalog. No assertions were removed.
+- Fighter fixture browser: 3/3 desktop/Pixel touch portrait/landscape pass, including
+  320px preview, cancel/resize, legal approach, heal, Taunt, inspection/logs/reload.
+  Six retained PNGs were visually inspected for readable feedback.
+- Production journey: first desktop attempt played all six encounters from a
+  canonical fresh seed-190 save, earned level 3, used/reloaded both abilities,
+  then reached terminal defeat at floor-2 guardian. The initial test incorrectly
+  required two-floor victory, which #163 does not require. It now asserts the
+  deterministic terminal defeat after both milestones, retaining the failed run.
+  Final browser matrix and final source/build receipts remain pending.
+- Continue by running the 19-stage policy inventory with reused valid unit/type
+  evidence, serial browser jobs/one worker and pinned task-local Chromium. No
+  CI/physical-device or release claim. Open the dependent feature PR after checks,
+  targeting `branch/issue-163-standalone-level` while PR #242 is open.
 
 - OpenSpec: [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
   [design](../../openspec/changes/issue-163-fighter-abilities/design.md),
@@ -14,7 +38,10 @@ Do not restore the old confirmation modal or overwrite those indicators.
   [tasks](../../openspec/changes/issue-163-fighter-abilities/tasks.md).
 - First chunk: standalone level-1 projection after raw validation, before asset
   loading, session and persistence. Raw definitions remain available for progression.
-  Focused verification/publication underway. Full Fighter feature remains pending.
+  Published ready for review as [PR #242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242),
+  commit `bad8f19`, branch `branch/issue-163-standalone-level`, base main.
+  Feature work continues on the requested `branch/issue-163-fighter-abilities`,
+  targeting the prerequisite branch while #242 is open. Full feature remains pending.
 - Next chunk: validated profiles + atomic rules/lifecycle/AI + save admission/versions
   + shared previews/UI, with existing unit and browser tests extended together.
 - Runtime: bundled Windows Node v24.19.0; npm is available at
@@ -238,23 +265,24 @@ drives verification; a Fighter-only UI test cannot prove all consumers.
 
 ## Implementation sequence and acceptance proof
 
-All items below are pending implementation.
+Use the OpenSpec tasks and current checkpoint for implementation status. Runtime
+acceptance and delivery below are checked only when their whole proof is complete.
 
-- [ ] **Profiles and unlocks (criterion 1):** add and validate both definitions;
+- [x] **Profiles and unlocks (criterion 1):** add and validate both definitions;
   prove levels 1/2/3/5, malformed owners/kinds/resources and direct locked-command
   rejection. Verify standalone level 1 and run/dungeon canonical learned lists;
   repeated catalog/battle construction must not accumulate projection.
-- [ ] **Atomic healing (criteria 2 and 5):** implement shared pure preview and
+- [x] **Atomic healing (criteria 2 and 5):** implement shared pure preview and
   resolution, bounded use state and accepted heal event. Test partial/capped
   healing, projected HP/power, full-health rejection, exhausted use, wrong/dead
   targets, spent actions, repeated preview/cancel, duplicate confirmation and
   unchanged RNG. Verify fresh-battle reset and mid-battle resume retains use.
-- [ ] **Taunt and AI (criteria 3 and 5):** implement one-source status and shared
+- [x] **Taunt and AI (criteria 3 and 5):** implement one-source status and shared
   offensive legality. Test no-roll application irrespective of attack accuracy,
   same-side/out-of-range/blocked/dead targets, replacement, source/target defeat,
   exact target-turn expiry, initiative wrap, minimum bow range, obstacles,
   unreachable/blocked firing positions, legal approach/Wait and no AI stall.
-- [ ] **Save/replay integration (criterion 5):** update versions/admission together;
+- [x] **Save/replay integration (criterion 5):** update versions/admission together;
   prove healing above entry HP in run and dungeon, over-max/non-Fighter/ineligible
   HP rejection, no accidental revival, malformed resource/source rejection,
   pending-action read-only behavior and old-save byte preservation. Compare

@@ -32,6 +32,8 @@ export function abilityPresentation(events: readonly BattleEvent[]) {
       feedback.push({unitId: event.unitId, kind: 'result', text: `−${event.damage}`});
     if (event.type === 'defeated') feedback.push({unitId: event.unitId, kind: 'defeat', text: 'Defeated'});
     if (event.type === 'guarded') feedback.push({unitId: event.unitId, kind: 'guard', text: 'Guarded'});
+    if (event.type === 'healed') feedback.push({unitId:event.unitId,kind:'result',text:`+${event.healing} HP`});
+    if (event.type === 'taunted') feedback.push({unitId:event.unitId,kind:'guard',text:'Taunted'});
   }
   return {signature, feedback};
 }

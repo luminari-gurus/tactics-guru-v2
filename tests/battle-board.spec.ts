@@ -1,6 +1,6 @@
 import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from '@playwright/test';
-import { battleCatalog } from '../src/content/catalog';
+import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
 import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';

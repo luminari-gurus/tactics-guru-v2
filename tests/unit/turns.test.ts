@@ -1,3 +1,4 @@
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
 import { CONTENT_BOUNDS } from '../../src/content/constants';
@@ -34,7 +35,7 @@ const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
     goblin_archer: { ...base.enemies.goblin_archer, stats: { ...base.enemies.goblin_archer.stats, maxHp: 10, dexterity: dexterity.goblin_archer } } } };
 // A hand-built mid-battle snapshot: initiative 1, 3, 2, 4 with unit 1 active.
 function snapshot(): BattleState {
-  return { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed: 7, rng: seedRng(7), mapId: map.id,
+  return { format: STATE_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: 1, content: contentVersion(catalog) }, seed: 7, rng: seedRng(7), mapId: map.id,
     units: [
       { id: 1, side: 'player', defId: 'fighter', cell: { x: 0, y: 0 }, hp: 20, hasMoved: true, hasActed: true },
       { id: 2, side: 'player', defId: 'ranger', cell: { x: 0, y: 1 }, hp: 16, hasMoved: true, hasActed: false },
@@ -83,9 +84,9 @@ describe('battle creation', () => {
       expect(result.state.initiative).toEqual(orderInitiative(rolls.map(({ u, natural }) => ({ unitId: u.id, side: u.side, natural, dexterity: dexterity[u.defId] }))));
       expect(result.events.slice(4)).toEqual([{ type: 'turnStarted', unitId: result.state.initiative[0], round: 1 }]);
       expect(result.state).toMatchObject({ seed: 7, mapId: map.id, activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0,
-        versions: { rules: 2, rng: 1, content: contentVersion(catalog) } });
+        versions: { rules: RULES_VERSION, rng: 1, content: contentVersion(catalog) } });
       expect(readBattleState(copy(result.state), catalog)).toEqual({ ok: true, state: result.state });
-      expect(readReplay({ format: 1, versions: result.state.versions, initial: result.state, commands: [] }, catalog).ok).toBe(true);
+      expect(readReplay({ format: STATE_FORMAT_VERSION, versions: result.state.versions, initial: result.state, commands: [] }, catalog).ok).toBe(true);
       expect(createBattle(map.id, 7, catalog)).toEqual(result);
       const other = createBattle(map.id, 8, catalog); assert(other.ok);
       expect(other.state.rng).not.toEqual(result.state.rng);
@@ -150,7 +151,7 @@ describe('restart (D7: a new battle with a new seed)', () => {
       expect(restarted.state.units).toEqual(first.state.units);
       expect(restarted.state.rng).not.toEqual(first.state.rng);
       expect(readBattleState(restarted.state, catalog).ok).toBe(true);
-      expect(readReplay({ format: 1, versions: restarted.state.versions, initial: restarted.state, commands: [] }, catalog).ok).toBe(true);
+      expect(readReplay({ format: STATE_FORMAT_VERSION, versions: restarted.state.versions, initial: restarted.state, commands: [] }, catalog).ok).toBe(true);
     }
     expect(Object.keys(turns)).not.toContain('restartBattle'); // restart is not a domain operation; the session supplies the seed
   });
@@ -210,7 +211,7 @@ describe('dispatch and replay', () => {
       const played = playBattle(7);
       expect(played.state.outcome).not.toBe('ongoing');
       expect(new Set(played.commands.map(c => c.type))).toEqual(new Set(['move', 'useAbility', 'endTurn']));
-      const replay = { format: 1, versions: played.initial.versions, initial: played.initial, commands: played.commands };
+      const replay = { format: STATE_FORMAT_VERSION, versions: played.initial.versions, initial: played.initial, commands: played.commands };
       const replayed = replayBattle(freeze(copy(replay)), catalog);
       expect(replayed).toEqual({ ok: true, state: played.state, events: played.events });
       expect(replayBattle(JSON.parse(JSON.stringify(replay)), catalog)).toEqual(replayed);
@@ -231,7 +232,7 @@ describe('dispatch and replay', () => {
   });
   it('names the first command that does not apply, and rejects a bad envelope', () => {
     const played = playBattle(7);
-    const replay = { format: 1, versions: played.initial.versions, initial: played.initial, commands: played.commands };
+    const replay = { format: STATE_FORMAT_VERSION, versions: played.initial.versions, initial: played.initial, commands: played.commands };
     const index = played.commands.findIndex(c => c.type === 'useAbility');
     const tampered = copy(replay); tampered.commands.splice(index, 0, tampered.commands[index]);
     expect(replayBattle(tampered, catalog)).toEqual({ ok: false, reason: 'invalidReplay', index: index + 1, rejection: 'alreadyActed' });
@@ -243,7 +244,7 @@ describe('dispatch and replay', () => {
   it('replays only from the battle its map and seed create, whatever the key order', () => {
     const created = createBattle(map.id, 7, catalog); assert(created.ok);
     const genuine = created.state;
-    const envelope = (initial: unknown, commands: Command[] = []) => ({ format: 1, versions: genuine.versions, initial, commands });
+    const envelope = (initial: unknown, commands: Command[] = []) => ({ format: STATE_FORMAT_VERSION, versions: genuine.versions, initial, commands });
     const reordered = (v: unknown): unknown => Array.isArray(v) ? v.map(reordered) :
       v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).reverse().map(([k, x]) => [k, reordered(x)])) : v;
     const honest = replayBattle(envelope(genuine, [wait(genuine.initiative[0])]), catalog); assert(honest.ok);
@@ -277,7 +278,7 @@ describe('dispatch and replay', () => {
     const order = created.state.initiative; // nobody falls, so each Wait passes to the next unit in order
     const commands = Array.from({ length: RULE_BOUNDS.commandCount.max }, (_, i) => wait(order[i % order.length]));
     const started = performance.now();
-    const replayed = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, content);
+    const replayed = replayBattle({ format: STATE_FORMAT_VERSION, versions: created.state.versions, initial: created.state, commands }, content);
     const elapsed = performance.now() - started;
     assert(replayed.ok);
     expect(replayed.state.commandCount).toBe(commands.length);
@@ -293,7 +294,7 @@ describe('dispatch and replay', () => {
     const next = wait(state.initiative[state.activeIndex]);
     expect(dispatch(state, next, catalog)).toEqual({ ok: false, reason: 'commandLimit' });
     expect(previewMovement(state, next.unitId, catalog)).toEqual({ ok: false, reason: 'commandLimit' });
-    const replayed = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, catalog);
+    const replayed = replayBattle({ format: STATE_FORMAT_VERSION, versions: created.state.versions, initial: created.state, commands }, catalog);
     assert(replayed.ok); expect(replayed.state).toEqual(state);
   });
 });

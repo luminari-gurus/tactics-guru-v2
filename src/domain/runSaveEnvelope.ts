@@ -1,4 +1,6 @@
 import { HERO_PROGRESSION } from '../content/progression';
+import { encounterHpLimit } from './effects';
+import { RULES_VERSION, RNG_VERSION } from './constants';
 import type { BattlefieldEncounter } from '../content/battlefieldTypes';
 import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
 import type { ContentCatalog } from '../content/types';
@@ -13,7 +15,7 @@ import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
-export const RUN_SAVE_FORMAT = 3;
+export const RUN_SAVE_FORMAT = 4;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -60,13 +62,12 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
   const battle = readBattleState(input.activeBattle, catalog);
   if (!battle.ok || battle.state.mapId !== resolved.map.id ||
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
-  // No healing exists during a battle. Entry HP is the upper bound, not live HP.
-  if (battle.state.units.some(u => u.side === 'player' && u.hp > items.run.party.find(h => h.heroId === u.defId)!.hp)) return invalid;
+  if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog))) return invalid;
   return { ok: true, state: { items, activeBattle: battle.state, battlefield:resolved.descriptor } };
 }
 
 function identity(context: RunSaveContext) {
-  return { content: hashJson({ content: contentVersion(context.catalog), progression: HERO_PROGRESSION }), items: itemCatalogIdentity(context.items),
+  return { content: hashJson({ rules:RULES_VERSION,rng:RNG_VERSION,content: contentVersion(context.catalog), progression: HERO_PROGRESSION }), items: itemCatalogIdentity(context.items),
     encounters: hashJson({ definition: context.definition, encounters: context.encounters }) };
 }
 export function encodeRunSave(input: unknown, context: RunSaveContext): { readonly ok: true; readonly text: string } | SaveFailure {

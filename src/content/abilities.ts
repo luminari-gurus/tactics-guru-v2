@@ -13,4 +13,8 @@ export const attackAbilities = {
   'ability:guarded_strike': { id: 'ability:guarded_strike', kind: 'guardedAttack', owners: ['fighter'],
     rangeMin: 1, rangeMax: 1, baseDamage: 2, uphillDamage: 0, ...GUARDED_STRIKE_TRADEOFF },
   'ability:magic_missile': { id: 'ability:magic_missile', kind: 'magicMissile', owners: ['mage'], casterLevel: 1, rangeMin: 1, rangeMax: 5 },
+  'ability:second_wind': { id: 'ability:second_wind', kind: 'secondWind', owners: ['fighter'], requiredLevel: 2,
+    rangeMin: 0, rangeMax: 0, target: 'self', healBase: 4, usesPerBattle: 1 },
+  'ability:taunt': { id: 'ability:taunt', kind: 'taunt', owners: ['fighter'], requiredLevel: 3,
+    rangeMin: 1, rangeMax: 1, target: 'hostile', duration: 'targetTurnEnd' },
 } as const satisfies Readonly<Record<AbilityId, Ability>>;

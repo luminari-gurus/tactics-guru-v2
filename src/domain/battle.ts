@@ -47,7 +47,12 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
   for (const u of input.units) {
     const unitKeys = ['id','defId','side','cell','hp','hasMoved','hasActed'];
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
+    if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'secondWindUsed')) unitKeys.push('secondWindUsed');
+    if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'tauntedBy')) unitKeys.push('tauntedBy');
     if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
+      (Object.hasOwn(u, 'secondWindUsed') && (u.secondWindUsed !== true || u.side !== 'player' || u.defId !== 'fighter' ||
+        !Object.values(catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes('fighter')))) ||
+      (Object.hasOwn(u, 'tauntedBy') && (!unitId(u.tauntedBy) || u.side !== 'enemy' || u.hp === 0)) ||
       !unitId(u.id) || u.id <= previous ||
       !cell(u.cell) || u.cell.x >= map.width || u.cell.y >= map.height ||
       typeof u.hasMoved !== 'boolean' || typeof u.hasActed !== 'boolean') return bad;
@@ -64,6 +69,11 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (u.hp > 0) occupied.add(key);
     ids.add(u.id); previous = u.id;
     units.push(u as unknown as UnitState);
+  }
+  for (const u of units) if (u.tauntedBy !== undefined) {
+    const source = units.find(s=>s.id===u.tauntedBy);
+    if (!source || source.hp===0 || source.side!=='player' || source.defId!=='fighter' ||
+      !Object.values(catalog.abilities).some(a=>a.kind==='taunt' && a.owners.includes(source.defId))) return bad;
   }
   if (input.initiative.some(id => !unitId(id) || !ids.has(id)) || new Set(input.initiative).size !== ids.size) return bad;
   const activeId = input.initiative[input.activeIndex];

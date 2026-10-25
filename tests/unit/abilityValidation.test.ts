@@ -16,3 +16,13 @@ it.each(['owners','kind'])('retains canonical %s checks',field=>{
 it('retains required canonical IDs',()=>{
   const c=structuredClone(abilityCatalog());delete (c.abilities as Record<string,unknown>)['ability:high_shot'];expect(validateContent(c).ok).toBe(false);
 });
+
+it.each([
+  ['ability:second_wind','requiredLevel',1],['ability:second_wind','rangeMax',1],['ability:second_wind','target','hostile'],
+  ['ability:second_wind','usesPerBattle',2],['ability:second_wind','healBase',5],['ability:second_wind','owners',['mage']],
+  ['ability:taunt','requiredLevel',2],['ability:taunt','rangeMin',0],['ability:taunt','duration','roundEnd'],
+  ['ability:taunt','immunity',false],['ability:taunt','owners',['goblin_grunt']],['ability:taunt','target','self'],
+])('rejects unsupported Fighter profile %s.%s=%j',(id,field,value)=>{
+  const c=structuredClone(abilityCatalog());Object.assign(c.abilities[id as keyof typeof c.abilities],{[field]:value});
+  expect(validateContent(c).ok).toBe(false);
+});

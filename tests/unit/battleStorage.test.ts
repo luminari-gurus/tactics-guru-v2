@@ -317,7 +317,7 @@ describe('failure taxonomy and unchanged memory', () => {
       const plan = planEnemyTurn(fixture.state, actor.id, fixture.catalog);
       expect(planEnemyTurn(state, actor.id, fixture.catalog)).toEqual(plan);
       const command = state.outcome !== 'ongoing' || state.commandCount === 10_000 ? { type: 'endTurn' as const, unitId: actor.id }
-        : plan.ok ? plan.commands[0] : playerDecision(fixture.state);
+        : plan.ok ? plan.commands[0] : playerDecision(fixture.state,fixture.catalog);
       expect(dispatch(state, command, fixture.catalog)).toEqual(dispatch(fixture.state, command, fixture.catalog));
     }
   });

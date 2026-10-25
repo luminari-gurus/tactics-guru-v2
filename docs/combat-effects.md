@@ -2,13 +2,15 @@
 
 Audited runtime base: `2b5a063f4a7e8f4a6329eaf1f80630133754012a`; implemented by the approved [#161 staged change](../openspec/changes/issue-161-combat-effects/proposal.md). This is a contract and first production integration, not delivery of all downstream effects.
 
-## Enabled runtime: Guarded
+## Enabled runtime: Guarded, Second Wind and Taunt
+
+Issue #163 activates the bounded Heal/Uses/Taunt handoffs below. See [the current Fighter rules](signature-abilities.md#fighter-progression-163). `secondWindUsed?: true` stores one spent Fighter use; `tauntedBy?: number` stores one living opposing Fighter source on a living enemy. Exact readers reject malformed values and ineligible profiles/references. Pure previews, dispatch, AI and inspection share these rules; accepted events drive logs and floating feedback. Taunt expires at target endTurn or source/target defeat. No generic status/resource framework is added.
 
 `src/domain/effects.ts` reads one closed `guarded` case with the Fighter instance as both source and target. Guarded Strike applies −2 attack and grants +2 AC after an accepted hit or miss; an active guard and a prospective Guarded Strike never double the penalty. Shared projection supplies combat previews/resolution, enemy expected-damage scoring through those previews, and HUD/inspection. Catalog stats already include equipment, which is not applied again.
 
-The optional `guarded: true` field is the only stored effect; it is a finite boolean, not a stack. Grant replaces rather than stacks. It expires before the living Fighter's next turn, including initiative wrap. Accepted damage and turn transitions remove it from defeated units; new battle construction starts without it. Defeat carries its own event, not a second guard-expiry event. Previews, cancellation and rejected commands never grant/expire effects, spend budgets, append events or draw RNG. Resolution preflights before drawing locally and adopting a complete result.
+The optional `guarded: true` field is a stored effect; it is a finite boolean, not a stack. Grant replaces rather than stacks. It expires before the living Fighter's next turn, including initiative wrap. Accepted damage and turn transitions remove it from defeated units; new battle construction starts without it. Defeat carries its own event, not a second guard-expiry event. Previews, cancellation and rejected commands never grant/expire effects, spend budgets, append events or draw RNG. Resolution preflights before drawing locally and adopting a complete result.
 
-## Closed downstream contract — not enabled gameplay
+## Closed downstream contract — remaining cases are not enabled gameplay
 
 | Closed case | Proposed semantics for consumer plan | Owning issue / implementation gate |
 | --- | --- | --- |
@@ -33,7 +35,7 @@ Proposed saves are d20 + the chosen save modifier >= DC, without automatic natur
 
 ## Persistence and acceptance gates
 
-State format 1/rules 2, standalone envelope format 1 and existing run/dungeon envelopes remain unchanged. Historical defeated-unit `guarded` flags are read without normalization before digest checking; projection treats them as inactive. Inspection does not rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery and retains original bytes. Effect state is battle-local and never projected into carried party data. Later heal consumers must replace the run reader's current entry-HP upper bound deliberately; later new kinds/uses require reviewed versioning, source references, lifetime/stack/resource bounds, size limits and safe recovery or migration.
+Issue #163 advances battle state to format 2/rules 3, run envelope to 4 and dungeon envelope to 5; the standalone wrapper remains format 1 and RNG remains 1. Earlier saves are incompatible and retain recovery/export of original bytes. Historical defeated-unit `guarded` flags are read without normalization before digest checking; projection treats them as inactive. Inspection does not rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery and retains original bytes. Effect state is battle-local and never projected into carried party data. Second Wind now admits bounded spent healing above entry HP in run/dungeon readers and short-run completion; other kinds/uses require reviewed versioning, source references, lifetime/stack/resource bounds, size limits and safe recovery or migration.
 
 | #161 criterion | This increment | Remaining acceptance |
 | --- | --- | --- |
