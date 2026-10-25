@@ -12,7 +12,7 @@ The optional `guarded: true` field is a stored effect; it is a finite boolean, n
 
 ## Closed downstream contract — remaining cases are not enabled gameplay
 
-| Closed case | Proposed semantics for consumer plan | Owning issue / implementation gate |
+| Closed case | Enabled semantics / remaining consumer proposal | Owning issue / implementation gate |
 | --- | --- | --- |
 | Guarded | One battle-local self status, attack −2/AC +2, grant after accepted hit/miss, replace not stack; expire at source next-turn start; remove on defeat | This increment; existing Guarded Strike |
 | Heal | Living eligible target only; reject full HP; clamp once to projected max HP; no RNG unless profile explicitly requires it | #163 Second Wind / #166 Heal Goblin / #172 item; each owns amount, uses and action cost |
@@ -23,7 +23,7 @@ The optional `guarded: true` field is a stored effect; it is a finite boolean, n
 | Finite stack | Explicit identity/source/target and cap; add only on consumer's successful trigger; reject overflow in saved input, saturate legitimate gain | #168 frenzy: cap 3, +1 accuracy per stack; trigger/expiry decided with its real profile |
 | Uses | Per-ability finite nonnegative integer remaining uses; whole-command validation before decrement; fresh-battle reset; save mid-battle | #163 Second Wind; no inert resources map now |
 
-These cases are specified handoffs. Unsupported status/resource fields and ability kinds reject through the existing exact-shape readers/validators. There is no general effect script, unused resource map or test-only action in production. Mark source-death, taunt duration, immobilization refresh, profile amounts/DCs and acquisition remain subject to the owning issue's approved plan.
+Guarded, Second Wind healing/uses and Taunt are enabled. The remaining cases are specified handoffs. Unsupported status/resource fields and ability kinds reject through the existing exact-shape readers/validators. There is no general effect script, unused resource map or test-only action in production. Mark source-death, immobilization refresh, future profile amounts/DCs and acquisition remain subject to the owning issue's approved plan.
 
 Source evidence: pinned legacy [resolver](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd), [status definitions](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/content_defs/StatusEffectDefinition.gd), and the linked content issues in the table. Approved v2 [signature rules](signature-abilities.md) take precedence over legacy Guarded/Mage behavior.
 
@@ -39,10 +39,10 @@ Issue #163 advances battle state to format 2/rules 3, run envelope to 4 and dung
 
 | #161 criterion | This increment | Remaining acceptance |
 | --- | --- | --- |
-| Minimal model | Closed contract and enabled Guarded view | Additional real consumers |
+| Minimal model | Closed contract; Guarded, Second Wind and Taunt | Additional real consumers |
 | Typed damage/save/immunity | Explicit proposed ordering and source links; current attacks preserved | #166–#169/#171 implementation/proof |
-| Shared pure evaluation/preflight | Guarded combat, AI and UI projection | Same integration for each new kind |
-| Lifecycle/scope | Self identity, one guard, expiry/defeat/new-battle cleanup | Consumer durations, stack/resource semantics |
-| Serialization/replay | Existing bounded Guarded shape and continuation | Marks, taunt, immobilization and finite uses with production profiles |
+| Shared pure evaluation/preflight | Guarded/Fighter combat, AI and UI projection | Same integration for each new kind |
+| Lifecycle/scope | Bounded guard/use/taunt, target/source expiry and fresh-battle cleanup | Consumer durations, stack/resource semantics |
+| Serialization/replay | Bounded Guarded/Second Wind/Taunt and continuation | Marks, immobilization and other consumer resources |
 
-Keep #161 open until all consumer-dependent gates have production evidence. The first increment uses `Refs #161` and a draft PR. Browser/device emulation is sufficient; physical hardware testing is not claimed. See the task-specific QA report for measured results.
+Keep #161 open until all consumer-dependent gates have production evidence. The original Guarded increment used `Refs #161` and a draft PR. Browser/device emulation is sufficient; physical hardware testing is not claimed. See the task-specific QA report for measured results.

@@ -1,7 +1,7 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; rules, persistence and focused UI complete, 6/9 tasks).
+`issue-163-fighter-abilities` (spec-driven; rules/persistence and production journeys complete, UI fixture requalification pending, 6/9 tasks).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
@@ -17,7 +17,7 @@ Do not restore the old confirmation modal or overwrite those indicators.
   Earlier failures are retained in QA logs: version literals, old catalog identity
   snapshot, additive status text and policy callers using raw catalogs. Browser
   standalone consumers now share a level-one projected test catalog; explicit
-  raw unit consumers pass their own catalog. No assertions were removed.
+  raw unit consumers pass their own catalog. No pre-existing assertions were removed.
 - Fighter fixture browser: 3/3 desktop/Pixel touch portrait/landscape pass, including
   320px preview, cancel/resize, legal approach, heal, Taunt, inspection/logs/reload.
   Six retained PNGs were visually inspected for readable feedback.
@@ -26,7 +26,18 @@ Do not restore the old confirmation modal or overwrite those indicators.
   then reached terminal defeat at floor-2 guardian. The initial test incorrectly
   required two-floor victory, which #163 does not require. It now asserts the
   deterministic terminal defeat after both milestones, retaining the failed run.
-  Final browser matrix and final source/build receipts remain pending.
+  The final desktop, Pixel portrait and Pixel landscape production journeys all
+  passed; their complete traces are identical (canonical SHA-256
+  `ecee36ea8c28011e6ac191e53e6d6958e578221caa943d686f7dd8fe0e0d2f00`).
+  Each plays 6 encounters/365 accepted commands, earns Fighter level 3 and ends
+  with five wins then the second-guardian defeat. Encounter 6 proves legal healing
+  above entry HP (24 → 30). Traces and representative PNGs are in `docs/qa/issue-163/`.
+  Remaining browser stages, focused repairs and final receipts are still pending.
+- WebKit exploration/dungeon stage passed 63/63; health bars passed 25/25.
+  All three Windows WebKit production traces also match the Chromium trace exactly,
+  giving 6 engine/device journeys with the same 365 commands and terminal state.
+  Source-bound traces and representative screenshots are copied under QA. This
+  completes OpenSpec 3.2; 3.1 stays reopened until the default Mage fixture repair.
 - Continue by running the 19-stage policy inventory with reused valid unit/type
   evidence, serial browser jobs/one worker and pinned task-local Chromium. No
   CI/physical-device or release claim. Open the dependent feature PR after checks,
@@ -42,8 +53,82 @@ Do not restore the old confirmation modal or overwrite those indicators.
   commit `bad8f19`, branch `branch/issue-163-standalone-level`, base main.
   Feature work continues on the requested `branch/issue-163-fighter-abilities`,
   targeting the prerequisite branch while #242 is open. Full feature remains pending.
-- Next chunk: validated profiles + atomic rules/lifecycle/AI + save admission/versions
-  + shared previews/UI, with existing unit and browser tests extended together.
+- The 19-stage qualification finished against clean feature source `d208a6b` and
+  its production build. Reused unit/type results have matching
+  input hash `405039eaba83caeb6484dca3a8310885bb817f49b8f51ad10a6e4fca6aa57dbc`.
+  Live reports: `tmp/issue-163-full/qualification/summary.json` and per-stage logs.
+  Runner: `node tmp/issue-163-full/run.mjs`, a temporary wrapper over the existing
+  19-stage manifest. Keep its failed aggregates; reconcile focused repairs without
+  rerunning unaffected checks. Both telemetry stages passed 36/36; performance
+  passed all 18 proof cold/warm samples with no failures. Prefix/root builds passed.
+  Asset modes retain the known expectation failures pending focused repair runs.
+- Known qualification repairs to finish after frozen-input coverage: the battle
+  case in `tests/public-asset-base.spec.ts` still constructs its expected session
+  with the raw catalog; use the existing level-one test catalog. The authored-final
+  case in `tests/procedural-grids.spec.ts` compares HP-only projections to complete
+  progression records. `tests/battle-animations.spec.ts` still expects the obsolete
+  short Guarded status in both actor and inspection; preserve the current full
+  penalty/expiry explanation in its assertion. An exact-base worktree at
+  `C:/Users/apexw/.codex/tmp/issue163-base-e489a30` is built with the same lockfile,
+  Node and browser versions for a focused literal-base comparison. Do not run it
+  concurrently with the active browser matrix. Retain failures, repair the carried
+  party assertion as a separate focused PR, and rerun only affected cases/modes.
+- Original qualification shell `68827` finished. Its base comparisons also ran:
+  both stale Chromium assertions and representative WebKit launch/media failures
+  reproduced on literal `e489a30`. The standalone assertion repair passed 9/9 on
+  `c4eed28` and is published ready for review as
+  [PR #244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244), branch
+  `branch/issue-163-battle-assertions`, head `95e1a6a`, stacked on #242. The notes
+  below describe the repair sequence; do not repeat the completed base work.
+  use the same pinned Chromium and desktop filter
+  `authored final entry|ability:guarded_strike: spent action` on the literal base.
+  Correct the HP comparison at the proper boundary and retain a separate full
+  party metadata assertion; expect the complete current Guarded explanation in
+  both actor and inspection. Qualify both repairs on all three Chromium profiles,
+  publish their focused dependency PR, merge that dependency into the feature
+  branch, and fix the feature's raw-catalog asset assertion with its affected
+  root/prefix preview/dev cases only. Do not rerun unaffected passing suites.
+- Chromium aggregate finished at `d208a6b`: 688 passed, 9 assertion failures
+  (the three known titles across all three profiles), 3 expected preview skips,
+  no retries/flakiness. The separate dev placement stage passed all 3 skipped
+  obligations. Fixtures: 69/72 passed; the three friendly-Missile failures expose
+  a task-owned fixture regression: default XP-null projection replaced its custom
+  `zz_mage` caster level 3 with level 1. Keep the level-one Fighter gating but
+  restore that explicitly authored default Mage fixture profile; XP fixtures must
+  still use canonical progression. Rerun the friendly-Missile and later-Mage cases
+  on all three profiles. This is a fixture repair, not a production ability change.
+  The original WebKit acceptance aggregate and all other stages are now finished.
+- WebKit acceptance on Windows finished 8/52 passed. Of 44 failures, 40 are
+  launch setup: file-level overrides in battle-persistence/run-progression pass
+  the Chromium executable to WebKit (`--inspector-pipe` against Chrome). Four audio
+  cases report unavailable load/decode on Windows WebKit. Keep both failure kinds
+  explicit. Fix engine-aware launch overrides in their own focused dependency PR
+  (the same pattern also exists in battle-animations). Compare representative
+  cases on literal base, then rerun WebKit acceptance on the existing WSL Linux
+  WebKit 2359 runtime with a deliberately unusable Chromium override to prove
+  that WebKit ignores it. Keep test IDs, workers, retries and selection intact.
+- WSL preparation only: isolated clone
+  `/home/aiwithapex/.cache/issue163-webkit-linux`, shared Git objects from primary,
+  detached at `d208a6b`, locked Linux dependencies installed. The ordinary Windows
+  production `dist` was copied; `pin-wsl-node.sh` verifies every file against the
+  root build inventory and pins task-local Node 24.19.0 / npm 12.2.1 (the initial
+  system Node 24.14.0 produced an npm engine warning). No WSL browser has launched.
+  Do not overlap WSL and Windows browser jobs. After committing repairs, check out
+  their exact feature SHA in the WSL clone; retain its source and runtime receipt.
+- Current source commits: `b45a011` repairs the feature's asset expectation and
+  preserves the explicit default `zz_mage` caster profile; `64adcdb` is the
+  separate browser-fixture dependency, merged into the feature at `9157214`.
+  Both type scopes pass. The browser fixture repair also corrects an obsolete
+  WebKit grep: 52 retained IDs are unchanged and exactly two complete authored-run
+  cases are added (54 total), with no omissions or altered assertions/workers/retries.
+- Active browser job is now **WSL acceptance**, shell session `78045`, exact
+  integration source `9157214`, verified ordinary `d208a6b` build. Its invalid
+  Chromium override sentinel must never reach WebKit. Parent Windows WebKit
+  startup/run-reload checks passed 2/2 with the fixed engine selection. Finish WSL
+  acceptance, publish the browser-fixture dependency, then run the feature's
+  focused Chromium assertion/launch, full ability-picker fixture and root/prefix
+  asset cases. Serialize all browsers across Windows/WSL. Keep raw reports and
+  finish the source-bound reconciliation, PR and cleanup.
 - Runtime: bundled Windows Node v24.19.0; npm is available at
   `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd` (prepend that directory to PATH
   per shell call). `npm ci --ignore-scripts --no-audit --no-fund` restored Windows
@@ -137,8 +222,9 @@ satisfies acceptance under AGENTS.md. No physical-device request was made;
 
 ## Source audit and implementation decisions
 
-The findings below describe the recorded base; proposed behavior is not yet
-implemented. Pinned legacy sources were read directly:
+The findings below record the base audit and approved implementation decisions;
+the checkpoint above describes current implementation and qualification. Pinned
+legacy sources were read directly during planning:
 [resolver definitions and lifecycle](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L74-L119),
 [Taunt resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L348-L394),
 [Second Wind resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L827-L872),
@@ -350,7 +436,9 @@ aggregate readers, healing/use reset on reload, expiry attached to the wrong
 turn, AI unable to finish under a taunt, and save identity drift. Each has an
 explicit implementation path and proof above. New on-disk state is intentionally
 incompatible with prior saves; recovery must preserve and export their bytes.
-PRs #139/#240 overlap shared HUD code: recheck live main before implementation,
-preserve their merged behavior if present, and update this plan for material scope
-changes. This setup request ends with the claimed issue, published plan and
-linked branch; no application code or runtime tests are changed by this commit.
+PR #240 and the #241 Guarded indicator work were merged before implementation;
+their confirmation and board behavior are preserved. Keep #139's independently
+owned work separate, and inspect live branch/PR state before final delivery.
+Continue from the current checkpoint and OpenSpec tasks, retaining source/build
+identities, failed attempts and focused repair receipts. Deliver the remaining
+reviewable dependency/feature PRs and leave the stack open for review.

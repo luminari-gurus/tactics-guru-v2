@@ -13,8 +13,8 @@
 
 ## 3. Reachable player controls
 
-- [x] 3.1 Integrate shared previews, self targeting, availability/unlocks, logs/inspection and event-derived floating feedback without changing confirmation or Guarded/Missile; prove existing UI/session/feedback units and focused keyboard/touch browser cases with representative screenshots.
-- [ ] 3.2 Complete a legal production dungeon journey earning level 3 and using both abilities with reload/transition checks; retain command/event/source/build evidence and screenshots across required engine/device profiles.
+- [ ] 3.1 Integrate shared previews, self targeting, availability/unlocks, logs/inspection and event-derived floating feedback without changing confirmation or Guarded/Missile; prove existing UI/session/feedback units and focused keyboard/touch browser cases with representative screenshots. Reopened during regression: restore the default Mage fixture's explicit caster-level override and requalify its consumers.
+- [x] 3.2 Complete a legal production dungeon journey earning level 3 and using both abilities with reload/transition checks; retain command/event/source/build evidence and screenshots across required engine/device profiles. All six Chromium/WebKit desktop/portrait/landscape traces match exactly; see docs/qa/issue-163/production-*-journey.json.gz.
 
 ## 4. Integration and delivery
 
