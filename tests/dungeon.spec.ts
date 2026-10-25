@@ -2,7 +2,8 @@ import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair } from './helpers/dungeonTraversal';
 import { atStairApproach } from './helpers/dungeonFixtures';
 import { expect,test,type Page } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { gunzipSync } from 'node:zlib';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
@@ -63,10 +64,30 @@ test('Fighter legal progression journey earns level three uses both abilities an
     await page.locator('#dungeon-item-confirm').click();
    }
   }
-  if(depth===1){const s=await snapshot(page);await walkDungeon(page,s.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');await page.locator('#dungeon-descend').click();expect((await snapshot(page)).depth).toBe(2);}
+  if(depth===1){const s=await snapshot(page);await walkDungeon(page,s.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(2);}
  }
  const final=await snapshot(page);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
  writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:190,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
+});
+
+test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{
+ test.setTimeout(90000);
+ // Accepted terminal combat from the retained six-encounter UI journey; spatial approach is explicit.
+ const trace=JSON.parse(gunzipSync(readFileSync(new URL('../docs/qa/issue-163/production-desktop-journey.json.gz',import.meta.url))).toString());
+ const record=trace.records[2];expect(record.state.units.find((u:{defId:string})=>u.defId==='fighter').secondWindUsed).toBe(true);
+ const completed=acceptDungeonBattle(record.entry,record.state);if(!completed.ok)throw Error(completed.reason);
+ const approach=atStairApproach(completed.state),party=approach.party,ownership=approach.ownership;
+ expect(party.find(h=>h.heroId==='fighter')!.hp).toBeGreaterThan(0);expect(party.find(h=>h.heroId==='fighter')!.learned).toContain('ability:second_wind');
+ await seed(page,approach);await walkDungeon(page,approach.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
+ const arrived=await snapshot(page);expect(arrived.depth).toBe(2);expect(arrived.revision).toBe(approach.revision+1);expect(arrived.party).toEqual(party);expect(arrived.ownership).toEqual(ownership);
+ expect(arrived.party.every(h=>!Object.hasOwn(h,'secondWindUsed')&&!Object.hasOwn(h,'tauntedBy'))).toBe(true);
+ await page.screenshot({path:test.info().outputPath('healed-party-automatic-arrival.png'),fullPage:true});
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(arrived);
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const entry=await snapshot(page),built=dungeonBattle(entry)!;expect(built.state.units.find(u=>u.defId==='fighter')!.hp).toBe(party.find(h=>h.heroId==='fighter')!.hp);
+ expect((await readSession(page)).state.units.every(u=>!u.secondWindUsed&&u.tauntedBy===undefined)).toBe(true);
+ await page.locator('#battle-party').click();await page.locator('#inspect-unit-1').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
+ await page.screenshot({path:test.info().outputPath('fresh-resource-after-automatic-stairs.png')});
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
