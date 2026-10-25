@@ -48,7 +48,8 @@ test('authored final entry preserves carried heroes and equipped projection',asy
  await page.locator('#run-continue').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const current=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
  expect(current.battlefield.kind).toBe('authored');expect(current.activeBattle.mapId).toBe('map:ruined_approach');
- expect(current.activeBattle.units.filter((u:any)=>u.side==='player').map((u:any)=>({heroId:u.defId,hp:u.hp}))).toEqual(items.run.party.filter(h=>h.hp>0));
+ expect(current.activeBattle.units.filter((u:any)=>u.side==='player').map((u:any)=>({heroId:u.defId,hp:u.hp}))).toEqual(items.run.party.filter(h=>h.hp>0).map(({heroId,hp})=>({heroId,hp})));
+ expect(current.items.run.party).toEqual(items.run.party);
  expect(runBattleCatalog(current.items,runContext)!.heroes.fighter.stats.armorClass).toBe(runContext.catalog.heroes.fighter.stats.armorClass+1);
  await page.screenshot({path:test.info().outputPath('authored-final.png')});
 });
