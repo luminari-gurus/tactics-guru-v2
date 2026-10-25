@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { battleCues, BATTLE_CUES } from '../../src/audio/battleCues';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import type { BattleEvent } from '../../src/domain/types';
-import { BattleSession } from '../../src/app/BattleSession';
-import { playerDecision } from '../helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
 
 const attack = (result: 'miss'|'hit'|'critical'): BattleEvent => ({type:'attackRolled',unitId:1,targetId:2,natural:10,bonus:1,total:11,armorClass:10,result});
@@ -27,19 +25,5 @@ describe('accepted event cue policy', () => {
   });
   it('caps at four while retaining defeat and outcome', () => {
     expect(battleCues([attack('miss'),attack('hit'),attack('critical'),attack('hit'),{type:'defeated',unitId:2},{type:'battleEnded',outcome:'playerWin'}],catalog)).toEqual(['miss','hit','unit-defeat','victory']);
-  });
-  it('cannot mutate frozen accepted batches or affect seeded state/RNG', () => {
-    const audible = new BattleSession(catalog,'map:forest_ruins',2), silent = new BattleSession(catalog,'map:forest_ruins',2);
-    for(let i=0;i<300 && audible.phase!=='ended';i++) {
-      const command=playerDecision(audible.state);
-      const a=audible.phase==='enemy'?audible.nextEnemy():(audible.prepare(command),audible.confirm());
-      const b=silent.phase==='enemy'?silent.nextEnemy():(silent.prepare(command),silent.confirm());
-      expect(a).not.toBeNull(); expect(b).not.toBeNull();
-      const before=structuredClone(a);
-      battleCues(a!.events,catalog);
-      expect(a).toEqual(before); expect(a).toEqual(b);
-      audible.finishPresentation(a!.token); silent.finishPresentation(b!.token);
-    }
-    expect(audible.state.outcome).toBe('playerWin'); expect(audible.replay).toEqual(silent.replay);
   });
 });

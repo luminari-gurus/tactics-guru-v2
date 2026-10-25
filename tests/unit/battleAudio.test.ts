@@ -1,7 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, assert, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { BattleAudio, LOAD_TIMEOUT_MS, REQUEST_TIMEOUT_MS, UNLOCK_TIMEOUT_MS } from '../../src/phaser/BattleAudio';
-import { BATTLE_CUES } from '../../src/audio/battleCues';
+import { battleCues, BATTLE_CUES, type BattleCue } from '../../src/audio/battleCues';
+import { BattleSession } from '../../src/app/BattleSession';
+import { decodeBattleSave, encodeBattleSave } from '../../src/domain/saveEnvelope';
+import { dispatch, replayBattle } from '../../src/domain/turns';
+import { playerDecision } from '../helpers/playerPolicy';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import type { BattleEvent } from '../../src/domain/types';
 
@@ -27,6 +31,65 @@ afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
 
 describe('scene audio lifetime',()=>{
+  it.each([[1,'playerLoss'],[2,'playerWin']] as const)('seed %i: enabled/muted adapters preserve every legal boundary through %s',async(seed,outcome)=>{
+    const audible=new BattleSession(catalog,'map:forest_ruins',seed),silent=new BattleSession(catalog,'map:forest_ruins',seed);
+    const enabled=fixture(),muted=fixture();enabled.audio.setEnabled(true);await flush();
+    expect(enabled.audio.snapshot().status).toBe('ready');
+    const snapshot=(session:BattleSession)=>({state:session.state,events:session.events,replay:session.replay,
+      continuation:session.continuation,pending:session.pending,phase:session.phase,error:session.error});
+    const save=(session:BattleSession)=>{const encoded=encodeBattleSave(session.state,catalog);assert(encoded.ok);return encoded.text;};
+    const step=(session:BattleSession)=>{
+      if(session.phase==='player')expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+      const accepted=session.phase==='enemy'?session.nextEnemy():session.confirm();assert(accepted);return accepted;
+    };
+    const heard=new Set<BattleCue>();let late:(()=>void)|undefined;
+    for(let i=0;i<300 && audible.phase!=='ended';i++){
+      const restored=decodeBattleSave(save(audible),catalog);assert(restored.ok);
+      const a=step(audible),b=step(silent),accepted=structuredClone(a);
+      expect(a).toEqual(b);expect(Object.isFrozen(a.events)).toBe(true);
+      expect(a.events.every(event=>Object.isFrozen(event))).toBe(true);
+      const cues=battleCues(a.events,catalog),started=enabled.audio.snapshot().started;
+      enabled.audio.present(a.token,a.events);muted.audio.present(b.token,b.events);
+      const first=enabled.sounds.find(sound=>sound.listenerCount('complete')>0);
+      late??=first?.listeners('complete')[0] as (()=>void)|undefined;
+      expect(enabled.audio.snapshot().started-started).toBe(cues.length?1:0);
+      expect(audible.phase).toBe('presenting');expect(silent.phase).toBe('presenting');
+      // Acknowledgement may precede or follow playback: audio cannot own its gate.
+      if(i%2===0){audible.finishPresentation(a.token);silent.finishPresentation(b.token);}
+      const beforeCallbacks=structuredClone(snapshot(audible));
+      for(let j=0;j<cues.length;j++){
+        const active=enabled.sounds.find(sound=>sound.listenerCount('complete')>0);assert(active);
+        active.emit('complete');
+      }
+      expect(snapshot(audible)).toEqual(beforeCallbacks);
+      expect(enabled.audio.snapshot()).toMatchObject({active:null,started:started+cues.length,completed:started+cues.length});
+      if(cues.length)expect(enabled.audio.snapshot().recent.slice(-cues.length)).toEqual(cues);
+      enabled.audio.snapshot().recent.forEach(cue=>heard.add(cue));
+      const finished=enabled.audio.snapshot();
+      enabled.audio.present(a.token,a.events);enabled.audio.present(a.token-1,a.events);
+      expect(enabled.audio.snapshot()).toEqual(finished);
+      expect(muted.audio.snapshot().started).toBe(0);expect(a).toEqual(accepted);
+      if(i%2!==0){audible.finishPresentation(a.token);silent.finishPresentation(b.token);}
+      expect(snapshot(audible)).toEqual(snapshot(silent));expect(save(audible)).toBe(save(silent));
+      const decoded=decodeBattleSave(save(audible),catalog);assert(decoded.ok);expect(decoded.state).toEqual(a.after);
+      expect(dispatch(restored.state,audible.replay!.commands.at(-1),catalog)).toEqual({ok:true,state:a.after,events:a.events});
+    }
+    expect(audible.phase).toBe('ended');expect(audible.state.outcome).toBe(outcome);
+    const replay=replayBattle(audible.replay,catalog);assert(replay.ok);
+    expect(replay.state).toEqual(audible.state);expect(replay.events).toEqual(audible.events);
+    expect([...heard]).toEqual(expect.arrayContaining(['move','hit','miss','unit-defeat',seed===2?'victory':'loss']));
+    if(seed===2){
+      expect([...heard]).toContain('magic');
+      expect(audible.replay!.commands.filter(command=>command.type==='useAbility').map(command=>command.abilityId))
+        .toEqual(expect.arrayContaining(['ability:basic_attack','ability:guarded_strike','ability:high_shot','ability:magic_missile']));
+    }
+    const beforeLate=structuredClone(snapshot(audible)),last=muted.audio.snapshot().lastToken;
+    muted.audio.setEnabled(true);await flush();muted.audio.present(last,move);muted.audio.present(last-1,move);
+    expect(muted.audio.snapshot().started).toBe(0);
+    enabled.audio.destroy();muted.audio.destroy();const disposed=enabled.audio.snapshot();late?.();await flush();
+    expect(enabled.audio.snapshot()).toEqual(disposed);expect(snapshot(audible)).toEqual(beforeLate);
+    expect(vi.getTimerCount()).toBe(0);
+  });
   it('refreshes Phaser HTML5 lock state in the enabling gesture',async()=>{
     const f=fixture(true,true);await flush();f.audio.setEnabled(true);
     expect(f.sound.unlock).toHaveBeenCalledTimes(1);await flush();
