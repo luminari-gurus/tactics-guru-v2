@@ -37,4 +37,6 @@ The caller explicitly requested the first five grouped fixes from the feedback a
 - [x] 4.3 Select native clock via explicit tags, atomically capture marker/step/description state and assert monotonic cached-page advancement; verify the native smoke and real BFCache checks without installing a fake clock after navigation.
 - [x] 4.4 Add keyboard/touch Pause/Resume, preserve pause through regeneration/art/visibility and resume after a full interval; verify no hidden RNG/position/step advancement and accessible control state/size.
 - [x] 4.5 Directly invoke the returned disposer twice and test hidden artwork completion; correct the main entry's full-reload cleanup hook and documentation, verifying idempotence, detached listeners and deferred DOM updates.
-- [ ] 4.6 Run affected units, build/type/content, full map preview and explicit dev interception cases plus root/prefix routing on final relevant inputs; retain failures and new receipts/screenshots, update PR #246 and confirm published branch parity without merge.
+- [x] 4.6 Run affected units, build/type/content, full map preview and explicit dev interception cases plus root/prefix routing on final relevant inputs; retain failures and new receipts/screenshots, update PR #246 and confirm published branch parity without merge.
+
+Review follow-up delivered on PR #246; all five requested groups verified on runtime/test source `8dbed57`. Subsequent changes retain QA evidence and task status only.
