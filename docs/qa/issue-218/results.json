@@ -1,0 +1,2035 @@
+{
+  "issue": 218,
+  "sourceCommit": "24b92830ffe8789cc726d8ef45086ce2b67cb01f",
+  "testedBuild": {
+    "commit": "87a80366686edd897affa1ec7053c0ac32609615",
+    "dirty": true
+  },
+  "environment": {
+    "createdAt": "2026-10-25T11:40:21.936Z",
+    "commit": "87a80366686edd897affa1ec7053c0ac32609615",
+    "node": "v26.11.0",
+    "playwright": "1.63.0",
+    "platform": "darwin",
+    "release": "27.0.0",
+    "arch": "arm64",
+    "browsers": {
+      "chromium": {
+        "executable": "/Users/brian/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+        "override": false,
+        "channel": "chromium",
+        "version": "153.0.8010.12",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "/Users/brian/Library/Caches/ms-playwright/webkit-2359/pw_run.sh",
+        "override": false,
+        "channel": null,
+        "version": "26.6",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "server": {
+    "mode": "preview",
+    "basePath": "/",
+    "port": 4173,
+    "workers": 1,
+    "retries": 0,
+    "telemetry": "unconfigured"
+  },
+  "runtimeAndServedBuildUnchangedSinceSnapshot": true,
+  "hashes": {
+    "src/app/BattlePersistence.ts": "473e45ff40466a468465df28cefb5e6ce8f66d8c04ce08f8d9dc37ee08e049a2",
+    "src/app/BattleSession.ts": "1243eefa8328e3d9cc2ef4111dd6b934e542f46a35775283d07b7d8f8d298b11",
+    "src/app/DungeonSession.ts": "0d0f439a0ad8a6c0d9d08b1f9d788c6d9d5ee1ef0d64ea15aef2cb06da4af41c",
+    "src/app/RunItemSession.ts": "de8b1644689c7caffb208a355fa105385ada42af3c2b789b6b103a3f235ff458",
+    "src/app/startBattleApp.ts": "0ded1982fade9445082d4e117c3aa867948e3a82ac8c16da968d8d76fa9ebf15",
+    "src/app/startDungeonApp.ts": "63b76b972916fd65d12d60dadf1f1bbd615362580dc15ef9daa6b7a5cdee35e1",
+    "src/app/startRunApp.ts": "a0db326c45320f9557f502022d08b695616a6d9525b7439395470d1e23a251ea",
+    "src/audio/battleCues.ts": "f3dd151943dfa2e2392a3b46a4c78111f11a181af275464c068b6687fa772b63",
+    "src/content/abilities.ts": "f38ce59b72808487d334f04545ad63f5e241d0940e26b9cd251fc89fe6bdbf25",
+    "src/content/assets.ts": "acfee3a0cd30fe148f84da041dc1456b2dcba43ac920fcd342be0bc09da27f27",
+    "src/content/battlefieldTypes.ts": "91f7637cd8f64ef1e21d8d44726eb756b0d3b0f709c0036fdde89d1f7e615f69",
+    "src/content/catalog.ts": "ee87bde89144f33047438ffd6f32699c78bc8368136ef2247f2b4ef65acc7a50",
+    "src/content/constants.ts": "f4fc0c7da21cda61fa6088a6617d1a044bcd636152ef3f37d1f61fbd54b5466f",
+    "src/content/desertAssets.ts": "29d37b9c049245aa6e102ac3c25a451b40dc871e2159ef1283375b5b2ff1f809",
+    "src/content/desertCatalog.ts": "700cdc0caa8613cc3ce31904fc043d0f2988c48b92b91c4c3701dcb901521447",
+    "src/content/dungeon.ts": "12518d6ead03c0329c9fa903d2243d99f6e8bea29f5aab8fb7e6cd9a317855a4",
+    "src/content/dungeonEncounters.ts": "4fb7f50da848c72dd9f2199063ed63da8f25748f05b14bb120ae7ce6e5702b6b",
+    "src/content/encounters.ts": "e7e8a81ee8bde7203bbdbf67c79f7c448a762e51928daa1f9608f6386ca3e4e0",
+    "src/content/forestRuins.ts": "100ea50834f9f1b1b94a1b397629f01ecafa3ac3d716c4af250a7896ccb21ecc",
+    "src/content/itemTypes.ts": "4a83ca8b30be6ffaa365edda856c1c51e64028e80067923ee359c57079123be5",
+    "src/content/items.ts": "0d708edcc49a32666bb904e42ad10dd294f60f92cf34aa0843e9f0ffc7b7b981",
+    "src/content/progression.ts": "c7b701ea6a78c46beb83f1243a017e3d954430f2c95da1ecd2279efdffb7f741",
+    "src/content/ruinedApproach.ts": "c1e78988f93a7f0b643a0d6d8becd29c834614eba8ffe90ce030e140ab976874",
+    "src/content/types.ts": "ec3e4aab571dc0673605e8e3babeffce3dface3a0732c2c875138078bd482259",
+    "src/content/validate.ts": "a06d0b53f9820eecc6634d0846bb6db09862c2c3a47097d424ad89c2dc46f259",
+    "src/content/validateItems.ts": "7b173b00c4c6132faf00e156cfb84ff459bb19b320f8adfec48de2ba28ad50c0",
+    "src/content/woodlandCrossing.ts": "52a002c518052b04b4bfd27be382f8fad7498e9f6650d1d573b38c6c3809ed24",
+    "src/diagnostics/audioState.ts": "742c423e6f17da2297faa162990a0727a6bc6b0211c3bf68dc37ade34a0cc572",
+    "src/diagnostics/boardFixture.ts": "40de586eec9de3243af2d1f356740a9bb5adafec58bcaf942397123fb48b9d35",
+    "src/diagnostics/browser.ts": "56d6a2da962ec981f65785d0dfec1940c65fde459bdb347eb18280ef9d6a98ea",
+    "src/diagnostics/measurements.ts": "0572c87a893c2d815a5685a291ce0fbc0e40d9a45970aa164cbf0fb9eec8a580",
+    "src/diagnostics/proofAssets.ts": "9b7c0ff926ced923dfe15f6b0e5ede66460dc9660d0bd7c956336b2b2c1a0ce0",
+    "src/diagnostics/scriptedMove.ts": "5a547b652ba4465909acba52d67fc7725f1a51053f0dd3e0e20d6ddb88e4480c",
+    "src/domain/ai.ts": "df1d2e160595176441ef4bc26e3a4c29bc90a7398c737816d3e19e9ef7b7043b",
+    "src/domain/battle.ts": "20db578de7e530e87385b41594627700ec7be3eb3caeaa6b068f0d48ef3bb9b2",
+    "src/domain/battlefield.ts": "e0b44661255579f16ffdc67ad1ad23ff3cbf26503ed370a9b0325e2a53f92ea8",
+    "src/domain/battlefieldValidation.ts": "acf28dec84756c96e8ac5dafc5cd7aee5cd349dc33da6e7a497e57d45df21da7",
+    "src/domain/combat.ts": "524a95c643b46b4911864362b70c16fc7030760a9a8ff248171838e8fb7a8a7a",
+    "src/domain/constants.ts": "de51ced4b0451a6cf3f174df9bf9a37f577f939cd0f1f0d827f4652787feee1b",
+    "src/domain/contentIdentity.ts": "b748e2da35ce2af3436031d27f00749e3d4cce800c901657a0074e59b1aa3aa5",
+    "src/domain/dungeon.ts": "0ffe724e9ad5101358409459138d0e955168bd2bded4f57cb1a2ebc887e63d71",
+    "src/domain/dungeonEncounters.ts": "02e384b3e605208fa4a0129bf319da1139f9dbad24115caecf77d428d0c678fc",
+    "src/domain/dungeonSaveEnvelope.ts": "80ab29bcef0eed8f311c451d531243e29066add27d6f00a8c080af7d98d63d86",
+    "src/domain/effects.ts": "6360606a292a789834ff75ce42c1474d30aacdc1d4d2e11ea70749218dc47409",
+    "src/domain/exploration.ts": "ccf75e22aae1c0a9073ac8f40fd5102bce9c240306cb4a6789358a9e5fc77d6c",
+    "src/domain/grid.ts": "50313fc6c880b0ad519ca47059a2bd153cfde5f9bd47f6dc9c7751912941aee5",
+    "src/domain/items.ts": "de846d1485c3fd7bd11903e5aa73642d2f7856d99399edf1bd85fccb904d0f19",
+    "src/domain/movementEdge.ts": "2730c096650bbc8cc5e6af8d2878e75ad02f74dd612c666218fc1ec8adcf7a35",
+    "src/domain/progression.ts": "3cecc28587fa7c8f5c47fdaf05ddb7c03e44d5ee2353316094c2f08e4510f968",
+    "src/domain/rewards.ts": "d249df3d4bc53e683267da5ce86cc3a54f27132d7672ac1316999f744930d362",
+    "src/domain/rng.ts": "1a9121e116a1c5a1e2ff176cfbf54186e2ab00672e1c9d84dfecbcb09380ecb0",
+    "src/domain/routes.ts": "85d4091eadfb0dcddf43262760a91083258a8cb862c116e1bf6cdc137f9299ab",
+    "src/domain/run.ts": "7f1e1df4bb61995b060b81b0e833e85e67473ddb2075ab31b42164e46050c8f1",
+    "src/domain/runBattle.ts": "a61f59d1c75ae878fbfdd9391b99047c19e0151065b37a97b72c56a7ffbec7f8",
+    "src/domain/runSaveEnvelope.ts": "e5993802e9a3f6ff6b9acab1b54acd887c7e5ee2b887e1c5d0aeaae1a66a1db0",
+    "src/domain/saveEnvelope.ts": "49d2fd2971c210c437d649b5fa55e6403c813150d5a9a69397cbaff3dcf218e6",
+    "src/domain/targeting.ts": "4d3945889c0868430fcca0b5765b232a765de7fc38389ad32f650402f39c794c",
+    "src/domain/turns.ts": "300be722e2dbd097199c384965b2736c73ccd7a90bdbc41643d8119707b55e9b",
+    "src/domain/types.ts": "d91b724f36aaf18dc2c92009f1ec851f0e5401359147488b7bbfbf358beff233",
+    "src/domain/validation.ts": "2b7589f2fc154c14979109e94bad8ce081b69724f5e49808f2bd228f93c06d7d",
+    "src/geometry/boardPresentation.ts": "b5c582d1849696c4173969af177195d5559b4d60647ab87c4b56776319935b97",
+    "src/geometry/canopy.ts": "5d8d1f0a8f44d3a127501e69c0db04026eb3af3912e348f6dea06c86caa967dc",
+    "src/geometry/iso.ts": "ceb00363053c4d40fbb3116442c16e29c78bcc7eddad9c1fc9d4bdd5b308968e",
+    "src/geometry/picking.ts": "80ab950438bc084dc27e5094183695c279210b804035b1d6915df5e02087c9c8",
+    "src/main.ts": "bbf7512149d52466e9d2525bbf12b5e00c7c52dd9edb0d5ce7d3a93ea964664b",
+    "src/map/art.ts": "5c45269c40063a16230a859acbf81fcad694cfa7369e9df90317ec31d86a963e",
+    "src/map/biomes.ts": "95d3134c4e4b0d1146840a29c4199e5f37dffc350290af15c975396dcc45eceb",
+    "src/map/generate.ts": "81be62bfe11c52a8de40b8cc46b2879a07b73dcb80da12bc399aba82c35a044d",
+    "src/map/state.ts": "5df209a637e8c31e1361111c95a9f185254925ea69211a6724b68e88829ae105",
+    "src/map/style.css": "5455fca41973e5af13bcaa8f20cddb1d5b350a70c0e0ce795bf5c6cce430078f",
+    "src/map/view.ts": "a6e6ee59223a24952eae6d6225dfc484510c6d1a2763d3239c378ca266d005db",
+    "src/persistence/battleStorage.ts": "2e3682d4b4351712b151601b2dc7f1c70d2d16d79ed8c5b3d25352a8568695e8",
+    "src/persistence/dungeonStorage.ts": "f3b7029ee0a8d75893c0b408d79eb3b3f1807e8eef23c288194177defd5adaee",
+    "src/persistence/runStorage.ts": "c217c052382c87a1935761ba3611c6f25c5dbe6bd60ba1ba11911e8fa212feac",
+    "src/phaser/BattleAudio.ts": "fef8ec0849a740bd55ab59e19722f37c4659ae22799b378e7238a07b87f39d30",
+    "src/phaser/BattleScene.ts": "b5cd13e9ed1ddb3b46de8303fc9f260c5f71b86564018073be6607f8c6834070",
+    "src/phaser/BoardInput.ts": "2333755ca87e08ddfd8d1b7e6e213ab490ad660eaf92940732ef69de167768c9",
+    "src/phaser/BoardRenderer.ts": "43ea2d54085a97a9cfe62427f6f0153249767b52a17e320925e26bf1b127d938",
+    "src/phaser/ContentSmokeScene.ts": "bf2ec2adddc0bc0565b2c11b4965f99bb279fb5e5d75951a1f714ec17a760d56",
+    "src/phaser/FitScene.ts": "93217a3cc43c15dde47d50b991b53f2076d073b4f16c390d97cae9ff32ed5f24",
+    "src/phaser/ProofAudio.ts": "bb7a695bafcf26044794ef57b155bcef19b98af563ce74b1bf63c95d56bb2b08",
+    "src/phaser/ProofBoardRenderer.ts": "2a53840686637382024225e237e12fa1fceb47ec201a2874bf303d716e1c8594",
+    "src/phaser/abilityPresentation.ts": "cacdca59ea87389921980a3da24eac4f5d535db8541cf8f6f68c9e72bed2b4e6",
+    "src/phaser/contentLoading.ts": "921fdcf2f2cb040d0b21cdb3c422c93e5f4b0de3faaa962ab41ea83b3319ea5d",
+    "src/phaser/healthBar.ts": "aa55706ef6cfbdb043c14bf1c08d86f7e85401dba75d3d73063764db06ea3874",
+    "src/phaser/start.ts": "54b16b254518d7ecdd9535f5d3c16d9e26958615eccec624d8d3a800d0d32991",
+    "src/style.css": "f9e2158bee96e4802385fd1794acff1cd7bba082cb9bc2f41ad6a9ac73e58cf9",
+    "src/telemetry/browser.ts": "dab33b0ac8895c822645aa6b59b911d0a7eba5bba951528e2c88612275f3bc80",
+    "src/telemetry/preferences.css": "b1bbad15ae44f2f8929bdf4025511db24a0bbefacf81cfa51bdf1738f0240995",
+    "src/telemetry/preferences.ts": "d89ac5caa419078244a1d72a19030c5a9a3608ebb325cccb9f770b8e164c0d40",
+    "src/telemetry/privacy.ts": "4e7240b2909616ed79ce21b0eb3093d383d7a19c48da810a7ff7bc691e6ff8d9",
+    "src/telemetry/telemetry.ts": "d7577cb162ca00324216b85ab85f4f6415b94eb095e93c17e6e20ba2db015f8f",
+    "src/telemetry/transport.ts": "b191278da5cf57efc2abb5c66ee4305b945e2a436f8f097be6a8affebf2d0412",
+    "src/terrain/materials.ts": "3506c2089e0ad0b24ef863c3a8ebab510e96a9d7b91e9602134292324401fa69",
+    "src/ui/battleActions.ts": "791a6b8746ab962f830a7f7d190059a82f38697dbc5250fc6b6b8615af5b5e69",
+    "src/ui/battleLayout.ts": "94f05277a3cb98474735530951aa9c3427611290916792c3c10221d6ad4e4947",
+    "src/ui/dialogs.ts": "9e540c5f80ce24c9e0ecf95fc44dd4d6516a9c945ead20ced00a6bb8964ec969",
+    "src/ui/dungeon.css": "eca427bb852bcc1b0160c40510dd10208d4679d27befe2995789b7808bc3d80a",
+    "src/ui/dungeon.ts": "056de0c7134cd4e098606bf769406649988301088b4ac53df04694ff7014190a",
+    "src/ui/dungeonMap.ts": "5b8e09e7963024e50302c739101dce4b5fa671aafd7eab39bed04ff053f93745",
+    "src/ui/hud.ts": "6fbad57b2f34bf6e0fe6436d7af1542ae5a88f323f3ce03ee4a5b6a0f92d9b9c",
+    "src/ui/persistence.ts": "f2d0b25b3e2df967f775d29b600842027d9fa7223177a0b39a58d26b52c1079e",
+    "src/ui/publicAssetUrl.ts": "bc5d7c58f59dd6988a1aff8e3c65891ffcc9d9d884473e1f23f67ac54466a52e",
+    "src/ui/runFlow.css": "49f6b863c6c05ab42ea0ada2597600cc8f085d21310e0e418178f7d40dbf4d21",
+    "src/ui/runItems.css": "d7ee73c486226eab44294c952570ba0dad88385fa9d3d8126b31e4c88ea6ad03",
+    "src/ui/runItems.ts": "b30c56c58f30c9145da5340f29a93e7fabbcd413fee2baedc8a4364ddc17bdc8",
+    "src/ui/targetPreview.ts": "e3f53678908b1502e6a996d756c17f858a308edbdfc8c74aa68e66561e8fd498",
+    "tests/ability-picker.spec.ts": "fd8e83494b480ef508606d5d1230c2b243a00f81eaa9a86786cb4a9f571ccc7b",
+    "tests/assets.spec.ts": "c21af334bb1e6258e0781a9464288196995aa9ddacd4cfa2533fbabacea8fd4a",
+    "tests/audio.spec.ts": "e35da8a1ebcfd4814a1ba2b6686e1f8f103a6c15f93aed5b95db13b597f2ec80",
+    "tests/authored-encounters.spec.ts": "72505638251bbb1cfb6ce074323b0b94472a524fd7ab2d4711e89026511f90d1",
+    "tests/battle-animations.spec.ts": "353a8d06bb4d7b5fbc4eb262d448379b4913a4ccc545b0b48cf0f4d3b679db79",
+    "tests/battle-audio.spec.ts": "9103689d513cbd7de4e63e7ad3756e1745f273da24b651dcea842fc2a52654d6",
+    "tests/battle-board.spec.ts": "98ee8d9093cef58f52e1850093c07ee2769c9a2bdf459c9dbab79f6d3f096103",
+    "tests/battle-loop.spec.ts": "c36baf6a449983bf70747344668aca75fae1f6c024a336a1af1bb4444f41671d",
+    "tests/battle-persistence.spec.ts": "6b592d79f99716eb4c87b751734f5dd6b6e0d4962d0b5c1e04bfd3e3f7c0a2f8",
+    "tests/board.spec.ts": "6760e06e2a979ebf24330be27505c50c5cc66c51b22fb0b229c1dcae35d2bf5b",
+    "tests/boot.spec.ts": "a6d8ed0a276f0f06157e65b744e37a98a57e8987ff53b439baf3a83e4298e9eb",
+    "tests/content-loading.spec.ts": "597f2c0a1d9dd9b2e9961844a08133dd75339a6e9aad43a2adda1055adbf64a6",
+    "tests/dungeon-exploration.spec.ts": "2bedc66e3d14fc6db18041e98808b11f458379e81c1bdae4db656548b055040f",
+    "tests/dungeon-lifecycle.spec.ts": "e843c99c26c53617a7bc5fd257715b2d9f9fb4939ab3c8296380750bf0de44fa",
+    "tests/dungeon.spec.ts": "5988fab15fda1bb41f262fef33b271a983f18912976596f01820aa72287643e0",
+    "tests/engine-fit.spec.ts": "376956e4d30ddf457e85808c27c800e8e03631d3beba574fb777027666e3fedf",
+    "tests/fixtures/abilities/index.html": "2a4c7bb8541f5227565afe526950e3d96908024d830fbf57a091be8048584911",
+    "tests/fixtures/abilities/main.ts": "ff91a57a246a5e86be492400e4a335dcf1e6c1431c7f4b57832317584947d335",
+    "tests/fixtures/encounters/index.html": "1aeef75ad341d9f313c44caeb37d1747465bad89ebbbcfcfee0e930bffbaa050",
+    "tests/fixtures/encounters/main.ts": "d6fe9f60d0fd8e6d65fe4e476474dffbc2bc738cc43f35e5e4b16a9d533e56a8",
+    "tests/fixtures/run-items/index.html": "0cee7ad1116d30cf7c354c7262c4db8a087e407ff04799179b53f9cd0e574668",
+    "tests/fixtures/run-items/main.ts": "4d686999478c74fd229b695444e09e686f57887af2566c0a5a8302c1d5e45382",
+    "tests/grass-surface.spec.ts": "d0676fe10fdba75d4d6388b6c85f9f40f7355e228f1a47e809f8ca3b26f7ed08",
+    "tests/guarded-effects.spec.ts": "f34539abc948157c42426621d164645d8be76d90eada2242e613f883b5fee72c",
+    "tests/helpers/abilityCatalog.ts": "1f1403bbddacc037ead905e7648c7bad9bef6491dc97cac096ba398d50321de1",
+    "tests/helpers/battlePolicy.ts": "7518d6da7240a4ac6b0b95133a4a98becaf4dc9e426824d90128bf3da694c597",
+    "tests/helpers/dungeonFixtures.ts": "7a1a8f0e6b2fa0b98d37ecc80b8ec85b7efc834faf754d27b375ad8c3e0239bc",
+    "tests/helpers/dungeonTraversal.ts": "9caad536c41c593efaee60d19e22421a1a8c1992c578d50188fe63691048ee30",
+    "tests/helpers/guardedBoundary.ts": "e94c7d4930063cf57423c87d80aacf0c14401f27f24b86ed59612e51d86376c6",
+    "tests/helpers/playerPolicy.ts": "8be6689cc5179cf60727d09e9c8e251adfaa30d7dbb81579d56481dcd112aaf0",
+    "tests/helpers/runItemFixtures.ts": "5f58ab5be2b99fafafe073a21ee46347194028784ccb2683659694e112903573",
+    "tests/helpers/runRecoveryFixtures.ts": "ffd592435a7075f1b3a897db971c89effa427b58181076c6f23dfa103f9114c7",
+    "tests/helpers/saveFixtures.ts": "d1c8244062dc211d58f123914482f3c7a33d296426526bfcc4cc77a071323053",
+    "tests/input.spec.ts": "bbb67597ae30228316ae6b59ebb0ec1ee2eb48f912fa65d6da61fdc6800e052d",
+    "tests/integration/buildHeaders.test.ts": "d88c193d9e0167387c872713dc8b33a29c98c028a0cf31802d8e47ba2123e37e",
+    "tests/layout.spec.ts": "7f40b2068e9a32fa76f5ea4b150791c56fa7fbc9adee993fc36135e68bd066ef",
+    "tests/lifecycle.spec.ts": "5811f7314f22a6fda3ae1cd01caa0df8c7baf9cb638c90db83cfbd6d73c3108a",
+    "tests/move.spec.ts": "674458fbdcca022de92e90be258bfd408e72885b5f67f2cf0577eb7a40091ea4",
+    "tests/opacity.spec.ts": "3fef1e22b4c82cc71b1d160e70e0f5dd2a7f67093ba13b8891c2103e2a607ec2",
+    "tests/overworld-map.spec.ts": "6a77665a31760e9a39ecae871e145bcb74fb6d700376ca040c985f3718c1c787",
+    "tests/procedural-grids.spec.ts": "30f4f8f93fe542aa471a63db68c8993c0bc63a820832a12887dce001ff6174a6",
+    "tests/public-asset-base.spec.ts": "66376d4c10390018ee1bb0bb5bdcf0a8c3bc789b0617525c00ed59a9ef9c6f41",
+    "tests/run-items.spec.ts": "9cfac23d1b65da27ac548c588e607c9841ac7fa84b25f6b1f99e3b2c2a7dce29",
+    "tests/run-progression.spec.ts": "0585ed8200dcc2900e2ac3c8ab0a693489984bf5b4c6a80b2e70d5952740d5c8",
+    "tests/telemetry.spec.ts": "1d97ee4d7ad5b948f50adf18fd397555c2b27b0f3fff2cf6ad6eab485363b974",
+    "tests/terrain-materials.spec.ts": "7dcdd199e60fddf6d0e254601a3b2149b79c14cc4298b8a83dcff9db48676be6",
+    "tests/tooling/browser-diagnostics.test.mjs": "43e4878bbdfa75a37f3e07e416f6788609dcf95394ea0b30a843af627884a5b7",
+    "tests/tooling/verification-batches.test.mjs": "a795268cc5238ca400da21d6161821de0af842f2ebf524f2bbb9de0b9cef26e4",
+    "tests/tooling/verification-browser.test.mjs": "3c83450857f920a0e13fe84947d188df25ff056a4dfa413207ba8d93eb9a806e",
+    "tests/tooling/verification-processes.test.mjs": "d37b14f4a725889d0ff115f668f2619cb784903ec5852ddf58ac2bdc1868f3e1",
+    "tests/tooling/verification-reporters.test.mjs": "0402af066a4d3471530e81400cbb1b94e69d984f29be263e2f4fcde05294d1ef",
+    "tests/tooling/verification-selection.test.mjs": "c23d2f10f78734e3e3a54d703f036782702a5cf6995aeca5047797af7fa22a86",
+    "tests/tooling/verification-timings.test.mjs": "e622b7211d5fcf3f682a5e30078081ea2a26b18b9b9645d5afc449e0fb77312a",
+    "tests/tooling/verify-full.test.mjs": "5f5162a0156802fa55420dcb9c09ee9075e9256b564088480ce4dc75d8abfc85",
+    "tests/unit/RunItemSession.test.ts": "1ef699a95e85a1d7471d032143a6453b47a35b60397544801103225750b61c70",
+    "tests/unit/__snapshots__/authoredEncounters.test.ts.snap": "e09fcc30b21b38b69c2eb236137990ec261326bcc3358e2f15baadbaf3941169",
+    "tests/unit/__snapshots__/battlefield.test.ts.snap": "f8fac2780d3dfd375b87f1c63b3418ae66d84e9c6b722c56e085e3f01a66efea",
+    "tests/unit/__snapshots__/dungeonEncounters.test.ts.snap": "b185f9d5a8da9d2c49bb7ea0526053dfeccd4a38799d4ba31d1477d3b3b582ad",
+    "tests/unit/abilities.test.ts": "fa7eb6a73bb8e175f7a04f2022162959d60345a4c14cb1866275ae4c784f566d",
+    "tests/unit/abilityValidation.test.ts": "6f81d9e9be45c2429521126ba3e3526e5bdf8b8ea9a6e24351d488046e6126d4",
+    "tests/unit/ai.test.ts": "4026b62ad95c9092d315417392ef6b99c9dee985928837643c08e96896eda11a",
+    "tests/unit/audioState.test.ts": "4dc0e5294761a448271801b5298494837ec11acd1abd8836849131032ab19319",
+    "tests/unit/authoredContent.test.ts": "10e5eec2e16adea4bc2fa107ee6e100f461fced0d958d55c63e8771cfb197e76",
+    "tests/unit/authoredEncounters.test.ts": "d1728f7f54e3edb423d878df64e30e3188db0bcfa5ce491fdb9af1b9008859e3",
+    "tests/unit/battleActions.test.ts": "750b8aa84729e6e4430db5a60c4ad23d8196be9b44dd49e0f97fe0a8b4235206",
+    "tests/unit/battleAudio.test.ts": "f1feca8bebdf1812e8693a896a0abf048ec8ec97d9bbed88871af3016a859125",
+    "tests/unit/battleAudioInventory.test.ts": "eecd4afb9f6453febe942a5b911d19bf36df846e74538822e5395adff83a129d",
+    "tests/unit/battleCues.test.ts": "60dd00cb9ec85a696a93bc0e0124a03c3561874e8bef76e88a9b7c4d21085785",
+    "tests/unit/battlePersistence.test.ts": "652c5fa075271d1de22a57a70114631bc2924dfc25c009ba1fc47f482825def9",
+    "tests/unit/battleSession.test.ts": "a7657da54e542f38c8c1867a920605d15f990065e9238efac26d3c74f14670a7",
+    "tests/unit/battleStorage.test.ts": "193806fa00a6656ae722cb30da960ffe15b2a55784d57de05e240df893eda397",
+    "tests/unit/battlefield.test.ts": "afbf49b4514c34054df6b45ca9349ded9305f39532147eabe5b5bca44449a271",
+    "tests/unit/battlefieldContinuation.test.ts": "6e7a2bfb467d8ca6e22723f57286389586e575726b71acb9c58bb0973aaf6f8b",
+    "tests/unit/battlefieldCorpus.test.ts": "f0a70683cab080c31e33867d018070228b9a63faa212ec2b51d1c6722580eb20",
+    "tests/unit/battlefieldSimulation.test.ts": "02f415dd6bb3bccf91005988f63545d6eb3c7e6332821100269b943deafabb3a",
+    "tests/unit/battlefieldSources.test.ts": "3789123c33b0ee6e0465a9ab56f57b4351c1bf515f801c7867942023aa688689",
+    "tests/unit/boardPresentation.test.ts": "fe8b860147c2a1b78c967f242480bcbbd30a8659ea2641eb79e9d7e14aebf8dd",
+    "tests/unit/canopy.test.ts": "18564b1933fb01347786643a3160600dae73a881dfcd2c294f59153330208531",
+    "tests/unit/combat.test.ts": "ac6be4485365d25159e0f1dcbe2991a7111e08490077fffb0324fe375bebadcd",
+    "tests/unit/content.test.ts": "a4637fe4a5d3fc6f6a18e4ed0c34f7fe588c840f5091cb257d53c3ade7186eb9",
+    "tests/unit/contentContract.test.ts": "1b5c756d0f1286bdaebea113ab190db6f4d23ec3193e1853a476e986e46d1ca3",
+    "tests/unit/domainBoundary.test.ts": "895267e5c109b1d21a841d5f0b48fdd72bca55c9414a48b5123465eabae882bf",
+    "tests/unit/dungeon.test.ts": "7140c3db146c9f2687a7aa4c95a31213c9c380f7b6d2a9c41b59e0861c13989b",
+    "tests/unit/dungeonBattle.test.ts": "7df199665b403db1911d753a2e4fff9e9d7317c72d296e1dc7d62157d543dab8",
+    "tests/unit/dungeonEncounters.test.ts": "5f689a6b836ec73e77494e76c7d087bf162c7a85a51d1a6c224d9f4872219077",
+    "tests/unit/exploration.test.ts": "2c0e9da998848137bc00f285d195c9ab481318857f444d8eaa31662bc0d9c9d3",
+    "tests/unit/fixtures/contentContract.ts": "a6671a5e3011198d87df6e01aae38c61ccb05f4f1d5f7a4edadf4627324f0e82",
+    "tests/unit/grid.test.ts": "dfd7bd15f363a4ea7812930802ff0ef902051f70acf49144ad1ab40a2cf6a352",
+    "tests/unit/healthBar.test.ts": "667451d985c4133f68ea0a7267ce5af28122a8d189e2b93585b8287de22c38d9",
+    "tests/unit/input.test.ts": "ee8444bfc9051cf03f017408ce40c5cfb89fc0184e8415ec7ecd37c7dac060c1",
+    "tests/unit/iso.test.ts": "21405f8298ff5505024152d80a32c3afd52cb122467db4151e10b913a46e6cc3",
+    "tests/unit/itemCommands.test.ts": "7d80bb80cda9c80a569431e614648c3fd005d1164364762770cd64e8ddd7635d",
+    "tests/unit/items.test.ts": "2ff3a7f0d74e9d67003a5e8079e68d4ff93acd3876b8b461c0a0eee61885ff06",
+    "tests/unit/measureFitOptions.test.ts": "aa6951945723a5382e75a65d44bc23f621a28f7efb2ca764ddf056daa292b48e",
+    "tests/unit/measureFitPreview.test.ts": "63a0d10948d76e77fbe9abdc3842d593fd493d6e64e1c0ea3a098c07d9b1d1e1",
+    "tests/unit/measurements.test.ts": "ce896e829cab1b34110638a846ee3607955d4d2d37df208faf9d5d9f09f66752",
+    "tests/unit/move.test.ts": "8736ca675f3bf88ac4df0d136d99fca8d54f69baafc16f17ca059305d30ca0db",
+    "tests/unit/overworldMap.test.ts": "5525b0e2a907a3dd547b1f7e5e71e648a7684189a780c50bd6d84d74f4a030ac",
+    "tests/unit/picking.test.ts": "69b5ae99172ae77605fbea72853e0cbaf0abb6115abdac46755184f60c017b8e",
+    "tests/unit/progression.test.ts": "db6940b30161c0c604d0a8e495a26301dcd614707b24a2144197d3ea8167d2f8",
+    "tests/unit/proofAssetExports.test.ts": "640a580a5042a7e87709f89fa84ae7b01842592549a64033d3c0a19e33fc30a7",
+    "tests/unit/rewards.test.ts": "7f9315b6ed05fa4cf827c8df44ad9984e92507335ce3bc5e269166d80f89d487",
+    "tests/unit/rng.test.ts": "17d6d3c1cb969e223a5d39a49380dd08d897e0cf0fe7e8756f7d9ee2bde1267f",
+    "tests/unit/run.test.ts": "725d55eb7ec9770e865f3b17b9b3dbd60af7ab8aece3be3b69145ffe4edae337",
+    "tests/unit/runBattle.test.ts": "a7da2bf210c2565ed7c9f199a7ba6fd827b80f2049b35d66f455edd736e0f731",
+    "tests/unit/runRecoveryFixtures.test.ts": "40da7a1175db5b3f57001e06c015072686ff15508d31721d15e1be1bdfcacd7c",
+    "tests/unit/runSaveEnvelope.test.ts": "56e8b65c068d864b5856b56019bdd67ad26b2f5222ef9d7039c9c520f7b2f27a",
+    "tests/unit/runStorage.test.ts": "4176e6de74e2cb549c5ad2becf52cc468dd50a40a52f1dc7ef6c0d14273b4718",
+    "tests/unit/saveEnvelope.test.ts": "9f2df6c2e2b8a1fe4f19db926834bd8ffdd9d60b805f74608bdbfd60f33c543d",
+    "tests/unit/state.test.ts": "97b56dc34f04096cd3143c394cf1bffa9fe31a79bd768e8f58acf3c52ac75e45",
+    "tests/unit/targeting.test.ts": "8ee0d98329cfe9e3360897a1cd0c2865f57a8e70abbb0da6d596b564f70c6a7f",
+    "tests/unit/telemetry.test.ts": "bfc1ac4c87ac08179421c96b5771160d4c5cd40e89784fd9b5f17ad21b6d67b2",
+    "tests/unit/turns.test.ts": "374833b8a461a1da611adfa072e3152d5ed094b8cfdc76b77b6d827e8c5f6766",
+    "tests/unit-health-bars.spec.ts": "6f4923e4dbd7744c31c2e2221289518a3e789f623d4a4a82701e36b11eaad54a",
+    "dist/_headers": "aeb501699e8020a132a9dfdc573edc1688f3fd42baaa321f58852ecf224846dd",
+    "dist/assets/070fb462027ed7a5/battle/source/goblin_archer_sprite.png": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e",
+    "dist/assets/0bf5465d7ad8396a/battle/terrain/sand.png": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810",
+    "dist/assets/37fcb2969f129de5/battle/source/mage_sprite.png": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b",
+    "dist/assets/57972fe37b1c0579/battle/source/goblin_grunt_sprite.png": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97",
+    "dist/assets/58625a5a9febe514/battle/terrain/grass.png": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8",
+    "dist/assets/70f30350ea20aac9/battle/portraits/goblin_archer.png": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b",
+    "dist/assets/7203e2b3a992c9c8/battle/source/ranger_sprite.png": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332",
+    "dist/assets/72b7f789a242de12/battle/portraits/ranger.png": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7",
+    "dist/assets/74e8838120256800/battle/terrain/rock.png": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5",
+    "dist/assets/9f88a273b676fa0e/battle/terrain/forest.png": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26",
+    "dist/assets/b47c382b0be6e6fe/battle/terrain/water.png": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622",
+    "dist/assets/b5b947941d91b972/proof/fighter.png": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981",
+    "dist/assets/battleLayout-CfYoACL1.css": "4e499ed7487d898511005768c765aa2933373a6f59c6be069334d63957ec6b81",
+    "dist/assets/battleLayout-RW58LTUw.js": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3",
+    "dist/assets/be249ec3f8849929/battle/terrain/grass_path.png": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9",
+    "dist/assets/biomes-B5t1B-JD.js": "9d39bc42811f6adf1b8f6f6e07c13ab2375c153446ce3b861a63c0e9fcb5914f",
+    "dist/assets/browser-BCmM7j27.js": "32a624b060b9218dda5bbd31681a6417bf02341f2347a18097b60dcd6a65c8ff",
+    "dist/assets/cc6494048e8cd6a8/battle/portraits/goblin_grunt.png": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7",
+    "dist/assets/da44b5706aaadefb/battle/portraits/mage.png": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95",
+    "dist/assets/f0c4ab9c2859f59e/battle/portraits/fighter.png": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3",
+    "dist/assets/f8322179450af915/battle/terrain/stone.png": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a",
+    "dist/assets/index-DvlsTWzI.js": "f95aa1d75bb6f85580ee4b15c0ce03fb9fed399e4228e51a851df13f2877e057",
+    "dist/assets/items-DJlRED8l.js": "ecd300364233a49cfb5b9137ec546c619b38d1d481d8dde66a9eb82513895da0",
+    "dist/assets/preferences-D1bXSLXU.css": "af92c2a36a8b5c528ff17e44b44197aa3cbb79844a123d21b454aab3889769b6",
+    "dist/assets/preferences-gqUtfquA.js": "d422de519a976e634a49d93a97633f371519a8d07e282b11f44c28e2aa66786c",
+    "dist/assets/preload-helper-BLdHbfdN.js": "8aec9ff75ffa86a03d51268b63126abadb3754aa5a6b6c5bb16e4e2446a63dee",
+    "dist/assets/rng-BCcJOpRP.js": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f",
+    "dist/assets/start-BYq_FMGg.js": "6b07dd68033df9d791a84a5d6840b5e4f7844ab6ad48ac22667505cfbe7fc07f",
+    "dist/assets/start-C8qcbqqc.js": "89e5f6d3149504a2c859977cc00efb828c4466f718337ad12d9d7cf9972e5c53",
+    "dist/assets/startBattleApp-Dn7PYj3q.js": "83b6e33f7f2503185a12aae59457c08e4ca922de76547e1237a4fc15b086e4cd",
+    "dist/assets/startDungeonApp-B9Aqjybd.js": "3e5ba30aaef8e51efbbf873a9ad49818698180ddc94f8310a518118b1a56abf8",
+    "dist/assets/startDungeonApp-Bs6ZGJ6B.css": "dff4daa8908f3ec8bb5ba2ebe2f45914f6a338e6a4cb4c78162412ebfe05797f",
+    "dist/assets/startRunApp-Coo4lyhj.js": "8614dc8a1a7ab112e5eca8d7cb84a4eafef2fc86b27369b611efe0acc81a0d5d",
+    "dist/assets/startRunApp-y3YtRGS5.css": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73",
+    "dist/assets/telemetry-DUsjSLnt.js": "d4699af1274635cfc24c4b0947f067a263ff2801c863e4a566f97eb2280c7b29",
+    "dist/assets/transport-CPtkaPOU.js": "b1b393c4936bc63e359090a7ac2e0f2049d25c72cb763380c4e20efffb31eab0",
+    "dist/assets/view-BJiQju0W.css": "7017c70ef0e651e00c8b76c0044a527e0e66e9389e75db2321be4d7f41974bc4",
+    "dist/assets/view-CGAX30jU.js": "159b5c34805e6661b5d1f769b7a61c0b9ab38e2fa9d2d627e5105d4c9803e369",
+    "dist/audio/battle/critical.mp3": "f419892404a9224fd4bf984892eb69f33a2c0704d8776873ee21bc58bd5901f8",
+    "dist/audio/battle/hit.mp3": "607244384c2d238211fa46631325a07232728d15fbfca68bcaaa87a5b65bee41",
+    "dist/audio/battle/loss.mp3": "cee68cbe441f8622a7b559414305e3bcc459fb48f46115951f9f5097291ca6a5",
+    "dist/audio/battle/magic.mp3": "ddab11c45966c473523560aed11b3722cca9e8108b4eb49f1e46387dcc2a6a65",
+    "dist/audio/battle/miss.mp3": "46c4680c22025042552972330e4237ce23c5480eac6db0e08a65e2ca0e8381e6",
+    "dist/audio/battle/move.mp3": "987ac8ce55959343212675696e3201821717fca9718ad7e5b26bd420f45e5d34",
+    "dist/audio/battle/unit-defeat.mp3": "a9a5264dacbfacba180c562dbfe4f4aeed8848f73171c3413009a8e2a2396df4",
+    "dist/audio/battle/victory.mp3": "1d6e4fd2177d1013b4cce4c9ee480ba67cf107a81e6ae1033b561f6619790758",
+    "dist/battle/portraits/fighter.png": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3",
+    "dist/battle/portraits/goblin_archer.png": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b",
+    "dist/battle/portraits/goblin_grunt.png": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7",
+    "dist/battle/portraits/mage.png": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95",
+    "dist/battle/portraits/ranger.png": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7",
+    "dist/battle/source/goblin_archer_portrait.png": "a4ee1b8eb0ab4ed959a6cb160f9b8db330c2e4125b99122c17e175cd2becde4e",
+    "dist/battle/source/goblin_archer_sprite.png": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e",
+    "dist/battle/source/goblin_grunt_portrait.png": "73248f68e4ada0036bb8cf379352631acec98b058ef63cc35ee17bc97f0b8992",
+    "dist/battle/source/goblin_grunt_sprite.png": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97",
+    "dist/battle/source/mage_portrait.png": "f40dcba51ab801afbbcb6588579e18229cb74360497972991bfa50e679610c5c",
+    "dist/battle/source/mage_sprite.png": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b",
+    "dist/battle/source/ranger_portrait.png": "bd8c8786e1006f85df5db3dc423d3535ee7664dee4b32b1a679041b59cc1cb8a",
+    "dist/battle/source/ranger_sprite.png": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332",
+    "dist/battle/terrain/forest.png": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26",
+    "dist/battle/terrain/grass.png": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8",
+    "dist/battle/terrain/grass_path.png": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9",
+    "dist/battle/terrain/rock.png": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5",
+    "dist/battle/terrain/sand.png": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810",
+    "dist/battle/terrain/stone.png": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a",
+    "dist/battle/terrain/water.png": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622",
+    "dist/index.html": "164c00d6578cf449608ca838014df2bd708a869e86ac1fae99b12719e22023a4",
+    "dist/map-art/legacy-8bit/00_terrain_grass_plains.png": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f",
+    "dist/map-art/legacy-8bit/01_terrain_forest.png": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013",
+    "dist/map-art/legacy-8bit/04_terrain_mountain_blocked.png": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e",
+    "dist/proof/fighter-portrait-96.webp": "e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8",
+    "dist/proof/fighter-portrait.png": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190",
+    "dist/proof/fighter.png": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981",
+    "dist/proof/grass-material-v1-348.png": "002fe98dc7d904b4813205b076e90bf605b594e8a51767e1e6abadbb7605920d",
+    "dist/proof/grass-material-v1.png": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2",
+    "dist/proof/tree-grass-v1-480.webp": "d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32",
+    "dist/proof/tree-grass-v1.png": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5",
+    "dist/proof/unlock-tone.mp3": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec",
+    "dist/proof/unlock-tone.ogg": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d",
+    "dist/textures/terrain/ash-top-down-v1.png": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b",
+    "dist/textures/terrain/cliff-top-down-v1.png": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06",
+    "dist/textures/terrain/forest-top-down-v1.png": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
+    "dist/textures/terrain/grass-top-down-v1.png": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
+    "dist/textures/terrain/grass_path-top-down-v1.png": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
+    "dist/textures/terrain/lava-top-down-v1.png": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea",
+    "dist/textures/terrain/mud-top-down-v1.png": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8",
+    "dist/textures/terrain/runtime/ash-top-down-v1.png": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74",
+    "dist/textures/terrain/runtime/cliff-top-down-v1.png": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295",
+    "dist/textures/terrain/runtime/forest-top-down-v1.png": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7",
+    "dist/textures/terrain/runtime/grass-top-down-v1.png": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93",
+    "dist/textures/terrain/runtime/grass_path-top-down-v1.png": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61",
+    "dist/textures/terrain/runtime/lava-top-down-v1.png": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86",
+    "dist/textures/terrain/runtime/mud-top-down-v1.png": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f",
+    "dist/textures/terrain/runtime/sand-top-down-v1.png": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d",
+    "dist/textures/terrain/runtime/stone-top-down-v1.png": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442",
+    "dist/textures/terrain/runtime/water-top-down-v1.png": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1",
+    "dist/textures/terrain/sand-top-down-v1.png": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db",
+    "dist/textures/terrain/stone-top-down-v1.png": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
+    "dist/textures/terrain/water-top-down-v1.png": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
+    "package.json": "b28b6e3cb02f2ea14ec1546635b0f6e53ad1508d0412e18decfdcc925a35e7e7",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+    "vite.config.ts": "2d07b3c635448a0bf99ef30ee26f1a1851392dddd2f4c25988e7d79dc03254ae",
+    "playwright.config.ts": "c482e2f4895b596d250bad1e5439733c9a605f7012f189c843047e9fd8a93891",
+    "playwright.health-bars.config.ts": "e9124acdc5ad5f4ef08a7eb8695ebb0f8f25517b4d8dda0c5b3f98173c330fce",
+    "tmp/issue218/webkit.config.ts": "3647f0d7544c6886f9e2d8a4a4151c7ecf60c7fe425ad1ab930566137670db4d"
+  },
+  "attempts": [
+    {
+      "id": "run-MYsBac",
+      "path": "verification-receipts/browser-runs/run-MYsBac/results.json",
+      "sha256": "b9049460343a1d7d66b2548d7750d32480a7f12691f5c36ccac409a831a73941",
+      "stats": {
+        "startTime": "2026-10-25T11:40:56.988Z",
+        "duration": 3832.762,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-c924f73976b9169b46b1",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "desktop",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 2960,
+              "errors": [
+                "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m95.43060803413391\u001b[39m\nReceived:   \u001b[31m96.1683840070452\u001b[39m\n\n  37 |     expect(badge.screen.y+badge.height/2).toBeLessThanOrEqual(r.region.y+r.region.height);\n  38 |     // Shield sits beside the sprite, well above the HP arc and tile/target overlays.\n> 39 |     expect(badge.screen.y+badge.height/2).toBeLessThan(rendered.health.screen.y-4);\n     |                                           ^\n  40 |   }\n  41 | }\n  42 |\n    at checkBadges (/Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:39:43)\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:126:5"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-nLWKwp",
+      "path": "verification-receipts/browser-runs/run-nLWKwp/results.json",
+      "sha256": "2fc60dc3bc1e4dbfbfb9791c203c42f08f3f009e0788301415e7764cc88a0d65",
+      "stats": {
+        "startTime": "2026-10-25T11:41:31.912Z",
+        "duration": 91595.22600000001,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-c924f73976b9169b46b1",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5035,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-905986fe6bed6e5beaa7",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone miss",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4156,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-8f2e54c797476ca811be",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run hit",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4250,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-8c2ac30f4bdb7e2ddec8",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run miss",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3492,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-9c5f37e6f009cb36f761",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon hit",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6482,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-3a9da70bd2c2089ef037",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon miss",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4587,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-6417ad4b94603e0038bf",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5292,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-c566769dbe4e17ab9296",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone miss",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4569,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-4fd5822790cdafe8f2bc",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run hit",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4918,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-7168c025563d344e73c5",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run miss",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3983,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-038c45b5dda40ab16729",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon hit",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7021,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-0a2eeaed4e2a61943690",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon miss",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5055,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-5d76f5f89910ca95148d",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5261,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-8dc4cda94e9da47e68f8",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone miss",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4623,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-d3f71dcaeb5eb4e92af4",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run hit",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4788,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-a470419a24ce73258001",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run miss",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3943,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-812d6efda258910f1e43",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon hit",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7057,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-a9d77765346c32fa9566",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon miss",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5090,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-KgQCo5",
+      "path": "verification-receipts/browser-runs/run-KgQCo5/results.json",
+      "sha256": "e15592e5e03cfcdf2a7e64c0ecdc63683477d26cf7010b78fc357885edca15fa",
+      "stats": {
+        "startTime": "2026-10-25T11:43:25.925Z",
+        "duration": 129422.01400000001,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-26b7d0673b879a4a96ca",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "desktop",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 627,
+              "errors": [
+                "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0.8863636363636364\u001b[39m\nReceived:   \u001b[31m0.8863636363636364\u001b[39m\n\n  194 |     await checkBadges(page);\n  195 |     const zoomed=await boardReport(page);\n> 196 |     expect(zoomed.transform.scale).toBeGreaterThan(r.transform.scale);\n      |                                    ^\n  197 |     const reach=previewMovement(state,1,battleCatalog);if(!reach.ok)throw Error(reach.reason);\n  198 |     const to=reach.cells.find(c=>c.cost>0)!.cell;\n  199 |     const initial=(await boardReport(page)).units.find((u:any)=>u.id===1);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:196:36"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-9b27093b65576edb8a5f",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "desktop",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 5597,
+              "errors": [
+                "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#game')\nExpected: \u001b[32m\"presenting\"\u001b[39m\nReceived: \u001b[31m\"enemy\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#game') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#game')\u001b[22m\n\u001b[2m    14 × locator resolved to <main id=\"game\" data-run=\"1\" data-ready=\"true\" data-phase=\"enemy\" aria-label=\"Tactics Guru game canvas\" data-session=\"{\"state\":{\"activeIndex\":2,\"commandCount\":84,\"format\":1,\"initiative\":[6,3,4,5,2,1],\"mapId\":\"map:forest_ruins\",\"outcome\":\"ongoing\",\"rng\":{\"cursor\":34,\"words\":[1942730122,1418479983,3020694275,47]},\"round\":10,\"seed\":1,\"units\":[{\"cell\":{\"x\":3,\"y\":8},\"defId\":\"fighter\",\"guarded\":true,\"hasActed\":true,\"hasMoved\":false,\"hp\":2,\"id\":1,\"side\":\"player\"},{\"cell\":{\"x\":3,\"y\":8},\"defId\":\"ranger\",\"has…>…</main>\u001b[22m\n\u001b[2m       - unexpected value \"enemy\"\u001b[22m\n\n\n  217 |     expect((await boardReport(page)).objectCount).toBe(objects);\n  218 |   } else {\n> 219 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');\n      |                                         ^\n  220 |     expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);\n  221 |     await page.clock.runFor(2000);\n  222 |     await expect.poll(async()=>(await readSession(page)).state.units.find(u=>u.id===1)!.hp).toBe(0);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:219:41"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-75b4a2bd4db9c9edc3b3",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "mobile-portrait",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "timedOut",
+              "retry": 0,
+              "durationMs": 30020,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#save-continue')\u001b[22m\n\n\n  186 |   await page.reload();\n  187 |   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));\n> 188 |   await page.locator('#save-continue').click();\n      |                                        ^\n  189 |   if(kind==='move') {\n  190 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  191 |     await checkBadges(page);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:188:40"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-c8a8e8e41fc76b6bb891",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "mobile-portrait",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "timedOut",
+              "retry": 0,
+              "durationMs": 30014,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#save-continue')\u001b[22m\n\n\n  186 |   await page.reload();\n  187 |   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));\n> 188 |   await page.locator('#save-continue').click();\n      |                                        ^\n  189 |   if(kind==='move') {\n  190 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  191 |     await checkBadges(page);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:188:40"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-101878108abd997aa2d2",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "mobile-landscape",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "timedOut",
+              "retry": 0,
+              "durationMs": 30029,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#save-continue')\u001b[22m\n\n\n  186 |   await page.reload();\n  187 |   await page.locator('#save-continue').waitFor({state:'visible'});\n> 188 |   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));\n      |                                        ^\n  189 |   await page.locator('#save-continue').click({force:true});\n  190 |   await page.clock.runFor(64);\n  191 |   if(kind==='move') {\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:188:40"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-054491fc0a0a8ba27e04",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "mobile-landscape",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "timedOut",
+              "retry": 0,
+              "durationMs": 30028,
+              "errors": [
+                "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#save-continue')\u001b[22m\n\n\n  186 |   await page.reload();\n  187 |   await page.locator('#save-continue').waitFor({state:'visible'});\n> 188 |   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));\n      |                                        ^\n  189 |   await page.locator('#save-continue').click({force:true});\n  190 |   await page.clock.runFor(64);\n  191 |   if(kind==='move') {\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:188:40"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-KVlS6c",
+      "path": "verification-receipts/browser-runs/run-KVlS6c/results.json",
+      "sha256": "ed9d4520f11612210b60be8a39d4c7d7b8e6cb380da465df77226302595703bb",
+      "stats": {
+        "startTime": "2026-10-25T11:45:42.588Z",
+        "duration": 3306.49,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-26b7d0673b879a4a96ca",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "desktop",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 683,
+              "errors": [
+                "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0.1896514467589583\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\nExpected precision:    4\nExpected difference: < \u001b[32m0.00005\u001b[39m\nReceived difference:   \u001b[31m0.1896514467589583\u001b[39m\n\n  210 |     expect(moving.guard.visible).toBe(true);\n  211 |     expect(moving.guard.position.x-initial.guard.position.x).toBeCloseTo(moving.position.x-initial.position.x,4);\n> 212 |     expect(moving.guard.position.y-initial.guard.position.y).toBeCloseTo(moving.position.y-initial.position.y,4);\n      |                                                              ^\n  213 |     await page.clock.runFor(1500);\n  214 |     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');\n  215 |     await checkBadges(page);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:212:62"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-9b27093b65576edb8a5f",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1345,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-FuVMxO",
+      "path": "verification-receipts/browser-runs/run-FuVMxO/results.json",
+      "sha256": "694c405115e294b04e13575e7b173659a49747389bdff050a34d62f6dd1e97aa",
+      "stats": {
+        "startTime": "2026-10-25T11:46:28.029Z",
+        "duration": 11943.624,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-26b7d0673b879a4a96ca",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2223,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-9b27093b65576edb8a5f",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1159,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-75b4a2bd4db9c9edc3b3",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2234,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-c8a8e8e41fc76b6bb891",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1162,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-101878108abd997aa2d2",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2240,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-054491fc0a0a8ba27e04",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1187,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-WWYqHN",
+      "path": "verification-receipts/browser-runs/run-WWYqHN/results.json",
+      "sha256": "eb56329e415748e43318fb3a8bffe2c3d5b6fd4e311236938edd1ade061d9bf7",
+      "stats": {
+        "startTime": "2026-10-25T11:46:56.059Z",
+        "duration": 65943.785,
+        "expected": 14,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-ad664f02eeedbd515e66",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5312,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-58fe490f16f659ccf5f5",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone miss",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4709,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-ef409d49326b5601cd78",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run hit",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4778,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-952b03f0028f45279af7",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run miss",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3826,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-ba7450e004b45444e340",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon hit",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6761,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-23cd4c32c96df973e636",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon miss",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5045,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-305ef20cb7425be9127c",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "guard-webkit-portrait",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 406,
+              "errors": [
+                "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  194 |     await page.clock.resume();\n  195 |     const r=await boardReport(page), p={x:r.region.x+r.region.width/2,y:r.region.y+r.region.height/2};\n> 196 |     await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-150);\n      |                                                     ^\n  197 |     await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(r.transform.scale);\n  198 |     await checkBadges(page);\n  199 |     const zoomed=await boardReport(page);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:196:53"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-401f9145406e12f2e0aa",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1583,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-025de723184753277468",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5272,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-70b19877be9e532976cf",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone miss",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4328,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-39ecbb5522187cea40fb",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run hit",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4842,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-ede34ba39ad7b6f417a3",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: run miss",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3679,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-eb3facd0bd12a7847442",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon hit",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 6578,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-20346d5d22eb1af6a877",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: dungeon miss",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4927,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-56cab8256c2c5bc551db",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "guard-webkit-landscape",
+          "status": "unexpected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "durationMs": 400,
+              "errors": [
+                "Error: mouse.wheel: Mouse wheel is not supported in mobile WebKit\n\n  194 |     await page.clock.resume();\n  195 |     const r=await boardReport(page), p={x:r.region.x+r.region.width/2,y:r.region.y+r.region.height/2};\n> 196 |     await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-150);\n      |                                                     ^\n  197 |     await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(r.transform.scale);\n  198 |     await checkBadges(page);\n  199 |     const zoomed=await boardReport(page);\n    at /Users/brian/Code/tactics-guru-v2/tests/guarded-effects.spec.ts:196:53"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-99dbbc27a4bcac8c0828",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal defeat presentation",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1554,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-RnxAyt",
+      "path": "verification-receipts/browser-runs/run-RnxAyt/results.json",
+      "sha256": "ebc8e45dc036366001852e51251c1209fd858a4055e4b3926b107818594139fe",
+      "stats": {
+        "startTime": "2026-10-25T11:48:18.803Z",
+        "duration": 16743.089,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-ad664f02eeedbd515e66",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5613,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-305ef20cb7425be9127c",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "guard-webkit-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2289,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-025de723184753277468",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5402,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-56cab8256c2c5bc551db",
+          "title": "guarded-effects.spec.ts > Guarded badge follows legal move presentation",
+          "project": "guard-webkit-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2166,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-Cpi8bf",
+      "path": "verification-receipts/browser-runs/run-Cpi8bf/results.json",
+      "sha256": "d2d0679ff0cd1175fa2126d23bb4f0d457eef0d795e23ac3e845609323eebb8e",
+      "stats": {
+        "startTime": "2026-10-25T11:48:57.885Z",
+        "duration": 159779.872,
+        "expected": 25,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "a24de51517fc506ec481-16fc771b7cf9c6193f13",
+          "title": "unit-health-bars.spec.ts > health bars are visible, attached and informational through mobile navigation",
+          "project": "health-desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3217,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-e6acc2b5b4e391c5f147",
+          "title": "unit-health-bars.spec.ts > elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3863,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d124ad68160a182997d2",
+          "title": "unit-health-bars.spec.ts > health follows damage presentation, cancellation and save resume",
+          "project": "health-desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1770,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-a3c4b29f3f29def6d23d",
+          "title": "unit-health-bars.spec.ts > health follows defeat presentation, cancellation and save resume",
+          "project": "health-desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1852,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d26f3e7db213f4baddc8",
+          "title": "unit-health-bars.spec.ts > real run reward healing carries into the next encounter without old bars",
+          "project": "health-desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 23444,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-bdb99b6f0cbcf08aba6f",
+          "title": "unit-health-bars.spec.ts > health bars are visible, attached and informational through mobile navigation",
+          "project": "health-android-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2583,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-fb0979779774b1920769",
+          "title": "unit-health-bars.spec.ts > elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-android-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3715,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-85c7a4b4af33621170a6",
+          "title": "unit-health-bars.spec.ts > health follows damage presentation, cancellation and save resume",
+          "project": "health-android-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1275,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-05ab8d996d7c85e267c9",
+          "title": "unit-health-bars.spec.ts > health follows defeat presentation, cancellation and save resume",
+          "project": "health-android-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1264,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-cdbb214d177f1c36fd3d",
+          "title": "unit-health-bars.spec.ts > real run reward healing carries into the next encounter without old bars",
+          "project": "health-android-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 23199,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-51536d0ca56142583ed9",
+          "title": "unit-health-bars.spec.ts > health bars are visible, attached and informational through mobile navigation",
+          "project": "health-android-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2648,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-c7178a85f6f10a6b7fc6",
+          "title": "unit-health-bars.spec.ts > elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-android-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3739,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-aa4b4b92b5f7bb907da4",
+          "title": "unit-health-bars.spec.ts > health follows damage presentation, cancellation and save resume",
+          "project": "health-android-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1151,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-236dafe5233254754969",
+          "title": "unit-health-bars.spec.ts > health follows defeat presentation, cancellation and save resume",
+          "project": "health-android-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1258,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-6982833b894097a5e624",
+          "title": "unit-health-bars.spec.ts > real run reward healing carries into the next encounter without old bars",
+          "project": "health-android-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 23254,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-648209e1b21ea4727a54",
+          "title": "unit-health-bars.spec.ts > health bars are visible, attached and informational through mobile navigation",
+          "project": "health-iphone-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2007,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-05e3f4283bd7d7f1436b",
+          "title": "unit-health-bars.spec.ts > elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-iphone-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3043,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-822bdd7a30a97c163173",
+          "title": "unit-health-bars.spec.ts > health follows damage presentation, cancellation and save resume",
+          "project": "health-iphone-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 862,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-36de82edd0a14df4f33f",
+          "title": "unit-health-bars.spec.ts > health follows defeat presentation, cancellation and save resume",
+          "project": "health-iphone-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 901,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-d06ca95ec07ca440e967",
+          "title": "unit-health-bars.spec.ts > real run reward healing carries into the next encounter without old bars",
+          "project": "health-iphone-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 23019,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-fe5afa799dc07c822a86",
+          "title": "unit-health-bars.spec.ts > health bars are visible, attached and informational through mobile navigation",
+          "project": "health-iphone-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 1938,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-606fd98eb325f81b56e0",
+          "title": "unit-health-bars.spec.ts > elevated movement keeps bars attached through refresh, rotation and restart",
+          "project": "health-iphone-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2941,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-9b12dc7249611738af21",
+          "title": "unit-health-bars.spec.ts > health follows damage presentation, cancellation and save resume",
+          "project": "health-iphone-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 852,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-33f9d6a50eb0164d4339",
+          "title": "unit-health-bars.spec.ts > health follows defeat presentation, cancellation and save resume",
+          "project": "health-iphone-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 904,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "a24de51517fc506ec481-813348a30508ed9f2524",
+          "title": "unit-health-bars.spec.ts > real run reward healing carries into the next encounter without old bars",
+          "project": "health-iphone-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 22917,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-6xyRnk",
+      "path": "verification-receipts/browser-runs/run-6xyRnk/results.json",
+      "sha256": "c356410ff94a5430005c170ab362faf3443a7eaad712a581f04e8d0d30a635f0",
+      "stats": {
+        "startTime": "2026-10-25T11:51:50.471Z",
+        "duration": 348238.499,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "048cec556759de4a1f3c-41f5f1a3131d4c88a493",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 30561,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-324278bf7ce82c1c2997",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 16076,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-fa2f18bbc4e14b3ee149",
+          "title": "battle-loop.spec.ts > keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2911,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-b0b473cbb99bebc88690",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 30461,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-7b4851b9c2f513d39be7",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 15987,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-16ff6faf339a08fe9bc2",
+          "title": "battle-loop.spec.ts > keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2901,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-2cf153048a93a6d7d744",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 1 reaches playerLoss through controls and replays",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 30503,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-9e52d1ea65aae81920d0",
+          "title": "battle-loop.spec.ts > complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 16023,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "048cec556759de4a1f3c-3e3f639903f2e63eba9f",
+          "title": "battle-loop.spec.ts > keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 2890,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-b1f558b26fddbee05add",
+          "title": "dungeon.spec.ts > legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7265,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-478ef942227c55980774",
+          "title": "dungeon.spec.ts > legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7321,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-eaa04c6723a5c2afa9f3",
+          "title": "dungeon.spec.ts > legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7486,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-471d9897f80fdb516c2b",
+          "title": "run-progression.spec.ts > legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 58281,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f975335c46ddd687e2ab",
+          "title": "run-progression.spec.ts > legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 58107,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-004e4d531227795b4a31",
+          "title": "run-progression.spec.ts > legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 58174,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "run-MFsKjA",
+      "path": "verification-receipts/browser-runs/run-MFsKjA/results.json",
+      "sha256": "f694e4c8004776cb67880b9d9340a7c684dda0b72ae1011bdf7c6a91f592a793",
+      "stats": {
+        "startTime": "2026-10-25T11:57:51.387Z",
+        "duration": 17677.044,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "id": "57cbf4b5a77ff9748f81-c924f73976b9169b46b1",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "desktop",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4994,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-6417ad4b94603e0038bf",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5544,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "id": "57cbf4b5a77ff9748f81-5d76f5f89910ca95148d",
+          "title": "guarded-effects.spec.ts > shared Guarded lifecycle and saved feedback: standalone hit",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "expectedStatus": "passed",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5445,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "screenshots": {
+    "guarded-desktop.png": "507f7a3cb0250dd3f3b0a2a299fda8497cbb6d63a3c573a28f1640c18f206453",
+    "guarded-landscape.png": "b0d2b4ac5f1d062b6ed1391c98ce660789a4fb446f6a70a11d059239b44349b3",
+    "guarded-portrait.png": "a7cacad29ac55df9777d6883e4f8573e0c3040ee4afcc959d07a59367d76e93d"
+  },
+  "unitEvidence": {
+    "full": {
+      "command": "npm run test:unit",
+      "passed": 915,
+      "failed": 27,
+      "errors": 27,
+      "reason": "sandbox listen EPERM",
+      "path": "tmp/issue218/units.log",
+      "sha256": "ac7573415904a9eee842d9beee0cec664d20f6da1cf31b2cc470db36e861d5a9"
+    },
+    "focusedRecovery": {
+      "command": "npm run test:unit -- tests/unit/measureFitPreview.test.ts",
+      "passed": 27,
+      "failed": 0,
+      "path": "tmp/issue218/preview-units-unsandboxed.log",
+      "sha256": "269c2619fb62291baba3eb4e82e34f7de09c3b9389bd483a7d2ac68822108136"
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "passed": true,
+    "path": "tmp/issue218/build-iteration2.log",
+    "sha256": "c261562fff6a4ce72eee40d05253e410e6b7caa9d28988f8f8273c900f4f6a0b"
+  },
+  "acceptance": {
+    "uniqueBrowserCases": 80,
+    "unresolved": 0,
+    "skips": 0,
+    "coverageByLatestReport": {
+      "run-MYsBac": 0,
+      "run-nLWKwp": 15,
+      "run-KgQCo5": 0,
+      "run-KVlS6c": 0,
+      "run-FuVMxO": 6,
+      "run-WWYqHN": 12,
+      "run-RnxAyt": 4,
+      "run-Cpi8bf": 25,
+      "run-6xyRnk": 15,
+      "run-MFsKjA": 3
+    },
+    "note": "Original failed attempts remain failed. This is exact latest-case accounting across affected-scope runs and focused recoveries, not a clean full-regression invocation."
+  }
+}
