@@ -176,7 +176,7 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
 });
 
 import { playerDecision, session, readSession, playCommand } from './helpers/battlePolicy';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';
 import type { Command } from '../src/domain/types';
 

@@ -1,7 +1,7 @@
 import { confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from '@playwright/test';
 import { readSession, session, playCommand, playerDecision } from './helpers/battlePolicy';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';
 import { battleCues, type BattleCue } from '../src/audio/battleCues';
 import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';

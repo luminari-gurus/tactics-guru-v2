@@ -2,15 +2,93 @@ import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair } from './helpers/dungeonTraversal';
 import { atStairApproach } from './helpers/dungeonFixtures';
 import { expect,test,type Page } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { gunzipSync } from 'node:zlib';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
-import { dungeonBattle, acceptDungeonBattle, type DungeonState } from '../src/domain/dungeon';
+import { dungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
-import { playerDecision } from './helpers/playerPolicy';
+import { playerDecision, fighterDecision } from './helpers/playerPolicy';
+import { journeyPreparation } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+
+test('Fighter legal progression journey earns level three uses both abilities and resumes',async({page,isMobile})=>{
+ test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ // Canonical unplayed level-1 seed, with no fabricated progression, inventory or combat boundary.
+ await seed(page,freshDungeon('fighter-production-journey',190));
+ const records:unknown[]=[];let healed=false,taunted=false;
+ for(let depth=1;depth<=2;depth++) {
+  for(let slot=0;slot<3;slot++) {
+   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   const entry=await snapshot(page);expect(entry.depth).toBe(depth);expect(entry.floors[depth-1].completed).toBe(slot);
+   expect(entry.activeBattle!.units.every(u=>!u.secondWindUsed && u.tauntedBy===undefined)).toBe(true);
+   let steps=0;
+   while((await snapshot(page)).phase==='battle' && steps++<500) {
+    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+    const s=await snapshot(page);if(s.phase!=='battle')break;
+    const before=await readSession(page),built=dungeonBattle(s)!;
+    const command=fighterDecision(before.state,built.catalog,taunted);
+    await playCommand(page,command);
+    await expect.poll(async()=>{const current=await snapshot(page);return current.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
+    await expect.poll(async()=>{const current=await snapshot(page);return current.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+    if(command.type==='useAbility' && (command.abilityId==='ability:second_wind'&&!healed || command.abilityId==='ability:taunt'&&!taunted)) {
+     const after=await readSession(page);expect(after.state.rng).toEqual(before.state.rng);
+     const fighter=after.state.units.find(u=>u.defId==='fighter')!;
+     expect(s.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(command.abilityId==='ability:taunt'?3:2);
+     if(command.abilityId==='ability:second_wind'){healed=true;expect(fighter.secondWindUsed).toBe(true);expect(fighter.hp).toBeGreaterThan(before.state.units.find(u=>u.id===fighter.id)!.hp);}
+     else {taunted=true;expect(after.state.units.some(u=>u.tauntedBy===fighter.id)).toBe(true);}
+     await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText(command.abilityId==='ability:second_wind'?'heals':'taunted by');
+     await page.screenshot({path:test.info().outputPath(command.abilityId==='ability:second_wind'?'production-heal-log.png':'production-taunt-log.png')});await page.locator('#log-close').click();
+     const saved=await snapshot(page);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
+     await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Second Wind');await page.screenshot({path:test.info().outputPath(command.abilityId==='ability:second_wind'?'production-heal-resumed.png':'production-taunt-resumed.png')});await page.locator('#inspection-close').click();
+    }
+   }
+   await expect(page.locator('#dungeon-screen')).toBeVisible();const completed=await snapshot(page);
+   // This fixed legal policy reaches the second guardian and ends in defeat after both unlocks.
+   // A terminal defeat is a complete journey; winning two floors is not an issue acceptance gate.
+   if(completed.phase==='defeat'){expect([depth,slot]).toEqual([2,2]);expect(healed&&taunted).toBe(true);}
+   else expect(completed.floors[depth-1].completed).toBe(slot+1);
+   const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);
+   let replayed=record.replay?.initial??record.continuation.snapshot;const events:unknown[]=[];
+   for(const c of record.replay?.commands??record.continuation.commands){const r=dispatch(replayed,c,dungeonBattle(record.entry)!.catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;events.push(...r.events);}
+   expect(replayed).toEqual(record.state);expect(events).toEqual(record.events);records.push(record);
+   for(let i=0;i<20;i++) {
+    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
+    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
+    else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+    else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();}
+    else throw Error('Unexpected preparation command');
+    await page.locator('#dungeon-item-confirm').click();
+   }
+  }
+  if(depth===1){const s=await snapshot(page);await walkDungeon(page,s.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(2);}
+ }
+ const final=await snapshot(page);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
+ writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:190,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
+});
+
+test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{
+ test.setTimeout(90000);
+ // Accepted terminal combat from the retained six-encounter UI journey; spatial approach is explicit.
+ const trace=JSON.parse(gunzipSync(readFileSync(new URL('../docs/qa/issue-163/production-desktop-journey.json.gz',import.meta.url))).toString());
+ const record=trace.records[2];expect(record.state.units.find((u:{defId:string})=>u.defId==='fighter').secondWindUsed).toBe(true);
+ const completed=acceptDungeonBattle(record.entry,record.state);if(!completed.ok)throw Error(completed.reason);
+ const approach=atStairApproach(completed.state),party=approach.party,ownership=approach.ownership;
+ expect(party.find(h=>h.heroId==='fighter')!.hp).toBeGreaterThan(0);expect(party.find(h=>h.heroId==='fighter')!.learned).toContain('ability:second_wind');
+ await seed(page,approach);await walkDungeon(page,approach.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
+ const arrived=await snapshot(page);expect(arrived.depth).toBe(2);expect(arrived.revision).toBe(approach.revision+1);expect(arrived.party).toEqual(party);expect(arrived.ownership).toEqual(ownership);
+ expect(arrived.party.every(h=>!Object.hasOwn(h,'secondWindUsed')&&!Object.hasOwn(h,'tauntedBy'))).toBe(true);
+ await page.screenshot({path:test.info().outputPath('healed-party-automatic-arrival.png'),fullPage:true});
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(arrived);
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const entry=await snapshot(page),built=dungeonBattle(entry)!;expect(built.state.units.find(u=>u.defId==='fighter')!.hp).toBe(party.find(h=>h.heroId==='fighter')!.hp);
+ expect((await readSession(page)).state.units.every(u=>!u.secondWindUsed&&u.tauntedBy===undefined)).toBe(true);
+ await page.locator('#battle-party').click();await page.locator('#inspect-unit-1').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
+ await page.screenshot({path:test.info().outputPath('fresh-resource-after-automatic-stairs.png')});
+});
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
 test('read-only entry, keyboard new dungeon, real action and active resume',async({page})=>{

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { BattleSession } from '../src/app/BattleSession';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import type { BattleState } from '../src/domain/types';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';

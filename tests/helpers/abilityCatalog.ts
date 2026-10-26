@@ -2,12 +2,12 @@ import { battleCatalog } from '../../src/content/catalog';
 import type { ContentCatalog, HeroId } from '../../src/content/types';
 import { validateContent } from '../../src/content/validate';
 import { BattleSession } from '../../src/app/BattleSession';
-export function abilityCatalog():ContentCatalog {
+export function abilityCatalog(requiredLevel?:number):ContentCatalog {
   const abilities={...battleCatalog.abilities};
   for(const hero of ['fighter','ranger','mage'] as const){
-    const source=Object.values(abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(hero))!;
+    const source=Object.values(abilities).find(a=>a.id!=='ability:basic_attack' && a.owners.includes(hero) && (a.kind==='attack'||a.kind==='guardedAttack'||a.kind==='magicMissile'))!;
     const id=`ability:zz_${hero}` as const;
-    abilities[id]={...source,id,rangeMin:1,rangeMax:5,...(source.kind==='magicMissile'?{casterLevel:3}:{})};
+    abilities[id]={...source,id,rangeMin:1,rangeMax:5,...(source.kind==='magicMissile'?{casterLevel:3}:{}),...(requiredLevel===undefined?{}:{requiredLevel})};
   }
   const catalog={...battleCatalog,abilities};
   const valid=validateContent(catalog);if(!valid.ok)throw Error(JSON.stringify(valid));

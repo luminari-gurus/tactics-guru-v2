@@ -1,6 +1,6 @@
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
-import type { ContentCatalog } from '../content/types';
-import type { UnitState } from './types';
+import type { ContentCatalog, HeroId } from '../content/types';
+import type { BattleEvent, UnitState } from './types';
 
 /** Supported runtime case only. Source and target are the same Fighter instance. */
 export function guardedEffect(unit: UnitState): { readonly kind: 'guarded'; readonly sourceId: number; readonly targetId: number } | null {
@@ -24,4 +24,27 @@ export function grantGuard(unit: UnitState): UnitState {
 /** Readers retain historic inert flags until an accepted damage or turn transition. */
 export function clearDefeatedGuard(unit: UnitState): UnitState {
   return unit.hp === 0 ? removeGuard(unit) : unit;
+}
+
+export function tauntSource(unit: UnitState, units: readonly UnitState[]): UnitState | undefined {
+  return unit.hp > 0 ? units.find(source=>source.id===unit.tauntedBy && source.hp>0 && source.side!==unit.side) : undefined;
+}
+export function removeTaunt(unit: UnitState): UnitState {
+  const { tauntedBy, ...rest } = unit;
+  return rest;
+}
+/** Accepted damage clears references immediately, including friendly missiles defeating the taunter. */
+export function clearDefeatedTaunts(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
+  return units.map(u=>{
+    if (u.tauntedBy===undefined || tauntSource(u,units)) return u;
+    events.push({type:'tauntExpired',unitId:u.id,sourceId:u.tauntedBy});
+    return removeTaunt(u);
+  });
+}
+/** Aggregate readers retain encounter-entry bounds except for this bounded, spent heal. */
+export function encounterHpLimit(unit: {readonly defId:HeroId;readonly secondWindUsed?:true}, entryHp: number, catalog: ContentCatalog): number {
+  if (entryHp===0) return 0;
+  const stats=catalog.heroes[unit.defId].stats;
+  const heal=Object.values(catalog.abilities).find(a=>a.kind==='secondWind' && a.owners.includes(unit.defId));
+  return Math.min(stats.maxHp,entryHp+(unit.secondWindUsed && heal?.kind==='secondWind'?heal.healBase+stats.power:0));
 }

@@ -18,10 +18,11 @@ export function actionCommand(session: BattleSession, action: Action, cell: Cell
 }
 export function actionTargets(session: BattleSession, action: Action) {
   const ability=session.catalog.abilities[action==='basic'?'ability:basic_attack':action as AbilityId];
-  return session.state.units.filter(u=>u.hp>0 && (ability?.kind==='magicMissile' || u.side!==session.active.side));
+  return session.state.units.filter(u=>u.hp>0 && (ability?.kind==='secondWind'?u.id===session.active.id:ability?.kind==='magicMissile' || u.side!==session.active.side));
 }
 export function friendlyFire(session: BattleSession, command: Command): string {
   if(command.type!=='useAbility')return '';
+  if(session.catalog.abilities[command.abilityId]?.kind==='secondWind')return '';
   const ids='unitId' in command.target?[command.target.unitId]:'missileTargets' in command.target?command.target.missileTargets:[];
   const allies=session.state.units.filter(u=>ids.includes(u.id) && u.side===session.active.side);
   return allies.length?`Friendly fire: this damages ${allies.map(u=>`${u.defId} #${u.id}`).join(', ')}. `:'';

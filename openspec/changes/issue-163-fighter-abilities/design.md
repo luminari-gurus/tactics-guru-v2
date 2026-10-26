@@ -17,6 +17,7 @@ See [proposal.md](proposal.md) and [the human handoff](../../../docs/ongoing-pro
 - Add pure effect previews and route session/dispatch/hover through one ability-preview dispatch. Existing attack/missile rules remain their own implementations. Taunt restriction applies to all offensive previews and AI candidates.
 - End target Taunt after its accepted endTurn; clear source/target defeat in accepted damage resolution. Reapplication replaces its source.
 - Admit HP up to `min(maxHp, entryHp + 4 + power)` only for a Fighter with spent Second Wind, retaining entry bounds otherwise. Shared battle validation still rejects over-max HP and invalid state. Carry only party HP through existing completion.
+- The short-run completion reducer also had an entry-HP check. Its completion command accepts an optional exact `secondWindUsed: true` fact copied from the already validated battle, allowing the same bounded healing without persisting flags in party data. Current equipment changes only accuracy/AC, so the reducer's progression catalog has the same healing power/max HP as the battle catalog. Host catalogs are trusted projections of validated raw definitions; validate raw standalone input before projecting, rather than requiring locked definitions in a projected host catalog.
 - Bump rules 2→3, battle state 1→2, run envelope 3→4, dungeon envelope 4→5. Existing export/recovery preserves incompatible bytes. Include rules/content in identities even without active battles.
 - Extend picker text, self targets, inspection, logs and existing floating text. Preserve direct confirmation and Guarded badges. No assets or new UI architecture.
 
@@ -28,5 +29,12 @@ See [proposal.md](proposal.md) and [the human handoff](../../../docs/ongoing-pro
 - Cross-route shared changes → focused iteration then policy full-regression accounting with valid evidence reuse. Retain failures, retries and incomplete coverage.
 
 ## Migration Plan
+
+Main `d5b1927` integrated automatic stairs during qualification. It was merged through
+the stack; the new journey follows automatic descent. Spatial publication is checked
+with healed-party/fresh-resource boundaries on all six profiles and a complete updated
+desktop journey. Combat states/events/RNG remain identical; world revision decreases
+once as intended. Unchanged combat, telemetry, asset and engine coverage is reused with
+the dependency-aware reconciliation rather than repeating the full matrix.
 
 No automatic migration or release action. Changed saves deliberately enter existing incompatible recovery with exportable original bytes. Publish focused prerequisite and dependent feature PRs, leaving them open for review.

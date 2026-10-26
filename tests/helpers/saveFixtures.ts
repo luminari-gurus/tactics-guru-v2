@@ -26,7 +26,7 @@ export function saveFixtures(): SaveFixture[] {
     const captured = new Set<string>();
     for (let i = 0; session.phase !== 'ended' && i < 300; i++) {
       const side = session.active.side;
-      if (session.phase === 'player' && !session.prepare(playerDecision(session.state)).ok) throw Error('Player policy rejected');
+      if (session.phase === 'player' && !session.prepare(playerDecision(session.state,session.catalog)).ok) throw Error('Player policy rejected');
       const step = session.phase === 'player' ? session.confirm() : session.nextEnemy();
       if (!step || session.phase !== 'presenting') throw Error('Expected accepted presentation boundary');
       // Capture the committed state before acknowledging any presentation token.

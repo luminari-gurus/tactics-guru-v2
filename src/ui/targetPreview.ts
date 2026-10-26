@@ -2,7 +2,7 @@ import type { CellPosition } from '../content/types';
 import type { BattleSession } from '../app/BattleSession';
 import { actionCommand, actionTargets, type Action } from './battleActions';
 import { lineOfSightBlocked, manhattanDistance } from '../domain/targeting';
-import { previewAttack, previewMagicMissile } from '../domain/combat';
+import { previewAbility } from '../domain/combat';
 
 export interface HoverPreview {
   readonly origin: CellPosition;
@@ -16,7 +16,7 @@ export function hoverPreview(session: BattleSession, origin: CellPosition | null
   const map=catalog.maps[state.mapId],tile=map.cells.find(c=>c.x===origin.x && c.y===origin.y);
   if(!tile || !catalog.terrains[tile.terrainId].walkable
     || state.units.some(u=>u.hp>0 && u.id!==active.id && u.cell.x===origin.x && u.cell.y===origin.y))return null;
-  const abilities=Object.values(catalog.abilities).filter(a=>a.owners.includes(active.defId));
+  const abilities=Object.values(catalog.abilities).filter(a=>a.owners.includes(active.defId) && a.kind!=='secondWind');
   const cells=map.cells.filter(cell=>{
     const distance=manhattanDistance(origin,cell);
     return abilities.some(a=>distance>=a.rangeMin && distance<=a.rangeMax)
@@ -26,7 +26,7 @@ export function hoverPreview(session: BattleSession, origin: CellPosition | null
   const hypothetical={...state,units:state.units.map(u=>u.id===active.id?{...u,cell:origin}:u)};
   const targets=state.units.filter(u=>u.hp>0 && u.id!==active.id && abilities.some(a=>{
     const command={type:'useAbility' as const,unitId:active.id,abilityId:a.id,target:{unitId:u.id}};
-    return (a.kind==='magicMissile'?previewMagicMissile:previewAttack)(hypothetical,command,catalog).ok;
+    return previewAbility(hypothetical,command,catalog).ok;
   })).map(u=>u.cell);
   return {origin,cells,targets};
 }

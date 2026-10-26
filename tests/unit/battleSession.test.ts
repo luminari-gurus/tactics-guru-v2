@@ -111,7 +111,7 @@ it.each([1,2,42])('plays and replays legal authored battle seed %i using basic a
   const s=make(seed);
   for(let i=0;i<300 && !['ended','error'].includes(s.phase);i++){
     if(s.phase==='enemy'){const step=s.nextEnemy();if(step)s.finishPresentation(step.token);}
-    else if(s.phase==='player'){const command=playerDecision(s.state);expect(s.prepare(command).ok).toBe(true);const step=s.confirm()!;s.finishPresentation(step.token);}
+    else if(s.phase==='player'){const command=playerDecision(s.state,s.catalog);expect(s.prepare(command).ok).toBe(true);const step=s.confirm()!;s.finishPresentation(step.token);}
   }
   expect(s.phase).toBe('ended');
   expect(s.state.outcome).toBe(seed===1?'playerLoss':'playerWin');
@@ -168,7 +168,7 @@ describe('validated continuation',()=>{
     for(let i=0;original.phase!=='ended' && i<300;i++){
       const result=BattleSession.fromSnapshot(catalog,original.state);assert(result.ok);const resumed=result.session;
       if(seed===2 && original.state.commandCount===29)checkedAttackWait=true;
-      for(const s of [original,resumed])if(s.phase==='player')expect(s.prepare(playerDecision(s.state)).ok).toBe(true);
+      for(const s of [original,resumed])if(s.phase==='player')expect(s.prepare(playerDecision(s.state,s.catalog)).ok).toBe(true);
       const a=original.phase==='player'?original.confirm():original.nextEnemy();
       const b=resumed.phase==='player'?resumed.confirm():resumed.nextEnemy();assert(a);assert(b);
       expect(b.after).toEqual(a.after);expect(b.events).toEqual(a.events);

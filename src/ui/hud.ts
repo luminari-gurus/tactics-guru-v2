@@ -1,4 +1,4 @@
-import { combatStats, guardedEffect } from '../domain/effects';
+import { combatStats, guardedEffect, tauntSource } from '../domain/effects';
 import type { CellPosition } from '../content/types';
 import type { BattleEvent, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
@@ -18,6 +18,8 @@ export function previewText(preview: ActionPreview): string {
     return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
   }
   if ('missileCount' in preview) return `Automatic hit · ${preview.missileCount} ${preview.missileCount===1?'missile':'missiles'} · ${preview.minDamage}–${preview.maxDamage} force damage each · uses action`;
+  if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action and 1 battle use · no roll`;
+  if ('sourceId' in preview) return `Taunt · only target Fighter #${preview.sourceId} until target ends its next turn · uses action · no roll`;
   return 'End this turn';
 }
 export function eventText(event: BattleEvent, name: (id:number)=>string): string {
@@ -31,6 +33,9 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'defeated': return `${name(event.unitId)} defeated`;
     case 'guarded': return `${name(event.unitId)} Guarded (+2 AC)`;
     case 'guardExpired': return `${name(event.unitId)} Guarded expires`;
+    case 'healed': return `${name(event.unitId)} heals ${event.healing} HP · ${event.hp} HP`;
+    case 'taunted': return `${name(event.unitId)} taunted by ${name(event.sourceId)} until its next turn ends`;
+    case 'tauntExpired': return `${name(event.unitId)} Taunt expires`;
     case 'missileRolled': return `Missile ${event.missile}: ${event.damage} force damage`;
     case 'battleEnded': return event.outcome==='playerWin'?'Victory':'Defeat';
     default: return '';
@@ -40,8 +45,12 @@ const LOG_LIMIT=40;
 export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
+  const source=tauntSource(unit,session.state.units);
+  const statuses=[...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
+    ...(source?[`Taunted by ${displayName(source.defId)} #${source.id} (only offensive target; expires after this unit’s next turn ends)`]:[]),
+    ...(unit.defId==='fighter' && Object.values(session.catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes(unit.defId))?[`Second Wind ${unit.secondWindUsed?'0':'1'}/1 use this battle`]:[])];
   return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
-    status:unit.hp===0?'Defeated':guard?`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`:'No status effects'};
+    status:unit.hp===0?'Defeated':statuses.join(' · ')||'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {
   const {def,name,status}=unitFeedback(session,unit);
@@ -116,12 +125,15 @@ export class BattleHud {
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
     const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'} · uses action`
+      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
+    if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
+    if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=actor.secondWindUsed?' · Use exhausted':actor.hp===info.def.stats.maxHp?' · Full health':'';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
       const signature=b.dataset.action==='signature'?chosen:null;
-      b.disabled=!enabled || spent || (b.dataset.action==='move' && !movement?.ok) || (b.dataset.action==='signature' && !signature);
+      const unavailableHeal=signature?.kind==='secondWind' && (actor.secondWindUsed || actor.hp===info.def.stats.maxHp);
+      b.disabled=!enabled || spent || (b.dataset.action==='move' && !movement?.ok) || (b.dataset.action==='signature' && !signature) || Boolean(unavailableHeal);
       b.setAttribute('aria-pressed',String(b.dataset.action==='signature'?action===chosen?.id:b.dataset.action===action));
       b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.disabled?'Unavailable':b.dataset.action==='move'?'Uses movement':'Uses action';
       if(b.dataset.action==='signature'){const label=signature?displayName(signature.id):'No signature';b.querySelector('strong')!.textContent=label;b.setAttribute('aria-label',label);}

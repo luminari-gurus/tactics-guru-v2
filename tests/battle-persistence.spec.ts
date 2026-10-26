@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { confirmRestart, playCommand, playerDecision, readSession } from './helpers/battlePolicy';
 import { BattleSession } from '../src/app/BattleSession';
 import { previewMovement } from '../src/domain/grid';

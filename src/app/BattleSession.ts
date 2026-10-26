@@ -6,7 +6,7 @@ import type { RunSaveContext } from '../domain/runSaveEnvelope';
 import type { ContentCatalog, MapId } from '../content/types';
 import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
-import { previewAttack, previewMagicMissile } from '../domain/combat';
+import { previewAbility } from '../domain/combat';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay } from '../domain/types';
@@ -14,7 +14,7 @@ import type { BattleEvent, BattleState, Command, Replay } from '../domain/types'
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
 export type AcceptedState = (state: BattleState) => void;
 export interface Presentation { readonly before: BattleState; readonly after: BattleState; readonly events: readonly BattleEvent[]; readonly token: number }
-export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAttack> | ReturnType<typeof previewMagicMissile> | ReturnType<typeof previewCommand>;
+export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAbility> | ReturnType<typeof previewCommand>;
 function freeze<T>(value: T): T {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
     Object.values(value).forEach(freeze); Object.freeze(value);
@@ -61,8 +61,7 @@ export class BattleSession {
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
     if (command.type === 'move') return previewMove(this.current, command, this.catalog);
-    if (command.type === 'useAbility') return this.catalog.abilities[command.abilityId]?.kind === 'magicMissile'
-      ? previewMagicMissile(this.current, command, this.catalog) : previewAttack(this.current, command, this.catalog);
+    if (command.type === 'useAbility') return previewAbility(this.current, command, this.catalog);
     return previewCommand(this.current, command, this.catalog);
   }
   prepare(command: Command): ActionPreview {

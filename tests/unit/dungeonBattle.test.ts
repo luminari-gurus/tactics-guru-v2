@@ -1,4 +1,5 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
+import { progressHero } from '../../src/domain/progression';
 import { atEncounter } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
@@ -16,6 +17,28 @@ import { freshExploration } from '../../src/domain/exploration';
 import { previewAttack } from '../../src/domain/combat';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
 import { rollDie, seedRng } from '../../src/domain/rng';
+
+it('restores bounded healing and Taunt without refreshing them and resets battle state at the next encounter',()=>{
+  let entry=freshDungeon('fighter-heal',190);
+  entry={...entry,party:entry.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
+  const started=startDungeonBattle(atEncounter(entry));if(!started.ok)throw Error(started.reason);
+  const built=dungeonBattle(started.state)!,initial=started.state.activeBattle!;
+  const active={...initial,activeIndex:initial.initiative.indexOf(1)};
+  const used=dispatch(active,{type:'useAbility',unitId:1,abilityId:'ability:second_wind',target:{unitId:1}},built.catalog);if(!used.ok)throw Error(used.reason);
+  const enemy=used.state.units.find(u=>u.side==='enemy')!;
+  const battle={...used.state,units:used.state.units.map(u=>u.id===enemy.id?{...u,tauntedBy:1}:u)};
+  const snapshot={...started.state,activeBattle:battle};
+  const encoded=encodeDungeon(snapshot);if(!encoded.ok)throw Error(encoded.reason);const decoded=decodeDungeon(encoded.text);if(!decoded.ok)throw Error(decoded.reason);
+  expect(decoded.state).toEqual(snapshot);expect(decoded.state.activeBattle!.units[0]).toMatchObject({hp:9,secondWindUsed:true});
+  const wait={type:'endTurn',unitId:1} as const;expect(dispatch(decoded.state.activeBattle!,wait,built.catalog)).toEqual(dispatch(battle,wait,built.catalog));
+  for(const [id,patch] of [[1,{hp:10}],[1,{secondWindUsed:false}],[2,{hp:3}],[enemy.id,{tauntedBy:2}]] as const)
+    expect(readDungeon({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===id?{...u,...patch}:u)}}).ok).toBe(false);
+  const won={...used.state,outcome:'playerWin' as const,units:used.state.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)};
+  const completed=acceptDungeonBattle(started.state,won);if(!completed.ok)throw Error(completed.reason);
+  expect(completed.state.party[0].hp).toBe(9);expect(completed.state.party[0]).not.toHaveProperty('secondWindUsed');expect(completed.state.activeBattle).toBeNull();
+  expect(dungeonBattle(completed.state)!.state.units.every(u=>!u.secondWindUsed && u.tauntedBy===undefined)).toBe(true);
+  const old=JSON.stringify({...JSON.parse(encoded.text),format:4});expect(decodeDungeon(old)).toEqual({ok:false,reason:'incompatible'});
+});
 it('legally reaches guardian victory with next-command/RNG equivalence after save/resume',()=>{
   let fixture:ReturnType<typeof dungeonVictoryBoundary>=null,seed=0;
   for(seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);

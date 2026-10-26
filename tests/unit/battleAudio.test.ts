@@ -39,7 +39,7 @@ describe('scene audio lifetime',()=>{
       continuation:session.continuation,pending:session.pending,phase:session.phase,error:session.error});
     const save=(session:BattleSession)=>{const encoded=encodeBattleSave(session.state,catalog);assert(encoded.ok);return encoded.text;};
     const step=(session:BattleSession)=>{
-      if(session.phase==='player')expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+      if(session.phase==='player')expect(session.prepare(playerDecision(session.state,session.catalog)).ok).toBe(true);
       const accepted=session.phase==='enemy'?session.nextEnemy():session.confirm();assert(accepted);return accepted;
     };
     const heard=new Set<BattleCue>();let late:(()=>void)|undefined;

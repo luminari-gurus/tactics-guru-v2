@@ -1,38 +1,68 @@
 # Issue #163: Fighter Second Wind and Taunt
 
 Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; initially 0/9 tasks complete).
+`issue-163-fighter-abilities` (spec-driven; 9/9 tasks complete, all work published ready for review).
 The branch was clean at handoff. Main `e489a30` was merged without conflict,
 including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
 Do not restore the old confirmation modal or overwrite those indicators.
 
 ## Current continuation checkpoint
 
-- OpenSpec: [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
+- Implementation, acceptance and delivery are complete. All four PRs are open,
+  non-draft and mergeable; remote parity and final review readiness were verified.
+  The requested branch remains `branch/issue-163-fighter-abilities`.
+- Review stack, all open and ready: [#242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242)
+  standalone level-one boundary → [#244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244)
+  carried-party/Guarded assertions → [#245](https://github.com/luminari-gurus/tactics-guru-v2/pull/245)
+  engine-aware fixtures/complete-run selector →
+  [#247](https://github.com/luminari-gurus/tactics-guru-v2/pull/247) Fighter abilities.
+- Main `d5b1927` (#243 automatic stairs) was merged normally through every
+  dependency branch and the feature. The new journey follows automatic descent.
+  Test/build source `a74d85e` is clean; later evidence commits reuse its unchanged
+  inputs. No history rewriting or GitHub PR merge was performed.
+- Current proof: 971/971 unit tests in 55 files, both TypeScript scopes, two build
+  integrations and root bundle pass. Before the bounded main update, the full
+  19-stage inventory had 1,194 browser executions; all 65 failures and 9 skips
+  are explicitly reconciled in [QA](../qa/issue-163/README.md), preserving failed
+  aggregates and literal-base comparisons. Focused repairs pass 15 Chromium,
+  27 picker, 54 Linux WebKit acceptance, 2 extra WebKit animation and 12 root/prefix
+  asset cases. Existing dungeon WebKit 63, health 25 and both telemetry 36 pass.
+- Six earlier full production journeys (Chromium/WebKit desktop/portrait/landscape)
+  have identical complete traces: seed 190, 6 encounters, 365 combat commands,
+  earned Fighter level 3, both abilities used/reloaded, five wins then terminal
+  second-guardian defeat. Encounter 6 heals above entry HP (24 → 30). These traces
+  are retained; no two-floor victory is claimed.
+- Current-main delta: 9 Chromium + 9 WebKit stair/healed-party/recovery cases pass,
+  plus the complete updated desktop journey. Every battle state/event/RNG and
+  final party matches the earlier evidence; world revision 431 → 430 is the
+  intended one-revision stair travel. Unchanged combat/device coverage is reused;
+  the changed stair boundary is exercised in all six profiles. See
+  [the integration addendum](../qa/issue-163/main-integration/README.md).
+- Final isolated proof capture: 18 cold/warm samples, no failures, served build
+  `a74d85e`. It is local proof-scene qualification, not a new #200 baseline.
+- Rules/save boundary: Second Wind level 2, self, action + one battle use,
+  `min(missing HP, 4 + projected power)`; Taunt level 3, adjacent hostile, no roll,
+  restrict offensive targets through target endTurn; source/target defeat clears.
+  Battle state 2 / rules 3, run envelope 4, dungeon envelope 5. RNG remains 1 and
+  standalone wrapper remains 1. Old saves retain recovery/export bytes.
+- OpenSpec [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
   [design](../../openspec/changes/issue-163-fighter-abilities/design.md),
   [spec](../../openspec/changes/issue-163-fighter-abilities/specs/fighter-abilities/spec.md),
   [tasks](../../openspec/changes/issue-163-fighter-abilities/tasks.md).
-- First chunk: standalone level-1 projection after raw validation, before asset
-  loading, session and persistence. Raw definitions remain available for progression.
-  Focused verification/publication underway. Full Fighter feature remains pending.
-- Next chunk: validated profiles + atomic rules/lifecycle/AI + save admission/versions
-  + shared previews/UI, with existing unit and browser tests extended together.
-- Runtime: bundled Windows Node v24.19.0; npm is available at
-  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd` (prepend that directory to PATH
-  per shell call). `npm ci --ignore-scripts --no-audit --no-fund` restored Windows
-  dependencies from the unchanged lockfile after inherited shims/native bindings failed.
-  Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to
-  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`;
-  the default installed Chromium failed to launch (`spawn UNKNOWN`). Fresh pinned
-  Chromium 153.0.8010.12 and installed WebKit 26.6 launch checks passed.
-  OpenSpec CLI is cached at
-  `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`;
-  run with Node. No application dependencies changed.
-- Retain this checkpoint, exact tested source identities and any failures as work advances.
-- Prerequisite proof: 48 tests in progression/battlePersistence, 221 build content
-  tests, both type scopes and production build passed. Focused default-Move Continue
-  browser case passed desktop/native-touch portrait/native-touch landscape (3/3,
-  no skips/retries). See [prerequisite evidence](../qa/issue-163/prerequisite.md).
+- No browser jobs remain active. Compressed reports, source/build hashes,
+  screenshots and traces are committed under `docs/qa/issue-163/`. Raw originals
+  are retained at `verification-receipts/issue-163-2026-10-25/`; their historical
+  report paths still say `tmp/issue-163-full/`. Task-owned comparison worktree and
+  WSL clone were removed after preserving evidence. All published unmerged branches
+  and qualified runtime/browser caches remain.
+- Runtime: Windows/WSL Node 24.19.0, npm 12.2.1, Playwright 1.63.0, Chromium
+  153.0.8010.12, WebKit 26.6. Windows npm wrapper:
+  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd`; Chromium executable:
+  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`.
+  Windows WebKit's base-reproduced media decode limitation was requalified with
+  real media on Linux WebKit; no codec mocking or engine substitution. WSL used
+  an invalid Chromium override sentinel to prove engine isolation. Device profiles
+  are emulation, with no physical-device or CI execution claim.
 
 - Issue: [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
 - Assignee: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/163#issuecomment-6396849340).
@@ -110,8 +140,9 @@ satisfies acceptance under AGENTS.md. No physical-device request was made;
 
 ## Source audit and implementation decisions
 
-The findings below describe the recorded base; proposed behavior is not yet
-implemented. Pinned legacy sources were read directly:
+The findings below record the base audit and approved implementation decisions;
+the checkpoint above describes current implementation and qualification. Pinned
+legacy sources were read directly during planning:
 [resolver definitions and lifecycle](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L74-L119),
 [Taunt resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L348-L394),
 [Second Wind resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L827-L872),
@@ -238,35 +269,36 @@ drives verification; a Fighter-only UI test cannot prove all consumers.
 
 ## Implementation sequence and acceptance proof
 
-All items below are pending implementation.
+Use the OpenSpec tasks and current checkpoint for implementation status. Runtime
+acceptance and delivery below are checked only when their whole proof is complete.
 
-- [ ] **Profiles and unlocks (criterion 1):** add and validate both definitions;
+- [x] **Profiles and unlocks (criterion 1):** add and validate both definitions;
   prove levels 1/2/3/5, malformed owners/kinds/resources and direct locked-command
   rejection. Verify standalone level 1 and run/dungeon canonical learned lists;
   repeated catalog/battle construction must not accumulate projection.
-- [ ] **Atomic healing (criteria 2 and 5):** implement shared pure preview and
+- [x] **Atomic healing (criteria 2 and 5):** implement shared pure preview and
   resolution, bounded use state and accepted heal event. Test partial/capped
   healing, projected HP/power, full-health rejection, exhausted use, wrong/dead
   targets, spent actions, repeated preview/cancel, duplicate confirmation and
   unchanged RNG. Verify fresh-battle reset and mid-battle resume retains use.
-- [ ] **Taunt and AI (criteria 3 and 5):** implement one-source status and shared
+- [x] **Taunt and AI (criteria 3 and 5):** implement one-source status and shared
   offensive legality. Test no-roll application irrespective of attack accuracy,
   same-side/out-of-range/blocked/dead targets, replacement, source/target defeat,
   exact target-turn expiry, initiative wrap, minimum bow range, obstacles,
   unreachable/blocked firing positions, legal approach/Wait and no AI stall.
-- [ ] **Save/replay integration (criterion 5):** update versions/admission together;
+- [x] **Save/replay integration (criterion 5):** update versions/admission together;
   prove healing above entry HP in run and dungeon, over-max/non-Fighter/ineligible
   HP rejection, no accidental revival, malformed resource/source rejection,
   pending-action read-only behavior and old-save byte preservation. Compare
   uninterrupted, replayed and resumed state/events/RNG; accepted encounter/floor
   transitions retain HP and reset battle effects/uses once.
-- [ ] **Reachable UI (criterion 4):** expose self heal and hostile taunt in the
+- [x] **Reachable UI (criterion 4):** expose self heal and hostile taunt in the
   real picker with accurate availability, status and logs. Exercise keyboard and
   touch, narrow portrait/short landscape, inspection, cancel, repeated activation,
   resize and presentation locks. Retain screenshots. Use existing level fixtures
   for boundary cases, plus a complete legal production dungeon journey that
   earns level 3 and uses both abilities; fixtures alone are not reachability proof.
-- [ ] **Preservation and delivery (all criteria):** retain Guarded and Magic
+- [x] **Preservation and delivery (all criteria):** retain Guarded and Magic
   Missile numeric, targeting, event, AI, replay and resume regressions. Reconcile
   every acceptance criterion with source-bound results, update rule/compatibility
   docs, inspect the final diff, commit/push only issue work and prepare the PR
@@ -322,7 +354,9 @@ aggregate readers, healing/use reset on reload, expiry attached to the wrong
 turn, AI unable to finish under a taunt, and save identity drift. Each has an
 explicit implementation path and proof above. New on-disk state is intentionally
 incompatible with prior saves; recovery must preserve and export their bytes.
-PRs #139/#240 overlap shared HUD code: recheck live main before implementation,
-preserve their merged behavior if present, and update this plan for material scope
-changes. This setup request ends with the claimed issue, published plan and
-linked branch; no application code or runtime tests are changed by this commit.
+PR #240 and the #241 Guarded indicator work were merged before implementation;
+their confirmation and board behavior are preserved. Keep #139's independently
+owned work separate, and inspect live branch/PR state before final delivery.
+Continue from the current checkpoint and OpenSpec tasks, retaining source/build
+identities, failed attempts and focused repair receipts. Deliver the remaining
+reviewable dependency/feature PRs and leave the stack open for review.

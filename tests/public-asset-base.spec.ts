@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { battleCatalog } from '../src/content/catalog';
+import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
@@ -78,7 +79,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
         } else {
           // A base change must not alter the seeded state or save identity.
           await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
-          const expectedSession = new BattleSession(battleCatalog, 'map:forest_ruins', 1);
+          const expectedSession = new BattleSession(standaloneCatalog, 'map:forest_ruins', 1);
           while (expectedSession.phase === 'enemy') {
             const step = expectedSession.nextEnemy()!;
             expectedSession.finishPresentation(step.token);

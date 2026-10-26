@@ -1,3 +1,4 @@
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog, MapRecord } from '../../src/content/types';
@@ -20,12 +21,32 @@ function setup(archer = false) {
   const catalog: ContentCatalog = { ...copy(catalogFixture), maps: { [map.id]: map } };
   const units: UnitState[] = map.spawns.map(s => ({ id: s.id, side: s.side === 'heroes' ? 'player' : 'enemy', defId: s.unitId,
     cell: { x: s.x, y: s.y }, hp: 18, hasMoved: false, hasActed: false }) as UnitState);
-  const state: BattleState = { format: 1, versions: { rules: 2, rng: 1, content: contentVersion(catalog) }, seed: 0, rng: seedRng(0),
+  const state: BattleState = { format: STATE_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: 1, content: contentVersion(catalog) }, seed: 0, rng: seedRng(0),
     mapId: map.id, units, initiative: [3, 1, 2], activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0 };
   assert(readBattleState(state, catalog).ok);
   return { catalog, state };
 }
 const wait = { type: 'endTurn', unitId: 3 } as const;
+
+it.each([false,true])('Taunt restricts legal enemy plans, including minimum bow range (%s)',archer=>{
+  const {catalog,state}=setup(archer);
+  const restricted=changeUnit(changeUnit(changeUnit(state,1,{cell:{x:3,y:1}}),2,{cell:{x:4,y:2}}),3,{tauntedBy:1});
+  const before=copy(restricted),list=commands(restricted,catalog);
+  expect(list.at(-1)).toEqual(wait);
+  expect(list.filter(c=>c.type==='useAbility')).toEqual([attack(1,archer)]);
+  if(archer)expect(list[0].type).toBe('move');
+  const ended=checkLegal(restricted,catalog,list);
+  expect(ended.units.find(u=>u.id===3)?.tauntedBy).toBeUndefined();expect(restricted).toEqual(before);
+  expect(planEnemyTurn({...restricted,units:[...restricted.units].reverse()},3,catalog)).toEqual(planEnemyTurn(restricted,3,catalog));
+});
+
+it('a taunted enemy waits for an unreachable taunter despite another attackable hero',()=>{
+  const {catalog,state}=setup();const map=catalog.maps[state.mapId];
+  const blocked={...catalog,terrains:{...catalog.terrains,forest:{...catalog.terrains.forest,walkable:false,blocksLineOfSight:true}},maps:{[map.id]:{...map,cells:map.cells.map(c=>c.x===2?{...c,terrainId:'forest' as const}:c)}}};
+  const snapshot={...changeUnit(changeUnit(state,2,{cell:{x:4,y:2}}),3,{tauntedBy:1}),versions:{...state.versions,content:contentVersion(blocked)}};
+  expect(commands(snapshot,blocked)).toEqual([wait]);
+  const run=runEnemyTurn(snapshot,3,blocked);assert(run.ok);expect(run.commands).toEqual([wait]);expect(run.state.units.find(u=>u.id===3)?.tauntedBy).toBeUndefined();
+});
 const attack = (target = 1, archer = false): Command => ({ type: 'useAbility', unitId: 3,
   abilityId: archer ? 'ability:shortbow_shot' : 'ability:basic_attack', target: { unitId: target } });
 const changeUnit = (s: BattleState, id: number, changes: Partial<UnitState>): BattleState =>
@@ -315,7 +336,7 @@ describe('seeded battle replay', () => {
       expect(state.outcome).not.toBe('ongoing');
       expect(commands.some(c => c.type === 'move')).toBe(true);
       expect(events.some(e => e.type === 'attackRolled')).toBe(true);
-      const replay = replayBattle({ format: 1, versions: created.state.versions, initial: created.state, commands }, battleCatalog);
+      const replay = replayBattle({ format: STATE_FORMAT_VERSION, versions: created.state.versions, initial: created.state, commands }, battleCatalog);
       assert(replay.ok);
       expect(replay.state).toEqual(state);
       expect(replay.events).toEqual(events.slice(created.events.length));

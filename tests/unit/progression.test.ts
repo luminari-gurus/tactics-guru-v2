@@ -20,6 +20,21 @@ import { createRun, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { authoredRun, runCatalog } from '../../src/content/encounters';
 
 describe('bounded progression',()=>{
+  it('unlocks Fighter effects only at canonical levels and keeps standalone at level one',()=>{
+    for(const [xp,level] of [[0,1],[60,2],[180,3],[600,5]]) {
+      const party=HERO_IDS.map(id=>progressHero(id,xp,1,catalog)),projected=projectProgression(party,catalog);
+      expect(party[0].level).toBe(level);
+      expect(party[0].learned.includes('ability:second_wind')).toBe(level>=2);
+      expect(party[0].learned.includes('ability:taunt')).toBe(level>=3);
+      expect(Boolean(projected.abilities['ability:second_wind'])).toBe(level>=2);
+      expect(Boolean(projected.abilities['ability:taunt'])).toBe(level>=3);
+      expect(projectProgression(party,catalog)).toEqual(projected);
+      const s=abilitySession('fighter',projected);
+      for(const abilityId of ['ability:second_wind','ability:taunt'] as const)if(!projected.abilities[abilityId])
+        expect(dispatch(s.state,{type:'useAbility',unitId:s.active.id,abilityId,target:{unitId:s.active.id}},projected)).toEqual({ok:false,reason:'unknownAbility'});
+    }
+    expect(catalog.heroes.fighter.stats.maxHp).toBe(18);
+  });
   it.each(HERO_IDS)('derives all thresholds and exact HP for %s without non-HP growth',id=>{
     for(const [i,xp] of rules.thresholds.entries()){
       const h=progressHero(id,xp,1,catalog);
