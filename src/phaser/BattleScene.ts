@@ -1,4 +1,5 @@
-import { progressionLabel } from '../domain/progression';
+import { progressHero, projectProgression, progressionLabel } from '../domain/progression';
+import { HERO_IDS } from '../content/constants';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
@@ -33,6 +34,7 @@ export class BattleScene extends Phaser.Scene {
     this.status('loading');measurements.begin(performance.now());
     let catalog:ContentCatalog;
     try{catalog=contentLoadPlan(this.host?.catalog??battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
+    if(!this.host)catalog=projectProgression(HERO_IDS.map(id=>progressHero(id,0,catalog.heroes[id].stats.maxHp,catalog)),catalog);
     loadContentAssets(this,catalog,()=>{try{this.prepareBattle(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
   }
   private prepareBattle(catalog:ContentCatalog):void {
