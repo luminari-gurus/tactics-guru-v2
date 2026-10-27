@@ -4,6 +4,7 @@
 const { realpathSync } = require('node:fs');
 const { Server } = require('node:net');
 if (process.platform === 'linux' && process.env.TACTICS_WSL_VITE_BIND === '1' && process.argv[1] &&
+    /[/\\](?:vite|vite\.js)$/.test(process.argv[1]) &&
     /[/\\]vite[/\\]bin[/\\]vite\.js$/.test(realpathSync(process.argv[1]))) {
   const listen = Server.prototype.listen;
   Server.prototype.listen = function (...args) {

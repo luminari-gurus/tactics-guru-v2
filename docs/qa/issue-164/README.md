@@ -1,7 +1,8 @@
 # Issue #164 qualification
 
-Status: implementation is published; final regression is running. This report is
-a continuation checkpoint, not a claim of PR readiness.
+Status: implementation is published; the original full regression is complete
+and failed. Bounded failure diagnosis and final added gates are in progress;
+this report does not yet claim PR readiness.
 
 ## Source and scope
 
@@ -57,7 +58,7 @@ so its consumption assertion failed. The legal test policy was corrected and
 rerun. The initial Windows build also lacked npm on the nested script PATH;
 the supported local wrapper directory fixed that environment error.
 
-## Final regression in progress
+## Original full regression
 
 Linux checkout: `/tmp/tactics-issue-164-20261027` in WSL Ubuntu, clean at the
 recorded full-run source. Node 24.15.0, npm 12.0.2, Playwright 1.63.0,
@@ -72,29 +73,33 @@ It does not enable server reuse or change assertions, retries or device settings
 The full process inherited `TACTICS_WSL_VITE_BIND=1` and `NODE_OPTIONS` requiring
 the identical adapter in the Windows worktree through `/mnt/c/`.
 
-Command: `npm run verify:full`, one browser worker and serial stages. The live
-19-stage checkpoint and raw logs/reports are retained at:
+Command: `npm run verify:full`, one browser worker and serial stages. The completed
+19-stage attempt and raw logs/reports are retained at:
 `/tmp/tactics-issue-164-20261027/tmp/verification/full-2026-10-27T11-14-39.281Z-2506569/`.
-The parent command is the unified-exec session recorded in this chat. Do not
-restart it merely because observation times out; inspect that session/process and
-the summary first.
+The parent command finished with exit 1: 17 stages passed, tooling and Chromium
+failed. [The complete original manifest](full-run-original/manifest.json) retains
+all stage logs/reports and before/after source identity. Input hashes are unchanged.
+All 1,241 browser executions are accounted for: 1,227 passes, five failures and
+nine declared mode skips, with zero retries/flaky results. The six Ranger journeys
+each prove five encounters/338 commands, both earned actions, reload/consumption,
+terminal defeat and exact continuation replay. Their traces and screenshots are
+retained under `full-run-original/journeys/` and portrait/landscape WebKit images
+have been visually reviewed.
 
 The first tooling stage failed because the adapter attempted to resolve an
 argument of a `node -e` subprocess as a file. Units, both type scopes and both
-build integrations passed afterward; runtime browser stages continue independently.
-Do not edit the adapter while this run is live (it is loaded from the Windows
-worktree). After completion, guard the realpath lookup by a Vite filename check,
-prove the affected tooling and actual Vite boot, and retain this failed aggregate
-separately from that recovery. Do not repeat successful suites solely to obtain
-a green aggregate.
+build integrations passed afterward; all independent stages completed. The
+adapter was not edited during that run. Only after its terminal exit was the
+Vite-filename guard applied; the original failed aggregate remains separate from
+that recovery. Successful unaffected suites will not be repeated for a green aggregate.
 
 The correction is isolated in ignored `tmp/issue-164/wsl-vite-bind-fixed.cjs`
 without editing the adapter used by the live run. It adds a Vite-filename guard
 before realpath lookup. With that candidate loaded, `test:verification` passes
 10/10, `test:verification-tooling` passes 20/20 and `test:verification-batches`
 passes 27/27. [Retained candidate receipts](tooling-candidate/manifest.json) bind
-the module bytes and command results. Application of the same bytes and actual
-Vite/engine smoke remain pending until the live browser run completes.
+the module bytes and command results. The same bytes are now applied and hash-
+verified; actual Vite/engine smoke with the final source remains pending.
 
 Current discovery: 718 default Chromium, 81 combined fixtures, 3 dev placement,
 54 WebKit acceptance, 81 WebKit exploration, 25 health bars, 36 each configured
@@ -109,7 +114,9 @@ Completed original components are retained in
 Chromium accounts for all 718 IDs, with 710 passes, five failures, three skips
 and zero retries/flaky results. The three dev-only placement selections are
 separately covered by the passing 3/3 dev stage. Combined fixtures pass 81/81;
-WebKit acceptance passes 54/54. Remaining stages are still running.
+WebKit acceptance passes 54/54; the complete manifest above also retains the later
+passed stages. Performance evaluation passes 18/18 with no integrity failures,
+budget violations or slow-load warnings.
 
 The five Chromium failures are preserved, not yet dispositioned:
 
@@ -123,10 +130,13 @@ The five Chromium failures are preserved, not yet dispositioned:
 A separate clean literal-base checkout at
 `/tmp/tactics-issue-164-base-18a6f63`, source
 `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8`, has locked dependencies and a passing
-build prepared. After the live run releases browser capacity, run only the
-affected base/change cases under matching conditions to determine cause. No
-pre-existing/flaky classification is claimed yet, and no assertions/timeouts or
-retries have been weakened.
+build prepared. Pristine matched focused runs reproduce the native-clearing
+failure in all three profiles in both base and change. Procedural portrait and
+landscape HTML5 cases each pass once in both trees; their original failures remain
+unattributed pending bounded diagnosis. Setup-only attempts (missing npm on a
+non-login shell PATH and overly anchored grep filters selecting zero cases) are
+retained separately. Corrected discovery proves exactly 3 + 1 + 1 selected cases.
+No assertions/timeouts or retries have been weakened.
 
 [Actual selection continuity](selection-continuity.json) compares the literal
 pre-implementation `18a6f63` tree with the current tests. Every prior test ID and

@@ -6,56 +6,41 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 
 ## Current implementation checkpoint
 
-- Runtime and tests are implemented/published in `af9c1b6`; current full-run source
-  is `789161c`, which only adds the task-local WSL bind adapter. Main's `b629926`
-  README update is integrated. No PR has been opened yet.
-- Windows iteration: all 986 units, both types, build/content, 12 Ranger picker
-  cases and the complete earned level-3 Ranger HUD journey passed. The journey
-  uses five encounters/338 combat commands, resumes both effects, observes Mark
-  consumption and ends in defeat with exact replayed state. Raw/retained evidence
-  and failures are described in [QA](../qa/issue-164/README.md).
-- The full 19-stage run is **live** in WSL checkout
-  `/tmp/tactics-issue-164-20261027`, Node process `2506569`, unified-exec session
-  `74639`. Reports:
-  `tmp/verification/full-2026-10-27T11-14-39.281Z-2506569/` in that checkout.
-  Check its actual process/session and summary; never restart because observation
-  times out. Units, types and build integrations passed; browser stages continue.
-- Initial tooling failed because `wsl-vite-bind.cjs` resolves a `node -e`
-  argument as a file. **Do not edit this adapter while the run is live:** its
-  `NODE_OPTIONS` path points into the Windows worktree. After completion, add a
-  Vite-filename guard before realpath lookup, rerun affected tooling and actual
-  Vite smoke, and retain the failed aggregate. Successful unaffected coverage is
-  reusable; do not rerun it merely for a green aggregate.
-- The fix is prepared separately in ignored
-  `tmp/issue-164/wsl-vite-bind-fixed.cjs`; its 10 verification, 20 process/reporting
-  and 27 selection/batch contracts pass. Candidate hashes/logs are retained under
-  `docs/qa/issue-164/tooling-candidate/`. Apply these same bytes only after the
-  live run, then prove actual Vite/engine startup with the corrected adapter.
-- Additional previous-format browser recovery cases are prepared in
-  `tests/dungeon-lifecycle.spec.ts` and typecheck passes; they still need focused
-  Chromium/WebKit execution after the live run. The extra simultaneous/replaced
-  source assertions in `abilities.test.ts` pass all 35 cases. No runtime changed.
-- Actual baseline/current selection comparison preserves every old ID, metadata,
-  worker and project: default 715 → 727, fixtures 72 → 81, WebKit exploration
-  78 → 90 and acceptance 54 → 54. This includes nine recovery cases added after
-  the full run froze at 718 default/81 exploration selections. Retained raw
-  selections and [continuity summary](../qa/issue-164/selection-continuity.json)
-  identify every addition.
-- Remaining: reconcile full results/failures, execute added recovery cases and
-  the task-specific WebKit picker config, preserve final reports/screenshots and
-  source/build identities, finish the acceptance audit, then open/attach the PR.
-  Explicitly evaluate `performance.json` with the existing `evaluateCapture`:
-  `measure:fit` checks capture integrity but its successful exit does not by itself
-  prove budget acceptance. Retain all per-sample violations and slow-load reviews.
-- Original Chromium is complete: 710 passes / five failures / three mapped dev
-  skips, zero retries; fixtures 81/81, placement-dev 3/3 and WebKit acceptance
-  54/54 pass. Five failures (native clearing/clock in three profiles, portrait
-  procedural picking, landscape HTML5 playback watchdog) need focused diagnosis.
-  The exact clean base `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8` is built at
-  `/tmp/tactics-issue-164-base-18a6f63` for matched comparisons after the live
-  run. Do not label failures pre-existing without that evidence. Full original
-  component reports, contexts and hashes are retained under
-  `docs/qa/issue-164/full-run-original/`.
+- Feature code is published in `af9c1b6`; original full qualification source is
+  `789161c`. Main's `b629926` README update is integrated. No PR is open yet.
+- The original 19-stage run has **finished**, with 17 stages passing and tooling /
+  Chromium failing. All 1,241 browser executions are accounted for: 1,227 passes,
+  five failures and nine declared mode skips; zero retries/flaky results.
+  Full source input hash is unchanged before/after the run. Raw reports, contexts,
+  six journey traces/screenshots and hashes are in `docs/qa/issue-164/full-run-original/`.
+- All six Chromium/WebKit Ranger production journeys pass: five encounters and
+  338 commands each, earned level 3, both actions used/reloaded, Mark consumed,
+  terminal defeat and exact continuation replay. Units (986), both types, builds,
+  fixtures (81), dev placement (3), WebKit acceptance (54), exploration (81),
+  health (25), both telemetry modes (36 each) and all owning asset modes are covered.
+  Performance evaluation passes all 18 samples with no failures, violations or warnings.
+- The WSL bind adapter was left unchanged throughout the original run. After
+  terminal exit, the exact qualified candidate bytes were applied (SHA-256
+  `8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38`).
+  Its 10 verification, 20 process/reporting and 27 selection/batch contracts pass;
+  final actual Vite/engine smoke is still needed.
+- A pristine matched comparison at literal base
+  `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8` and original change `789161c`
+  reproduces native-clearing/clock failure in all three Chromium profiles.
+  Procedural portrait picking and landscape HTML5 watchdog cases each pass one
+  focused execution in both trees. Those original intermittent failures remain
+  retained and require bounded diagnosis; no blanket retry or pre-existing label
+  is applied to them. Base checkout: `/tmp/tactics-issue-164-base-18a6f63`;
+  original change: `/tmp/tactics-issue-164-20261027`.
+- Additional previous-format recovery cases (nine Chromium / nine WebKit) and
+  the 12-case WebKit Ranger picker selection remain to run. Extra simultaneous /
+  replaced-source assertions pass all 35 ability units; no feature runtime changed.
+- Selection continuity preserves all old IDs/settings: default 715 → 727,
+  fixtures 72 → 81, WebKit exploration 78 → 90 and acceptance 54 → 54.
+- Remaining: repair and prove the bounded qualification failures, execute the
+  added recovery/picker gates and corrected engine smoke, retain final identities,
+  finish the acceptance audit, then open/attach the PR. The ignored literal-base
+  export remains local as evidence after automatic approval review denied cleanup.
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.
