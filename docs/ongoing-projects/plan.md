@@ -44,6 +44,9 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 - Remaining: reconcile full results/failures, execute added recovery cases and
   the task-specific WebKit picker config, preserve final reports/screenshots and
   source/build identities, finish the acceptance audit, then open/attach the PR.
+  Explicitly evaluate `performance.json` with the existing `evaluateCapture`:
+  `measure:fit` checks capture integrity but its successful exit does not by itself
+  prove budget acceptance. Retain all per-sample violations and slow-load reviews.
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.

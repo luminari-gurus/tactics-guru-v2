@@ -117,3 +117,9 @@ repairs, the additional WebKit picker run, explicit previous-format byte-preserv
 browser recovery, screenshot/report retention, final source/input equivalence,
 the requirement audit and PR creation. No full-regression pass, physical-device,
 CI success, production deployment or comparable performance baseline is claimed.
+
+Performance disposition must use `evaluateCapture` in
+`scripts/measure-fit-evaluate.ts`, including every row's violations and repeated
+slow-load disposition. Inspection confirmed that `measure:fit` exits on capture
+integrity errors, while budget violations remain in the evaluator's rows; a
+successful performance stage exit alone is not proof that budgets passed.
