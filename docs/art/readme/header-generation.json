@@ -1,0 +1,14 @@
+{
+  "purpose": "Promotional README header",
+  "mode": "built-in image_gen",
+  "date": "2026-10-27",
+  "output": "tactics-guru-header.png",
+  "references": [
+    "../unit-art-reference.png",
+    "../design-references/title-concept-03.png"
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: ultra-wide 3:1 illustrated header for the top of the Tactics Guru GitHub README.\nPrimary request: Create polished original fantasy tactics key art grounded in this project's canonical heroes, isometric terrain and visual design. This is promotional illustration, not a gameplay screenshot.\nInput images: Image 1 is a reference sheet for canonical hero silhouettes, equipment, faces and illustrated art style; do not reproduce the sheet or its labels. Image 2 is a title lettering style reference only; create fresh clean lettering.\nScene/backdrop: mossy forest ruins, olive foliage, weathered stone steps and grass arranged as a visible isometric diamond-grid battlefield, cool midnight shadows and restrained warm light; far-right terrain subtly transitions to sandy desert ruins, reflecting the game's Forest and Desert encounters.\nSubject: exactly the three canonical heroes in a small party: blond Fighter in blue-and-gold tabard and steel armor with sword and blue/gold shield, brown-haired Ranger with olive hood and leather armor carrying bow/quiver, young Mage with blue-and-gold pointed hat and robes carrying a blue-jewel staff. A small pair of goblins can wait across the board. Tactical storytelling, confident adventure, readable silhouettes.\nStyle/medium: richly painted fantasy strategy-game cover art, detailed illustrated characters and tactile terrain, cohesive restrained polish, not pixel art, not photorealistic.\nComposition/framing: very wide 3:1 landscape banner; calm dark left half for large readable two-line title; hero party and isometric forest battlefield in the right half with foreground depth. Keep all lettering comfortably inside safe margins. The title must remain legible at GitHub README width. A single small compass/star ornament can sit above the title.\nLighting/mood: atmospheric twilight with warm rim light, inviting and adventurous.\nColor palette: midnight navy #101827, olive foliage, parchment ivory #fff1cf, restrained brass #f0cf83 and aged gold, teal tactical highlights.\nText (verbatim): \"TACTICS GURU\" only, two lines, balanced classical serif capitals in ivory with thin gold edges and navy separation, inspired by Cinzel Semibold.\nConstraints: no subtitle, no UI panels, no badges, no fake screenshot, no additional text, no watermark, no dragons or extra hero classes, no excessive bloom or ornamental clutter. Output one finished opaque banner.",
+  "width": 2172,
+  "height": 724,
+  "sha256": "3cc8e6c97391eef16ee928ba1c2cfedf0a5efff260336f8fcb0cd0acc0c210d5"
+}

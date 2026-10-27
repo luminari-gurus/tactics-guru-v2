@@ -1,157 +1,266 @@
-# Tactics Guru v2
+![Tactics Guru — the Fighter, Ranger and Mage face goblins on an isometric battlefield between forest and desert ruins](docs/art/readme/tactics-guru-header.png)
 
-The continuing [dungeon floor mode](docs/dungeon.md) opens at `/dungeon`, also linked from `/run`. Explore Rooms floors with seeded Forest/Desert encounters, normal/elite/vault kinds, a goblin stair guardian and bounded enemy depth scaling. Saved selections, discovery, party/items and active battles survive reload and backtracking. Prior dungeon saves retain their fixed, unscaled opponents. `/run` retains the terminal three-battle proof of concept and its existing saves.
+<p align="center">
+  <a href="https://tactics-guru-v2.pages.dev/"><img alt="Play in your browser" src="https://img.shields.io/badge/PLAY-in_your_browser-f0cf83?style=for-the-badge&amp;labelColor=101827"></a>
+  <img alt="Status: playable prototype" src="https://img.shields.io/badge/status-playable_prototype-a9ddb8?style=for-the-badge&amp;labelColor=101827">
+</p>
+<p align="center">
+  <a href="package.json"><img alt="Phaser dependency version" src="https://img.shields.io/github/package-json/dependency-version/luminari-gurus/tactics-guru-v2/phaser?branch=main&amp;style=flat-square&amp;color=f0cf83"></a>
+  <a href="package.json"><img alt="TypeScript dependency version" src="https://img.shields.io/github/package-json/dependency-version/luminari-gurus/tactics-guru-v2/dev/typescript?branch=main&amp;style=flat-square&amp;logo=typescript&amp;logoColor=white"></a>
+  <a href="package.json"><img alt="Vite dependency version" src="https://img.shields.io/github/package-json/dependency-version/luminari-gurus/tactics-guru-v2/dev/vite?branch=main&amp;style=flat-square&amp;logo=vite&amp;logoColor=white&amp;color=9d8df1"></a>
+  <a href="package.json"><img alt="Node.js 22.12 or newer" src="https://img.shields.io/badge/Node.js-%3E%3D22.12-5fa04e?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white"></a>
+  <a href="docs/verification-policy.md"><img alt="Vitest dependency version" src="https://img.shields.io/github/package-json/dependency-version/luminari-gurus/tactics-guru-v2/dev/vitest?branch=main&amp;style=flat-square&amp;logo=vitest&amp;logoColor=white&amp;color=729b1b"></a>
+  <a href="docs/browser-testing.md"><img alt="Playwright dependency version" src="https://img.shields.io/github/package-json/dependency-version/luminari-gurus/tactics-guru-v2/dev/%40playwright%2Ftest?branch=main&amp;style=flat-square&amp;label=Playwright&amp;color=2e8b57"></a>
+  <a href="https://github.com/luminari-gurus/tactics-guru-v2/issues"><img alt="Open GitHub issues" src="https://img.shields.io/github/issues/luminari-gurus/tactics-guru-v2?style=flat-square&amp;color=c9963d"></a>
+  <a href="https://github.com/luminari-gurus/tactics-guru-v2/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/luminari-gurus/tactics-guru-v2?style=flat-square&amp;color=f0cf83"></a>
+</p>
 
-The standalone [overworld map prototype](docs/overworld-map.md) opens at `/map` under the configured base path. Choose Rooms (default), Random walker or Cellular caves, and Grassland (default), Forest or Desert. Enter a seed from 0 to 4294967295 and press Generate to reproduce the map; either dropdown applies the displayed valid seed, and New seed retains selections. Each complete world has one cyan player circle and three coral enemy diamonds on distinct walkable cells, with a matching legend and accessible coordinates. Marker positions reproduce from the same layout and seed and survive art switching or late image loads. Invalid seeds or failed placement preserve the previous complete world with explicit feedback. Simple art supports all nine combinations; [terrain, marker and art contracts](docs/overworld-map.md) document the controls and fallback behavior. This inspection prototype uses no movement, battle state or persistence; the normal entry path still opens the battle.
+# Tactics Guru
 
-Phaser 4 + TypeScript + Vite tactical-board prototype. The default scene renders the authored Forest Ruins map, canonical heroes/enemies, selection, reachable cells and canopy occlusion. A small controller uses the pure domain for movement and turn advancement; the renderer never owns combat state. The original Godot project is untouched. Start with the [visual design guide](docs/DESIGN.md) for typography, colors, logo/title-screen direction, and links to the detailed art and interface documents.
+**Three heroes. Elevated battlefields. One more dungeon floor.**
 
-The proof-of-fit scene remains available at `/?scene=proof`, and the content-loading smoke scene at `/?scene=content-smoke`.
+A browser-based fantasy tactics game built with **Phaser 4, TypeScript and Vite**.
+Lead a Fighter, Ranger and Mage through turn-based battles where terrain, line of
+sight and high ground matter. Explore seeded dungeon floors, choose rewards and
+carry your surviving party into the next encounter.
 
-During attack targeting, board diamonds show ✓ valid and × unavailable targets; a double outline marks the selected cell. Movement highlights return when targeting is cancelled. See the [legacy overlay review and target preview behavior](docs/target-preview-overlays.md).
-Hover a free, walkable tile to preview only the active unit's ability reach from that proposed destination. The existing teal overlay continues to show movement reach. Purple dotted diamonds include ability-range cells, including occupied tiles; pink plus markers identify units that can be targeted from the preview origin, marked by a white ring. Keyboard navigation and a prepared Move destination expose the same preview; hovering never changes selection or prepares a command.
+This repository is the playable **v2 prototype**. The header is promotional art;
+the game uses illustrated portraits, compact sprites and isometric tile boards.
 
-## Requirements
+**[Play a battle](https://tactics-guru-v2.pages.dev/) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
 
-Node.js **22.12 or newer** (prefer a supported LTS release) and npm. Dependencies are pinned and `package-lock.json` is tracked.
+## Choose your adventure
 
-## Development
+- **[Standalone battle](https://tactics-guru-v2.pages.dev/) — `/`**<br>
+  Fight the authored 12×12 Forest Ruins encounter with a level-1 party, enemy AI,
+  attack previews, combat feedback and a saved battle you can continue.
+- **[Three-encounter run](https://tactics-guru-v2.pages.dev/run) — `/run`**<br>
+  Play two seeded Desert battles followed by the authored Ruined Approach finale.
+  Carry HP, XP and equipment between encounters; choose an item after each of the
+  first two victories. The third victory completes the run.
+- **[Dungeon floors](https://tactics-guru-v2.pages.dev/dungeon) — `/dungeon`**<br>
+  Explore Rooms layouts with fog of discovery, encounter markers and stairs.
+  Floors alternate Forest and Desert after a seeded first biome. Each has a normal
+  encounter, an elite or vault encounter, and a goblin guardian encounter. Clear the
+  guardian to unlock descent; revisit discovered floors with their progress intact.
+  Enemies scale with depth, and a party wipe ends the dungeon.
+- **[Map laboratory](https://tactics-guru-v2.pages.dev/map) — `/map`**<br>
+  Inspect reproducible 20×20 Rooms, Random walker or Cellular caves layouts in
+  Grassland, Forest or Desert. Switch between Simple and available Legacy 8-bit
+  art. This separate inspection tool has seeded markers but no movement, battles
+  or saved progress.
+
+## Meet the party
+
+- **Fighter** — **Guarded Strike** trades accuracy for defense. In runs and dungeons,
+  level 2 unlocks **Second Wind**, a once-per-battle self-heal; level 3 unlocks
+  **Taunt**, restricting a hostile target's offensive choices to the living Fighter
+  until that target's next turn ends.
+- **Ranger** — **High Shot** rewards taking higher ground, with ranged attacks
+  governed by distance and line of sight.
+- **Mage** — **Magic Missile** deals automatic-hit force damage, subject to range
+  and line of sight. Progression increases the missile count at levels 3 and 5.
+  It can target allies, so check the friendly-fire warning before confirming.
+
+Runs and dungeons support **levels 1–5**. Victories award XP to living participants;
+level-ups increase maximum HP and heal them. Defeated heroes stay defeated.
+Between encounters, use **Healing Draughts** or equip an **Aiming Charm** or
+**Warding Charm**. See [hero progression](docs/hero-progression.md),
+[ability rules](docs/signature-abilities.md#fighter-progression-163) and
+[items and rewards](docs/run-items.md) for the exact contracts.
+
+### Your first turn
+
+1. Choose **Move**, **Basic attack** or a learned **Ability**, then select a tile or
+   target. Hovering a possible destination previews ability reach from that tile.
+2. Read the preview, then press **Confirm action** to commit. Selecting, hovering
+   and cancelling leave the battle state unchanged.
+3. Use **Wait / End turn** when ready; it ends the turn immediately. Enemies take
+   their turns automatically.
+
+Click or tap to select, drag to pan, and use the wheel or pinch to zoom. On the
+focused battle board, arrows navigate, **Enter** selects and **Escape** cancels.
+Dungeon exploration supports arrows/WASD, adjacent-cell taps and direction buttons.
+Sound starts off; **Enable sound** turns on battle cues.
+
+### Pick up where you left off
+
+Standalone battles, runs and dungeons keep **separate browser-local saves**, with
+primary/backup slots and recovery controls. Accepted progress and active battles
+can survive reload; hovering and unconfirmed actions are not saved. Saves belong
+to this browser and origin, with no account or cloud sync.
+
+Save readers validate content and rules versions. Incompatible or damaged data
+is retained for recovery/export instead of silently resetting progress. Export an
+older save before replacing it; continuing it may require its originating build.
+Storage failures are shown in the UI. See [battle storage](docs/battle-storage.md)
+and [progression compatibility](docs/hero-progression.md#save-compatibility).
+
+## Run locally
+
+Use **Node.js 22.12 or newer** and npm; repository CI uses Node 24. Start from a Git
+checkout so production builds can record their source identity.
 
 ```sh
+git clone https://github.com/luminari-gurus/tactics-guru-v2.git
+cd tactics-guru-v2
 npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite. Development and preview bind to localhost by default; pass `-- --host 0.0.0.0` only when intentionally testing on a trusted LAN.
+Open the URL printed by Vite, then append `/run`, `/dungeon` or `/map` to explore
+the other modes. No environment configuration or API keys are required to play,
+build or test. Dependencies are pinned in `package-lock.json`.
 
 ```sh
-npm run typecheck
-npm run build
-npm run preview
+npm run typecheck  # application and pure-domain TypeScript scopes
+npm run build      # content validation, both typechecks, then production output
+npm run preview    # serve the generated dist/ locally
 ```
 
-`dist/` is generated static output, not committed. Vite currently warns about the single Phaser bundle size; production load-time optimization requires later measurement and is not claimed by this scaffold.
+Development and preview bind to localhost. For intentional testing on a trusted
+LAN, use `npm run dev -- --host 0.0.0.0`. `dist/` is generated and ignored by Git.
 
-### Application base paths
+<details>
+<summary><strong>Hosting under a subpath</strong></summary>
 
-Public images, portraits and audio follow Vite's base. Canonical catalog paths and save identities stay unchanged. For a prefixed development server use `npm run dev -- --base=/prototype/`. For a built preview:
+Images, portraits and audio follow Vite's base path. Use the same prefix for build
+and preview:
 
 ```sh
 npm run build -- --base=/prototype/
 npm run preview -- --base=/prototype/
 ```
 
-Open `/prototype/`, `/prototype/?scene=proof`, `/prototype/?scene=content-smoke` `/prototype/map`, `/prototype/run` or `/prototype/dungeon` under that server; direct navigation and refresh are supported. A real host must serve the built output beneath the same prefix and route application entries to `index.html`.
+Open `/prototype/`, `/prototype/run`, `/prototype/dungeon` or `/prototype/map`.
+For development, use `npm run dev -- --base=/prototype/`. A production host must
+serve `dist/` beneath that prefix and route application entries to `index.html`.
+Rebuild at the root base before running the default browser suite. The
+[verification policy](docs/verification-policy.md#focused-commands-and-base-paths)
+documents root/prefix checks and shell-specific environment setup.
 
-After a matching build, run the focused checks with `PLAYWRIGHT_BASE_PATH=/prototype/ npm test -- tests/public-asset-base.spec.ts`; add `PLAYWRIGHT_SERVER_MODE=dev` to check development instead. Use `/` for root checks. These are shell environment assignments (in PowerShell, set `$env:PLAYWRIGHT_BASE_PATH='/prototype/'` and `$env:PLAYWRIGHT_SERVER_MODE='dev'` before `npm test`). Clear both variables and rebuild at root before running the complete default suite. See [review repair evidence](docs/qa/issue-92-public-asset-base.md).
+</details>
 
-## Verification policy
+## How it fits together
 
-Use the [verification tiers and suite inventory](docs/verification-policy.md) to select iteration, PR-readiness and full-regression checks and determine when unchanged evidence can be reused. Use `npm test -- <filters>` for focused browser work, `npm run test:fixtures` for all three dev fixture suites, and `npm run verify:full` for explicit full verification. Browser CI targets the self-hosted runner; no GitHub-hosted fallback is assumed.
+Game rules live in pure TypeScript. Application sessions validate commands and
+own accepted state; Phaser and the DOM present that state. Animations acknowledge
+already-resolved outcomes, and previews do not spend actions or advance battle RNG.
 
-Fast unit checks, including content, use `npm run test:unit`. The two real root/prefix
-build checks use `npm run test:build`; `npm run test:unit:all` runs their complete
-union. Standalone `npm run build` still validates content and both type scopes.
-Full verification reuses its successful unit/content and type stages for ordinary
-root/prefix/restored bundles; configured telemetry builds remain separate.
+```mermaid
+flowchart TD
+    routes["Game entry points<br/>Battle · Run · Dungeon"]
+    view["Phaser board + DOM controls<br/>Input · Previews · Animation"]
+    sessions["Application sessions<br/>Battle · Run · Dungeon"]
+    rules["Pure TypeScript rules<br/>Movement · Combat · Enemy AI<br/>Progression · Rewards · Exploration"]
+    content["Validated content<br/>Heroes · Abilities · Items<br/>Authored and seeded encounters"]
+    persistence["Versioned persistence<br/>Validation · Backup · Recovery"]
+    storage[("Browser-local saves<br/>Separate battle / run / dungeon slots")]
 
-## Browser smoke tests
+    routes --> view
+    view <-->|Intent / snapshots| sessions
+    sessions <-->|Commands / results| rules
+    content --> rules
+    sessions <-->|Save / validated resume| persistence
+    persistence <-->|Read / write| storage
 
-For repeatable per-stage build/test timings and before/after comparisons, see
-[verification timing baselines](docs/verification-timings.md).
-For independently budgeted self-hosted jobs, exact coverage and targeted resume,
-see [serial verification](docs/serial-verification.md).
+    classDef entry fill:#26364b,color:#f5efdf,stroke:#8d9bad
+    classDef presentation fill:#182335,color:#f5efdf,stroke:#8d9bad
+    classDef application fill:#f0cf83,color:#101827,stroke:#c9963d
+    classDef domain fill:#163d39,color:#e7fff5,stroke:#69cdb8
+    classDef saved fill:#302747,color:#f5efff,stroke:#b48aff
+    class routes entry
+    class view presentation
+    class sessions application
+    class rules,content domain
+    class persistence,storage saved
+```
+
+The independent `/map` laboratory shares seeded map generation; the diagram above
+shows the playable battle, run and dungeon flow.
+
+- [`src/domain/`](src/domain/) — deterministic rules, RNG, replay, progression and save codecs.
+- [`src/content/`](src/content/) — validated heroes, abilities, terrain, encounters and items.
+- [`src/app/`](src/app/) — route hosts and battle/run/dungeon session orchestration.
+- [`src/phaser/`](src/phaser/), [`src/geometry/`](src/geometry/), [`src/ui/`](src/ui/) — scenes, isometric projection, picking, accessible controls and feedback.
+- [`src/persistence/`](src/persistence/) — guarded browser storage and recovery.
+- [`src/map/`](src/map/) — seeded layouts, biomes and the standalone map view.
+- [`public/`](public/) — runtime art and audio; [`docs/art/`](docs/art/) — art references and production records.
+- [`tests/`](tests/) and [`scripts/`](scripts/) — unit, build and browser verification plus measurement tools.
+
+## Verify a change
+
+Follow the [verification policy](docs/verification-policy.md): choose checks from
+the affected behavior and its consumers. Documentation-only changes need link,
+path and command checks; they do not require game or browser regression runs.
 
 ```sh
-npm run setup:browsers # Linux with missing OS libraries: npm run setup:browsers:linux
+npm run test:unit           # fast units, including content
+npm run test:build          # real root/prefix build integrations
+npm run test:unit:all       # both selections together
+npm run setup:browsers      # Chromium + WebKit; install once/update as needed
 npm run check:browsers
 npm run build
 npm run test:browser-smoke
-npm test
+npm test                   # default Chromium matrix; not the full regression set
 ```
 
-Tests serve the production build and cover the authored battle board plus the proof/content scenes: canonical anchors, elevation and solid-face picking, camera transforms, live DPR changes, touch gestures, movement, canopy opacity, repeated restart, controlled load errors, audio, lifecycle and panel layout. Chromium projects select the full Chromium headless channel so cached-history tests exercise real BFCache returns; use the standard installation above rather than a shell-only installation. Phaser browser tests run serially to avoid contention between headless renderers on the host GPU. They do not certify real iPhone Safari/Chrome or Android hardware behavior.
+On Linux, `npm run setup:browsers:linux` also installs required system libraries.
+Use `npm test -- <filters>` for focused browser checks, `npm run test:fixtures`
+for the development fixture suites, and `npm run verify:full` for explicit full
+verification. Run browser workloads sequentially; the default tests serve the
+production build, while fixtures and telemetry have their own configurations.
 
-If browser downloads are unavailable, an existing compatible Chromium can be selected explicitly:
+Browser coverage includes desktop, mobile portrait/landscape emulation and
+separate WebKit configurations. **Playwright evidence satisfies project device
+acceptance unless physical-device testing is explicitly requested.** Report the
+actual engine/profile used. Browser CI uses the self-hosted runner without an
+automatic GitHub-hosted fallback.
 
-```sh
-PLAYWRIGHT_CHROMIUM_EXECUTABLE=/absolute/path/to/chrome npm test
-```
+See [browser setup](docs/browser-testing.md), [serial verification](docs/serial-verification.md)
+and [timing baselines](docs/verification-timings.md) for diagnostics and receipts.
 
-See [browser setup and focused diagnostics](docs/browser-testing.md) for reproducible installation, launch receipts, exact-base comparison and the CI smoke check.
+<details>
+<summary><strong>Diagnostic scenes and measurements</strong></summary>
 
-## Layout
+- `/?scene=proof` — the retained rendering/input/audio proof scene. Open
+  **Measurements** or call `window.fitDiagnostics()` in browser developer tools.
+- `/?scene=content-smoke` — catalog loading and terrain-surface inspection.
+- `npm run measure:fit` — after a build, collect cold/warm proof-scene measurements
+  into `test-results/fit-baseline.json`, including source/build identity. This is
+  a diagnostic baseline, not a complete gameplay performance certification.
 
-- `src/main.ts`: shell, scene-specific controls and status
-- `src/phaser/{start,BattleScene,BoardRenderer}.ts`: Phaser game, snapshot controller and authored-board renderer
-- `src/phaser/{FitScene,ProofBoardRenderer}.ts`: retained proof scene and its fixture renderer
-- `src/phaser/{BoardInput,ProofAudio}.ts`: scene-owned pointer/wheel input and the unlock-tone adapter
-- `src/diagnostics/audioState.ts`: pure audio state reducer (no Phaser or DOM), unit-tested
-- `src/geometry/iso.ts`: pure projection, joined tile faces, stable depth order and viewport fitting
-- `src/geometry/{boardPresentation,canopy,picking}.ts`: pure authored render data, art bounds/occlusion and visible-face picking
-- `src/diagnostics/boardFixture.ts`: immutable authored 4×4 fixture with elevations 0, 1 and 2
-- `src/diagnostics/`: navigation-relative timings, transfer sizes and bounded active frame sampling
-- `src/style.css`: full-viewport canvas container, capped scrolling panel, page-gesture rules
-- `public/proof/`: the four proof images as originals, the display-size exports the scene loads (`tree-grass-v1-480.webp`, `fighter-portrait-96.webp`) plus the `grass-material-v1-348.png` test fixture (rule and record in [issue #35 QA](docs/qa/issue-35-proof-asset-export.md)), and the generated unlock tone (MP3 played, OGG decode probe)
-- `tests/*.spec.ts`: production-browser checks for boot/resize, proof scene, board, assets, input, move, audio, lifecycle and layout
-- `tests/unit/`: Node-only unit tests, including measurement reset, visibility behavior, input cleanup and the audio reducer
-- `playwright.config.ts`: desktop and mobile-emulated test projects
+These routes also respect the configured base path.
 
-`.gitignore` excludes dependencies, build/test output, logs, local environment files, the `tmp/` scratch directory, TypeScript caches and editor/OS files. Lockfiles and source/assets remain tracked. `.env.example` lists optional media-generation API keys for hand-run asset tooling (see `docs/media-gen/`); nothing in the game, build or tests reads them, and no environment configuration or secrets are required.
+</details>
 
-## Proof-scene measurements
+## Project guide
 
-At `/?scene=proof`, open **Measurements** and use **Refresh measurements** for a JSON snapshot, or call `window.fitDiagnostics()` in browser developer tools. Timings are milliseconds relative to navigation start (`0`); `fit:scene-start`, `fit:scene-ready` and `fit:controls-usable` are Performance API marks for the current scene run. Scene-ready means scene creation and asset loading have completed; controls-usable follows the first rendered frame and enables restart. Restart clears the old marks and sample, while timestamps stay relative to the same navigation. Hidden periods reset the previous-frame timestamp so resume gaps do not inflate frame samples. `measure:fit` selects the proof URL automatically and records it as `conditions.sceneUrl`.
+- **Visual identity:** [design guide](docs/DESIGN.md), [unit artwork](docs/art/unit-art-guide.md), [terrain](docs/art/terrain-textures.md), [header generation record](docs/art/readme/header-generation.json).
+- **Combat:** [battle foundation](docs/battle-foundation.md), [turn flow](docs/turn-flow-combat.md), [enemy decisions](docs/enemy-turns.md), [target previews](docs/target-preview-overlays.md).
+- **Adventures:** [dungeon contract](docs/dungeon.md), [run integration](docs/run-contract.md#live-integration-80), [hero progression](docs/hero-progression.md), [map laboratory](docs/overworld-map.md).
+- **Persistence:** [battle save format](docs/battle-save-format.md), [storage and recovery](docs/battle-storage.md).
+- **Planning:** [`openspec/`](openspec/), [ongoing project notes](docs/ongoing-projects/), [GitHub issues](https://github.com/luminari-gurus/tactics-guru-v2/issues).
 
-Frame statistics use the first 600 active scene-update intervals after controls are usable, with nearest-rank p50/p95. This is an idle-shell baseline, not a GPU benchmark or combat performance result. Resource entries report transferred bytes (including response headers), encoded body bytes and decoded body bytes; zero transfer on same-origin assets can indicate a cache hit. Report cache/network conditions alongside the snapshot.
+Some technical documents retain dated implementation history. Their historical
+limitations and future-work notes describe those revisions; current behavior is
+defined by the source and current acceptance contracts.
 
-```sh
-npm run test:unit
-npm run test:unit -- tests/unit/measurements.test.ts
-npm run build
-npm run measure:fit
-```
+### Privacy and optional tooling
 
-The collector starts its own localhost production preview on port 4174, runs three fresh-context cold loads and same-context warm reloads for desktop and both mobile-emulated orientations, then writes `test-results/fit-baseline.json`. An optional output path follows `npm run measure:fit -- /absolute/path/result.json`. To measure a deployed origin instead, add `--url` (or set `FIT_URL`): `npm run measure:fit -- /absolute/path/result.json --url https://tactics-guru-v2.pages.dev`; no preview is started, `buildFiles` is `null`, and `measuredBuild` records the commit baked into the served bundle. In local mode the collector refuses a `dist` built from a commit other than the checked-out source. Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` as above if using installed Chrome. Do not run other browser workloads during measurement. The JSON includes source/build commit and dirty state, browser version, network/cache method, exact build-file sizes/SHA-256 hashes, and all samples. A normal build requires the Git checkout to capture its source identity.
+Unconfigured builds and ordinary local development keep PostHog off. Configured
+production builds can collect anonymous events and sanitized errors with a
+persistent **Privacy & analytics** opt-out. Dungeon collection is currently
+disabled. See the [telemetry configuration and privacy policy](docs/telemetry.md).
 
-Local preview uses loopback HTTP and negotiates HTTP content compression; actual beta compression, network latency, physical devices and gameplay workload require later evidence in #20 and #11. See [the initial baseline](docs/qa/issue-14-baseline.md) and [the deployed measurements and physical-device gate for #20](docs/qa/issue-20-fit-gate.md), which proposes budgets; none is asserted by code.
+Optional developer media-generation tools are documented in [the media guide](docs/media-gen/README.md).
+Their credentials are not required by gameplay. Treat `.env` and `.env.example`
+as developer configuration and keep secrets out of commits.
 
-## Authored battle board
+### Contributing
 
-The default scene displays all 144 Forest Ruins cells, elevations 0/1/2 and six authored units. Sprite foot origins come from validated asset metadata; terrain images stay top-down inputs mapped onto 80×40 diamonds. Columns share a deterministic depth order with picking, reserving layers for the surface, highlights and occupants. Forest cells use vector trunks and foliage; only a nearer foliage canopy overlapping living unit art fades to 35%. Trees and sprites pass input through to the visible solid tile beneath them.
-
-Gold outlines/rings show the active unit, an inset white outline shows selection, and teal surfaces show the domain's reachable-cell preview. **Move selected** commits a legal move through `dispatch`; selecting or completing a drag/pinch never commits gameplay. **Next turn** advances either side for board inspection; enemy AI, attacks and combat animation are outside this renderer's scope. **Restart battle** creates a fresh snapshot with the next deterministic session seed (the first load starts at 1).
-
-Tap/click selects visible top or side faces; drag pans and wheel/pinch zooms from the fitted size to 4× fit. Resize refits below the controls while retaining zoom and selection. Coordinates use the canvas CSS rectangle, independently of DPR. The scene removes input, resize/observer and button bindings on shutdown and reuses loaded textures on restart. Browser state evidence is available in `#game.dataset.battleReport`; screenshots and validation notes are described in [issue #6 QA](docs/qa/issue-6-authored-board.md). Physical-device acceptance remains unverified.
-
-## Diagnostic board
-
-The board uses generated filled polygons, with named 80×40 tile dimensions, 24-pixel elevation steps and a common 12-pixel base. Complete columns draw back to front by grid depth (`x + y`), then by `y` and `x` for deterministic ties; elevation shifts the top surface instead of changing this order. The immutable elevation table is a diagnostic fixture, not gameplay content or a procedural map.
-
-Resize fits every top and side face below the current diagnostics panel with a 16-pixel margin. The Measurements snapshot includes tile count, elevation levels, scale and rendered board bounds. The proof board includes diagnostic selection, camera gestures, authored art fixtures and one scripted hero move. See [issue #15 visual QA](docs/qa/issue-15-board.md).
-
-## Proof board input
-
-Tap/click a solid tile to select its visible top or side face. Picking uses the same back-to-front column order as rendering; trees and characters pass input through to the visible board beneath them (canopy pixels outside the board select nothing). A yellow outline marks the selected top surface. Selection is diagnostic state only.
-
-Drag with the primary mouse button or one finger to pan; wheel or pinch to zoom between the fitted size and four times that size. Pan is clamped so the board remains reachable at the center of the area below the panel. A six scene-pixel movement begins a drag; drag, cancellation, and pinch release never select. Resize refits the view while retaining zoom and selection. Coordinates use the canvas CSS rectangle rather than device pixels. Scene shutdown removes all six canvas input listeners and releases pointer captures.
-
-Issue 17 validation includes pure elevated-face picking, inverse transforms and view bounds, listener cleanup, and Chromium interactions across desktop/mobile DPR and portrait/landscape. Physical iPhone Safari/Chrome and Android touch hardware remain unverified.
-
-## Diagnostic hero move
-
-Choose **Raised tile (2, 2)** in **Move destination** to preview its yellow outline, then press **Start diagnostic move**. The two-second authored path starts at (0, 0), passes through (1, 0), (1, 1) and (2, 1), and ends at elevation 2 on (2, 2). The tree uses the raised fixture at (1, 1). Hero feet use the shared tile projection throughout; depth ordering and tree opacity update each frame as the hero crosses the canopy.
-
-The controls report Idle, Moving and Completed. Move/destination/fixture controls lock during animation, then restore; pan, zoom, tile selection and tree opacity remain available. Restart cancels the scene-owned tween and returns to the ground-behind fixture. This is a rendering/input diagnostic, without pathfinding or battle rules. `tests/move.spec.ts` exercises the controls, repeated starts and restarts, fractional elevation, projection and canopy depth/opacity in desktop and mobile emulation. Physical devices remain unverified.
-
-## Proof-scene audio and lifecycle
-
-**Play test sound** plays a generated 880 Hz, 150 ms tone (`public/proof/unlock-tone.mp3`; generation record in [issue #19 QA](docs/qa/issue-19-lifecycle.md)). The button is the only code path that starts playback: it resumes the WebAudio context inside the click, plays the tone once and waits for Phaser's completion event. The status beside it reports Loading, Locked, Ready, Unlocking, Playing, Played, Blocked or Unavailable, and follows the audio context between presses: Phaser's own gesture unlock reads Ready, and a context suspended while the window is blurred reads Locked. Blocked means the gesture happened but the context did not reach `running` or did not resume within 2 s, playback was refused or threw, or completion never arrived; the button stays enabled so the tester can retry. Unavailable means the file did not load or decode, or the device has no audio; the board stays usable. The tone and a same-source OGG decode-only probe load in their own loader pass after the board is created, each with a 5 s request timeout, so the board and Restart never wait on audio and the control reads Loading until that pass settles. The `audio` block in Measurements records the manager, lock state, context state, attempts, completed plays, the last error, the device's codec answers and which files are cached, reading the context and cache state when the snapshot is taken.
-
-While the page is hidden, a move in flight freezes at its current progress and resumes when the page is visible again, completing exactly once; `#move-status` stays Moving throughout and the locked controls stay locked. Window blur alone does not freeze the move. Pointers that are down when the page is hidden are dropped, so returning to the page cannot pan without a new press. Hidden, visible, blur and focus events are counted per scene run in the `lifecycle` block, with the tween progress at the last freeze and the number of completions. Nothing starts audio on visibility, focus or unlock events.
-
-The diagnostics panel is capped at 70% of the viewport height (45% in landscape under 500 px tall) and scrolls instead of hiding controls; **Board controls** collapses the fixture, opacity, move and audio rows. Every panel control is at least 44 CSS px tall. The page suppresses overscroll, selection and long-press callouts over the board and panel (the measurements JSON stays selectable), and the canvas has no context menu. `tests/audio.spec.ts`, `tests/lifecycle.spec.ts` and `tests/layout.spec.ts` cover these in Chromium emulation; safe-area insets, the iOS autoplay rules, OS-level suspension, browser-chrome changes and real touch gestures are physical checks listed for #20 in the QA note.
-
-## Optional telemetry
-
-Unconfigured builds and local development keep PostHog off. Configured production builds use the approved anonymous collection policy with a persistent opt-out. See [setup, privacy policy, event schema and source-map verification](docs/telemetry.md).
+Start with [AGENTS.md](AGENTS.md) and the [verification policy](docs/verification-policy.md).
+Keep gameplay rules in the pure domain, preserve deterministic RNG and save
+contracts, and record evidence for the behavior your change affects. For a bug
+report, include the route, reproduction steps, browser/device profile and any
+relevant seed or recovery message.
