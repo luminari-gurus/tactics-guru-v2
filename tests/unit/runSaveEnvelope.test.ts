@@ -10,6 +10,24 @@ import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
 
+it('retains Ranger effects in progressed run saves and rejects the immediately previous envelope',()=>{
+  const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,
+    party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
+  const created=createRunBattle(items,runContext);assert(created.ok);
+  const ranger=created.state.units.find(u=>u.defId==='ranger')!,target=created.state.units.find(u=>u.side==='enemy')!;
+  const battle={...created.state,units:created.state.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,pinnedBy:ranger.id}:u)};
+  const snapshot={items,activeBattle:battle,battlefield:created.battlefield},encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);
+  const decoded=decodeRunSave(encoded.text,runContext);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  expect(encodeRunSave(decoded.state,runContext)).toEqual(encoded);
+  const wait={type:'endTurn',unitId:battle.initiative[battle.activeIndex]} as const;
+  expect(dispatch(decoded.state.activeBattle!,wait,created.catalog)).toEqual(dispatch(battle,wait,created.catalog));
+  for(const source of [1,3,64])expect(readRunSnapshot({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,markedBy:source}:u)}},runContext).ok).toBe(false);
+  expect(decodeRunSave(JSON.stringify({...JSON.parse(encoded.text),format:4}),runContext)).toEqual({ok:false,reason:'incompatible'});
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,pinnedBy,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
+  expect(completed.state.items.run.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'pinnedBy'))).toBe(true);
+});
+
 it('admits only spent bounded Second Wind healing and carries it through run completion',()=>{
   const prepared=preparedSnapshot();
   const items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,

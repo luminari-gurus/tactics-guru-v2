@@ -34,6 +34,8 @@ export function abilityPresentation(events: readonly BattleEvent[]) {
     if (event.type === 'guarded') feedback.push({unitId: event.unitId, kind: 'guard', text: 'Guarded'});
     if (event.type === 'healed') feedback.push({unitId:event.unitId,kind:'result',text:`+${event.healing} HP`});
     if (event.type === 'taunted') feedback.push({unitId:event.unitId,kind:'guard',text:'Taunted'});
+    if (event.type === 'marked') feedback.push({unitId:event.unitId,kind:'guard',text:'Marked'});
+    if (event.type === 'pinned') feedback.push({unitId:event.unitId,kind:'guard',text:'Pinned'});
   }
   return {signature, feedback};
 }

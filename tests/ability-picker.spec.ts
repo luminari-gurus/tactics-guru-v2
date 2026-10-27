@@ -5,6 +5,57 @@ import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
 import { previewMovement } from '../src/domain/grid';
 
+test('Ranger learned actions follow level one, two and three through the real picker',async({page})=>{
+  for(const [xp,mark,pin] of [[0,0,0],[60,1,0],[180,1,1]]) {
+    await page.goto(`/tests/fixtures/abilities/index.html?hero=ranger&xp=${xp}`);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(page.locator('#battle-ability option[value="ability:high_shot"]')).toHaveCount(1);
+    await expect(page.locator('#battle-ability option[value="ability:mark_target"]')).toHaveCount(mark);
+    await expect(page.locator('#battle-ability option[value="ability:pinning_shot"]')).toHaveCount(pin);
+    await expect(page.locator('#battle-ability-info')).toContainText('Mark Target unlocks at level 2; Pinning Shot at level 3');
+  }
+});
+
+for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${ability} preserves keyboard touch preview cancellation inspection and exact resume`,async({page,isMobile})=>{
+  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/tests/fixtures/abilities/index.html?hero=ranger&xp=180');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),abilityId=`ability:${ability}`;
+  const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
+  // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
+  // hide an accidental attack/magic cue in the presentation path.
+  if(isMobile)await page.locator('#battle-sound').tap();else {await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
+  expect((await readSession(page)).state).toEqual(before.state);
+  await picker.selectOption(abilityId);await expect(picker).toHaveValue(abilityId);await picker.focus();
+  if(isMobile)await button.tap();else await button.click();
+  await page.locator('#battle-target').selectOption('2,0');
+  await expect(page.locator('#battle-preview')).toContainText('no damage or roll');
+  await expect(page.locator('#battle-preview')).not.toContainText('Taunt');
+  const pending=(await readSession(page)).pending;expect(pending).toMatchObject({abilityId});
+  const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});
+  await expect(picker).toHaveValue(abilityId);expect((await readSession(page)).pending).toEqual(pending);
+  expect((await readSession(page)).state).toEqual(before.state);expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(storage);
+  await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath(`${ability}-narrow-preview.png`)});
+  await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();
+  expect((await readSession(page)).state).toEqual(before.state);
+  if(isMobile)await button.tap();else await button.click();await page.locator('#battle-target').selectOption('2,0');
+  if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page),target=accepted.state.units.find(u=>u.id===5)!;
+  expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
+  expect(target[ability==='mark_target'?'markedBy':'pinnedBy']).toBe(2);expect(accepted.state.rng).toEqual(before.state.rng);
+  expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
+  await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();
+  await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'Marked by Ranger #2':'Pinned by Ranger #2');
+  await page.screenshot({path:test.info().outputPath(`${ability}-inspection.png`)});await page.locator('#inspection-close').click();
+  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'marked by Ranger':'pinned by Ranger');await page.locator('#log-close').click();
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);expect(resumed.pending).toBeNull();
+  expect(errors).toEqual([]);
+});
+
 test('Fighter healing and Taunt preserve keyboard touch cancellation inspection and resume',async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&injured');

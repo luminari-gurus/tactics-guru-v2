@@ -1,4 +1,4 @@
-import { combatStats, guardedEffect, tauntSource } from '../domain/effects';
+import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource } from '../domain/effects';
 import type { CellPosition } from '../content/types';
 import type { BattleEvent, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
@@ -15,11 +15,13 @@ export function previewText(preview: ActionPreview): string {
   if ('path' in preview) return `Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`;
   if ('bonus' in preview) {
     const hits = Array.from({length:D20_SIDES},(_,i)=>i+1).filter(n=>n===NATURAL_CRITICAL || n!==NATURAL_AUTO_MISS && n+preview.bonus>=preview.armorClass).length;
-    return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
+    return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass}${preview.markBonus?` · Mark +${preview.markBonus} (consumed on roll)`:''} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
   }
   if ('missileCount' in preview) return `Automatic hit · ${preview.missileCount} ${preview.missileCount===1?'missile':'missiles'} · ${preview.minDamage}–${preview.maxDamage} force damage each · uses action`;
   if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action and 1 battle use · no roll`;
-  if ('sourceId' in preview) return `Taunt · only target Fighter #${preview.sourceId} until target ends its next turn · uses action · no roll`;
+  if ('kind' in preview && preview.kind === 'taunt') return `Taunt · only target Fighter #${preview.sourceId} until target ends its next turn · uses action · no roll`;
+  if ('kind' in preview && preview.kind === 'markTarget') return 'Mark Target · next player attack roll gains +2 accuracy and consumes Mark, including a miss · uses action · no damage or roll';
+  if ('kind' in preview && preview.kind === 'pinningShot') return 'Pinning Shot · prevents movement until target ends its next turn · uses action · no damage or roll';
   return 'End this turn';
 }
 export function eventText(event: BattleEvent, name: (id:number)=>string): string {
@@ -36,6 +38,11 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'healed': return `${name(event.unitId)} heals ${event.healing} HP · ${event.hp} HP`;
     case 'taunted': return `${name(event.unitId)} taunted by ${name(event.sourceId)} until its next turn ends`;
     case 'tauntExpired': return `${name(event.unitId)} Taunt expires`;
+    case 'marked': return `${name(event.unitId)} marked by ${name(event.sourceId)} (+2 on next player attack roll)`;
+    case 'markConsumed': return `${name(event.unitId)} Mark consumed`;
+    case 'markExpired': return `${name(event.unitId)} Mark expires`;
+    case 'pinned': return `${name(event.unitId)} pinned by ${name(event.sourceId)} until its next turn ends`;
+    case 'pinExpired': return `${name(event.unitId)} Pin expires`;
     case 'missileRolled': return `Missile ${event.missile}: ${event.damage} force damage`;
     case 'battleEnded': return event.outcome==='playerWin'?'Victory':'Defeat';
     default: return '';
@@ -46,8 +53,11 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
   const source=tauntSource(unit,session.state.units);
+  const marker=markSource(unit,session.state.units), pinner=movementBlockSource(unit,session.state.units);
   const statuses=[...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
     ...(source?[`Taunted by ${displayName(source.defId)} #${source.id} (only offensive target; expires after this unit’s next turn ends)`]:[]),
+    ...(marker?[`Marked by Ranger #${marker.id} (+2 on next player attack roll; consumed even on miss; expires on source/target defeat)`]:[]),
+    ...(pinner?[`Pinned by Ranger #${pinner.id} (movement blocked; expires after this unit’s next turn ends or source/target defeat)`]:[]),
     ...(unit.defId==='fighter' && Object.values(session.catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes(unit.defId))?[`Second Wind ${unit.secondWindUsed?'0':'1'}/1 use this battle`]:[])];
   return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
     status:unit.hp===0?'Defeated':statuses.join(' · ')||'No status effects'};
@@ -125,9 +135,10 @@ export class BattleHud {
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
     const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
+      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'?'Hostile target · blocks movement until its next turn ends · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
     if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
+    if(actor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
     if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=actor.secondWindUsed?' · Use exhausted':actor.hp===info.def.stats.maxHp?' · Full health':'';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;

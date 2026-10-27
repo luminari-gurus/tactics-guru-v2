@@ -15,7 +15,7 @@ import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
-export const RUN_SAVE_FORMAT = 4;
+export const RUN_SAVE_FORMAT = 5;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {

@@ -20,6 +20,21 @@ import { createRun, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { authoredRun, runCatalog } from '../../src/content/encounters';
 
 describe('bounded progression',()=>{
+  it('learns and exposes Ranger Mark at level two and Pin only at level three',()=>{
+    for(const [xp,level] of [[0,1],[59,1],[60,2],[179,2],[180,3],[600,5]]) {
+      const party=HERO_IDS.map(id=>progressHero(id,xp,1,catalog)),projected=projectProgression(party,catalog);
+      const ranger=party.find(h=>h.heroId==='ranger')!;
+      for(const [abilityId,gate] of [['ability:mark_target',2],['ability:pinning_shot',3]] as const) {
+        expect(ranger.learned.includes(abilityId)).toBe(level>=gate);
+        expect(Boolean(projected.abilities[abilityId])).toBe(level>=gate);
+        if(level<gate) {
+          const s=abilitySession('ranger',projected);
+          expect(dispatch(s.state,{type:'useAbility',unitId:s.active.id,abilityId,target:{unitId:4}},projected)).toEqual({ok:false,reason:'unknownAbility'});
+        }
+      }
+      expect(projected.abilities['ability:high_shot']).toEqual(catalog.abilities['ability:high_shot']);
+    }
+  });
   it('unlocks Fighter effects only at canonical levels and keeps standalone at level one',()=>{
     for(const [xp,level] of [[0,1],[60,2],[180,3],[600,5]]) {
       const party=HERO_IDS.map(id=>progressHero(id,xp,1,catalog)),projected=projectProgression(party,catalog);

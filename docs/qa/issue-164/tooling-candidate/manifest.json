@@ -1,0 +1,27 @@
+{
+  "status": "candidate; application after live run",
+  "source": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+  "adapterSha256": "8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38",
+  "passed": {
+    "verification": 10,
+    "processAndReporting": 20,
+    "selectionAndBatches": 27
+  },
+  "files": [
+    {
+      "file": "tooling-recovery-candidate.log.gz",
+      "rawSha256": "0edfe3807c3b71732ab5a319b4b915bf3424efe48cc4ecd1b97969fb4e19ae69",
+      "gzipSha256": "d57aba9466bb86ee2654d9fade19f37b3cd1943964a262f86f850b82ec47299c"
+    },
+    {
+      "file": "tooling-process-candidate.log.gz",
+      "rawSha256": "e0ef945ff3775d0c3e1ab20aa2b27addc813f32589853df56f60471fc934e63b",
+      "gzipSha256": "8c7b64fc930d5b47746373989fd05327a53df5736c7a0de757a853431788f4bc"
+    },
+    {
+      "file": "tooling-selection-candidate.log.gz",
+      "rawSha256": "0912ab833b24527d40ae114f7672dd1c41e537f42e41349c1a09f1997794dbe8",
+      "gzipSha256": "f1035d387e744195c9210737f1468d3f49f43e5288f38f1fbd6a0823b3d7dfee"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "kind": "iteration-only",
+  "artifacts": [
+    {
+      "path": "typecheck-first.log.gz",
+      "rawBytes": 400,
+      "rawSha256": "286c8b7a1b15e60ea78e67ebb4dc2de7fc4b2a7b690654869adab2b867f431b2",
+      "gzipSha256": "4a6f394d584f9fffce3832d7577bcaed885ec33bc02f821faa958be46b720625"
+    },
+    {
+      "path": "ranger-domain-first.log.gz",
+      "rawBytes": 19396,
+      "rawSha256": "ca7f5db84fdd2ada5ec50e2287da1513d8440973f4bfa54528338ae9713720b7",
+      "gzipSha256": "8d7dab6c72a0bb98be5b622f7c3e8c4eaa88b6606c00ceb924ef4107965be505"
+    },
+    {
+      "path": "ranger-domain-corrected-fixture.log.gz",
+      "rawBytes": 1495,
+      "rawSha256": "73e2fcc49658839474285c591b0aa973fb38485b05a15cec002a55c472e5c4bd",
+      "gzipSha256": "e746741090a1fb0bdd76892fd9e28ef99667e59613a92a419f34885c1c298ea5"
+    },
+    {
+      "path": "build-first.log.gz",
+      "rawBytes": 214,
+      "rawSha256": "d7c3b593d6ecab920c93e064ec90aa84b0544cef658282433c73bfb222f405bf",
+      "gzipSha256": "24a8c89370312ab6752d723a9b31deb35b77d76334bfb53131600a57c742b3a3"
+    },
+    {
+      "path": "build-iteration.log.gz",
+      "rawBytes": 2212,
+      "rawSha256": "16845accd47826c71b4f103fa627b56921d9756530a868aebcee4d2bc1545425",
+      "gzipSha256": "25fe4cb3656f325aefc2c3cb7afdd9c92a251dd7c496eac276c35578020d2be2"
+    },
+    {
+      "path": "build-current-catalog.log.gz",
+      "rawBytes": 5611,
+      "rawSha256": "98d6f455a6cdc8968344daf567d15dae7fb0fb9b0ffdd07e0a227caa02e9dbf4",
+      "gzipSha256": "c387fa2628f33d16bd8b0bf86c9faf3c01190e4d1748bb563d67c7125fbb3f2b"
+    },
+    {
+      "path": "units-all-iteration.log.gz",
+      "rawBytes": 310,
+      "rawSha256": "3460ec8da5a0aebefc5882ab11ce0a88c68b1fcb24da460562c7815b7d25676e",
+      "gzipSha256": "77d7320b886b4a6e4a4ce55d06c7c99fed5e8e454982652c39d76e2281092f49"
+    },
+    {
+      "path": "ranger-journey-first.json.gz",
+      "rawBytes": 8880,
+      "rawSha256": "d0eb84237db45f861806f9425ef90da1bcb86b5d078f835d5eec459ea0b149f5",
+      "gzipSha256": "337a2d6d208d36dd8811da1ad72e4fa9a73fa2217170324dcbbedea2d13c39e0"
+    },
+    {
+      "path": "ranger-journey-first.log.gz",
+      "rawBytes": 2887,
+      "rawSha256": "d527002fb7b30900b1a403c14be4b70217a79af8df0036368e278e2ed37c4583",
+      "gzipSha256": "d27fb2540e84ba99fb7f14c9bddede0e5d9e55ea80daa0fbe9d1fbdeff071e56"
+    },
+    {
+      "path": "ranger-picker-first.json.gz",
+      "rawBytes": 17035,
+      "rawSha256": "17fe831e55ab733ed5a41f4c051e3f42d69fe3928fefa22d048c392edca88bb0",
+      "gzipSha256": "e5dbc243074efdfd5a57e6cd5d229e481fa270341cc278bc4091827717031569"
+    },
+    {
+      "path": "ranger-journey-consumption.json.gz",
+      "rawBytes": 5084,
+      "rawSha256": "b41e5c0461c995fffa0bf859d92908efb26620193b32277ef8584753f416de7f",
+      "gzipSha256": "04b4a2590501e2934d0b43351d938a29a28ca73c04c73928ee48bc26563cd8dd"
+    },
+    {
+      "path": "ranger-journey-consumption.log.gz",
+      "rawBytes": 1531,
+      "rawSha256": "517480a87587c2721d5e5885e7ba39cf025c1504a2fe0f75c5882c7465d7595d",
+      "gzipSha256": "c6e27a4a779c717f076b49dcf5afb110ecfeff9b3dfd7ebce47d1cbe080c0b64"
+    },
+    {
+      "path": "ranger-witness-consumption.log.gz",
+      "rawBytes": 373,
+      "rawSha256": "e82d2edee72be71d9cd0eae55eaf3f46186fbbcfca1b2dada0e11217d8ca41f4",
+      "gzipSha256": "110df04c2e6dc2499337389460a86ded703cef906e4e4de505688c36b853e21a"
+    },
+    {
+      "path": "ranger-production-desktop.json.gz",
+      "rawBytes": 142340,
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "gzipSha256": "aeb4796b0cff78bd742157a4d07898563cb4bfe5c75f92dc6b1687f31877b23c"
+    }
+  ]
+}

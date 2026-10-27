@@ -24,6 +24,37 @@ export function fighterDecision(state:BattleState,catalog:ContentCatalog,tauntUs
   return playerDecision(state,catalog,true);
 }
 
+/** Ranger acceptance witness uses each learned control once, then keeps the legal combat policy. */
+export function rangerDecision(state:BattleState,catalog:ContentCatalog,used:{mark:boolean;pin:boolean}):Command {
+  const actor=state.units.find(u=>u.id===state.initiative[state.activeIndex])!;
+  if(actor.defId==='ranger' && !actor.hasActed)for(const abilityId of [
+    ...(!used.pin?['ability:pinning_shot' as const]:[]),...(!used.mark?['ability:mark_target' as const]:[]),
+  ]) {
+    const targets=state.units.filter(u=>u.side==='enemy'&&u.hp>0);
+    for(const target of targets){const command={type:'useAbility' as const,unitId:actor.id,abilityId,target:{unitId:target.id}};if(previewAbility(state,command,catalog).ok)return command;}
+    if(!catalog.abilities[abilityId]||actor.hasMoved)continue;
+    const reach=previewMovement(state,actor.id,catalog);if(!reach.ok)continue;
+    for(const cell of reach.cells.filter(c=>c.cost>0)) {
+      const move={type:'move' as const,unitId:actor.id,to:cell.cell},result=moveUnit(state,move,catalog);if(!result.ok)continue;
+      if(targets.some(target=>previewAbility(result.state,{type:'useAbility',unitId:actor.id,abilityId,target:{unitId:target.id}},catalog).ok))return move;
+    }
+  }
+  // Make the mark witness observable: preserve a marked target for a rolled
+  // player attack rather than letting the next automatic missile defeat it.
+  const decision=fighterDecision(state,catalog,true);
+  if(decision.type==='useAbility'&&catalog.abilities[decision.abilityId]?.kind==='magicMissile') {
+    const targetId='unitId' in decision.target?decision.target.unitId:'missileTargets' in decision.target?decision.target.missileTargets[0]:undefined;
+    if(state.units.find(u=>u.id===targetId)?.markedBy!==undefined) {
+      for(const target of state.units.filter(u=>u.side==='enemy'&&u.hp>0&&u.markedBy===undefined)) {
+        const alternative={...decision,target:{unitId:target.id}};
+        if(previewAbility(state,alternative,catalog).ok)return alternative;
+      }
+      return {type:'endTurn',unitId:actor.id};
+    }
+  }
+  return decision;
+}
+
 /** Test-only policy. Longer dungeon witnesses can prioritize finishing enemies and safer firing positions; established callers keep their policy. */
 export function playerDecision(state:BattleState, catalog:ContentCatalog = standaloneCatalog, finishTargets = false):Command {
   const actor=state.units.find(u=>u.id===state.initiative[state.activeIndex])!;

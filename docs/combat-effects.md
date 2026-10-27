@@ -1,10 +1,23 @@
 # Combat effects
 
-Audited runtime base: `2b5a063f4a7e8f4a6329eaf1f80630133754012a`; implemented by the approved [#161 staged change](../openspec/changes/issue-161-combat-effects/proposal.md). This is a contract and first production integration, not delivery of all downstream effects.
+Foundation audit: `2b5a063f4a7e8f4a6329eaf1f80630133754012a`, implemented by the
+approved [#161 staged change](../openspec/changes/issue-161-combat-effects/proposal.md).
+The #164 Ranger consumer builds on main `56e2b0d`; it enables the cases below
+without claiming delivery of every downstream effect.
 
-## Enabled runtime: Guarded, Second Wind and Taunt
+## Enabled runtime: Guarded, Second Wind, Taunt, Mark and Pin
 
 Issue #163 activates the bounded Heal/Uses/Taunt handoffs below. See [the current Fighter rules](signature-abilities.md#fighter-progression-163). `secondWindUsed?: true` stores one spent Fighter use; `tauntedBy?: number` stores one living opposing Fighter source on a living enemy. Exact readers reject malformed values and ineligible profiles/references. Pure previews, dispatch, AI and inspection share these rules; accepted events drive logs and floating feedback. Taunt expires at target endTurn or source/target defeat. No generic status/resource framework is added.
+
+Issue #164 activates Mark and movement blocking through [the Ranger rules](signature-abilities.md#ranger-progression-164).
+`markedBy?: number` and `pinnedBy?: number` reference one living opposing Ranger
+with the corresponding learned profile. Mark grants +2 to the next accepted
+player attack roll and is consumed even on miss; automatic missiles do not use it.
+Pin blocks ordinary movement through target endTurn while permitting attack/Wait.
+An existing Pin rejects reapplication. Both clear on source/target defeat and
+new-battle construction; distinct targets and both cases can coexist. Their
+previews spend nothing and all damage paths perform defeat cleanup. Current
+goblins have no immunity; no dormant immunity/forced-movement engine is added.
 
 `src/domain/effects.ts` reads one closed `guarded` case with the Fighter instance as both source and target. Guarded Strike applies −2 attack and grants +2 AC after an accepted hit or miss; an active guard and a prospective Guarded Strike never double the penalty. Shared projection supplies combat previews/resolution, enemy expected-damage scoring through those previews, and HUD/inspection. Catalog stats already include equipment, which is not applied again.
 
@@ -16,14 +29,18 @@ The optional `guarded: true` field is a stored effect; it is a finite boolean, n
 | --- | --- | --- |
 | Guarded | One battle-local self status, attack −2/AC +2, grant after accepted hit/miss, replace not stack; expire at source next-turn start; remove on defeat | This increment; existing Guarded Strike |
 | Heal | Living eligible target only; reject full HP; clamp once to projected max HP; no RNG unless profile explicitly requires it | #163 Second Wind / #166 Heal Goblin / #172 item; each owns amount, uses and action cost |
-| Mark | One mark per target, newest replaces; next qualifying player attack roll gains +2 and consumes even on miss; previews and automatic missiles do not consume; target defeat removes; source defeat removes | #164; source-lifetime choice is proposed v2 adaptation for approval in that consumer plan |
+| Mark | One mark per target, newest replaces; next qualifying player attack roll gains +2 and consumes even on miss; previews and automatic missiles do not consume; target/source defeat removes | #164; source-death cleanup is the approved v2 adaptation |
 | Taunt | One living hostile source; restrict offensive targets to source; allow legal approach or Wait if unreachable; remove on source/target defeat; replace same case | #163; duration anchored to target turn boundary and reviewed in its plan |
-| Movement block | Reject ordinary movement without consuming movement; Wait/attack remain legal; no implicit forced-movement immunity | #164/#165; selected duration/refresh and adoption remain in their plans |
+| Movement block | Pin keeps only origin reachable, rejects ordinary moves without spending, permits attack/Wait; target endTurn or source/target defeat expires; already pinned rejects | #164 enables Pin; #165 owns Frost Snare's later consumer |
 | Accuracy/AC debuff | Add bounded integer modifier once through shared projection; same identity replaces, distinct permitted identities add within derived bounds | #166 weakened / #168 exposure; no guessed DC/duration in this increment |
 | Finite stack | Explicit identity/source/target and cap; add only on consumer's successful trigger; reject overflow in saved input, saturate legitimate gain | #168 frenzy: cap 3, +1 accuracy per stack; trigger/expiry decided with its real profile |
 | Uses | Per-ability finite nonnegative integer remaining uses; whole-command validation before decrement; fresh-battle reset; save mid-battle | #163 Second Wind; no inert resources map now |
 
-Guarded, Second Wind healing/uses and Taunt are enabled. The remaining cases are specified handoffs. Unsupported status/resource fields and ability kinds reject through the existing exact-shape readers/validators. There is no general effect script, unused resource map or test-only action in production. Mark source-death, immobilization refresh, future profile amounts/DCs and acquisition remain subject to the owning issue's approved plan.
+Guarded, Second Wind healing/uses, Taunt, Mark and Pin are enabled. Other cases
+remain specified handoffs. Unsupported status/resource fields and ability kinds
+reject through exact-shape readers/validators. There is no general effect script,
+unused resource map or test-only action in production. Future profile amounts,
+DCs, immunity and acquisition remain with their owning issues.
 
 Source evidence: pinned legacy [resolver](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd), [status definitions](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/content_defs/StatusEffectDefinition.gd), and the linked content issues in the table. Approved v2 [signature rules](signature-abilities.md) take precedence over legacy Guarded/Mage behavior.
 
@@ -35,14 +52,22 @@ Proposed saves are d20 + the chosen save modifier >= DC, without automatic natur
 
 ## Persistence and acceptance gates
 
-Issue #163 advances battle state to format 2/rules 3, run envelope to 4 and dungeon envelope to 5; the standalone wrapper remains format 1 and RNG remains 1. Earlier saves are incompatible and retain recovery/export of original bytes. Historical defeated-unit `guarded` flags are read without normalization before digest checking; projection treats them as inactive. Inspection does not rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery and retains original bytes. Effect state is battle-local and never projected into carried party data. Second Wind now admits bounded spent healing above entry HP in run/dungeon readers and short-run completion; other kinds/uses require reviewed versioning, source references, lifetime/stack/resource bounds, size limits and safe recovery or migration.
+Issue #164 advances battle state to format 3/rules 4, run envelope to 5 and dungeon
+envelope to 6 (following #163's 2/3, 4 and 5 respectively); standalone wrapper and
+RNG remain 1. Earlier saves are incompatible and retain recovery/export of original
+bytes. Historical defeated-unit `guarded` flags are read without normalization
+before digest checking; projection treats them as inactive. Inspection does not
+rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery.
+Effects are battle-local and never projected into carried party data. Second Wind
+admits bounded spent healing above entry HP in aggregate readers/completion. New
+effects require reviewed versioning, source/lifetime/resource bounds and recovery.
 
 | #161 criterion | This increment | Remaining acceptance |
 | --- | --- | --- |
-| Minimal model | Closed contract; Guarded, Second Wind and Taunt | Additional real consumers |
+| Minimal model | Closed contract; Guarded, Second Wind, Taunt, Mark and Pin | Additional real consumers |
 | Typed damage/save/immunity | Explicit proposed ordering and source links; current attacks preserved | #166–#169/#171 implementation/proof |
-| Shared pure evaluation/preflight | Guarded/Fighter combat, AI and UI projection | Same integration for each new kind |
-| Lifecycle/scope | Bounded guard/use/taunt, target/source expiry and fresh-battle cleanup | Consumer durations, stack/resource semantics |
-| Serialization/replay | Bounded Guarded/Second Wind/Taunt and continuation | Marks, immobilization and other consumer resources |
+| Shared pure evaluation/preflight | Guarded/Fighter/Ranger combat, movement, AI and UI projection | Same integration for each new kind |
+| Lifecycle/scope | Bounded guard/use/taunt/mark/pin, target/source expiry and fresh-battle cleanup | Future consumer durations, stack/resource semantics |
+| Serialization/replay | Bounded enabled effects and continuation | Future effects/resources |
 
 Keep #161 open until all consumer-dependent gates have production evidence. The original Guarded increment used `Refs #161` and a draft PR. Browser/device emulation is sufficient; physical hardware testing is not claimed. See the task-specific QA report for measured results.

@@ -5,7 +5,7 @@ import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { expect,it } from 'vitest';
-import { dungeonJourney, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, healedFighterBoundary } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -14,6 +14,37 @@ import { dispatch } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
+
+it('finds a legal earned Ranger level-three witness using both controls and retains replayable histories',()=>{
+  const journey=rangerJourney(190);
+  expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{mark:true,pin:true}});
+  expect(journey.records.length).toBeGreaterThanOrEqual(4);
+  expect(journey.state.phase).toBe('defeat');
+  expect(journey.records.some(record=>record.events.some(e=>e.type==='markConsumed'))).toBe(true);
+  expect(journey.state.party.find(h=>h.heroId==='ranger')!.level).toBeGreaterThanOrEqual(3);
+  for(const record of journey.records) {
+    const catalog=dungeonBattle(record.entry)!.catalog;let state=record.entry.activeBattle!;
+    for(const command of record.commands){const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);state=result.state;}
+    expect(state).toEqual(record.state);
+  }
+  const fighter=healedFighterBoundary();expect(fighter.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
+},120000);
+
+it('retains live Mark and Pin across dungeon continuation and keeps them out of the next encounter',()=>{
+  const fresh=freshDungeon('ranger-save',190),entry={...fresh,party:fresh.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
+  const started=startDungeonBattle(atEncounter(entry));if(!started.ok)throw Error(started.reason);
+  const built=dungeonBattle(started.state)!,initial=started.state.activeBattle!,ranger=initial.units.find(u=>u.defId==='ranger')!,target=initial.units.find(u=>u.side==='enemy')!;
+  const battle={...initial,units:initial.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,pinnedBy:ranger.id}:u)},snapshot={...started.state,activeBattle:battle};
+  const encoded=encodeDungeon(snapshot);if(!encoded.ok)throw Error(encoded.reason);const decoded=decodeDungeon(encoded.text);if(!decoded.ok)throw Error(decoded.reason);
+  expect(decoded.state).toEqual(snapshot);expect(encodeDungeon(decoded.state)).toEqual(encoded);
+  const wait={type:'endTurn',unitId:battle.initiative[battle.activeIndex]} as const;expect(dispatch(decoded.state.activeBattle!,wait,built.catalog)).toEqual(dispatch(battle,wait,built.catalog));
+  for(const field of ['markedBy','pinnedBy'])for(const source of [1,3,64])expect(readDungeon({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,[field]:source}:u)}}).ok).toBe(false);
+  const old=JSON.stringify({...JSON.parse(encoded.text),format:5});expect(decodeDungeon(old)).toEqual({ok:false,reason:'incompatible'});
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,pinnedBy,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const completed=acceptDungeonBattle(started.state,won);if(!completed.ok)throw Error(completed.reason);
+  expect(completed.state.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'pinnedBy'))).toBe(true);
+  expect(dungeonBattle(completed.state)!.state.units.every(u=>u.markedBy===undefined&&u.pinnedBy===undefined)).toBe(true);
+});
 import { previewAttack } from '../../src/domain/combat';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
 import { rollDie, seedRng } from '../../src/domain/rng';

@@ -1,0 +1,776 @@
+{
+  "conditions": {
+    "node": "24.15.0",
+    "npm": "12.0.2",
+    "playwright": "1.63.0",
+    "chromium": "153.0.8010.12",
+    "serverMode": "preview",
+    "basePath": "/",
+    "workers": 1,
+    "retries": 0,
+    "adapterSha256": "8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38",
+    "cache": "persistent",
+    "otherHostLoad": "not independently verified"
+  },
+  "interpretation": {
+    "nativeClearing": "Pristine base/change both fail three; clock-before-boot variant passes nine in each",
+    "picking": "Diagnostic change captured old 412x839 report used after 412x859 refit; synchronization preserves all picking assertions and passes 12 in each",
+    "html5": "Original timeout remains unattributed; pristine focused, six diagnostic and 21 matching-prefix executions pass in each; no production audio repair is claimed"
+  },
+  "runs": [
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 3,
+        "expected": 0,
+        "unexpected": 3,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": [
+        {
+          "id": "048cec556759de4a1f3c-d0c8b0be2f7bd0f69366",
+          "project": "desktop",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d66588facbe332f19920",
+          "project": "mobile-portrait",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-5c91861200b05c3970aa",
+          "project": "mobile-landscape",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        }
+      ]
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "clock-corrected",
+      "counts": {
+        "total": 9,
+        "expected": 9,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "picking-diagnostic-before-sync",
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Attachment-only diagnostic variant before viewport synchronization; errors/attachments preserve that source",
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "picking-synchronized",
+      "counts": {
+        "total": 12,
+        "expected": 12,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "html5-native-diagnostic",
+      "counts": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "base",
+      "productSource": "18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8",
+      "kind": "matching-landscape-audio-prefix",
+      "counts": {
+        "total": 21,
+        "expected": 21,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 3,
+        "expected": 0,
+        "unexpected": 3,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": [
+        {
+          "id": "048cec556759de4a1f3c-d0c8b0be2f7bd0f69366",
+          "project": "desktop",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d66588facbe332f19920",
+          "project": "mobile-portrait",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-5c91861200b05c3970aa",
+          "project": "mobile-landscape",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        }
+      ]
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "pristine-matched",
+      "counts": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Git source before test edits",
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "clock-corrected",
+      "counts": {
+        "total": 9,
+        "expected": 9,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "picking-diagnostic-before-sync",
+      "counts": {
+        "total": 3,
+        "expected": 1,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": "Attachment-only diagnostic variant before viewport synchronization; errors/attachments preserve that source",
+      "failures": [
+        {
+          "id": "32f393a4e32272813f9b-a83a89b2a04ad5881627",
+          "project": "mobile-portrait",
+          "title": "generated production board picks, moves and resumes the same desert after camera changes"
+        },
+        {
+          "id": "32f393a4e32272813f9b-080cdcb03d02a1a275e9",
+          "project": "mobile-portrait",
+          "title": "generated production board picks, moves and resumes the same desert after camera changes"
+        }
+      ]
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "picking-synchronized",
+      "counts": {
+        "total": 12,
+        "expected": 12,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "html5-native-diagnostic",
+      "counts": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    },
+    {
+      "label": "change",
+      "productSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+      "kind": "matching-landscape-audio-prefix",
+      "counts": {
+        "total": 21,
+        "expected": 21,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "testInputs": {
+        "tests/battle-loop.spec.ts": {
+          "productSourceOriginalSha256": "8faf3adec2a73fac8e0924693109af2dcc660ba0c4bce72406828f0d71807a87",
+          "currentQualifiedVariantSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+          "normalizedVariantSha256": "352ef74efc1dcbf3c8d9a79d0a8918bb3e5a72738db922a58a9dfc435b6377fe"
+        },
+        "tests/procedural-grids.spec.ts": {
+          "productSourceOriginalSha256": "c1de18fa3c220ef9e0bcf825438f36121c3adc8c4f1dc85e57f39b76b2a848ce",
+          "currentQualifiedVariantSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+          "normalizedVariantSha256": "6a6e65a6bee5e750d75cfd2df60568753a15f285cde7b45e997859d5422c31de"
+        },
+        "tests/battle-audio.spec.ts": {
+          "productSourceOriginalSha256": "26d2d374ae612b6e2f4e4518418f9380fff16364cfb9ab505c92890b1fe89fcf",
+          "currentQualifiedVariantSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+          "normalizedVariantSha256": "5c69cd8f09868e6f00b63fbcddee8d3899c78064d846376071f36a3ef018583a"
+        }
+      },
+      "failures": []
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "base/qualified-test-inputs/battle-loop.spec.ts.gz",
+      "rawSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+      "gzipSha256": "b5b443e292d9259a22633319e90e455e3913204f743e7cd2b80f765ebf8b4626"
+    },
+    {
+      "file": "base/qualified-test-inputs/procedural-grids.spec.ts.gz",
+      "rawSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+      "gzipSha256": "04243fd1aae31abf6a79a52c7d6df04bf42a021d5a8f3c046391d6c0f1da210f"
+    },
+    {
+      "file": "base/qualified-test-inputs/battle-audio.spec.ts.gz",
+      "rawSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+      "gzipSha256": "65fa2d0374ec606e0a45010202422b8f39e185d10ae66745f72b323b140aabd8"
+    },
+    {
+      "file": "base/pristine-matched/native-clear.json.gz",
+      "rawSha256": "d16b190c423748e9e73c42162046fcb11c3392140b4f26458cdb6a65821b6537",
+      "gzipSha256": "52bbbc137efd6e13a5a4978c59c91b2b283ad30ab1149969e1f224431ee9eb75"
+    },
+    {
+      "file": "base/pristine-matched/native-clear.log.gz",
+      "rawSha256": "4354c561fab351b5034182c781ed31790f551ce18d1cf85b60cbaf918761db91",
+      "gzipSha256": "54246d887adc08496cadfc36e657a1df735db87505ef063509a60a234ced2b3f"
+    },
+    {
+      "file": "base/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-portrait.md.gz",
+      "rawSha256": "41ba6edc871ae3467b999b293050629705edeba85ab64106e27671ecced3122a",
+      "gzipSha256": "c9c19aedd40d5cbbd10ae11a6fce34cb291703c9d08368a9c81e15100325ce73"
+    },
+    {
+      "file": "base/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-landscape.md.gz",
+      "rawSha256": "c80e2fd39fde0375767aaa523bc2009dc1d2139b6305d8fba010e74c7bef7bb6",
+      "gzipSha256": "ffe3b9a0f0037b8fe309ba4feb3012a6ddf868fd4f1c2c30d2612260c3f80b14"
+    },
+    {
+      "file": "base/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-desktop.md.gz",
+      "rawSha256": "c80e2fd39fde0375767aaa523bc2009dc1d2139b6305d8fba010e74c7bef7bb6",
+      "gzipSha256": "ffe3b9a0f0037b8fe309ba4feb3012a6ddf868fd4f1c2c30d2612260c3f80b14"
+    },
+    {
+      "file": "base/pristine-matched/procedural.json.gz",
+      "rawSha256": "c437ac4a5bd5d2b70a18d5f07ae0c4b6e9b92df379d2cb67a46c5a3a05632852",
+      "gzipSha256": "d3589fbdda0f79bb55e5715eefbdab46337694b9e436489baa31594109249c02"
+    },
+    {
+      "file": "base/pristine-matched/procedural.log.gz",
+      "rawSha256": "f34d0cb933a7c09daa13f6f67b1e4361ad7e2dc88da69d144f6e410f6cbf1257",
+      "gzipSha256": "26d3fa37d2e4a46fba353894302a17f137a815ad990546a815878cf276e7fd90"
+    },
+    {
+      "file": "base/pristine-matched/html5.json.gz",
+      "rawSha256": "82891974001501761352c1c4ebeb42813960c850eb37e9cf2897199b2444898b",
+      "gzipSha256": "57a956442ee10f8c6e25eff62e498e8982f6c29759a852b0f57fcc1862bc6c07"
+    },
+    {
+      "file": "base/pristine-matched/html5.log.gz",
+      "rawSha256": "1ab849423e2582ea4d66c05daec10a99cbf0df8ed0270397ee9038efb9e59d75",
+      "gzipSha256": "983f1d5b59d86b4355abf1be2be749e5b87b2c2026238e462cdceae16f56f350"
+    },
+    {
+      "file": "base/clock-corrected/clock.json.gz",
+      "rawSha256": "b6a000f76e21a917b7596b4a92e4dfb3818dfee81612291e69e9d0de7b7ccae0",
+      "gzipSha256": "04bd11a4ab7509b06924875a2a172f6ec7bad489f4921786e9944bbe0f4fa486"
+    },
+    {
+      "file": "base/clock-corrected/clock.log.gz",
+      "rawSha256": "3b7f268f19ff131d517674be5212337cdc1626fca7f451ca5bed3b861edeae45",
+      "gzipSha256": "519658cde3a02555717f78ae4f6649adf8379e2f3ad06863ebbb440e621ab0de"
+    },
+    {
+      "file": "base/picking-diagnostic-before-sync/picking.json.gz",
+      "rawSha256": "8d7fd820e6f5d16bbca7d6108041ca3428de961ff838f13b95629374ab322286",
+      "gzipSha256": "c13ca113a4795ba11dcb35cf0e8b94d1ab1b33d0872f9f65d18a4a497157947a"
+    },
+    {
+      "file": "base/picking-diagnostic-before-sync/picking.log.gz",
+      "rawSha256": "bbc7e7d96920e82e8f58a7f7136df12b382a8efc04cc8012196aefd489aed3a4",
+      "gzipSha256": "073c100a1041315685550360eb2daf51c7a207bb35085f0647a80f46da65df1b"
+    },
+    {
+      "file": "base/picking-synchronized/all.json.gz",
+      "rawSha256": "4bbd2c2095c2d978beb435247a6f48211f7495137921dd0a1a2c1b592aa55a26",
+      "gzipSha256": "b9c35fbe34ec557917d5aed8fad4bec91246d37650a316181db9ad0d43627ed6"
+    },
+    {
+      "file": "base/picking-synchronized/all.log.gz",
+      "rawSha256": "dc4b456da4b794b23ab8aa5149b0d2753da6544859099bb54cb179afa38457b3",
+      "gzipSha256": "b372b8a374500fffa962004303f108773728b736d93be6830ad2764fc7aada02"
+    },
+    {
+      "file": "base/html5-native-diagnostic/results.json.gz",
+      "rawSha256": "f0f7bb72c4cae9644e7be8ea3a9a7e2c80a07232bd69366e49d93c22b7e2d88a",
+      "gzipSha256": "cef1b393373473fa90f1c378bdc4ea2c3395a10a1ae9e58110cd7319606c8269"
+    },
+    {
+      "file": "base/html5-native-diagnostic/results.log.gz",
+      "rawSha256": "34d99181158f4a96853cfa607241942223a469e66064a48c3a38a7bf1a7fc5e4",
+      "gzipSha256": "d0e25ac6c03a6cf0d8ab3816a6d9d604d77df5f5f27d262cce3c31d2824418e7"
+    },
+    {
+      "file": "base/matching-landscape-audio-prefix/results.json.gz",
+      "rawSha256": "8ceb384db117a1f85e773afcda83e83fecf66e5346c21541bdb113af94af911a",
+      "gzipSha256": "67ab5c5307703f7649bd69f5369c9ed3177667828271d60a0dbb0db54091c866"
+    },
+    {
+      "file": "base/matching-landscape-audio-prefix/results.log.gz",
+      "rawSha256": "a41546f2312ada5cc4a64cfe179837d7ae12c31ae7bb0dadaea209d26ef2c282",
+      "gzipSha256": "af56529e29b666975f98dd0ad7452315896cda8f76b31e1555378cb393b1bd77"
+    },
+    {
+      "file": "base/setup-and-build/build.log.gz",
+      "rawSha256": "fce3526b8257c3de3608bc9b7dfb9d602bd5f5258a6048952307d2121d27d2c0",
+      "gzipSha256": "a2f3d9898b3a5ea6bb0a6d051ccb2538d0e9dd5268d9d4745ef480025de9c23b"
+    },
+    {
+      "file": "base/setup-and-build/html5.log.gz",
+      "rawSha256": "ea990851be2003a93ddf4130ee6f7e621ac147afc3cd79028a431831ac33c4da",
+      "gzipSha256": "23bc4852c931d79320aede53c58dd75d7c7a1727e976ff575f6618fa973a3288"
+    },
+    {
+      "file": "base/setup-and-build/install.log.gz",
+      "rawSha256": "fd1c5d8229219dec68c258ed03d11ada112a7bfd26695813be496383f22845f2",
+      "gzipSha256": "33f999fc9454907c6ee3ee79cd940f15798f2efa6aefdfa5de812ce9a1e622c4"
+    },
+    {
+      "file": "base/setup-and-build/native-clear.log.gz",
+      "rawSha256": "d62fbd59d036389a1ead47a63b97ed73d6c4d6801814bc67edb79fe4897cafec",
+      "gzipSha256": "ff027379ad8d7fd9b4ac8690020b80d06bfce471d226f6f01913ea36b7dbf36b"
+    },
+    {
+      "file": "base/setup-and-build/procedural.log.gz",
+      "rawSha256": "64d83cfeb4ef67e546116ab7ecfe5363ddd2d76bbd39437ca9e0f865c7b6ee31",
+      "gzipSha256": "0d2ef9c11534d31d2e0fac69450c6508ce442dbcea06981a0ce71149f476d184"
+    },
+    {
+      "file": "base/setup-and-build/html5.exit.gz",
+      "rawSha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "gzipSha256": "2cf22b7aea8e41f5c29c75d12c063d10790f1711b55dc478e2bbf7af6997cecc"
+    },
+    {
+      "file": "base/setup-and-build/native-clear.exit.gz",
+      "rawSha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "gzipSha256": "2cf22b7aea8e41f5c29c75d12c063d10790f1711b55dc478e2bbf7af6997cecc"
+    },
+    {
+      "file": "base/setup-and-build/procedural.exit.gz",
+      "rawSha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "gzipSha256": "2cf22b7aea8e41f5c29c75d12c063d10790f1711b55dc478e2bbf7af6997cecc"
+    },
+    {
+      "file": "base/empty-filter-setup/html5.log.gz",
+      "rawSha256": "5e28e7137792db5db3a453f121915dc50e454592e4e84b6d7808d790223329bd",
+      "gzipSha256": "bb867e1dede19287cd50dada957818df583a8e7f4464cda08eb5e301ddf881cd"
+    },
+    {
+      "file": "base/empty-filter-setup/native-clear.log.gz",
+      "rawSha256": "e9f9d9f05e6fdd6415b4ea7fb25449dc5ad0accde2d6abe258023c779f6eba59",
+      "gzipSha256": "e054f39140da4db860b09de24600f41226e0cdd82ef56a4f0580c2ea08fe295c"
+    },
+    {
+      "file": "base/empty-filter-setup/procedural.log.gz",
+      "rawSha256": "2a9b7d554997d30521ccb379fd5a5f1cf0fa6962902d04f3149934a49389fc41",
+      "gzipSha256": "1ac56a27010304ba08f119d546270897087ed544e5484ab963576f106f8156c9"
+    },
+    {
+      "file": "base/empty-filter-setup/html5.json.gz",
+      "rawSha256": "8ca4fa75dcf2c280cd6f264a6f63958fb806d35802b831a25c32036059c7e33d",
+      "gzipSha256": "bb3ab911bf8828b3ac59ebc1d5516b114c70b90ee439c56279b1cd2d1ec1c60f"
+    },
+    {
+      "file": "base/empty-filter-setup/native-clear.json.gz",
+      "rawSha256": "b713d0df0edaa7906925edde6fc54f1fa3a6f089eb0e57bc1b42c7d9270905b6",
+      "gzipSha256": "2039977b61921636f368fa2e347df472ead617f2cab8cb3a192adbc0838ec329"
+    },
+    {
+      "file": "base/empty-filter-setup/procedural.json.gz",
+      "rawSha256": "2b7d9b78020ed3cc10bdcca52537ae8e6aa2849aa028ef68b9fabfa2ab4060d3",
+      "gzipSha256": "15a47a1cc299fdc59766c3cb3c9b8109fb6993fa840e0b593278649af2187752"
+    },
+    {
+      "file": "base/empty-filter-setup/html5.exit.gz",
+      "rawSha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzipSha256": "d381e5a9b7c1c71b5fb3fef202103bf4b6098ce288f148735de1ecf61d4e3b75"
+    },
+    {
+      "file": "base/empty-filter-setup/native-clear.exit.gz",
+      "rawSha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzipSha256": "d381e5a9b7c1c71b5fb3fef202103bf4b6098ce288f148735de1ecf61d4e3b75"
+    },
+    {
+      "file": "base/empty-filter-setup/procedural.exit.gz",
+      "rawSha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzipSha256": "d381e5a9b7c1c71b5fb3fef202103bf4b6098ce288f148735de1ecf61d4e3b75"
+    },
+    {
+      "file": "change/qualified-test-inputs/battle-loop.spec.ts.gz",
+      "rawSha256": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+      "gzipSha256": "b5b443e292d9259a22633319e90e455e3913204f743e7cd2b80f765ebf8b4626"
+    },
+    {
+      "file": "change/qualified-test-inputs/procedural-grids.spec.ts.gz",
+      "rawSha256": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+      "gzipSha256": "04243fd1aae31abf6a79a52c7d6df04bf42a021d5a8f3c046391d6c0f1da210f"
+    },
+    {
+      "file": "change/qualified-test-inputs/battle-audio.spec.ts.gz",
+      "rawSha256": "ae5c6a17ef261455b1415f6b20cf860b9d881d45c3800ef96bf8347b8e82ee14",
+      "gzipSha256": "65fa2d0374ec606e0a45010202422b8f39e185d10ae66745f72b323b140aabd8"
+    },
+    {
+      "file": "change/pristine-matched/native-clear.json.gz",
+      "rawSha256": "2819d60945fe0b7720331580a4124b9980ededdaf8547a52721707f1e8177060",
+      "gzipSha256": "3d68bab41be5e8e5ee43f0f6aeee98902dbd1434004188f98a6a227986b0dc5d"
+    },
+    {
+      "file": "change/pristine-matched/native-clear.log.gz",
+      "rawSha256": "f7d225f5c930f51077a2206cba80b2304e035f27be0196d878f1057788199f87",
+      "gzipSha256": "ad261008be9fd2b45202e5d8e471bd34c7705eb0e1a1e17a3bd7578833810840"
+    },
+    {
+      "file": "change/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-portrait.md.gz",
+      "rawSha256": "97b8e486775988b8aa5b18b09229aaca1852fc19f3cbce1d9d72ab6e4511e4cd",
+      "gzipSha256": "bf90e5fb51ec48da3ace0326deb885efd81427095d13365ab1c679d7426a7e9a"
+    },
+    {
+      "file": "change/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-landscape.md.gz",
+      "rawSha256": "97b8e486775988b8aa5b18b09229aaca1852fc19f3cbce1d9d72ab6e4511e4cd",
+      "gzipSha256": "bf90e5fb51ec48da3ace0326deb885efd81427095d13365ab1c679d7426a7e9a"
+    },
+    {
+      "file": "change/pristine-matched/contexts/battle-loop-clearing-the-n-819ea-view-without-changing-saves-desktop.md.gz",
+      "rawSha256": "fad835e083cb5f1cf77c231c646c4a8d0e2b88245db7b6fc8be82af2c089b4dc",
+      "gzipSha256": "4ccb8933ac3cd27a6b86032fb66d58a2a958e46b839d5dc0431f57402bab826d"
+    },
+    {
+      "file": "change/pristine-matched/procedural.json.gz",
+      "rawSha256": "1339881e18417c1782c0952802664e3b1aaf31a575ecc3be1e304e9f7e667592",
+      "gzipSha256": "87f3e5a17443edbef716cc6fc29191397a5aa5eee638f8e1308f9d2a3d2af48b"
+    },
+    {
+      "file": "change/pristine-matched/procedural.log.gz",
+      "rawSha256": "53c4322ab2a09908ec6531588d3c81f9498efb43111a3a60b8682561729fa29d",
+      "gzipSha256": "c83457a44e917d76e9d0281927e3b191f7e8b9fb4ccbb449dafed9ee406e03f4"
+    },
+    {
+      "file": "change/pristine-matched/html5.json.gz",
+      "rawSha256": "fceac5e975c04d4bbe8ccf265f064725b3cbb79bbe53246884dd11233bc3af70",
+      "gzipSha256": "348e12f4cd4e2dd7cfa2248edfec0527ac0c50fe7aa0b40060950d7f29c82ad4"
+    },
+    {
+      "file": "change/pristine-matched/html5.log.gz",
+      "rawSha256": "12474a94a76db1454a544826d7f7bc0cbbd00f0513c65243f9b9c5bc9387a280",
+      "gzipSha256": "9547236fdf8ea2d787bf3cfea2706c80e4fce39ebe8c0bac84b30652d1a796bf"
+    },
+    {
+      "file": "change/clock-corrected/clock.json.gz",
+      "rawSha256": "b162c9fba1fef2bbe4c8d849f2ab877f2b9cfd244893ac4d1f9b0e6231d7cefb",
+      "gzipSha256": "ba7a03801ec6fbf6e2cebcbcf9a25a77ddf44cc0fe2ca67c217b6e93f5426bc4"
+    },
+    {
+      "file": "change/clock-corrected/clock.log.gz",
+      "rawSha256": "245f7dafe20d6983a833fefa1df89fa0189ca35d4402b93881beafed0be176d9",
+      "gzipSha256": "da1f0a5317a8cae6822d4e0a8dd68c271e7b9361b999c4fd90b30c86de714059"
+    },
+    {
+      "file": "change/clock-corrected/contexts/procedural-grids-generated-51ceb-desert-after-camera-changes-mobile-portrait-repeat2.md.gz",
+      "rawSha256": "d74ecd713c3448bdc44c5b721e7b6e705233c8e29c506251d35d9b1c696efaec",
+      "gzipSha256": "81c3c72edc351a63fda18448a06dee883f415a7ed6564d5889dc1c5b4e4c7d2d"
+    },
+    {
+      "file": "change/clock-corrected/contexts/procedural-grids-generated-51ceb-desert-after-camera-changes-mobile-portrait-repeat1.md.gz",
+      "rawSha256": "d74ecd713c3448bdc44c5b721e7b6e705233c8e29c506251d35d9b1c696efaec",
+      "gzipSha256": "81c3c72edc351a63fda18448a06dee883f415a7ed6564d5889dc1c5b4e4c7d2d"
+    },
+    {
+      "file": "change/picking-diagnostic-before-sync/picking.json.gz",
+      "rawSha256": "a6ae3b7a6ad6c6d50b9a615f849885d37ddcb6778a85379c7d2e01b0f550f0d9",
+      "gzipSha256": "d1197feab73432f4e0964e797590d8be4bedab0a5c4f9fe5d1d288c29da62e2a"
+    },
+    {
+      "file": "change/picking-diagnostic-before-sync/picking.log.gz",
+      "rawSha256": "fde95bdf48d43beacb5d9fa8030e918a30579553b2fb675966129ca5dd6c9b75",
+      "gzipSha256": "c40d70c521393f848551c681da29c2f5628ece26ae84acf4abae9768ca9d645d"
+    },
+    {
+      "file": "change/picking-diagnostic-before-sync/contexts/procedural-grids-generated-51ceb-desert-after-camera-changes-mobile-portrait-repeat2.md.gz",
+      "rawSha256": "d74ecd713c3448bdc44c5b721e7b6e705233c8e29c506251d35d9b1c696efaec",
+      "gzipSha256": "81c3c72edc351a63fda18448a06dee883f415a7ed6564d5889dc1c5b4e4c7d2d"
+    },
+    {
+      "file": "change/picking-diagnostic-before-sync/contexts/procedural-grids-generated-51ceb-desert-after-camera-changes-mobile-portrait-repeat1.md.gz",
+      "rawSha256": "d74ecd713c3448bdc44c5b721e7b6e705233c8e29c506251d35d9b1c696efaec",
+      "gzipSha256": "81c3c72edc351a63fda18448a06dee883f415a7ed6564d5889dc1c5b4e4c7d2d"
+    },
+    {
+      "file": "change/picking-synchronized/all.json.gz",
+      "rawSha256": "7aa1ca72054293c2b079e0227b7194c1ca97afc9274f4c349c6d8cfca6b3339a",
+      "gzipSha256": "840f8b64a6b418da4d666742810ae67988ced3850c7385c8229e2af4f449d2a3"
+    },
+    {
+      "file": "change/picking-synchronized/all.log.gz",
+      "rawSha256": "0d6625dd9349a02895940dd0beed5538df093df1e9a0cdbe4220dcb9424ce962",
+      "gzipSha256": "d5e77bac02f598d74e5d5836f80fa8cd3dac7fcf4aa572621f550a506f4a2496"
+    },
+    {
+      "file": "change/html5-native-diagnostic/results.json.gz",
+      "rawSha256": "60ee93edc9d06daed21863c0910e6efe0a0cf7dde75a63a006024a92c3371759",
+      "gzipSha256": "fb5c58fb027e23d96c22cb57da554d42db5bee75797b9845a4779b264e1c9875"
+    },
+    {
+      "file": "change/html5-native-diagnostic/results.log.gz",
+      "rawSha256": "87df326515f969120cde14e596fa0f9fa2629675b5148882d4608f3f7e2f7d4a",
+      "gzipSha256": "2d041731588e5c5d46aff88c5e42e1ca88796fac7e2f711ff84458310c83873f"
+    },
+    {
+      "file": "change/matching-landscape-audio-prefix/results.json.gz",
+      "rawSha256": "fd6aee22caec19b635923fc6cce518aefdbde14cd46d6c35f26f0a6b115360f3",
+      "gzipSha256": "65f54a6353af63a126a1282a83d31e5ecc4412fd06543b186dadd37f8adb9477"
+    },
+    {
+      "file": "change/matching-landscape-audio-prefix/results.log.gz",
+      "rawSha256": "7195d5418634ac595f6cdcae1d08e212bcb61f119f1d984bff388388d1edd521",
+      "gzipSha256": "9f3105fd18d6176e10fb96c543f34d7f629d1618839fc74bb122e0f8a09b7c30"
+    }
+  ]
+}
