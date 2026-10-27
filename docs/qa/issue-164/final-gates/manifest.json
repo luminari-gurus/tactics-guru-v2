@@ -1,0 +1,814 @@
+{
+  "source": "09b4924330ab294efc9f83a1c536d2738a399d34",
+  "inputHash": "f8b7a9e763056a4495cb6b9a033ad88295b748edc6f2306adcaff918d66875cf",
+  "cleanBeforeAndAfter": true,
+  "runtimeSource": "af9c1b60bab2c19c1abf8f08dc26ea32e0b461f3",
+  "reusedOriginalSource": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+  "changedInputs": [
+    "docs/qa/issue-164/playwright.config.ts.json.gz",
+    "docs/qa/issue-164/playwright.device-acceptance.config.ts.json.gz",
+    "docs/qa/issue-164/playwright.exploration.config.ts.json.gz",
+    "docs/qa/issue-164/playwright.fixtures.config.ts.json.gz",
+    "tests/ability-picker.spec.ts",
+    "tests/battle-audio.spec.ts",
+    "tests/battle-loop.spec.ts",
+    "tests/dungeon-lifecycle.spec.ts",
+    "tests/fixtures/abilities/main.ts",
+    "tests/procedural-grids.spec.ts",
+    "tests/unit/abilities.test.ts"
+  ],
+  "runtimeAndBuildInputDiff": "",
+  "adapterSha256": "8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38",
+  "runs": [
+    {
+      "label": "initial",
+      "gate": "ranger-chromium",
+      "counts": {
+        "total": 12,
+        "expected": 6,
+        "unexpected": 6,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [
+        {
+          "project": "desktop",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "desktop",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        }
+      ]
+    },
+    {
+      "label": "initial",
+      "gate": "ranger-webkit",
+      "counts": {
+        "total": 12,
+        "expected": 6,
+        "unexpected": 6,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [
+        {
+          "project": "desktop-webkit",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "desktop-webkit",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "portrait-webkit",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "portrait-webkit",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "landscape-webkit",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+        },
+        {
+          "project": "landscape-webkit",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+        }
+      ]
+    },
+    {
+      "label": "initial",
+      "gate": "recovery-chromium",
+      "counts": {
+        "total": 9,
+        "expected": 9,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": []
+    },
+    {
+      "label": "initial",
+      "gate": "recovery-webkit",
+      "counts": {
+        "total": 9,
+        "expected": 9,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": []
+    },
+    {
+      "label": "qualified",
+      "gate": "engine-smoke",
+      "counts": {
+        "total": 2,
+        "expected": 2,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": []
+    },
+    {
+      "label": "qualified",
+      "gate": "picker-chromium",
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": []
+    },
+    {
+      "label": "qualified",
+      "gate": "ranger-webkit",
+      "counts": {
+        "total": 12,
+        "expected": 12,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": []
+    }
+  ],
+  "notes": [
+    "Initial smoke wrapper rejected custom reporters before executing tests; qualified direct Playwright smoke replaces only that missing execution.",
+    "Initial stronger Ranger cases failed because fixture lacked diagnostics hook, not because an audio assertion failed. Hook is present in qualified source; all assertions retained.",
+    "Original full aggregate remains failed. Unattributed original HTML5 timeout remains a limitation despite matched follow-up passes."
+  ],
+  "artifacts": [
+    {
+      "file": "initial/abilities.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "initial/abilities.log.gz",
+      "rawSha256": "2612f0d15f83346d4c47b0dc3091f5cba29b729298dfdc309a6915cda7223783",
+      "gzipSha256": "c6f53bcfd339d920f44c2b3e40b443928a85565f5abe24f7d95b0f4e495f1147"
+    },
+    {
+      "file": "initial/adapter.sha256.gz",
+      "rawSha256": "f1d5801fa10ff82a25dae03602be5f12d7e4543fd4c60853a6baad66dac57609",
+      "gzipSha256": "9b8c85c1d8d3c9a87bfc4d1e43d0a771ce651a17eb2ee653a1f5c4f453548eba"
+    },
+    {
+      "file": "initial/build.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "initial/build.log.gz",
+      "rawSha256": "b146070d6661c92980ec1ede102a5d33a408966e669c2ed5743af168c880b6b9",
+      "gzipSha256": "b3b859c8eae73c11bd0230f0ca7a70e914536a63c18805bc56c3ab008f0f7292"
+    },
+    {
+      "file": "initial/engine-smoke.exit.gz",
+      "rawSha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "gzipSha256": "6e08a71af69ad2fa0122936c77c0ba1d20f2b26808cfc5ea068985fb8264bf05"
+    },
+    {
+      "file": "initial/engine-smoke.log.gz",
+      "rawSha256": "5c60d1cb915055a4a5eb1e7ea1499497d4f2e363ee31f791cd1ce9b762661ad7",
+      "gzipSha256": "d3c82901e60a86c255bc6abb4f3496cd338099d165c34333f7e473343eb6ee08"
+    },
+    {
+      "file": "initial/install.log.gz",
+      "rawSha256": "fd1c5d8229219dec68c258ed03d11ada112a7bfd26695813be496383f22845f2",
+      "gzipSha256": "33f999fc9454907c6ee3ee79cd940f15798f2efa6aefdfa5de812ce9a1e622c4"
+    },
+    {
+      "file": "initial/ranger-chromium.exit.gz",
+      "rawSha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzipSha256": "d381e5a9b7c1c71b5fb3fef202103bf4b6098ce288f148735de1ecf61d4e3b75"
+    },
+    {
+      "file": "initial/ranger-chromium.json.gz",
+      "rawSha256": "2c63198bd106754d6d8b3285eb1930321859b75cf6174ba05fa4ebad670325d6",
+      "gzipSha256": "af828f2ff965c8c646253489038abe6d87be358e2aa7167c1309afbea752db1b"
+    },
+    {
+      "file": "initial/ranger-chromium.log.gz",
+      "rawSha256": "f298edddbb232befc91d2e9fcb315d82b389913f6aa2150cb5157e83b30ed5d8",
+      "gzipSha256": "a311b9b164e9f69a8e84aeaacfcc8dad88e905d45aebe30981d24b59fe293dbb"
+    },
+    {
+      "file": "initial/ranger-webkit.exit.gz",
+      "rawSha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzipSha256": "d381e5a9b7c1c71b5fb3fef202103bf4b6098ce288f148735de1ecf61d4e3b75"
+    },
+    {
+      "file": "initial/ranger-webkit.json.gz",
+      "rawSha256": "db4048484ae45a05f632543fba391d26186564fe09fa5cb60e6c90a278d39d84",
+      "gzipSha256": "6c3eb25841a957b1857e93f7650bb18c2e307c7d7b7f724a929bd68ed754c7b1"
+    },
+    {
+      "file": "initial/ranger-webkit.log.gz",
+      "rawSha256": "a8b54e3b36f73bfe50eee7851125c9c0d04af9c0c9a754ea277d4df972dfd52a",
+      "gzipSha256": "b83818317ed16ad3891877edbc9e8cfc53b7b0b6c14b7b29df0b674406e006dc"
+    },
+    {
+      "file": "initial/recovery-chromium.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "initial/recovery-chromium.json.gz",
+      "rawSha256": "d3b5aaa70ed629dc1b3abc44c46128efe880316927a6c0a789398ca94d98d8de",
+      "gzipSha256": "ef0fd9cbe3d0d364bd34daf07252346305edf2c622e58603b60944be58f13a34"
+    },
+    {
+      "file": "initial/recovery-chromium.log.gz",
+      "rawSha256": "0fa257038fcb8d3b08367c8ff187944207a01a4114bbec340e82bfa58c3faf8b",
+      "gzipSha256": "cb9c705347e4b93fa1f8f4fe21d4148a32aeaad775865f61cdad8ad2c8c7f8d8"
+    },
+    {
+      "file": "initial/recovery-webkit.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "initial/recovery-webkit.json.gz",
+      "rawSha256": "83e177e0c9c21414e9be99e487e4875279d87843d00b57f732a3b568bca044e2",
+      "gzipSha256": "890010c9fe4759be114419a444e6adcb20105ba2ab7f4a87f8c395a7a0819c0f"
+    },
+    {
+      "file": "initial/recovery-webkit.log.gz",
+      "rawSha256": "0ddcafee649be7638d5486d1db671d6828b660a69acd2c57aeaf02737869e070",
+      "gzipSha256": "7d883df107b4535f69c770322ebe06d17c6df98f82b654c36ea9e0e372b48eeb"
+    },
+    {
+      "file": "initial/source.txt.gz",
+      "rawSha256": "c0ffacda10b7f9278c4b2c7f7e379b2952a6c201dd67b565d8014c9fb58912de",
+      "gzipSha256": "e7268d2eaff20591f6b9ee748270d514e704f8103ccb8a7ddb5e4bc249c5c3ea"
+    },
+    {
+      "file": "initial/status.txt.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-portrait-webkit.md.gz",
+      "rawSha256": "42353d4035626a95c3dbd63ed141ec694ceb2ad327fb4135ca81570a8556cbcf",
+      "gzipSha256": "554487f030f3fd91d544760bb81d8e78e9180a0cd4fd7d04d64ea19903593053"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-landscape-webkit.md.gz",
+      "rawSha256": "11b10dcb734cc717e74897fd77e871378791c89380b8eaea7ea952f1b92f5866",
+      "gzipSha256": "4693df5992f92c328ea06b81536d7a7672d7afa4bc83f212031bed7723838615"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop-webkit.md.gz",
+      "rawSha256": "11b10dcb734cc717e74897fd77e871378791c89380b8eaea7ea952f1b92f5866",
+      "gzipSha256": "4693df5992f92c328ea06b81536d7a7672d7afa4bc83f212031bed7723838615"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-portrait-webkit.md.gz",
+      "rawSha256": "690445b0a7942d9ad175a466068709817d7b1588cfaa6d9a46f2c7286d6bb0ce",
+      "gzipSha256": "46479cdb826696340bd6d7592ba916334448b874e1194d5bb6462e004c6f5c2e"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-landscape-webkit.md.gz",
+      "rawSha256": "0dd74ea9667f496d9ebf173c506a47c306fd6759bf391eb961fd10c47a9affe6",
+      "gzipSha256": "039400b1cb5889df9f0529a65e0099ff5817deaaadd4c3c67e7f6ba6696743cd"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop-webkit.md.gz",
+      "rawSha256": "0dd74ea9667f496d9ebf173c506a47c306fd6759bf391eb961fd10c47a9affe6",
+      "gzipSha256": "039400b1cb5889df9f0529a65e0099ff5817deaaadd4c3c67e7f6ba6696743cd"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-portrait.md.gz",
+      "rawSha256": "82f8e6cc9c0309154477d4cd5a1f264539ecc4b15d86f37cbfaa6cf4f63d79ca",
+      "gzipSha256": "4d2754f1a1cb2f49c67dedc4f3d26b1636cdee4fff3eba55880aaf5baf0ff4ba"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-landscape.md.gz",
+      "rawSha256": "82f8e6cc9c0309154477d4cd5a1f264539ecc4b15d86f37cbfaa6cf4f63d79ca",
+      "gzipSha256": "4d2754f1a1cb2f49c67dedc4f3d26b1636cdee4fff3eba55880aaf5baf0ff4ba"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop.md.gz",
+      "rawSha256": "82f8e6cc9c0309154477d4cd5a1f264539ecc4b15d86f37cbfaa6cf4f63d79ca",
+      "gzipSha256": "4d2754f1a1cb2f49c67dedc4f3d26b1636cdee4fff3eba55880aaf5baf0ff4ba"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-portrait.md.gz",
+      "rawSha256": "03787cb4468bb07b401001abdd82852856c6c817291341e0562a428479253845",
+      "gzipSha256": "73ac61aaebba791848f0c182398cf79a918a7f0f6383f9d72902c364147d8bae"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-landscape.md.gz",
+      "rawSha256": "03787cb4468bb07b401001abdd82852856c6c817291341e0562a428479253845",
+      "gzipSha256": "73ac61aaebba791848f0c182398cf79a918a7f0f6383f9d72902c364147d8bae"
+    },
+    {
+      "file": "initial/contexts/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop.md.gz",
+      "rawSha256": "03787cb4468bb07b401001abdd82852856c6c817291341e0562a428479253845",
+      "gzipSha256": "73ac61aaebba791848f0c182398cf79a918a7f0f6383f9d72902c364147d8bae"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-portrait-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "591159ed26979dbd0a215d4a5f40c9acaec2ee2f8663213f05bf62bf884ed998",
+      "gzipSha256": "95677019c6b5073aaeef9b08a3a5214c730f9237a1066c2827714f38ec57b2cc"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-portrait-webkit/ranger-picker.png.gz",
+      "rawSha256": "e3801c6a0c630bbc18e4a48351c096dac3027f0adab97a153a95428c42405fb8",
+      "gzipSha256": "3a7d735693ad66bdfc300be2395961679dcc53c75c612f8c3bf9fa46fb131145"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-landscape-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "339d509ef698ea73280668e464ea5c4571b96f5f2d064a3379e697aaa8db1831",
+      "gzipSha256": "8624f0b3e739607155341a9d39474c4f5717b6a2f4ceb3a0be89e77ee8328c4e"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-landscape-webkit/ranger-picker.png.gz",
+      "rawSha256": "0e88cfeea95fb2d567c286281817ed372cbdde3b955ae940a2afab236f595114",
+      "gzipSha256": "dd5b9d6df001d6838abc58a497342fc98bc913c28464b2f763c96b97a6cc991e"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "0726d24c10223e89f3b5771cfd5c4b0682cde8d40758f9ee488b06dba7923ffc",
+      "gzipSha256": "d30b2b93b446db77119e6a67e7f9e845870848e4d2eb1b839458f3eaeaca3c1a"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop-webkit/ranger-picker.png.gz",
+      "rawSha256": "56566b07b31875096472767ff585ef57f70832044fe1545d7a026b78d3c2f826",
+      "gzipSha256": "165925f3ef7d14d125f4388bce31739d30aadd7d425b968fc31a4d2b284ab093"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-portrait/ranger-original-viewport.png.gz",
+      "rawSha256": "cc3371440ae7ebda279074af42982cddf56f359121323eaec450dbfd1727c0ff",
+      "gzipSha256": "a9a6e812e155a7e32c7128f501bd4137327231fd67703a986b34314b842b2222"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-portrait/ranger-picker.png.gz",
+      "rawSha256": "efeb323ed7bad2398b60e3a56f34dc3924df9bacfc7b6bcc0278b8586ba91c4b",
+      "gzipSha256": "4bd1d5f6b66c836a008a55a989892b9073ff4b1d7fa8310cf575cf689e9f9b3e"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-landscape/ranger-original-viewport.png.gz",
+      "rawSha256": "fbcfc788ee707781371bcd3c51b6d8a291aececaa67db272f8ae24145d0887f7",
+      "gzipSha256": "a2ff82f91a9cf94f67d61fe3a0d5430fcce64d98f28ffe28dcb3dfe18043c216"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-landscape/ranger-picker.png.gz",
+      "rawSha256": "99809286f8d01b55676dfef5c47d5056ebc184d39a2e5285c0a622ee0ba0a095",
+      "gzipSha256": "6811c8df08db439723a7113a650b9ad148dd7206cbf0f796cc27ae9fca519e46"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop/ranger-original-viewport.png.gz",
+      "rawSha256": "c02c03bc390fa2ae9439274a11e2190bc1e9f57002a57ab982b4b39e3b388c19",
+      "gzipSha256": "2e056306b5e374883bc9a0b043e066a183f06fcf8c8c9db5b7637e837f2a2566"
+    },
+    {
+      "file": "initial/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop/ranger-picker.png.gz",
+      "rawSha256": "6f026e4211d716216a45c3e0a270ab0d1eec43593634390c03ed0fc3c6cb0237",
+      "gzipSha256": "1aa9de817ff9beff94898c962a09f33cf96c3407e19ef9ee72edd26ff6dad781"
+    },
+    {
+      "file": "qualified/abilities.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "qualified/abilities.log.gz",
+      "rawSha256": "cb68822533b9d4d0e6412dd343c0a9058c8f1e9516642836eda9733bf6c8e295",
+      "gzipSha256": "e63765614cbb105580d606aca232c95bd48efad75cb4ce5c14c117c4a7ea2f8b"
+    },
+    {
+      "file": "qualified/after.json.gz",
+      "rawSha256": "c03c82cc87742e4d8ab3b4b62be490f37b4ab5a62e4ee3f1e3041ba0d85817c9",
+      "gzipSha256": "15fb170d0a7d1aae54ce8990994442e628a2df609aab10970c0b3ddf858942b9"
+    },
+    {
+      "file": "qualified/before.json.gz",
+      "rawSha256": "c03c82cc87742e4d8ab3b4b62be490f37b4ab5a62e4ee3f1e3041ba0d85817c9",
+      "gzipSha256": "15fb170d0a7d1aae54ce8990994442e628a2df609aab10970c0b3ddf858942b9"
+    },
+    {
+      "file": "qualified/build.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "qualified/build.log.gz",
+      "rawSha256": "7ecc7cc042f66e85bab1f65e5d86a157c4518e41b02bb304e0aa1c8af7eec1bd",
+      "gzipSha256": "5290233f766122f5b96f5671e5f93f43d9dc8144ce17bbd7cd1fc90dc3d6d63a"
+    },
+    {
+      "file": "qualified/engine-smoke.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "qualified/engine-smoke.json.gz",
+      "rawSha256": "4bb0f33f0b2661d665771f0804e2f6efaf78117e8a866c628623e43c8a87a37d",
+      "gzipSha256": "d376a83894d5024f3e5eff81c56be309a95aff3f7ce6114f8dc9419c0fd9bd85"
+    },
+    {
+      "file": "qualified/engine-smoke.log.gz",
+      "rawSha256": "401550591746c27306bf8cdacacbb08341f943c999294437534c42399aaf6e35",
+      "gzipSha256": "ff585afb69015620b3a17da4f3cd9311157d915a99e6816935b4b2052559abfb"
+    },
+    {
+      "file": "qualified/picker-chromium.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "qualified/picker-chromium.json.gz",
+      "rawSha256": "5e3f9c0e37481749c64248c7c09c8d34ac7f20f303d0fbbb608557f42e82217c",
+      "gzipSha256": "cecd631b78e64d68b394e37c8c297473dbbdd40c1f2400436cc581866877d783"
+    },
+    {
+      "file": "qualified/picker-chromium.log.gz",
+      "rawSha256": "f4dcb5b2b1f906c23579fd0c261f7ea57f44475df56682e4bf9a7253d90ab184",
+      "gzipSha256": "5a8c0e42b73c665cc47f0783d3789e084e5749f5a5b94bba820e60fc31d6e03c"
+    },
+    {
+      "file": "qualified/ranger-webkit.exit.gz",
+      "rawSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzipSha256": "cabc3a30b39528db601f65ca3ced008dd775595c901102d08ac8ae8976b29bcf"
+    },
+    {
+      "file": "qualified/ranger-webkit.json.gz",
+      "rawSha256": "45b75dc7ed80210d5914dab390daff634b3ebe3ddf5ca0d1fe12921b1c461cb1",
+      "gzipSha256": "08512542c80e1e9ae7acb0e3c75c1f6691e9a98aa237332719fe8aa49244eb25"
+    },
+    {
+      "file": "qualified/ranger-webkit.log.gz",
+      "rawSha256": "f03c4fcbe3e9364b726340298aec5464b7a57fc4eea58310ea8b81f4deb88d4c",
+      "gzipSha256": "980d211be68d5e63b058129703f77ce7da1b54c346d4f610a999baa2696e10f2"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-portrait-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "0a7b373b84d28c92c5fa3df6dcd31d1aef23bbfb99d40b0d3e4138a70a843829",
+      "gzipSha256": "62c9e54cbe1b65be1fc114d51ff3661cb3055423cb41e5c45caa0c13bfdbeeb2"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-portrait-webkit/ranger-picker.png.gz",
+      "rawSha256": "0dfdf32d35a5d25f05dd179948a5a5310680d5d2695a42dfe51812a7f0369bdc",
+      "gzipSha256": "08db22803b0a922461e3c3a4cef70291d6f15a7eaa05b9a0d4df4e86be316bf7"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-landscape-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "7c05a376d3d315e011e07c70f569776b9108db63b38ea65e2d7f52fd84881291",
+      "gzipSha256": "1bc53148ab9c3d2cf3881c3c5cdab9a511c937576faf7e9afef6b95c90d8679f"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-landscape-webkit/ranger-picker.png.gz",
+      "rawSha256": "6319d9bf656cf4225f38f015d345b4ddbeb7e397d6c67c0e814eebb55960390c",
+      "gzipSha256": "3f722f14a7d781f8a95ee81448b534ec8bef48edda728ed611cc82fbde916c84"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop-webkit/ranger-original-viewport.png.gz",
+      "rawSha256": "bca6d8108a2310a96e2bfb8603b1b9cc8c182e55ff3643de6a49de90f6ebe5df",
+      "gzipSha256": "85ec294d48a54969df944467175ca699249a9781dcda2ccf807754eb3e8eb802"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop-webkit/ranger-picker.png.gz",
+      "rawSha256": "39bf4a315d973e45ffb05ad338b3b5902f8e9ea21a7f03cac000c4faee65b34d",
+      "gzipSha256": "69853cafbdbf71a6e26cc172cf9c26133b4ae474bc40b0430787d41ba8c42e24"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-portrait-webkit/pinning_shot-inspection.png.gz",
+      "rawSha256": "28b3782da9876fa7a089517f3191974ed1a3277d7fefd6a56af3923cebeb3eb7",
+      "gzipSha256": "ca8c3427c1eede97f8ce9761cb5b187872a9815e135844ebf170d36e6b5234da"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-portrait-webkit/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "8e115f4f0e5d73ce9619f0bc97f062906512c7607fb95c64ae3ef829a7ef69c4",
+      "gzipSha256": "0650d1dcedc87b80e6b615562f001d5c962e735289acffe23dbb088e50537503"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-landscape-webkit/pinning_shot-inspection.png.gz",
+      "rawSha256": "5e13f45129a3574176c0ab9e54192fee0832c596fc5012b21477b75ae455aab7",
+      "gzipSha256": "7908e34014704dc9599b21a1144736cd2fc10d52f686611aea78653a8286d779"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-landscape-webkit/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "824a2e5b25a03cb99593f8fdd0295164727b0892d21e587d07be411c73142b13",
+      "gzipSha256": "9c0b960617fae5cf9f3c0daede38f9c8d7fb485f22970e0f895ce14e925e9149"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop-webkit/pinning_shot-inspection.png.gz",
+      "rawSha256": "d13e56ba65f7252ca84216ae5a287cd28475c9ddbf8b6fb4d9d663bf32b967a2",
+      "gzipSha256": "8858348b1d7aba5566b8a6d342d41403004ac8b31b8c772d0c7bc63fee31400f"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop-webkit/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "1d9805175673d9dc5a0559daf0c46b20c3eb563b61cb3a818e49b9de5e7d7015",
+      "gzipSha256": "cbb29e4b2753d1bff41e1a1e3c18b821303672b60023dcdb45e35b7cb2d55bc4"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-portrait-webkit/mark_target-inspection.png.gz",
+      "rawSha256": "cafbee239365b3fa52d4de7e96728875594c52f6c20c422e4748aaf6f83391f8",
+      "gzipSha256": "3b7be4f3c00eea0c526da6c41a31e14ff4fd085d3a9e91f55b6bde14e87bf0bf"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-portrait-webkit/mark_target-narrow-preview.png.gz",
+      "rawSha256": "ce46a82452269278afda6c89c64fce9f7cb5e3c2ad854f3f69f48f74c3afa35b",
+      "gzipSha256": "0ae3dbea03847adc3ce1a29a140dace6205e3a61b58eac5011b1b62184437d26"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-landscape-webkit/mark_target-inspection.png.gz",
+      "rawSha256": "f569b10f98170a0d525707b25ce3479b90bca999ede981878ef5ec6e6f643cbd",
+      "gzipSha256": "a8aa1a36f3d0fdb287f127d1afee3e28617c7a962076ccb774dfedc202f0dcdc"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-landscape-webkit/mark_target-narrow-preview.png.gz",
+      "rawSha256": "c883fcda2ac85a9b3cde5cd9959b02ccaed9bfc7c33ffc95d3465f6806f2cfca",
+      "gzipSha256": "fb31fb28bd3bc97d8580c3925c87d98eb14e7f0fb240cad585d285ac68f94f63"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop-webkit/mark_target-inspection.png.gz",
+      "rawSha256": "71ea635b90977577764f90f814f8eb3962f5db78ad7839304b7bd73c03ee27e8",
+      "gzipSha256": "f3bf098c930158aabab81f907ab6626531a83f7a7f075030f2e609b369466ffc"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop-webkit/mark_target-narrow-preview.png.gz",
+      "rawSha256": "180aa991e7d46c2e101a3f48efc13f51e2babd207ef3ecd2dc803ddd693c6dfe",
+      "gzipSha256": "2f0b7e1de6b1d2e8dacc5d6556e4d0c779bc5516e351f094f8e2c5431dc24f08"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-portrait/ranger-original-viewport.png.gz",
+      "rawSha256": "d7b7044ea4ce5807f41b16a100a19a366de3c9d979ca55e019a6487889f993df",
+      "gzipSha256": "a26dcb9b8aecba880626e0734fe031b65d594ae5ec554fda4c6d4ebab69eba58"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-portrait/ranger-picker.png.gz",
+      "rawSha256": "d430377d6b7b229effd28e5275d8fa5d6eadb08215c66160aabb2eba7fac6c2f",
+      "gzipSha256": "867724bbed2a5bc834235b3e03727bd75d3a30ec09cbf08fe282ab3e2f6db668"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-landscape/ranger-original-viewport.png.gz",
+      "rawSha256": "fbcfc788ee707781371bcd3c51b6d8a291aececaa67db272f8ae24145d0887f7",
+      "gzipSha256": "a2ff82f91a9cf94f67d61fe3a0d5430fcce64d98f28ffe28dcb3dfe18043c216"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-mobile-landscape/ranger-picker.png.gz",
+      "rawSha256": "f22f7ed4fcb7013f5b8cd9df91c334c944c2903b4eb819187d173cb46c0ee4a8",
+      "gzipSha256": "aadeea3e3afc4a90f120e3fabdb2b942e8db6c5667e1d09e096e1ec01a44dbfc"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop/ranger-original-viewport.png.gz",
+      "rawSha256": "c02c03bc390fa2ae9439274a11e2190bc1e9f57002a57ab982b4b39e3b388c19",
+      "gzipSha256": "2e056306b5e374883bc9a0b043e066a183f06fcf8c8c9db5b7637e837f2a2566"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-ranger-expl-0f549-nd-cancels-without-mutation-desktop/ranger-picker.png.gz",
+      "rawSha256": "f61e55973b37eab2070664c434ebb53f45cce47d8153eb5148d184176ef5332b",
+      "gzipSha256": "ad29bef07a77e91c9307c8bc93e00fe94ab78d03f6d61ccf47c08b3116d8bb5f"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-e50fc-ns-and-resumes-caster-level-mobile-portrait/progression-level-5.png.gz",
+      "rawSha256": "801f6562ed29a59d5c3ee234a118f9c285b9d146b635f0d0793197c45bf07659",
+      "gzipSha256": "20a7b01dd5b948ed16591957827dcfe87d581f501a957112683e1b8c4fe88e96"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-e50fc-ns-and-resumes-caster-level-mobile-landscape/progression-level-5.png.gz",
+      "rawSha256": "a2502532aa66db581fd458f626869c015f0d2a8af8688c31405f74122cc8ee2d",
+      "gzipSha256": "92ddc60c33e81af002a758dcbd5ad5ce14e6595c5a22f8dba67d0b8d81021287"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-e50fc-ns-and-resumes-caster-level-desktop/progression-level-5.png.gz",
+      "rawSha256": "4c80e4892bb2040cf2cc6396358ab1abad070d8d8c8f74cef92debf93dcc7625",
+      "gzipSha256": "ff6f950c7b74d8d92bfff1bfea3125ddbffead5ba6c5ac0fb3255798bf68e67a"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-9ad96-ns-and-resumes-caster-level-mobile-portrait/progression-level-2.png.gz",
+      "rawSha256": "2b0a8846a60f9bd79caae413f748f171cf46eb600b3c13b1031449a1ba03930a",
+      "gzipSha256": "a11bcbb064a0461eaf8478367a86c99ecccc3916daa63b7d2c9c487aca8f340d"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-9ad96-ns-and-resumes-caster-level-mobile-landscape/progression-level-2.png.gz",
+      "rawSha256": "7a65bbb12fea265594d2808fe381d1d89609cb7785af25e8bcb3f428c73165ed",
+      "gzipSha256": "337f9cabe5bc503a1089010bda8a0e4757d867dadcad137d7c5600e0e3170ffe"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-9ad96-ns-and-resumes-caster-level-desktop/progression-level-2.png.gz",
+      "rawSha256": "02a8cdcb20cfe06096e8f51586dd91541ab79cb650845bc9c5489d50c5759ad7",
+      "gzipSha256": "d7aa43150e120bea0f55f8cda5960f55c8a8de78647aca8ba605962665821025"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-63ab3-ns-and-resumes-caster-level-mobile-portrait/progression-level-1.png.gz",
+      "rawSha256": "8e4869a37c222576bde0ee14ce3a0867997bae5cd4fbc17d35a69e07bc8c6f9a",
+      "gzipSha256": "63e0468ab0abe1764763d1c28f10e31c4cc34ee2a1c090a4f346d11f5d441160"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-63ab3-ns-and-resumes-caster-level-mobile-landscape/progression-level-1.png.gz",
+      "rawSha256": "86bbc8a8927eebb86caa385aa5e556eff32faf29f5658eae915d41aa1fb81cb7",
+      "gzipSha256": "973a2d2515c8de8a03d5dc47357dc9992d08c7a439abc20f01b460d6f9e1854e"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-63ab3-ns-and-resumes-caster-level-desktop/progression-level-1.png.gz",
+      "rawSha256": "e8274a36c64d815dbdb86cf8b8b22f23c09b2c5b77967e80de66c7d27626f9dc",
+      "gzipSha256": "06a99db32a188229be358172b17d5255c09f04c52866b0736fee4d824b788786"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-3731e-ns-and-resumes-caster-level-mobile-portrait/progression-level-3.png.gz",
+      "rawSha256": "876b0f7c9941339ef1b1801b573b80c3efd32d55e109b022b00eb30a8546fbbf",
+      "gzipSha256": "8d2b9f7e8a95346a3b33cdccd61343088a5281074f0e20a54602de05d7edec28"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-3731e-ns-and-resumes-caster-level-mobile-landscape/progression-level-3.png.gz",
+      "rawSha256": "bce77013ba01aabd56f146e101a6677b7c01bfa6cb4b1a05f554b9719a8db338",
+      "gzipSha256": "d44886a431a5ab6189eab11c17e36dedef04755c5790d03a597a57dcbc9b7323"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-progression-3731e-ns-and-resumes-caster-level-desktop/progression-level-3.png.gz",
+      "rawSha256": "9bf54adc4f106fd0842957cdfec308ba90c0409750e4d81e916a7b8523c31f0d",
+      "gzipSha256": "c1ee4801f2234ca5d44222d3a2b8a85b313cd49ba907e3dcc73140edde752420"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-mobile-portrait/mage-original-viewport.png.gz",
+      "rawSha256": "871c6bf952b6b00dd94f69caf7b327ad6a613ee61bc280a539fe1aae7e5cedcd",
+      "gzipSha256": "328caa52818b5130d96979055553bbf3d8f6b470acb610aee6554eb7e4564072"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-mobile-portrait/mage-picker.png.gz",
+      "rawSha256": "24857ea0697de83979887893edd5cf83f3bb2a3127e034f078fb4c55ca952b22",
+      "gzipSha256": "8ff71142f74d3375c7815562953d902636ad817037d7428380d151a9f405b380"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-mobile-landscape/mage-original-viewport.png.gz",
+      "rawSha256": "f0a58eba7b0878408273845b45babdfc4029e1cb185d52d20ba9aff0e6e2f15d",
+      "gzipSha256": "549997e3b054bfda398377ab4a2829d2f6ae770d36ecf4518df966ddc7c86aa6"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-mobile-landscape/mage-picker.png.gz",
+      "rawSha256": "b8e1b79e933a17d096505b9c796422095c114b45b264b8361a41aa99f22e979e",
+      "gzipSha256": "e5a6ae5ed502a80a6cf0c4da796cb6f2cdd9cb1e827baeeb644a403230bf414b"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-desktop/mage-original-viewport.png.gz",
+      "rawSha256": "e322c62f656f51da08b9f280942dff4c3fe96e9d7f7137ec036d33fa6a91741f",
+      "gzipSha256": "98b997a27a981b07a633da307892641ff62ec2470f41e690cb0a2ad03cbce4b6"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-mage-explic-d86fd-nd-cancels-without-mutation-desktop/mage-picker.png.gz",
+      "rawSha256": "d524fd28cace8f0f9b1b1f69c64717ddaa0a22077b8662084391724c646aa829",
+      "gzipSha256": "211077f5fdb206c214b6ed5e5762d8f8ae9e8dc619c098a75abc30fb0a192129"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-mobile-portrait/fighter-original-viewport.png.gz",
+      "rawSha256": "1d8073765fd3fa57e493854dbd2a708cedaf9bb56d73b19b2f362d78bc0a2999",
+      "gzipSha256": "7dd425874de1a2c9642f182abc316b1f282861e31c0bcffb7c544c574c7aaf01"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-mobile-portrait/fighter-picker.png.gz",
+      "rawSha256": "142b272f10c944e38391505aff3dcb4773e5486d07792d4bf81f232af87ce29d",
+      "gzipSha256": "eb70489e9e9daedd6cea3d6ea0c477ce6094cdd492f4f95fc327af9380148ab2"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-mobile-landscape/fighter-original-viewport.png.gz",
+      "rawSha256": "a388ddf035d5d3336eed999d5541c927422e9ac784c326a338bd89e5012e791a",
+      "gzipSha256": "955cefb2889e2ec81a1d18b6d9d6428b6e333c63ca862ddee82ddcf5fb41c21e"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-mobile-landscape/fighter-picker.png.gz",
+      "rawSha256": "4c6ec0e54010bcca7ec65fe00c46e85bdda7a155b81c7639d24bf7a02a16c968",
+      "gzipSha256": "82bdf4472d31d660d2284294549c2deeda8065a4ff4a6f94b30073242b2583ea"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-desktop/fighter-original-viewport.png.gz",
+      "rawSha256": "b995e3bf48eb51578f9a4fd9c6ce853586470c035b0c62430441d90c1303b619",
+      "gzipSha256": "e1deab48002717c36021401e5ea9f918fba0f473d96c788a3452cf64e817293a"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-fighter-exp-98b70-nd-cancels-without-mutation-desktop/fighter-picker.png.gz",
+      "rawSha256": "45d7a635db330bbb79252fbb0681cb05b7ae99f06b2ea12be7d3b009f61b410b",
+      "gzipSha256": "a6fbe6c73bda00c11c4561464957e91b0c821fff473d937e4dee26f8f840a990"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-portrait/pinning_shot-inspection.png.gz",
+      "rawSha256": "cd73d0a1e6b90ab01ccf9c943922f8dec82206de8b5516d74446cf5fddf90f82",
+      "gzipSha256": "1e96cd8f1edbf31b2ba536a6edcb237cdda49258eefdc50011257ff4400a9966"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-portrait/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "0353f1dca54a601bb2a7e3eaefe4fa94ab7d9dcf88c8fa9b783a4b45f71211a2",
+      "gzipSha256": "67f740b6d4a8e4b70dfabba55b39020898b80ab292c2cab3ab2fe10c73694a37"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-landscape/pinning_shot-inspection.png.gz",
+      "rawSha256": "ad89a16b67477eef7245307d3c0869ab227996094d749de60be371b9b072bcd4",
+      "gzipSha256": "4aefbce4db4adbd1309a28dd30cf50afcdd25ddede6cfd58a54dc450a40c3d01"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-mobile-landscape/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "0353f1dca54a601bb2a7e3eaefe4fa94ab7d9dcf88c8fa9b783a4b45f71211a2",
+      "gzipSha256": "67f740b6d4a8e4b70dfabba55b39020898b80ab292c2cab3ab2fe10c73694a37"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop/pinning_shot-inspection.png.gz",
+      "rawSha256": "61cdf95021f0befe87f56616ca83157f34914deaa992782be56cd2266dce9479",
+      "gzipSha256": "640e45013633ea09e5b64dc23e312ef2a2314a80feba477023e9360e1e029447"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-pinn-3a29a-inspection-and-exact-resume-desktop/pinning_shot-narrow-preview.png.gz",
+      "rawSha256": "8c91fd2c6fccbd9eb55d08aeb37936394dc733ea7e3b60b06cf9b0814377d53e",
+      "gzipSha256": "30daef4982664afff375c05b11c3db67c086aa1413944563af0a77abaa97b11e"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-portrait/mark_target-inspection.png.gz",
+      "rawSha256": "2035505358b1c8bf83fd5230e730d89b2dce10b73c010eadf20494f1765867a2",
+      "gzipSha256": "ac9526c81f296994951d9cf32ae57c468f188851a010d9de789d04667895112e"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-portrait/mark_target-narrow-preview.png.gz",
+      "rawSha256": "fff13d1aaa61935569e8a140cd727cc8ca5fc30777de70b40030a316400de4e7",
+      "gzipSha256": "ace0fff5bd066cd5ac0ca8863d7cfcf2de63198290e931fd44693abd7c252123"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-landscape/mark_target-inspection.png.gz",
+      "rawSha256": "eaf5317c6e805fb4a0e02f3a3276f24153ec91b3ce1562a8febf9f82b4045211",
+      "gzipSha256": "0729bed8ba3e81d0bd85664a9f37ed00153b9585ffe3c6a4fdf81d3858ca6eec"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-mobile-landscape/mark_target-narrow-preview.png.gz",
+      "rawSha256": "fff13d1aaa61935569e8a140cd727cc8ca5fc30777de70b40030a316400de4e7",
+      "gzipSha256": "ace0fff5bd066cd5ac0ca8863d7cfcf2de63198290e931fd44693abd7c252123"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop/mark_target-inspection.png.gz",
+      "rawSha256": "b61c6f9038d42648a92088db489da1930ef405db78c69600e779cfc27dd148fb",
+      "gzipSha256": "56e0e524a539c0f58412d5faa765d6c45776e7f1c2f02ebadd4792a590c6aeea"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Ranger-mark-0ee26-inspection-and-exact-resume-desktop/mark_target-narrow-preview.png.gz",
+      "rawSha256": "7a44409deaec5044ae0e13c19957aa1b81f8cf54915931091cd742474fedb498",
+      "gzipSha256": "54c2bd02d39862b58ae6918e0999582f9679caf6fa0bcbeba5fff7c929fd30e4"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-mobile-portrait/fighter-heal-preview-narrow.png.gz",
+      "rawSha256": "58e3fa50130d2b89993d9bc1c19d2d30fbaa471eec4bfe38f8205d88a64a7dbc",
+      "gzipSha256": "f163253223b8ba99dc8d4d4bfde1b6e16ee483280605e2a6bf0576042f446bc3"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-mobile-portrait/fighter-taunt-inspection.png.gz",
+      "rawSha256": "e3b620ed81213bdee51d320c4ed2e92c50b179d70faa28816dee81b07c921c5d",
+      "gzipSha256": "26e92ddff0b75a2584e6f93de30563e3fd422789d42ba8844aaf050e0d2ad0fd"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-mobile-landscape/fighter-heal-preview-narrow.png.gz",
+      "rawSha256": "e43afeeb389975a0f59a30694a9d07740961c6438cb403e4587518f3a5f7fa35",
+      "gzipSha256": "25374b72297db027793d1f4e3f1abb49e25d1067379f9539ca60bf1d5931099d"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-mobile-landscape/fighter-taunt-inspection.png.gz",
+      "rawSha256": "6a4a24b2d65e998968dea8e8e678804d510a0a2075a91f6648fa71c1c351ca9c",
+      "gzipSha256": "5f157485314623a48bc855402b2d6da4f8c0e40216b78ef149e9efe26ba775e5"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-desktop/fighter-heal-preview-narrow.png.gz",
+      "rawSha256": "8549284570e64deb85efe38d717b18898810f42f340294ad7385d3a8b42d1d97",
+      "gzipSha256": "50261cdc8a628e04c22b2bbca7b446612bb7e584a7c4e3a3354baf286d6c9a64"
+    },
+    {
+      "file": "qualified/screenshots/ability-picker-Fighter-hea-517f9-ation-inspection-and-resume-desktop/fighter-taunt-inspection.png.gz",
+      "rawSha256": "06ec7ff5422f558b55a2fff9cd7e18fedacbbc155c46aadeec5d36e2b7754dd4",
+      "gzipSha256": "e6a164d939880df5c9ef5651b9aab4bc9ae2735b533b53f8514a8713d1af451c"
+    }
+  ]
+}

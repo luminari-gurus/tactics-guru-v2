@@ -1,6 +1,6 @@
 # Issue #164: Ranger Mark Target and Pinning Shot
 
-Date: 2026-10-27 (Asia/Jerusalem). Status: implementation approved and active.
+Date: 2026-10-27 (Asia/Jerusalem). Status: implementation and PR qualification complete.
 The caller approved this plan and requested implementation, required verification
 and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 
@@ -23,24 +23,31 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
   terminal exit, the exact qualified candidate bytes were applied (SHA-256
   `8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38`).
   Its 10 verification, 20 process/reporting and 27 selection/batch contracts pass;
-  final actual Vite/engine smoke is still needed.
+  final actual Vite/engine smoke passes both Chromium and WebKit (2/2).
 - A pristine matched comparison at literal base
   `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8` and original change `789161c`
   reproduces native-clearing/clock failure in all three Chromium profiles.
-  Procedural portrait picking and landscape HTML5 watchdog cases each pass one
-  focused execution in both trees. Those original intermittent failures remain
-  retained and require bounded diagnosis; no blanket retry or pre-existing label
-  is applied to them. Base checkout: `/tmp/tactics-issue-164-base-18a6f63`;
+  The clock-before-boot repair passes the clearing/confirmation group 9/9 in each.
+  Resize diagnostics prove a stale camera report; synchronization passes the full
+  procedural file 12/12 in each. Native HTML5 variants pass six diagnostic repeats
+  and the matching 21-case landscape prefix in each tree; the original watchdog
+  timeout remains unattributed. No blanket retry or pre-existing label is applied
+  to it. Base checkout: `/tmp/tactics-issue-164-base-18a6f63`;
   original change: `/tmp/tactics-issue-164-20261027`.
-- Additional previous-format recovery cases (nine Chromium / nine WebKit) and
-  the 12-case WebKit Ranger picker selection remain to run. Extra simultaneous /
-  replaced-source assertions pass all 35 ability units; no feature runtime changed.
+- Final gates pass: previous-format recovery 9 Chromium / 9 WebKit, entire picker
+  36 Chromium, Ranger picker 12 WebKit, both types/build and all 35 ability units.
+  Mark/Pin no-cue assertions run with sound actually enabled and ready. The fixture
+  diagnostics hook repair and its failed first attempts are preserved.
 - Selection continuity preserves all old IDs/settings: default 715 → 727,
   fixtures 72 → 81, WebKit exploration 78 → 90 and acceptance 54 → 54.
-- Remaining: repair and prove the bounded qualification failures, execute the
-  added recovery/picker gates and corrected engine smoke, retain final identities,
-  finish the acceptance audit, then open/attach the PR. The ignored literal-base
-  export remains local as evidence after automatic approval review denied cleanup.
+- Final clean qualified source: `09b4924330ab294efc9f83a1c536d2738a399d34`;
+  input hash `f8b7a9e763056a4495cb6b9a033ad88295b748edc6f2306adcaff918d66875cf`
+  is unchanged before/after. Application/build inputs are equivalent to the
+  original full-run source; changed test bodies and adapter have separate proof.
+  [QA report and acceptance audit](../qa/issue-164/README.md) retain exact reuse,
+  original failures and all added gates. PR publication follows this docs checkpoint.
+  The ignored literal-base export remains local as evidence after automatic
+  approval review denied cleanup.
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.

@@ -1,8 +1,8 @@
 # Issue #164 qualification
 
-Status: implementation is published; the original full regression is complete
-and failed. Bounded failure diagnosis and final added gates are in progress;
-this report does not yet claim PR readiness.
+Status: implementation and required acceptance proof are complete for PR review.
+The original full regression remains failed. Focused repairs and added gates are
+separately retained; the original intermittent HTML5 timeout remains unattributed.
 
 ## Source and scope
 
@@ -99,7 +99,7 @@ before realpath lookup. With that candidate loaded, `test:verification` passes
 10/10, `test:verification-tooling` passes 20/20 and `test:verification-batches`
 passes 27/27. [Retained candidate receipts](tooling-candidate/manifest.json) bind
 the module bytes and command results. The same bytes are now applied and hash-
-verified; actual Vite/engine smoke with the final source remains pending.
+verified; final actual Vite/engine smoke passes 2/2 in Chromium and WebKit.
 
 Current discovery: 718 default Chromium, 81 combined fixtures, 3 dev placement,
 54 WebKit acceptance, 81 WebKit exploration, 25 health bars, 36 each configured
@@ -118,7 +118,7 @@ WebKit acceptance passes 54/54; the complete manifest above also retains the lat
 passed stages. Performance evaluation passes 18/18 with no integrity failures,
 budget violations or slow-load warnings.
 
-The five Chromium failures are preserved, not yet dispositioned:
+The five original Chromium failures are preserved:
 
 - Native movement destination clearing remains `presenting` after clock resume
   in desktop, portrait and landscape (three failures at battle-loop line 112).
@@ -132,11 +132,34 @@ A separate clean literal-base checkout at
 `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8`, has locked dependencies and a passing
 build prepared. Pristine matched focused runs reproduce the native-clearing
 failure in all three profiles in both base and change. Procedural portrait and
-landscape HTML5 cases each pass once in both trees; their original failures remain
-unattributed pending bounded diagnosis. Setup-only attempts (missing npm on a
+landscape HTML5 cases each pass once in both trees. Setup-only attempts (missing npm on a
 non-login shell PATH and overly anchored grep filters selecting zero cases) are
 retained separately. Corrected discovery proves exactly 3 + 1 + 1 selected cases.
 No assertions/timeouts or retries have been weakened.
+
+### Matched diagnosis and repairs
+
+[Comparison receipts](comparisons/manifest.json) retain the literal base and
+feature reports, logs, diagnostics, test input hashes and original failures.
+
+- Installing Playwright's clock before Phaser boots fixes the native-clearing
+  test's mixed clock origins. The clearing and confirmation/cancel group passes
+  9/9 in each tree with all original assertions and timeouts retained.
+- The picking diagnostic captured a stale 412×839 camera report used after the
+  412×859 refit. Waiting for the report's viewport to match the requested resize
+  before calculating the click fixes that race; the complete procedural file
+  passes 12/12 in each tree. The diagnostic's original change run retains its two
+  failures; the synchronized result does not overwrite them.
+- Native HTML5 instrumentation records media events and promises without replacing
+  their behavior. Both variants pass six bounded landscape repetitions in each
+  tree. The matching landscape prefix (assets plus the entire audio file) then
+  passes 21/21 in each tree. The original watchdog timeout remains **unattributed**;
+  this evidence neither proves it pre-existing nor claims an audio-engine fix.
+
+The clock and resize changes are isolated test synchronization repairs. Audio
+changes add bounded diagnostic attachments only. Production runtime has not changed
+since `af9c1b6`. These focused results supplement a failed aggregate; they are not
+a clean full-suite result.
 
 [Actual selection continuity](selection-continuity.json) compares the literal
 pre-implementation `18a6f63` tree with the current tests. Every prior test ID and
@@ -146,14 +169,92 @@ cases bring current selection to 727 default and 90 exploration; those nine
 executions per matrix were added after the full-run freeze and require focused
 follow-up. Compressed before/after discovery reports are linked by the summary.
 
-Final acceptance still requires complete stage accounting, any focused failure
-repairs, the additional WebKit picker run, explicit previous-format byte-preserving
-browser recovery, screenshot/report retention, final source/input equivalence,
-the requirement audit and PR creation. No full-regression pass, physical-device,
-CI success, production deployment or comparable performance baseline is claimed.
+### Final acceptance gates and evidence reuse
+
+[Final gate manifest](final-gates/manifest.json) retains successful and failed
+attempts, logs, reports, screenshots and SHA-256 hashes. The clean qualified
+checkout is `/tmp/tactics-issue-164-final-20261027` at
+`09b4924330ab294efc9f83a1c536d2738a399d34`, with unchanged before/after input hash
+`f8b7a9e763056a4495cb6b9a033ad88295b748edc6f2306adcaff918d66875cf`.
+
+- Standalone build, all 221 content checks and both TypeScript scopes pass.
+  All 35 current ability unit tests pass, including the two cases added after
+  the original full-run freeze.
+- Corrected bind adapter: actual Phaser boot/resize smoke passes 2/2, one engine
+  each; its module hash equals the candidate qualified by 57 tooling contracts.
+- Entire ability-picker file passes 36/36 Chromium selections, covering desktop
+  keyboard, portrait and landscape native touch, Fighter/Ranger/Mage, cancellation,
+  inspection, narrow layout, reload and unchanged High Shot interactions.
+- Ranger fixture WebKit selection passes 12/12 across desktop and both touch
+  orientations. Mark/Pin use a real enabled/ready audio backend and assert zero
+  started/completed/dropped cues and no owned sound instances after acceptance.
+- Previous-format recovery passes nine Chromium and nine WebKit selections for
+  battle/run/dungeon. Those tests ran at clean source `61a9dd6`; their inputs and
+  all application inputs are unchanged by the later fixture-only hook addition.
+
+The first stronger audio attempt at `61a9dd6` failed six cases per engine because
+the source-entry fixture lacked `window.fitDiagnostics`; the fixture now exposes
+the same production diagnostics function. Both initial failed reports remain
+retained. A smoke-wrapper attempt rejected custom reporter flags before executing
+tests; the qualified direct Playwright command covers that missing execution.
+There are no blanket retries or weakened assertions/timeouts.
+
+Relative to original source `789161c`, application code, public assets, dependency
+lock, scripts and executable build/Playwright configs are unchanged. The identity
+diff contains seven deliberately updated test/fixture files and four compressed
+discovery reports matched by the identity collector's broad `*config*` glob.
+The opt-in adapter correction is separately bound by its explicit hash. Original
+units, production journeys, owning modes/engines, telemetry, asset and performance
+results are reused only for unchanged relevant inputs. Changed test bodies use
+the focused receipts above and the matched clock/resize/audio comparisons.
+
+All five issue criteria are audited below. No clean full-regression pass,
+physical-device, CI success, production deployment or comparable performance
+baseline is claimed. The original aggregate's audio timeout remains an explicit
+review limitation even though its matching prefix and full audio file pass in
+both the literal base and feature builds.
 
 Performance disposition must use `evaluateCapture` in
 `scripts/measure-fit-evaluate.ts`, including every row's violations and repeated
 slow-load disposition. Inspection confirmed that `measure:fit` exits on capture
 integrity errors, while budget violations remain in the evaluator's rows; a
 successful performance stage exit alone is not proof that budgets passed.
+
+## Requirement audit
+
+1. **Mark Target and explicit rules:** canonical level-2 profile, hostile living
+   targets, range 2–5 with LOS, no damage/roll, an action cost, newest-source
+   replacement, independent simultaneous targets and source/target defeat cleanup
+   are implemented. `abilities.test.ts` exercises both current enemy kinds,
+   malformed/dead references and multiple eligible Ranger sources. Level/XP gates
+   also run through the real picker.
+2. **Qualifying attack only:** shared preview/resolution adds +2 exactly once for
+   Basic Attack, High Shot and Guarded Strike. Natural 1/20 and ordinary misses
+   consume it; previews, rejected commands, cancellation, movement, Wait, enemy
+   rolls and automatic multi-missiles do not. Lethal automatic damage expires
+   target/source effects rather than falsely reporting a consumed attack mark.
+3. **Pin decision:** adopted deliberately, with the legacy menu omission recorded
+   in `docs/signature-abilities.md`. Level 3 unlocks the real action. It is hostile,
+   range 2–5/LOS, no damage/roll and blocks ordinary movement until the target's
+   accepted endTurn or either participant's defeat. Repeated Pin rejects without
+   spending. Existing AI receives an origin-only movement preview and can still
+   attack or Wait; deterministic AI/replay and round-wrap expiry are covered.
+4. **Live UI and High Shot:** picker guidance, discriminated no-roll previews,
+   inspection/source/lifetime text, battle log and status feedback expose the
+   actions. The unchanged High Shot/Fighter/Mage coverage remains selected.
+   Six complete production journeys use earned unlocks, the real HUD, active-effect
+   reload and exact replay. Enabled-backend picker checks additionally verify that
+   Mark/Pin emit no attack/magic cue. Broader #161/#162 trackers stay open.
+5. **Interactions and persistence:** units cover simultaneous/replaced marks,
+   invalid/dead targets, multi-hit interaction, expiry, AI and exact state/RNG/event
+   continuation. Both current enemy kinds are explicitly susceptible; unsupported
+   immunity fields reject, with positive immunity semantics deferred to #169's
+   first actual consumer as agreed in the plan. Battle/run/dungeon recovery cases
+   prove previous-version rejection and byte-exact export of distinct primary and
+   backup slots, unchanged after reload, including an unrelated storage key.
+   They are explicit version-boundary fixtures, not historical-build executions.
+
+The unresolved original HTML5 watchdog timeout remains a qualification limitation
+outside the new abilities' no-cue checks. No original failure is waived or relabeled
+as a clean aggregate, and no physical-device, CI, merge or deployment result is
+claimed by these local receipts.
