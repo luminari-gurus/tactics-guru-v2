@@ -104,6 +104,30 @@ existing test titles/projects/config filters are retained. Additional Ranger
 fixture WebKit discovery uses [webkit-fixtures.config.ts](webkit-fixtures.config.ts)
 and selects 12 cases without changing the default full matrix.
 
+Completed original components are retained in
+[full-run-original/completed-components.json](full-run-original/completed-components.json):
+Chromium accounts for all 718 IDs, with 710 passes, five failures, three skips
+and zero retries/flaky results. The three dev-only placement selections are
+separately covered by the passing 3/3 dev stage. Combined fixtures pass 81/81;
+WebKit acceptance passes 54/54. Remaining stages are still running.
+
+The five Chromium failures are preserved, not yet dispositioned:
+
+- Native movement destination clearing remains `presenting` after clock resume
+  in desktop, portrait and landscape (three failures at battle-loop line 112).
+- Portrait procedural-grid picking selects `(6,6)` for the hardcoded `(5,6)`
+  click after resize (procedural-grids line 26).
+- Landscape HTML5 audio permission/restart records no completed cue, with the
+  bounded playback watchdog reporting timeout (battle-audio line 193).
+
+A separate clean literal-base checkout at
+`/tmp/tactics-issue-164-base-18a6f63`, source
+`18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8`, has locked dependencies and a passing
+build prepared. After the live run releases browser capacity, run only the
+affected base/change cases under matching conditions to determine cause. No
+pre-existing/flaky classification is claimed yet, and no assertions/timeouts or
+retries have been weakened.
+
 [Actual selection continuity](selection-continuity.json) compares the literal
 pre-implementation `18a6f63` tree with the current tests. Every prior test ID and
 its metadata, worker policy and effective projects is unchanged: default 715/715,

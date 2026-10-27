@@ -47,6 +47,15 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
   Explicitly evaluate `performance.json` with the existing `evaluateCapture`:
   `measure:fit` checks capture integrity but its successful exit does not by itself
   prove budget acceptance. Retain all per-sample violations and slow-load reviews.
+- Original Chromium is complete: 710 passes / five failures / three mapped dev
+  skips, zero retries; fixtures 81/81, placement-dev 3/3 and WebKit acceptance
+  54/54 pass. Five failures (native clearing/clock in three profiles, portrait
+  procedural picking, landscape HTML5 playback watchdog) need focused diagnosis.
+  The exact clean base `18a6f639ab6b5f5c25b9f46f65c7bcc9b733dce8` is built at
+  `/tmp/tactics-issue-164-base-18a6f63` for matched comparisons after the live
+  run. Do not label failures pre-existing without that evidence. Full original
+  component reports, contexts and hashes are retained under
+  `docs/qa/issue-164/full-run-original/`.
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.
