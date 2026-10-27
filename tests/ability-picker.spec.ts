@@ -22,6 +22,11 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),abilityId=`ability:${ability}`;
   const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
+  // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
+  // hide an accidental attack/magic cue in the presentation path.
+  if(isMobile)await page.locator('#battle-sound').tap();else {await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
+  expect((await readSession(page)).state).toEqual(before.state);
   await picker.selectOption(abilityId);await expect(picker).toHaveValue(abilityId);await picker.focus();
   if(isMobile)await button.tap();else await button.click();
   await page.locator('#battle-target').selectOption('2,0');
@@ -38,6 +43,7 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
   if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const accepted=await readSession(page),target=accepted.state.units.find(u=>u.id===5)!;
+  expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
   expect(target[ability==='mark_target'?'markedBy':'pinnedBy']).toBe(2);expect(accepted.state.rng).toEqual(before.state.rng);
   expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
   expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
