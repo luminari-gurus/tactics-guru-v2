@@ -17,4 +17,8 @@ export const attackAbilities = {
     rangeMin: 0, rangeMax: 0, target: 'self', healBase: 4, usesPerBattle: 1 },
   'ability:taunt': { id: 'ability:taunt', kind: 'taunt', owners: ['fighter'], requiredLevel: 3,
     rangeMin: 1, rangeMax: 1, target: 'hostile', duration: 'targetTurnEnd' },
+  'ability:mark_target': { id: 'ability:mark_target', kind: 'markTarget', owners: ['ranger'], requiredLevel: 2,
+    rangeMin: 2, rangeMax: 5, target: 'hostile', accuracyBonus: 2, duration: 'nextPlayerAttackRoll' },
+  'ability:pinning_shot': { id: 'ability:pinning_shot', kind: 'pinningShot', owners: ['ranger'], requiredLevel: 3,
+    rangeMin: 2, rangeMax: 5, target: 'hostile', duration: 'targetTurnEnd' },
 } as const satisfies Readonly<Record<AbilityId, Ability>>;

@@ -1,15 +1,21 @@
-import { STATE_FORMAT_VERSION } from '../../src/domain/constants';
+import { STATE_FORMAT_VERSION, RNG_WARMUP_DRAWS, RULE_BOUNDS, UINT32_RANGE } from '../../src/domain/constants';
 import { guardedEffect, combatStats } from '../../src/domain/effects';
 import { unitFeedback } from '../../src/ui/hud';
 import { BattleSession } from '../../src/app/BattleSession';
 import { assert, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
-import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility } from '../../src/domain/combat';
+import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility, previewRangerAbility } from '../../src/domain/combat';
 import { createBattle, dispatch, endTurn, replayBattle } from '../../src/domain/turns';
 import { validateContent } from '../../src/content/validate';
 import { rollDie, seedRng } from '../../src/domain/rng';
 import { abilityPresentation } from '../../src/phaser/abilityPresentation';
+import { previewMove, previewMovement } from '../../src/domain/grid';
+import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
+import { decodeBattleSave, encodeBattleSave } from '../../src/domain/saveEnvelope';
+import { previewText } from '../../src/ui/hud';
+import type { BattleState } from '../../src/domain/types';
+import { battleCues } from '../../src/audio/battleCues';
 
 const shot = { type: 'useAbility', unitId: 2, abilityId: 'ability:high_shot', target: { unitId: 4 } } as const;
 function freeze<T>(value:T):T {
@@ -76,6 +82,198 @@ it('High Shot uses the real Ranger stats and elevation in shared preview and dis
 const guardedStrike = { type: 'useAbility', unitId: 1, abilityId: 'ability:guarded_strike', target: { unitId: 4 } } as const;
 const secondWind = {type:'useAbility',unitId:1,abilityId:'ability:second_wind',target:{unitId:1}} as const;
 const taunt = {...guardedStrike,abilityId:'ability:taunt'} as const;
+const mark = { type: 'useAbility', unitId: 2, abilityId: 'ability:mark_target', target: { unitId: 4 } } as const;
+const pin = { ...mark, abilityId: 'ability:pinning_shot' } as const;
+function rangerSetup() {
+  const { catalog, state } = setup();
+  const cells = [{x:2,y:0},{x:0,y:0},{x:1,y:0},{x:3,y:0},{x:5,y:0},{x:7,y:0}];
+  return { catalog, state: { ...state, units: state.units.map((u,i) => ({ ...u, cell: cells[i] })) } };
+}
+function activate(state: BattleState, id: number): BattleState {
+  return { ...state, activeIndex: state.initiative.indexOf(id), units: state.units.map(u =>
+    u.id === id ? { ...u, hasActed: false, hasMoved: false } : u) };
+}
+function naturalState(state: BattleState, natural: number): BattleState {
+  let seed=0; while (rollDie(seedRng(seed),20).value !== natural) seed++;
+  return { ...state, rng: seedRng(seed) };
+}
+
+it('applies Mark and Pin through pure previews and dispatch without HP, movement or RNG changes', () => {
+  for (const command of [mark,pin]) for (const targetId of [4,5]) {
+    const {catalog,state}=rangerSetup(),before=structuredClone(state),input={...command,target:{unitId:targetId}};
+    const preview=previewRangerAbility(freeze(state),input,catalog);assert(preview.ok);
+    expect(previewText(preview)).toContain('no damage or roll');
+    expect(previewText(preview)).not.toContain('Taunt');
+    const result=dispatch(state,input,catalog);assert(result.ok);
+    expect(result.state.rng).toEqual(state.rng);expect(result.state.activeIndex).toBe(state.activeIndex);
+    expect(result.state.units.map(u=>u.hp)).toEqual(state.units.map(u=>u.hp));
+    expect(result.state.units.find(u=>u.id===2)).toMatchObject({hasActed:true,hasMoved:false});
+    const event={type:command===mark?'marked':'pinned',unitId:targetId,sourceId:2};
+    expect(result.events).toEqual([{type:'abilityUsed',unitId:2,abilityId:command.abilityId,target:{unitId:targetId}},event]);
+    expect(abilityPresentation(result.events)).toEqual({signature:null,feedback:[{unitId:targetId,kind:'guard',text:command===mark?'Marked':'Pinned'}]});
+    expect(battleCues(result.events,catalog)).toEqual([]);
+    expect(readBattleState(result.state,catalog).ok).toBe(true);expect(state).toEqual(before);
+  }
+});
+
+it('rejects Ranger target, ownership, action, range and LOS failures atomically', () => {
+  const {catalog,state}=rangerSetup();
+  for (const command of [mark,pin]) {
+    for (const [input,reason] of [[{...command,target:{unitId:2}},'sameSide'],[{...command,target:{unitId:1}},'sameSide'],
+      [{...command,target:{unitId:64}},'missingTarget'],[{...command,target:{cell:{x:3,y:0}}},'wrongTargetKind'],
+      [{...command,unitId:1},'abilityNotOwned']] as const) {
+      const snapshot=activate(state,input.unitId),before=structuredClone(snapshot);
+      expect(dispatch(freeze(snapshot),input,catalog)).toEqual({ok:false,reason});expect(snapshot).toEqual(before);
+    }
+    expect(dispatch({...state,units:state.units.map(u=>u.id===2?{...u,hasActed:true}:u)},command,catalog)).toEqual({ok:false,reason:'alreadyActed'});
+    expect(dispatch({...state,units:state.units.map(u=>u.id===4?{...u,hp:0}:u)},command,catalog)).toEqual({ok:false,reason:'targetDefeated'});
+    for(const distance of [1,2,5,6]) {
+      // Keep other living units away from the tested ray and target.
+      const snapshot={...state,units:state.units.map(u=>u.id===4?{...u,cell:{x:distance,y:0}}:u.id===2?u:{...u,cell:{x:u.id,y:2}})};
+      expect(previewRangerAbility(snapshot,command,catalog).ok).toBe(distance>=2&&distance<=5);
+    }
+    const blocked={...catalog,maps:{...catalog.maps,'map:forest_ruins':{...catalog.maps['map:forest_ruins'],
+      cells:catalog.maps['map:forest_ruins'].cells.map(c=>c.x===1&&c.y===0?{...c,terrainId:'forest' as const}:c)}}};
+    expect(dispatch({...state,versions:{...state.versions,content:contentVersion(blocked)},units:state.units.map(u=>u.id===3?{...u,cell:{x:1,y:1}}:u)},command,blocked)).toEqual({ok:false,reason:'blockedLos'});
+  }
+});
+
+it('grants and consumes Mark exactly once on each supported player attack roll, including natural misses', () => {
+  for (const [unitId,abilityId] of [[1,'ability:basic_attack'],[1,'ability:guarded_strike'],[2,'ability:high_shot']] as const)
+    for (const natural of [1,7,9,20]) {
+      const {catalog,state}=rangerSetup();
+      const command={type:'useAbility',unitId,abilityId,target:{unitId:4}} as const;
+      const snapshot=naturalState(activate({...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2}:u)},unitId),natural);
+      const before=structuredClone(snapshot),plain={...snapshot,units:snapshot.units.map(u=>{const {markedBy,...rest}=u;return rest;})};
+      const preview=previewAttack(freeze(snapshot),command,catalog),without=previewAttack(plain,command,catalog);assert(preview.ok&&without.ok);
+      expect(preview.bonus).toBe(without.bonus+2);expect(preview.markBonus).toBe(2);
+      expect(preview.damage).toBe(without.damage);expect(previewText(preview)).toContain('Mark +2');
+      expect(previewAttack(snapshot,command,catalog)).toEqual(preview);
+      const result=dispatch(snapshot,command,catalog);assert(result.ok);
+      expect(result.events.filter(e=>e.type==='markConsumed')).toEqual([{type:'markConsumed',unitId:4,sourceId:2}]);
+      expect(result.state.units.find(u=>u.id===4)?.markedBy).toBeUndefined();
+      expect(result.events.find(e=>e.type==='attackRolled')).toMatchObject({natural,bonus:preview.bonus,...(natural===1?{result:'miss'}:natural===20?{result:'critical'}:{})});
+      expect(readBattleState(result.state,catalog).ok).toBe(true);expect(snapshot).toEqual(before);
+    }
+});
+
+it('keeps simultaneous marks independent, replaces without stacking, and does not consume on cancel or rejected attacks', () => {
+  const {catalog,state}=rangerSetup();
+  const first=dispatch(state,mark,catalog);assert(first.ok);
+  const second=dispatch(activate(first.state,2),{...mark,target:{unitId:5}},catalog);assert(second.ok);
+  const replaced=dispatch(activate(second.state,2),mark,catalog);assert(replaced.ok);
+  expect(replaced.state.units.filter(u=>u.markedBy===2).map(u=>u.id)).toEqual([4,5]);
+  const snapshot=activate(replaced.state,1),session=new BattleSession(catalog,snapshot,snapshot.seed),before=structuredClone(session.state);
+  for(let i=0;i<3;i++){expect(session.prepare({...guardedStrike,abilityId:'ability:basic_attack'}).ok).toBe(true);session.cancel();}
+  expect(session.state).toEqual(before);expect(session.events).toEqual([]);
+  const invalid={...guardedStrike,target:{unitId:5}};
+  expect(dispatch(freeze(snapshot),invalid,catalog)).toEqual({ok:false,reason:'outOfRange'});
+  const exhausted={...snapshot,rng:{...snapshot.rng,cursor:RULE_BOUNDS.cursor.max,words:[...snapshot.rng.words] as [number,number,number,number]}};
+  // Use the same valid terminal RNG word/cursor relation as the existing cursor-boundary tests.
+  exhausted.rng.words[3]=(exhausted.rng.cursor%UINT32_RANGE+RNG_WARMUP_DRAWS+1)%UINT32_RANGE;
+  expect(readBattleState(exhausted,catalog).ok).toBe(true);
+  const saved=structuredClone(exhausted);expect(dispatch(exhausted,guardedStrike,catalog)).toEqual({ok:false,reason:'invalidState'});expect(exhausted).toEqual(saved);
+});
+
+it('does not consume Mark on automatic multi-missiles, enemy rolls or turn transitions', () => {
+  const {catalog:base,state}=rangerSetup();
+  const catalog={...base,abilities:{...base.abilities,'ability:magic_missile':{...base.abilities['ability:magic_missile'],casterLevel:3}}};
+  const snapshot={...state,versions:{...state.versions,content:contentVersion(catalog)},units:state.units.map(u=>u.id===4?{...u,markedBy:2}:u)};
+  const cast=dispatch(activate(snapshot,3),{...missile,target:{missileTargets:[4,5]}},catalog);assert(cast.ok);
+  expect(cast.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);expect(cast.events.some(e=>e.type==='markConsumed')).toBe(false);
+  expect(cast.state.units.find(u=>u.id===4)?.markedBy).toBe(2);
+  const enemy=dispatch(naturalState(activate(snapshot,4),1),{type:'useAbility',unitId:4,abilityId:'ability:basic_attack',target:{unitId:1}},catalog);assert(enemy.ok);
+  expect(enemy.state.units.find(u=>u.id===4)?.markedBy).toBe(2);
+  const wait=endTurn(activate(snapshot,4),{type:'endTurn',unitId:4},catalog);assert(wait.ok);expect(wait.state.units.find(u=>u.id===4)?.markedBy).toBe(2);
+});
+
+it('pins movement while preserving legal enemy attacks or Wait, and expires at target endTurn across round wrap', () => {
+  const {catalog,state}=rangerSetup(),cast=dispatch(state,pin,catalog);assert(cast.ok);
+  const snapshot=activate(cast.state,4),before=structuredClone(snapshot),cell=snapshot.units.find(u=>u.id===4)!.cell;
+  expect(previewMovement(freeze(snapshot),4,catalog)).toEqual({ok:true,cells:[{cell,cost:0}]});
+  const move={type:'move',unitId:4,to:{x:3,y:1}} as const;
+  expect(previewMove(snapshot,move,catalog)).toEqual({ok:false,reason:'immobilized'});
+  expect(dispatch(snapshot,move,catalog)).toEqual({ok:false,reason:'immobilized'});expect(snapshot).toEqual(before);
+  const plan=planEnemyTurn(snapshot,4,catalog);assert(plan.ok);expect(plan.commands.some(c=>c.type==='move')).toBe(false);expect(plan.commands.some(c=>c.type==='useAbility')).toBe(true);
+  const run=runEnemyTurn(snapshot,4,catalog);assert(run.ok);expect(run.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
+  const isolated={...snapshot,units:snapshot.units.map(u=>u.side==='player'?{...u,cell:{x:u.id,y:8}}:u)};
+  expect(planEnemyTurn(isolated,4,catalog)).toEqual({ok:true,commands:[{type:'endTurn',unitId:4}]});
+  const wrapped={...snapshot,initiative:[1,2,3,5,6,4],activeIndex:5,round:9,units:snapshot.units.map(u=>u.id===4?{...u,markedBy:2}:u)};
+  const ended=endTurn(wrapped,{type:'endTurn',unitId:4},catalog);assert(ended.ok);expect(ended.state.round).toBe(10);
+  expect(ended.state.units.find(u=>u.id===4)).toMatchObject({markedBy:2});expect(ended.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
+  expect(ended.events).toContainEqual({type:'pinExpired',unitId:4,sourceId:2});
+  expect(dispatch(activate(cast.state,2),pin,catalog)).toEqual({ok:false,reason:'alreadyPinned'});
+  expect(dispatch(activate(ended.state,2),pin,catalog).ok).toBe(true);
+});
+
+it('cleans both Ranger effects when source or target is defeated through ordinary or automatic damage', () => {
+  for(const sourceDeath of [false,true])for(const automatic of [false,true]) {
+    const {catalog,state}=rangerSetup();
+    const targetId=sourceDeath?2:4,actorId=automatic?3:sourceDeath?6:1;
+    const snapshot=naturalState(activate({...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,pinnedBy:2,...(!sourceDeath?{hp:1}:{})}:
+      u.id===2&&sourceDeath?{...u,hp:1}:u.id===6&&sourceDeath?{...u,cell:{x:0,y:1}}:u)},actorId),20);
+    const result=dispatch(snapshot,{type:'useAbility',unitId:actorId,abilityId:automatic?'ability:magic_missile':'ability:basic_attack',target:{unitId:targetId}},catalog);assert(result.ok);
+    expect(result.state.units.find(u=>u.id===targetId)?.hp).toBe(0);
+    expect(result.state.units.find(u=>u.id===4)?.markedBy).toBeUndefined();expect(result.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
+    expect(result.events).toContainEqual({type:'pinExpired',unitId:4,sourceId:2});
+    expect(result.events).toContainEqual({type:!sourceDeath&&!automatic?'markConsumed':'markExpired',unitId:4,sourceId:2});
+    expect(readBattleState(result.state,catalog).ok).toBe(true);
+  }
+});
+
+it('validates bounded living Ranger references and the current susceptible-enemy content policy', () => {
+  const {catalog,state}=rangerSetup();
+  for(const field of ['markedBy','pinnedBy']) {
+    for(const source of [undefined,0,1,3,4,64,1.5,'2',null]) {
+      const invalid={...state,units:state.units.map(u=>u.id===4?{...u,[field]:source}:u)};
+      expect(readBattleState(invalid,catalog).ok).toBe(false);
+    }
+    for(const id of [1,2,3])expect(readBattleState({...state,units:state.units.map(u=>u.id===id?{...u,[field]:2}:u)},catalog).ok).toBe(false);
+    for(const deadId of [2,4])expect(readBattleState({...state,units:state.units.map(u=>({...u,...(u.id===4?{[field]:2}:{}),...(u.id===deadId?{hp:0}:{})}))},catalog).ok).toBe(false);
+  }
+  for(const [id,patch] of [['ability:mark_target',{accuracyBonus:3}],['ability:mark_target',{requiredLevel:1}],['ability:pinning_shot',{duration:'sourceTurnStart'}],['ability:pinning_shot',{owners:['fighter']}]] as const)
+    expect(validateContent({...catalog,abilities:{...catalog.abilities,[id]:{...catalog.abilities[id],...patch}}}).ok).toBe(false);
+  for(const id of ['goblin_grunt','goblin_archer'] as const) {
+    expect(catalog.enemies[id]).not.toHaveProperty('immunities');
+    expect(validateContent({...catalog,enemies:{...catalog.enemies,[id]:{...catalog.enemies[id],immunities:['marked','pinned']}}}).ok).toBe(false);
+  }
+});
+
+it('round-trips live Mark/Pin and rejects the previous battle format without rewriting input', () => {
+  const {catalog,state}=rangerSetup(),snapshot={...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,pinnedBy:2}:u)};
+  const encoded=encodeBattleSave(snapshot,catalog);assert(encoded.ok);const restored=decodeBattleSave(encoded.text,catalog);assert(restored.ok);
+  expect(restored.state).toEqual(snapshot);expect(encodeBattleSave(restored.state,catalog)).toEqual(encoded);
+  expect(dispatch(restored.state,mark,catalog)).toEqual(dispatch(snapshot,mark,catalog));
+  const old=JSON.stringify({...JSON.parse(encoded.text),payload:{...snapshot,format:2,versions:{...snapshot.versions,rules:3}}});
+  expect(decodeBattleSave(old,catalog)).toEqual({ok:false,reason:'incompatible'});
+  const made=createBattle('map:forest_ruins',17,catalog);assert(made.ok);expect(made.state.units.every(u=>u.markedBy===undefined&&u.pinnedBy===undefined)).toBe(true);
+  const feedback=unitFeedback(new BattleSession(catalog,snapshot,snapshot.seed),snapshot.units.find(u=>u.id===4)!);
+  expect(feedback.status).toContain('Marked by Ranger #2');expect(feedback.status).toContain('Pinned by Ranger #2');
+});
+
+it('replaces a Mark source with the newest Ranger without stacking', () => {
+  const base=rangerSetup(),map=base.catalog.maps['map:forest_ruins'];
+  const catalog={...base.catalog,maps:{...base.catalog.maps,[map.id]:{...map,spawns:map.spawns.map(s=>s.id===3?{...s,side:'heroes' as const,unitId:'ranger' as const}:s)}}};
+  const state={...base.state,versions:{...base.state.versions,content:contentVersion(catalog)},units:base.state.units.map(u=>u.id===3?{...u,side:'player' as const,defId:'ranger' as const,hp:12}:u)};
+  const first=dispatch(state,mark,catalog);assert(first.ok);
+  const second=dispatch(activate(first.state,3),{...mark,unitId:3},catalog);assert(second.ok);
+  expect(second.state.units.find(u=>u.id===4)?.markedBy).toBe(3);
+  const preview=previewAttack(activate(second.state,1),guardedStrike,catalog);assert(preview.ok);expect(preview.markBonus).toBe(2);
+});
+
+it('replays both Ranger actions from canonical creation with identical state, events and RNG', () => {
+  const base=rangerSetup(),map=base.catalog.maps['map:forest_ruins'];
+  const catalog={...base.catalog,maps:{...base.catalog.maps,[map.id]:{...map,spawns:map.spawns.map(s=>({...s,...base.state.units.find(u=>u.id===s.id)!.cell}))}}};
+  const created=createBattle(map.id,17,catalog);assert(created.ok);let state=created.state;
+  const commands:import('../../src/domain/types').Command[]=[],events:import('../../src/domain/types').BattleEvent[]=[];
+  const apply=(command:import('../../src/domain/types').Command)=>{const result=dispatch(state,command,catalog);assert(result.ok);commands.push(command);events.push(...result.events);state=result.state;};
+  for(const command of [mark,pin]) {
+    while(state.initiative[state.activeIndex]!==2)apply({type:'endTurn',unitId:state.initiative[state.activeIndex]});
+    apply(command);apply({type:'endTurn',unitId:2});
+  }
+  const replay=replayBattle({format:state.format,versions:state.versions,initial:created.state,commands},catalog);assert(replay.ok);
+  expect(replay).toEqual({ok:true,state,events});
+});
 
 it('heals projected missing HP atomically once with no RNG and resets only in a fresh battle',()=>{
   for(const missing of [1,7,12]) {

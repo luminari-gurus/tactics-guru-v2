@@ -1,8 +1,8 @@
 # Issue #164: Ranger Mark Target and Pinning Shot
 
-Date: 2026-10-27 (Asia/Jerusalem). Status: implementation plan; no application
-code or tests have been changed. The caller requested selection, assignment,
-this plan and branch publication. Implementation is a subsequent step.
+Date: 2026-10-27 (Asia/Jerusalem). Status: implementation approved and active.
+The caller approved this plan and requested implementation, required verification
+and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.

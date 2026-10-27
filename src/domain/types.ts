@@ -14,6 +14,10 @@ export type UnitState = {
   readonly secondWindUsed?: true;
   /** One living opposing Fighter; expires after this unit's next accepted endTurn. */
   readonly tauntedBy?: number;
+  /** One living opposing Ranger; consumed by the next player attack roll. */
+  readonly markedBy?: number;
+  /** Blocks ordinary movement until this target ends its next turn. */
+  readonly pinnedBy?: number;
 } & ({ readonly side: 'player'; readonly defId: HeroId } | { readonly side: 'enemy'; readonly defId: EnemyId });
 /** Snapshot data only: no duplicated grid/stats or scene references. */
 export interface BattleState {
@@ -34,7 +38,7 @@ export type RejectionReason = 'malformedCommand' | 'invalidState' | 'battleOver'
   'unitDefeated' | 'notActiveUnit' | 'alreadyMoved' | 'outOfBounds' | 'sameCell' | 'notWalkable' |
   'occupied' | 'unreachable' | 'alreadyActed' | 'unknownAbility' | 'abilityNotOwned' |
   'wrongTargetKind' | 'missingTarget' | 'targetDefeated' | 'sameSide' | 'outOfRange' | 'blockedLos' | 'wrongMissileCount' | 'targetsTooFarApart' |
-  'fullHealth' | 'useExhausted' | 'selfTargetRequired' | 'tauntedTargetRequired';
+  'fullHealth' | 'useExhausted' | 'selfTargetRequired' | 'tauntedTargetRequired' | 'alreadyPinned' | 'immobilized';
 export type Rejection = { readonly ok: false; readonly reason: RejectionReason };
 export type CommandPreview = { readonly ok: true; readonly command: Command } | Rejection;
 /** Events are data contracts, not implementations of combat or turn flow. */
@@ -52,6 +56,7 @@ export type BattleEvent =
   | { readonly type: 'guarded' | 'guardExpired'; readonly unitId: number }
   | { readonly type: 'healed'; readonly unitId: number; readonly healing: number; readonly hp: number }
   | { readonly type: 'taunted' | 'tauntExpired'; readonly unitId: number; readonly sourceId: number }
+  | { readonly type: 'marked' | 'markConsumed' | 'markExpired' | 'pinned' | 'pinExpired'; readonly unitId: number; readonly sourceId: number }
   | { readonly type: 'battleEnded'; readonly outcome: Exclude<BattleState['outcome'], 'ongoing'> };
 export type CommandResult = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Rejection;
 /** Initial boundary + accepted intents; replayBattle (turns.ts) re-executes them. */

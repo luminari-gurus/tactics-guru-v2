@@ -2,17 +2,66 @@ import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair } from './helpers/dungeonTraversal';
 import { atStairApproach } from './helpers/dungeonFixtures';
 import { expect,test,type Page } from '@playwright/test';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { gunzipSync } from 'node:zlib';
+import { writeFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
-import { playerDecision, fighterDecision } from './helpers/playerPolicy';
-import { journeyPreparation } from './helpers/dungeonFixtures';
+import { playerDecision, fighterDecision, rangerDecision } from './helpers/playerPolicy';
+import { journeyPreparation, healedFighterBoundary, rangerJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+
+test('Ranger legal progression journey earns level three uses Mark and Pin and resumes',async({page,isMobile})=>{
+ test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ const witness=rangerJourney(190),used={mark:false,pin:false};expect(witness.used).toEqual({mark:true,pin:true});expect(witness.state.phase).toBe('defeat');
+ await seed(page,freshDungeon('ranger-production-journey',190));
+ const records:unknown[]=[];let consumed=false;
+ for(const expected of witness.records) {
+  const position=await snapshot(page);
+  if(position.depth<expected.entry.depth){await walkDungeon(page,position.floors[position.depth-1].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(expected.entry.depth);}
+  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const entry=await snapshot(page);expect(entry.party).toEqual(expected.entry.party);
+  expect(entry.activeBattle!.units.every(u=>u.markedBy===undefined&&u.pinnedBy===undefined)).toBe(true);
+  let steps=0;
+  while((await snapshot(page)).phase==='battle'&&steps++<500) {
+   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+   const current=await snapshot(page);if(current.phase!=='battle')break;
+   const before=await readSession(page),built=dungeonBattle(current)!,command=rangerDecision(before.state,built.catalog,used);
+   await playCommand(page,command);
+   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
+   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+   if((await snapshot(page)).phase==='battle')consumed ||= (await readSession(page)).events.some(e=>e.type==='markConsumed');
+   if(command.type==='useAbility'&&(command.abilityId==='ability:mark_target'||command.abilityId==='ability:pinning_shot')) {
+    const kind=command.abilityId==='ability:mark_target'?'mark':'pin';used[kind]=true;
+    const after=await readSession(page),targetId='unitId' in command.target?command.target.unitId:0;
+    expect(after.state.rng).toEqual(before.state.rng);expect(after.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+    expect(current.party.find(h=>h.heroId==='ranger')!.level).toBeGreaterThanOrEqual(kind==='mark'?2:3);
+    expect(after.state.units.find(u=>u.id===targetId)?.[kind==='mark'?'markedBy':'pinnedBy']).toBe(command.unitId);
+    await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${targetId}`).click();
+    await expect(page.getByRole('dialog')).toContainText(kind==='mark'?'Marked by Ranger':'Pinned by Ranger');
+    await page.screenshot({path:test.info().outputPath(`production-ranger-${kind}-inspection.png`)});await page.locator('#inspection-close').click();
+    const saved=await snapshot(page);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
+   }
+  }
+  const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);
+  expect(record.state).toEqual(expected.state);let replayed=record.replay?.initial??record.continuation.snapshot;const events:unknown[]=[];
+  for(const c of record.replay?.commands??record.continuation.commands){const r=dispatch(replayed,c,dungeonBattle(record.entry)!.catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;events.push(...r.events);}
+  expect(replayed).toEqual(record.state);expect(events).toEqual(record.events);records.push(record);
+  for(let i=0;i<20;i++) {
+   const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
+   if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
+   else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+   else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();}
+   else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
+  }
+ }
+ const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:190,records,final,used,consumed}));
+ expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({mark:true,pin:true});expect(consumed).toBe(true);expect(errors).toEqual([]);
+ await page.screenshot({path:test.info().outputPath('ranger-terminal-journey.png'),fullPage:true});
+});
 
 test('Fighter legal progression journey earns level three uses both abilities and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -72,9 +121,8 @@ test('Fighter legal progression journey earns level three uses both abilities an
 
 test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{
  test.setTimeout(90000);
- // Accepted terminal combat from the retained six-encounter UI journey; spatial approach is explicit.
- const trace=JSON.parse(gunzipSync(readFileSync(new URL('../docs/qa/issue-163/production-desktop-journey.json.gz',import.meta.url))).toString());
- const record=trace.records[2];expect(record.state.units.find((u:{defId:string})=>u.defId==='fighter').secondWindUsed).toBe(true);
+ // Generate the legal boundary under current rules; the historical #163 receipt remains immutable.
+ const record=healedFighterBoundary();expect(record.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
  const completed=acceptDungeonBattle(record.entry,record.state);if(!completed.ok)throw Error(completed.reason);
  const approach=atStairApproach(completed.state),party=approach.party,ownership=approach.ownership;
  expect(party.find(h=>h.heroId==='fighter')!.hp).toBeGreaterThan(0);expect(party.find(h=>h.heroId==='fighter')!.learned).toContain('ability:second_wind');

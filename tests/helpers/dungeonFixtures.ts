@@ -2,7 +2,7 @@ import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/ex
 import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
-import { playerDecision } from './playerPolicy';
+import { playerDecision, fighterDecision, rangerDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounterPolicy } from '../../src/domain/dungeonEncounters';
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
@@ -120,4 +120,49 @@ export function dungeonJourney(seed: number, floorCount = 1, finishTargets = fal
     if(depth<floorCount)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
   }
   return {seed,battles,state,won:true};
+}
+
+/** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */
+export function rangerJourney(seed:number) {
+  let state=freshDungeon('ranger-production-journey',seed);
+  const used={mark:false,pin:false},records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
+  for(let depth=1;depth<=3;depth++) {
+    for(let slot=0;slot<3;slot++) {
+      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
+      for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+        if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}
+        const command=rangerDecision(battle.state,built.catalog,used);if(!battle.prepare(command).ok)throw Error('Ranger witness rejected');
+        const p=battle.confirm();if(!p)throw Error('Ranger witness stalled');battle.finishPresentation(p.token);
+        if(command.type==='useAbility'&&command.abilityId==='ability:mark_target')used.mark=true;
+        if(command.type==='useAbility'&&command.abilityId==='ability:pinning_shot')used.pin=true;
+      }
+      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      state=checkedDungeon(acceptDungeonBattle(state,battle.state));
+      if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
+      for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
+    }
+    // Continue to a terminal boundary after proving both actions; a finite witness may end in victory or defeat.
+    if(used.mark&&used.pin)return {seed,records,state,used};
+    state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
+  }
+  return {seed,records,state,used};
+}
+
+/** Legal first-floor Fighter witness supplies the healed carry fixture in the current wire format. */
+export function healedFighterBoundary() {
+  let state=freshDungeon('fighter-production-journey',190);
+  for(let slot=0;slot<3;slot++) {
+    state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+    const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
+    for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+      const p=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(fighterDecision(battle.state,built.catalog,false)),battle.confirm());
+      if(!p)throw Error('Fighter witness stalled');battle.finishPresentation(p.token);
+    }
+    if(battle.state.outcome!=='playerWin')throw Error('Fighter fixture did not win');
+    if(slot===2)return {entry,state:battle.state};
+    state=checkedDungeon(acceptDungeonBattle(state,battle.state));
+    for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
+  }
+  throw Error('Missing healed Fighter boundary');
 }

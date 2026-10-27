@@ -1,5 +1,36 @@
 # Signature abilities (#8)
 
+## Ranger progression (#164)
+
+Mark Target unlocks at level 2 (60 XP); Pinning Shot at level 3 (180 XP).
+Both spend one action against a living hostile unit at Manhattan range 2–5 with
+ordinary LOS, without damage, attack/save rolls, cooldowns or limited uses.
+High Shot retains its existing range, elevation and damage rules.
+
+Mark stores one living Ranger source per enemy. The newest application replaces
+that source without stacking; different enemies may be marked simultaneously.
+The next accepted player-side attack roll gains +2 accuracy and consumes the Mark,
+including misses and natural 1/20. Basic Attack, High Shot and Guarded Strike use
+that same evaluation. Preview/cancel/rejection, enemy attacks, movement, Wait and
+automatic-hit Magic Missile do not consume or benefit. Multi-missile damage clears
+a mark only if its target or source is defeated. Mark has no turn countdown;
+target/source defeat and replacement of the battle clear it.
+
+Pinning Shot is deliberately adopted in v2: the legacy resolver and level-3
+unlock existed, but the normal legacy Ranger action list omitted it. Pin prevents
+ordinary movement through the target's next accepted endTurn, including round
+wrap. Attacks and Wait remain legal; source/target defeat also clears it. An
+already pinned target rejects without spending anything. Movement preview retains
+only the origin so enemy planning can still choose an attack or Wait; this grants
+no forced-movement immunity. Mark and Pin may coexist. Both current goblin kinds
+are susceptible; typed/tag immunity remains with #169's first immune consumer.
+
+The existing picker, no-roll preview, inspection, accepted-event log and floating
+feedback expose these rules. Learned actions follow run/dungeon progression;
+standalone starts at level 1. Current save/resume retains exact bounded
+`markedBy`/`pinnedBy` references; new encounters reset both. No status engine,
+Lingering Mark upgrade or Mage action is introduced.
+
 ## Fighter progression (#163)
 
 Second Wind unlocks at level 2. It targets the living active Fighter itself at
@@ -24,7 +55,7 @@ Healing and Taunt use the existing native picker, board/self targets, direct
 confirmation, inspection, accepted-event log and floating feedback. Guarded Strike
 and Magic Missile retain their approved rules and Guarded retains its board shield.
 
-Battle state format 2/rules 3, run envelope 4 and dungeon envelope 5 deliberately
+Current battle state format 3/rules 4, run envelope 5 and dungeon envelope 6 deliberately
 reject earlier versions as incompatible while preserving original bytes through
 existing recovery/export. The standalone wrapper remains format 1 and RNG stays 1.
 Run/dungeon readers admit healing above entry HP only within the spent Fighter's
@@ -58,10 +89,13 @@ commands, actor changes and restart discard stale intent; Continue reconstructs
 current availability without executing an uncommitted choice. Selection and
 cancellation do not change saved state, RNG or replay.
 
-Ownership comes from catalog `owners` after shared [progression projection](hero-progression.md). Production still has the same
-three hero signatures; extra test profiles demonstrate multiple choices per hero.
-Implemented hero abilities can declare `requiredLevel` (default 1); canonical learned state gates availability. Limited-use and cooldown schemas remain future work. Only attack, guardedAttack and magicMissile
-profiles are implemented; self-heal and cell/area mechanics remain future work.
+Ownership comes from catalog `owners` after shared [progression projection](hero-progression.md).
+Production has the three starting signatures plus the Fighter and Ranger actions
+above; extra test profiles exercise selection independently. Hero profiles can
+declare `requiredLevel` (default 1); canonical learned state gates availability.
+Implemented kinds are attack, guardedAttack, magicMissile, secondWind, taunt,
+markTarget and pinningShot. Second Wind has one bounded battle use; generic
+resources, cooldowns and cell/area actions remain future work.
 Additional well-formed ability IDs can use these existing profiles with bounded
 values and distinct existing owners. Canonical IDs remain required with their
 original kind and ordered owners. See `src/content/validate.ts` and

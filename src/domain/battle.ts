@@ -49,10 +49,12 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'secondWindUsed')) unitKeys.push('secondWindUsed');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'tauntedBy')) unitKeys.push('tauntedBy');
+    for (const field of ['markedBy','pinnedBy']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
     if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
       (Object.hasOwn(u, 'secondWindUsed') && (u.secondWindUsed !== true || u.side !== 'player' || u.defId !== 'fighter' ||
         !Object.values(catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes('fighter')))) ||
       (Object.hasOwn(u, 'tauntedBy') && (!unitId(u.tauntedBy) || u.side !== 'enemy' || u.hp === 0)) ||
+      ['markedBy','pinnedBy'].some(field => Object.hasOwn(u, field) && (!unitId(u[field]) || u.side !== 'enemy' || u.hp === 0)) ||
       !unitId(u.id) || u.id <= previous ||
       !cell(u.cell) || u.cell.x >= map.width || u.cell.y >= map.height ||
       typeof u.hasMoved !== 'boolean' || typeof u.hasActed !== 'boolean') return bad;
@@ -74,6 +76,12 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     const source = units.find(s=>s.id===u.tauntedBy);
     if (!source || source.hp===0 || source.side!=='player' || source.defId!=='fighter' ||
       !Object.values(catalog.abilities).some(a=>a.kind==='taunt' && a.owners.includes(source.defId))) return bad;
+  }
+  for (const u of units) for (const [field, kind] of [['markedBy','markTarget'],['pinnedBy','pinningShot']] as const) {
+    if (u[field] === undefined) continue;
+    const source = units.find(s => s.id === u[field]);
+    if (!source || source.hp === 0 || source.side !== 'player' || source.defId !== 'ranger' ||
+      !Object.values(catalog.abilities).some(a => a.kind === kind && a.owners.includes(source.defId))) return bad;
   }
   if (input.initiative.some(id => !unitId(id) || !ids.has(id)) || new Set(input.initiative).size !== ids.size) return bad;
   const activeId = input.initiative[input.activeIndex];

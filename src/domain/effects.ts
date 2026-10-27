@@ -41,6 +41,34 @@ export function clearDefeatedTaunts(units: readonly UnitState[], events: BattleE
     return removeTaunt(u);
   });
 }
+function rangerSource(unit: UnitState, units: readonly UnitState[], sourceId: number | undefined): UnitState | undefined {
+  return unit.hp > 0 && unit.side === 'enemy' ? units.find(source => source.id === sourceId &&
+    source.hp > 0 && source.side === 'player' && source.defId === 'ranger') : undefined;
+}
+export const markSource = (unit: UnitState, units: readonly UnitState[]) => rangerSource(unit, units, unit.markedBy);
+export const movementBlockSource = (unit: UnitState, units: readonly UnitState[]) => rangerSource(unit, units, unit.pinnedBy);
+export function removeMark(unit: UnitState): UnitState {
+  const { markedBy, ...rest } = unit;
+  return rest;
+}
+export function removePin(unit: UnitState): UnitState {
+  const { pinnedBy, ...rest } = unit;
+  return rest;
+}
+/** All damage paths clean target/source defeat before adopting the next validated snapshot. */
+export function clearDefeatedRangerEffects(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
+  return units.map(unit => {
+    if (unit.markedBy !== undefined && !markSource(unit, units)) {
+      events.push({ type: 'markExpired', unitId: unit.id, sourceId: unit.markedBy });
+      unit = removeMark(unit);
+    }
+    if (unit.pinnedBy !== undefined && !movementBlockSource(unit, units)) {
+      events.push({ type: 'pinExpired', unitId: unit.id, sourceId: unit.pinnedBy });
+      unit = removePin(unit);
+    }
+    return unit;
+  });
+}
 /** Aggregate readers retain encounter-entry bounds except for this bounded, spent heal. */
 export function encounterHpLimit(unit: {readonly defId:HeroId;readonly secondWindUsed?:true}, entryHp: number, catalog: ContentCatalog): number {
   if (entryHp===0) return 0;
