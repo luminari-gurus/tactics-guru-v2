@@ -3,6 +3,8 @@
 Status: implementation and required acceptance proof are complete for PR review.
 The original full regression remains failed. Focused repairs and added gates are
 separately retained; the original intermittent HTML5 timeout remains unattributed.
+[PR #248](https://github.com/luminari-gurus/tactics-guru-v2/pull/248) is open
+against `main` and linked to #164. No merge or deployment occurred.
 
 ## Source and scope
 
@@ -188,6 +190,8 @@ checkout is `/tmp/tactics-issue-164-final-20261027` at
 - Ranger fixture WebKit selection passes 12/12 across desktop and both touch
   orientations. Mark/Pin use a real enabled/ready audio backend and assert zero
   started/completed/dropped cues and no owned sound instances after acceptance.
+  Final WebKit portrait Pin inspection was visually reviewed: source/expiry text
+  wraps clearly and all inspection controls fit the scrollable dialog.
 - Previous-format recovery passes nine Chromium and nine WebKit selections for
   battle/run/dungeon. Those tests ran at clean source `61a9dd6`; their inputs and
   all application inputs are unchanged by the later fixture-only hook addition.

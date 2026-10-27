@@ -7,7 +7,10 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 ## Current implementation checkpoint
 
 - Feature code is published in `af9c1b6`; original full qualification source is
-  `789161c`. Main's `b629926` README update is integrated. No PR is open yet.
+  `789161c`. Main's `b629926` README update is integrated.
+  [PR #248](https://github.com/luminari-gurus/tactics-guru-v2/pull/248) is open
+  against `main`, attached to this chat and linked to #164. The pickup comment is
+  updated with the PR and qualification limits. No merge or deployment occurred.
 - The original 19-stage run has **finished**, with 17 stages passing and tooling /
   Chromium failing. All 1,241 browser executions are accounted for: 1,227 passes,
   five failures and nine declared mode skips; zero retries/flaky results.
@@ -45,7 +48,8 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
   is unchanged before/after. Application/build inputs are equivalent to the
   original full-run source; changed test bodies and adapter have separate proof.
   [QA report and acceptance audit](../qa/issue-164/README.md) retain exact reuse,
-  original failures and all added gates. PR publication follows this docs checkpoint.
+  original failures and all added gates. Later commits update evidence/docs only;
+  their source changes do not invalidate the qualified application/test inputs.
   The ignored literal-base export remains local as evidence after automatic
   approval review denied cleanup.
 
