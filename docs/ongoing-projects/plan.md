@@ -1,362 +1,358 @@
-# Issue #163: Fighter Second Wind and Taunt
+# Issue #164: Ranger Mark Target and Pinning Shot
 
-Date: 2026-10-25 (Asia/Jerusalem). Status: implementation active via OpenSpec
-`issue-163-fighter-abilities` (spec-driven; 9/9 tasks complete, all work published ready for review).
-The branch was clean at handoff. Main `e489a30` was merged without conflict,
-including direct HUD confirmation (#240) and Guarded badges/pan fix (#241).
-Do not restore the old confirmation modal or overwrite those indicators.
+Date: 2026-10-27 (Asia/Jerusalem). Status: implementation plan; no application
+code or tests have been changed. The caller requested selection, assignment,
+this plan and branch publication. Implementation is a subsequent step.
 
-## Current continuation checkpoint
+- Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
+- Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.
+- [Pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/164#issuecomment-6439889068).
+- Base: `origin/main`, `56e2b0ddd1fb8d7559239a2db38220c59241976e`.
+- Work branch: [branch/issue-164-ranger-abilities](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-164-ranger-abilities),
+  created after writing the plan through GitHub's native linked-branch operation.
+  Its Development association is #164. Planning files are published from an
+  isolated managed worktree; verify remote commit parity before handoff.
+- Previous root plan: [issue-163-fighter-abilities-plan.md](issue-163-fighter-abilities-plan.md),
+  moved without changing its bytes; SHA-256
+  `26940ba96adebce344ca58a97e5ba5ff887a567de9f50eb73613811596bbb159`.
+  It is historical: its four PRs are now merged and #163 is closed.
 
-- Implementation, acceptance and delivery are complete. All four PRs are open,
-  non-draft and mergeable; remote parity and final review readiness were verified.
-  The requested branch remains `branch/issue-163-fighter-abilities`.
-- Review stack, all open and ready: [#242](https://github.com/luminari-gurus/tactics-guru-v2/pull/242)
-  standalone level-one boundary → [#244](https://github.com/luminari-gurus/tactics-guru-v2/pull/244)
-  carried-party/Guarded assertions → [#245](https://github.com/luminari-gurus/tactics-guru-v2/pull/245)
-  engine-aware fixtures/complete-run selector →
-  [#247](https://github.com/luminari-gurus/tactics-guru-v2/pull/247) Fighter abilities.
-- Main `d5b1927` (#243 automatic stairs) was merged normally through every
-  dependency branch and the feature. The new journey follows automatic descent.
-  Test/build source `a74d85e` is clean; later evidence commits reuse its unchanged
-  inputs. No history rewriting or GitHub PR merge was performed.
-- Current proof: 971/971 unit tests in 55 files, both TypeScript scopes, two build
-  integrations and root bundle pass. Before the bounded main update, the full
-  19-stage inventory had 1,194 browser executions; all 65 failures and 9 skips
-  are explicitly reconciled in [QA](../qa/issue-163/README.md), preserving failed
-  aggregates and literal-base comparisons. Focused repairs pass 15 Chromium,
-  27 picker, 54 Linux WebKit acceptance, 2 extra WebKit animation and 12 root/prefix
-  asset cases. Existing dungeon WebKit 63, health 25 and both telemetry 36 pass.
-- Six earlier full production journeys (Chromium/WebKit desktop/portrait/landscape)
-  have identical complete traces: seed 190, 6 encounters, 365 combat commands,
-  earned Fighter level 3, both abilities used/reloaded, five wins then terminal
-  second-guardian defeat. Encounter 6 heals above entry HP (24 → 30). These traces
-  are retained; no two-floor victory is claimed.
-- Current-main delta: 9 Chromium + 9 WebKit stair/healed-party/recovery cases pass,
-  plus the complete updated desktop journey. Every battle state/event/RNG and
-  final party matches the earlier evidence; world revision 431 → 430 is the
-  intended one-revision stair travel. Unchanged combat/device coverage is reused;
-  the changed stair boundary is exercised in all six profiles. See
-  [the integration addendum](../qa/issue-163/main-integration/README.md).
-- Final isolated proof capture: 18 cold/warm samples, no failures, served build
-  `a74d85e`. It is local proof-scene qualification, not a new #200 baseline.
-- Rules/save boundary: Second Wind level 2, self, action + one battle use,
-  `min(missing HP, 4 + projected power)`; Taunt level 3, adjacent hostile, no roll,
-  restrict offensive targets through target endTurn; source/target defeat clears.
-  Battle state 2 / rules 3, run envelope 4, dungeon envelope 5. RNG remains 1 and
-  standalone wrapper remains 1. Old saves retain recovery/export bytes.
-- OpenSpec [proposal](../../openspec/changes/issue-163-fighter-abilities/proposal.md),
-  [design](../../openspec/changes/issue-163-fighter-abilities/design.md),
-  [spec](../../openspec/changes/issue-163-fighter-abilities/specs/fighter-abilities/spec.md),
-  [tasks](../../openspec/changes/issue-163-fighter-abilities/tasks.md).
-- No browser jobs remain active. Compressed reports, source/build hashes,
-  screenshots and traces are committed under `docs/qa/issue-163/`. Raw originals
-  are retained at `verification-receipts/issue-163-2026-10-25/`; their historical
-  report paths still say `tmp/issue-163-full/`. Task-owned comparison worktree and
-  WSL clone were removed after preserving evidence. All published unmerged branches
-  and qualified runtime/browser caches remain.
-- Runtime: Windows/WSL Node 24.19.0, npm 12.2.1, Playwright 1.63.0, Chromium
-  153.0.8010.12, WebKit 26.6. Windows npm wrapper:
-  `C:/Users/apexw/.codex/tmp/issue163-tools/npm.cmd`; Chromium executable:
-  `C:/Users/apexw/.codex/tmp/issue163-tools/browsers/chromium-1243/chrome-win64/chrome.exe`.
-  Windows WebKit's base-reproduced media decode limitation was requalified with
-  real media on Linux WebKit; no codec mocking or engine substitution. WSL used
-  an invalid Chromium override sentinel to prove engine isolation. Device profiles
-  are emulation, with no physical-device or CI execution claim.
+## Selection and available work
 
-- Issue: [#163](https://github.com/luminari-gurus/tactics-guru-v2/issues/163).
-- Assignee: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/163#issuecomment-6396849340).
-- Base: `origin/main` at `f2b8b95df128d6936d405eacdc235834c575a207`.
-- Branch: [branch/issue-163-fighter-abilities](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-163-fighter-abilities).
-  Created from the recorded base after writing this plan through GitHub's
-  native linked-branch operation; this branch appears in #163's Development section.
-- Prior root plan: [issue-205-audio-equivalence-plan.md](issue-205-audio-equivalence-plan.md),
-  preserved byte-for-byte (SHA-256
-  `e31af7d1fbeb855d192039dc71eb6cb2c8b1e32f446e2a4761829dcfe9c3e6d7`).
-  Its recorded statuses are historical; PR #229 is now merged.
+Reviewed all **33 open issues**, their complete bodies, labels and assignees,
+the **four open PRs**, and **six remote branches**. The paginated REST issue list
+contains 37 entries including PRs, with an empty second page; GraphQL independently
+reports 33 open issues and no next page. Native dependency and linked-branch
+relationships were inspected for all issues, together with relevant comments,
+merged prerequisites, existing plans and current source. Selection was not
+restricted to the `ready for work` label; #164 had only `enhancement`.
+
+All open issues have zero Project memberships. The authenticated user and
+organization each expose zero Projects V2. Repository-only Project/draft-item
+listing requires unavailable `read:project` permission, so that separate inventory
+could not be verified. No permission changes were made.
+
+**Choose #164:** it is high priority, unclaimed, has concrete legacy/source-backed
+rules and can use the shipped progression, picker and effect boundaries. It is
+the oldest remaining unassigned high-priority class-ability issue after #163.
+Adopting Pinning Shot also supplies a tested movement-blocking primitive for
+#165's Frost Snare; this enables that part of #165, not its unresolved Arc Bolt
+adaptation. Mark semantics also provide a real consumer for #161 and later Ranger
+reward work in #174. No active branch or PR covers #164.
+
+Prerequisites are judged by merged functionality, not blanket tracker closure:
+
+- #160 is closed; [PR #238](https://github.com/luminari-gurus/tactics-guru-v2/pull/238)
+  merged progression at `852e9d5`. `progressHero` derives learned abilities from
+  catalog `requiredLevel`; `projectProgression` removes locked profiles.
+- #161 remains assigned to `dubstylee` and open for downstream effects.
+  [PR #188](https://github.com/luminari-gurus/tactics-guru-v2/pull/188) merged the
+  Guarded foundation at `38474f2`; [combat-effects.md](../combat-effects.md)
+  explicitly assigns Mark and movement-block activation to their first consumers.
+- #162 remains assigned to `dubstylee` and open for wider acceptance.
+  [PR #211](https://github.com/luminari-gurus/tactics-guru-v2/pull/211) merged the
+  catalog-driven picker at `c051b00`. Its existing real consumer is now #163.
+- [PR #247](https://github.com/luminari-gurus/tactics-guru-v2/pull/247), current
+  main, delivered Second Wind/Taunt and bounded source references, turn/defeat
+  cleanup, accessible feedback, replay and save recovery. Those patterns are
+  directly reusable; they do not mean marks or immobilization already work.
+
+Disposition of the rest of the open backlog:
+
+- **Existing ownership/work:** #85 (operator release acceptance), #123 (PR #139),
+  #128 (telemetry), #155 (PR #246), #161, #162, #200 (baseline acceptance),
+  #219 (cleanup already integrated via #222/#209) are assigned to `dubstylee`.
+  #208 remains assigned and blocked on additional isolated runner capacity.
+  #199 is the DevOps epic, not an unclaimed implementation slice. PR #12 is the
+  separate restricted-SSH proposal; draft PR #237 is combat UI design.
+- **Strong alternatives:** #165 needs an Arc Bolt adaptation decision; #166 needs
+  reviewed save/debuff rules, support AI and new content; #167 needs push/formation
+  rules; #168 needs charge/stack rules; #169 needs damage traits/immunity and
+  Graveyard placement. #164 has a smaller, more established gameplay contract.
+- **Ready or plan-able, lower immediate priority:** #153 menu/navigation needs
+  destination and save-selection choices; #172 consumables/revival needs supply
+  policy; #176 records needs retention/counter semantics; #177 movement undo has
+  information/save boundaries; #179 logs, #181 convenience UI, #183 documentation
+  and #184 generator profiles are useful but less direct core-combat progress.
+- **Broader or dependent design:** #170 requires per-biome issue slices; #171
+  needs hazard/damage and forced-move ordering; #173 equipment and #174 rewards
+  need functioning modifier/acquisition choices; #175 depends on rewards/unlocks;
+  #178 rotation is a deliberate usability/cost review; #180 music depends on
+  Settings/provenance choices; #182 editor needs an adoption decision; #185
+  explicitly remains deferred pending a class-stat mapping.
+
+No unrelated issue was reassigned, closed or relabeled. #161/#162 are references,
+not additional issues claimed by this branch.
 
 ## Outcome
 
-Make Second Wind and Taunt real, level-gated Fighter abilities through the existing
-domain, session and accessible ability picker. Second Wind heals once per battle;
-Taunt constrains one enemy's offensive targeting for its next turn. Preserve
-atomic rejection, deterministic replay, save/resume, encounter transitions and
-the approved Guarded Strike and Magic Missile rules.
+Make Mark Target a real level-2 Ranger action and adopt Pinning Shot as a real
+level-3 action. Both must be reachable through the existing HUD in earned
+progression, survive active-battle save/resume, replay deterministically, and show
+accurate effect information. Keep High Shot, Guarded Strike, Fighter skills,
+Magic Missile, ordinary movement and existing input/confirmation boundaries intact.
 
-## Backlog review and selection
+## Rules selected for implementation
 
-Reviewed all **37 open issue bodies**, labels and assignees, all **four open PRs**,
-and all **six remote branches**, including work without `ready for work`. REST
-page 2 is empty; GraphQL reports `totalCount: 37`, `hasNextPage: false`. Native
-blocked-by and Development relationships were checked for every open issue.
-Every open issue has zero project memberships; the organization and authenticated
-user each report zero Projects V2. Repository-level Projects V2 listing requires
-an unavailable `read:project` scope, so a separate repository-only draft-item
-inventory could not be verified. No access settings were changed.
+These are concrete planning decisions, including explicit v2 adaptations. They
+are not claims that the feature is implemented or that every legacy detail is
+already approved v2 behavior.
 
-Selection is based on current source and completed prerequisite increments, not
-the readiness label. #163 has only `enhancement`, was unassigned with no comments,
-linked branch or competing PR immediately before pickup, and is high priority.
-It is the oldest concrete high-priority class-ability slice newly enabled by
-merged [#160 / PR #238](https://github.com/luminari-gurus/tactics-guru-v2/pull/238).
-The existing picker and effect handoff provide its integration path. The reusable
-healing and forced-target behavior can support later content, but completing
-#163 does not certify those other issues or promise to unblock every criterion.
+### Mark Target
 
-The complete open inventory is accounted for:
+- Ranger only, level 2 (60 XP), one action, living hostile unit, Manhattan range
+  2–5 and the existing line-of-sight rule. No damage, attack/save roll, cooldown
+  or per-battle use limit. Successful application does not end the actor's turn.
+- One mark per target; reapplication replaces its source and never stacks the
+  bonus. Different enemies can be marked simultaneously; there is no global
+  one-mark-per-Ranger cap. Mark and Pin may coexist on the same enemy.
+- The next accepted **player-side attack roll** against that target receives +2
+  accuracy exactly once, including Basic Attack, High Shot and Guarded Strike.
+  Consume on a hit, miss, natural 1 or natural 20. Preserve existing height,
+  Guarded penalties, critical and damage calculations; this is target-dependent
+  attack accuracy, not a permanent actor stat bonus.
+- Previews, prepared/cancelled commands, rejected actions, Wait, movement,
+  enemy attacks and automatic-hit Magic Missile do not consume or benefit.
+  Multi-missile damage leaves a surviving target's mark intact; target defeat
+  still removes it. A future rolled multi-hit profile is outside current content;
+  it must consume on its first qualifying roll if introduced later.
+- No turn countdown. Remove on target defeat, marking Ranger defeat, or battle
+  replacement. Source-death cleanup is the explicit v2 adaptation proposed by
+  #161. Rebuilding a new encounter never carries battle-local marks forward.
 
-- **Selected:** #163, a bounded high-priority production consumer of progression,
-  healing, finite uses and taunt.
-- **Already owned by `dubstylee`:** #85 release operations, #123 HUD collapse
-  (PR #139), #128 telemetry, #161 staged effects, #162 ability picker, #187 direct
-  confirmation (PR #240), #200 timing acceptance, #208 parallel CI capacity and
-  #219 process cleanup. Keep their ownership. Open tracker state does not make
-  integrated work available to duplicate. #208 explicitly awaits another isolated
-  host; #200 explicitly rejects an automatic new baseline capture.
-- **Other actionable or independently plannable alternatives:** #153 menu, #155
-  overworld movement, #164 Ranger abilities, #166 Shaman, #167 Hobgoblin, #168 Orc,
-  #172 consumables/revival, #176 records, #177 planning/undo, #179 log export,
-  #181 queue/tips/pace, #183 documentation, #184 generation, #218 Guarded badge and
-  #230 automatic stairs. #155's native blocker #154 is closed. Several enemy
-  features still need their first effect/profile decisions. None has the same
-  combination of an earlier concrete class scope and settled unlock foundation.
-- **Need decisions, content slices or prerequisite contracts:** #165 Mage
-  adaptation, #169 Graveyard traits, #170 biome-pack epic, #171 hazards and
-  push/charge ordering, #173 equipment/acquisition, #174 rewards/upgrades, #175
-  reward-dependent exploration, #178 rotation adoption, #180 music/Settings,
-  #182 editor adoption and #185 class-stat formulas. These remain valid future
-  work; absence of a readiness label alone is not the reason to defer them.
-- **Coordination:** #199 is the DevOps epic; its implemented child work and
-  remaining baseline/capacity acceptance stay with their existing owners. It is
-  not an additional unclaimed implementation patch.
-- **Open PR coordination:** #139 and #240 already own related shared-HUD changes;
-  #237 is a design-only combat-UI draft and #12 a held deployment alternative.
-  No existing branch belongs to #163. `work/issue-66-safari-restart` also remains
-  separate. Do not import or merge any of this work as part of planning.
+### Pinning Shot decision: adopt
 
-No issue was relabeled or closed. Only #163 is claimed. Browser/device emulation
-satisfies acceptance under AGENTS.md. No physical-device request was made;
-`CAN_TEST_MOBILE` was absent in this checkout and no hardware testing is claimed.
+The pinned legacy source defines a level-3 unlock and a resolver, but its normal
+Ranger action list omits Pinning Shot. Adopt it deliberately in v2; do not describe
+it as a previously reachable legacy ability.
 
-## Source audit and implementation decisions
+- Ranger only, level 3 (180 XP), one action, living hostile unit, range 2–5 with
+  ordinary LOS. No damage or attack/save roll, cooldown or per-battle use limit.
+- Prevent ordinary voluntary movement until the target completes its next
+  accepted `endTurn`. Attacks and Wait remain legal. Expire at that exact boundary
+  across initiative wrap, or on source/target defeat; no stacking/countdown array.
+- Reject an already pinned target before spending an action or changing state.
+  This follows the legacy resolver's explicit `already_pinned` rejection and
+  avoids an extra refresh policy. Reapplication after expiry is legal.
+- Movement preview exposes only the origin for a pinned active unit; an actual
+  move rejects with an intelligible immobilized reason and spends nothing.
+  Keeping an origin-only reachable result lets existing enemy planning still
+  consider attacks or Wait instead of failing its whole turn. No ordinary-move
+  candidate may escape the lock. This does not confer forced-movement immunity;
+  push/charge content remains owned by #167/#168.
+- Use a small shared movement-block predicate in `effects.ts`, exercised by Pin
+  now. #165 can later reuse it; no dormant Frost Snare profile ships here.
 
-The findings below record the base audit and approved implementation decisions;
-the checkpoint above describes current implementation and qualification. Pinned
-legacy sources were read directly during planning:
-[resolver definitions and lifecycle](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L74-L119),
-[Taunt resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L348-L394),
-[Second Wind resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L827-L872),
-and [unlock levels](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/UnitProgressionService.gd#L15-L28).
+### Immunity and atomicity
 
-1. **Unlocks and mode boundaries.** Add validated `ability:second_wind` at level 2
-   and `ability:taunt` at level 3, owned by Fighter. Reuse `requiredLevel`,
-   `progressHero` and `projectProgression`; unlock through actual run/dungeon XP.
-   The standalone battle remains level 1. Its `BattleScene` currently receives
-   the full `battleCatalog`, without progression projection: explicitly project
-   a level-1 catalog at that boundary so adding definitions cannot grant locked
-   abilities. Reuse the same catalog for its session, persistence and resume.
-   Raw content definitions remain available to run/dungeon progression. No
-   production debug unlock, level selector or new XP model.
-2. **Second Wind.** Self target only, range 0, living active Fighter, unused action
-   and unused once-per-battle use; heal `min(missing HP, 4 + projected power)`.
-   It needs no LOS, attack/save roll or RNG. Full HP, dead/foreign targets, locked
-   skills, spent actions/uses and stale commands reject with no changes to HP,
-   budgets, RNG, events or history. Commit healing, action and use together.
-   Store one bounded spent marker on the Fighter, equivalent to 0/1 remaining
-   uses; absence means unused. Fresh encounter/restart resets it; turn changes
-   and reload do not. No revival or preparation-item consumption.
-3. **Taunt.** One living hostile unit at Manhattan range 1 with ordinary clear
-   LOS; consumes one action, has no cooldown/use cap, damage, attack/save roll
-   or RNG draw. Store one source instance ID on the target. Reapplication
-   replaces the source without stacking. Expire after the target's next accepted
-   `endTurn`, including an otherwise idle turn, rather than at source turn start
-   or global round wrap. Source/target defeat clears it immediately; fresh battle
-   drops it. A defeated-source reference is never an effective restriction.
-4. **AI and immunity policy.** Offensive commands from a taunted enemy may target
-   only the living taunter, enforced by authoritative preview/resolution as well
-   as AI candidate filtering. Reuse route-based scoring and stable tie-breaks:
-   attack the source from a legal position, move toward a legal firing position
-   if one exists, otherwise Wait. Respect minimum bow range, terrain, LOS,
-   occupancy, movement/action budgets and presentation locks; never redirect an
-   illegal attack to another hero or stall the turn. Current enemy definitions
-   have no taunt immunity: all current living hostiles are eligible. Document
-   that boundary and reject unsupported immunity data through exact readers;
-   do not add a generic immunity catalog with no real immune consumer.
-5. **UI and presentation.** Extend the current picker, target list, board/self
-   targeting and preview dispatch for these two profile kinds. Show actual heal,
-   0/1 use availability, unlock requirement, taunter and expiry; a heal must not
-   be described as friendly fire or an attack roll. Use accepted events for
-   heal/status logs and existing text feedback; inspection reads current state,
-   including on resume. Keep keyboard/touch, review/cancel, resize, stale-intent
-   clearing and input locks. Preserve the current confirmation flow at this
-   branch's base; if #240 merges before implementation, adapt to its shared
-   confirmation path without restoring a removed modal. No new art/audio assets
-   or persistent board-badge system (#218 remains separate).
-6. **Persistence is part of healing.** `runSaveEnvelope.ts:63-64` and
-   `dungeon.ts:204-206` reject live HP above encounter-entry party HP. Replace
-   that no-healing assumption deliberately: after a spent Second Wind, bound the
-   living Fighter's HP by `min(projected max HP, entry HP + 4 + projected power)`;
-   retain entry-HP bounds for other heroes and unspent healing state. Keep
-   roster, seed, map, equipment,
-   outcome and defeated-hero constraints. Carry healed HP at accepted completion;
-   never carry battle-local spent/taunt state into party or floor state.
-7. **Versioning.** Extend exact-shape readers for only the new bounded fields,
-   validate source ID/allegiance and profile eligibility, and reject malformed
-   resources/references. Proposed versions: battle state 1→2 and rules 2→3,
-   run envelope 3→4 and dungeon envelope 4→5; retain RNG version 1 and the
-   independent standalone wrapper unless its envelope itself changes. Recheck
-   those numbers before editing if the base advances. Catalog/rules identities
-   must bind new abilities and semantics, including dungeon saves with no active
-   battle. Choose explicit incompatibility with existing export/recovery for
-   pre-change saves, preserving original bytes; no silent default injection,
-   destructive reset or speculative multi-version migration. Document this
-   player-visible compatibility boundary with the implementation.
+Current validated enemy content consists of Goblin Grunt/Archer with no status
+immunities. The selected policy makes both susceptible to Mark and Pin. Verify
+both explicitly and keep malformed/unsupported immunity metadata rejected by
+content validation; do not invent a current immune enemy or silently skip this
+policy check. Positive typed/tag immunity behavior belongs to #169's first real
+immune consumer, and is not claimed as implemented/tested here.
 
-The [#161 effect contract](../combat-effects.md) is staged: only Guarded runs
-today, and new kinds/resources are intentionally introduced with their first
-consumer. Its [completed increment](../../openspec/changes/issue-161-combat-effects/tasks.md)
-and the [picker increment](../../openspec/changes/issue-162-ability-picker/tasks.md)
-are on main. #161/#162 remain separately owned and open; this issue implements
-only the heal/use/taunt portions it actually needs, without closing those trackers.
+Every action checks ownership/unlock, actor/target, action availability, range,
+LOS, existing Pin and current state before adoption. Rejection and previews leave
+HP, actions, movement, RNG, command count, events and stored bytes unchanged.
+An exhausted RNG cursor rejects a qualifying attack without consuming its mark.
 
-## Non-goals and ablation
+## Source and consumer trace
 
-No Ranger/Mage/enemy ability additions, generic effect language, typed damage or
-save resolver, unused immunity/stack/cooldown framework, revival, new class stats,
-reward/equipment upgrades, UI redesign, music/assets, CI parallelism, deployment,
-merge or unrelated cleanup. Keep Guarded Strike's −2 attack/+2 AC and next-own-turn
-expiry, and Magic Missile's approved force/count/range/damage/spread behavior.
+Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`.
 
-The ablation pass keeps exactly two profile kinds, one 0/1 spent marker and one
-taunt source/lifetime. Existing command shapes, progression, route scoring,
-picker, presentation events and storage recovery do the rest. A generic resource
-map, status scheduler, event bus, new UI framework and compatibility adapter add
-no required behavior, so omit them. Save admission and versioning cannot be cut:
-the traced readers otherwise reject legal healing or misinterpret changed state.
-Shared legality cannot be cut: AI-only filtering would leave direct commands and
-previews inconsistent. No separate ablation report or extra approval workflow.
+- [Profiles and status hooks](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L102-L146):
+  ranges, +2 Mark, no Mark countdown, Pin turn-end hook.
+- [Mark and Pin resolution](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L301-L450):
+  action spending, no attack roll/damage, already-pinned rejection.
+- [Mark accuracy](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L1095-L1107)
+  and [consumption](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L1238-L1262)
+  establish player-side roll semantics, including misses.
+- [Unlocks](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/run/UnitProgressionService.gd#L15-L28)
+  versus [normal action list](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/ForestRuinsMvpBuilder.gd#L1190-L1215)
+  distinguish the Pinning Shot adoption from ordinary legacy parity.
 
-## Files and affected consumers
+Current source has explicit `Ability` kinds and exact validators, `UnitState`
+optional bounded effect fields, shared previews and `dispatch`, and source-bound
+Taunt cleanup. `BattleSession` delegates all commands to those domain paths.
+`battleActions.ts` already builds hostile unit targets from catalog profiles;
+`targetPreview.ts` uses `previewAbility`. HUD preview text currently identifies
+Taunt by `sourceId`, so adding another source-bearing preview requires an
+explicit discriminant rather than letting Mark/Pin render as Taunt.
 
-Expected edit locations; touch a file only when its traced behavior needs it:
+`grid.ts` supplies both player movement and AI candidates; `ai.ts` propagates a
+failed movement preview, explaining why the origin-only Pin preview matters.
+`BattleScene` is shared by standalone, short runs and dungeon battles. Existing
+`abilityPresentation.ts` can show accepted status events without new sprites or
+attack animations. `progression.ts` derives learned identities from catalog
+profiles; short runs can exercise Mark after level 2, while the continuing dungeon
+is the normal route to use level-3 Pin during a later encounter.
 
-- Content: `src/content/{types,abilities,validate}.ts`, existing content constants
-  only for bounds; retain catalog validation and required-level projection.
-- Domain: `src/domain/{types,effects,combat,turns,battle,ai,constants}.ts` for
-  profiles, atomic resolution, lifecycle, command legality and bounded state;
-  `progression.ts` only if the existing projection needs a demonstrated change.
-- Save/encounter integration: `src/domain/{runSaveEnvelope,runBattle,dungeon,dungeonSaveEnvelope,saveEnvelope}.ts`
-  and relevant identity construction. Existing storage adapters and recovery
-  flows should remain the path; edit them only for a demonstrated version issue.
-- Shared app/UI: `src/app/BattleSession.ts`, `src/ui/{battleActions,targetPreview,hud}.ts`,
-  `src/phaser/{BattleScene,abilityPresentation}.ts`. Inspect event consumers such
-  as audio/diagnostics for exhaustiveness; add no new cue asset requirement.
-- Extend existing unit files for ability validation, progression, abilities,
-  combat, AI, turns, session, feedback, run/dungeon battle and all save/storage
-  boundaries. Reuse `tests/ability-picker.spec.ts`, its existing dev fixture,
-  `tests/guarded-effects.spec.ts` and relevant battle/run/dungeon suites before
-  adding any test file. Existing policy helpers need explicit ability-kind
-  handling if they enumerate newly unlocked actions; trace all their consumers.
-- Update `docs/{combat-effects,signature-abilities}.md` and current save/run rules
-  that describe changed behavior; record source-bound qualification under
-  `docs/qa/issue-163/` during implementation. This `plan.md` is the requested
-  human plan; no additional planning artifact set is needed for this setup task.
+## Files and implementation steps
 
-Shared combat, turns, command admission, state readers and the HUD serve standalone,
-authored runs and dungeon battles. Catalog changes also reach content loading,
-fixtures, deterministic policies and telemetry gameplay journeys. That union
-drives verification; a Fighter-only UI test cannot prove all consumers.
+1. **Content and bounded effect data.** Extend
+   `src/content/{types,abilities,validate}.ts` with the two canonical Ranger kinds
+   and levels. Add bounded source references and effect events/rejections to
+   `src/domain/types.ts`; validate exact shapes and living, eligible source/target
+   references in `src/domain/battle.ts`. Reuse catalog-derived progression;
+   change `src/domain/progression.ts` only if an observed gate requires it.
+2. **One authoritative resolution path.** Extend
+   `src/domain/{effects,combat,grid,turns}.ts`. Apply/consume Mark around accepted
+   rolled attacks, clean both statuses after every damage path including missiles,
+   expire Pin at target endTurn, and share movement restriction with previews and
+   AI. Edit `src/domain/ai.ts` only if its existing origin/attack/Wait path needs
+   adjustment; preserve deterministic tie-breaks and no preview RNG.
+3. **Versioned persistence and continuation.** Extend the existing exact readers
+   and envelopes in `src/domain/{constants,saveEnvelope,runSaveEnvelope,dungeonSaveEnvelope}.ts`
+   and inspect `src/domain/{run,dungeon}.ts`, `src/app/BattleSession.ts` and owning
+   storage/session consumers. Planned versions: battle state 3 / rules 4, run
+   envelope 5, dungeon envelope 6; RNG stays 1 and standalone wrapper stays 1.
+   Recheck these against implementation base before reserving values. New learned
+   identities also affect progression/catalog hashes. Use the existing incompatible
+   save recovery/export behavior, retain original primary/backup bytes, and never
+   silently migrate, normalize or clear old data. Current-format reload preserves
+   exact effects/events/RNG; the next encounter starts without them.
+4. **Reachable actions and feedback.** Extend `src/ui/hud.ts` with discriminated
+   no-roll previews, source/lifetime information, action guidance and event text;
+   extend `src/phaser/abilityPresentation.ts` for accepted Mark/Pin feedback. Check
+   `src/ui/{battleActions,targetPreview}.ts`, `src/phaser/BattleScene.ts` and
+   `src/app/BattleSession.ts`; change only necessary consumers. Reuse the native
+   picker, direct HUD confirm, cancel, inspection, targeting and input locks.
+5. **Proof and current documentation.** Extend existing unit/browser files below,
+   update [signature-abilities.md](../signature-abilities.md) and
+   [combat-effects.md](../combat-effects.md), and retain source-bound QA under
+   `docs/qa/issue-164/`. Record enabled versus deferred #161/#162 acceptance;
+   completing #164 must not close either broader tracker automatically.
 
-## Implementation sequence and acceptance proof
+## Non-goals and ablation decisions
 
-Use the OpenSpec tasks and current checkpoint for implementation status. Runtime
-acceptance and delivery below are checked only when their whole proof is complete.
+- Keep two closed effect cases and existing state/command paths. Drop a generic
+  status engine, scripting language, global effect registry, middleware and a
+  resource/cooldown subsystem: neither chosen ability needs them.
+- Keep shared movement blocking because Pin needs it now; drop all Mage ability,
+  typed-damage/save, enemy-immunity catalog, hazard and forced-move implementations.
+  Their future owners do not justify shipping unused machinery here.
+- Keep HUD/inspection/log/floating feedback because live status information is an
+  acceptance criterion. Drop new art, sound packs, persistent board badges, a
+  replacement picker and any dependency on unmerged mobile collapse/design PRs.
+- Keep version/recovery work because exact state shapes and derived learned lists
+  change. Drop speculative backwards migration; retain the established safe
+  incompatible-save flow and explicit proof of untouched bytes.
+- Keep High Shot and all approved signatures unchanged. Drop Lingering Mark,
+  class-stat growth, rewards, recruitment and balance changes outside these rules.
+- Keep focused iteration and final full-regression accounting because shared
+  attack, movement, turn and save contracts change. Reuse valid unaffected proof
+  under the verification policy; do not rerun suites merely for a new docs commit.
 
-- [x] **Profiles and unlocks (criterion 1):** add and validate both definitions;
-  prove levels 1/2/3/5, malformed owners/kinds/resources and direct locked-command
-  rejection. Verify standalone level 1 and run/dungeon canonical learned lists;
-  repeated catalog/battle construction must not accumulate projection.
-- [x] **Atomic healing (criteria 2 and 5):** implement shared pure preview and
-  resolution, bounded use state and accepted heal event. Test partial/capped
-  healing, projected HP/power, full-health rejection, exhausted use, wrong/dead
-  targets, spent actions, repeated preview/cancel, duplicate confirmation and
-  unchanged RNG. Verify fresh-battle reset and mid-battle resume retains use.
-- [x] **Taunt and AI (criteria 3 and 5):** implement one-source status and shared
-  offensive legality. Test no-roll application irrespective of attack accuracy,
-  same-side/out-of-range/blocked/dead targets, replacement, source/target defeat,
-  exact target-turn expiry, initiative wrap, minimum bow range, obstacles,
-  unreachable/blocked firing positions, legal approach/Wait and no AI stall.
-- [x] **Save/replay integration (criterion 5):** update versions/admission together;
-  prove healing above entry HP in run and dungeon, over-max/non-Fighter/ineligible
-  HP rejection, no accidental revival, malformed resource/source rejection,
-  pending-action read-only behavior and old-save byte preservation. Compare
-  uninterrupted, replayed and resumed state/events/RNG; accepted encounter/floor
-  transitions retain HP and reset battle effects/uses once.
-- [x] **Reachable UI (criterion 4):** expose self heal and hostile taunt in the
-  real picker with accurate availability, status and logs. Exercise keyboard and
-  touch, narrow portrait/short landscape, inspection, cancel, repeated activation,
-  resize and presentation locks. Retain screenshots. Use existing level fixtures
-  for boundary cases, plus a complete legal production dungeon journey that
-  earns level 3 and uses both abilities; fixtures alone are not reachability proof.
-- [x] **Preservation and delivery (all criteria):** retain Guarded and Magic
-  Missile numeric, targeting, event, AI, replay and resume regressions. Reconcile
-  every acceptance criterion with source-bound results, update rule/compatibility
-  docs, inspect the final diff, commit/push only issue work and prepare the PR
-  when implementation is requested. Incomplete acceptance stays explicit.
+Removing any retained work would omit a named acceptance criterion or a traced
+consumer. This plan is the requested repository document; no duplicate planning
+report, general framework or separate approval artifact is needed for this handoff.
 
-## Proof and verification scope
+## Proof and acceptance mapping
 
-**For this planning commit:** check relative links, cited source paths, script/config
-names, full backlog accounting, archive SHA-256, `git diff --check`, commit/remote
-parity, issue assignment/comment and native branch link. Documentation-only setup
-requires no build or app/browser run and makes no gameplay acceptance claim.
+Follow [verification-policy.md](../verification-policy.md). This planning commit
+requires documentation/link/path/command/diff checks only, not app execution.
+The following commands and cases are the future implementation gates, not results.
 
-**During implementation:** start with selected existing units, for example:
+1. **Mark rules and level gate (criteria 1–2).** Extend `combat.test.ts`,
+   `state.test.ts`, `progression.test.ts`, `content.test.ts` and
+   `contentContract.test.ts`: levels 1/2/3, real ownership, range edges/LOS,
+   ally/self/missing/dead targets, source defeat, simultaneous marked enemies,
+   replacement, miss/natural rolls, additive accuracy without double projection,
+   pure repeated preview/cancel, exhausted RNG and rejected-command equality.
+   Exercise automatic multi-missile casts against both surviving and defeated
+   marked targets and friendly damage defeating a source.
+2. **Adopted Pin (criterion 3).** Extend `grid.test.ts`, `ai.test.ts` and
+   `turns.test.ts`: only origin reachable, movement rejected without spending,
+   legal attack/Wait, no-attack fallback, next target endTurn including round wrap,
+   source/target defeat, already-pinned rejection, Mark/Pin coexistence, new-battle
+   reset, and deterministic enemy plan/replay. Both current enemies are susceptible
+   under the explicit immunity policy; unsupported immunity fields remain invalid.
+3. **Real UI and unchanged High Shot (criterion 4).** Extend
+   `battleActions.test.ts`, `battleSession.test.ts`, `abilities.test.ts`,
+   `tests/ability-picker.spec.ts` and its existing fixture only as needed. Verify
+   locked/learned choices, correct no-roll text, effect source/expiry, hit chance
+   with Mark, target switching, cancel, repeat input, stale intent, inspection,
+   resize, keyboard focus, native touch and narrow portrait/landscape. Assert no
+   accidental damage animation or false attack/magic audio cue. Retain High Shot
+   and Fighter/Magic Missile regression coverage.
+4. **Continuation and real progression (criterion 5).** Extend
+   `saveEnvelope.test.ts`, `runSaveEnvelope.test.ts`, `dungeon.test.ts`,
+   `dungeonBattle.test.ts`, session/storage tests and `tests/{battle-persistence,run-progression,dungeon,dungeon-lifecycle}.spec.ts`.
+   Prove exact active Mark/Pin reload, replay/state/event/RNG agreement, corrupt
+   references and old-format recovery without data loss, new-encounter cleanup,
+   and no leakage into carried party fields. Play a complete legal production
+   dungeon journey earning level 3 and using both abilities through the HUD with
+   reloads, then reach victory or defeat. Use a demonstrated legal seed/strategy;
+   do not assume #163's Fighter trace guarantees Ranger survival or rewrite saves
+   to manufacture progression. Short-run acceptance covers earned Mark; standalone
+   acceptance keeps level-one actions and the unchanged initial battle boundary.
+
+Focused iteration commands, from the repository root after installing locked
+dependencies with the supported Node version:
 
 ```sh
-npm run test:unit -- tests/unit/abilityValidation.test.ts tests/unit/progression.test.ts tests/unit/abilities.test.ts tests/unit/combat.test.ts tests/unit/ai.test.ts tests/unit/turns.test.ts
-npm run test:unit -- tests/unit/battleSession.test.ts tests/unit/runBattle.test.ts tests/unit/runSaveEnvelope.test.ts tests/unit/dungeonBattle.test.ts
+npm run test:unit -- tests/unit/combat.test.ts tests/unit/state.test.ts tests/unit/grid.test.ts tests/unit/ai.test.ts tests/unit/turns.test.ts tests/unit/progression.test.ts
+npm run test:unit -- tests/unit/saveEnvelope.test.ts tests/unit/runSaveEnvelope.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts tests/unit/battleSession.test.ts tests/unit/battleActions.test.ts tests/unit/abilities.test.ts
+npm run build
 npm run test:fixtures -- ability-picker.spec.ts
-npx --no-install playwright test tests/guarded-effects.spec.ts --list
+npx --no-install playwright test tests/battle-loop.spec.ts tests/battle-persistence.spec.ts tests/run-progression.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts
 ```
 
-Confirm the exact new/changed test titles with discovery before selecting browser
-filters. Add the existing save/storage/feedback unit files to iteration selection
-as their consumers change. No application checks are executed merely to validate
-this plan's prose.
+Final selection is **full regression** because this changes shared attack/move/
+turn behavior and save admission across routes. Use `npm run verify:full -- --list`
+to inventory every stage, then `npm run verify:full` on qualified exclusive
+capacity, or the existing resumable serial batch workflow with an exact coverage
+ledger. Include all fast units/content, both type scopes, root/prefix build
+integrations, default Chromium desktop/touch profiles, all dev fixtures and dev
+placement, WebKit acceptance/exploration, health bars, distinct configured telemetry
+modes, root/prefix assets and the existing full-run performance capture. Add the
+new Ranger browser cases to the appropriate engine selections where existing
+grep/testMatch would otherwise omit them; discover and preserve existing IDs.
 
-**Final implementation readiness selects full regression** under
-[verification policy](../verification-policy.md): shared turn/command contracts,
-state admission and cross-route persistence change. Use `npm run verify:full -- --list`
-to inventory the final selection, then `npm run verify:full` or the existing
-resumable `verify:batches` workflow on qualified exclusive self-hosted capacity.
-Account for all suites: tooling, full units/content, both TypeScript scopes,
-root/prefix builds and assets, default Chromium, combined dev fixtures, dev-only
-placement, WebKit battle/run and dungeon/exploration, health bars, separately
-configured production/development telemetry and isolated performance capture.
-Audit new cases against specialized config greps so required WebKit scenarios
-are actually selected; list-only output is not an executed test.
+Retain failures/skips/interrupted runs, final build/source and relevant input
+hashes, browser/host/mode identity, screenshots and replay receipts. Run browser
+suites sequentially with one worker and zero blanket retries. Browser CI remains
+self-hosted without automatic GitHub-hosted fallback. Physical access in the
+caller's `.env` is `android`; none is required here because Playwright/device
+emulation is sufficient under AGENTS.md. Do not claim physical-device coverage.
+Use a functioning qualified WebKit environment for its real media/engine cases.
 
-Keep one browser job/worker per shared GPU, the existing exclusive lock and no
-automatic GitHub-hosted fallback. Reuse only evidence with unchanged relevant
-source/test/config/dependency/build inputs and retained artifacts; record source,
-build, host/browser, commands, selection, hashes, retries/skips and every failure.
-The #200 baseline and PR #240's reported procedural-grid/WebKit focus failures
-remain historical failures; reproduce an affected failure on the literal base
-under matching conditions before calling it pre-existing. A focused pass does
-not turn those old aggregates green. Do not repeat an unchanged completed suite
-solely because this plan or later evidence prose changed.
+Reusable evidence must have unchanged relevant inputs and retained original
+receipts; a prior failed aggregate cannot become a clean full run by adding focused
+passes. Investigate any new regression against the literal base under matching
+conditions and rerun only invalidated coverage. Finish with `git diff --check`,
+an acceptance-by-acceptance audit and a focused PR referencing #164; only use
+`Closes #164` after every selected criterion is proven. No merge or deployment is
+part of this plan.
 
-## Risks and continuation
+## Planning verification
 
-The principal risks are accidental standalone unlocks, valid healing rejected by
-aggregate readers, healing/use reset on reload, expiry attached to the wrong
-turn, AI unable to finish under a taunt, and save identity drift. Each has an
-explicit implementation path and proof above. New on-disk state is intentionally
-incompatible with prior saves; recovery must preserve and export their bytes.
-PR #240 and the #241 Guarded indicator work were merged before implementation;
-their confirmation and board behavior are preserved. Keep #139's independently
-owned work separate, and inspect live branch/PR state before final delivery.
-Continue from the current checkpoint and OpenSpec tasks, retaining source/build
-identities, failed attempts and focused repair receipts. Deliver the remaining
-reviewable dependency/feature PRs and leave the stack open for review.
+- Local Markdown links and named unit/browser paths checked against current main.
+  The first path check caught a proposed `abilityPresentation.test.ts` filename;
+  corrected it to the existing `abilities.test.ts` that owns that coverage.
+- `npm run verify:full -- --list`: all 19 stages discovered without execution.
+- Playwright `--list` for the five listed default browser files: 189 selections;
+  the two listed WebKit exploration files: 33; ability-picker fixtures: 27.
+  These establish valid current commands, not future Ranger coverage or test passes.
+- The previous plan's archive hash matches its original bytes. The primary
+  checkout's original plan was restored after moving this work into isolation;
+  concurrent README/art changes were left intact and are excluded from this branch.
+- No application, browser or physical-device tests were run for this docs-only
+  change. Final staged whitespace, file-scope and remote parity checks precede
+  handoff; implementation acceptance remains entirely outstanding.
+
+## Estimate for my implementation
+
+**6–9 hours of elapsed working time**, assuming a usable, otherwise idle browser
+environment and no new base regression: roughly 2–3 hours for domain/content/save
+work and focused tests, 1–1.5 hours for UI and legal progression journeys, 2–3 hours
+for full verification and focused repairs, and 0.5–1.5 hours for final evidence,
+documentation and PR preparation. This estimates my work after implementation
+is requested; it is not a human-engineer estimate or a guaranteed deadline.
+
+The largest uncertainties are a legal Ranger level-3 journey, changed save
+admission/old-format recovery, WebKit media availability and serial runner queues.
+Allow **10–12 hours** if those expose substantive repairs. Queue/offline waiting,
+review and deployment time are excluded. No new benchmark was run for this plan.
