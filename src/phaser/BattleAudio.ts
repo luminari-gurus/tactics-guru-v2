@@ -35,6 +35,7 @@ export class BattleAudio {
   private active: BattleCue|null = null;
   private sounds = new Map<BattleCue, Phaser.Sound.BaseSound>();
   private completion: (()=>void)|undefined;
+  private removeMediaCompletion?: ()=>void;
   private playTimer?: Timer;
   private unlockTimer?: Timer;
   private loadTimer?: Timer;
@@ -145,6 +146,7 @@ export class BattleAudio {
   }
   private clearActive() {
     clearTimeout(this.playTimer);this.playTimer=undefined;
+    this.removeMediaCompletion?.();this.removeMediaCompletion=undefined;
     if(this.active) {
       const sound=this.sounds.get(this.active);
       if(this.completion) sound?.off('complete',this.completion);
@@ -162,11 +164,20 @@ export class BattleAudio {
       let sound=this.sounds.get(cue);
       if(!sound) {sound=this.host.sound.add(BATTLE_CUES[cue].key);this.sounds.set(cue,sound);}
       this.active=cue;
-      this.completion=()=>{
-        if(!this.live || generation !== this.generation) return;
+      const complete=()=>{
+        if(!this.live || generation !== this.generation || this.completion !== complete) return;
         this.completed++;this.clearActive();this.next(generation);
       };
+      this.completion=complete;
       sound.once('complete',this.completion);
+      const tag=this.media.get(BATTLE_CUES[cue].key)?.tag;
+      if(tag) {
+        // Phaser polls HTML5 completion on render frames; media can finish between them.
+        // A queued end event from a previous use must not complete a restarted tag.
+        const ended=()=>{if(tag.ended)complete();};
+        tag.addEventListener('ended',ended);
+        this.removeMediaCompletion=()=>tag.removeEventListener('ended',ended);
+      }
       if(!sound.play({volume:0.5})) {this.block('Sound playback refused. Retry sound.');return;}
       this.started++;this.recent.push(cue);this.recent=this.recent.slice(-32);
       this.playTimer=setTimeout(()=>{

@@ -159,19 +159,32 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   expect((await audio(page)).enabled).toBe(true);expect(found).toEqual([]);
 });
 
-for(const early of [true,false]) test(`HTML5 per-element permission survives ${early?'early enable':'enabled restart'}`,async({page})=>{
+for(const [early,delayedFrames] of [[true,false],[false,false],[false,true]] as const) test(delayedFrames
+  ? 'HTML5 completion survives delayed animation frames after enabled restart'
+  : `HTML5 per-element permission survives ${early?'early enable':'enabled restart'}`,async({page})=>{
   const found=errors(page);
   const warnings:string[]=[];page.on('console',message=>{if(message.type()==='warning')warnings.push(message.text());});
-  await page.addInitScript(()=>{
+  await page.addInitScript(delayedFrames=>{
     Object.defineProperty(window,'AudioContext',{value:undefined});Object.defineProperty(window,'webkitAudioContext',{value:undefined});
     const original=HTMLMediaElement.prototype.play,primed=new WeakSet<HTMLMediaElement>();
     const observed=new WeakMap<HTMLMediaElement,number>(),trace:unknown[]=[];let nextId=0;
     window.__html5Trace=trace;
+    let holdFramesUntil=0;
+    if(delayedFrames) {
+      window.__html5FrameDelay={withheld:0,nativeEnds:0};
+      const requestFrame=window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame=callback=>requestFrame(time=>{
+        const remaining=holdFramesUntil-performance.now();
+        if(remaining>0){window.__html5FrameDelay!.withheld++;setTimeout(()=>callback(performance.now()),remaining);}
+        else callback(time);
+      });
+    }
     const record=(tag:HTMLMediaElement,event:string)=>{
       trace.push({event,id:observed.get(tag),now:performance.now(),time:tag.currentTime,
         duration:Number.isFinite(tag.duration)?tag.duration:null,paused:tag.paused,ended:tag.ended,
         muted:tag.muted,rate:tag.playbackRate,ready:tag.readyState,seeking:tag.seeking,used:tag.dataset.used,
         hidden:document.hidden,focused:document.hasFocus(),phase:document.getElementById('game')?.dataset.phase,error:tag.error?.code});
+      if(event==='ended' && !tag.muted && window.__html5FrameDelay)window.__html5FrameDelay.nativeEnds++;
       if(trace.length>512)trace.shift();
     };
     let gesture=false;
@@ -183,11 +196,13 @@ for(const early of [true,false]) test(`HTML5 per-element permission survives ${e
     HTMLMediaElement.prototype.play=function(){
       if(!observed.has(this)){observed.set(this,++nextId);for(const event of ['playing','waiting','stalled','timeupdate','ended','pause','error','seeking','seeked'])this.addEventListener(event,()=>record(this,event));}
       record(this,'play-request');
+      // Delay render polling only; the native media and watchdog timers keep running.
+      if(delayedFrames && !this.muted)holdFramesUntil=performance.now()+900;
       if(this.muted && gesture && !primed.has(this)){primed.add(this);window.__mediaPolicy!.primed++;}
       if(!primed.has(this)){window.__mediaPolicy!.rejected++;return Promise.reject(new DOMException('Element requires a gesture','NotAllowedError'));}
       return original.call(this);
     };
-  });
+  },delayedFrames);
   let release!:()=>void;const held=new Promise<void>(resolve=>{release=resolve;});
   if(early)await page.route('**/audio/battle/**',async route=>{await held;await route.continue();});
   await page.goto('/');await ready(page);
@@ -204,8 +219,16 @@ for(const early of [true,false]) test(`HTML5 per-element permission survives ${e
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   try {await expect.poll(async()=>(await audio(page)).completed).toBeGreaterThan(0);}
   finally {await test.info().attach('html5-playback.json',{contentType:'application/json',body:JSON.stringify({
-    audio:await audio(page),policy:await page.evaluate(()=>window.__mediaPolicy),events:await page.evaluate(()=>window.__html5Trace),warnings,
+    audio:await audio(page),policy:await page.evaluate(()=>window.__mediaPolicy),events:await page.evaluate(()=>window.__html5Trace),
+    frameDelay:await page.evaluate(()=>window.__html5FrameDelay),warnings,
   })});}
+  if(delayedFrames) {
+    const frames=await page.evaluate(()=>window.__html5FrameDelay);
+    expect(frames?.withheld).toBeGreaterThan(0);expect(frames?.nativeEnds).toBe(1);
+    expect(await audio(page)).toMatchObject({status:'ready',error:null,started:1,completed:1,active:null});
+    await ready(page);
+    await page.screenshot({path:test.info().outputPath('html5-completed-after-frame-delay.png')});
+  }
   expect(await page.evaluate(()=>window.__mediaPolicy!.rejected)).toBe(0);expect(found).toEqual([]);
 });
 
@@ -220,6 +243,7 @@ declare global { interface Window {
   __battleContext?:AudioContext;__resumeFailure?:boolean;__resumeCalls?:number;__releaseResume?:()=>void;
   __mediaPolicy?:{primed:number;rejected:number};
   __html5Trace?:unknown[];
+  __html5FrameDelay?:{withheld:number;nativeEnds:number};
 } }
 
 for(const mode of ['missing','corrupt','stalled','decode-stalled'] as const) test(`${mode} optional media leaves legal controls usable`,async({page})=>{

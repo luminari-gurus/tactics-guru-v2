@@ -29,6 +29,18 @@ function fixture(cached=true, html5=false) {
 beforeEach(()=>{vi.useFakeTimers();vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)})));});
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
+function loadedHtml5() {
+  class Media extends EventTarget {
+    dataset:Record<string,string>={};src='';muted=false;currentTime=0;preload='';ended=false;
+    oncanplaythrough:(()=>void)|null=null;onerror:(()=>void)|null=null;
+    load(){queueMicrotask(()=>this.oncanplaythrough?.());}
+    pause=vi.fn();removeAttribute(){this.src='';}
+    play(){return Promise.resolve();}
+  }
+  vi.stubGlobal('Audio',Media);
+  const f=fixture(false,true);
+  return {...f,tag:(cue:BattleCue)=>(f.cache.get(BATTLE_CUES[cue].key) as Media[])[0]};
+}
 
 describe('scene audio lifetime',()=>{
   it.each([[1,'playerLoss'],[2,'playerWin']] as const)('seed %i: enabled/muted adapters preserve every legal boundary through %s',async(seed,outcome)=>{
@@ -105,12 +117,47 @@ describe('scene audio lifetime',()=>{
     expect(f.audio.snapshot()).toMatchObject({active:null,started:1});f.audio.destroy();
     expect(f.sound.pauseOnBlur).toBe(true);
   });
+  it('completes native HTML5 audio without a render tick and counts each cue only once',async()=>{
+    const f=loadedHtml5();await flush();f.audio.setEnabled(true);await flush();
+    f.audio.present(1,[...move,{type:'battleEnded',outcome:'playerWin'}]);
+    const lateComplete=f.sounds[0].listeners('complete')[0];
+    const moveTag=f.tag('move');
+    moveTag.ended=true;moveTag.dispatchEvent(new Event('ended'));
+    expect(f.audio.snapshot()).toMatchObject({completed:1,active:'victory',started:2});
+    lateComplete();moveTag.dispatchEvent(new Event('ended'));
+    expect(f.audio.snapshot()).toMatchObject({completed:1,active:'victory',started:2});
+    f.sounds[1].emit('complete');
+    const victoryTag=f.tag('victory');victoryTag.ended=true;victoryTag.dispatchEvent(new Event('ended'));
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(f.audio.snapshot()).toMatchObject({completed:2,active:null,status:'ready',error:null});
+    expect(vi.getTimerCount()).toBe(0);f.audio.destroy();
+  });
+  it('ignores a queued native end event after the same HTML5 tag is reused',async()=>{
+    const f=loadedHtml5();await flush();f.audio.setEnabled(true);await flush();
+    f.audio.present(1,move);f.audio.present(2,move);
+    const tag=f.tag('move');tag.dispatchEvent(new Event('ended'));
+    expect(f.audio.snapshot()).toMatchObject({completed:0,active:'move',started:2});
+    tag.ended=true;tag.dispatchEvent(new Event('ended'));
+    expect(f.audio.snapshot()).toMatchObject({completed:1,active:null,status:'ready'});f.audio.destroy();
+  });
+  it.each(['mute','hide','blur','destroy'] as const)('removes native HTML5 completion after %s',async action=>{
+    const f=loadedHtml5();await flush();f.audio.setEnabled(true);await flush();
+    f.audio.present(1,move);const tag=f.tag('move');
+    if(action==='mute')f.audio.setEnabled(false);
+    if(action==='hide'){f.document.hidden=true;f.document.dispatchEvent(new Event('visibilitychange'));}
+    if(action==='blur')f.window.dispatchEvent(new Event('blur'));
+    if(action==='destroy')f.audio.destroy();
+    const before=f.audio.snapshot(),renders=f.render.mock.calls.length;
+    tag.ended=true;tag.dispatchEvent(new Event('ended'));await vi.advanceTimersByTimeAsync(2000);
+    expect(f.audio.snapshot()).toEqual(before);expect(f.render).toHaveBeenCalledTimes(renders);
+    expect(vi.getTimerCount()).toBe(0);f.audio.destroy();
+  });
   it('ignores late HTML5 priming promises after an explicit retry',async()=>{
     let retry=false;const late:(()=>void)[]=[],tags:Media[]=[];
-    class Media {
+    class Media extends EventTarget {
       dataset:Record<string,string>={};src='';muted=false;currentTime=0;preload='';
       oncanplaythrough:(()=>void)|null=null;onerror:(()=>void)|null=null;
-      constructor(){tags.push(this);}
+      constructor(){super();tags.push(this);}
       load(){queueMicrotask(()=>this.oncanplaythrough?.());}
       pause=vi.fn();removeAttribute(){this.src='';}
       play(){return retry?Promise.resolve():new Promise<void>(resolve=>late.push(resolve));}
