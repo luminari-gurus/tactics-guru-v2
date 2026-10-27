@@ -1,5 +1,13 @@
 # Battle save format 1
 
+Current #164 versions: the standalone wrapper remains format 1, containing battle
+state format 3 / rules 4; run envelope is 5 and dungeon envelope is 6. RNG remains
+1. Older versions are incompatible and preserve original bytes for recovery/export.
+The bounded active `markedBy`/`pinnedBy` references are validated with living,
+eligible Ranger sources and remain battle-local. See [current effect rules](combat-effects.md)
+and [progression compatibility](hero-progression.md#save-compatibility). The
+procedural-format section below records its historical introduction.
+
 This is the pure contract for [#69](https://github.com/luminari-gurus/tactics-guru-v2/issues/69), the schema child of [#58](https://github.com/luminari-gurus/tactics-guru-v2/issues/58). The [#72 storage adapter](battle-storage.md) calls `src/domain/saveEnvelope.ts`; the codec itself remains pure. Successful decoding returns an owned domain state; it does not resume a live session or access storage.
 
 ## Representation decision
@@ -57,7 +65,7 @@ The continuation tests compare decoded presentation snapshots against the **unin
 
 The [#72 adapter](battle-storage.md) supplies Phaser-namespaced primary/backup storage, guarded failures, raw-data preservation and documented interrupted-write ordering without changing this pure codec. The #73 coordinator connects it to hydration, autosave, Continue/recovery/export controls and guarded restart invalidation. #74 retains physical persistence/lifecycle certification. Persistence is origin-scoped and best-effort. No live UI, Godot importer, run/reward model, deployment or parent-epic closure belongs to this codec contract.
 
-## Procedural run snapshots: format 2
+## Procedural run snapshots: format 2 (historical introduction)
 
 Run snapshots now require `{items, activeBattle, battlefield}`. `battlefield` is
 null without an active battle. Authored descriptors contain `encounterId`, `kind`,

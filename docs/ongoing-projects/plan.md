@@ -264,6 +264,11 @@ is the normal route to use level-3 Pin during a later encounter.
    [combat-effects.md](../combat-effects.md), and retain source-bound QA under
    `docs/qa/issue-164/`. Record enabled versus deferred #161/#162 acceptance;
    completing #164 must not close either broader tracker automatically.
+   Also update the directly affected current summaries in `README.md`,
+   `docs/hero-progression.md`, `docs/run-contract.md` and
+   `docs/battle-save-format.md`: inspection found obsolete unlock/version claims
+   there. Preserve and label historical format sections; this is documentation
+   consistency for #164, not the broader #183 reconciliation.
 
 ## Non-goals and ablation decisions
 

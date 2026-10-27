@@ -57,7 +57,11 @@ the game uses illustrated portraits, compact sprites and isometric tile boards.
   **Taunt**, restricting a hostile target's offensive choices to the living Fighter
   until that target's next turn ends.
 - **Ranger** — **High Shot** rewards taking higher ground, with ranged attacks
-  governed by distance and line of sight.
+  governed by distance and line of sight. Level 2 unlocks **Mark Target**, adding
+  +2 accuracy to the next player attack roll against that enemy and clearing the
+  Mark afterward, including on a miss.
+  Level 3 unlocks **Pinning Shot**, blocking movement until the enemy's next turn
+  ends. Both controls use an action without damage or a roll.
 - **Mage** — **Magic Missile** deals automatic-hit force damage, subject to range
   and line of sight. Progression increases the missile count at levels 3 and 5.
   It can target allies, so check the friendly-fire warning before confirming.
@@ -66,7 +70,7 @@ Runs and dungeons support **levels 1–5**. Victories award XP to living partici
 level-ups increase maximum HP and heal them. Defeated heroes stay defeated.
 Between encounters, use **Healing Draughts** or equip an **Aiming Charm** or
 **Warding Charm**. See [hero progression](docs/hero-progression.md),
-[ability rules](docs/signature-abilities.md#fighter-progression-163) and
+[ability rules](docs/signature-abilities.md) and
 [items and rewards](docs/run-items.md) for the exact contracts.
 
 ### Your first turn
