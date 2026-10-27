@@ -26,6 +26,11 @@ and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
   Vite-filename guard before realpath lookup, rerun affected tooling and actual
   Vite smoke, and retain the failed aggregate. Successful unaffected coverage is
   reusable; do not rerun it merely for a green aggregate.
+- The fix is prepared separately in ignored
+  `tmp/issue-164/wsl-vite-bind-fixed.cjs`; its 10 verification, 20 process/reporting
+  and 27 selection/batch contracts pass. Candidate hashes/logs are retained under
+  `docs/qa/issue-164/tooling-candidate/`. Apply these same bytes only after the
+  live run, then prove actual Vite/engine startup with the corrected adapter.
 - Additional previous-format browser recovery cases are prepared in
   `tests/dungeon-lifecycle.spec.ts` and typecheck passes; they still need focused
   Chromium/WebKit execution after the live run. The extra simultaneous/replaced

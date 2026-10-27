@@ -88,6 +88,14 @@ prove the affected tooling and actual Vite boot, and retain this failed aggregat
 separately from that recovery. Do not repeat successful suites solely to obtain
 a green aggregate.
 
+The correction is isolated in ignored `tmp/issue-164/wsl-vite-bind-fixed.cjs`
+without editing the adapter used by the live run. It adds a Vite-filename guard
+before realpath lookup. With that candidate loaded, `test:verification` passes
+10/10, `test:verification-tooling` passes 20/20 and `test:verification-batches`
+passes 27/27. [Retained candidate receipts](tooling-candidate/manifest.json) bind
+the module bytes and command results. Application of the same bytes and actual
+Vite/engine smoke remain pending until the live browser run completes.
+
 Current discovery: 718 default Chromium, 81 combined fixtures, 3 dev placement,
 54 WebKit acceptance, 81 WebKit exploration, 25 health bars, 36 each configured
 telemetry mode and 69 each explicit root-dev/prefix asset selection. The three
