@@ -4,6 +4,42 @@ Date: 2026-10-27 (Asia/Jerusalem). Status: implementation approved and active.
 The caller approved this plan and requested implementation, required verification
 and a PR on `branch/issue-164-ranger-abilities` on 2026-10-27.
 
+## Current implementation checkpoint
+
+- Runtime and tests are implemented/published in `af9c1b6`; current full-run source
+  is `789161c`, which only adds the task-local WSL bind adapter. Main's `b629926`
+  README update is integrated. No PR has been opened yet.
+- Windows iteration: all 986 units, both types, build/content, 12 Ranger picker
+  cases and the complete earned level-3 Ranger HUD journey passed. The journey
+  uses five encounters/338 combat commands, resumes both effects, observes Mark
+  consumption and ends in defeat with exact replayed state. Raw/retained evidence
+  and failures are described in [QA](../qa/issue-164/README.md).
+- The full 19-stage run is **live** in WSL checkout
+  `/tmp/tactics-issue-164-20261027`, Node process `2506569`, unified-exec session
+  `74639`. Reports:
+  `tmp/verification/full-2026-10-27T11-14-39.281Z-2506569/` in that checkout.
+  Check its actual process/session and summary; never restart because observation
+  times out. Units, types and build integrations passed; browser stages continue.
+- Initial tooling failed because `wsl-vite-bind.cjs` resolves a `node -e`
+  argument as a file. **Do not edit this adapter while the run is live:** its
+  `NODE_OPTIONS` path points into the Windows worktree. After completion, add a
+  Vite-filename guard before realpath lookup, rerun affected tooling and actual
+  Vite smoke, and retain the failed aggregate. Successful unaffected coverage is
+  reusable; do not rerun it merely for a green aggregate.
+- Additional previous-format browser recovery cases are prepared in
+  `tests/dungeon-lifecycle.spec.ts` and typecheck passes; they still need focused
+  Chromium/WebKit execution after the live run. The extra simultaneous/replaced
+  source assertions in `abilities.test.ts` pass all 35 cases. No runtime changed.
+- Actual baseline/current selection comparison preserves every old ID, metadata,
+  worker and project: default 715 → 727, fixtures 72 → 81, WebKit exploration
+  78 → 90 and acceptance 54 → 54. This includes nine recovery cases added after
+  the full run froze at 718 default/81 exploration selections. Retained raw
+  selections and [continuity summary](../qa/issue-164/selection-continuity.json)
+  identify every addition.
+- Remaining: reconcile full results/failures, execute added recovery cases and
+  the task-specific WebKit picker config, preserve final reports/screenshots and
+  source/build identities, finish the acceptance audit, then open/attach the PR.
+
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
 - Assignee: `moshehbenavraham`, resolved from the authenticated GitHub account.
 - [Pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/164#issuecomment-6439889068).

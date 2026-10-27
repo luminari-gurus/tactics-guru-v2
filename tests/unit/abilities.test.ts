@@ -168,6 +168,9 @@ it('keeps simultaneous marks independent, replaces without stacking, and does no
   expect(session.state).toEqual(before);expect(session.events).toEqual([]);
   const invalid={...guardedStrike,target:{unitId:5}};
   expect(dispatch(freeze(snapshot),invalid,catalog)).toEqual({ok:false,reason:'outOfRange'});
+  const consumed=dispatch(snapshot,guardedStrike,catalog);assert(consumed.ok);
+  expect(consumed.state.units.find(u=>u.id===4)?.markedBy).toBeUndefined();
+  expect(consumed.state.units.find(u=>u.id===5)?.markedBy).toBe(2);
   const exhausted={...snapshot,rng:{...snapshot.rng,cursor:RULE_BOUNDS.cursor.max,words:[...snapshot.rng.words] as [number,number,number,number]}};
   // Use the same valid terminal RNG word/cursor relation as the existing cursor-boundary tests.
   exhausted.rng.words[3]=(exhausted.rng.cursor%UINT32_RANGE+RNG_WARMUP_DRAWS+1)%UINT32_RANGE;
@@ -259,6 +262,9 @@ it('replaces a Mark source with the newest Ranger without stacking', () => {
   const second=dispatch(activate(first.state,3),{...mark,unitId:3},catalog);assert(second.ok);
   expect(second.state.units.find(u=>u.id===4)?.markedBy).toBe(3);
   const preview=previewAttack(activate(second.state,1),guardedStrike,catalog);assert(preview.ok);expect(preview.markBonus).toBe(2);
+  const oldSourceDeath=naturalState(activate({...second.state,units:second.state.units.map(u=>u.id===2?{...u,hp:1}:u.id===6?{...u,cell:{x:0,y:1}}:u)},6),20);
+  const killed=dispatch(oldSourceDeath,{type:'useAbility',unitId:6,abilityId:'ability:basic_attack',target:{unitId:2}},catalog);assert(killed.ok);
+  expect(killed.state.units.find(u=>u.id===2)?.hp).toBe(0);expect(killed.state.units.find(u=>u.id===4)?.markedBy).toBe(3);
 });
 
 it('replays both Ranger actions from canonical creation with identical state, events and RNG', () => {
@@ -269,7 +275,9 @@ it('replays both Ranger actions from canonical creation with identical state, ev
   const apply=(command:import('../../src/domain/types').Command)=>{const result=dispatch(state,command,catalog);assert(result.ok);commands.push(command);events.push(...result.events);state=result.state;};
   for(const command of [mark,pin]) {
     while(state.initiative[state.activeIndex]!==2)apply({type:'endTurn',unitId:state.initiative[state.activeIndex]});
-    apply(command);apply({type:'endTurn',unitId:2});
+    apply(command);
+    if(command===pin)expect(state.units.find(u=>u.id===4)).toMatchObject({markedBy:2,pinnedBy:2});
+    apply({type:'endTurn',unitId:2});
   }
   const replay=replayBattle({format:state.format,versions:state.versions,initial:created.state,commands},catalog);assert(replay.ok);
   expect(replay).toEqual({ok:true,state,events});
