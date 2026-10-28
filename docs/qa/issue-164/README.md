@@ -9,7 +9,7 @@ against `main` and linked to #164. No merge or deployment occurred.
 ## Source and scope
 
 - Issue: [#164](https://github.com/luminari-gurus/tactics-guru-v2/issues/164).
-- Approved [implementation plan](../../ongoing-projects/plan.md).
+- Approved [implementation plan](../../ongoing-projects/issue-164-ranger-abilities-plan.md).
 - Runtime/test implementation: `af9c1b60bab2c19c1abf8f08dc26ea32e0b461f3`.
 - Full regression source: `789161cc2efcb4c7dd9034b524d0e799bc27644b` (same runtime
   and tests; adds the task-local WSL bind adapter).
