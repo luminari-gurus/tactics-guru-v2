@@ -63,6 +63,17 @@ Final durable receipts/screenshots will use unique directories and be retained h
 
 ## Remaining qualification
 
+Exact-base list-only [selection comparison](selection/manifest.json) passed across
+all **15** configured stage/legacy/setup selections. Every retained ID, title,
+timeout, expected status, tag and effective device/project setting is identical.
+Default Chromium adds 3 Mage journeys (**736 → 739**), combined fixtures add
+6 Mage cases (**81 → 87**), WebKit exploration adds 3 Mage journeys (**90 → 93**),
+and the legacy ability config adds the same 6 Mage cases (**36 → 42**).
+All other selections are unchanged, including 54 WebKit acceptance, 25 health bars,
+both 36-case telemetry modes and each 75-case asset mode. No server/browser ran
+during this comparison. Exact source bindings, selected IDs/settings and the
+capture/comparison scripts are retained with hashes; it does not claim execution.
+
 Clean Linux source `85191afe80ab8b76fc0059a32b522cc154bc82ba` installed via
 `npm ci` (zero audit vulnerabilities), built successfully, and passed all **6/6**
 new real-media WebKit Mage picker selections with no skips/retries. Relevant input
