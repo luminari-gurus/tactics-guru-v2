@@ -1,8 +1,8 @@
 # Mage Frost Snare acceptance (#165)
 
-Date: 2026-10-28, Asia/Jerusalem. Implementation and policy qualification are
-complete. Final review-ready publication is being audited in
-[PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250).
+Date: 2026-10-28, Asia/Jerusalem. Implementation, policy qualification and
+publication audit are complete. [PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250)
+is open and ready for review, with non-draft/mergeable state read back.
 See [the handoff plan](../../ongoing-projects/plan.md) and
 [OpenSpec tasks](../../../openspec/changes/issue-165-mage-frost-snare/tasks.md).
 
@@ -173,6 +173,15 @@ are iteration evidence, not final acceptance.
   artifact directories. Original component failures/skips were never relabeled
   as passes and no blanket retry or full-suite rerun was used.
 
-No merge, deployment, release tag, additional asset or unrelated issue ownership
-change is part of this delivery. The remaining step is final PR readiness audit
-and publication; review/merge remains with the caller.
+The final audit passes strict OpenSpec validation, all 45 local documentation
+links, 102 raw artifact hashes, unchanged runtime/test inputs and preservation of
+the archived Ranger plan. OpenSpec is 5/5 complete. The pushed branch and review
+artifact are associated with PR #250; caller review/merge is the next step.
+
+No merge, production deployment, release tag, additional asset or unrelated issue
+ownership change was performed. The existing Cloudflare Pages integration
+automatically published a [branch preview](https://branch-issue-165-mage-frost.tactics-guru-v2.pages.dev)
+and its build succeeded for audited head `1e7c685`. This is build/preview evidence,
+not a claim that the live preview received the local full acceptance matrix.
+Repository verification jobs are branch-scoped and skipped here; the retained
+local WSL 19-stage run supplies qualification, without a hosted-browser fallback.

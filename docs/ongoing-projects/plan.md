@@ -1,8 +1,8 @@
 # Issue #165: Mage adaptation and Frost Snare
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: implementation and 19-stage qualification
-complete. Final review-ready publication audit is pending; the current handoff and
-QA ledger below are authoritative.
+Date: 2026-10-28 (Asia/Jerusalem). Status: implementation, 19-stage qualification
+and publication audit complete. PR #250 is ready for review; the current handoff
+and QA ledger below are authoritative.
 
 - Issue: [#165](https://github.com/luminari-gurus/tactics-guru-v2/issues/165).
 - Assignee: `moshehbenavraham`, verified through both authenticated GitHub clients.
@@ -335,10 +335,12 @@ source and suite inventory; no fresh implementation timing benchmark was run.
 
 ## Current implementation handoff (2026-10-28)
 
-Implementation and qualification are complete. [PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250)
-is being finalized for review on `branch/issue-165-mage-frost-snare`; no merge,
-deployment or release tag is authorized by this delivery. OpenSpec is 4/5 complete;
-only the final delivery/readiness audit remains.
+Implementation, qualification and publication audit are complete.
+[PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250) is open,
+non-draft and mergeable on `branch/issue-165-mage-frost-snare`, with state read back
+and pushed-head parity confirmed. OpenSpec is 5/5 complete. Caller review/merge is
+the remaining workflow step; there is no unfinished implementation or acceptance
+work. No merge, production deployment or release tag was performed.
 
 - Main/base is `bd06447d8dea21d65acc8f8a3851c379c04509d1`; the original planning
   commit is `e2f0cddd5037cd36d24442ebb099b5225fd9bc33`. Runtime/test qualification is
@@ -388,9 +390,15 @@ only the final delivery/readiness audit remains.
   traces, performance evaluation and hashes are retained in `docs/qa/issue-165/`.
   Byte-hashed text is compressed against checkout line-ending conversion.
 
-Finish by auditing the final diff/links/artifact hashes and issue/OpenSpec
-requirements, confirming unchanged runtime/test inputs and remote parity,
-updating the focused PR description, marking it non-draft and reading that state
-back. Then complete OpenSpec 3.2, publish the final documentation-only handoff,
-verify the clean pushed head and leave the work ready for caller review. No
-application/browser rerun is required for those documentation-only changes.
+Final audit: all five issue criteria map to retained proof; strict OpenSpec
+validation, 45 local documentation links, 102 raw artifact hashes, archived Ranger
+plan preservation, unchanged qualified runtime/test inputs and remote parity pass.
+The existing Cloudflare integration built a branch preview successfully at audited
+head `1e7c685`; that preview did not receive an additional live acceptance matrix.
+Branch-scoped repository verification jobs are skipped; no hosted-browser fallback
+was introduced. Final changes are documentation-only and reuse valid qualification.
+
+Review the focused PR and its QA record next. Archive/sync OpenSpec after review
+when requested. Preserve raw qualification evidence for follow-up and apply the
+verification policy to any future code/main changes; do not restart the completed
+full run solely because of documentation commits or a different build-info SHA.
