@@ -6,6 +6,14 @@ The new policy `dungeon-encounters-v1` seed-selects Forest/Desert first, then al
 
 Current contract: issues #157, #158 and #159. The continuation plan and QA reports distinguish pure/domain proof from browser route acceptance and identify tested revisions.
 
+#166 adds `forest_ruins_shaman_v1` only to the dungeon Forest Ruins choice. Spawn 6
+becomes a Goblin Shaman at the same coordinates; other IDs/coordinates and the
+existing dungeon access step remain unchanged. The dungeon-local map carries that
+same roster to satisfy authored battlefield admission. Canonical standalone,
+authored-run and generated Desert rosters remain unchanged. Map/biome selection
+streams and scaling arithmetic are preserved; the encounter catalog identity
+changes deliberately. Shaman power affects Hex DC after ordinary depth projection.
+
 Open `/dungeon` (respecting the configured application base path), or follow **Dungeon floors** from `/run`. This is an explicit continuing mode. `/` remains a standalone battle, `/run` remains the terminal three-battle proof of concept, and `/map` remains independent inspection. Their saves are separate.
 
 Each fresh floor saves three selected encounters, including source/roster, map/composition/pool IDs, biome, kind, guardian reference, scaling depth/policy and resolved battlefield hash. Resume validates these facts against their versioned definitions without drawing a new selection. The same projected catalog supplies initial HP, inspection, preview, AI, resolution and replay. Active saves retain damage. New-format games using the legacy opponent policy keep fixed opponents and unscaled enemy stats, including on unvisited floors. Pre-progression saves require recovery/export and their originating build. Rooms exploration geometry, stairs and POIs remain independent of battle selection. Further content expansion remains #170; passive wandering/aggressive pursuit remains #155.

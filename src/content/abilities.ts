@@ -23,4 +23,8 @@ export const attackAbilities = {
     rangeMin: 2, rangeMax: 5, target: 'hostile', duration: 'targetTurnEnd' },
   'ability:frost_snare': { id: 'ability:frost_snare', kind: 'frostSnare', owners: ['mage'], requiredLevel: 3,
     rangeMin: 2, rangeMax: 4, target: 'hostile', duration: 'targetTurnEnd' },
+  'ability:weakening_hex': { id: 'ability:weakening_hex', kind: 'weakeningHex', owners: ['goblin_shaman'],
+    rangeMin: 2, rangeMax: 4, target: 'hostile', duration: 'targetTurnEnd', accuracyPenalty: 2 },
+  'ability:heal_goblin': { id: 'ability:heal_goblin', kind: 'healGoblin', owners: ['goblin_shaman'],
+    rangeMin: 1, rangeMax: 4, target: 'allied', healAmount: 4, targetFilter: 'livingInjuredGoblin' },
 } as const satisfies Readonly<Record<AbilityId, Ability>>;

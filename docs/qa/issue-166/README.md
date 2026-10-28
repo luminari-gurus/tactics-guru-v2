@@ -13,6 +13,54 @@ continuation index, not completed issue acceptance.
   metadata changes only documentation/OpenSpec progress and reuses identical
   qualified inputs; no application/browser rerun is needed.
 
+## Support runtime progress (dependent branch)
+
+`branch/issue-166-shaman-support` implements support rules, bounded immunity and
+Weakened state, shared AI, save versions **5/6/7/8**, dungeon-only Forest Ruins
+placement and existing-surface feedback. OpenSpec progress is **6/9**; complete
+six-profile browser and full policy qualification remain pending.
+
+Focused rules/validation/AI/state/turn tests passed 172 cases; later ability
+feedback checks pass 48 cases. Existing save/storage/session selection passed
+167 cases. New active Weakened/enemy-heal roundtrips in standalone, controlled run
+and actual dungeon composition preserve hero-entry HP/Second Wind bounds.
+Every pool/survivor/fallback and canonical map/roster assertion passes in the
+84-case encounter selection. Both type scopes pass. Raw iteration reports are
+under `tmp/issue166/` until final immutable evidence is assembled.
+
+The first full unit attempt had **1,045 passed / two failed** (1,047 total),
+preserved in `tmp/issue166/support-all-units-1.{json,log}`. Both failures were
+seed-190 witnesses whose gameplay changed with the new Shaman composition:
+Ranger no longer reached Pin and the two-floor guardian policy lost. Search of
+legal current-source journeys found Ranger seed 1 (five battles, Mark/Pin and
+terminal defeat) and guardian seed 4 (six wins, both biomes/all encounter kinds).
+Only those inputs changed; all assertions remain. The repaired 13-case dungeon-
+battle suite passes, with the original failure retained.
+
+Shaman seed 3 provides a legal 53-command victory with one failed Hex, two ally
+heals and expiry through the real session. The browser journey reaches the same
+terminal state and reloads active Weakened. Its first attempt failed only the
+test oracle's single-Magic-Missile target syntax (array versus the HUD's unitId
+shorthand); the oracle now canonicalizes that equivalent input. Raw actual
+browser commands/events are preserved and independently replayed exactly.
+
+The repaired Chromium journey passed **3/3** desktop/portrait/landscape cases,
+with zero skips/retries/flaky results and 53 accepted commands in each. Both type
+scopes pass at the checkpoint. [Passing browser report](iteration/shaman-chromium.json),
+[original oracle failure](iteration/browser-oracle-failure.json),
+[original full-unit failure](iteration/units-first-failure.json),
+[repaired dungeon suite](iteration/dungeon-repaired.json),
+[actual desktop command/event trace](iteration/chromium-desktop-journey.json) and
+[source/build inventory](iteration/inputs.json) are retained.
+
+Reviewed [portrait board](iteration/shaman-portrait-board.png),
+[Shaman inspection](iteration/shaman-portrait-inspection.png),
+[landscape Weakened](iteration/weakened-landscape-inspection.png) and
+[Will-save log](iteration/shaman-portrait-save-log.png): art anchor and status/save
+text are consistent. Existing bounded heading/caption regions remain scrollable
+to protect the playfield; modals scroll for detailed inspection. WebKit and final
+full qualification are pending; these iteration results do not replace them.
+
 ## Source and export evidence
 
 Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. Asset registry:

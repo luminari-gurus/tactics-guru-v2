@@ -17,8 +17,8 @@ import { resolveBattlefield } from '../../src/domain/battlefield';
 import * as battlefields from '../../src/domain/battlefield';
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
-it('retains exact dungeon-6 bytes from e2f0cdd for recovery/export without migration',()=>{
-  const raw=readFileSync('tests/fixtures/saves/issue-165/dungeon.json','utf8'),data=new Map([[DUNGEON_KEYS.primary,raw],[DUNGEON_KEYS.backup,raw]]);
+it.each(['issue-165','issue-166'])('retains exact %s previous-format dungeon bytes for recovery/export without migration',issue=>{
+  const raw=readFileSync(`tests/fixtures/saves/${issue}/dungeon.json`,'utf8'),data=new Map([[DUNGEON_KEYS.primary,raw],[DUNGEON_KEYS.backup,raw]]);
   const storage={getItem:(key:string)=>data.get(key as typeof DUNGEON_KEYS.primary)??null,setItem:(key:string,value:string)=>{throw Error(`Unexpected write ${key} ${value.length}`);},removeItem:()=>{throw Error('Unexpected removal');}};
   const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
   expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review).map(v=>v.text)).toContain(raw);expect(data.get(DUNGEON_KEYS.primary)).toBe(raw);

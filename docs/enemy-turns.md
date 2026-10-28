@@ -2,13 +2,33 @@
 
 `planEnemyTurn(snapshot, unitId, catalog)` chooses commands for the living active enemy. It accepts equivalent unit-array permutations by sorting a copied array before the shared snapshot checks; it leaves inputs and RNG unchanged. Before copying or sorting, it validates the original record/array shapes and ID descriptors so hidden fields, custom prototypes and accessors reject without evaluating getters. Only unit order is normalized; all remaining snapshot checks stay with the shared reader. Shared intent rejections are preserved; an active player returns `notEnemyUnit`. The catalog must be trusted and immutable, as for other domain APIs.
 
-Candidates use `previewMovement`, `moveUnit` snapshots and `previewAttack`. Owned ordinary attacks only are considered. Expected damage is the sum of damage across the 20 d20 faces, including natural 1 misses and natural 20 criticals. The preview supplies all accuracy, AC, height and damage modifiers.
+Candidates use `previewMovement`, `moveUnit` snapshots and shared attack/support
+previews. Owned ordinary attacks retain summed damage across the 20 d20 faces,
+including natural 1 misses and natural 20 criticals. The preview supplies all
+accuracy, AC, height and damage modifiers. Goblin Shaman also considers Heal
+Goblin (20 × applied healing) and Weakening Hex (failed-save faces × max(1, target
+effective accuracy + power)). Zero healing, already-Weakened and immune Hex
+targets are excluded without drawing RNG. Taunt restricts offensive targets;
+allied healing remains legal. Pin/Snare permit a legal in-place action or Wait.
 
-Attack ordering is higher expected damage, lower movement cost, lower target ID, lexical ability ID, then cell y/x. Staying in place costs zero. When no attack exists, choose the reachable cell with lowest Manhattan distance to the nearest living player, then movement cost, target ID and cell y/x. Move only if distance strictly decreases; otherwise Wait. Spent move/action budgets prohibit a second move/action. Dead targets are ignored and living occupancy remains authoritative.
+Ability ordering is higher score, lower movement cost, lower target ID, lexical
+ability ID, then cell y/x. Staying in place costs zero. Without an immediate
+useful action, choose a reachable legal action-position goal by route cost,
+target ID, ability ID and y/x, then a legal move that strictly reduces remaining
+route cost. Useful support targets participate in those goals. If no improving
+move exists, Wait. Spent budgets prohibit a second move/action. Dead targets are
+ignored and living occupancy remains authoritative.
 
-This greedy policy can wait at obstacles requiring a temporary move away from the target. It has no difficulty profiles, signature evaluator, hazard strategy or multi-turn lookahead. Domain execution uses no browser globals, timers or external entropy.
+Route costs allow a detour that temporarily increases Manhattan distance. There
+are no difficulty profiles, configurable weights, hazard strategy or multi-turn
+lookahead. Domain execution uses no browser globals, timers or external entropy.
 
-Plans order optional movement, optional attack, then Wait. After state/actor validation, `hasActed: true` returns only Wait, even if `hasMoved: false`: an attack has already committed the final decision before Wait. After an accepted move, replanning from the new origin selects the same attack or Wait as the original plan suffix. Thus accepted nonterminal snapshots can reconstruct the existing session queue without storing it. This policy does not remove the domain's legal move-after-attack command; it preserves the enemy session's existing choices. Ended or command-exhausted snapshots still reject through shared validation.
+Plans order optional movement, optional ability, then Wait. After state/actor
+validation, `hasActed: true` returns only Wait, even if `hasMoved: false`: an
+ability commits the final decision before Wait. Accepted nonterminal snapshots
+reconstruct the existing session queue without storing it. The domain's legal
+move-after-action command remains available; enemy planning preserves its stricter
+one-decision policy. Ended or command-exhausted snapshots still reject.
 
 ## Execution and #10 hand-off
 

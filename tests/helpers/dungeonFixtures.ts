@@ -122,6 +122,20 @@ export function dungeonJourney(seed: number, floorCount = 1, finishTargets = fal
   return {seed,battles,state,won:true};
 }
 
+/** Single production Shaman encounter from an unplayed seed; UI tests enact traversal and all commands. */
+export function shamanJourney(seed = 3) {
+  const entry=checkedDungeon(startDungeonBattle(atEncounter(freshDungeon('shaman-production-journey',seed))));
+  const built=dungeonBattle(entry)!;
+  if(!entry.activeBattle!.units.some(u=>u.defId==='goblin_shaman'))throw Error('Shaman witness selected another composition');
+  const battle=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);
+  for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+    const p=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,built.catalog)),battle.confirm());
+    if(!p)throw Error('Shaman witness stalled');battle.finishPresentation(p.token);
+  }
+  if(battle.state.outcome==='ongoing')throw Error('Shaman witness did not finish');
+  return {seed,entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events};
+}
+
 /** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */
 export function rangerJourney(seed:number) {
   let state=freshDungeon('ranger-production-journey',seed);

@@ -93,6 +93,43 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
   Gameplay/placement continues on `branch/issue-166-shaman-support`, based on this
   branch, with its PR targeting `branch/issue-166-goblin-shaman` until #251 merges.
   No tag/release/merge/deployment is needed for these review chunks.
+- Support branch is now active at base `56b0c8c`. Exact previous-format
+  standalone/run/dungeon bytes were captured with original encoders before edits
+  in `tests/fixtures/saves/issue-166/`; capture unit passed and was removed.
+- Implemented: fixed support profiles/immunity validation, pure Hex/heal preview
+  and resolver, one-source Weakened projection/refresh/expiry/defeat cleanup,
+  versions **5/6/7/8**, deterministic AI candidates and dungeon-only placement.
+  OpenSpec tasks 2.1/2.2/2.3/3.1 are complete; feedback/journey qualification and
+  final full-regression/delivery remain pending (6/9 complete, including feedback).
+- Latest proof: 172 focused rules/AI/turn tests, 167 existing save/session tests,
+  new aggregate roundtrip/hero-HP admission cases, 84 encounter/content cases,
+  both type scopes and 48 expanded ability/feedback tests pass. The first full
+  unit run retained 1,045 passes and two changed legal-witness failures. Source-
+  grounded replacement seeds preserve every assertion: Ranger 1 (was 190),
+  two-biome/six-battle guardian 4 (was 190). All 13 dungeon-battle cases now pass.
+- Shaman seed **3**, unplayed level-1/full-HP dungeon entry, legally yields a
+  **53-command victory**, one failed Hex, two ally heals and Weakened expiry.
+  `shamanJourney` supplies the exact pure witness; the new browser case enacts all
+  exploration/combat input, active status reload and full actual-command replay.
+  Both default Chromium and WebKit exploration discover all three device profiles.
+- Retained iteration findings: a test target 99 exceeded the existing ID bound
+  (corrected to missing valid ID 63); authored admission requires the dungeon-local
+  map's roster to match the selected composition (both now carry the same spawn-6
+  replacement). The first browser journey reached its terminal state but compared
+  equivalent single-missile array/unitId intents syntactically; only that oracle
+  comparison is normalized, while actual browser commands/events remain raw and
+  are replayed exactly. No application rule or acceptance gate was weakened.
+- All three Chromium production Shaman cases now pass (desktop/native-touch
+  portrait/landscape, 53-command victory, active Weakened reload, two heals and
+  exact actual command/event/RNG replay). Board/ability/status/save-log screenshots
+  are reviewed and retained with raw passing/failing reports under
+  `docs/qa/issue-166/iteration/`. Current checkpoint is ready for publication as a
+  dependent draft while Linux WebKit and full qualification proceed. Browser
+  evidence binds the dirty source/build at `56b0c8c`; immutable inputs are recorded.
+- Next: commit/push the runtime checkpoint and open its dependent PR; use a clean
+  Linux checkout for WebKit/full verification without replacing Windows dependencies.
+  Prior Linux checkout `/tmp/tactics-issue-165-20261028` and engine caches exist,
+  but old results do not qualify changed Shaman runtime. Keep browser/GPU work serial.
 - Environment: Windows Node and installed Windows dependencies work; WSL provides
   npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
   and browser runs; do not replace the shared installed node_modules.

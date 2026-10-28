@@ -45,7 +45,16 @@ export interface FrostSnareAbility {
   readonly requiredLevel: number; readonly rangeMin: number; readonly rangeMax: number;
   readonly target: 'hostile'; readonly duration: 'targetTurnEnd';
 }
-export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility;
+export type ShamanAbility = {
+  readonly requiredLevel?: number;
+  readonly id: AbilityId; readonly owners: readonly UnitId[];
+  readonly rangeMin: number; readonly rangeMax: number;
+} & (
+  | { readonly kind: 'weakeningHex'; readonly target: 'hostile'; readonly duration: 'targetTurnEnd'; readonly accuracyPenalty: 2 }
+  | { readonly kind: 'healGoblin'; readonly target: 'allied'; readonly healAmount: 4; readonly targetFilter: 'livingInjuredGoblin' }
+);
+export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility | ShamanAbility;
+export type EffectImmunity = 'weakened' | 'debuff';
 export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock';
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */
@@ -64,11 +73,13 @@ export interface UnitArt {
   readonly portraitAssetId: AssetId;
 }
 export interface HeroRecord extends UnitArt {
+  readonly immunities?: readonly EffectImmunity[];
   readonly id: HeroId;
   readonly kind: 'hero';
   readonly stats: UnitStats;
 }
 export interface EnemyRecord extends UnitArt {
+  readonly immunities?: readonly EffectImmunity[];
   readonly id: EnemyId;
   readonly kind: 'enemy';
   readonly stats: UnitStats;

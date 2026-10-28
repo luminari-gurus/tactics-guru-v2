@@ -1,6 +1,6 @@
-import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedControlEffects, combatStats, grantGuard, markSource, removeMark, tauntSource } from './effects';
+import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedControlEffects, combatStats, grantGuard, markSource, removeMark, tauntSource, weakenedImmune } from './effects';
 import type { ContentCatalog } from '../content/types';
-import { MAGIC_MISSILE } from '../content/constants';
+import { HEAL_GOBLIN_IDS, MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
 import { CRITICAL_DAMAGE_MULTIPLIER, D20_SIDES, HEIGHT_ATTACK_MODIFIER, MIN_HIT_DAMAGE, NATURAL_AUTO_MISS, NATURAL_CRITICAL, RULE_BOUNDS } from './constants';
 import { rollDie } from './rng';
@@ -56,6 +56,8 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
     return resolveFighterAbility(state, input, catalog);
   if (intent.command.type === 'useAbility' && ['markTarget','pinningShot','frostSnare'].includes(catalog.abilities[intent.command.abilityId]?.kind))
     return resolveControlAbility(state, input, catalog);
+  if (intent.command.type === 'useAbility' && ['weakeningHex','healGoblin'].includes(catalog.abilities[intent.command.abilityId]?.kind))
+    return resolveSupportAbility(state, input, catalog);
   const preview = previewAttack(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state; const { command, targetId } = preview;
@@ -189,7 +191,78 @@ export function previewAbility(state: unknown, input: Command, catalog: ContentC
   const kind=input.type==='useAbility'?catalog.abilities[input.abilityId]?.kind:undefined;
   return kind==='magicMissile'?previewMagicMissile(state,input,catalog):
     kind==='secondWind'||kind==='taunt'?previewFighterAbility(state,input,catalog):
+    kind==='weakeningHex'||kind==='healGoblin'?previewSupportAbility(state,input,catalog):
     kind==='markTarget'||kind==='pinningShot'||kind==='frostSnare'?previewControlAbility(state,input,catalog):previewAttack(state,input,catalog);
+}
+
+export type SupportPreview = { readonly ok: true; readonly command: Extract<Command, {type:'useAbility'}>;
+  readonly sourceId: number; readonly targetId: number } & (
+  | { readonly kind: 'weakeningHex'; readonly modifier: number; readonly dc: number; readonly savedFaces: number; readonly failedSaveFaces: number }
+  | { readonly kind: 'healGoblin'; readonly healing: number; readonly hp: number }
+);
+/** Saves have no automatic natural outcomes; equality succeeds. Shared with result presentation. */
+export function saveFaceCounts(modifier: number, dc: number) {
+  const savedFaces = Math.max(0, Math.min(D20_SIDES, D20_SIDES + 1 + modifier - dc));
+  return { savedFaces, failedSaveFaces: D20_SIDES - savedFaces };
+}
+/** Complete legal preflight; every candidate reads the same projected stats without drawing dice. */
+export function previewSupportAbility(state: unknown, input: unknown, catalog: ContentCatalog): SupportPreview | Rejection {
+  const intent = previewCommand(state, input, catalog); if (!intent.ok) return intent;
+  if (intent.command.type !== 'useAbility') return { ok: false, reason: 'malformedCommand' };
+  const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
+  const snapshot = checked.state, command = intent.command, actor = snapshot.units.find(u => u.id === command.unitId)!;
+  if (actor.hasActed) return { ok: false, reason: 'alreadyActed' };
+  const profile = Object.hasOwn(catalog.abilities, command.abilityId) ? catalog.abilities[command.abilityId] : undefined;
+  if (!profile) return { ok: false, reason: 'unknownAbility' };
+  if (profile.kind !== 'weakeningHex' && profile.kind !== 'healGoblin') return { ok: false, reason: 'wrongTargetKind' };
+  if (!profile.owners.includes(actor.defId)) return { ok: false, reason: 'abilityNotOwned' };
+  if (!('unitId' in command.target)) return { ok: false, reason: 'wrongTargetKind' };
+  const targetId = command.target.unitId;
+  const target = snapshot.units.find(u => u.id === targetId);
+  if (!target) return { ok: false, reason: 'missingTarget' };
+  if (target.hp === 0) return { ok: false, reason: 'targetDefeated' };
+  if (profile.kind === 'healGoblin') {
+    if (target.side !== actor.side || target.side !== 'enemy' || !HEAL_GOBLIN_IDS.some(id => id === target.defId))
+      return { ok: false, reason: 'ineligibleAlly' };
+    if (target.hp === stats(catalog, target).maxHp) return { ok: false, reason: 'fullHealth' };
+  } else {
+    if (target.side === actor.side) return { ok: false, reason: 'sameSide' };
+    const source = tauntSource(actor, snapshot.units);
+    if (source && target.id !== source.id) return { ok: false, reason: 'tauntedTargetRequired' };
+    if (weakenedImmune(target, catalog)) return { ok: false, reason: 'immune' };
+  }
+  const distance = manhattanDistance(actor.cell, target.cell);
+  if (distance < profile.rangeMin || distance > profile.rangeMax) return { ok: false, reason: 'outOfRange' };
+  if (lineOfSightBlocked(catalog, snapshot.mapId, actor.cell, target.cell)) return { ok: false, reason: 'blockedLos' };
+  const base = { ok: true as const, command, sourceId: actor.id, targetId: target.id };
+  if (profile.kind === 'healGoblin') {
+    const healing = Math.min(profile.healAmount, stats(catalog, target).maxHp - target.hp);
+    return { ...base, kind: 'healGoblin', healing, hp: target.hp + healing };
+  }
+  const modifier = stats(catalog, target).will, dc = 10 + stats(catalog, actor).power;
+  return { ...base, kind: 'weakeningHex', modifier, dc, ...saveFaceCounts(modifier, dc) };
+}
+function resolveSupportAbility(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
+  const preview = previewSupportAbility(state, input, catalog); if (!preview.ok) return preview;
+  const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
+  const snapshot = checked.state;
+  let rng = snapshot.rng, saved = false;
+  const events: BattleEvent[] = [{ type: 'abilityUsed', unitId: preview.sourceId,
+    abilityId: preview.command.abilityId, target: preview.command.target }];
+  if (preview.kind === 'weakeningHex') {
+    let roll: ReturnType<typeof rollDie>;
+    try { roll = rollDie(rng, D20_SIDES); } catch { return { ok: false, reason: 'invalidState' }; }
+    rng = roll.rng;
+    const total = roll.value + preview.modifier;
+    saved = total >= preview.dc;
+    events.push({ type: 'saveRolled', unitId: preview.targetId, natural: roll.value,
+      modifier: preview.modifier, total, dc: preview.dc, saved });
+    if (!saved) events.push({ type: 'weakened', unitId: preview.targetId, sourceId: preview.sourceId });
+  } else events.push({ type: 'healed', unitId: preview.targetId, healing: preview.healing, hp: preview.hp });
+  const units = snapshot.units.map((unit): UnitState => unit.id === preview.sourceId ? { ...unit, hasActed: true } :
+    unit.id !== preview.targetId ? unit : preview.kind === 'healGoblin' ? { ...unit, hp: preview.hp } :
+      saved ? unit : { ...unit, weakenedBy: preview.sourceId });
+  return { ok: true, state: { ...snapshot, units, rng, commandCount: snapshot.commandCount + 1 }, events };
 }
 export type ControlPreview = { readonly ok: true; readonly command: Extract<Command,{type:'useAbility'}>;
   readonly targetId: number; readonly sourceId: number; readonly kind: 'markTarget' | 'pinningShot' | 'frostSnare' };

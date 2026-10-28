@@ -49,13 +49,13 @@ imported into this slice.
 
 ## Save compatibility
 
-Run state format 2 / envelope 6 and dungeon envelope 7 bind progression rules to
+Run state format 2 / envelope 7 and dungeon envelope 8 bind progression rules to
 save identities. Older run/dungeon formats are incompatible: inspection preserves
 raw primary/backup bytes for export/recovery instead of reconstructing past awards
 or silently resetting heroes. Return to the originating build to continue an old
 save; export it before explicitly replacing it. Older code cannot be assumed to
 read the new formats. Standalone catalogs explicitly project the level-1 party;
-battle state format 4 / rules 5 apply across routes, while the standalone save
+battle state format 5 / rules 6 apply across routes, while the standalone save
 wrapper remains format 1. Mark and shared Pin/Snare source references are battle-local and do not
 enter the carried progression records.
 

@@ -10,7 +10,8 @@ export function guardedEffect(unit: UnitState): { readonly kind: 'guarded'; read
 export function combatStats(unit: UnitState, catalog: ContentCatalog, guarding = false) {
   const stats = unit.side === 'player' ? catalog.heroes[unit.defId].stats : catalog.enemies[unit.defId].stats;
   const guard = guardedEffect(unit) !== null;
-  return { accuracy: stats.accuracy - (guard || guarding ? GUARDED_STRIKE_TRADEOFF.attackPenalty : 0),
+  return { accuracy: stats.accuracy - (guard || guarding ? GUARDED_STRIKE_TRADEOFF.attackPenalty : 0) -
+    (unit.hp > 0 && unit.weakenedBy !== undefined ? 2 : 0),
     armorClass: stats.armorClass + (guard ? GUARDED_STRIKE_TRADEOFF.armorClassBonus : 0) };
 }
 export function removeGuard(unit: UnitState): UnitState {
@@ -60,9 +61,25 @@ export function removeMovementBlock(unit: UnitState): UnitState {
   const { movementBlock, ...rest } = unit;
   return rest;
 }
+export function weakenedImmune(unit: UnitState, catalog: ContentCatalog): boolean {
+  const definition = unit.side === 'player' ? catalog.heroes[unit.defId] : catalog.enemies[unit.defId];
+  return definition.immunities?.some(id => id === 'weakened' || id === 'debuff') ?? false;
+}
+export function weakenedSource(unit: UnitState, units: readonly UnitState[]): UnitState | undefined {
+  return unit.hp > 0 ? units.find(source => source.id === unit.weakenedBy && source.hp > 0 &&
+    source.side !== unit.side && source.side === 'enemy' && source.defId === 'goblin_shaman') : undefined;
+}
+export function removeWeakened(unit: UnitState): UnitState {
+  const { weakenedBy, ...rest } = unit;
+  return rest;
+}
 /** All damage paths clean target/source defeat before adopting the next validated snapshot. */
 export function clearDefeatedControlEffects(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
   return units.map(unit => {
+    if (unit.weakenedBy !== undefined && !weakenedSource(unit, units)) {
+      events.push({ type: 'weakenedExpired', unitId: unit.id, sourceId: unit.weakenedBy });
+      unit = removeWeakened(unit);
+    }
     if (unit.markedBy !== undefined && !markSource(unit, units)) {
       events.push({ type: 'markExpired', unitId: unit.id, sourceId: unit.markedBy });
       unit = removeMark(unit);

@@ -9,9 +9,69 @@ import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
-import { journeyPreparation, healedFighterBoundary, rangerJourney, mageJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, healedFighterBoundary, rangerJourney, mageJourney, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
+import type { Command, BattleEvent } from '../src/domain/types';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+
+test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle',async({page,isMobile},info)=>{
+ test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ const witness=shamanJourney(3),catalog=dungeonBattle(witness.entry)!.catalog;
+ // This is the canonical unplayed save: level 1, full HP, no fabricated inventory or combat boundary.
+ await seed(page,freshDungeon('shaman-production-journey',3));
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const first=await readSession(page);expect(first.state.units.find(u=>u.id===6)?.defId).toBe('goblin_shaman');
+ const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+ const shaman=board.units.find((u:any)=>u.unitId==='goblin_shaman');
+ expect(shaman).toMatchObject({assetId:'asset:goblin_shaman_sprite'});expect(shaman.anchorError).toBeLessThan(0.001);
+ await page.screenshot({path:info.outputPath('shaman-production-board.png')});
+ await page.locator('#battle-party').click();await page.locator('#inspect-unit-6').click();
+ await expect(page.getByRole('dialog')).toContainText('Weakening Hex range 2–4');
+ await expect(page.getByRole('dialog')).toContainText('Heal Goblin range 1–4');
+ await expect(page.getByRole('dialog')).toContainText('Fighter #1 50%');
+ await expect(page.getByRole('dialog')).toContainText('Ranger #2 45%');
+ await expect(page.getByRole('dialog')).toContainText('Mage #3 55%');
+ await page.screenshot({path:info.outputPath('shaman-abilities-inspection.png')});await page.locator('#inspection-close').click();
+ let reloaded=false;let prefixCommands:readonly Command[]=[],prefixEvents:readonly BattleEvent[]=[];
+ for(let step=0;(await snapshot(page)).phase==='battle'&&step<500;step++) {
+  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+  if((await snapshot(page)).phase!=='battle')break;
+  const before=await readSession(page),weak=before.state.units.find(u=>u.weakenedBy!==undefined);
+  if(weak&&!reloaded) {
+   const saved=await snapshot(page);
+   await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
+   await expect(page.getByRole('dialog')).toContainText('45% save chance');
+   await page.screenshot({path:info.outputPath('shaman-will-save-log.png')});await page.locator('#log-close').click();
+   await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${weak.id}`).click();
+   await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
+   await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
+   await page.screenshot({path:info.outputPath('shaman-weakened-inspection.png')});await page.locator('#inspection-close').click();
+   prefixCommands=before.replay?.commands??before.continuation!.commands;prefixEvents=before.events;
+   expect(prefixEvents.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
+   await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);
+   expect((await readSession(page)).events).toEqual([]);reloaded=true;continue;
+  }
+  await playCommand(page,playerDecision(before.state,catalog));
+  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
+ }
+ expect(reloaded).toBe(true);
+ const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);
+ const commands=[...prefixCommands,...(record.replay?.commands??record.continuation.commands)],events=[...prefixEvents,...record.events];
+ // The HUD submits one automatic missile as unitId; the pure policy uses its equivalent one-entry array.
+ const expectedCommands=witness.commands.map(c=>c.type==='useAbility'&&c.abilityId==='ability:magic_missile'&&'missileTargets' in c.target&&c.target.missileTargets.length===1
+  ?{...c,target:{unitId:c.target.missileTargets[0]}}:c);
+ expect(commands).toEqual(expectedCommands);expect(record.state).toEqual(witness.state);
+ expect(events.filter(e=>e.type==='healed')).toHaveLength(2);expect(events.some(e=>e.type==='weakenedExpired')).toBe(true);
+ let replayed=witness.entry.activeBattle!;const replayEvents:BattleEvent[]=[];
+ for(const command of commands){const r=dispatch(replayed,command,catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;replayEvents.push(...r.events);}
+ expect({state:replayed,events:replayEvents}).toEqual({state:record.state,events});
+ expect(record.state.outcome).toBe('playerWin');expect((await snapshot(page)).party.every(h=>!Object.hasOwn(h,'weakenedBy'))).toBe(true);
+ expect(errors).toEqual([]);
+ writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:3,entry:witness.entry,commands,events,state:record.state,reloaded,final:await snapshot(page)},null,2));
+ await page.screenshot({path:info.outputPath('shaman-terminal.png'),fullPage:true});
+});
 
 test('Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -69,8 +129,8 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
 
 test('Ranger legal progression journey earns level three uses Mark and Pin and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=rangerJourney(190),used={mark:false,pin:false};expect(witness.used).toEqual({mark:true,pin:true});expect(witness.state.phase).toBe('defeat');
- await seed(page,freshDungeon('ranger-production-journey',190));
+ const witness=rangerJourney(1),used={mark:false,pin:false};expect(witness.used).toEqual({mark:true,pin:true});expect(witness.state.phase).toBe('defeat');
+ await seed(page,freshDungeon('ranger-production-journey',1));
  const records:unknown[]=[];let consumed=false;
  for(const expected of witness.records) {
   const position=await snapshot(page);
@@ -114,7 +174,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:190,records,final,used,consumed}));
+ const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:1,records,final,used,consumed}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({mark:true,pin:true});expect(consumed).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('ranger-terminal-journey.png'),fullPage:true});
 });
