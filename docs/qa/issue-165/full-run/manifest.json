@@ -1,0 +1,1116 @@
+{
+  "schemaVersion": 1,
+  "scope": "Complete original policy full-regression attempt",
+  "aggregateExitCode": 0,
+  "source": {
+    "commit": "4f8c194deb575310866eeb132247197f1062cc5b",
+    "inputHash": "362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420",
+    "clean": true,
+    "beforeAfterInputsIdentical": true
+  },
+  "builds": {
+    "preAggregatePilot": "6a0f9eb48d2afb17943462986a39cc5ef5697fca72f43fd7f0094e89062af68c",
+    "qualifiedRoot": "4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942",
+    "prefix": "ea4f89002e5f3370fbe62dd12ee997fe055fcb9f627994bb1db1a231859da208",
+    "restoredRoot": "4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942",
+    "rootRestorationEqual": true,
+    "metadata": "Vite embeds commit in __BUILD_INFO__; the pilot bundle and aggregate bundle are distinct and labeled."
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "test:verification"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/tooling.log",
+      "status": "passed",
+      "durationMs": 240
+    },
+    {
+      "id": "units",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/units.log",
+      "status": "passed",
+      "durationMs": 22865
+    },
+    {
+      "id": "typecheck",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/typecheck.log",
+      "status": "passed",
+      "durationMs": 593
+    },
+    {
+      "id": "build-integration",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "test:build"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/build-integration.log",
+      "status": "passed",
+      "durationMs": 3352
+    },
+    {
+      "id": "build-root",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "build:bundle"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/build-root.log",
+      "status": "passed",
+      "durationMs": 569
+    },
+    {
+      "id": "chromium",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/chromium-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/chromium.log",
+      "status": "passed",
+      "durationMs": 6294603
+    },
+    {
+      "id": "fixtures",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/fixtures-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/fixtures.log",
+      "status": "passed",
+      "durationMs": 364601
+    },
+    {
+      "id": "placement-dev",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/overworld-map.spec.ts",
+        "-g",
+        "controlled placement failure preserves complete state and supports retry",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/placement-dev-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/placement-dev.log",
+      "status": "passed",
+      "durationMs": 4520
+    },
+    {
+      "id": "webkit-acceptance",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.device-acceptance.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/webkit-acceptance-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/webkit-acceptance.log",
+      "status": "passed",
+      "durationMs": 508401
+    },
+    {
+      "id": "webkit-exploration",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.exploration.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/webkit-exploration-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/webkit-exploration.log",
+      "status": "passed",
+      "durationMs": 2313514
+    },
+    {
+      "id": "health-bars",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.health-bars.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/health-bars-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/health-bars.log",
+      "status": "passed",
+      "durationMs": 270074
+    },
+    {
+      "id": "telemetry-production",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/telemetry-production-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/telemetry-production.log",
+      "status": "passed",
+      "durationMs": 359661
+    },
+    {
+      "id": "telemetry-development",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/telemetry-development-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/telemetry-development.log",
+      "status": "passed",
+      "durationMs": 388162
+    },
+    {
+      "id": "assets-root-dev",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-root-dev-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-root-dev.log",
+      "status": "passed",
+      "durationMs": 255648
+    },
+    {
+      "id": "performance",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "measure:fit",
+        "--",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/performance.json"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/performance.log",
+      "status": "passed",
+      "durationMs": 44491
+    },
+    {
+      "id": "build-prefix",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "build:bundle",
+        "--",
+        "--base=/prototype/"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/build-prefix.log",
+      "status": "passed",
+      "durationMs": 763
+    },
+    {
+      "id": "assets-prefix-preview",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-prefix-preview-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-prefix-preview.log",
+      "status": "passed",
+      "durationMs": 208069
+    },
+    {
+      "id": "assets-prefix-dev",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts",
+        "--reporter=line,json",
+        "--output",
+        "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-prefix-dev-artifacts"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/assets-prefix-dev.log",
+      "status": "passed",
+      "durationMs": 253206
+    },
+    {
+      "id": "restore-root",
+      "exitCode": 0,
+      "signal": null,
+      "command": [
+        "npm",
+        "run",
+        "build:bundle"
+      ],
+      "log": "/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/restore-root.log",
+      "status": "passed",
+      "durationMs": 673
+    }
+  ],
+  "stageDefinitions": [
+    {
+      "id": "tooling",
+      "args": [
+        "run",
+        "test:verification"
+      ]
+    },
+    {
+      "id": "units",
+      "args": [
+        "run",
+        "test:unit"
+      ]
+    },
+    {
+      "id": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "id": "build-integration",
+      "args": [
+        "run",
+        "test:build"
+      ]
+    },
+    {
+      "id": "build-root",
+      "args": [
+        "run",
+        "build:bundle"
+      ],
+      "needs": [
+        "units",
+        "typecheck"
+      ]
+    },
+    {
+      "id": "chromium",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test"
+      ],
+      "browser": true,
+      "needs": [
+        "build-root"
+      ]
+    },
+    {
+      "id": "fixtures",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts"
+      ],
+      "browser": true
+    },
+    {
+      "id": "placement-dev",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/overworld-map.spec.ts",
+        "-g",
+        "controlled placement failure preserves complete state and supports retry"
+      ],
+      "browser": true,
+      "env": {
+        "PLAYWRIGHT_SERVER_MODE": "dev"
+      }
+    },
+    {
+      "id": "webkit-acceptance",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.device-acceptance.config.ts"
+      ],
+      "browser": true,
+      "needs": [
+        "build-root"
+      ]
+    },
+    {
+      "id": "webkit-exploration",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.exploration.config.ts"
+      ],
+      "browser": true,
+      "needs": [
+        "build-root"
+      ]
+    },
+    {
+      "id": "health-bars",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.health-bars.config.ts"
+      ],
+      "browser": true,
+      "needs": [
+        "build-root"
+      ]
+    },
+    {
+      "id": "telemetry-production",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts"
+      ],
+      "browser": true
+    },
+    {
+      "id": "telemetry-development",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "-c",
+        "playwright.telemetry.config.ts"
+      ],
+      "browser": true,
+      "env": {
+        "PLAYWRIGHT_TELEMETRY_DEV": "true"
+      }
+    },
+    {
+      "id": "assets-root-dev",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts"
+      ],
+      "browser": true,
+      "env": {
+        "PLAYWRIGHT_SERVER_MODE": "dev"
+      }
+    },
+    {
+      "id": "performance",
+      "args": [
+        "run",
+        "measure:fit"
+      ],
+      "needs": [
+        "build-root"
+      ]
+    },
+    {
+      "id": "build-prefix",
+      "args": [
+        "run",
+        "build:bundle",
+        "--",
+        "--base=/prototype/"
+      ],
+      "needs": [
+        "units",
+        "typecheck"
+      ]
+    },
+    {
+      "id": "assets-prefix-preview",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts"
+      ],
+      "browser": true,
+      "needs": [
+        "build-prefix"
+      ],
+      "env": {
+        "PLAYWRIGHT_BASE_PATH": "/prototype/"
+      }
+    },
+    {
+      "id": "assets-prefix-dev",
+      "args": [
+        "exec",
+        "--no",
+        "--",
+        "playwright",
+        "test",
+        "tests/public-asset-base.spec.ts"
+      ],
+      "browser": true,
+      "env": {
+        "PLAYWRIGHT_BASE_PATH": "/prototype/",
+        "PLAYWRIGHT_SERVER_MODE": "dev"
+      }
+    },
+    {
+      "id": "restore-root",
+      "args": [
+        "run",
+        "build:bundle"
+      ],
+      "needs": [
+        "units",
+        "typecheck"
+      ]
+    }
+  ],
+  "browser": {
+    "chromium": {
+      "counts": {
+        "total": 739,
+        "expected": 736,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "fixtures": {
+      "counts": {
+        "total": 87,
+        "expected": 87,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "placement-dev": {
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "webkit-acceptance": {
+      "counts": {
+        "total": 54,
+        "expected": 54,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "webkit-exploration": {
+      "counts": {
+        "total": 93,
+        "expected": 93,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "health-bars": {
+      "counts": {
+        "total": 25,
+        "expected": 25,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "telemetry-production": {
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "telemetry-development": {
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "assets-root-dev": {
+      "counts": {
+        "total": 75,
+        "expected": 72,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "assets-prefix-preview": {
+      "counts": {
+        "total": 75,
+        "expected": 75,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    },
+    "assets-prefix-dev": {
+      "counts": {
+        "total": 75,
+        "expected": 72,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "exactDiscoveredIds": true,
+      "globalErrors": 0
+    }
+  },
+  "browserExecutionSlots": {
+    "total": 1298,
+    "expected": 1289,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 9,
+    "retryAttempts": 0
+  },
+  "skipCoverage": [
+    {
+      "stage": "chromium",
+      "project": "desktop",
+      "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "executedOwner": "placement-dev"
+    },
+    {
+      "stage": "chromium",
+      "project": "mobile-portrait",
+      "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "executedOwner": "placement-dev"
+    },
+    {
+      "stage": "chromium",
+      "project": "mobile-landscape",
+      "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "executedOwner": "placement-dev"
+    },
+    {
+      "stage": "assets-root-dev",
+      "project": "desktop",
+      "id": "65be83c730a4dc5a6388-f315cf3a0a3e1643a118",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "chromium"
+    },
+    {
+      "stage": "assets-root-dev",
+      "project": "mobile-portrait",
+      "id": "65be83c730a4dc5a6388-ee0a840e2ceaf3a9bf15",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "chromium"
+    },
+    {
+      "stage": "assets-root-dev",
+      "project": "mobile-landscape",
+      "id": "65be83c730a4dc5a6388-01b9036bf8e48df75d03",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "chromium"
+    },
+    {
+      "stage": "assets-prefix-dev",
+      "project": "desktop",
+      "id": "65be83c730a4dc5a6388-f315cf3a0a3e1643a118",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "assets-prefix-preview"
+    },
+    {
+      "stage": "assets-prefix-dev",
+      "project": "mobile-portrait",
+      "id": "65be83c730a4dc5a6388-ee0a840e2ceaf3a9bf15",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "assets-prefix-preview"
+    },
+    {
+      "stage": "assets-prefix-dev",
+      "project": "mobile-landscape",
+      "id": "65be83c730a4dc5a6388-01b9036bf8e48df75d03",
+      "title": "built startup hints preserve a supplied script nonce",
+      "executedOwner": "assets-prefix-preview"
+    }
+  ],
+  "performance": {
+    "passed": true,
+    "samples": 18,
+    "integrityFailures": 0,
+    "budgetFailedSamples": 0,
+    "warningSamples": 0,
+    "measuredBuild": {
+      "commit": "4f8c194deb575310866eeb132247197f1062cc5b",
+      "dirty": false
+    },
+    "host": {
+      "platform": "linux",
+      "release": "6.6.114.1-microsoft-standard-WSL2",
+      "arch": "x64",
+      "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+      "node": "v24.15.0"
+    },
+    "conditions": {
+      "url": "http://127.0.0.1:4174",
+      "mode": "headless Chromium; mobile profiles are emulation",
+      "network": "unthrottled loopback HTTP, no TLS; HTTP content compression negotiated by Vite preview",
+      "cache": "cold: fresh context; warm: same-context reload; inspect per-resource transfer bytes",
+      "frames": "v3: first >=120 visible active post-render intervals; raw idle intervals; nearest-rank p50/p95; cap 600; no interaction workload",
+      "scene": "proof",
+      "route": "proof",
+      "sceneUrl": "http://127.0.0.1:4174/?scene=proof",
+      "warmStorage": "four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume"
+    },
+    "browserVersion": "153.0.8010.12"
+  },
+  "units": {
+    "passed": 1012,
+    "files": 55,
+    "discovery": "unit-discovery-component.json"
+  },
+  "supplementalWebKitPicker": {
+    "passed": 6,
+    "source": "85191afe80ab8b76fc0059a32b522cc154bc82ba",
+    "scopedUnchangedInputProof": "../iteration/webkit-picker-reuse.json.gz"
+  },
+  "mageJourneys": "mage-journeys.json",
+  "artifacts": [
+    {
+      "path": "tooling.log.gz",
+      "bytes": 654,
+      "sha256": "8a10304b777e416e56756ff62636943a47a95754295dff3aa073e685e028baaa",
+      "originalSha256": "d66ef135084790177817af49386e73dd88b96c5a14b27c4b5c68b713c2d14a0e"
+    },
+    {
+      "path": "units.log.gz",
+      "bytes": 4488,
+      "sha256": "6e558fadd39fac63489d8e9c2e5c88d7a9e5707588921e5bf50696b24155871b",
+      "originalSha256": "9211de68fe5b4585b1fe9a16e6e2ef70b54569e9510f5639484062015abc8a71"
+    },
+    {
+      "path": "typecheck.log.gz",
+      "bytes": 104,
+      "sha256": "aec385581d64e9251d2699704af8e60fb62db3d6fbb6ab33e99c30c95ccf82a6",
+      "originalSha256": "e169155b776999d5c89afe5b42cff7d0f4c2b0791b10dcb5a6dd6b9c63204e11"
+    },
+    {
+      "path": "build-integration.log.gz",
+      "bytes": 608,
+      "sha256": "23afeaf0ebb3b9d2793c4cba505a97180bdbbb3dfb35f790edb0cf2b7e80d19b",
+      "originalSha256": "4ad4d5616f75671a26a31dc10abbb2bf1f6953b88133fa11e1ebcf18b5d86bc7"
+    },
+    {
+      "path": "build-root.log.gz",
+      "bytes": 1640,
+      "sha256": "5f4856ca7a9832fb5bb094406b4f510a8e450da5001538f0a580115b0c341166",
+      "originalSha256": "62b57165c2a660ea879b808bd9756006741a9b144e32f15824ad638bf8be3145"
+    },
+    {
+      "path": "chromium.log.gz",
+      "bytes": 22226,
+      "sha256": "ce89543731b012af979a2db6633759c0ae53b4a6d30b7b9d7b2603f1b23a75ab",
+      "originalSha256": "faaee5975bc32927ac38ebaa0db7ce04719e74466f7148422bc61f85e020a6e9"
+    },
+    {
+      "path": "chromium.json.gz",
+      "bytes": 68298,
+      "sha256": "95758a578ba1d0bb6dcdebbe1583ce6ddbb284eadd8eb50d7aae47a5137f0909",
+      "originalSha256": "acf6434ca0be271d4ef1d16a95ecf47c5214db47baa29cc8af53d25760b34a1e"
+    },
+    {
+      "path": "fixtures.log.gz",
+      "bytes": 2002,
+      "sha256": "0e620feac55316c1a749c2ef1f8ea6527609254984f551b86d3e3a25d17b8c41",
+      "originalSha256": "561df587bb0bd89c492745225b1ee3e480cdb0ef41657b8bf112451196610c05"
+    },
+    {
+      "path": "fixtures.json.gz",
+      "bytes": 5382,
+      "sha256": "8dff06a419f245e6e6e3472e9ce8fab41881301fb53253b1f08169aa01506e80",
+      "originalSha256": "39368f85b3126cf3169d475cb8888441b122ddf7570bfa383a36c27a12e2661b"
+    },
+    {
+      "path": "placement-dev.log.gz",
+      "bytes": 646,
+      "sha256": "264a2e7dbedd95510a0eeff5ae654d71908a8f1f727bc35e7ef2121496d0ffd2",
+      "originalSha256": "6d8fab688045d6693191217d977216c441a351d0aebb55f98c1fff09ae44e127"
+    },
+    {
+      "path": "placement-dev.json.gz",
+      "bytes": 1313,
+      "sha256": "766560adfc9e5945c32a22018537cedfe41fd5b848be14ddd8d153a7c34445fa",
+      "originalSha256": "303117365db4a35b0cafc8039da2557643ca5646b40e724a21676474ca2d8a10"
+    },
+    {
+      "path": "webkit-acceptance.log.gz",
+      "bytes": 1990,
+      "sha256": "4188884feb52ce696670ab450265129d2c4e4f4c4dcbb9cef184a4ce3720947f",
+      "originalSha256": "ba2e19a42ff206c9e072ab838d8c2ea7ac5ad83a4f5152681280c15a54ffc4c4"
+    },
+    {
+      "path": "webkit-acceptance.json.gz",
+      "bytes": 4816,
+      "sha256": "659f242ff4adca44343303c8469fc59256c44b5c682474815a2618a4624dc63d",
+      "originalSha256": "569ef8c39d29eb8fdbceb212fc2219587201dbcd8345bdd4c672209b4d258484"
+    },
+    {
+      "path": "webkit-exploration.log.gz",
+      "bytes": 2348,
+      "sha256": "54132d6f039f9a84b631b06ebbf3638e04207390c4be9da620f7c49183b826ba",
+      "originalSha256": "c9f372295e67c9427d93fd2762efa5026e8b32199d7f2bfe324ecd462ebb96a9"
+    },
+    {
+      "path": "webkit-exploration.json.gz",
+      "bytes": 5927,
+      "sha256": "c4d209702afbb08c4786f0d8497dd64231f6f314540b6da87497277cf8b29c8b",
+      "originalSha256": "08ef7c694a9ea681f4c09f817ebb3e1d80a276c65ef80955d6cedc4f432204ee"
+    },
+    {
+      "path": "health-bars.log.gz",
+      "bytes": 929,
+      "sha256": "c04dd439f2a6c384676c68c16b783563b6f8fdac860e488d5a213d55f2062329",
+      "originalSha256": "555d04b7e6e24564431e4c3d09476a44d8a6ad20b03e7aa83b3045e40ef327ad"
+    },
+    {
+      "path": "health-bars.json.gz",
+      "bytes": 2422,
+      "sha256": "4c9cfe65d722283271c8e5f49cb9a828c0a4b0d147be55574001f9da8f799b9b",
+      "originalSha256": "3d81fc72a230b0b81aff2c35f23427dde11b0d7ea450d62d82b160448ff4f700"
+    },
+    {
+      "path": "telemetry-production.log.gz",
+      "bytes": 1577,
+      "sha256": "a411376b8d390cd523907011678056512314d7522935864cc266804ea596e785",
+      "originalSha256": "f1d132cc1ed5684df48c4caccccfc48fc7354344d8c8033e96fc2e14e6238670"
+    },
+    {
+      "path": "telemetry-production.json.gz",
+      "bytes": 3046,
+      "sha256": "558d5e5f406d2331a307653dc1137e2ea18f58f02356af82fd517270dfd64ef7",
+      "originalSha256": "4dc8ae6ab9c6ebcbf46962b021f341bf963d1abfe77ebffae9b4456a85ada13a"
+    },
+    {
+      "path": "telemetry-development.log.gz",
+      "bytes": 1220,
+      "sha256": "9a66c11bebb4df9398874ddf6a30ec67b00f2cd03243fdadc40c1dad37876c5e",
+      "originalSha256": "fcd9e61559832c922574a3c96ad23523182073ed451703c9c274e4b13a1e4636"
+    },
+    {
+      "path": "telemetry-development.json.gz",
+      "bytes": 3043,
+      "sha256": "3321267e5454fb65eea69da20ef845363076b2cb49719183ba2680216ad42c5d",
+      "originalSha256": "72b49829d70488c5b43c2c6d1f37a9caf10b13516bc41388e1ea4a4cd048666a"
+    },
+    {
+      "path": "assets-root-dev.log.gz",
+      "bytes": 1369,
+      "sha256": "ac3f508ef7f9034ddc448194c01dee4820cae630c033bd99bb9ce34c3081b59a",
+      "originalSha256": "e6e74f96cc68b709e11297b6a13f7aaa2e52816df82db00fdbb0bd279eaef213"
+    },
+    {
+      "path": "assets-root-dev.json.gz",
+      "bytes": 4357,
+      "sha256": "eaf58ba607b94518fc5437d683c1b9f94837226cccc611afaa6d137b30154ce8",
+      "originalSha256": "3e884e3f517a07ebadb852a15bfc2227a327bdc43852f3fe2e4fbb7b09049402"
+    },
+    {
+      "path": "performance.log.gz",
+      "bytes": 211,
+      "sha256": "91a876a9e16d3c54326a2425dd5325d31400fd054d8b5be548008c0df8a8be17",
+      "originalSha256": "902af90707936885cc9723b9779a4bde0a8858a95cfa45fe010d13d1ee54ffbe"
+    },
+    {
+      "path": "performance.json.gz",
+      "bytes": 45825,
+      "sha256": "2963b78903c93b2e37210b2a20e51738c90028c594958402f5543dfabb227d69",
+      "originalSha256": "2dfd4b91adb0234b00fb36e556a7c1ea2ec071a8ab992a8c716f675615e53f59"
+    },
+    {
+      "path": "build-prefix.log.gz",
+      "bytes": 1653,
+      "sha256": "0a9a80c1f91ffb37e53f182a668e4a4999b3a19511ed42ab17704b4b84971a90",
+      "originalSha256": "77598b30a593d69ee22d8fe87c1ca7825a602e74ec643a04fc1d53eeaf7cd092"
+    },
+    {
+      "path": "assets-prefix-preview.log.gz",
+      "bytes": 1374,
+      "sha256": "13a434e42725e1565fbdc5a122842f6f8fa5f29f70a6099b7b9657f7c940d750",
+      "originalSha256": "76a9caac8b1507b22f6f99f082ef4d13eadbb00e7536cf2208db257fd04d5771"
+    },
+    {
+      "path": "assets-prefix-preview.json.gz",
+      "bytes": 4152,
+      "sha256": "7b33cb319a0d278bb1d0d041e47a71546f7bbc65b40073b0162caee39e2da470",
+      "originalSha256": "a1d4397f54de3d320ab078b1f3e84742441e459cb620bdea7fbb77a389f39e32"
+    },
+    {
+      "path": "assets-prefix-dev.log.gz",
+      "bytes": 1377,
+      "sha256": "cada0c3712f8fb76dbe638377efe4998b5ac07895510f52409cc693567c8e404",
+      "originalSha256": "b246b0b1ca93c0926e99e052b452481140a8692eb46eb8d97870759359a3ba34"
+    },
+    {
+      "path": "assets-prefix-dev.json.gz",
+      "bytes": 4360,
+      "sha256": "d5633007748c992397b43f4e4a75de3dd694602fd4abcaf316242cb6312f5b13",
+      "originalSha256": "d43be9346ba45c02d29022cd228d40d413deef3466257e677717ea7a951e6f3e"
+    },
+    {
+      "path": "restore-root.log.gz",
+      "bytes": 1640,
+      "sha256": "25d1b70b30f7c63f61e8143f8cac5bdf38539b6c5f5466d57dc48efe09f852ac",
+      "originalSha256": "d965b993009626619cc5bc01b959b28c8bc735815e309fd4bd87047793aaebd1"
+    },
+    {
+      "path": "summary.json.gz",
+      "bytes": 955,
+      "sha256": "1b97d5f22aceabd56814ec52c78f5445feef50f0464319b3fd505e7d116f716a",
+      "originalSha256": "7da4933ab1328f8b0bab3d6289d90b82b93133f6e4d91109f2d38437aa0a6477"
+    },
+    {
+      "path": "aggregate-command.log.gz",
+      "bytes": 493,
+      "sha256": "fb773f39fb84152cb1185362ab993b4121e887862a6d7903415c620d6146f694",
+      "originalSha256": "234c79ca67d2e10b9f20101c71058fa51d454df6572be39ffa0fa99684573700"
+    },
+    {
+      "path": "source-after.json.gz",
+      "bytes": 21461,
+      "sha256": "7d7fe87cc8339398a295d80e3b70c50ddd4d951890a08d62e6871f12a8b42981",
+      "originalSha256": "3d1e32e0cdbcc1ee81b5f624ade26728e9fb6cf12aa20d7fc7fcc06cc9bbcc37"
+    },
+    {
+      "path": "prefix-build-identity.json.gz",
+      "bytes": 21463,
+      "sha256": "31810e138a941a49463c7a67978fe5976217ed80490cbd9563c9fafdc084cd00",
+      "originalSha256": "5f7587cc268811ef16f376cf55217ad8005c2b1bbcb120f21d310354cec61daa"
+    },
+    {
+      "path": "engine-preflight.json.gz",
+      "bytes": 361,
+      "sha256": "168f5dceded7b5b627161879e540afd1f7fd6ac7b44bdf9aa26feeeeef803b31",
+      "originalSha256": "718d314247d7b1479a687bb87114da2e5f98e10b176c960dde37924d95c6fb7e"
+    },
+    {
+      "path": "wsl-vite-bind.cjs.gz",
+      "bytes": 523,
+      "sha256": "71f147ba1a4a1f4703f873f0985d6a83b4cc76bc3c973497a5a1f1e658718dd0",
+      "originalSha256": "8892ee2200fec6494b1902d7dfc847f4814d370faa08ece191b75e34220fbd38"
+    },
+    {
+      "path": "performance-evaluation.json.gz",
+      "bytes": 809,
+      "sha256": "f1e5c09c2aaaec89382c4113ce933840bf5b5f431bebf96cf524d13f7e7f4c0e",
+      "originalSha256": "9ea674b140a916b3c092e3957113e23775c21a94024a853ca72c336885d430ce"
+    }
+  ],
+  "derivedIndexes": [
+    {
+      "path": "chromium-component.json",
+      "jsonDataSha256": "8ab439fd076a3008251d51db8cf0a888877eb772aeabb5e040c0137a94a69adb"
+    },
+    {
+      "path": "fixtures-placement-component.json",
+      "jsonDataSha256": "07bfffe2900bddcafa4a782b5187e2eb472e3636d0ac7a6b226bde3ae0944da3"
+    },
+    {
+      "path": "mage-journeys.json",
+      "jsonDataSha256": "84c5a74a89b3d3ecc374d256bacb85f2e9e4a2ffb430c23b82538c543523e66c"
+    },
+    {
+      "path": "unit-discovery-component.json",
+      "jsonDataSha256": "12dbb2f49ad06862b5ddc08fed3fa4c13a2e96e2c70f1121db9728ce73246f17"
+    },
+    {
+      "path": "webkit-acceptance-component.json",
+      "jsonDataSha256": "2833e60ccc0b6366b9db458286e395634c67f62a06da6fcf1aec80f2eb123bbb"
+    },
+    {
+      "path": "webkit-exploration-component.json",
+      "jsonDataSha256": "5c75d34e3b1a09bae211dcc0a0af298720db09f6ce14be4e1e6c2e8279f1e59a"
+    }
+  ]
+}

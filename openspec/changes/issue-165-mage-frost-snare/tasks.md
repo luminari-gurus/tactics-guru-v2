@@ -11,7 +11,7 @@
 
 ## 3. Integration and delivery
 
-- [ ] 3.1 Reconcile full regression under verification-policy.md with immutable source/build identities, valid reuse and proportional repairs; preserve all failures, skips and incomplete runs in QA evidence.
+- [x] 3.1 Reconcile full regression under verification-policy.md with immutable source/build identities, valid reuse and proportional repairs; preserve all failures, skips and incomplete runs in QA evidence. The original full attempt passed all 19 stages with exit 0: 1,012 units, both type scopes/build integrations, 1,289 passed browser executions and nine expected skips covered by their owning stages, zero failures/flaky cases/retries, and 18 passing performance samples without warnings. Before/after inputs and restored root inventory match; root/prefix identities and 102 raw artifact hashes are retained. Earlier iteration failures remain separate.
 - [ ] 3.2 Audit all issue/OpenSpec requirements, update plan.md and QA handoff, pass strict OpenSpec validation/diff review, commit/push and publish focused review-ready PRs with remote parity; leave merge/deployment to review.
 
 ## Workflow follow-up

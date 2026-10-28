@@ -1,9 +1,8 @@
 # Issue #165: Mage adaptation and Frost Snare
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: implementation in progress under the
-caller's explicit goal authorization. OpenSpec change `issue-165-mage-frost-snare`
-tracks implementation and acceptance. No application acceptance is claimed until
-the evidence below is completed.
+Date: 2026-10-28 (Asia/Jerusalem). Status: implementation and 19-stage qualification
+complete. Final review-ready publication audit is pending; the current handoff and
+QA ledger below are authoritative.
 
 - Issue: [#165](https://github.com/luminari-gurus/tactics-guru-v2/issues/165).
 - Assignee: `moshehbenavraham`, verified through both authenticated GitHub clients.
@@ -18,7 +17,7 @@ the evidence below is completed.
   `77476596ee291bf0f4a1c6f7878621d2ac9c4ce96ea9545c97b0471a14086dfa`.
   Its PR-open wording is historical: #248 is now merged and #164 is closed.
 
-## Selection and available work
+## Planning selection snapshot (2026-10-28)
 
 Reviewed all **31 open issues**, their bodies, labels and assignees, the **three
 open PRs**, **six remote branches**, native dependency/linked-branch relationships,
@@ -93,7 +92,7 @@ and honest feedback. Resolve Arc Bolt's adaptation explicitly by consolidating
 its automatic force-attack role into Magic Missile. Preserve approved Magic
 Missile, Ranger Pin, Mark, Fighter actions and ordinary movement/turn behavior.
 
-## Rules selected for the implementation plan
+## Implemented rules
 
 These selected v2 rules guide implementation. Acceptance evidence is tracked below
 and in [the QA record](../qa/issue-165/README.md).
@@ -192,7 +191,7 @@ spells, Ember Burst, Mage Drill/Mana Charm/reward upgrades, enemy support AI,
 route/menu redesign and new dependencies/assets. Do not change #161/#162 ownership,
 claim their whole trackers complete, or add unrelated documentation cleanup.
 
-## Files and implementation sequence
+## Planned implementation sequence (completed)
 
 1. **Freeze regression boundaries and content.** Extend existing ability,
    validation and progression tests for the selected rules; retain exact-base
@@ -227,7 +226,7 @@ claim their whole trackers complete, or add unrelated documentation cleanup.
    canonical OpenSpec rules only where an existing current scenario changes;
    OpenSpec change `issue-165-mage-frost-snare` now tracks the authorized implementation.
    Finish acceptance audit, commit/push implementation and prepare a focused PR
-   when implementation is requested.
+   as recorded in the current handoff.
 
 ## Proof and acceptance mapping
 
@@ -301,9 +300,9 @@ Retain source/build hashes, exact commands/configs/test IDs, modes, browser/host
 screenshots, replay receipts and all failures/skips/incomplete runs. Reuse evidence
 only for unchanged relevant inputs with retained provenance. Prior failed runs
 remain failed; compare suspected regressions with the literal base and rerun only
-invalidated coverage. No new runtime results are claimed by this planning task.
+invalidated coverage. This sentence records the original planning-only scope; completed implementation evidence is in the current handoff.
 
-## Planning verification and publication
+## Historical planning verification and publication
 
 - Local Markdown links and all named existing source/unit paths pass inspection.
 - `node scripts/verify-full.mjs --list`: all 19 stages discovered without execution.
@@ -321,7 +320,7 @@ invalidated coverage. No new runtime results are claimed by this planning task.
   native issue/branch and assignee readback, then local/remote commit equality.
   Commit only the new plan, old-plan move and necessary backlink change.
 
-## Estimate for my implementation
+## Historical implementation estimate (recorded before work)
 
 **6–9 hours of my elapsed working time after implementation is requested**:
 roughly 2–3 hours for content/domain/save changes and focused tests, 1–1.5 hours
@@ -334,31 +333,64 @@ Allow **10–12 hours** if legal Mage progression, save-fixture updates or WebKi
 base regressions require substantive repair. The plan is grounded in the current
 source and suite inventory; no fresh implementation timing benchmark was run.
 
-## Implementation handoff (2026-10-28)
+## Current implementation handoff (2026-10-28)
 
-- Current source base: e2f0cddd5037cd36d24442ebb099b5225fd9bc33; clean at start, remote parity verified after fetch. No feature PR yet.
-- Using ablation and OpenSpec apply, schema spec-driven; 1/5 tasks complete. See `openspec/changes/issue-165-mage-frost-snare/tasks.md`.
-- Exact-base battle (state 3/rules 4), run-5 and dungeon-6 bytes captured under `tests/fixtures/saves/issue-165/` before modifying readers. Temporary capture unit passed and was removed.
-- Core rules and save work is implemented: bounded movementBlock source/ability reference, Frost Snare catalog/validation, shared control preview/resolver/cleanup, ability-aware events and versions. Both type scopes and 352 focused tests passed; rule docs and existing Pin consumers are updated. No runtime alias/parallel Pin implementation remains.
-- npm and OpenSpec exist outside PATH. npm bin: `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin`; cached OpenSpec CLI: `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` (run with Node).
-- Required work remaining: focused units/types/build, real Mage picker and earned production journey, full policy qualification, QA evidence/docs, final commits/push/ready PR. Do not treat the captured-fixture test as feature acceptance.
-- The standalone build passed (221 content checks plus both type scopes). Mage seed-17 legal witness reaches level 3, uses both actions, and ends in defeat; pure replay passed. New Chromium picker checks passed with one retained cold-navigation failure followed by its targeted pass. Windows WebKit real-media preconditions fail because MP3 is unavailable; WSL Linux is the existing supported real-media route. See the QA record for all retained failures.
-- Next: commit/push this coherent implementation for fixed source identity; clone it into a fresh WSL `/tmp/tactics-issue-165-20261028` checkout and reuse the existing lockfile-compatible Linux dependency/browser installation. Use the unchanged, guarded `docs/qa/issue-164/wsl-vite-bind.cjs` adapter if port 4173 requires wildcard bind. The established `docs/qa/issue-164/webkit-fixtures.config.ts` selects real WebKit fixture cases; no new permanent config is needed.
-- Windows nested npm needs the ignored `tmp/issue165-bin/npm.cmd` wrapper invoking the npm CLI directly. Chromium override is `C:/Users/apexw/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe`. Do not relax audio assertions/timeouts for Windows limitations; retain original reports and qualify in Linux.
-- Implementation source `85191af` is committed/pushed and [PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250) is open as a draft until qualification. The fresh WSL checkout is ready; lockfile install has zero audit vulnerabilities and both browser preflights/build passed. Real-media Mage WebKit picker: 6/6 passed, screenshots reviewed.
-- The first desktop production witness reached level 3 but found `walkDungeon` crossing enabled upstairs en route to another encounter (cell 113 versus destination 114), unintentionally ascending. The necessary helper repair excludes enabled stairs unless they are the requested destination. It does not change app code, movement inputs or assertions. Also updated the existing synthetic Mage level-3/5 browser option counts for the real Snare. Commit these focused test repairs, fast-forward the Linux checkout, rerun the failed desktop journey, then proceed with full qualification. Preserve the initial Linux failure/provenance in `tmp/issue165/`.
-- The focused repairs were pushed in `c8e8314`; the repeated desktop production journey **passed in 4.9 minutes** with all requested Snare/missile/active-reload/block/expiry/terminal replay assertions. OpenSpec is now 2/5 complete; cross-device production journeys and full integration remain pending. The added pure witness assertion also passes for blocked enemy turns and target-end-turn expiry.
-- Next verification command in clean WSL source: `TACTICS_WSL_VITE_BIND=1 NODE_OPTIONS=--require=/tmp/tactics-issue-165-20261028/docs/qa/issue-164/wsl-vite-bind.cjs npm run verify:full`. Keep its unique `tmp/verification/full-*/summary.json` and stage logs/reports intact, capture source identity before/after and add explicit Mage WebKit fixtures (already 6/6 passed) to the final ledger. No application/browser input changes are planned during the run; any necessary repair must be a later focused commit with its own proof.
-- **Live qualification checkpoint:** source `4f8c194deb575310866eeb132247197f1062cc5b` is committed/pushed and clean in Linux. Full command is running in exec session `79550`, output redirected to `/tmp/tactics-issue-165-20261028/tmp/issue165/full-command.log`. Reports: `/tmp/tactics-issue-165-20261028/tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/`. Tooling, **1012 units**, both type scopes, both root/prefix build integrations and root bundle have passed; default Chromium (**739 selections**) is running. Before-source/build identity is `tmp/issue165/source-before-full.json` (input hash `362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420`, root build hash `6a0f9eb48d2afb17943462986a39cc5ef5697fca72f43fd7f0094e89062af68c`). Do not start a second browser run or mutate tested inputs while this command is live.
-- After completion: read the terminal exit and all stage outcomes, preserve the original aggregate even if failed, capture after-source/build identity, then resolve only demonstrated failures with focused source-bound proof. Retain raw logs/JSON and representative screenshots/replay receipts in `docs/qa/issue-165/`; finish the six-profile Mage production journey audit and complete coverage ledger before marking PR #250 ready for review. The current Windows plan checkpoint is a documentation-only uncommitted update; preserve it.
-- Completed iteration evidence is now retained under `docs/qa/issue-165/iteration/manifest.json`: 30 hash-verified artifacts, original failures and passing recoveries kept separate, source bindings, six WebKit picker screenshots and the complete desktop journey trace. That legal trace has six battles/412 accepted commands, Mage XP 205/level 3, active Snare reload, blocked enemy turn/expiry and terminal defeat with exact continuation replay. Production desktop and WebKit portrait/narrow screenshots were reviewed. Local documentation links (16) and the archived Ranger plan SHA-256 were verified. Full regression remains live on untouched Linux `4f8c194` inputs; copying evidence/documentation to the Windows checkout does not modify that tested source.
-- Iteration evidence/handoff updates are published in `f612e3a` and `52db975` (byte-hashed text is compressed against checkout line-ending conversion). Windows is clean at that published documentation head; Linux stays at the frozen `4f8c194` runtime/test inputs. The full-run desktop Mage trace also completed and is byte-identical to the retained passing pilot trace (`caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445`). Existing Ranger/Fighter journeys then completed without reported failures.
-- Exact-base list-only selection preservation is proven in `docs/qa/issue-165/selection/manifest.json`: 15 configuration/mode sets, all old IDs/metadata and all effective device settings unchanged. Only Mage selections are added: default Chromium 736→739, combined fixtures 81→87, WebKit exploration 90→93, legacy ability config 36→42. These are discovery receipts, not runtime results. The base archive is `/tmp/tactics-issue-165-selection-base-20261028`; the active full browser run was not interrupted or modified.
-- **Three Chromium Mage production traces are complete** on frozen full-run source `4f8c194`: desktop, native-touch portrait and native-touch landscape. All three `chromium-artifacts/dungeon-Mage-*/mage-production-journey.json` files have identical SHA-256 `caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445` (six battles/412 accepted commands, Snare/active reload/block/expiry, multiple missiles, legal terminal defeat and exact continuation). Both touch-orientation production inspection screenshots were reviewed. Keep OpenSpec 2.2 pending until all three WebKit production profiles and final evidence retention are complete. The full process/session is still live; do not start competing browser work or change Linux tested inputs.
-- **Chromium component complete:** 736 passed / 3 declared dev-mode skips / zero failures, flaky cases or retries, with exact equality to all 739 discovered IDs and one worker. The three skips are exclusively controlled placement failure/retry and require the later `placement-dev` owner stage; do not count them as executed until that stage passes. Immutable raw report/log, before-source identity and the three Mage journey traces/screenshots are now retained in `docs/qa/issue-165/full-run/`, indexed by `chromium-component.json`. Full aggregate session `79550` / Linux PID `2048134` has moved to the 87-case dev fixtures; WebKit and later stages remain pending.
-- **Fixtures and preview-skip ownership complete:** 87/87 dev fixtures and 3/3 placement-dev cases passed with no skips, failures/flaky cases/retries. Exact selected IDs match discovery, and the executed placement IDs exactly equal all three Chromium preview skips. Source input hash remains `362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420` with clean Linux `4f8c194`. Eight aggregate stages are passed; `webkit-acceptance` (54 selections) is live now, followed by WebKit exploration/production journeys and the remaining modes. Frozen-source raw reports/logs, CPU stage logs, partial stage summary and Mage picker screenshots are retained under `full-run/fixtures-placement-component.json`. Keep the same aggregate process running.
-- **WebKit acceptance complete:** 54/54 passed with no skips/failures/flaky cases/retries/global errors; exact actual IDs equal discovery, one worker, clean unchanged frozen source. Raw report/log and source-bound component index are retained in `full-run/webkit-acceptance-component.json`. Nine aggregate stages have passed. The 93-case `webkit-exploration` matrix is now live, including desktop/portrait/landscape Mage production journeys; those three cases, final ledger/after-source capture and later modes remain pending. Continue observing session `79550` / PID `2048134`, preserving the original run and its inputs.
-- WebKit desktop and portrait production Mage traces are now complete and byte-identical to all three Chromium traces (`caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445`); the WebKit portrait production inspection screenshot was reviewed. Five of six production profiles are proven; landscape WebKit is running its Mage journey (case 85/93). Initial six WebKit real-picker executions are valid reusable evidence: `iteration/webkit-picker-reuse.json.gz` proves unchanged Mage case/import bytes plus 14 unchanged runtime/asset/fixture/helper/lock/config paths. The changed synthetic-picker assertion and unrelated traversal/unit code do not execute in those selected cases. Final-source unit discovery also retains all 1,012 test names/locations in 55 files under `full-run/unit-discovery-component.json`, matching the completed unit log without rerunning tests. No tested Linux inputs changed.
-- **All six Mage production profiles are formally passed:** Chromium/WebKit desktop/portrait/landscape, identical six-battle/412-accepted-command journeys. `full-run/mage-journeys.json` retains all six actual test IDs, active-Snare continuation snapshots, in-place shortbow attack/Wait, expiry, terminal defeat and exact continuation replay; WebKit traces/screenshots are retained alongside Chromium. Both touch orientation screenshots were reviewed. The record intentionally begins a resumed battle at its saved snapshot, not a persisted original pre-reload command history. OpenSpec 2.2 is complete (3/5 tasks); full integration and final PR-readiness audit remain.
-- **Build binding clarified:** actual aggregate root inventory/hash is `4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942` in `full-run/root-build-identity.json.gz`. Earlier `6a0f9eb...` belongs to the reused pre-aggregate/pilot `85191af` bundle. Vite embeds `__BUILD_INFO__.commit`, affecting bytes on commit changes without changing gameplay. Current source is clean `4f8c194`, input hash still `362b2d28...`; all aggregate tests use that source's bundle. Final restoration must match `4fdb85...`. Picker reuse explicitly accounts for diagnostic build metadata, with the selected gameplay/audio assertions and code unchanged.
-- WebKit exploration has passed all 93 cases; its raw report/log and exact-ID component index are retained. Health bars have also passed; configured telemetry and later asset/performance/prefix/restoration modes are running next in the same aggregate. Do not mark OpenSpec integration/delivery complete until all 19 stages, final source/build equality, hash verification, requirement audit and non-draft PR readback are done.
+Implementation and qualification are complete. [PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250)
+is being finalized for review on `branch/issue-165-mage-frost-snare`; no merge,
+deployment or release tag is authorized by this delivery. OpenSpec is 4/5 complete;
+only the final delivery/readiness audit remains.
+
+- Main/base is `bd06447d8dea21d65acc8f8a3851c379c04509d1`; the original planning
+  commit is `e2f0cddd5037cd36d24442ebb099b5225fd9bc33`. Runtime/test qualification is
+  frozen at `4f8c194deb575310866eeb132247197f1062cc5b`. Later changes are evidence/docs.
+- Arc Bolt is consolidated into approved Magic Missile. Mage level-3 Frost Snare,
+  shared Pin/Snare state/admission/expiry/cleanup, precise feedback and versions
+  4/5/6/7 are implemented. There is no parallel pin-only state path, migration,
+  generic effect engine, immunity invention or new asset/dependency.
+- The [QA record](../qa/issue-165/README.md) maps every issue criterion to its
+  implementation/proof. The [complete ledger](../qa/issue-165/full-run/manifest.json)
+  records **19/19 passed stages, aggregate exit 0**, 1,012 units, both type scopes,
+  both build integrations, 1,289 passed browser executions and nine expected
+  mode skips, all covered in their owning stages. No failures, flaky cases or
+  retries occurred in the original full attempt. All 18 performance samples pass
+  integrity and budgets without load warnings.
+- All six Chromium/WebKit desktop/portrait/landscape Mage production journeys
+  passed. Each legally earns level 3/XP 205, uses Snare and multiple missiles,
+  reloads active Snare, proves blocked movement with legal attack/Wait and expiry,
+  and ends in defeat with exact saved-snapshot continuation replay. Six-battle/
+  412-command traces are identical; hash and screenshots are in
+  [the journey receipt](../qa/issue-165/full-run/mage-journeys.json). Browser/device
+  emulation is the acceptance evidence; no physical-device claim is made.
+- Before/after verification inputs are identical and the Linux tree is clean:
+  `362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420`.
+  Qualified/restored root bundle is
+  `4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942`;
+  prefix bundle is
+  `ea4f89002e5f3370fbe62dd12ee997fe055fcb9f627994bb1db1a231859da208`.
+  Earlier pilot `6a0f9eb...` is a distinct `85191af` bundle. Vite embeds Git commit
+  in diagnostics, so documentation commit metadata can change bundle bytes while
+  gameplay/test inputs remain unchanged. Root restoration is explicitly verified.
+- Exact-base discovery across 15 configuration/mode sets preserves every old
+  ID/metadata/device setting and adds only Mage cases. All 1,012 expanded unit
+  names/locations are retained. Six initial Linux WebKit picker executions are
+  reused under a scoped unchanged-input proof. Earlier Windows/audio/navigation/
+  seed failures remain in the iteration receipts, separate from the clean full
+  run; the necessary stair-routing and synthetic-option-count repairs are proven.
+- Qualified environment: WSL Ubuntu, Node 24.15.0, Playwright 1.63.0, Chromium
+  153.0.8010.12 and WebKit 26.6. The unchanged guarded WSL bind adapter is recorded
+  in the ledger. The exact command was `npm run verify:full` with
+  `TACTICS_WSL_VITE_BIND=1` and
+  `NODE_OPTIONS=--require=/tmp/tactics-issue-165-20261028/docs/qa/issue-164/wsl-vite-bind.cjs`.
+  The process/session has exited 0; do not restart it.
+- Raw source/build/reports remain in `/tmp/tactics-issue-165-20261028`; full run:
+  `tmp/verification/full-2026-10-28T12-45-31.728Z-2048134/`. Durable raw reports,
+  stage commands/configs, source/build inventories, skip ownership, screenshots,
+  traces, performance evaluation and hashes are retained in `docs/qa/issue-165/`.
+  Byte-hashed text is compressed against checkout line-ending conversion.
+
+Finish by auditing the final diff/links/artifact hashes and issue/OpenSpec
+requirements, confirming unchanged runtime/test inputs and remote parity,
+updating the focused PR description, marking it non-draft and reading that state
+back. Then complete OpenSpec 3.2, publish the final documentation-only handoff,
+verify the clean pushed head and leave the work ready for caller review. No
+application/browser rerun is required for those documentation-only changes.
