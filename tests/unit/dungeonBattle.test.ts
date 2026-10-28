@@ -20,10 +20,17 @@ it('finds a legal earned Mage Snare and multi-missile journey with exact replay 
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
+  let blocked=false,expiredAtTurnEnd=false;
   for(const record of journey.records){const catalog=dungeonBattle(record.entry)!.catalog;let state=record.entry.activeBattle!;const events:import('../../src/domain/types').BattleEvent[]=[];
-    for(const command of record.commands){const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);state=result.state;events.push(...result.events);}
+    for(const command of record.commands){
+      if(state.units.find(u=>u.id===command.unitId)?.movementBlock?.abilityId==='ability:frost_snare'){blocked=true;expect(command.type).not.toBe('move');}
+      const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);
+      expiredAtTurnEnd ||= command.type==='endTurn'&&result.events.some(e=>e.type==='movementBlockExpired'&&e.unitId===command.unitId&&e.abilityId==='ability:frost_snare');
+      state=result.state;events.push(...result.events);
+    }
     expect(state).toEqual(record.state);expect(events).toEqual(record.events);expect(state.units.every(u=>u.movementBlock===undefined)).toBe(true);
   }
+  expect(blocked&&expiredAtTurnEnd).toBe(true);
 },120000);
 
 it('roundtrips active Mage Snare in dungeon continuation and clears it before the next encounter',()=>{

@@ -66,6 +66,14 @@ requested, preserving normal keyboard/touch movement and stair-entry assertions.
 The existing synthetic Mage progression browser cases also now expect the real
 Snare option at level 3+. Both repairs will be exercised in their owning selections.
 
+The targeted desktop production journey on `c8e83144eb79d2f56de3929095962b819d1a5980`
+then **passed in 4.9 minutes**: six legal battles, earned level 3, Snare, active
+reload, no movement by a blocked enemy, expiry, multi-missile casts, terminal
+defeat and exact continuation replay. No game rules or battle outcome were
+relaxed. Its unique repair JSON/log/artifacts remain in Linux
+`tmp/issue165/mage-desktop-journey-repair*`. The pure witness additionally asserts
+that Snare expiry occurs at its target's accepted endTurn.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all
