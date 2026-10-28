@@ -315,6 +315,16 @@ describe('independent overworld enemy movement', () => {
       expect(state.world.markers[1]).toMatchObject({x:3,y:3});
     }
   });
+  it('excludes protected cells for wandering and pursuit', () => {
+    const passive=createMovement(fixture(undefined,[43,83,62]),idle);
+    expect(position(stepMovement(passive),'enemy-1')).toMatchObject({x:4,y:3});
+    expect(position(stepMovement(passive,[],[64]),'enemy-1')).toMatchObject({x:3,y:3});
+    expect(position(stepMovement(passive,[],[63]),'enemy-1')).toMatchObject({x:4,y:3}); // Existing occupant can leave.
+    const profiles: readonly EnemyBehavior[]=[idle[0],{id:'enemy-2',kind:'aggressive',range:38},idle[2]];
+    const pursuit=createMovement(fixture([[5,5],[2,2],[4,3],[17,17]],[44,65,85]),profiles);
+    expect(position(stepMovement(pursuit),'enemy-2')).toMatchObject({x:4,y:4});
+    expect(position(stepMovement(pursuit,[],[84]),'enemy-2')).not.toMatchObject({x:4,y:4});
+  });
   it('uses inclusive Manhattan detection without terrain occlusion and loses detection immediately', () => {
     const world = fixture(undefined, [204]); // wall directly between enemy-2 and player
     const configured = (range: number) => createMovement(world, [idle[0],{ id:'enemy-2',kind:'aggressive',range },idle[2]]);

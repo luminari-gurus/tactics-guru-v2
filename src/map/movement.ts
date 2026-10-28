@@ -58,7 +58,7 @@ function pursue(start: number, player: number, legal: (cell: number) => boolean)
 }
 
 /** One simultaneous cadence, resolved in stable ID order against updated occupancy. */
-export function stepMovement(state: OverworldMovement, inactive: readonly EnemyId[] = []): OverworldMovement {
+export function stepMovement(state: OverworldMovement, inactive: readonly EnemyId[] = [], blocked: readonly number[] = []): OverworldMovement {
   if (!Number.isSafeInteger(state.step) || state.step < 0 || state.step === Number.MAX_SAFE_INTEGER) {
     throw new RangeError('Invalid or exhausted movement step.');
   }
@@ -72,7 +72,7 @@ export function stepMovement(state: OverworldMovement, inactive: readonly EnemyI
     const marker = markers[index];
     const start = cellOf(marker);
     const occupied = new Set(markers.filter(other => other.id !== id && (other.id === 'player' || !inactive.includes(other.id))).map(cellOf));
-    const legal = (cell: number) => world.map.cells[cell] === 1 && !occupied.has(cell);
+    const legal = (cell: number) => world.map.cells[cell] === 1 && !occupied.has(cell) && !blocked.includes(cell);
     const behavior = state.behaviors.find(profile => profile.id === id)!;
     let destination = start;
     if (behavior.kind === 'passive') {

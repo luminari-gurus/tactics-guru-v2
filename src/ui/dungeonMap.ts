@@ -61,7 +61,7 @@ export class DungeonMap {
       if(visible){cell.dataset.terrain=treated.terrain[i];
         if(showUpstairs&&i===f.descriptor.upstairs)cell.textContent='↑';
         if(showDownstairs&&i===f.descriptor.downstairs)cell.textContent='↓';
-        const p=pois.get(i);if(p){cell.textContent=cleared.includes(p.encounterSlot)?'✓':'M';cell.dataset.poi=p.id;}
+        const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))cell.textContent='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))cell.textContent='✓';cell.dataset.poi=p.id;}
       }
       if(i===f.position){cell.textContent='●';cell.dataset.player='true';}
       grid.append(cell);

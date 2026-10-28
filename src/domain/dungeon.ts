@@ -329,7 +329,8 @@ function moveDungeonEnemies(s: DungeonState): DungeonState {
   const map = applyBiome(generateMap(f.descriptor.seed,'rooms'), f.descriptor.biome === 'forest-v1' ? 'forest' : f.descriptor.biome === 'desert-v1' ? 'desert' : 'grassland');
   const player = {id:'player' as const,kind:'player' as const,x:f.position % 20,y:Math.floor(f.position / 20)};
   const moved = stepMovement({world:{map,placementVersion:'markers-v1',markers:[player,...exploration.pois]},behaviors:DEFAULT_BEHAVIORS,
-    rng:exploration.movement!.rng,step:exploration.movement!.step}, cleared.map(i=>`enemy-${i+1}` as 'enemy-1'|'enemy-2'|'enemy-3'));
+    rng:exploration.movement!.rng,step:exploration.movement!.step}, cleared.map(i=>`enemy-${i+1}` as 'enemy-1'|'enemy-2'|'enemy-3'),
+    [...(s.depth > 1 ? [f.descriptor.upstairs] : []), ...(f.completed === 3 ? [f.descriptor.downstairs] : [])]);
   const pois = exploration.pois.map((p,i)=>({...p,x:moved.world.markers[i+1].x,y:moved.world.markers[i+1].y}));
   const floors = [...s.floors];
   floors[s.depth-1] = {...f,exploration:{...exploration,pois,movement:{rng:moved.rng,step:moved.step}}};

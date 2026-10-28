@@ -24,3 +24,14 @@ The dungeon SHALL persist movement and unordered completion while accepting vali
 #### Scenario: Reload after movement
 - **WHEN** a saved dungeon is reopened
 - **THEN** saved enemy positions and movement RNG resume without advancing
+
+### Requirement: Visible stairs remain clear of incoming enemies
+Dungeon enemy movement SHALL avoid cells occupied by currently available stairs. Existing saved enemies on stairs remain valid; live encounters remain visible, and cleared markers SHALL NOT hide an available stair.
+
+#### Scenario: Enemy approaches a visible stair
+- **WHEN** an enemy moves during an accepted player step
+- **THEN** it does not enter a currently available stair cell
+
+#### Scenario: Existing cleared marker on a stair
+- **WHEN** a saved cleared encounter shares a cell with an available stair
+- **THEN** the map displays the stair glyph

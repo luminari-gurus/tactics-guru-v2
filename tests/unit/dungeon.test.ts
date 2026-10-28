@@ -1,6 +1,8 @@
 import { atEncounter, atDownstairs, atStairApproach, atCell } from '../helpers/dungeonFixtures';
-import { freshExploration, neighbors, poiCell } from '../../src/domain/exploration';
+import { freshExploration, movableExploration, neighbors, poiCell } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
+import { applyBiome } from '../../src/map/biomes';
+import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
@@ -346,6 +348,30 @@ describe('unordered encounters and moving dungeon enemies', () => {
     if(destination===undefined)throw Error('No safe step');
     return good(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination}));
   };
+  it('protects displayed upstairs from a passive enemy during a real player step', () => {
+    let tested=false;
+    for(let seed=0;seed<200&&!tested;seed++) {
+      const base=freshDungeon('protected-stair',seed), descriptor=floorDescriptor(seed,2), map=generateMap(descriptor.seed,'rooms');
+      const stair=descriptor.upstairs, adjacent=neighbors(stair).find(n=>map.cells[n]);if(adjacent===undefined)continue;
+      const initial=freshExploration(descriptor.seed,stair), exploration=movableExploration(initial,descriptor.seed,0,'ready');
+      const others=exploration.pois.slice(1);if(others.some(p=>poiCell(p)===adjacent))continue;
+      const pois=exploration.pois.map((p,i)=>i===0?{...p,x:adjacent%20,y:Math.floor(adjacent/20)}:p);
+      for(const from of map.cells.flatMap((c,i)=>c?[i]:[])) {
+        const dest=neighbors(from).find(n=>map.cells[n]&&n!==stair&&!pois.some(p=>poiCell(p)===n));
+        if(dest===undefined||pois.some(p=>poiCell(p)===from))continue;
+        const player={id:'player' as const,kind:'player' as const,x:dest%20,y:Math.floor(dest/20)};
+        const raw=stepMovement({world:{map:applyBiome(map),placementVersion:'markers-v1',markers:[player,...pois]},behaviors:DEFAULT_BEHAVIORS,rng:exploration.movement!.rng,step:0});
+        if(poiCell(raw.world.markers[1] as typeof pois[number])!==stair)continue;
+        const state=atCell({...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:stair,completed:0,exploration:{...exploration,pois}}]},from);
+        if(!readDungeon(state).ok)continue;
+        const result=good(stepDungeon(state,{id:state.id,depth:2,revision:state.revision,destination:dest}));
+        expect(poiCell(result.floors[1].exploration.pois[0])).not.toBe(stair);
+        expect(result.floors[1].exploration.movement!.step).toBe(1);
+        tested=true;break;
+      }
+    }
+    expect(tested).toBe(true);
+  });
   it('enters and clears slots 2, 0, 1 with the matching battle, rewards and save continuation', () => {
     let s = fresh();
     for (const [ordinal,slot] of [2,0,1].entries()) {

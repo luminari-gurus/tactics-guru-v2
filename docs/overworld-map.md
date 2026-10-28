@@ -74,6 +74,6 @@ See [issue #99](https://github.com/luminari-gurus/tactics-guru-v2/issues/99), [a
 
 ## Dungeon movement model
 
-`src/map/movement.ts` supplies the pure movement transition used by `/dungeon`. Enemy 1 wanders passively; enemies 2 and 3 pursue within Manhattan ranges 6 and 10. Detection ignores terrain. Each accepted dungeon player step advances living enemies at most one cardinal cell, in stable ID order, with collision resolution and an independent saved RNG. Aggressive enemies use a shortest walkable path to a free player-adjacent cell. See [Dungeon floors](dungeon.md) for encounters and persistence.
+`src/map/movement.ts` supplies the pure movement transition used by `/dungeon`. Enemy 1 wanders passively; enemies 2 and 3 pursue within Manhattan ranges 6 and 10. Detection ignores terrain. Each accepted dungeon player step advances living enemies at most one cardinal cell, in stable ID order, with collision resolution, avoidance of available stairs and an independent saved RNG. Aggressive enemies use a shortest walkable path to a free player-adjacent cell. See [Dungeon floors](dungeon.md) for encounters and persistence.
 
 The `/map` inspection prototype has no movement timer, encounters, or player movement. Markers remain stationary until the user regenerates the map. The view's idempotent disposer removes lifecycle listeners; hidden or detached views ignore delayed artwork callbacks, and cached-page restoration redraws the retained map. Earlier movement demonstrations in [issue 155 QA](qa/issue-155-overworld-movement.md) describe historical revisions.

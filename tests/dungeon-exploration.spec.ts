@@ -13,7 +13,7 @@ import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
 import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
-import { freshExploration } from '../src/domain/exploration';
+import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
@@ -64,6 +64,23 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
  if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();}
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
+});
+
+test('stairs remain visible under cleared saved markers and live markers stay visible',async({page})=>{
+ const base=freshDungeon('stair-overlap',1), descriptor=floorDescriptor(base.seed,2), initial=freshExploration(descriptor.seed,descriptor.upstairs);
+ const map=generateMap(descriptor.seed,'rooms'), from=neighbors(descriptor.upstairs).find(n=>map.cells[n]&&!initial.pois.some(p=>poiCell(p)===n));
+ if(from===undefined)throw Error('No safe approach');
+ const explore=movableExploration(initial,descriptor.seed,0,'ready');
+ const pois=explore.pois.map((p,i)=>i===0?{...p,x:descriptor.upstairs%20,y:Math.floor(descriptor.upstairs/20)}:p);
+ const state=atCell({...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:0,exploration:{...explore,pois}}]},from);
+ const load=async(s:DungeonState)=>{const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();};
+ const stair=page.locator(`#dungeon-map [data-cell="${descriptor.upstairs}"]`);
+ await load(state);await expect(stair).toHaveText('M');
+ const floor=state.floors[1];await load({...state,floors:[state.floors[0],{...floor,completed:1,exploration:{...floor.exploration,cleared:[0]}}]});
+ await expect(stair).toHaveText('↑');await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();await expect(stair).toHaveText('↑');
+ const down=descriptor.downstairs, moved=pois.map((p,i)=>i===0?{...p,x:down%20,y:Math.floor(down/20)}:p);
+ const all={...floor,completed:3,exploration:{...floor.exploration,pois:moved,cleared:[0,1,2],revealed:Array.from({length:400},(_,i)=>i)}};
+ await load({...state,floors:[state.floors[0],all]});await expect(page.locator(`#dungeon-map [data-cell="${down}"]`)).toHaveText('↓');
 });
 
 for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs travel once per entry with ${control}, stay on arrival and restore, and respect locks`,async({page,isMobile})=>{
