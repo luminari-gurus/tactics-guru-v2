@@ -2,7 +2,7 @@
 
 ## 1. Source-pinned content foundation
 
-- [ ] 1.1 Add validated Shaman baseline, Basic Attack ownership and source-pinned sprite/portrait exports; update content/asset docs and tests, verify content units, both type scopes, build/headers and affected loading/visual cases, then commit/push a focused review-ready foundation PR. Do not enable production placement until support runtime is ready.
+- [x] 1.1 Add validated Shaman baseline, Basic Attack ownership and source-pinned sprite/portrait exports; update content/asset docs and tests, verify content units, both type scopes, build/headers and affected loading/visual cases, then commit/push a focused review-ready foundation PR. Do not enable production placement until support runtime is ready. Delivered in PR #251 at d2e211d; 199 focused/28 fixture/222 content-validation tests, both type scopes, root/prefix header integrations and 27 browser cases pass. Source/build identity and original failures are retained in docs/qa/issue-166/.
 
 ## 2. Shared support rules and continuation
 

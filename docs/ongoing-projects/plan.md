@@ -88,9 +88,11 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
 
 - Starting source: clean `b5b450f80405d14a28082c43ba555bcf02f2b11e` on the named
   branch; fetched `origin/main` remains `7cea1e9`, with no intervening changes.
-- Current work: OpenSpec artifacts pass strict validation. The source-pinned
-  Shaman catalog/art foundation is verified and being committed/published as the
-  first independent PR. Gameplay/placement follows on a dependent branch/PR.
+- Current work (2026-10-29): foundation PR [#251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251)
+  is open and non-draft, pushed at `d2e211d`. OpenSpec task 1.1 is complete (1/9).
+  Gameplay/placement continues on `branch/issue-166-shaman-support`, based on this
+  branch, with its PR targeting `branch/issue-166-goblin-shaman` until #251 merges.
+  No tag/release/merge/deployment is needed for these review chunks.
 - Environment: Windows Node and installed Windows dependencies work; WSL provides
   npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
   and browser runs; do not replace the shared installed node_modules.

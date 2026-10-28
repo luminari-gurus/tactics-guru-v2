@@ -8,6 +8,10 @@ continuation index, not completed issue acceptance.
 - Starting commit: `b5b450f80405d14a28082c43ba555bcf02f2b11e`.
 - First chunk: validated Shaman stats/art and Basic Attack ownership, with no
   production encounter/AI changes. New support rules/placement are pending.
+- Foundation: [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251),
+  open/non-draft at `d2e211ddc87a7ff57ee9b719fd9fd7a9be1fff93`. Final handoff
+  metadata changes only documentation/OpenSpec progress and reuses identical
+  qualified inputs; no application/browser rerun is needed.
 
 ## Source and export evidence
 
