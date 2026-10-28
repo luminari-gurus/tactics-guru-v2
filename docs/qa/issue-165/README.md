@@ -100,6 +100,16 @@ The retained trace has **412 accepted commands** across battles of
 inspection and terminal screenshots were visually reviewed, alongside portrait
 WebKit inspection and the narrow preview.
 
+The live full-regression source `4f8c194` has now also completed the production
+Mage trace on **Chromium desktop, native-touch portrait and native-touch landscape**.
+All three complete JSON traces are byte-identical to the passing pilot:
+`caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445`.
+Production Snare inspection screenshots on both touch orientations were visually
+reviewed. These completed case artifacts are in the full run's
+`chromium-artifacts/dungeon-Mage-*/` directories. The aggregate is still live;
+the remaining Chromium cases, WebKit production journeys and later modes are
+not yet claimed complete.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all
