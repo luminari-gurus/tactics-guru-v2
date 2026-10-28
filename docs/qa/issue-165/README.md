@@ -110,6 +110,16 @@ reviewed. These completed case artifacts are in the full run's
 the remaining Chromium cases, WebKit production journeys and later modes are
 not yet claimed complete.
 
+The complete [Chromium component](full-run/chromium-component.json) has now
+finished: **736 passed, 3 declared dev-mode skips, zero failures/flaky cases/retries**
+across all 739 discovered IDs. All three skipped cases are the controlled
+placement failure/retry case; their required owner is the later `placement-dev`
+stage, still pending at this checkpoint. Exact ID equality, one-worker policy,
+zero global errors and all three passing Mage journeys were checked directly
+against the final JSON report. Raw report/log, before-source identity and all
+three Mage traces/screenshots are retained with hashes under `full-run/`.
+The aggregate has moved to the 87-case dev fixture stage.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all

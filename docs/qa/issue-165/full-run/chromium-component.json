@@ -1,0 +1,242 @@
+{
+  "source": "4f8c194deb575310866eeb132247197f1062cc5b",
+  "scope": "Completed Chromium component; aggregate still running",
+  "counts": {
+    "total": 739,
+    "expected": 736,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 3,
+    "retryAttempts": 0
+  },
+  "exactDiscoveredIds": true,
+  "workers": 1,
+  "skipsOwnedBy": "placement-dev (pending)",
+  "skipped": [
+    {
+      "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+      "file": "overworld-map.spec.ts",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "project": "desktop",
+      "outcome": "skipped",
+      "expectedStatus": "skipped",
+      "durationMs": 59,
+      "attempts": [
+        {
+          "status": "skipped",
+          "durationMs": 59,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-10-28T13:13:53.533Z"
+        }
+      ]
+    },
+    {
+      "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+      "file": "overworld-map.spec.ts",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "project": "mobile-portrait",
+      "outcome": "skipped",
+      "expectedStatus": "skipped",
+      "durationMs": 68,
+      "attempts": [
+        {
+          "status": "skipped",
+          "durationMs": 68,
+          "retry": 0,
+          "workerIndex": 5,
+          "startTime": "2026-10-28T13:46:34.014Z"
+        }
+      ]
+    },
+    {
+      "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+      "file": "overworld-map.spec.ts",
+      "title": "controlled placement failure preserves complete state and supports retry",
+      "project": "mobile-landscape",
+      "outcome": "skipped",
+      "expectedStatus": "skipped",
+      "durationMs": 66,
+      "attempts": [
+        {
+          "status": "skipped",
+          "durationMs": 66,
+          "retry": 0,
+          "workerIndex": 10,
+          "startTime": "2026-10-28T14:21:59.970Z"
+        }
+      ]
+    }
+  ],
+  "mage": [
+    {
+      "id": "e0f8639c387951b6a797-edbf3bc8eb219a3bb905",
+      "file": "dungeon.spec.ts",
+      "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 312393,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 312393,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-10-28T12:55:40.824Z"
+        }
+      ]
+    },
+    {
+      "id": "e0f8639c387951b6a797-c052d78117af743441d2",
+      "file": "dungeon.spec.ts",
+      "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 259524,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 259524,
+          "retry": 0,
+          "workerIndex": 5,
+          "startTime": "2026-10-28T13:31:22.399Z"
+        }
+      ]
+    },
+    {
+      "id": "e0f8639c387951b6a797-b95e9a162887c3a2f0d3",
+      "file": "dungeon.spec.ts",
+      "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 276977,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 276977,
+          "retry": 0,
+          "workerIndex": 10,
+          "startTime": "2026-10-28T14:05:19.309Z"
+        }
+      ]
+    }
+  ],
+  "traces": [
+    {
+      "project": "desktop",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "commands": 412,
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "blocked": true,
+      "expired": true,
+      "terminal": "defeat"
+    },
+    {
+      "project": "mobile-landscape",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "commands": 412,
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "blocked": true,
+      "expired": true,
+      "terminal": "defeat"
+    },
+    {
+      "project": "mobile-portrait",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "commands": 412,
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "blocked": true,
+      "expired": true,
+      "terminal": "defeat"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "chromium.json.gz",
+      "bytes": 68298,
+      "sha256": "95758a578ba1d0bb6dcdebbe1583ce6ddbb284eadd8eb50d7aae47a5137f0909",
+      "originalSha256": "acf6434ca0be271d4ef1d16a95ecf47c5214db47baa29cc8af53d25760b34a1e"
+    },
+    {
+      "path": "chromium.log.gz",
+      "bytes": 22226,
+      "sha256": "ce89543731b012af979a2db6633759c0ae53b4a6d30b7b9d7b2603f1b23a75ab",
+      "originalSha256": "faaee5975bc32927ac38ebaa0db7ce04719e74466f7148422bc61f85e020a6e9"
+    },
+    {
+      "path": "source-before.json.gz",
+      "bytes": 21454,
+      "sha256": "3699d757c0567ec6152eb56348625c1dc830892e1198871a920722a0f2ecf9c6",
+      "originalSha256": "d962d5e027c4d421dd3b1475490b56e1604f8005e9bc13af591c1ac7faae243c"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/mage-terminal-journey.png",
+      "bytes": 49270,
+      "sha256": "38276b24f555a7aff919af3de73dbe89e380bc61822b8d7d1523b9100dd7d222",
+      "originalSha256": "38276b24f555a7aff919af3de73dbe89e380bc61822b8d7d1523b9100dd7d222"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/production-mage-snare-inspection.png",
+      "bytes": 260824,
+      "sha256": "01a82a624c7eb3a6c2908f34a961f33faf033b4448941617d2bb01d29382299e",
+      "originalSha256": "01a82a624c7eb3a6c2908f34a961f33faf033b4448941617d2bb01d29382299e"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-landscape/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-landscape/mage-terminal-journey.png",
+      "bytes": 137179,
+      "sha256": "b2879da98f0f1605a537df10b57f2b44508d028c4f112287178b6fb8f2894a00",
+      "originalSha256": "b2879da98f0f1605a537df10b57f2b44508d028c4f112287178b6fb8f2894a00"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-landscape/production-mage-snare-inspection.png",
+      "bytes": 378078,
+      "sha256": "22863272390ca7b6d9e7937041ee7afec83b7f9edb1b1dd5adea857cafe8e206",
+      "originalSha256": "22863272390ca7b6d9e7937041ee7afec83b7f9edb1b1dd5adea857cafe8e206"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-portrait/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-portrait/mage-terminal-journey.png",
+      "bytes": 161703,
+      "sha256": "28482ceabdc85789747d4deb9d4e65613f83ccdd735a6fc1fb226da5ca60b749",
+      "originalSha256": "28482ceabdc85789747d4deb9d4e65613f83ccdd735a6fc1fb226da5ca60b749"
+    },
+    {
+      "path": "chromium-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-mobile-portrait/production-mage-snare-inspection.png",
+      "bytes": 213952,
+      "sha256": "f9a03dabfc634defaee342feec0c5d92d042ad34d21e4840eca1ec85a5947b7d",
+      "originalSha256": "f9a03dabfc634defaee342feec0c5d92d042ad34d21e4840eca1ec85a5947b7d"
+    }
+  ]
+}
