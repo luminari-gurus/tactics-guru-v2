@@ -3,7 +3,6 @@ import { generateMap, MAP_TYPES, type MapType } from './generate';
 import { applyBiome, BIOMES, type Biome } from './biomes';
 import { ART_STYLES, createMapArt, type ArtStyle, type ArtTreatment } from './art';
 import { createOverworld, type OverworldState } from './state';
-import { createMovement, describeBehavior, stepMovement, type OverworldMovement } from './movement';
 
 export function startMap(): () => void {
   document.title = 'Overworld map · Tactics Guru';
@@ -21,12 +20,10 @@ export function startMap(): () => void {
       </form>
       <p id="map-seed-help">Enter a whole number from 0 to 4294967295. Reuse a seed to see the same map.</p>
       <p id="map-status" role="status" aria-live="polite"></p>
-      <p><button id="map-motion" type="button" aria-pressed="false">Pause movement</button> <span id="map-motion-state" role="status"></span></p>
       <figure id="map-figure"><div id="map-grid" role="img" aria-describedby="map-markers"></div>
         <figcaption><span><i class="map-floor"></i> <span id="map-open-label">Walkable</span></span><span><i class="map-wall"></i> <span id="map-blocked-label">Blocked</span></span>
           <span><i class="map-marker-key" data-marker-kind="player" aria-hidden="true"></i> Player · 1</span>${[1, 2, 3].map(id => `<span><i class="map-marker-key" data-marker-kind="enemy" data-marker-label="${id}" aria-hidden="true"></i> Enemy ${id}</span>`).join('')}</figcaption>
       </figure>
-      <p id="map-behaviors"></p>
       <p id="map-markers" class="map-visually-hidden"></p>
     </main>`;
   const input = document.querySelector<HTMLInputElement>('#map-seed')!;
@@ -37,59 +34,27 @@ export function startMap(): () => void {
   const artSelect = document.querySelector<HTMLSelectElement>('#map-art')!;
   const figure = document.querySelector<HTMLElement>('#map-figure')!;
   const description = document.querySelector<HTMLElement>('#map-markers')!;
-  const motionButton = document.querySelector<HTMLButtonElement>('#map-motion')!;
-  const motionStatus = document.querySelector<HTMLElement>('#map-motion-state')!;
-  const behaviorDescription = document.querySelector<HTMLElement>('#map-behaviors')!;
   const listeners = new AbortController();
-  let movement: OverworldMovement | undefined;
   let world: OverworldState | undefined;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;
-  let paused = false;
   let pageHidden = false;
-  let movementFailure = '';
   function visible(): boolean { return !disposed && !pageHidden && !document.hidden && grid.isConnected; }
-  function stop(): void {
-    clearTimeout(timer);
-    timer = undefined;
-  }
   function dispose(): void {
     if (disposed) return;
     disposed = true;
-    stop();
     listeners.abort();
   }
-  function schedule(): void {
-    if (timer !== undefined || !movement || paused || movementFailure || !visible()) return;
-    timer = setTimeout(() => {
-      timer = undefined;
-      if (!grid.isConnected) { dispose(); return; }
-      if (!visible() || !movement) return;
-      try {
-        movement = stepMovement(movement);
-        world = movement.world;
-        projectMarkers();
-      } catch {
-        movementFailure = 'Enemy movement stopped. Generate the map to retry.';
-        status.textContent = movementFailure;
-        updateMotionControl();
-      }
-      schedule();
-    }, 1000);
-  }
   document.addEventListener('visibilitychange', () => {
-    stop();
-    if (visible()) { render(); schedule(); }
+    if (visible()) render();
   }, { signal: listeners.signal });
   window.addEventListener('pagehide', event => {
     pageHidden = true;
-    stop();
     if (!event.persisted) dispose();
   }, { signal: listeners.signal });
   window.addEventListener('pageshow', event => {
     if (!event.persisted) return;
     pageHidden = false;
-    if (visible()) { render(); schedule(); }
+    if (visible()) render();
   }, { signal: listeners.signal });
   let placementFailure = '';
   let art: ArtStyle = 'simple';
@@ -102,7 +67,6 @@ export function startMap(): () => void {
   function render(): void {
     if (!visible()) return;
     restoreChoices();
-    updateMotionControl();
     const validation = invalidSeed ? 'Enter a whole number from 0 to 4294967295. The map is unchanged. ' : '';
     if (!world) {
       grid.replaceChildren();
@@ -147,39 +111,19 @@ export function startMap(): () => void {
     const feedback = fallbacks.has('missing') ? ' · No legacy desert artwork; using Simple'
       : fallbacks.has('failed') ? ' · Artwork unavailable; using Simple for affected terrain'
       : fallbacks.has('loading') ? ' · Loading artwork; using Simple while loading' : '';
-    status.textContent = `${validation}${placementFailure}${movementFailure}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;
+    status.textContent = `${validation}${placementFailure}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;
   }
   function projectMarkers(): void {
-    if (!movement || !world || !visible()) return;
-    for (const cell of grid.querySelectorAll<HTMLElement>('[data-marker-id]')) {
-      delete cell.dataset.markerId; delete cell.dataset.markerKind;
-      delete cell.dataset.markerX; delete cell.dataset.markerY;
-      delete cell.dataset.markerLabel;
-    }
+    if (!world || !visible()) return;
     for (const marker of world.markers) {
       const cell = grid.children[marker.y * world.map.width + marker.x] as HTMLElement;
       cell.dataset.markerId = marker.id; cell.dataset.markerKind = marker.kind;
       cell.dataset.markerX = String(marker.x); cell.dataset.markerY = String(marker.y);
       if (marker.kind === 'enemy') cell.dataset.markerLabel = marker.id.slice(-1);
     }
-    const profiles = movement.behaviors.map(profile => `${profile.id}: ${describeBehavior(profile)}.`).join(' ');
-    behaviorDescription.textContent = `${profiles} Detection uses Manhattan distance; terrain does not block sight. Enemies move once per second while visible.`;
     description.textContent = world.markers.map(marker =>
-      `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ') + ` ${profiles}`;
-    grid.dataset.movementStep = String(movement.step);
+      `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ');
   }
-  function updateMotionControl(): void {
-    motionButton.textContent = paused ? 'Resume movement' : 'Pause movement';
-    motionButton.setAttribute('aria-pressed', String(paused));
-    motionButton.disabled = !movement || Boolean(movementFailure);
-    motionStatus.textContent = paused ? 'Movement paused.' : '';
-  }
-  motionButton.addEventListener('click', () => {
-    paused = !paused;
-    stop();
-    updateMotionControl();
-    schedule();
-  }, { signal: listeners.signal });
   function restoreChoices(): void {
     select.value = world?.map.type ?? 'rooms';
     biomeSelect.value = world?.map.biome ?? 'grassland';
@@ -207,17 +151,12 @@ export function startMap(): () => void {
       render();
       return;
     }
-    const nextMovement = createMovement(result.state);
-    stop();
-    movement = nextMovement;
-    world = nextMovement.world;
-    movementFailure = '';
+    world = result.state;
     placementFailure = '';
     input.value = String(world.map.seed);
     invalidSeed = false;
     input.removeAttribute('aria-invalid');
     render();
-    schedule();
   }
   function applySelection(): void {
     const value = validSeed();

@@ -7,16 +7,15 @@ The independent `/map` prototype places enemies but never moves them. Issue [#15
 ## What Changes
 
 - Add pure, bounded simulation steps with explicit per-enemy behavior configuration, a separate seeded movement RNG, stable update order and collision handling.
-- Add visible numbered enemy markers and matching legend keys, plus a keyboard/touch Pause/Resume control.
-- Demonstrate both behaviors among the existing three enemies. Make each assignment and aggressive detection range visible in the map legend/description.
-- Move enemies once per visible second; pause while hidden, preserve simulation through artwork changes, reset on successful regeneration, and dispose scheduling/listeners on departure.
+- Add visible numbered enemy markers and matching legend keys to the static `/map` inspection view.
+- Advance dungeon enemies only when the player moves, and start an encounter when the player enters any uncleared enemy cell.
 - Document the chosen range-based visibility and pathfinding rules and retain desktop/mobile interaction evidence.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `overworld-enemy-movement`: deterministic passive/aggressive movement and its independent map-view lifecycle.
+- `overworld-enemy-movement`: deterministic passive/aggressive movement and player-driven dungeon integration.
 
 ### Modified Capabilities
 
@@ -30,4 +29,4 @@ Issue owner/caller: `dubstylee`. Branch: `work/issue-155-overworld-enemy-movemen
 
 Caller explicitly approved this published proposal, design, specification and tasks in chat on 2026-10-25.
 
-The caller explicitly authorized the first five grouped PR review repairs on 2026-10-25, including view-local pause and stronger lifecycle/test evidence. See design and review follow-up tasks.
+The caller explicitly authorized the first five grouped PR review repairs on 2026-10-25, including stronger lifecycle/test evidence; the later caller clarification removed the map pause and timer. See design and review follow-up tasks.

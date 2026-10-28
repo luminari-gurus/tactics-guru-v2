@@ -47,3 +47,8 @@ Review follow-up delivered on PR #246; all five requested groups verified on run
 - [x] 5.2 Persist positions, independent movement RNG and unordered completion in format 5, preserving format-4 continuation and stale-save protection.
 - [ ] 5.3 Verify affected domain and browser flows, save migration, device emulation and required full regression; retain failures and source identity.
 - [ ] 5.4 Update PR #246 after verification.
+
+## 6. Static map review correction
+
+- [x] 6.1 Remove the `/map` movement timer and pause controls, retaining static numbered markers and dungeon movement.
+- [x] 6.2 Verify static map, lifecycle and dungeon cadence, then update PR #246.

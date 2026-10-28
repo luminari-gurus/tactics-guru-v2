@@ -1,5 +1,7 @@
 # Design
 
+**Scope update:** The caller subsequently restricted wandering to `/dungeon`, on player steps. The original `/map` timer and pause sections below are historical and superseded by the dungeon integration section.
+
 ## Context
 
 See [proposal](proposal.md) for issue/branch identity and motivation. Inspected base: `d5b19279a869501205e98856ebd5e5f91f8c287d`.
@@ -112,4 +114,4 @@ Use the full affected map browser file after final runtime changes, then run bot
 
 ## Dungeon integration (caller clarification)
 
-The `/map` prototype remains independent and encounter-free. In `/dungeon`, an accepted player step either enters the touched uncleared enemy battle or advances each live enemy once using the existing movement policy and a separate saved RNG. Waiting and rejected commands never advance movement. Position, enemy movement and entry are saved atomically in one revision. Encounters can be cleared in any order; descent requires all three. Continue validates format-4 saves and upgrades them on progress. Shared save and route changes require full regression under the verification policy.
+The `/map` prototype is independent, stationary and encounter-free. The earlier timer and pause design above is superseded by this caller clarification. In `/dungeon`, an accepted player step either enters the touched uncleared enemy battle or advances each live enemy once using the existing movement policy and a separate saved RNG. Waiting and rejected commands never advance movement. Position, enemy movement and entry are saved atomically in one revision. Encounters can be cleared in any order; descent requires all three. Continue validates format-4 saves and upgrades them on progress. Shared save and route changes require full regression under the verification policy.

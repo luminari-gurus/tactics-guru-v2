@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Provide reproducible passive wandering and aggressive pursuit on the independent overworld inspection map while preserving terrain, marker identities and artwork independence.
+Provide reproducible passive wandering and aggressive pursuit in the dungeon while preserving terrain, marker identities and artwork independence.
 
 ## ADDED Requirements
 
-### Requirement: Inspectable behavior assignments
-The map SHALL retain one stationary player and three enemies with explicit configurable passive/aggressive profiles. Defaults SHALL assign enemy-1 passive, enemy-2 aggressive with range 6 and enemy-3 aggressive with range 10. The visible legend and accessible description SHALL identify assignments and detection ranges without requiring color alone.
+### Requirement: Static inspection markers
+The `/map` inspection view SHALL display stationary, numbered player and enemy markers without encounters or a movement timer.
 
-#### Scenario: Both profiles are discoverable
-- **WHEN** a map is successfully generated on desktop or mobile
-- **THEN** each enemy has a visible numbered marker matched by its legend key, and its ID, profile and aggressive range are inspectable, all four markers remain distinct and walkable, and no marker becomes an interactive combat control
+#### Scenario: Time passes on the inspection map
+- **WHEN** the map remains open without regeneration
+- **THEN** all marker positions remain unchanged and the numbered legend remains visible
 
 ### Requirement: Passive legal wandering
 Each passive enemy SHALL move at most one cardinal cell per simulation step, selecting reproducibly among currently unoccupied walkable neighbors in north/east/south/west order. With no legal neighbor it SHALL stay in place.
@@ -21,7 +21,7 @@ Each passive enemy SHALL move at most one cardinal cell per simulation step, sel
 - **THEN** passive destinations and resulting random states match, blocked/occupied cells are never entered, and an enclosed enemy stays in place
 
 ### Requirement: Range-based aggressive detection
-Aggressive enemies SHALL detect the player at Manhattan distance less than or equal to their configured range. Terrain SHALL NOT occlude this prototype's range-based visibility. Outside that range they SHALL stay still, immediately losing pursuit without remembered targets.
+Aggressive enemies SHALL detect the player at Manhattan distance less than or equal to their configured range. Terrain SHALL NOT occlude range-based detection. Outside that range they SHALL stay still, immediately losing pursuit without remembered targets.
 
 #### Scenario: Detection boundary and loss
 - **WHEN** the player is exactly at the configured range, beyond it, or later moved beyond it in a pure-model fixture
@@ -39,38 +39,22 @@ Detected enemies SHALL follow a shortest legal cardinal path toward an unoccupie
 - **THEN** the earlier enemy claims a free destination first and later movement uses the updated occupancy, preventing overlap and direct swaps
 
 ### Requirement: Independent reproducible simulation
-Simulation SHALL be a pure retained-state transition with its own seeded random state and step count. Terrain generation, initial markers-v1 placement, player position, combat RNG, dungeon exploration and game-save data SHALL remain unchanged. Rendering and artwork callbacks SHALL neither step nor reset simulation.
+Simulation SHALL be a pure retained-state transition with its own seeded random state and step count. Terrain generation, initial markers-v1 placement, player position, and combat RNG SHALL remain unchanged; dungeon positions and movement state SHALL be persisted after accepted player steps. Rendering and artwork callbacks SHALL neither step nor reset simulation.
 
 #### Scenario: Reproducibility through art updates
 - **WHEN** the same initial map/configuration receives the same number of steps with different intervening art selections and image success/failure callbacks
 - **THEN** resulting positions, movement random state and step count match, with terrain and unrelated session state unchanged
 
-### Requirement: Visible cadence and disposal
-The unpaused map SHALL advance at most once per 1000 milliseconds while visible, without catch-up bursts. Hidden/page-hidden views SHALL stop scheduling and DOM updates. Return to visibility or BFCache restoration SHALL resume unpaused movement with a fresh full delay. Final disposal SHALL release timers/listeners and make late artwork callbacks harmless.
+### Requirement: Static map lifecycle
+Rendering, artwork, visibility changes and cached-page restoration SHALL leave the retained marker positions unchanged. Disposal SHALL remove listeners and make late artwork callbacks harmless.
 
-#### Scenario: Hidden time and restored pages
-- **WHEN** the unpaused page hides across many intervals and is then restored
-- **THEN** no hidden-time steps occur and only one step occurs after the next full visible delay, without duplicate loops
-
-#### Scenario: Disposed view
-- **WHEN** the map is finally disposed and pending timer/image work completes
-- **THEN** no further movement or DOM updates occur from that view and a later map mount owns only one loop
+#### Scenario: Hidden or restored map
+- **WHEN** the map is hidden and restored or a delayed image finishes
+- **THEN** marker positions remain unchanged and pending edits are retained
 
 ### Requirement: Atomic regeneration and retained edits
-Successful Generate, New seed, type or biome changes SHALL atomically recreate placement and reset movement state. Repeated committed inputs SHALL reproduce the initial state. Invalid seed input or placement failure SHALL preserve the current simulation; ordinary scheduled steps SHALL continue from it. Rendering SHALL preserve pending input, focus, selected artwork and validation/failure feedback.
+Successful Generate, New seed, type or biome changes SHALL atomically recreate placement. Invalid seed input or placement failure SHALL preserve the current map.
 
-#### Scenario: Reset and failed regeneration
-- **WHEN** a moving world is successfully regenerated, or a regeneration fails
-- **THEN** success resets positions/RNG/count coherently while failure retains the previous world/RNG/count at the operation boundary, without resetting or advancing it through rendering
-
-#### Scenario: Editing during movement
-- **WHEN** the user edits the seed, focuses a native control or changes artwork while scheduled movement proceeds
-- **THEN** movement does not replace their pending input, steal focus, dismiss controls, clear validation/errors or respawn enemies
-
-
-### Requirement: Player-controlled movement pause
-The map SHALL provide an accessible Pause/Resume control that stops simulation without changing positions, random state or step count. The pause choice SHALL survive artwork changes, regeneration and hidden/cached-page restoration within the view. Resume SHALL wait a full interval before stepping.
-
-#### Scenario: Pause survives other map operations
-- **WHEN** a player pauses with keyboard or touch, changes artwork or regenerates, and hides/restores the view
-- **THEN** movement remains paused, regeneration resets only the simulation, and Resume advances only after a fresh full second
+#### Scenario: Failed regeneration
+- **WHEN** a regeneration fails
+- **THEN** the previous world and pending edits are retained with an error
