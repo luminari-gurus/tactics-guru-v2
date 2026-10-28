@@ -44,8 +44,17 @@ These results precede final source/build qualification and are not a clean full 
   cache path. The physical cache-path override launched Chromium **153.0.8010.12**;
   WebKit **26.6** also launched. Node **24.19.0**, Playwright **1.63.0**.
 
-Raw iteration JSON reports currently remain in ignored `tmp/issue165-*.json`.
-The explicit WebKit run retains its artifacts under `tmp/issue165-mage-picker-webkit/`.
+Completed iteration JSON, logs, source bindings, failure contexts, screenshots
+and the desktop journey trace are retained under [iteration/](iteration/manifest.json).
+All 30 stored artifact hashes and original-byte hashes were checked after copying.
+Windows attempts without a complete input manifest are explicitly labeled iteration
+evidence rather than reused as final acceptance. The Linux repair source manifest
+is reconstructed from the actual committed Git blobs and the full-input manifest;
+the only verification-input change from that repair to the full-run source is the
+strengthened Mage unit assertion. Application/build inputs are identical.
+
+The ignored original Windows reports remain in `tmp/issue165-*.json`.
+The explicit WebKit run also retains its original artifacts under `tmp/issue165-mage-picker-webkit/`.
 The initial Chromium run used disposable `test-results/`; its JSON errors remain
 but the following targeted invocation replaced that disposable artifact directory.
 Final durable receipts/screenshots will use unique directories and be retained here.
@@ -73,6 +82,10 @@ defeat and exact continuation replay. No game rules or battle outcome were
 relaxed. Its unique repair JSON/log/artifacts remain in Linux
 `tmp/issue165/mage-desktop-journey-repair*`. The pure witness additionally asserts
 that Snare expiry occurs at its target's accepted endTurn.
+The retained trace has **412 accepted commands** across battles of
+40/45/48/58/164/57 commands; the Mage finishes at XP 205/level 3. Desktop Snare
+inspection and terminal screenshots were visually reviewed, alongside portrait
+WebKit inspection and the narrow preview.
 
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked

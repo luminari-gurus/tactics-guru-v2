@@ -1,0 +1,839 @@
+{
+  "schemaVersion": 1,
+  "scope": "Completed iteration attempts, not the running full regression",
+  "attempts": [
+    {
+      "id": "linux-picker-webkit",
+      "report": "tmp/issue165/mage-picker-webkit.json",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 15352.893,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 1098,
+        "testExecutionSpanMs": 14144,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop-webkit",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "portrait-webkit",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "landscape-webkit",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "dc05b687c651765fa444-3f0323a0d74bbc982555",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "desktop-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2208,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2208,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:33:49.319Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-2254af0650f836ab1974",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "desktop-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2697,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2697,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:33:51.620Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-47c4e286fcaf642eb7d5",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "portrait-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 1467,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 1467,
+                "retry": 0,
+                "workerIndex": 1,
+                "startTime": "2026-10-28T12:33:54.653Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-47d2055364e74d4b7025",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "portrait-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2654,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2654,
+                "retry": 0,
+                "workerIndex": 1,
+                "startTime": "2026-10-28T12:33:56.191Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-4325601fdcaa80776be9",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "landscape-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 1471,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 1471,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:33:59.171Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-681da2b97c531759f743",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "landscape-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2749,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2749,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:34:00.714Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "linux-desktop-journey-failed",
+      "report": "tmp/issue165/mage-desktop-journey.json",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 1,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 159556.324,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 951,
+        "testExecutionSpanMs": 158257,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "mobile-portrait",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "mobile-landscape",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "e0f8639c387951b6a797-edbf3bc8eb219a3bb905",
+            "file": "dungeon.spec.ts",
+            "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+            "project": "desktop",
+            "outcome": "unexpected",
+            "expectedStatus": "passed",
+            "durationMs": 158257,
+            "attempts": [
+              {
+                "status": "failed",
+                "durationMs": 158257,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:34:07.170Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "linux-desktop-journey-repair",
+      "report": "tmp/issue165/mage-desktop-journey-repair.json",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 293898.734,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 745,
+        "testExecutionSpanMs": 292800,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "mobile-portrait",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          },
+          {
+            "name": "mobile-landscape",
+            "retries": 0,
+            "testDir": "/tmp/tactics-issue-165-20261028/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "e0f8639c387951b6a797-edbf3bc8eb219a3bb905",
+            "file": "dungeon.spec.ts",
+            "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+            "project": "desktop",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 292800,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 292800,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:38:30.988Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "windows-mage-picker-chromium",
+      "report": "/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue165-mage-picker-chromium.json",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 6,
+          "expected": 5,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 69386.944,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 2359,
+        "testExecutionSpanMs": 66331,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "mobile-portrait",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "mobile-landscape",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "dc05b687c651765fa444-80074fc60f1c9e7792a0",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "desktop",
+            "outcome": "unexpected",
+            "expectedStatus": "passed",
+            "durationMs": 30062,
+            "attempts": [
+              {
+                "status": "timedOut",
+                "durationMs": 30062,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:25:49.189Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-ed327ffdffcc150d91e6",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "desktop",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 23939,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 23939,
+                "retry": 0,
+                "workerIndex": 1,
+                "startTime": "2026-10-28T12:26:20.126Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-0f7c1345084c09ff2201",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "mobile-portrait",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 3046,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 3046,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:26:44.890Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-46dcaa6051186049e003",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "mobile-portrait",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2109,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2109,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:26:48.174Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-60982a375e4178fbe088",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "mobile-landscape",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2141,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2141,
+                "retry": 0,
+                "workerIndex": 3,
+                "startTime": "2026-10-28T12:26:50.910Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-7a97db9ea9f98e1f70a5",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "mobile-landscape",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2251,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2251,
+                "retry": 0,
+                "workerIndex": 3,
+                "startTime": "2026-10-28T12:26:53.269Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "windows-mage-picker-desktop-followup",
+      "report": "/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue165-mage-picker-desktop-followup.json",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 9785.508999999998,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 1900,
+        "testExecutionSpanMs": 6920,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "mobile-portrait",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "mobile-landscape",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "dc05b687c651765fa444-80074fc60f1c9e7792a0",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "desktop",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 6920,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 6920,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:27:31.944Z"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "windows-mage-picker-webkit",
+      "report": "/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue165-mage-picker-webkit.json",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance",
+      "summary": {
+        "kind": "playwright",
+        "counts": {
+          "total": 6,
+          "expected": 3,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "retryAttempts": 0
+        },
+        "runnerDurationMs": 33802.249,
+        "configuredWorkers": 1,
+        "firstTestDelayMs": 1995,
+        "testExecutionSpanMs": 31210,
+        "actualWorkers": 1,
+        "projects": [
+          {
+            "name": "desktop-webkit",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "portrait-webkit",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          },
+          {
+            "name": "landscape-webkit",
+            "retries": 0,
+            "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests"
+          }
+        ],
+        "globalErrors": [],
+        "tests": [
+          {
+            "id": "dc05b687c651765fa444-3f0323a0d74bbc982555",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "desktop-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 6975,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 6975,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:28:53.980Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-2254af0650f836ab1974",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "desktop-webkit",
+            "outcome": "unexpected",
+            "expectedStatus": "passed",
+            "durationMs": 6001,
+            "attempts": [
+              {
+                "status": "failed",
+                "durationMs": 6001,
+                "retry": 0,
+                "workerIndex": 0,
+                "startTime": "2026-10-28T12:29:01.062Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-47c4e286fcaf642eb7d5",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "portrait-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2333,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2333,
+                "retry": 0,
+                "workerIndex": 1,
+                "startTime": "2026-10-28T12:29:07.567Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-47d2055364e74d4b7025",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "portrait-webkit",
+            "outcome": "unexpected",
+            "expectedStatus": "passed",
+            "durationMs": 6059,
+            "attempts": [
+              {
+                "status": "failed",
+                "durationMs": 6059,
+                "retry": 0,
+                "workerIndex": 1,
+                "startTime": "2026-10-28T12:29:09.975Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-4325601fdcaa80776be9",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+            "project": "landscape-webkit",
+            "outcome": "expected",
+            "expectedStatus": "passed",
+            "durationMs": 2443,
+            "attempts": [
+              {
+                "status": "passed",
+                "durationMs": 2443,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:29:16.530Z"
+              }
+            ]
+          },
+          {
+            "id": "dc05b687c651765fa444-681da2b97c531759f743",
+            "file": "ability-picker.spec.ts",
+            "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio",
+            "project": "landscape-webkit",
+            "outcome": "unexpected",
+            "expectedStatus": "passed",
+            "durationMs": 6114,
+            "attempts": [
+              {
+                "status": "failed",
+                "durationMs": 6114,
+                "retry": 0,
+                "workerIndex": 2,
+                "startTime": "2026-10-28T12:29:19.076Z"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "linux-picker-webkit.json.gz",
+      "bytes": 1491,
+      "sha256": "281b8c08d91514b8c571e75db6bf196d53e40a111671a3970f0af84bdef413d9",
+      "originalSha256": "66a0b4c249a39e423665e53465336d4683730867a881a1aaca0b3a79f680f713",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-desktop-journey-failed.json.gz",
+      "bytes": 1724,
+      "sha256": "26a6374560de7e6a2b8572e0f69af844502b3c385a0e5f8fb4fb86c911e094a1",
+      "originalSha256": "a75efac21a59719b83f7ece2a2677bfb465ae35350488a474e621d82cbca0aeb",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-desktop-journey-repair.json.gz",
+      "bytes": 1214,
+      "sha256": "d57522d7c5359e9911c957f3c9253a91aab062630931a556208593032e4811f7",
+      "originalSha256": "ffc52f1a078d7a2ed65b0b0958c1a699b519ebf77b8ea8833f6f282cb9ca03f0",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "windows-mage-picker-chromium.json.gz",
+      "bytes": 2095,
+      "sha256": "b96e1e2d21f1274ef136b8c4e8cdd884dca26b73d603d9bddaf9217176db6af1",
+      "originalSha256": "e138f781071c524b049f68a779eb6c8f0bb76d2c607640c0f01110dcae057bb1",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance"
+    },
+    {
+      "path": "windows-mage-picker-desktop-followup.json.gz",
+      "bytes": 1213,
+      "sha256": "3745a4b4c356ecbddcfdcdd6acb1a01848528ff9e78fb71abdb1e0bf96924487",
+      "originalSha256": "342f001f8d54e40785f8d499500bf3d28f3b14e27084b179783ae287321949f4",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance"
+    },
+    {
+      "path": "windows-mage-picker-webkit.json.gz",
+      "bytes": 2527,
+      "sha256": "8a0a842468a42181ee0cbc0258997e8fd91f9972379009d09b2e066cb1b62d7f",
+      "originalSha256": "be1892a6186be8aa3ed5a620d3a39485c30b039ef6313745a90ebc7937f599f1",
+      "binding": "uncommitted Windows iteration; no input manifest; not final acceptance"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/.last-run.json.gz",
+      "bytes": 60,
+      "sha256": "229163249e11ddc0333e1466cf61040acb56a6ca1734d46249f54c8f13fbd034",
+      "originalSha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-desktop-webkit/mage-snare-inspection.png",
+      "bytes": 688168,
+      "sha256": "e1dd90f203559490e5ac9ca33b2afac470f5ad1443ea350909b0d99b4694b135",
+      "originalSha256": "e1dd90f203559490e5ac9ca33b2afac470f5ad1443ea350909b0d99b4694b135",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-desktop-webkit/mage-snare-narrow-preview.png",
+      "bytes": 251209,
+      "sha256": "7d9dbab110cdb98f0fdc4a9c0c45d8f7bd94051c15d68b640619637b3eae296e",
+      "originalSha256": "7d9dbab110cdb98f0fdc4a9c0c45d8f7bd94051c15d68b640619637b3eae296e",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-landscape-webkit/mage-snare-inspection.png",
+      "bytes": 352324,
+      "sha256": "5d6571081535d8273642707767c50ac6f88fc5007d56e77b58393d5424c9fd9a",
+      "originalSha256": "5d6571081535d8273642707767c50ac6f88fc5007d56e77b58393d5424c9fd9a",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-landscape-webkit/mage-snare-narrow-preview.png",
+      "bytes": 449820,
+      "sha256": "ccfd3fc42f3352a03be80e64262974f90760ea9079c856186fb25d90e2082c1a",
+      "originalSha256": "ccfd3fc42f3352a03be80e64262974f90760ea9079c856186fb25d90e2082c1a",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-portrait-webkit/mage-snare-inspection.png",
+      "bytes": 221299,
+      "sha256": "1e1560c131fd29fc26c4705b546ea2b568e04d14dbb1b8b1ae802c030d6910f4",
+      "originalSha256": "1e1560c131fd29fc26c4705b546ea2b568e04d14dbb1b8b1ae802c030d6910f4",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-picker-webkit-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-portrait-webkit/mage-snare-narrow-preview.png",
+      "bytes": 475219,
+      "sha256": "4e75a848a14ef6ac33dd512e7c4d4101dccec453e6136ab569d4db9a00b7d51c",
+      "originalSha256": "4e75a848a14ef6ac33dd512e7c4d4101dccec453e6136ab569d4db9a00b7d51c",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-desktop-journey-artifacts/.last-run.json.gz",
+      "bytes": 106,
+      "sha256": "ba8ce9109bec2c212477273e88980b0214e1c95bada6f95883d1aab2235abba5",
+      "originalSha256": "9cb6f8a2d9c7437dabfb2cc891485f17889da73ad15bcd9ca08ad9567e91e1df",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-desktop-journey-artifacts/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/error-context.md.gz",
+      "bytes": 2775,
+      "sha256": "57d9649a3dd3730e5bd113eecbb82f4ea3e454da1f2040f164c2fdec762e565e",
+      "originalSha256": "fc6ebfbb537cfadb271b1b404ed7340433dbd7b81858ea623e973702d7b12efc",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "mage-desktop-journey-repair-artifacts/.last-run.json.gz",
+      "bytes": 60,
+      "sha256": "229163249e11ddc0333e1466cf61040acb56a6ca1734d46249f54c8f13fbd034",
+      "originalSha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "mage-desktop-journey-repair-artifacts/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "mage-desktop-journey-repair-artifacts/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/mage-terminal-journey.png",
+      "bytes": 49270,
+      "sha256": "38276b24f555a7aff919af3de73dbe89e380bc61822b8d7d1523b9100dd7d222",
+      "originalSha256": "38276b24f555a7aff919af3de73dbe89e380bc61822b8d7d1523b9100dd7d222",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "mage-desktop-journey-repair-artifacts/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop/production-mage-snare-inspection.png",
+      "bytes": 260824,
+      "sha256": "01a82a624c7eb3a6c2908f34a961f33faf033b4448941617d2bb01d29382299e",
+      "originalSha256": "01a82a624c7eb3a6c2908f34a961f33faf033b4448941617d2bb01d29382299e",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "windows-webkit-failed-artifacts/.last-run.json.gz",
+      "bytes": 138,
+      "sha256": "889c0e372f1aa3b91b06c2da50a5d6ae20bc91cd9b6977957194e0c073f011e3",
+      "originalSha256": "49e7aebeb3d81fd0cf13ec3c704b30bccbeb96c47f7e0218efb3bada2c346061",
+      "binding": "uncommitted Windows iteration"
+    },
+    {
+      "path": "windows-webkit-failed-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-desktop-webkit/error-context.md.gz",
+      "bytes": 4411,
+      "sha256": "449039f86e1a41c6d0b8c01e8d5ec111ab88c266037471a94212109e000b83b9",
+      "originalSha256": "6930aa12d5f7d7da87c70f9d5ee4a5462e187613d8fe7c0c5aad91e8adad9f66",
+      "binding": "uncommitted Windows iteration"
+    },
+    {
+      "path": "windows-webkit-failed-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-landscape-webkit/error-context.md.gz",
+      "bytes": 4409,
+      "sha256": "7342a2a07d725bd58fed4d7aa4c2219126d0cb0ec51503610c497246ea0103a2",
+      "originalSha256": "f5261da7e10dabc722f268a9b2b1693eecf601e118e50b451f5b335cdc4dbc04",
+      "binding": "uncommitted Windows iteration"
+    },
+    {
+      "path": "windows-webkit-failed-artifacts/ability-picker-Mage-real-F-e65e7-resume-without-attack-audio-portrait-webkit/error-context.md.gz",
+      "bytes": 4375,
+      "sha256": "8c8b19abf6be2a238d2e18fff10a51e1eba17b1272d1709800cd18661efda36c",
+      "originalSha256": "0c42d32e4558a43320937691c91b81c6340f7ff5101accad1296d17af76dfdd2",
+      "binding": "uncommitted Windows iteration"
+    },
+    {
+      "path": "linux-preflight.log.gz",
+      "bytes": 248,
+      "sha256": "7ad441c9d78f2fbe037f77dcd36752c4312e99229508f9e6b8b87a2736297fd9",
+      "originalSha256": "f9f4d951cc3ee4e3cb66c086860e1059859a70b9c25f325df1d6ed5bd90dbadd",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-build.log.gz",
+      "bytes": 2309,
+      "sha256": "c442cd05d95d240ba3a917764c399fbc3993dd524c10bb36d63d2e1d138b8d91",
+      "originalSha256": "6b3c730ac0164f78c07ae388d02372101e1e0bb221eaedcef3c46f4403c56193",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-mage-picker-webkit.log.gz",
+      "bytes": 606,
+      "sha256": "6da342e3047556f3eb894ff8c80fbc54df8e219422ad2c2c5ffc401d443436c0",
+      "originalSha256": "97eb1ef76e5059885adcd9eb98df5698fe1ce31369c35598dd1f7c8c8d692826",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-mage-desktop-journey.log.gz",
+      "bytes": 860,
+      "sha256": "e569a0f2992978b9e71ce0f9e068c4067e9d32f54b547aa59863742e0614a80f",
+      "originalSha256": "4607a1082a6854b3f1570d7afdb9ff5ca25e5df3ad1fcbc16a33b7aac3c152d0",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-provenance.json.gz",
+      "bytes": 22507,
+      "sha256": "b96cb80468f1db946d39940dd5e838b98dd0b2c2eca19ae346465c57cf1fe2cd",
+      "originalSha256": "57ca34652f4e9653d490995c1a1c6ab7ced5b3bf9c2960c04adffd0abd3be641",
+      "binding": "85191afe80ab8b76fc0059a32b522cc154bc82ba"
+    },
+    {
+      "path": "linux-desktop-journey-repair.log.gz",
+      "bytes": 513,
+      "sha256": "3680e5a8db56e1b827b64fb35b37a76187a2781aeab05f0cbc4de22c0b0c0e20",
+      "originalSha256": "fe5739a349d9ad2fb2a5bbcc584bb871b43b5f5366bfba8640009ad0e9979bb5",
+      "binding": "c8e83144eb79d2f56de3929095962b819d1a5980"
+    },
+    {
+      "path": "linux-repair-source.json",
+      "sha256": "46bc5f50c005968f55f29583a115e67b1e4c31f98478f071ce3ffd8ef7c40710"
+    }
+  ]
+}
