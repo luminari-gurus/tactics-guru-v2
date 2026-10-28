@@ -1,8 +1,10 @@
-import { atEncounter, atDownstairs, atStairApproach } from '../helpers/dungeonFixtures';
-import { freshExploration } from '../../src/domain/exploration';
+import { atEncounter, atDownstairs, atStairApproach, atCell } from '../helpers/dungeonFixtures';
+import { freshExploration, neighbors, poiCell } from '../../src/domain/exploration';
+import { generateMap } from '../../src/map/generate';
+import { HERO_PROGRESSION } from '../../src/content/progression';
 import { describe, expect, it, vi } from 'vitest';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
-import { freshDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { clearedDungeonSlots, freshDungeon, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity } from '../../src/content/dungeon';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -334,5 +336,111 @@ describe('confirmed dungeon charm disposal',()=>{
     m.setItem=()=>{throw Object.assign(Error('full'),{name:'QuotaExceededError'});};
     const current=session.snapshot;expect(session.dispatch({...dungeonBoundary(current),type:'discardEquipment',instanceId:current.ownership.equipment[0].instanceId})).toBe(true);
     expect(session.snapshot.ownership.equipment).toHaveLength(4);expect(session.status).toContain('unsaved');
+  });
+});
+
+describe('unordered encounters and moving dungeon enemies', () => {
+  const move = (s: DungeonState) => {
+    const f=s.floors[s.depth-1], map=generateMap(f.descriptor.seed,'rooms');
+    const destination=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n&&!clearedDungeonSlots(f).includes(p.encounterSlot)));
+    if(destination===undefined)throw Error('No safe step');
+    return good(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination}));
+  };
+  it('enters and clears slots 2, 0, 1 with the matching battle, rewards and save continuation', () => {
+    let s = fresh();
+    for (const [ordinal,slot] of [2,0,1].entries()) {
+      const f=s.floors[0], target=f.exploration.pois[slot], cell=target.y*20+target.x;
+      const map=generateMap(f.descriptor.seed,'rooms');
+      const previous=neighbors(cell).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>p.y*20+p.x===n));
+      if (previous===undefined) throw Error('No safe approach');
+      s=atCell(s,previous);
+      s=good(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination:cell}));
+      expect(s.phase).toBe('battle');
+      expect(s.floors[0].exploration.active).toBe(slot);
+      expect(s.activeBattle!.seed).toBe(dungeonSeed(s.seed,s.depth,'battle',slot));
+      const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);
+      const decoded=decodeDungeon(encoded.text);if(!decoded.ok)throw Error(decoded.reason);s=decoded.state;
+      const battle=s.activeBattle!;
+      s=good(acceptDungeonBattle(s,{...battle,outcome:'playerWin',units:battle.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)}));
+      expect(s.floors[0].completed).toBe(ordinal+1);
+      expect(s.floors[0].exploration.cleared).toEqual([2,0,1].slice(0,ordinal+1).sort());
+      if(s.offer) s=good(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:s.offer.options[0].itemId}));
+      s=atCell(s,previous);
+      s=good(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination:cell}));
+      expect(s.phase).toBe('ready');
+      const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);
+      const loaded=decodeDungeon(saved.text);if(!loaded.ok)throw Error(loaded.reason);s=loaded.state;
+    }
+    expect(s.floors[0].completed).toBe(3);
+  });
+  it('persists reproducible motion without moving cleared enemies or consuming battle RNG', () => {
+    const initial=fresh(), first=move(initial);
+    expect(first.floors[0].exploration.version).toBe('exploration-v2');
+    expect(first.floors[0].exploration.movement!.step).toBe(1);
+    expect(first).toEqual(move(initial));
+    expect(first.floors[0].descriptor).toEqual(initial.floors[0].descriptor);
+    const encoded=encodeDungeon(first);if(!encoded.ok)throw Error(encoded.reason);
+    const loaded=decodeDungeon(encoded.text);if(!loaded.ok)throw Error(loaded.reason);
+    expect(move(loaded.state)).toEqual(move(first));
+    expect(initial.floors[0].exploration.version).toBe('exploration-v1');
+    const unmovedBattle=good(startDungeonBattle(atEncounter(initial,0)));
+    const movedBattle=good(startDungeonBattle(atEncounter(first,0)));
+    expect(movedBattle.activeBattle).toEqual(unmovedBattle.activeBattle);
+  });
+  it('keeps cleared markers stationary and preserves a ready encounter under the player', () => {
+    let s=fresh();
+    s=good(startDungeonBattle(atEncounter(s,2)));
+    const battle=s.activeBattle!;
+    s=good(acceptDungeonBattle(s,{...battle,outcome:'playerWin',units:battle.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)}));
+    if(s.offer)s=good(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:s.offer.options[0].itemId}));
+    const cleared=s.floors[0].exploration.pois[2];
+    for(let i=0;i<5;i++) {s=move(s);expect(s.floors[0].exploration.pois[2]).toEqual(cleared);}
+    expect(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination:-1})).toEqual({ok:false,reason:'blockedStep'});
+    expect(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision-1,destination:-1})).toEqual({ok:false,reason:'staleBoundary'});
+  });
+  it('rejects malformed movable markers, completion state and RNG rather than admitting unsafe saves', () => {
+    const state=move(fresh()), f=state.floors[0], e=f.exploration;
+    const attempt=(exploration:typeof e)=>readDungeon({...state,floors:[{...f,exploration}]});
+    const overlap=e.pois.map((p,i)=>i===1?{...p,x:e.pois[0].x,y:e.pois[0].y}:p);
+    expect(attempt({...e,pois:overlap}).ok).toBe(false);
+    expect(attempt({...e,cleared:[2,2]}).ok).toBe(false);
+    expect(attempt({...e,cleared:[2]}).ok).toBe(false);
+    expect(attempt({...e,active:2}).ok).toBe(false);
+    expect(attempt({...e,movement:{...e.movement!,step:-1}}).ok).toBe(false);
+  });
+  it('continues an authenticated format-4 active battle and upgrades after victory', () => {
+    const initial=fresh(), started=good(startDungeonBattle(atEncounter(initial,0)));
+    const oldExploration={...initial.floors[0].exploration,revealed:started.floors[0].exploration.revealed,visited:started.floors[0].exploration.visited};
+    const legacyState={...started,floors:[{...started.floors[0],exploration:oldExploration}]};
+    const body={kind:'tactics-guru:dungeon',format:4,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:legacyState};
+    const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));if(!legacy.ok)throw Error(legacy.reason);
+    const battle=legacy.state.activeBattle!;
+    const won=good(acceptDungeonBattle(legacy.state,{...battle,outcome:'playerWin',units:battle.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)}));
+    expect(won.floors[0].exploration.version).toBe('exploration-v2');
+    expect(won.floors[0].exploration.cleared).toEqual([0]);
+    expect(won.floors[0].exploration.active).toBe(0);
+    expect(won.offer).not.toBeNull();
+  });
+  it('refuses an automatic movement write after another tab changes the saved dungeon', () => {
+    const m=memory(), initial=fresh(), firstStore=createDungeonStorage(()=>m), secondStore=createDungeonStorage(()=>m);
+    expect(firstStore.save(initial).ok).toBe(true);
+    const first=new DungeonSession(initial,firstStore), second=new DungeonSession(initial,secondStore);
+    expect(first.continue(first.inspect())).toBe(true);expect(second.continue(second.inspect())).toBe(true);
+    const before=second.snapshot, destination=move(before).floors[0].position;expect(first.step({id:before.id,depth:before.depth,revision:before.revision,destination})).toBe(true);
+    const primary=m.getItem(DUNGEON_KEYS.primary),backup=m.getItem(DUNGEON_KEYS.backup);
+    expect(second.step({id:before.id,depth:before.depth,revision:before.revision,destination})).toBe(false);expect(second.snapshot).toEqual(before);
+    expect(second.status).toContain('changed');
+    expect(m.getItem(DUNGEON_KEYS.primary)).toBe(primary);expect(m.getItem(DUNGEON_KEYS.backup)).toBe(backup);
+    expect(second.retry(second.inspect())).toBe(true); // Explicit recovery adopts the reviewed storage boundary.
+  });
+  it('reads an authenticated format-4 save and upgrades it only after movement', () => {
+    const s=fresh(), body={kind:'tactics-guru:dungeon',format:4,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
+    const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));
+    if(!legacy.ok)throw Error(legacy.reason);
+    expect(legacy.state.floors[0].exploration.version).toBe('exploration-v1');
+    const upgraded=move(legacy.state);
+    const next=encodeDungeon(upgraded);if(!next.ok)throw Error(next.reason);
+    expect(JSON.parse(next.text).format).toBe(5);
+    expect(decodeDungeon(next.text)).toEqual({ok:true,state:upgraded});
   });
 });

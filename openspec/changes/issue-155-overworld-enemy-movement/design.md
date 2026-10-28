@@ -95,7 +95,7 @@ Keep exact commands, final relevant source hashes/build ID, browser/runtime/host
 
 ## Migration Plan
 
-No saves, content identities, placement versions or dependencies change. Deliver one feature PR after explicit approval and verified acceptance; do not deploy or merge automatically. Reverting the feature removes movement without converting stored data. Keep OpenSpec unarchived until merge and a separate archive request.
+The caller subsequently expanded scope: dungeon enemies advance once per accepted player step and entering any live marker starts its encounter. Format 5 stores positions, cleared slots and movement RNG, and reads format 4; older builds cannot be assumed to read format 5. No placement versions or dependencies change. Deliver one feature PR after explicit approval and verified acceptance; do not deploy or merge automatically. Reverting the feature removes movement without converting stored data. Keep OpenSpec unarchived until merge and a separate archive request.
 
 ## Scope review
 
@@ -109,3 +109,7 @@ The caller requested implementation of the first five grouped review recommendat
 Pause is a view-local choice, initially false. The existing scheduler checks it; the control cancels the outstanding timeout, exposes its state, and resumes with a new full delay. It preserves the choice through regeneration, artwork, visibility and BFCache. No preference storage or new simulation state is needed. Ordinary unpaused behavior stays as approved. Hidden-time and artwork callbacks do not change the choice.
 
 Use the full affected map browser file after final runtime changes, then run both source-interception cases explicitly in dev mode (placement failure and direct disposer), plus root/prefix route checks. Preserve prior failed runs and add new source-bound receipts and reviewed screenshots separately. No full project regression is selected for these bounded map/view/test changes.
+
+## Dungeon integration (caller clarification)
+
+The `/map` prototype remains independent and encounter-free. In `/dungeon`, an accepted player step either enters the touched uncleared enemy battle or advances each live enemy once using the existing movement policy and a separate saved RNG. Waiting and rejected commands never advance movement. Position, enemy movement and entry are saved atomically in one revision. Encounters can be cleared in any order; descent requires all three. Continue validates format-4 saves and upgrades them on progress. Shared save and route changes require full regression under the verification policy.

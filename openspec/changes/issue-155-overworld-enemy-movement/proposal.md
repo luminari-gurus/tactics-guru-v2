@@ -24,7 +24,7 @@ None. The existing spec inventory contains battle contracts, not an overworld mo
 
 ## Impact
 
-Expected implementation files: new `src/map/movement.ts`, `src/map/view.ts`, `src/map/style.css` if legend layout needs adjustment, and the map branch of `src/main.ts` for disposal. Extend `tests/unit/overworldMap.test.ts` and `tests/overworld-map.spec.ts`; update `docs/overworld-map.md` and add task-specific QA evidence. Preserve `src/map/state.ts`'s marker shape and placement output because dungeon exploration extends that type. No dependencies, player movement, combat triggers, persistence, terrain-generation changes or dungeon enemy simulation.
+Expected implementation files: new `src/map/movement.ts`, `src/map/view.ts`, `src/map/style.css` if legend layout needs adjustment, and the map branch of `src/main.ts` for disposal. Extend `tests/unit/overworldMap.test.ts` and `tests/overworld-map.spec.ts`; update `docs/overworld-map.md` and add task-specific QA evidence. Preserve `src/map/state.ts`'s marker shape and placement output because dungeon exploration extends that type. The caller subsequently expanded this PR to include player-driven dungeon enemy movement, unordered encounters and durable progress; `/map` remains encounter-free. No terrain-generation changes or dependencies are required.
 
 Issue owner/caller: `dubstylee`. Branch: `work/issue-155-overworld-enemy-movement`, published from `origin/main` at `d5b19279a869501205e98856ebd5e5f91f8c287d`. Prerequisite #154 / PR #156 is merged into that base. Physical availability: none (local CAN_TEST_MOBILE missing/invalid); required physical platforms: none. Browser/device emulation satisfies acceptance.
 

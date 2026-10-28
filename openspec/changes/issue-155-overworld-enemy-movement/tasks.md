@@ -40,3 +40,10 @@ The caller explicitly requested the first five grouped fixes from the feedback a
 - [x] 4.6 Run affected units, build/type/content, full map preview and explicit dev interception cases plus root/prefix routing on final relevant inputs; retain failures and new receipts/screenshots, update PR #246 and confirm published branch parity without merge.
 
 Review follow-up delivered on PR #246; all five requested groups verified on runtime/test source `8dbed57`. Subsequent changes retain QA evidence and task status only.
+
+## 5. Dungeon integration (caller clarification)
+
+- [x] 5.1 Advance dungeon enemies only on accepted player steps; entering any uncleared marker starts that enemy's battle, and all three victories unlock descent.
+- [x] 5.2 Persist positions, independent movement RNG and unordered completion in format 5, preserving format-4 continuation and stale-save protection.
+- [ ] 5.3 Verify affected domain and browser flows, save migration, device emulation and required full regression; retain failures and source identity.
+- [ ] 5.4 Update PR #246 after verification.
