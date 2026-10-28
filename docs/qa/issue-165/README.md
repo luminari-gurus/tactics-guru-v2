@@ -52,6 +52,8 @@ evidence rather than reused as final acceptance. The Linux repair source manifes
 is reconstructed from the actual committed Git blobs and the full-input manifest;
 the only verification-input change from that repair to the full-run source is the
 strengthened Mage unit assertion. Application/build inputs are identical.
+Byte-hashed text artifacts are compressed so checkout line-ending conversion
+cannot change their stored or original-byte hashes.
 
 The ignored original Windows reports remain in `tmp/issue165-*.json`.
 The explicit WebKit run also retains its original artifacts under `tmp/issue165-mage-picker-webkit/`.
