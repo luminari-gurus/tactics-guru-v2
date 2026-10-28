@@ -52,6 +52,20 @@ Final durable receipts/screenshots will use unique directories and be retained h
 
 ## Remaining qualification
 
+Clean Linux source `85191afe80ab8b76fc0059a32b522cc154bc82ba` installed via
+`npm ci` (zero audit vulnerabilities), built successfully, and passed all **6/6**
+new real-media WebKit Mage picker selections with no skips/retries. Relevant input
+hash: `d36f7b85300e91680a6b96ddf2a3c94c8620af06fc60f51b9f4bf74fdf41a214`;
+build inventory hash: `6a0f9eb48d2afb17943462986a39cc5ef5697fca72f43fd7f0094e89062af68c`.
+The first desktop production witness failed during floor-2 navigation after
+earning level 3: `walkDungeon` planned through an enabled upstairs tile, causing
+an unintended ascent (expected destination 114, transition at cell 113). Its
+failure JSON/log/context are retained in Linux `tmp/issue165/mage-desktop-journey*`.
+The bounded helper repair avoids enabled transit stairs except when explicitly
+requested, preserving normal keyboard/touch movement and stair-entry assertions.
+The existing synthetic Mage progression browser cases also now expect the real
+Snare option at level 3+. Both repairs will be exercised in their owning selections.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all
