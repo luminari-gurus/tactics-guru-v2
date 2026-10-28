@@ -1,9 +1,9 @@
 # Issue #165: Mage adaptation and Frost Snare
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: planning complete; implementation has
-not started. This request authorizes backlog selection, assignment, the pickup
-comment, this plan and branch publication. All implementation acceptance below
-remains outstanding.
+Date: 2026-10-28 (Asia/Jerusalem). Status: implementation in progress under the
+caller's explicit goal authorization. OpenSpec change `issue-165-mage-frost-snare`
+tracks implementation and acceptance. No application acceptance is claimed until
+the evidence below is completed.
 
 - Issue: [#165](https://github.com/luminari-gurus/tactics-guru-v2/issues/165).
 - Assignee: `moshehbenavraham`, verified through both authenticated GitHub clients.
@@ -95,7 +95,8 @@ Missile, Ranger Pin, Mark, Fighter actions and ordinary movement/turn behavior.
 
 ## Rules selected for the implementation plan
 
-These are proposed v2 rules for plan review, not claims of implemented behavior.
+These selected v2 rules guide implementation. Acceptance evidence is tracked below
+and in [the QA record](../qa/issue-165/README.md).
 
 ### Arc Bolt consolidation and Magic Missile
 
@@ -182,8 +183,8 @@ Keep only the shared movement-block change needed by two real consumers, the
 Mage catalog/unlock, correct feedback, save identity/recovery, tests and rule docs.
 Consolidating Arc Bolt removes a redundant automatic-force attack and avoids
 competing missile implementations. Generalizing the existing Pin path avoids
-a second immobilization lifecycle. A single requested plan is sufficient for
-this bounded adaptation; duplicate proposal/design/task documents add no decision.
+a second immobilization lifecycle. The caller subsequently requested OpenSpec;
+the change artifacts track this plan's rules and tasks without reopening settled decisions.
 
 Drop generic effect scripting, arbitrary stacking/durations, new save migrations,
 spell resistance/typed-damage systems, tabletop class-stat progression, area
@@ -224,7 +225,7 @@ claim their whole trackers complete, or add unrelated documentation cleanup.
    `docs/signature-abilities.md`, `docs/combat-effects.md`, `docs/hero-progression.md`
    and a bounded `docs/qa/issue-165/README.md` evidence record. Update affected
    canonical OpenSpec rules only where an existing current scenario changes;
-   this planning commit does not initialize an additional change workflow.
+   OpenSpec change `issue-165-mage-frost-snare` now tracks the authorized implementation.
    Finish acceptance audit, commit/push implementation and prepare a focused PR
    when implementation is requested.
 
@@ -332,3 +333,15 @@ deadline. Runner queue/offline waiting, review and deployment are excluded.
 Allow **10–12 hours** if legal Mage progression, save-fixture updates or WebKit/
 base regressions require substantive repair. The plan is grounded in the current
 source and suite inventory; no fresh implementation timing benchmark was run.
+
+## Implementation handoff (2026-10-28)
+
+- Current source base: e2f0cddd5037cd36d24442ebb099b5225fd9bc33; clean at start, remote parity verified after fetch. No feature PR yet.
+- Using ablation and OpenSpec apply, schema spec-driven; 1/5 tasks complete. See `openspec/changes/issue-165-mage-frost-snare/tasks.md`.
+- Exact-base battle (state 3/rules 4), run-5 and dungeon-6 bytes captured under `tests/fixtures/saves/issue-165/` before modifying readers. Temporary capture unit passed and was removed.
+- Core rules and save work is implemented: bounded movementBlock source/ability reference, Frost Snare catalog/validation, shared control preview/resolver/cleanup, ability-aware events and versions. Both type scopes and 352 focused tests passed; rule docs and existing Pin consumers are updated. No runtime alias/parallel Pin implementation remains.
+- npm and OpenSpec exist outside PATH. npm bin: `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin`; cached OpenSpec CLI: `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js` (run with Node).
+- Required work remaining: focused units/types/build, real Mage picker and earned production journey, full policy qualification, QA evidence/docs, final commits/push/ready PR. Do not treat the captured-fixture test as feature acceptance.
+- The standalone build passed (221 content checks plus both type scopes). Mage seed-17 legal witness reaches level 3, uses both actions, and ends in defeat; pure replay passed. New Chromium picker checks passed with one retained cold-navigation failure followed by its targeted pass. Windows WebKit real-media preconditions fail because MP3 is unavailable; WSL Linux is the existing supported real-media route. See the QA record for all retained failures.
+- Next: commit/push this coherent implementation for fixed source identity; clone it into a fresh WSL `/tmp/tactics-issue-165-20261028` checkout and reuse the existing lockfile-compatible Linux dependency/browser installation. Use the unchanged, guarded `docs/qa/issue-164/wsl-vite-bind.cjs` adapter if port 4173 requires wildcard bind. The established `docs/qa/issue-164/webkit-fixtures.config.ts` selects real WebKit fixture cases; no new permanent config is needed.
+- Windows nested npm needs the ignored `tmp/issue165-bin/npm.cmd` wrapper invoking the npm CLI directly. Chromium override is `C:/Users/apexw/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe`. Do not relax audio assertions/timeouts for Windows limitations; retain original reports and qualify in Linux.

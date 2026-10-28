@@ -37,8 +37,8 @@ UI does not independently unlock actions. Existing signatures remain level 1.
 Second Wind unlocks at Fighter level 2 and Taunt at level 3 under #163; see
 [their rules](signature-abilities.md#fighter-progression-163). Ranger level 2
 unlocks Mark Target and level 3 unlocks Pinning Shot under #164; see
-[their rules](signature-abilities.md#ranger-progression-164). Mage additions remain
-#165; absent abilities are not advertised as learned. Broader non-HP class
+[their rules](signature-abilities.md#ranger-progression-164). Mage level 3 unlocks Frost Snare under #165; Arc Bolt is consolidated into level-1
+Magic Missile, without a separate level-2 skill. See [Mage rules](signature-abilities.md#mage-progression-165). Broader non-HP class
 advancement remains #185.
 
 The HP increments and level boundaries adapt the
@@ -49,14 +49,14 @@ imported into this slice.
 
 ## Save compatibility
 
-Run state format 2 / envelope 5 and dungeon envelope 6 bind progression rules to
+Run state format 2 / envelope 6 and dungeon envelope 7 bind progression rules to
 save identities. Older run/dungeon formats are incompatible: inspection preserves
 raw primary/backup bytes for export/recovery instead of reconstructing past awards
 or silently resetting heroes. Return to the originating build to continue an old
 save; export it before explicitly replacing it. Older code cannot be assumed to
 read the new formats. Standalone catalogs explicitly project the level-1 party;
-battle state format 3 / rules 4 apply across routes, while the standalone save
-wrapper remains format 1. Mark/Pin source references are battle-local and do not
+battle state format 4 / rules 5 apply across routes, while the standalone save
+wrapper remains format 1. Mark and shared Pin/Snare source references are battle-local and do not
 enter the carried progression records.
 
 Party and battle inspection show level, XP/next threshold (or MAX), learned actions

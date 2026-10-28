@@ -55,6 +55,21 @@ export function rangerDecision(state:BattleState,catalog:ContentCatalog,used:{ma
   return decision;
 }
 
+/** Mage witness casts one learned Snare, then preserves the established combat policy. */
+export function mageDecision(state:BattleState,catalog:ContentCatalog,snareUsed:boolean):Command {
+  const actor=state.units.find(u=>u.id===state.initiative[state.activeIndex])!;
+  if(actor.defId==='mage'&&!actor.hasActed&&!snareUsed&&catalog.abilities['ability:frost_snare']) {
+    const targets=state.units.filter(u=>u.side==='enemy'&&u.hp>0);
+    for(const target of targets){const command={type:'useAbility' as const,unitId:actor.id,abilityId:'ability:frost_snare' as const,target:{unitId:target.id}};if(previewAbility(state,command,catalog).ok)return command;}
+    const reach=previewMovement(state,actor.id,catalog);
+    if(!actor.hasMoved&&reach.ok)for(const cell of reach.cells.filter(c=>c.cost>0)) {
+      const move={type:'move' as const,unitId:actor.id,to:cell.cell},result=moveUnit(state,move,catalog);if(!result.ok)continue;
+      if(targets.some(target=>previewAbility(result.state,{type:'useAbility',unitId:actor.id,abilityId:'ability:frost_snare',target:{unitId:target.id}},catalog).ok))return move;
+    }
+  }
+  return fighterDecision(state,catalog,true);
+}
+
 /** Test-only policy. Longer dungeon witnesses can prioritize finishing enemies and safer firing positions; established callers keep their policy. */
 export function playerDecision(state:BattleState, catalog:ContentCatalog = standaloneCatalog, finishTargets = false):Command {
   const actor=state.units.find(u=>u.id===state.initiative[state.activeIndex])!;

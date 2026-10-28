@@ -40,7 +40,12 @@ export type RangerAbility = {
   | { readonly kind: 'markTarget'; readonly accuracyBonus: 2; readonly duration: 'nextPlayerAttackRoll' }
   | { readonly kind: 'pinningShot'; readonly duration: 'targetTurnEnd' }
 );
-export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility;
+export interface FrostSnareAbility {
+  readonly id: AbilityId; readonly kind: 'frostSnare'; readonly owners: readonly UnitId[];
+  readonly requiredLevel: number; readonly rangeMin: number; readonly rangeMax: number;
+  readonly target: 'hostile'; readonly duration: 'targetTurnEnd';
+}
+export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility;
 export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock';
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */

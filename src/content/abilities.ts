@@ -21,4 +21,6 @@ export const attackAbilities = {
     rangeMin: 2, rangeMax: 5, target: 'hostile', accuracyBonus: 2, duration: 'nextPlayerAttackRoll' },
   'ability:pinning_shot': { id: 'ability:pinning_shot', kind: 'pinningShot', owners: ['ranger'], requiredLevel: 3,
     rangeMin: 2, rangeMax: 5, target: 'hostile', duration: 'targetTurnEnd' },
+  'ability:frost_snare': { id: 'ability:frost_snare', kind: 'frostSnare', owners: ['mage'], requiredLevel: 3,
+    rangeMin: 2, rangeMax: 4, target: 'hostile', duration: 'targetTurnEnd' },
 } as const satisfies Readonly<Record<AbilityId, Ability>>;

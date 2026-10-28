@@ -2,7 +2,7 @@ import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/ex
 import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
-import { playerDecision, fighterDecision, rangerDecision } from './playerPolicy';
+import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
 import type { Command } from '../../src/domain/types';
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounterPolicy } from '../../src/domain/dungeonEncounters';
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
@@ -145,6 +145,31 @@ export function rangerJourney(seed:number) {
     // Continue to a terminal boundary after proving both actions; a finite witness may end in victory or defeat.
     if(used.mark&&used.pin)return {seed,records,state,used};
     state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
+  }
+  return {seed,records,state,used};
+}
+
+/** Current-source Mage combat witness; browser acceptance enacts all spatial steps and commands. */
+export function mageJourney(seed:number) {
+  let state=freshDungeon('mage-production-journey',seed);
+  const used={snare:false,missiles:false},records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
+  for(let depth=1;depth<=3;depth++) {
+    for(let slot=0;slot<3;slot++) {
+      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
+      for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+        if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}
+        const command=mageDecision(battle.state,built.catalog,used.snare);if(!battle.prepare(command).ok)throw Error('Mage witness rejected');
+        const p=battle.confirm();if(!p)throw Error('Mage witness stalled');battle.finishPresentation(p.token);
+        if(command.type==='useAbility'&&command.abilityId==='ability:frost_snare')used.snare=true;
+        if(p.events.filter(e=>e.type==='missileRolled').length>=2)used.missiles=true;
+      }
+      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      state=checkedDungeon(acceptDungeonBattle(state,battle.state));
+      if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
+      for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
+    }
+    if(depth<3)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
   }
   return {seed,records,state,used};
 }

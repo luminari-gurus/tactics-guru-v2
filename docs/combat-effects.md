@@ -5,17 +5,19 @@ approved [#161 staged change](../openspec/changes/issue-161-combat-effects/propo
 The #164 Ranger consumer builds on main `56e2b0d`; it enables the cases below
 without claiming delivery of every downstream effect.
 
-## Enabled runtime: Guarded, Second Wind, Taunt, Mark and Pin
+## Enabled runtime: Guarded, Second Wind, Taunt, Mark, Pin and Snare
 
 Issue #163 activates the bounded Heal/Uses/Taunt handoffs below. See [the current Fighter rules](signature-abilities.md#fighter-progression-163). `secondWindUsed?: true` stores one spent Fighter use; `tauntedBy?: number` stores one living opposing Fighter source on a living enemy. Exact readers reject malformed values and ineligible profiles/references. Pure previews, dispatch, AI and inspection share these rules; accepted events drive logs and floating feedback. Taunt expires at target endTurn or source/target defeat. No generic status/resource framework is added.
 
 Issue #164 activates Mark and movement blocking through [the Ranger rules](signature-abilities.md#ranger-progression-164).
-`markedBy?: number` and `pinnedBy?: number` reference one living opposing Ranger
-with the corresponding learned profile. Mark grants +2 to the next accepted
+`markedBy?: number` references one living opposing Ranger with the learned Mark
+profile. Pin and Frost Snare now share `movementBlock?: {sourceId, abilityId}`;
+exact readers admit only learned Pin/Ranger and Snare/Mage ownership. Mark grants +2 to the next accepted
 player attack roll and is consumed even on miss; automatic missiles do not use it.
-Pin blocks ordinary movement through target endTurn while permitting attack/Wait.
-An existing Pin rejects reapplication. Both clear on source/target defeat and
-new-battle construction; distinct targets and both cases can coexist. Their
+Pin/Snare block ordinary movement through target endTurn while permitting attack/Wait.
+Either rejects an existing movement block without stacking, replacing or refreshing.
+Mark and movement blocks clear on source/target defeat and new-battle construction;
+distinct targets and Mark plus one movement block can coexist. Their
 previews spend nothing and all damage paths perform defeat cleanup. Current
 goblins have no immunity; no dormant immunity/forced-movement engine is added.
 
@@ -31,12 +33,12 @@ The optional `guarded: true` field is a stored effect; it is a finite boolean, n
 | Heal | Living eligible target only; reject full HP; clamp once to projected max HP; no RNG unless profile explicitly requires it | #163 Second Wind / #166 Heal Goblin / #172 item; each owns amount, uses and action cost |
 | Mark | One mark per target, newest replaces; next qualifying player attack roll gains +2 and consumes even on miss; previews and automatic missiles do not consume; target/source defeat removes | #164; source-death cleanup is the approved v2 adaptation |
 | Taunt | One living hostile source; restrict offensive targets to source; allow legal approach or Wait if unreachable; remove on source/target defeat; replace same case | #163; duration anchored to target turn boundary and reviewed in its plan |
-| Movement block | Pin keeps only origin reachable, rejects ordinary moves without spending, permits attack/Wait; target endTurn or source/target defeat expires; already pinned rejects | #164 enables Pin; #165 owns Frost Snare's later consumer |
+| Movement block | Pin/Snare keep only origin reachable, rejects ordinary moves without spending, permits attack/Wait; target endTurn or source/target defeat expires; already blocked rejects without stacking, replacement or refresh | #164 enables Pin; #165 enables Frost Snare |
 | Accuracy/AC debuff | Add bounded integer modifier once through shared projection; same identity replaces, distinct permitted identities add within derived bounds | #166 weakened / #168 exposure; no guessed DC/duration in this increment |
 | Finite stack | Explicit identity/source/target and cap; add only on consumer's successful trigger; reject overflow in saved input, saturate legitimate gain | #168 frenzy: cap 3, +1 accuracy per stack; trigger/expiry decided with its real profile |
 | Uses | Per-ability finite nonnegative integer remaining uses; whole-command validation before decrement; fresh-battle reset; save mid-battle | #163 Second Wind; no inert resources map now |
 
-Guarded, Second Wind healing/uses, Taunt, Mark and Pin are enabled. Other cases
+Guarded, Second Wind healing/uses, Taunt, Mark, Pin and Snare are enabled. Other cases
 remain specified handoffs. Unsupported status/resource fields and ability kinds
 reject through exact-shape readers/validators. There is no general effect script,
 unused resource map or test-only action in production. Future profile amounts,
@@ -52,8 +54,8 @@ Proposed saves are d20 + the chosen save modifier >= DC, without automatic natur
 
 ## Persistence and acceptance gates
 
-Issue #164 advances battle state to format 3/rules 4, run envelope to 5 and dungeon
-envelope to 6 (following #163's 2/3, 4 and 5 respectively); standalone wrapper and
+Issue #165 advances battle state to format 4/rules 5, run envelope to 6 and dungeon
+envelope to 7 (following #164’s 3/4, 5 and 6 respectively); standalone wrapper and
 RNG remain 1. Earlier saves are incompatible and retain recovery/export of original
 bytes. Historical defeated-unit `guarded` flags are read without normalization
 before digest checking; projection treats them as inactive. Inspection does not

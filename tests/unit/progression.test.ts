@@ -20,6 +20,17 @@ import { createRun, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { authoredRun, runCatalog } from '../../src/content/encounters';
 
 describe('bounded progression',()=>{
+  it('consolidates Arc Bolt into level-one Magic Missile and learns Frost Snare only at level three',()=>{
+    for(const [xp,level,count] of [[0,1,1],[60,2,1],[179,2,1],[180,3,2],[360,4,2],[600,5,3]]) {
+      const party=HERO_IDS.map(id=>progressHero(id,xp,1,catalog)),projected=projectProgression(party,catalog),mage=party.find(h=>h.heroId==='mage')!;
+      expect(mage.level).toBe(level);expect(mage.learned.includes('ability:magic_missile')).toBe(true);
+      expect(mage.learned.includes('ability:frost_snare')).toBe(level>=3);expect(mage.learned.includes('ability:arc_bolt')).toBe(false);
+      expect(Boolean(projected.abilities['ability:frost_snare'])).toBe(level>=3);
+      const profile=projected.abilities['ability:magic_missile'];expect(profile.kind).toBe('magicMissile');
+      if(profile.kind==='magicMissile')expect(Math.min(5,Math.floor((profile.casterLevel+1)/2))).toBe(count);
+      if(level<3){const s=abilitySession('mage',projected);expect(dispatch(s.state,{type:'useAbility',unitId:s.active.id,abilityId:'ability:frost_snare',target:{unitId:4}},projected)).toEqual({ok:false,reason:'unknownAbility'});}
+    }
+  });
   it('learns and exposes Ranger Mark at level two and Pin only at level three',()=>{
     for(const [xp,level] of [[0,1],[59,1],[60,2],[179,2],[180,3],[600,5]]) {
       const party=HERO_IDS.map(id=>progressHero(id,xp,1,catalog)),projected=projectProgression(party,catalog);
