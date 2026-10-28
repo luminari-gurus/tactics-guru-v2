@@ -105,7 +105,7 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
     const distance = manhattanDistance(cell, target.cell);
     if (occupied.has(cellKey(cell)) || !catalog.terrains[cell.terrainId].walkable || distance < ability.rangeMin ||
       distance > ability.rangeMax || lineOfSightBlocked(catalog, map.id, cell, target.cell)) continue;
-    if (ability.kind !== 'attack' && supportScore({ ...state, units: state.units.map(u => u.id === unitId ? { ...u, cell } : u) },
+    if (ability.kind !== 'attack' && supportScore({ ...state, units: state.units.map(u => u.id === unitId ? { ...u, cell: { x: cell.x, y: cell.y } } : u) },
       { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } }, target) <= 0) continue;
     const cost = fromOrigin.get(cellKey(cell));
     if (cost !== undefined) goals.push({cell, cost, targetId: target.id, abilityId: ability.id});

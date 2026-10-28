@@ -107,6 +107,23 @@ src/public/tests/scripts/config/package differences between its source `4f8c194`
 and literal base `7cea1e9`; that existing baseline evidence is reused, rather
 than claiming the new failure was pre-existing or rerunning a base matrix.
 
+During the final coverage audit, the original support-approach fixture was
+strengthened to put an injured ally opposite all attack goals. It exposed a real
+implementation defect: hypothetical support goals passed an entire MapCell as
+UnitState.cell, so exact x/y admission rejected the preview. The one-line repair
+projects `{x,y}`; the reader remains strict. All **45 AI + 14 dungeon-battle tests**
+and both type scopes pass. The original aggregate remains frozen at its checkpoint;
+it does not qualify this newly exercised branch.
+
+Complete before/after consumer packets are equal for Ranger 1, Mage 17, Shaman 3,
+guardian 4, the healed Fighter boundary and dynamically selected victory fixtures:
+commands, events, states/RNG, progression/party and replay data. Canonical hashes
+are retained in `tmp/issue166/consumer-equivalence.json` pending the final ledger.
+Static reach is the non-attack support-goal branch only; standalone/short-run
+rosters have no Shaman and ordinary-enemy planning is untouched. Fresh final-source
+units/build/header/base-path/performance and Shaman/Fighter six-profile checks
+will accompany reuse of demonstrably unchanged consumer histories.
+
 ## Source and export evidence
 
 Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. Asset registry:

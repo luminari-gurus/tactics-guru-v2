@@ -86,9 +86,10 @@ it.each(['ability:pinning_shot','ability:frost_snare'] as const)('movement-block
 it('approaches useful support goals, skips defeated/already-Weakened/immune/zero-value targets and waits when none are reachable',()=>{
   const {catalog:base,state:initial}=supportSetup();
   const catalog:ContentCatalog={...base,enemies:{...base.enemies,goblin_shaman:{...base.enemies.goblin_shaman,stats:{...base.enemies.goblin_shaman.stats,move:1}}}};
-  const state={...initial,versions:{...initial.versions,content:contentVersion(catalog)},units:initial.units.map(u=>u.id===3?{...u,cell:{x:10,y:0}}:
-    u.id===4?{...u,hp:4,cell:{x:0,y:1}}:u.id===2?{...u,hp:0}:u.side==='player'?{...u,weakenedBy:3}:u)};
-  const plan=commands(state,catalog);expect(plan[0]).toEqual({type:'move',unitId:3,to:{x:9,y:0}});expect(plan.at(-1)).toEqual(wait);
+  const state={...initial,versions:{...initial.versions,content:contentVersion(catalog)},units:initial.units.map(u=>u.id===3?{...u,cell:{x:5,y:0}}:
+    u.id===4?{...u,hp:4,cell:{x:11,y:1}}:u.id===2?{...u,hp:0}:u.side==='player'?{...u,weakenedBy:3}:u)};
+  // The useful ally is right of the caster; ordinary attack goals lead left. Only support approach chooses right.
+  const plan=commands(state,catalog);expect(plan[0]).toEqual({type:'move',unitId:3,to:{x:6,y:0}});expect(plan.at(-1)).toEqual(wait);
   expect(plan.some(c=>c.type==='useAbility')).toBe(false);checkLegal(state,catalog,plan);
   const exhausted=changeUnit(state,3,{hasMoved:true});expect(commands(exhausted,catalog)).toEqual([wait]);
   const noAbilities={...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).map(([id,a])=>

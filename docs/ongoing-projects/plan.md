@@ -167,6 +167,53 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
   avoiding a redundant base matrix. Current Ranger seed-1 browser trace also
   naturally proves a successful Shaman Will save (17 vs DC 12), supplementing
   Shaman seed 3's failed save without another test case.
+- Repair checkpoint: local commit `baa1402` (not pushed yet); only tests and
+  handoff docs differ from `4e765f8`. Both type scopes pass. Keep the Linux
+  checkout frozen until its original run ends. Then fetch its local Windows
+  origin and check out the repair commit, retaining the qualified `dist/` because
+  application/build/asset inputs are unchanged. Run the repaired case serially:
+  `npx --no-install playwright test tests/dungeon.spec.ts -g '^Fighter legal progression'`
+  and the same command with `-c playwright.exploration.config.ts` (three profiles
+  each). Capture expanded unit JSON once after this new pure Fighter case;
+  `vitest list --json` groups parameterized declarations (542 entries), so it is
+  discovery metadata, not the 1,048 executed-case inventory. Final repaired unit
+  selection is expected to contain 1,049 cases; verify the actual count.
+- Final ledger must retain the original aggregate failure and separately bind
+  focused repair results to their changed test inputs. Reuse unchanged consumers
+  with an explicit dependency comparison; do not rerun the full matrix for this
+  seed-only repair or relabel the original run clean. Complete QA/tasks, strict
+  validation, commit/push and mark #252 ready only after remaining gates pass.
+- Input comparison is retained in `tmp/issue166/repair-scope.json`: only
+  `tests/dungeon.spec.ts`, `tests/helpers/dungeonFixtures.ts` and
+  `tests/unit/dungeonBattle.test.ts` differ logically between the qualified Linux
+  checkout and repair checkpoint; other raw differences are line endings. A
+  metadata-only watcher (unified session 49387) captures `prefix-build.json` and
+  `after-full.json` into Linux `tmp/issue166/` when those stages finish. It runs
+  no browsers and refuses to mislabel restored-root bytes as a missed prefix.
+- **Latest bounded runtime repair (supersedes the seed-only build-reuse note):**
+  strengthening the support-approach fixture revealed that AI goal previews passed
+  whole map cells as unit positions, including terrain/elevation. Exact state
+  admission correctly rejected them, leaving support approach goals unused.
+  `src/domain/ai.ts` now projects only `{x,y}` for that hypothetical position.
+  The revised unit requires movement toward an injured ally opposite the hostile
+  attack goals, so ordinary approach cannot accidentally satisfy it. All 45 AI
+  and 14 dungeon-battle tests (59 total), plus both type scopes, pass.
+- The original Linux run remains frozen at `4e765f8`; continue it and preserve all
+  original failures. Final source needs a fresh build after this one-line repair.
+  Static reach is only the support-goal branch (Shaman); ordinary-enemy decisions,
+  turn/RNG/save contracts and renderer/transport code are unchanged. Full legal
+  old/new consumer traces are being compared in ignored `tmp/issue166/` to bound
+  reuse. After the original run, qualify fresh units/build/header/base-path/perf
+  obligations and Shaman/Fighter six-profile cases; expand any consumer whose
+  trace differs. Do not claim the old build qualified the repaired branch.
+- Before/after complete consumer packets are **identical** for Ranger seed 1,
+  Mage seed 17, Shaman seed 3, the six-battle guardian seed 4, healed Fighter
+  boundary and dynamically selected victory boundaries. This includes commands,
+  events, states/RNG, party/progression and replay data, recorded in
+  `tmp/issue166/consumer-equivalence.json` with canonical hashes and both capture
+  logs/packets. These equivalent histories justify reusing the original long
+  Mage/Ranger UI runs; fresh Shaman/Fighter six-profile checks and changed build/
+  asset/performance obligations still run after the original aggregate.
 - Environment: Windows Node and installed Windows dependencies work; WSL provides
   npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
   and browser runs; do not replace the shared installed node_modules.
