@@ -120,6 +120,17 @@ against the final JSON report. Raw report/log, before-source identity and all
 three Mage traces/screenshots are retained with hashes under `full-run/`.
 The aggregate has moved to the 87-case dev fixture stage.
 
+The [fixture/placement component](full-run/fixtures-placement-component.json)
+has also finished: **87/87 fixtures** and **3/3 dev placement cases** passed,
+without skips, failures, retries or flaky results. Actual IDs match discovery;
+the three executed dev IDs exactly match the three preview skips above. All six
+new Mage picker/gate executions passed on frozen full-run source. Eight aggregate
+stages are now complete (tooling, 1,012 units, types, both build integrations,
+root bundle, Chromium, fixtures and dev placement). Verification input hash is
+still `362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420`,
+and the tested Linux tree remains clean. Raw logs/reports and final-source Mage
+picker screenshots are retained under `full-run/`. WebKit acceptance is running.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all
