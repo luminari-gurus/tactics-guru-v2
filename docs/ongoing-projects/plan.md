@@ -126,10 +126,47 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
   `docs/qa/issue-166/iteration/`. Current checkpoint is ready for publication as a
   dependent draft while Linux WebKit and full qualification proceed. Browser
   evidence binds the dirty source/build at `56b0c8c`; immutable inputs are recorded.
-- Next: commit/push the runtime checkpoint and open its dependent PR; use a clean
-  Linux checkout for WebKit/full verification without replacing Windows dependencies.
+- Next: finish the clean Linux WebKit/full verification without replacing Windows dependencies,
+  reconcile failures with proportional repairs, then publish final review readiness.
   Prior Linux checkout `/tmp/tactics-issue-165-20261028` and engine caches exist,
   but old results do not qualify changed Shaman runtime. Keep browser/GPU work serial.
+- Runtime checkpoint is now committed/pushed at `4e765f89bf84ae2651f6a571f8b8370c4dd35d36`.
+  [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252) targets the
+  #251 branch and is draft/mergeable while qualification proceeds. No runtime/test
+  inputs changed after the Chromium pass (recorded input hash
+  `a6ce2adf4ffd5ba5529f05fcfcf92bad7fb742b68e45aad829da00882c211886`).
+- Linux qualification checkout: `/tmp/tactics-issue-166-20261029`, clean detached
+  `4e765f8`, Node 24.15.0/npm 12.0.2, independently installed Linux dependencies;
+  Windows dependencies are untouched. `npm ci` passed (zero audit vulnerabilities);
+  npm blocked the unused PostHog CLI postinstall under its existing allowScripts
+  policy. Initial smoke failed before tests because no dist bundle existed in the
+  fresh clone. Pilot build and corrected browser setup are in progress, with logs
+  in its `tmp/issue166/` and `verification-receipts/browser-runs/`.
+- Corrected Linux setup now passes Chromium and WebKit smoke (2/2). The original
+  full command `npm run verify:full` is running against clean `4e765f8`, unified
+  execution session 33257. Reports:
+  `/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+  `summary.json` updates per stage; `tmp/issue166/full-launch.log` tracks progress.
+  Tooling, units, typecheck, build integrations and root bundle passed; Chromium
+  is in progress. Before/full-root input/build inventories are in that checkout's
+  `tmp/issue166/{before-full,during-full-root}.json`. Do not start parallel browser
+  work. Capture prefix inventory when its stage begins, then restored root and
+  after-source inventory. Preserve this original run even if focused repairs follow.
+- Original full-run Chromium found a Fighter witness regression at seed 190:
+  healing occurs, but the party loses at depth 2/slot 0 before Taunt, rather than
+  the expected depth 2/slot 2 terminal boundary. Do not erase this failure. A legal
+  pure search found seed **17**, retaining all six battles, both actions, level 3,
+  terminal position and exact replay. Test-only repair is prepared in the Windows
+  checkout (`fighterJourney` shared by unit/browser); its new targeted unit passes.
+  After the original serial run finishes, run only this repaired browser case in
+  three Chromium and three WebKit profiles. Application source/assets are unchanged.
+- Literal base `7cea1e9` has no differences in src/public/tests/scripts/config/
+  package inputs from the retained qualified source `4f8c194`; the prior raw
+  `docs/qa/issue-165/full-run/chromium.json.gz` records the Fighter case passing
+  all three profiles. This is valid baseline reuse for the changed witness,
+  avoiding a redundant base matrix. Current Ranger seed-1 browser trace also
+  naturally proves a successful Shaman Will save (17 vs DC 12), supplementing
+  Shaman seed 3's failed save without another test case.
 - Environment: Windows Node and installed Windows dependencies work; WSL provides
   npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
   and browser runs; do not replace the shared installed node_modules.

@@ -136,6 +136,32 @@ export function shamanJourney(seed = 3) {
   return {seed,entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events};
 }
 
+/** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */
+export function fighterJourney(seed:number) {
+  let state=freshDungeon('fighter-production-journey',seed),healed=false,taunted=false;
+  const records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
+  for(let depth=1;depth<=2;depth++) {
+    for(let slot=0;slot<3;slot++) {
+      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
+      for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+        if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Fighter enemy stalled');battle.finishPresentation(p.token);continue;}
+        const command=fighterDecision(battle.state,built.catalog,taunted);
+        if(!battle.prepare(command).ok)throw Error('Fighter witness rejected');
+        const p=battle.confirm();if(!p)throw Error('Fighter witness stalled');battle.finishPresentation(p.token);
+        healed ||= command.type==='useAbility'&&command.abilityId==='ability:second_wind';
+        taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
+      }
+      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      state=checkedDungeon(acceptDungeonBattle(state,battle.state));
+      if(battle.state.outcome!=='playerWin')return {seed,records,state,healed,taunted,depth,slot};
+      for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
+    }
+    if(depth<2)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
+  }
+  return {seed,records,state,healed,taunted,depth:2,slot:2};
+}
+
 /** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */
 export function rangerJourney(seed:number) {
   let state=freshDungeon('ranger-production-journey',seed);

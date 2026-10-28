@@ -9,7 +9,7 @@ import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
-import { journeyPreparation, healedFighterBoundary, rangerJourney, mageJourney, shamanJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, healedFighterBoundary, rangerJourney, mageJourney, shamanJourney, fighterJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import type { Command, BattleEvent } from '../src/domain/types';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
@@ -181,8 +181,9 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
 
 test('Fighter legal progression journey earns level three uses both abilities and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ const witness=fighterJourney(17);expect(witness.healed&&witness.taunted).toBe(true);
  // Canonical unplayed level-1 seed, with no fabricated progression, inventory or combat boundary.
- await seed(page,freshDungeon('fighter-production-journey',190));
+ await seed(page,freshDungeon('fighter-production-journey',17));
  const records:unknown[]=[];let healed=false,taunted=false;
  for(let depth=1;depth<=2;depth++) {
   for(let slot=0;slot<3;slot++) {
@@ -232,7 +233,8 @@ test('Fighter legal progression journey earns level three uses both abilities an
   if(depth===1){const s=await snapshot(page);await walkDungeon(page,s.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(2);}
  }
  const final=await snapshot(page);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
- writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:190,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
+ expect(final.party).toEqual(witness.state.party);
+ writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:17,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
 });
 
 test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{

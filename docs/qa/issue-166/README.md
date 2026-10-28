@@ -61,6 +61,52 @@ text are consistent. Existing bounded heading/caption regions remain scrollable
 to protect the playfield; modals scroll for detailed inspection. WebKit and final
 full qualification are pending; these iteration results do not replace them.
 
+## Acceptance map (qualification still in progress)
+
+1. Validated stats/assets/abilities and placement: content/ability validators,
+   pinned source/runtime hashes, unchanged canonical map snapshots and every
+   dungeon pool/survivor/fallback pass. The actual seed-3 browser board includes
+   Shaman spawn 6; other modes retain their original rosters.
+2. Will-save/Weakened contract and feedback: ability tests enumerate twenty faces,
+   equality/extreme Will/DC/natural outcomes, Guard/Mark composition, refresh,
+   saved-cast preservation, immunity and defeat/turn expiry. Actual inspection and
+   log show DC 12 and Fighter/Ranger/Mage 50%/45%/55% save chances; the seed-3
+   Ranger fails with natural 3 and reload retains exactly one −2 source.
+   The full-run Ranger seed-1 HUD trace also records natural 17 + Will 0 saving
+   against DC 12, plus later failures, through existing legal journey coverage.
+3. Heal eligibility/cap/atomic rejection: existing ability owner tests cover
+   injured living grunt/archer/Shaman, wrong side, dead/missing/full/self/range/LOS,
+   missing HP 1/4/7 and exhausted RNG. Aggregate run/dungeon tests preserve hero
+   entry HP and Second Wind limits. The production trace contains two useful ally
+   heals, one ordinary action each, without RNG or extra use counters.
+4. Useful stable AI: all 45 AI cases pass, including common integer utility,
+   ties/permutations/repeated planning, no preview RNG, Taunt, Pin/Snare,
+   support approach/Wait and the existing grunt/archer expectations. Real-session
+   and browser traces prove one committed ability followed by turn end.
+5. Negative cases and complete continuation: malformed/reference/immunity/range/
+   LOS/action/target cases are atomic; exact prior saves remain recoverable. The
+   53-command production victory includes Hex, healing, active status reload,
+   expiry and exact raw command/event/RNG replay on three Chromium profiles.
+   WebKit's three profiles and remaining full-regression stages are still pending;
+   no complete issue acceptance is claimed yet.
+
+The original Linux full run is retained at
+`/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+Its units passed **1,048/1,048** with both type scopes/build integrations/root
+bundle passing. The served root hash is
+`ace84f9570c810d914d61abbc15861e2218f951ac5afd389334a2baf8bb26ba5`,
+byte-identical to the pilot bundle. This original run is still in progress and
+has a retained Fighter seed-190 browser failure: the party loses at floor 2's
+first encounter before Taunt. The replacement seed 17 preserves every gate,
+including the second-guardian terminal boundary; the new pure six-battle test
+passes. Its six browser profiles remain pending until serial capacity is free.
+
+The [previous qualified raw Chromium report](../issue-165/full-run/chromium.json.gz)
+records all three old Fighter cases passing. Git comparison verifies zero
+src/public/tests/scripts/config/package differences between its source `4f8c194`
+and literal base `7cea1e9`; that existing baseline evidence is reused, rather
+than claiming the new failure was pre-existing or rerunning a base matrix.
+
 ## Source and export evidence
 
 Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. Asset registry:

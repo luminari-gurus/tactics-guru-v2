@@ -6,7 +6,7 @@ import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary, shamanJourney } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -34,6 +34,20 @@ it('completes production Shaman Hex and healing through the real session with ex
   }
   expect({state,events}).toEqual({state:witness.state,events:witness.events});
 });
+
+it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
+  const witness=fighterJourney(17);
+  expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
+    .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
+  expect(witness.records).toHaveLength(6);
+  expect(witness.state.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);
+  for(const record of witness.records) {
+    const catalog=dungeonBattle(record.entry)!.catalog;let state=record.entry.activeBattle!;
+    const events:import('../../src/domain/types').BattleEvent[]=[];
+    for(const command of record.commands){const result=dispatch(state,command,catalog);assert(result.ok);state=result.state;events.push(...result.events);}
+    expect({state,events}).toEqual({state:record.state,events:record.events});
+  }
+},120000);
 
 it('roundtrips live Weakened and Shaman ally healing without broadening party HP or carrying status to the next battle',()=>{
   let entry;
