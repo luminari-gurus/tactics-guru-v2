@@ -1,4 +1,4 @@
-import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedRangerEffects, combatStats, grantGuard, markSource, removeMark, tauntSource } from './effects';
+import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedControlEffects, combatStats, grantGuard, markSource, removeMark, tauntSource } from './effects';
 import type { ContentCatalog } from '../content/types';
 import { MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
@@ -54,8 +54,8 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
     return resolveMagicMissile(state, input, catalog);
   if (intent.command.type === 'useAbility' && ['secondWind','taunt'].includes(catalog.abilities[intent.command.abilityId]?.kind))
     return resolveFighterAbility(state, input, catalog);
-  if (intent.command.type === 'useAbility' && ['markTarget','pinningShot'].includes(catalog.abilities[intent.command.abilityId]?.kind))
-    return resolveRangerAbility(state, input, catalog);
+  if (intent.command.type === 'useAbility' && ['markTarget','pinningShot','frostSnare'].includes(catalog.abilities[intent.command.abilityId]?.kind))
+    return resolveControlAbility(state, input, catalog);
   const preview = previewAttack(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
   const snapshot = checked.state; const { command, targetId } = preview;
@@ -81,7 +81,7 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   if (hp === 0) events.push({ type: 'defeated', unitId: targetId });
   if (grantsGuard) events.push({ type: 'guarded', unitId: command.unitId });
   units = clearDefeatedTaunts(units, events);
-  units = clearDefeatedRangerEffects(units, events);
+  units = clearDefeatedControlEffects(units, events);
   if (outcome !== 'ongoing') events.push({ type: 'battleEnded', outcome });
   return { ok: true, state: { ...snapshot, rng: roll.rng, units, outcome, commandCount: snapshot.commandCount + 1 }, events };
 }
@@ -145,7 +145,7 @@ export function resolveMagicMissile(state: unknown, input: unknown, catalog: Con
     }
   });
   units = clearDefeatedTaunts(units, events);
-  units = clearDefeatedRangerEffects(units, events);
+  units = clearDefeatedControlEffects(units, events);
   const outcome = !units.some(u => u.side === 'player' && u.hp > 0) ? 'playerLoss' :
     !units.some(u => u.side === 'enemy' && u.hp > 0) ? 'playerWin' : 'ongoing';
   if (outcome !== 'ongoing') events.push({ type: 'battleEnded', outcome });
@@ -189,12 +189,12 @@ export function previewAbility(state: unknown, input: Command, catalog: ContentC
   const kind=input.type==='useAbility'?catalog.abilities[input.abilityId]?.kind:undefined;
   return kind==='magicMissile'?previewMagicMissile(state,input,catalog):
     kind==='secondWind'||kind==='taunt'?previewFighterAbility(state,input,catalog):
-    kind==='markTarget'||kind==='pinningShot'?previewRangerAbility(state,input,catalog):previewAttack(state,input,catalog);
+    kind==='markTarget'||kind==='pinningShot'||kind==='frostSnare'?previewControlAbility(state,input,catalog):previewAttack(state,input,catalog);
 }
-export type RangerPreview = { readonly ok: true; readonly command: Extract<Command,{type:'useAbility'}>;
-  readonly targetId: number; readonly sourceId: number; readonly kind: 'markTarget' | 'pinningShot' };
-/** Both Ranger actions use the existing hostile targeting rule without damage or a die roll. */
-export function previewRangerAbility(state: unknown, input: unknown, catalog: ContentCatalog): RangerPreview | Rejection {
+export type ControlPreview = { readonly ok: true; readonly command: Extract<Command,{type:'useAbility'}>;
+  readonly targetId: number; readonly sourceId: number; readonly kind: 'markTarget' | 'pinningShot' | 'frostSnare' };
+/** Effect-only controls share hostile targeting, with no damage or die roll. */
+export function previewControlAbility(state: unknown, input: unknown, catalog: ContentCatalog): ControlPreview | Rejection {
   const intent = previewCommand(state, input, catalog); if (!intent.ok) return intent;
   if (intent.command.type !== 'useAbility') return { ok: false, reason: 'malformedCommand' };
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
@@ -202,7 +202,7 @@ export function previewRangerAbility(state: unknown, input: unknown, catalog: Co
   if (actor.hasActed) return { ok: false, reason: 'alreadyActed' };
   const profile = Object.hasOwn(catalog.abilities, command.abilityId) ? catalog.abilities[command.abilityId] : undefined;
   if (!profile) return { ok: false, reason: 'unknownAbility' };
-  if (profile.kind !== 'markTarget' && profile.kind !== 'pinningShot') return { ok: false, reason: 'wrongTargetKind' };
+  if (profile.kind !== 'markTarget' && profile.kind !== 'pinningShot' && profile.kind !== 'frostSnare') return { ok: false, reason: 'wrongTargetKind' };
   if (!profile.owners.includes(actor.defId)) return { ok: false, reason: 'abilityNotOwned' };
   if (!('unitId' in command.target)) return { ok: false, reason: 'wrongTargetKind' };
   const targetId = command.target.unitId;
@@ -213,18 +213,20 @@ export function previewRangerAbility(state: unknown, input: unknown, catalog: Co
   const distance = manhattanDistance(actor.cell, target.cell);
   if (distance < profile.rangeMin || distance > profile.rangeMax) return { ok: false, reason: 'outOfRange' };
   if (lineOfSightBlocked(catalog, snapshot.mapId, actor.cell, target.cell)) return { ok: false, reason: 'blockedLos' };
-  if (profile.kind === 'pinningShot' && target.pinnedBy !== undefined) return { ok: false, reason: 'alreadyPinned' };
+  if (profile.kind !== 'markTarget' && target.movementBlock !== undefined) return { ok: false, reason: 'alreadyImmobilized' };
   return { ok: true, command, targetId: target.id, sourceId: actor.id, kind: profile.kind };
 }
-function resolveRangerAbility(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
-  const preview = previewRangerAbility(state, input, catalog); if (!preview.ok) return preview;
+function resolveControlAbility(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
+  const preview = previewControlAbility(state, input, catalog); if (!preview.ok) return preview;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
-  const field = preview.kind === 'markTarget' ? 'markedBy' : 'pinnedBy';
-  const units = checked.state.units.map(u => u.id === preview.command.unitId ? { ...u, hasActed: true } :
-    u.id === preview.targetId ? { ...u, [field]: preview.sourceId } : u);
+  const abilityId = preview.kind === 'pinningShot' ? 'ability:pinning_shot' : 'ability:frost_snare';
+  const units = checked.state.units.map((u): UnitState => u.id === preview.command.unitId ? { ...u, hasActed: true } :
+    u.id === preview.targetId ? preview.kind === 'markTarget' ? { ...u, markedBy: preview.sourceId } :
+      { ...u, movementBlock: { sourceId: preview.sourceId, abilityId } } : u);
   return { ok: true, state: { ...checked.state, units, commandCount: checked.state.commandCount + 1 }, events: [
     { type: 'abilityUsed', unitId: preview.command.unitId, abilityId: preview.command.abilityId, target: preview.command.target },
-    { type: preview.kind === 'markTarget' ? 'marked' : 'pinned', unitId: preview.targetId, sourceId: preview.sourceId },
+    preview.kind === 'markTarget' ? { type: 'marked', unitId: preview.targetId, sourceId: preview.sourceId } :
+      { type: 'movementBlocked', unitId: preview.targetId, sourceId: preview.sourceId, abilityId },
   ] };
 }
 function resolveFighterAbility(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {

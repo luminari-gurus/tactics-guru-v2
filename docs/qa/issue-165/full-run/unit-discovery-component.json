@@ -1,0 +1,18 @@
+{
+  "source": "4f8c194deb575310866eeb132247197f1062cc5b",
+  "inputHash": "362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420",
+  "command": "node node_modules/vitest/vitest.mjs list --json --no-staticParse --includeTaskLocation",
+  "staticListDeclarations": 523,
+  "scope": "List-only final-source unit names/files/locations; no tests re-executed",
+  "discovered": 1012,
+  "files": 55,
+  "execution": "units.log.gz: all 1,012 tests in 55 files passed under npm run test:unit on the same unchanged inputs",
+  "artifacts": [
+    {
+      "path": "unit-discovery.json.gz",
+      "bytes": 25228,
+      "sha256": "71854581946a4bd3a7b83a3cc130d708b1db6dcd8282d294acbe27699670c1a7",
+      "originalSha256": "ab765db2e3d5474f4e668085df5ffead4cce592a5c58c41273af17745c7ef22d"
+    }
+  ]
+}

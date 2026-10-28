@@ -46,25 +46,30 @@ function rangerSource(unit: UnitState, units: readonly UnitState[], sourceId: nu
     source.hp > 0 && source.side === 'player' && source.defId === 'ranger') : undefined;
 }
 export const markSource = (unit: UnitState, units: readonly UnitState[]) => rangerSource(unit, units, unit.markedBy);
-export const movementBlockSource = (unit: UnitState, units: readonly UnitState[]) => rangerSource(unit, units, unit.pinnedBy);
+export function movementBlockSource(unit: UnitState, units: readonly UnitState[]): UnitState | undefined {
+  const block = unit.movementBlock;
+  const owner = block?.abilityId === 'ability:pinning_shot' ? 'ranger' : block?.abilityId === 'ability:frost_snare' ? 'mage' : undefined;
+  return unit.hp > 0 && unit.side === 'enemy' && owner ? units.find(source => source.id === block!.sourceId &&
+    source.hp > 0 && source.side === 'player' && source.defId === owner) : undefined;
+}
 export function removeMark(unit: UnitState): UnitState {
   const { markedBy, ...rest } = unit;
   return rest;
 }
-export function removePin(unit: UnitState): UnitState {
-  const { pinnedBy, ...rest } = unit;
+export function removeMovementBlock(unit: UnitState): UnitState {
+  const { movementBlock, ...rest } = unit;
   return rest;
 }
 /** All damage paths clean target/source defeat before adopting the next validated snapshot. */
-export function clearDefeatedRangerEffects(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
+export function clearDefeatedControlEffects(units: readonly UnitState[], events: BattleEvent[]): UnitState[] {
   return units.map(unit => {
     if (unit.markedBy !== undefined && !markSource(unit, units)) {
       events.push({ type: 'markExpired', unitId: unit.id, sourceId: unit.markedBy });
       unit = removeMark(unit);
     }
-    if (unit.pinnedBy !== undefined && !movementBlockSource(unit, units)) {
-      events.push({ type: 'pinExpired', unitId: unit.id, sourceId: unit.pinnedBy });
-      unit = removePin(unit);
+    if (unit.movementBlock !== undefined && !movementBlockSource(unit, units)) {
+      events.push({ type: 'movementBlockExpired', unitId: unit.id, ...unit.movementBlock });
+      unit = removeMovementBlock(unit);
     }
     return unit;
   });

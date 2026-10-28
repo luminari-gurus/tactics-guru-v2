@@ -1,4 +1,5 @@
 import { HERO_IDS } from '../../../src/content/constants';
+import { battleCatalog } from '../../../src/content/catalog';
 import { progressHero, projectProgression } from '../../../src/domain/progression';
 import Phaser from 'phaser';
 import '../../../src/style.css';
@@ -10,12 +11,13 @@ import { BattleDialogs } from '../../../src/ui/dialogs';
 import { mountBattleLayout } from '../../../src/ui/battleLayout';
 import { diagnosticsSnapshot } from '../../../src/diagnostics/browser';
 const hero=(new URLSearchParams(location.search).get('hero')??'mage') as HeroId;
-const xp=new URLSearchParams(location.search).get('xp'),base=abilityCatalog(xp===null?undefined:2);
+const params=new URLSearchParams(location.search),xp=params.get('xp'),real=params.has('real');
+const base=real?battleCatalog:abilityCatalog(xp===null?undefined:2);
 const party=HERO_IDS.map(id=>progressHero(id,Number(xp??0),1,base));
 const projected=projectProgression(party,base);
 // The default picker fixture deliberately authors two missiles; XP fixtures use canonical caster progression.
-const catalog=xp===null?{...projected,abilities:{...projected.abilities,'ability:zz_mage':base.abilities['ability:zz_mage']}}:projected;
-const saveKey=`ability-fixture-${hero}${xp===null?'':`-xp-${xp}`}`;
+const catalog=xp===null&&!real?{...projected,abilities:{...projected.abilities,'ability:zz_mage':base.abilities['ability:zz_mage']}}:projected;
+const saveKey=`ability-fixture-${hero}${real?'-real':''}${xp===null?'':`-xp-${xp}`}`;
 const saved=localStorage.getItem(saveKey);
 const accepted=(state:import('../../../src/domain/types').BattleState)=>localStorage.setItem(saveKey,JSON.stringify(state));
 const resumed=saved?BattleSession.fromSnapshot(catalog,JSON.parse(saved),accepted):null;

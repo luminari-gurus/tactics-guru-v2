@@ -22,6 +22,9 @@ it.each([
   ['ability:second_wind','usesPerBattle',2],['ability:second_wind','healBase',5],['ability:second_wind','owners',['mage']],
   ['ability:taunt','requiredLevel',2],['ability:taunt','rangeMin',0],['ability:taunt','duration','roundEnd'],
   ['ability:taunt','immunity',false],['ability:taunt','owners',['goblin_grunt']],['ability:taunt','target','self'],
+  ['ability:frost_snare','requiredLevel',2],['ability:frost_snare','rangeMin',1],['ability:frost_snare','rangeMax',5],
+  ['ability:frost_snare','target','self'],['ability:frost_snare','duration','roundEnd'],['ability:frost_snare','owners',['ranger']],
+  ['ability:frost_snare','immunity',false],['ability:frost_snare','baseDamage',0],
 ])('rejects unsupported Fighter profile %s.%s=%j',(id,field,value)=>{
   const c=structuredClone(abilityCatalog());Object.assign(c.abilities[id as keyof typeof c.abilities],{[field]:value});
   expect(validateContent(c).ok).toBe(false);

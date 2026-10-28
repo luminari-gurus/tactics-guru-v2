@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "base": {
+    "commit": "bd06447d8dea21d65acc8f8a3851c379c04509d1",
+    "tree": "406e0c722f07df6259e7e1004a8040087b913e38",
+    "method": "git archive of verification inputs; no browser/server execution"
+  },
+  "current": "4f8c194deb575310866eeb132247197f1062cc5b",
+  "allRetainedIdsAndMetadataEqual": true,
+  "allDeviceSettingsEqual": true,
+  "method": "List-only discovery with the existing verification-selection reporter against exact-base git archive and clean 4f8c194. Deep equality for all old IDs/metadata and project/device settings; every added ID must be a new Mage title. No browser/server was started.",
+  "changes": [
+    {
+      "stage": "chromium",
+      "before": 736,
+      "after": 739,
+      "retained": 736,
+      "added": 3
+    },
+    {
+      "stage": "fixtures",
+      "before": 81,
+      "after": 87,
+      "retained": 81,
+      "added": 6
+    },
+    {
+      "stage": "placement-dev",
+      "before": 3,
+      "after": 3,
+      "retained": 3,
+      "added": 0
+    },
+    {
+      "stage": "webkit-acceptance",
+      "before": 54,
+      "after": 54,
+      "retained": 54,
+      "added": 0
+    },
+    {
+      "stage": "webkit-exploration",
+      "before": 90,
+      "after": 93,
+      "retained": 90,
+      "added": 3
+    },
+    {
+      "stage": "health-bars",
+      "before": 25,
+      "after": 25,
+      "retained": 25,
+      "added": 0
+    },
+    {
+      "stage": "telemetry-production",
+      "before": 36,
+      "after": 36,
+      "retained": 36,
+      "added": 0
+    },
+    {
+      "stage": "telemetry-development",
+      "before": 36,
+      "after": 36,
+      "retained": 36,
+      "added": 0
+    },
+    {
+      "stage": "assets-root-dev",
+      "before": 75,
+      "after": 75,
+      "retained": 75,
+      "added": 0
+    },
+    {
+      "stage": "assets-prefix-preview",
+      "before": 75,
+      "after": 75,
+      "retained": 75,
+      "added": 0
+    },
+    {
+      "stage": "assets-prefix-dev",
+      "before": 75,
+      "after": 75,
+      "retained": 75,
+      "added": 0
+    },
+    {
+      "stage": "playwright.encounters.config.ts",
+      "before": 24,
+      "after": 24,
+      "retained": 24,
+      "added": 0
+    },
+    {
+      "stage": "playwright.run-items.config.ts",
+      "before": 21,
+      "after": 21,
+      "retained": 21,
+      "added": 0
+    },
+    {
+      "stage": "playwright.abilities.config.ts",
+      "before": 36,
+      "after": 42,
+      "retained": 36,
+      "added": 6
+    },
+    {
+      "stage": "playwright.setup-smoke.config.ts",
+      "before": 2,
+      "after": 2,
+      "retained": 2,
+      "added": 0
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "base.json.gz",
+      "sha256": "496660bb68da7fecfddeb512540c4266d3b172244cb23e7e5a49aa9aaa495de9",
+      "originalSha256": "a2e1bc33023689f774809eb04596d06254ca64cdce0da72702db42dac60edb30",
+      "bytes": 61516
+    },
+    {
+      "path": "current.json.gz",
+      "sha256": "a59489ae69088a080ee94ecc6c7aa8886eb31067c0dd6f30f878acb282e69c67",
+      "originalSha256": "b99e4fd04478fd75872ad4d43fd56e9788a39fb3d849bc981c1ea25870e8a15a",
+      "bytes": 79452
+    },
+    {
+      "path": "comparison.json.gz",
+      "sha256": "d144d9e8f6328774aeb121197e4ee849e16f5b266cec63b850dc77260b928459",
+      "originalSha256": "d7d4952b1c00bf4274c65276320aceb2552d6de7cd311fec13ab3997f7941dea",
+      "bytes": 1287
+    },
+    {
+      "path": "capture-base.sh.gz",
+      "sha256": "ed3cd7d3c55fd44dad241ee00d0c7e012bd294df73e152de4d11af04d39a424e",
+      "originalSha256": "8cfab1c9e62e1cf00808d305559c465c1895fa7b5f0162c4499888bba02afed6",
+      "bytes": 314
+    },
+    {
+      "path": "compare.mjs.gz",
+      "sha256": "d2a7bc2bd53a85c2b77d5ea5fe0f92ca7d099d8da2e3c06ef9bc520c3bc7ee02",
+      "originalSha256": "d05ce2804c557a45038e1c772ce420e67b9fd624bf228e7ac82fb27ea8639be2",
+      "bytes": 1096
+    }
+  ]
+}

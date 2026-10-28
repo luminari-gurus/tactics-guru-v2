@@ -5,8 +5,10 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
   const s=await dungeonSnapshot(page),f=s.floors[s.depth-1],destination=target??poiCell(f.exploration.pois[f.completed]);
+  // Enabled stairs change floors on entry. They are only a valid path when requested.
+  const transit=new Set([...(s.depth>1?[f.descriptor.upstairs]:[]),...(f.completed===3?[f.descriptor.downstairs]:[])].filter(cell=>cell!==destination));
   const map=generateMap(f.descriptor.seed,'rooms'),previous=new Map<number,number>();const queue=[f.position];previous.set(f.position,-1);
-  for(let i=0;i<queue.length&&!previous.has(destination);i++)for(const n of neighbors(queue[i]))if(map.cells[n]&&!previous.has(n)){previous.set(n,queue[i]);queue.push(n);}
+  for(let i=0;i<queue.length&&!previous.has(destination);i++)for(const n of neighbors(queue[i]))if(map.cells[n]&&!transit.has(n)&&!previous.has(n)){previous.set(n,queue[i]);queue.push(n);}
   if(!previous.has(destination))throw Error('Unreachable fixture destination');
   const path:number[]=[];for(let n=destination;n!==f.position;n=previous.get(n)!)path.unshift(n);
   let current=f.position;

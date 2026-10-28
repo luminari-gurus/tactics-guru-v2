@@ -10,12 +10,21 @@ import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
 
+it('roundtrips active Mage Snare in progressed run state and expires identically after reload',()=>{
+  const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
+  const created=createRunBattle(items,runContext);assert(created.ok);const mage=created.state.units.find(u=>u.defId==='mage')!,target=created.state.units.find(u=>u.side==='enemy')!;
+  const battle={...created.state,activeIndex:created.state.initiative.indexOf(target.id),units:created.state.units.map(u=>u.id===target.id?{...u,movementBlock:{sourceId:mage.id,abilityId:'ability:frost_snare' as const}}:u)},snapshot={items,activeBattle:battle,battlefield:created.battlefield};
+  const encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);const decoded=decodeRunSave(encoded.text,runContext);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  const wait={type:'endTurn',unitId:target.id} as const,ended=dispatch(decoded.state.activeBattle!,wait,created.catalog);assert(ended.ok);expect(ended).toEqual(dispatch(battle,wait,created.catalog));expect(ended.state.units.find(u=>u.id===target.id)?.movementBlock).toBeUndefined();
+  for(const sourceId of [1,2,64])expect(readRunSnapshot({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,movementBlock:{sourceId,abilityId:'ability:frost_snare'}}:u)}},runContext).ok).toBe(false);
+});
+
 it('retains Ranger effects in progressed run saves and rejects the immediately previous envelope',()=>{
   const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,
     party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
   const created=createRunBattle(items,runContext);assert(created.ok);
   const ranger=created.state.units.find(u=>u.defId==='ranger')!,target=created.state.units.find(u=>u.side==='enemy')!;
-  const battle={...created.state,units:created.state.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,pinnedBy:ranger.id}:u)};
+  const battle={...created.state,units:created.state.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,movementBlock:{sourceId:ranger.id,abilityId:'ability:pinning_shot' as const}}:u)};
   const snapshot={items,activeBattle:battle,battlefield:created.battlefield},encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);
   const decoded=decodeRunSave(encoded.text,runContext);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
   expect(encodeRunSave(decoded.state,runContext)).toEqual(encoded);
@@ -23,9 +32,9 @@ it('retains Ranger effects in progressed run saves and rejects the immediately p
   expect(dispatch(decoded.state.activeBattle!,wait,created.catalog)).toEqual(dispatch(battle,wait,created.catalog));
   for(const source of [1,3,64])expect(readRunSnapshot({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,markedBy:source}:u)}},runContext).ok).toBe(false);
   expect(decodeRunSave(JSON.stringify({...JSON.parse(encoded.text),format:4}),runContext)).toEqual({ok:false,reason:'incompatible'});
-  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,pinnedBy,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,movementBlock,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
   const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
-  expect(completed.state.items.run.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'pinnedBy'))).toBe(true);
+  expect(completed.state.items.run.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'movementBlock'))).toBe(true);
 });
 
 it('admits only spent bounded Second Wind healing and carries it through run completion',()=>{

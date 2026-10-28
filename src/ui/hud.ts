@@ -21,7 +21,8 @@ export function previewText(preview: ActionPreview): string {
   if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action and 1 battle use · no roll`;
   if ('kind' in preview && preview.kind === 'taunt') return `Taunt · only target Fighter #${preview.sourceId} until target ends its next turn · uses action · no roll`;
   if ('kind' in preview && preview.kind === 'markTarget') return 'Mark Target · next player attack roll gains +2 accuracy and consumes Mark, including a miss · uses action · no damage or roll';
-  if ('kind' in preview && preview.kind === 'pinningShot') return 'Pinning Shot · prevents movement until target ends its next turn · uses action · no damage or roll';
+  if ('kind' in preview && (preview.kind === 'pinningShot' || preview.kind === 'frostSnare'))
+    return `${preview.kind === 'frostSnare' ? 'Frost Snare · Snared by Mage' : 'Pinning Shot · Pinned by Ranger'} #${preview.sourceId} · prevents movement until target ends its next turn or source/target defeat · uses action · no damage or roll`;
   return 'End this turn';
 }
 export function eventText(event: BattleEvent, name: (id:number)=>string): string {
@@ -41,8 +42,8 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'marked': return `${name(event.unitId)} marked by ${name(event.sourceId)} (+2 on next player attack roll)`;
     case 'markConsumed': return `${name(event.unitId)} Mark consumed`;
     case 'markExpired': return `${name(event.unitId)} Mark expires`;
-    case 'pinned': return `${name(event.unitId)} pinned by ${name(event.sourceId)} until its next turn ends`;
-    case 'pinExpired': return `${name(event.unitId)} Pin expires`;
+    case 'movementBlocked': return `${name(event.unitId)} ${event.abilityId === 'ability:frost_snare' ? 'Snared' : 'Pinned'} by ${name(event.sourceId)} until its next turn ends or source/target defeat · no damage or roll`;
+    case 'movementBlockExpired': return `${name(event.unitId)} ${event.abilityId === 'ability:frost_snare' ? 'Snare' : 'Pin'} expires`;
     case 'missileRolled': return `Missile ${event.missile}: ${event.damage} force damage`;
     case 'battleEnded': return event.outcome==='playerWin'?'Victory':'Defeat';
     default: return '';
@@ -57,7 +58,7 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const statuses=[...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
     ...(source?[`Taunted by ${displayName(source.defId)} #${source.id} (only offensive target; expires after this unit’s next turn ends)`]:[]),
     ...(marker?[`Marked by Ranger #${marker.id} (+2 on next player attack roll; consumed even on miss; expires on source/target defeat)`]:[]),
-    ...(pinner?[`Pinned by Ranger #${pinner.id} (movement blocked; expires after this unit’s next turn ends or source/target defeat)`]:[]),
+    ...(pinner?[`${unit.movementBlock!.abilityId === 'ability:frost_snare' ? 'Snared by Mage' : 'Pinned by Ranger'} #${pinner.id} (movement blocked; no damage or roll; expires after this unit’s next turn ends or source/target defeat)`]:[]),
     ...(unit.defId==='fighter' && Object.values(session.catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes(unit.defId))?[`Second Wind ${unit.secondWindUsed?'0':'1'}/1 use this battle`]:[])];
   return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
     status:unit.hp===0?'Defeated':statuses.join(' · ')||'No status effects'};
@@ -135,10 +136,11 @@ export class BattleHud {
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
     const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'?'Hostile target · blocks movement until its next turn ends · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
+      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
     if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
     if(actor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
+    if(actor.defId==='mage')this.root.querySelector('#battle-ability-info')!.textContent+=' · Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3';
     if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=actor.secondWindUsed?' · Use exhausted':actor.hp===info.def.stats.maxHp?' · Full health':'';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;

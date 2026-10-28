@@ -5,7 +5,7 @@ import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { expect,it } from 'vitest';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, healedFighterBoundary } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -14,6 +14,35 @@ import { dispatch } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
+
+it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
+  const journey=mageJourney(17);
+  expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
+  expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
+  expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
+  let blocked=false,expiredAtTurnEnd=false;
+  for(const record of journey.records){const catalog=dungeonBattle(record.entry)!.catalog;let state=record.entry.activeBattle!;const events:import('../../src/domain/types').BattleEvent[]=[];
+    for(const command of record.commands){
+      if(state.units.find(u=>u.id===command.unitId)?.movementBlock?.abilityId==='ability:frost_snare'){blocked=true;expect(command.type).not.toBe('move');}
+      const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);
+      expiredAtTurnEnd ||= command.type==='endTurn'&&result.events.some(e=>e.type==='movementBlockExpired'&&e.unitId===command.unitId&&e.abilityId==='ability:frost_snare');
+      state=result.state;events.push(...result.events);
+    }
+    expect(state).toEqual(record.state);expect(events).toEqual(record.events);expect(state.units.every(u=>u.movementBlock===undefined)).toBe(true);
+  }
+  expect(blocked&&expiredAtTurnEnd).toBe(true);
+},120000);
+
+it('roundtrips active Mage Snare in dungeon continuation and clears it before the next encounter',()=>{
+  const fresh=freshDungeon('mage-save',190),entry={...fresh,party:fresh.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
+  const started=startDungeonBattle(atEncounter(entry));if(!started.ok)throw Error(started.reason);
+  const built=dungeonBattle(started.state)!,initial=started.state.activeBattle!,mage=initial.units.find(u=>u.defId==='mage')!,target=initial.units.find(u=>u.side==='enemy')!;
+  const battle={...initial,activeIndex:initial.initiative.indexOf(target.id),units:initial.units.map(u=>u.id===target.id?{...u,movementBlock:{sourceId:mage.id,abilityId:'ability:frost_snare' as const}}:u)},snapshot={...started.state,activeBattle:battle};
+  const encoded=encodeDungeon(snapshot);if(!encoded.ok)throw Error(encoded.reason);const decoded=decodeDungeon(encoded.text);if(!decoded.ok)throw Error(decoded.reason);expect(decoded.state).toEqual(snapshot);
+  const wait={type:'endTurn',unitId:target.id} as const,ended=dispatch(decoded.state.activeBattle!,wait,built.catalog);if(!ended.ok)throw Error(ended.reason);expect(ended).toEqual(dispatch(battle,wait,built.catalog));expect(ended.state.units.find(u=>u.id===target.id)?.movementBlock).toBeUndefined();
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {movementBlock,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const completed=acceptDungeonBattle(started.state,won);if(!completed.ok)throw Error(completed.reason);expect(dungeonBattle(completed.state)!.state.units.every(u=>u.movementBlock===undefined)).toBe(true);
+});
 
 it('finds a legal earned Ranger level-three witness using both controls and retains replayable histories',()=>{
   const journey=rangerJourney(190);
@@ -34,16 +63,16 @@ it('retains live Mark and Pin across dungeon continuation and keeps them out of 
   const fresh=freshDungeon('ranger-save',190),entry={...fresh,party:fresh.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
   const started=startDungeonBattle(atEncounter(entry));if(!started.ok)throw Error(started.reason);
   const built=dungeonBattle(started.state)!,initial=started.state.activeBattle!,ranger=initial.units.find(u=>u.defId==='ranger')!,target=initial.units.find(u=>u.side==='enemy')!;
-  const battle={...initial,units:initial.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,pinnedBy:ranger.id}:u)},snapshot={...started.state,activeBattle:battle};
+  const battle={...initial,units:initial.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,movementBlock:{sourceId:ranger.id,abilityId:'ability:pinning_shot' as const}}:u)},snapshot={...started.state,activeBattle:battle};
   const encoded=encodeDungeon(snapshot);if(!encoded.ok)throw Error(encoded.reason);const decoded=decodeDungeon(encoded.text);if(!decoded.ok)throw Error(decoded.reason);
   expect(decoded.state).toEqual(snapshot);expect(encodeDungeon(decoded.state)).toEqual(encoded);
   const wait={type:'endTurn',unitId:battle.initiative[battle.activeIndex]} as const;expect(dispatch(decoded.state.activeBattle!,wait,built.catalog)).toEqual(dispatch(battle,wait,built.catalog));
-  for(const field of ['markedBy','pinnedBy'])for(const source of [1,3,64])expect(readDungeon({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,[field]:source}:u)}}).ok).toBe(false);
+  for(const field of ['markedBy','movementBlock'])for(const source of [1,3,64])expect(readDungeon({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,[field]:source}:u)}}).ok).toBe(false);
   const old=JSON.stringify({...JSON.parse(encoded.text),format:5});expect(decodeDungeon(old)).toEqual({ok:false,reason:'incompatible'});
-  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,pinnedBy,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,movementBlock,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
   const completed=acceptDungeonBattle(started.state,won);if(!completed.ok)throw Error(completed.reason);
-  expect(completed.state.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'pinnedBy'))).toBe(true);
-  expect(dungeonBattle(completed.state)!.state.units.every(u=>u.markedBy===undefined&&u.pinnedBy===undefined)).toBe(true);
+  expect(completed.state.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'movementBlock'))).toBe(true);
+  expect(dungeonBattle(completed.state)!.state.units.every(u=>u.markedBy===undefined&&u.movementBlock===undefined)).toBe(true);
 });
 import { previewAttack } from '../../src/domain/combat';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';

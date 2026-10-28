@@ -4,6 +4,7 @@ import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashJson, rulesContent } from './contentIdentity';
+import { movementBlockSource } from './effects';
 
 import { hasShape as shape, isDenseArray } from './validation';
 function cell(v: unknown): v is { x: number; y: number } {
@@ -49,12 +50,14 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'secondWindUsed')) unitKeys.push('secondWindUsed');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'tauntedBy')) unitKeys.push('tauntedBy');
-    for (const field of ['markedBy','pinnedBy']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
+    for (const field of ['markedBy','movementBlock']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
     if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
       (Object.hasOwn(u, 'secondWindUsed') && (u.secondWindUsed !== true || u.side !== 'player' || u.defId !== 'fighter' ||
         !Object.values(catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes('fighter')))) ||
       (Object.hasOwn(u, 'tauntedBy') && (!unitId(u.tauntedBy) || u.side !== 'enemy' || u.hp === 0)) ||
-      ['markedBy','pinnedBy'].some(field => Object.hasOwn(u, field) && (!unitId(u[field]) || u.side !== 'enemy' || u.hp === 0)) ||
+      (Object.hasOwn(u, 'markedBy') && (!unitId(u.markedBy) || u.side !== 'enemy' || u.hp === 0)) ||
+      (Object.hasOwn(u, 'movementBlock') && (!shape(u.movementBlock, ['sourceId','abilityId']) || !unitId(u.movementBlock.sourceId) ||
+        !['ability:pinning_shot','ability:frost_snare'].includes(u.movementBlock.abilityId as string))) ||
       !unitId(u.id) || u.id <= previous ||
       !cell(u.cell) || u.cell.x >= map.width || u.cell.y >= map.height ||
       typeof u.hasMoved !== 'boolean' || typeof u.hasActed !== 'boolean') return bad;
@@ -77,11 +80,16 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (!source || source.hp===0 || source.side!=='player' || source.defId!=='fighter' ||
       !Object.values(catalog.abilities).some(a=>a.kind==='taunt' && a.owners.includes(source.defId))) return bad;
   }
-  for (const u of units) for (const [field, kind] of [['markedBy','markTarget'],['pinnedBy','pinningShot']] as const) {
-    if (u[field] === undefined) continue;
-    const source = units.find(s => s.id === u[field]);
+  for (const u of units) if (u.markedBy !== undefined) {
+    const source = units.find(s => s.id === u.markedBy);
     if (!source || source.hp === 0 || source.side !== 'player' || source.defId !== 'ranger' ||
-      !Object.values(catalog.abilities).some(a => a.kind === kind && a.owners.includes(source.defId))) return bad;
+      !Object.values(catalog.abilities).some(a => a.kind === 'markTarget' && a.owners.includes(source.defId))) return bad;
+  }
+  for (const u of units) if (u.movementBlock !== undefined) {
+    const source = movementBlockSource(u, units);
+    const profile = Object.hasOwn(catalog.abilities, u.movementBlock.abilityId) ? catalog.abilities[u.movementBlock.abilityId] : undefined;
+    const kind = u.movementBlock.abilityId === 'ability:pinning_shot' ? 'pinningShot' : 'frostSnare';
+    if (!source || !profile || profile.id !== u.movementBlock.abilityId || profile.kind !== kind || !profile.owners.includes(source.defId)) return bad;
   }
   if (input.initiative.some(id => !unitId(id) || !ids.has(id)) || new Set(input.initiative).size !== ids.size) return bad;
   const activeId = input.initiative[input.activeIndex];

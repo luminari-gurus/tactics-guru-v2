@@ -1,0 +1,332 @@
+{
+  "source": "4f8c194deb575310866eeb132247197f1062cc5b",
+  "inputHash": "362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420",
+  "rootBuildHash": "4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942",
+  "preAggregatePilotBuildHash": "6a0f9eb48d2afb17943462986a39cc5ef5697fca72f43fd7f0094e89062af68c",
+  "deviceTesting": "Playwright Chromium/WebKit desktop and native-touch device emulation; no physical hardware used",
+  "allSixMageCasesPassed": true,
+  "identicalTraceSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+  "recordContract": "Six complete legal journeys, each with 412 accepted commands. A reloaded battle stores its saved-snapshot continuation; these receipts prove exact continuation replay and do not claim the original pre-reload command history is persisted.",
+  "traces": [
+    {
+      "project": "desktop",
+      "testId": "e0f8639c387951b6a797-edbf3bc8eb219a3bb905",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    },
+    {
+      "project": "mobile-landscape",
+      "testId": "e0f8639c387951b6a797-b95e9a162887c3a2f0d3",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    },
+    {
+      "project": "mobile-portrait",
+      "testId": "e0f8639c387951b6a797-c052d78117af743441d2",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    },
+    {
+      "project": "desktop-webkit",
+      "testId": "e0f8639c387951b6a797-c6d33ce00e8c6402e3f2",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    },
+    {
+      "project": "landscape-webkit",
+      "testId": "e0f8639c387951b6a797-07ba860506074a2408b1",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    },
+    {
+      "project": "portrait-webkit",
+      "testId": "e0f8639c387951b6a797-8813a9a6cc370b9d0cfc",
+      "sha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445",
+      "battles": 6,
+      "acceptedCommandCount": 412,
+      "mage": {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 19,
+        "learned": [
+          "ability:basic_attack",
+          "ability:frost_snare",
+          "ability:magic_missile"
+        ]
+      },
+      "activeSnareResume": {
+        "unitId": 5,
+        "abilityId": "ability:frost_snare",
+        "sourceId": 3
+      },
+      "blockedCommands": [
+        {
+          "type": "useAbility",
+          "unitId": 5,
+          "abilityId": "ability:shortbow_shot",
+          "target": {
+            "unitId": 3
+          }
+        },
+        {
+          "type": "endTurn",
+          "unitId": 5
+        }
+      ],
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "terminal": "defeat"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop-webkit/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop-webkit/production-mage-snare-inspection.png",
+      "bytes": 724710,
+      "sha256": "e0728c955e0b3d966f3efd4777e5a379a72b7c023b8a91d486757cecbb77e373",
+      "originalSha256": "e0728c955e0b3d966f3efd4777e5a379a72b7c023b8a91d486757cecbb77e373"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-desktop-webkit/mage-terminal-journey.png",
+      "bytes": 128970,
+      "sha256": "dd9dcf00cf4428a8f8295622a747a09c847c893eaa0be89cfc20f66890acdf65",
+      "originalSha256": "dd9dcf00cf4428a8f8295622a747a09c847c893eaa0be89cfc20f66890acdf65"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-landscape-webkit/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-landscape-webkit/production-mage-snare-inspection.png",
+      "bytes": 359499,
+      "sha256": "82d38236f065ad588c94b915aed554b099a3c0430edc48b635900fea8664bf3a",
+      "originalSha256": "82d38236f065ad588c94b915aed554b099a3c0430edc48b635900fea8664bf3a"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-landscape-webkit/mage-terminal-journey.png",
+      "bytes": 174942,
+      "sha256": "0b11d680a8f6e5f65b282540aca19962762fcdbdc6791861e095eb0fc2904667",
+      "originalSha256": "0b11d680a8f6e5f65b282540aca19962762fcdbdc6791861e095eb0fc2904667"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-portrait-webkit/mage-production-journey.json.gz",
+      "bytes": 12787,
+      "sha256": "b51b6ec2b861093967531bb036e36e5e35f0e396c1dee0da742c2b48621b1ccd",
+      "originalSha256": "caf799524409d582cd3f7a5cec1bf2c37cea83f094f9d98a9e4a43105a366445"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-portrait-webkit/production-mage-snare-inspection.png",
+      "bytes": 219514,
+      "sha256": "1b9a201fa58430f2e2334a02d26f00fb703689381a72ed7187be25dbb5f2ef42",
+      "originalSha256": "1b9a201fa58430f2e2334a02d26f00fb703689381a72ed7187be25dbb5f2ef42"
+    },
+    {
+      "path": "webkit-journeys/dungeon-Mage-legal-progres-0edab-ltiple-missiles-and-resumes-portrait-webkit/mage-terminal-journey.png",
+      "bytes": 187221,
+      "sha256": "a577a69a5d682bf561b4a7e631f368bf7123504ca94ab3167a1d5eb6824c7739",
+      "originalSha256": "a577a69a5d682bf561b4a7e631f368bf7123504ca94ab3167a1d5eb6824c7739"
+    },
+    {
+      "path": "root-build-identity.json.gz",
+      "bytes": 21461,
+      "sha256": "d891ba137828779677508b8b16285e8fd8528b36b0655c054eaadb4170664c4c",
+      "originalSha256": "aba8992f7bef9b2b885689532685dff35fb225956bdb3e34b9d80154d6725b60"
+    }
+  ]
+}

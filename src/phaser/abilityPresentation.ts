@@ -35,7 +35,7 @@ export function abilityPresentation(events: readonly BattleEvent[]) {
     if (event.type === 'healed') feedback.push({unitId:event.unitId,kind:'result',text:`+${event.healing} HP`});
     if (event.type === 'taunted') feedback.push({unitId:event.unitId,kind:'guard',text:'Taunted'});
     if (event.type === 'marked') feedback.push({unitId:event.unitId,kind:'guard',text:'Marked'});
-    if (event.type === 'pinned') feedback.push({unitId:event.unitId,kind:'guard',text:'Pinned'});
+    if (event.type === 'movementBlocked') feedback.push({unitId:event.unitId,kind:'guard',text:event.abilityId === 'ability:frost_snare' ? 'Snared' : 'Pinned'});
   }
   return {signature, feedback};
 }

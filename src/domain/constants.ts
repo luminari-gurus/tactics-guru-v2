@@ -2,9 +2,9 @@
  * Bump manually when the foundation contracts or generator change. The battle session (#10) records replays in memory. Also bump when a
  * rules change would make a recorded replay play out differently; UI orchestration does not change rules.
  */
-export const RULES_VERSION = 4;
+export const RULES_VERSION = 5;
 export const RNG_VERSION = 1;
-export const STATE_FORMAT_VERSION = 3;
+export const STATE_FORMAT_VERSION = 4;
 export const RULE_BOUNDS = {
   uint32: { min: 0, max: 0xffffffff },
   cursor: { min: 0, max: Number.MAX_SAFE_INTEGER },

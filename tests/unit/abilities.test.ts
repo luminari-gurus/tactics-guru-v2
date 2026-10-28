@@ -5,7 +5,7 @@ import { BattleSession } from '../../src/app/BattleSession';
 import { assert, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
-import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility, previewRangerAbility } from '../../src/domain/combat';
+import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility, previewControlAbility } from '../../src/domain/combat';
 import { createBattle, dispatch, endTurn, replayBattle } from '../../src/domain/turns';
 import { validateContent } from '../../src/content/validate';
 import { rollDie, seedRng } from '../../src/domain/rng';
@@ -84,6 +84,7 @@ const secondWind = {type:'useAbility',unitId:1,abilityId:'ability:second_wind',t
 const taunt = {...guardedStrike,abilityId:'ability:taunt'} as const;
 const mark = { type: 'useAbility', unitId: 2, abilityId: 'ability:mark_target', target: { unitId: 4 } } as const;
 const pin = { ...mark, abilityId: 'ability:pinning_shot' } as const;
+const snare = { ...pin, unitId:3, abilityId:'ability:frost_snare' } as const;
 function rangerSetup() {
   const { catalog, state } = setup();
   const cells = [{x:2,y:0},{x:0,y:0},{x:1,y:0},{x:3,y:0},{x:5,y:0},{x:7,y:0}];
@@ -98,17 +99,100 @@ function naturalState(state: BattleState, natural: number): BattleState {
   return { ...state, rng: seedRng(seed) };
 }
 
+it('Frost Snare uses one action and shared immobilization for both real goblins without rolls or Mark consumption',()=>{
+  for(const targetId of [4,5]) {
+    const {catalog,state}=rangerSetup(),snapshot=activate({...state,units:state.units.map(u=>u.id===targetId?{...u,markedBy:2}:u)},3);
+    const input={...snare,target:{unitId:targetId}},before=structuredClone(snapshot),preview=previewAbility(freeze(snapshot),input,catalog);assert(preview.ok);
+    expect(previewText(preview)).toContain('Snared by Mage #3');expect(previewText(preview)).toContain('no damage or roll');
+    const result=dispatch(snapshot,input,catalog);assert(result.ok);
+    expect(result.state.rng).toEqual(snapshot.rng);expect(result.state.activeIndex).toBe(snapshot.activeIndex);
+    expect(result.state.units.map(u=>u.hp)).toEqual(snapshot.units.map(u=>u.hp));
+    expect(result.state.units.find(u=>u.id===3)).toMatchObject({hasActed:true,hasMoved:false});
+    expect(result.state.units.find(u=>u.id===targetId)).toMatchObject({markedBy:2,movementBlock:{sourceId:3,abilityId:snare.abilityId}});
+    expect(result.events).toEqual([{type:'abilityUsed',unitId:3,abilityId:snare.abilityId,target:input.target},{type:'movementBlocked',unitId:targetId,sourceId:3,abilityId:snare.abilityId}]);
+    expect(abilityPresentation(result.events)).toEqual({signature:null,feedback:[{unitId:targetId,kind:'guard',text:'Snared'}]});expect(battleCues(result.events,catalog)).toEqual([]);
+    expect(unitFeedback(new BattleSession(catalog,result.state,result.state.seed),result.state.units.find(u=>u.id===targetId)!).status).toContain('Snared by Mage #3');
+    const enemy=activate(result.state,targetId),cell=enemy.units.find(u=>u.id===targetId)!.cell;
+    expect(previewMovement(enemy,targetId,catalog)).toEqual({ok:true,cells:[{cell,cost:0}]});
+    expect(dispatch(enemy,{type:'move',unitId:targetId,to:{x:cell.x,y:1}},catalog)).toEqual({ok:false,reason:'immobilized'});
+    const plan=planEnemyTurn(enemy,targetId,catalog);assert(plan.ok);expect(plan.commands.some(c=>c.type==='move')).toBe(false);
+    const ai=runEnemyTurn(enemy,targetId,catalog);assert(ai.ok);expect(ai.state.units.find(u=>u.id===targetId)?.movementBlock).toBeUndefined();
+    const isolated={...enemy,units:enemy.units.map(u=>u.side==='player'?{...u,cell:{x:u.id,y:8}}:u)};
+    expect(planEnemyTurn(isolated,targetId,catalog)).toEqual({ok:true,commands:[{type:'endTurn',unitId:targetId}]});
+    expect(snapshot).toEqual(before);expect(readBattleState(result.state,catalog).ok).toBe(true);
+  }
+});
+
+it('Frost Snare rejects invalid targeting, ownership, budgets, LOS and every Pin/Snare duplicate atomically',()=>{
+  const {catalog,state}=rangerSetup(),initial=activate(state,3);
+  for(const [input,reason] of [[{...snare,target:{unitId:1}},'sameSide'],[{...snare,target:{unitId:64}},'missingTarget'],
+    [{...snare,target:{cell:{x:3,y:0}}},'wrongTargetKind'],[{...snare,unitId:2},'abilityNotOwned']] as const){
+    const snapshot=activate(initial,input.unitId),before=structuredClone(snapshot);expect(previewAbility(freeze(snapshot),input,catalog)).toEqual({ok:false,reason});expect(dispatch(snapshot,input,catalog)).toEqual({ok:false,reason});expect(snapshot).toEqual(before);
+  }
+  for(const [id,patch,reason] of [[3,{hasActed:true},'alreadyActed'],[4,{hp:0},'targetDefeated']] as const){
+    const snapshot={...initial,units:initial.units.map(u=>u.id===id?{...u,...patch}:u)},before=structuredClone(snapshot);
+    expect(dispatch(freeze(snapshot),snare,catalog)).toEqual({ok:false,reason});expect(snapshot).toEqual(before);
+  }
+  for(const distance of [1,2,4,5]){
+    const snapshot={...initial,units:initial.units.map(u=>u.id===3?{...u,cell:{x:0,y:0}}:u.id===4?{...u,cell:{x:distance,y:0}}:{...u,cell:{x:u.id,y:2}})};
+    const before=structuredClone(snapshot);expect(previewAbility(freeze(snapshot),snare,catalog).ok).toBe(distance>=2&&distance<=4);expect(snapshot).toEqual(before);
+  }
+  const blocked={...catalog,maps:{...catalog.maps,'map:forest_ruins':{...catalog.maps['map:forest_ruins'],cells:catalog.maps['map:forest_ruins'].cells.map(c=>c.x===2&&c.y===0?{...c,terrainId:'forest' as const}:c)}}};
+  expect(dispatch({...initial,versions:{...initial.versions,content:contentVersion(blocked)},units:initial.units.map(u=>u.id===1?{...u,cell:{x:2,y:1}}:u)},snare,blocked)).toEqual({ok:false,reason:'blockedLos'});
+  for(const first of [pin,snare])for(const second of [pin,snare]){
+    const cast=dispatch(activate(state,first.unitId),first,catalog);assert(cast.ok);
+    const snapshot=activate(cast.state,second.unitId),before=structuredClone(snapshot);
+    expect(dispatch(freeze(snapshot),second,catalog)).toEqual({ok:false,reason:'alreadyImmobilized'});expect(snapshot).toEqual(before);
+  }
+});
+
+it('Frost Snare survives unrelated turns, round wrap, range and LOS changes and expires only on accepted target endTurn',()=>{
+  const {catalog,state}=rangerSetup(),cast=dispatch(activate(state,3),snare,catalog);assert(cast.ok);
+  const snapshot={...cast.state,initiative:[4,1,2,5,6,3],activeIndex:5,round:9,units:cast.state.units.map(u=>u.id===3?{...u,cell:{x:8,y:8}}:u)};
+  const unrelated=endTurn(snapshot,{type:'endTurn',unitId:3},catalog);assert(unrelated.ok);expect(unrelated.state.round).toBe(10);
+  expect(unrelated.state.units.find(u=>u.id===4)?.movementBlock).toEqual({sourceId:3,abilityId:snare.abilityId});
+  const blocked={...catalog,maps:{...catalog.maps,'map:forest_ruins':{...catalog.maps['map:forest_ruins'],cells:catalog.maps['map:forest_ruins'].cells.map(c=>c.x===7&&c.y===8?{...c,terrainId:'forest' as const}:c)}}};
+  const current={...unrelated.state,versions:{...unrelated.state.versions,content:contentVersion(blocked)}};
+  expect(dispatch(current,{type:'endTurn',unitId:3},blocked)).toEqual({ok:false,reason:'notActiveUnit'});
+  const ended=endTurn(current,{type:'endTurn',unitId:4},blocked);assert(ended.ok);
+  expect(ended.state.units.find(u=>u.id===4)?.movementBlock).toBeUndefined();expect(ended.events).toContainEqual({type:'movementBlockExpired',unitId:4,sourceId:3,abilityId:snare.abilityId});
+});
+
+it('Frost Snare cleans source and target defeat for ordinary attacks and missiles including friendly source damage',()=>{
+  for(const sourceDeath of [false,true])for(const automatic of [false,true]){
+    const {catalog,state}=rangerSetup();
+    // A second real Mage is used only for the friendly-missile source-death case.
+    const map=catalog.maps['map:forest_ruins'],copy=automatic&&sourceDeath?{...catalog,maps:{...catalog.maps,[map.id]:{...map,spawns:map.spawns.map(s=>s.id===2?{...s,unitId:'mage' as const,side:'heroes' as const}:s)}}}:catalog;
+    const targetId=sourceDeath?3:4,actorId=automatic?sourceDeath?2:3:sourceDeath?6:1;
+    const snapshot=naturalState(activate({...state,versions:{...state.versions,content:contentVersion(copy)},units:state.units.map(u=>u.id===4?{...u,movementBlock:{sourceId:3,abilityId:snare.abilityId},...(!sourceDeath?{hp:1}:{})}:u.id===3&&sourceDeath?{...u,hp:1}:u.id===6&&sourceDeath?{...u,cell:{x:1,y:1}}:automatic&&sourceDeath&&u.id===2?{...u,side:'player' as const,defId:'mage' as const,hp:10}:u)},actorId),20);
+    const result=dispatch(freeze(snapshot),{type:'useAbility',unitId:actorId,abilityId:automatic?'ability:magic_missile':'ability:basic_attack',target:{unitId:targetId}},copy);assert(result.ok);
+    expect(result.state.units.find(u=>u.id===targetId)?.hp).toBe(0);expect(result.state.units.find(u=>u.id===4)?.movementBlock).toBeUndefined();
+    expect(result.events).toContainEqual({type:'movementBlockExpired',unitId:4,sourceId:3,abilityId:snare.abilityId});expect(readBattleState(result.state,copy).ok).toBe(true);
+  }
+});
+
+it('admits only exact learned movement-block references and roundtrips active Snare without refresh',()=>{
+  const {catalog,state}=rangerSetup(),snapshot={...state,units:state.units.map(u=>u.id===4?{...u,movementBlock:{sourceId:3,abilityId:snare.abilityId}}:u)};
+  for(const movementBlock of [null,undefined,{},3,{sourceId:3},{sourceId:3,abilityId:'ability:taunt'},{sourceId:2,abilityId:snare.abilityId},{sourceId:64,abilityId:snare.abilityId},{sourceId:3,abilityId:snare.abilityId,extra:1}])expect(readBattleState({...snapshot,units:snapshot.units.map(u=>u.id===4?{...u,movementBlock}:u)},catalog).ok).toBe(false);
+  for(const id of [3,4])expect(readBattleState({...snapshot,units:snapshot.units.map(u=>u.id===id?{...u,hp:0}:u)},catalog).ok).toBe(false);
+  const {['ability:frost_snare']:_,...abilities}=catalog.abilities,locked={...catalog,abilities};
+  expect(readBattleState({...snapshot,versions:{...snapshot.versions,content:contentVersion(locked)}},locked).ok).toBe(false);
+  const encoded=encodeBattleSave(snapshot,catalog);assert(encoded.ok);const decoded=decodeBattleSave(encoded.text,catalog);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  const active=activate(snapshot,4),restored=activate(decoded.state,4);expect(dispatch(restored,{type:'endTurn',unitId:4},catalog)).toEqual(dispatch(active,{type:'endTurn',unitId:4},catalog));
+  const fresh=createBattle('map:forest_ruins',17,catalog);assert(fresh.ok);expect(fresh.state.units.every(u=>u.movementBlock===undefined)).toBe(true);
+});
+
 it('applies Mark and Pin through pure previews and dispatch without HP, movement or RNG changes', () => {
   for (const command of [mark,pin]) for (const targetId of [4,5]) {
     const {catalog,state}=rangerSetup(),before=structuredClone(state),input={...command,target:{unitId:targetId}};
-    const preview=previewRangerAbility(freeze(state),input,catalog);assert(preview.ok);
+    const preview=previewControlAbility(freeze(state),input,catalog);assert(preview.ok);
     expect(previewText(preview)).toContain('no damage or roll');
     expect(previewText(preview)).not.toContain('Taunt');
     const result=dispatch(state,input,catalog);assert(result.ok);
     expect(result.state.rng).toEqual(state.rng);expect(result.state.activeIndex).toBe(state.activeIndex);
     expect(result.state.units.map(u=>u.hp)).toEqual(state.units.map(u=>u.hp));
     expect(result.state.units.find(u=>u.id===2)).toMatchObject({hasActed:true,hasMoved:false});
-    const event={type:command===mark?'marked':'pinned',unitId:targetId,sourceId:2};
+    const event=command===mark?{type:'marked',unitId:targetId,sourceId:2}:{type:'movementBlocked',unitId:targetId,sourceId:2,abilityId:'ability:pinning_shot'};
     expect(result.events).toEqual([{type:'abilityUsed',unitId:2,abilityId:command.abilityId,target:{unitId:targetId}},event]);
     expect(abilityPresentation(result.events)).toEqual({signature:null,feedback:[{unitId:targetId,kind:'guard',text:command===mark?'Marked':'Pinned'}]});
     expect(battleCues(result.events,catalog)).toEqual([]);
@@ -130,7 +214,7 @@ it('rejects Ranger target, ownership, action, range and LOS failures atomically'
     for(const distance of [1,2,5,6]) {
       // Keep other living units away from the tested ray and target.
       const snapshot={...state,units:state.units.map(u=>u.id===4?{...u,cell:{x:distance,y:0}}:u.id===2?u:{...u,cell:{x:u.id,y:2}})};
-      expect(previewRangerAbility(snapshot,command,catalog).ok).toBe(distance>=2&&distance<=5);
+      expect(previewControlAbility(snapshot,command,catalog).ok).toBe(distance>=2&&distance<=5);
     }
     const blocked={...catalog,maps:{...catalog.maps,'map:forest_ruins':{...catalog.maps['map:forest_ruins'],
       cells:catalog.maps['map:forest_ruins'].cells.map(c=>c.x===1&&c.y===0?{...c,terrainId:'forest' as const}:c)}}};
@@ -198,14 +282,14 @@ it('pins movement while preserving legal enemy attacks or Wait, and expires at t
   expect(previewMove(snapshot,move,catalog)).toEqual({ok:false,reason:'immobilized'});
   expect(dispatch(snapshot,move,catalog)).toEqual({ok:false,reason:'immobilized'});expect(snapshot).toEqual(before);
   const plan=planEnemyTurn(snapshot,4,catalog);assert(plan.ok);expect(plan.commands.some(c=>c.type==='move')).toBe(false);expect(plan.commands.some(c=>c.type==='useAbility')).toBe(true);
-  const run=runEnemyTurn(snapshot,4,catalog);assert(run.ok);expect(run.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
+  const run=runEnemyTurn(snapshot,4,catalog);assert(run.ok);expect(run.state.units.find(u=>u.id===4)?.movementBlock).toBeUndefined();
   const isolated={...snapshot,units:snapshot.units.map(u=>u.side==='player'?{...u,cell:{x:u.id,y:8}}:u)};
   expect(planEnemyTurn(isolated,4,catalog)).toEqual({ok:true,commands:[{type:'endTurn',unitId:4}]});
   const wrapped={...snapshot,initiative:[1,2,3,5,6,4],activeIndex:5,round:9,units:snapshot.units.map(u=>u.id===4?{...u,markedBy:2}:u)};
   const ended=endTurn(wrapped,{type:'endTurn',unitId:4},catalog);assert(ended.ok);expect(ended.state.round).toBe(10);
-  expect(ended.state.units.find(u=>u.id===4)).toMatchObject({markedBy:2});expect(ended.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
-  expect(ended.events).toContainEqual({type:'pinExpired',unitId:4,sourceId:2});
-  expect(dispatch(activate(cast.state,2),pin,catalog)).toEqual({ok:false,reason:'alreadyPinned'});
+  expect(ended.state.units.find(u=>u.id===4)).toMatchObject({markedBy:2});expect(ended.state.units.find(u=>u.id===4)?.movementBlock).toBeUndefined();
+  expect(ended.events).toContainEqual({type:'movementBlockExpired',abilityId:'ability:pinning_shot',unitId:4,sourceId:2});
+  expect(dispatch(activate(cast.state,2),pin,catalog)).toEqual({ok:false,reason:'alreadyImmobilized'});
   expect(dispatch(activate(ended.state,2),pin,catalog).ok).toBe(true);
 });
 
@@ -213,12 +297,12 @@ it('cleans both Ranger effects when source or target is defeated through ordinar
   for(const sourceDeath of [false,true])for(const automatic of [false,true]) {
     const {catalog,state}=rangerSetup();
     const targetId=sourceDeath?2:4,actorId=automatic?3:sourceDeath?6:1;
-    const snapshot=naturalState(activate({...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,pinnedBy:2,...(!sourceDeath?{hp:1}:{})}:
+    const snapshot=naturalState(activate({...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,movementBlock:{sourceId:2,abilityId:'ability:pinning_shot' as const},...(!sourceDeath?{hp:1}:{})}:
       u.id===2&&sourceDeath?{...u,hp:1}:u.id===6&&sourceDeath?{...u,cell:{x:0,y:1}}:u)},actorId),20);
     const result=dispatch(snapshot,{type:'useAbility',unitId:actorId,abilityId:automatic?'ability:magic_missile':'ability:basic_attack',target:{unitId:targetId}},catalog);assert(result.ok);
     expect(result.state.units.find(u=>u.id===targetId)?.hp).toBe(0);
-    expect(result.state.units.find(u=>u.id===4)?.markedBy).toBeUndefined();expect(result.state.units.find(u=>u.id===4)?.pinnedBy).toBeUndefined();
-    expect(result.events).toContainEqual({type:'pinExpired',unitId:4,sourceId:2});
+    expect(result.state.units.find(u=>u.id===4)?.markedBy).toBeUndefined();expect(result.state.units.find(u=>u.id===4)?.movementBlock).toBeUndefined();
+    expect(result.events).toContainEqual({type:'movementBlockExpired',abilityId:'ability:pinning_shot',unitId:4,sourceId:2});
     expect(result.events).toContainEqual({type:!sourceDeath&&!automatic?'markConsumed':'markExpired',unitId:4,sourceId:2});
     expect(readBattleState(result.state,catalog).ok).toBe(true);
   }
@@ -226,13 +310,13 @@ it('cleans both Ranger effects when source or target is defeated through ordinar
 
 it('validates bounded living Ranger references and the current susceptible-enemy content policy', () => {
   const {catalog,state}=rangerSetup();
-  for(const field of ['markedBy','pinnedBy']) {
+  for(const field of ['markedBy','movementBlock']) {
     for(const source of [undefined,0,1,3,4,64,1.5,'2',null]) {
       const invalid={...state,units:state.units.map(u=>u.id===4?{...u,[field]:source}:u)};
       expect(readBattleState(invalid,catalog).ok).toBe(false);
     }
-    for(const id of [1,2,3])expect(readBattleState({...state,units:state.units.map(u=>u.id===id?{...u,[field]:2}:u)},catalog).ok).toBe(false);
-    for(const deadId of [2,4])expect(readBattleState({...state,units:state.units.map(u=>({...u,...(u.id===4?{[field]:2}:{}),...(u.id===deadId?{hp:0}:{})}))},catalog).ok).toBe(false);
+    for(const id of [1,2,3])expect(readBattleState({...state,units:state.units.map(u=>u.id===id?{...u,[field]:field==='markedBy'?2:{sourceId:2,abilityId:'ability:pinning_shot'}}:u)},catalog).ok).toBe(false);
+    for(const deadId of [2,4])expect(readBattleState({...state,units:state.units.map(u=>({...u,...(u.id===4?{[field]:field==='markedBy'?2:{sourceId:2,abilityId:'ability:pinning_shot'}}:{}),...(u.id===deadId?{hp:0}:{})}))},catalog).ok).toBe(false);
   }
   for(const [id,patch] of [['ability:mark_target',{accuracyBonus:3}],['ability:mark_target',{requiredLevel:1}],['ability:pinning_shot',{duration:'sourceTurnStart'}],['ability:pinning_shot',{owners:['fighter']}]] as const)
     expect(validateContent({...catalog,abilities:{...catalog.abilities,[id]:{...catalog.abilities[id],...patch}}}).ok).toBe(false);
@@ -243,13 +327,13 @@ it('validates bounded living Ranger references and the current susceptible-enemy
 });
 
 it('round-trips live Mark/Pin and rejects the previous battle format without rewriting input', () => {
-  const {catalog,state}=rangerSetup(),snapshot={...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,pinnedBy:2}:u)};
+  const {catalog,state}=rangerSetup(),snapshot={...state,units:state.units.map(u=>u.id===4?{...u,markedBy:2,movementBlock:{sourceId:2,abilityId:'ability:pinning_shot' as const}}:u)};
   const encoded=encodeBattleSave(snapshot,catalog);assert(encoded.ok);const restored=decodeBattleSave(encoded.text,catalog);assert(restored.ok);
   expect(restored.state).toEqual(snapshot);expect(encodeBattleSave(restored.state,catalog)).toEqual(encoded);
   expect(dispatch(restored.state,mark,catalog)).toEqual(dispatch(snapshot,mark,catalog));
   const old=JSON.stringify({...JSON.parse(encoded.text),payload:{...snapshot,format:2,versions:{...snapshot.versions,rules:3}}});
   expect(decodeBattleSave(old,catalog)).toEqual({ok:false,reason:'incompatible'});
-  const made=createBattle('map:forest_ruins',17,catalog);assert(made.ok);expect(made.state.units.every(u=>u.markedBy===undefined&&u.pinnedBy===undefined)).toBe(true);
+  const made=createBattle('map:forest_ruins',17,catalog);assert(made.ok);expect(made.state.units.every(u=>u.markedBy===undefined&&u.movementBlock===undefined)).toBe(true);
   const feedback=unitFeedback(new BattleSession(catalog,snapshot,snapshot.seed),snapshot.units.find(u=>u.id===4)!);
   expect(feedback.status).toContain('Marked by Ranger #2');expect(feedback.status).toContain('Pinned by Ranger #2');
 });
@@ -267,17 +351,17 @@ it('replaces a Mark source with the newest Ranger without stacking', () => {
   expect(killed.state.units.find(u=>u.id===2)?.hp).toBe(0);expect(killed.state.units.find(u=>u.id===4)?.markedBy).toBe(3);
 });
 
-it('replays both Ranger actions from canonical creation with identical state, events and RNG', () => {
+it('replays Ranger actions and Frost Snare from canonical creation with identical state, events and RNG', () => {
   const base=rangerSetup(),map=base.catalog.maps['map:forest_ruins'];
   const catalog={...base.catalog,maps:{...base.catalog.maps,[map.id]:{...map,spawns:map.spawns.map(s=>({...s,...base.state.units.find(u=>u.id===s.id)!.cell}))}}};
   const created=createBattle(map.id,17,catalog);assert(created.ok);let state=created.state;
   const commands:import('../../src/domain/types').Command[]=[],events:import('../../src/domain/types').BattleEvent[]=[];
   const apply=(command:import('../../src/domain/types').Command)=>{const result=dispatch(state,command,catalog);assert(result.ok);commands.push(command);events.push(...result.events);state=result.state;};
-  for(const command of [mark,pin]) {
-    while(state.initiative[state.activeIndex]!==2)apply({type:'endTurn',unitId:state.initiative[state.activeIndex]});
+  for(const command of [mark,pin,snare]) {
+    while(state.initiative[state.activeIndex]!==command.unitId)apply({type:'endTurn',unitId:state.initiative[state.activeIndex]});
     apply(command);
-    if(command===pin)expect(state.units.find(u=>u.id===4)).toMatchObject({markedBy:2,pinnedBy:2});
-    apply({type:'endTurn',unitId:2});
+    if(command===pin)expect(state.units.find(u=>u.id===4)).toMatchObject({markedBy:2,movementBlock:{sourceId:2,abilityId:'ability:pinning_shot' as const}});
+    apply({type:'endTurn',unitId:command.unitId});
   }
   const replay=replayBattle({format:state.format,versions:state.versions,initial:created.state,commands},catalog);assert(replay.ok);
   expect(replay).toEqual({ok:true,state,events});
@@ -548,7 +632,9 @@ it('Magic Missile follows caster-level progression and splits assigned missiles 
     const result = dispatch(state, command, catalog); assert(result.ok);
     expect(result.events.filter(e => e.type === 'missileRolled')).toHaveLength(count);
     expect(result.events.filter(e => e.type === 'defeated').length).toBeLessThanOrEqual(1);
-
+    let rng=state.rng;const expected=[];
+    for(let missile=1;missile<=count;missile++){const roll=rollDie(rng,4);rng=roll.rng;expected.push({type:'missileRolled',unitId:3,targetId:4,missile,natural:roll.value,damage:roll.value+1});}
+    expect(result.events.filter(e=>e.type==='missileRolled')).toEqual(expected);expect(result.state.rng).toEqual(rng);
   }
   const { catalog, state } = missileSetup(3);
   const nearby = { ...state, units: state.units.map(u => u.id === 5 ? { ...u, cell: { x: 4, y: 0 } } : u) };
@@ -591,7 +677,9 @@ it('Magic Missile replays from the real battle creation boundary', () => {
 
 it('Magic Missile rejects cursor exhaustion atomically, validates profiles and ends battle only once', () => {
   const { catalog, state } = missileSetup(9);
-  const exhausted = { ...state, rng: { ...state.rng, cursor: Number.MAX_SAFE_INTEGER - 2 } };
+  const cursor=Number.MAX_SAFE_INTEGER-2;
+  const exhausted = { ...state, rng: { ...state.rng, cursor, words:[state.rng.words[0],state.rng.words[1],state.rng.words[2],(cursor%UINT32_RANGE+RNG_WARMUP_DRAWS+1)%UINT32_RANGE] as const } };
+  expect(readBattleState(exhausted,catalog).ok).toBe(true);
   const before = structuredClone(exhausted);
   expect(dispatch(exhausted, missile, catalog)).toEqual({ ok: false, reason: 'invalidState' });
   expect(exhausted).toEqual(before);

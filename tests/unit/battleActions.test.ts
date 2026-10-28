@@ -14,7 +14,7 @@ it('self healing uses the shared preview and self target without friendly-fire o
 });
 it.each(['fighter','ranger','mage'] as const)('selects later %s abilities by identity across catalog order and rejects foreign IDs',hero=>{
   const catalog=abilityCatalog(),s=abilitySession(hero,catalog),before=JSON.stringify({state:s.state,replay:s.replay});
-  const choices=ownedAbilities(s);expect(choices).toHaveLength(hero==='mage'?2:4);
+  const choices=ownedAbilities(s);expect(choices).toHaveLength(hero==='mage'?3:4);
   const reverse=abilitySession(hero,{...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).reverse())});
   expect(ownedAbilities(reverse)).toEqual(choices);
   const target=s.state.units.find(u=>u.side==='enemy')!;
