@@ -152,6 +152,23 @@ Vitest 5's default static list has 523 declarations; collection with
 without executing their test bodies. The rejected static count is distinguished
 in the discovery receipt.
 
+The [six-profile journey receipt](full-run/mage-journeys.json) now binds all six
+formally passed Mage cases to the identical trace above. Each reload resumes an
+active Snare snapshot; the target legally shoots in place and then ends its turn
+without moving. The record proves saved-snapshot continuation replay; it does
+not claim persistence of the original pre-reload command history.
+
+Actual aggregate root bundle identity is
+`4fdb85ebf502d5140988bb4be75e1e37671f0b769fc41d7295573d77bd8bf942`,
+retained with its file inventory in [root-build-identity.json.gz](full-run/root-build-identity.json.gz).
+The earlier `6a0f9eb48d2afb17943462986a39cc5ef5697fca72f43fd7f0094e89062af68c`
+is the reused pre-aggregate/pilot bundle from `85191af`, not the aggregate bundle.
+`vite.config.ts` embeds Git commit in `__BUILD_INFO__`, so a commit change alters
+bundle bytes even with identical gameplay inputs. The scoped picker reuse proof
+accounts for this diagnostics/telemetry/map-attribute metadata; it does not affect
+the selected picker/gameplay/audio assertions. All full-stage tests use frozen
+`4f8c194`; final root restoration must match the measured aggregate hash.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all

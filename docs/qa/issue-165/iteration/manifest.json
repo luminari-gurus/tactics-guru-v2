@@ -839,9 +839,9 @@
     },
     {
       "path": "webkit-picker-reuse.json.gz",
-      "bytes": 810,
-      "sha256": "6171f8bb0894500ac7c07d3ba51e4845d34c0f96c7389e47d485f814d8e4972a",
-      "originalSha256": "2c3130cba226ece318d221e6450c7e89a94ef9c7e176d345ed2d3c6a273a6305",
+      "bytes": 1020,
+      "sha256": "4af997e8a728f5886f86a3768ab2497baef2ab77b16222447e5815359e147766",
+      "originalSha256": "773b41bc6ecdb23ebe7f8ba4bca65a7303fcd1af937e868a82998d0b26c814e3",
       "binding": "Scoped unchanged-input reuse from 85191af to frozen 4f8c194"
     }
   ]
