@@ -836,6 +836,13 @@
       "sha256": "773f743a08083e65e09a2a3945597b2a0f2513f88f8b83ea67524fa7dbc7c330",
       "bytes": 17377,
       "originalSha256": "46bc5f50c005968f55f29583a115e67b1e4c31f98478f071ce3ffd8ef7c40710"
+    },
+    {
+      "path": "webkit-picker-reuse.json.gz",
+      "bytes": 810,
+      "sha256": "6171f8bb0894500ac7c07d3ba51e4845d34c0f96c7389e47d485f814d8e4972a",
+      "originalSha256": "2c3130cba226ece318d221e6450c7e89a94ef9c7e176d345ed2d3c6a273a6305",
+      "binding": "Scoped unchanged-input reuse from 85191af to frozen 4f8c194"
     }
   ]
 }

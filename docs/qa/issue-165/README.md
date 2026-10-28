@@ -138,6 +138,20 @@ unchanged. The ninth stage is complete; the 93-case WebKit exploration matrix
 (including the three production Mage journeys) is now running. Its completion
 and the later telemetry/asset/performance/restoration modes remain pending.
 
+The earlier six real-media WebKit picker results are reused under an explicit
+[unchanged-input proof](iteration/webkit-picker-reuse.json.gz): the two Mage case
+bodies and imports are byte-identical, and 14 application/asset/fixture/helper/
+lockfile/configuration paths have no changes from tested `85191af` to `4f8c194`.
+Only unrelated later synthetic-picker assertions, dungeon traversal and a unit
+assertion changed. No browser assertion or required coverage is waived.
+[Final unit discovery](full-run/unit-discovery-component.json) retains all 1,012
+names/files/locations across 55 files, matching the completed unit execution on
+the same unchanged inputs; that list-only capture did not rerun the tests.
+Vitest 5's default static list has 523 declarations; collection with
+`--no-staticParse --includeTaskLocation` expands the actual 1,012 registered cases
+without executing their test bodies. The rejected static count is distinguished
+in the discovery receipt.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all
