@@ -131,6 +131,13 @@ still `362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420`,
 and the tested Linux tree remains clean. Raw logs/reports and final-source Mage
 picker screenshots are retained under `full-run/`. WebKit acceptance is running.
 
+[WebKit acceptance](full-run/webkit-acceptance-component.json) then completed
+**54/54 passed**, with no skips, failures, flaky cases, retries or global errors.
+The actual ID set equals discovery and the verification input hash remains
+unchanged. The ninth stage is complete; the 93-case WebKit exploration matrix
+(including the three production Mage journeys) is now running. Its completion
+and the later telemetry/asset/performance/restoration modes remain pending.
+
 Run real-media Mage picker cases and the complete production-HUD Mage journey on
 Chromium/WebKit desktop/portrait/landscape, including active-Snare reload, blocked
 enemy movement, expiry and terminal exact continuation replay. Account for all

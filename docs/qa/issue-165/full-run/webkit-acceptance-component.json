@@ -1,0 +1,33 @@
+{
+  "source": "4f8c194deb575310866eeb132247197f1062cc5b",
+  "inputHash": "362b2d28b0ebe0999ac113a2d7ab605083b077e7bfb3c5a8608ca8e468feb420",
+  "scope": "Completed browser component; aggregate completion is separate",
+  "counts": {
+    "total": 54,
+    "expected": 54,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "retryAttempts": 0
+  },
+  "exactDiscoveredIds": true,
+  "workers": 1,
+  "skipped": [],
+  "expectedStatuses": [
+    "passed"
+  ],
+  "artifacts": [
+    {
+      "path": "webkit-acceptance.json.gz",
+      "bytes": 4816,
+      "sha256": "659f242ff4adca44343303c8469fc59256c44b5c682474815a2618a4624dc63d",
+      "originalSha256": "569ef8c39d29eb8fdbceb212fc2219587201dbcd8345bdd4c672209b4d258484"
+    },
+    {
+      "path": "webkit-acceptance.log.gz",
+      "bytes": 1990,
+      "sha256": "4188884feb52ce696670ab450265129d2c4e4f4c4dcbb9cef184a4ce3720947f",
+      "originalSha256": "ba2e19a42ff206c9e072ab838d8c2ea7ac5ad83a4f5152681280c15a54ffc4c4"
+    }
+  ]
+}
