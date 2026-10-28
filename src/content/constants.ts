@@ -13,7 +13,7 @@ export const CONTENT_BOUNDS = {
 /** Forest ground, paths, ruins/platforms, forest floor and water; props are separate. */
 export const FIRST_MAP_TERRAIN_IDS = ['grass', 'grass_path', 'stone', 'forest', 'water'] as const;
 export const HERO_IDS = ['fighter', 'ranger', 'mage'] as const;
-export const ENEMY_IDS = ['goblin_grunt', 'goblin_archer'] as const;
+export const ENEMY_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
 /** Initial attack catalog limits; runtime validation also requires min range <= max range. */
 export const ATTACK_BOUNDS = {
   rangeMin: { min: 1, max: 20 }, rangeMax: { min: 1, max: 20 },

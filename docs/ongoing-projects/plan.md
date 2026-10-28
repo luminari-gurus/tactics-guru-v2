@@ -1,7 +1,7 @@
 # Issue #166: Goblin Shaman support combat
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: implementation plan complete;
-implementation has not started.
+Date: 2026-10-28 (Asia/Jerusalem). Status: implementation authorized and in progress.
+OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
 
 - Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.
@@ -81,7 +81,33 @@ source-pinned and bounded by existing loading budgets.
 Non-goals: the full #161 effect engine, broader #170 roster, new hero buttons,
 typed damage/resistance, hazards, push/charge, generic resource/stack scripting,
 new services/dependencies, UI redesign, telemetry schema expansion, save migration,
-production deployment and merge. The caller requested planning/publication only.
+production deployment and merge. The caller has now authorized implementation,
+testing, commits, pushes and focused review-ready PRs, including dependent stacks.
+
+## Implementation handoff (live)
+
+- Starting source: clean `b5b450f80405d14a28082c43ba555bcf02f2b11e` on the named
+  branch; fetched `origin/main` remains `7cea1e9`, with no intervening changes.
+- Current work: OpenSpec artifacts pass strict validation. The source-pinned
+  Shaman catalog/art foundation is verified and being committed/published as the
+  first independent PR. Gameplay/placement follows on a dependent branch/PR.
+- Environment: Windows Node and installed Windows dependencies work; WSL provides
+  npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
+  and browser runs; do not replace the shared installed node_modules.
+- Foundation proof: 199 focused content tests, 28 combat/turn fixture tests, 222
+  content-validation tests, both type scopes, production bundle and two root/prefix
+  header integrations pass. The final 27-case desktop/portrait/landscape browser
+  selection passes on installed Chrome via the supported executable override.
+  Setup failures, exact commands/input/build inventory and screenshots are retained
+  in [#166 QA](../qa/issue-166/README.md). No full-issue acceptance is claimed.
+- Browser environment: packaged Windows Chromium fails `spawn UNKNOWN`; installed
+  Chrome 155.0.8059.41 works. Native npm shim in ignored `tmp/issue166/tools/npm.cmd`
+  invokes Node + `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`.
+  Add that shim directory to PATH for nested npm/test-server commands. Keep one
+  browser worker; Linux WebKit qualification is still required later.
+- Ablation: retain the existing catalog, pure preview, candidate loop, bounded
+  optional state and event surfaces. No general effect interpreter, configurable
+  scoring framework, new UI controls or asset generation is needed.
 
 ## Evidence and proposed implementation decisions
 

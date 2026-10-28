@@ -3,6 +3,8 @@ import { battleCatalog } from '../../src/content/catalog';
 import { createBattle, dispatch, replayBattle } from '../../src/domain/turns';
 import type { BattleEvent, Command } from '../../src/domain/types';
 import { validateContent } from '../../src/content/validate';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 describe('authored first battle', () => {
   it('accepts the actual catalog and complete fixed map', () => {
@@ -12,10 +14,31 @@ describe('authored first battle', () => {
     expect(map.spawns.map(s => s.unitId)).toEqual(['fighter', 'ranger', 'mage', 'goblin_grunt', 'goblin_archer', 'goblin_grunt']);
     expect(map.cells.filter(c => c.elevation === 1)).toHaveLength(15);
     expect(map.cells.filter(c => c.elevation === 2)).toHaveLength(9);
-    expect(Object.keys(battleCatalog.assets)).toHaveLength(15);
+    expect(Object.keys(battleCatalog.assets)).toHaveLength(17);
     expect(battleCatalog.heroes.fighter.stats.maxHp).toBe(18);
     expect(battleCatalog.heroes.ranger.stats.accuracy).toBe(5);
     expect(battleCatalog.heroes.mage.stats.power).toBe(4);
+  });
+  it('admits the source-backed Shaman and verifies its packaged sprite/portrait exports', () => {
+    expect(battleCatalog.enemies.goblin_shaman.stats).toEqual({ maxHp: 10, move: 4, jump: 1,
+      accuracy: 3, armorClass: 11, power: 2, dexterity: 1, will: 3 });
+    expect(battleCatalog.abilities['ability:basic_attack'].owners).toContain('goblin_shaman');
+    let runtimeBytes = 0;
+    for (const id of ['asset:goblin_shaman_sprite', 'asset:goblin_shaman_portrait'] as const) {
+      const asset = battleCatalog.assets[id], source = readFileSync(asset.sourcePath), runtime = readFileSync(`public${asset.runtimePath}`);
+      expect(createHash('sha256').update(source).digest('hex')).toBe(asset.provenance.sourceSha256);
+      expect([source.readUInt32BE(16), source.readUInt32BE(20)]).toEqual([asset.sourceWidth, asset.sourceHeight]);
+      expect([runtime.readUInt32BE(16), runtime.readUInt32BE(20)]).toEqual([asset.runtimeWidth, asset.runtimeHeight]);
+      if (asset.kind === 'unit-sprite') expect(runtime).toEqual(source);
+      runtimeBytes += runtime.length;
+    }
+    expect(runtimeBytes).toBe(28208);
+    for (const change of [(c: any) => { delete c.enemies.goblin_shaman; },
+      (c: any) => { c.enemies.goblin_shaman.stats.will = NaN; },
+      (c: any) => { c.enemies.goblin_shaman.spriteAssetId = 'asset:missing'; }]) {
+      const catalog: any = structuredClone(battleCatalog); change(catalog);
+      expect(validateContent(catalog).ok).toBe(false);
+    }
   });
   it.each(['reference', 'occupiedSpawn', 'coordinate', 'walkability', 'number', 'cells'])('rejects an authored-content %s regression', code => {
     const c: any = structuredClone(battleCatalog);
