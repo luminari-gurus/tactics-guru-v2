@@ -10,7 +10,7 @@ The root URL starts a standalone battle and offers no shared entry surface for s
 - Render Continue, New Game, Hall of Records, and Settings from an ordered definition. Add quiet secondary links to standalone battle, three-encounter run, and map inspection.
 - Continue inspects all three existing save families without creating sessions or writing saves. One resumable mode routes to that mode; multiple modes require explicit choice. Destination code re-inspects before resuming, retaining existing backup/recovery safeguards.
 - New Game starts the dungeon flow through its existing reviewed replacement confirmation; preserve unrelated battle/run saves. Hall of Records is an honest empty-state dialog pending #176. Settings exposes existing privacy controls and current audio guidance, with no new music/preferences subsystem.
-- Use separate decorative background, supplied title image, and native control layers. Preserve portrait composition on wide screens and reachable controls on narrow/short screens, with readable fallbacks when images fail.
+- Use the two user-supplied background sources, Dawn Beyond the Ivy Ruins and Midnight Strategist’s War Room, with separate title-image and native-control layers. Preserve the originals under `docs/art/issue-153/source/`; derive optimized runtime backgrounds from these sources during implementation. Preserve portrait composition on wide screens and reachable controls on narrow/short screens, with readable fallbacks when images fail.
 
 ## Capabilities
 
