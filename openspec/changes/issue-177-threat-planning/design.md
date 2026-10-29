@@ -4,6 +4,8 @@
 
 Issue [#177](https://github.com/luminari-gurus/tactics-guru-v2/issues/177); caller `dubstylee`; base `1c53c5e52e5b691d9827799892d8c415f78a6331`; branch `work/issue-177-threat-planning`. #142 is closed. The current `BattleSession` records each accepted command and persists immediately; `previewMovement` and `previewAbility` validate authoritative state. `hoverPreview` relocates hypothetically without checking reachability. AI currently evaluates reachable moves and ordinary attacks. The design must preserve accepted history and saved snapshots rather than simply moving a sprite back.
 
+Plan approved by the caller on 2026-10-29.
+
 ## Goals / Non-Goals
 
 **Goals:** Safe, understandable planning and undo across standalone, run and dungeon consumers. **Non-Goals:** New hazard/reaction systems, arbitrary rewind, predictive AI choices, and hidden information.

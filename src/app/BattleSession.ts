@@ -7,6 +7,7 @@ import type { ContentCatalog, MapId } from '../content/types';
 import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
+import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay } from '../domain/types';
@@ -28,6 +29,8 @@ export class BattleSession {
   private commands: Command[] = [];
   private resolvedEvents: BattleEvent[] = [];
   private intent: Command | null = null;
+  private plan: { move: Extract<Command, {type:'move'}>; ability: Extract<Command, {type:'useAbility'}> } | null = null;
+  private plannedAbility: Extract<Command, {type:'useAbility'}> | null = null;
   private enemyQueue: Command[] = [];
   private generation = 0;
   phase: SessionPhase;
@@ -65,13 +68,34 @@ export class BattleSession {
     return previewCommand(this.current, command, this.catalog);
   }
   prepare(command: Command): ActionPreview {
-    this.intent = null; this.error = null;
+    this.cancel(); this.error = null;
     if (this.phase !== 'player' || command.unitId !== this.active.id) return {ok:false,reason:'notActiveUnit'};
     const preview = this.preview(command);
     if (preview.ok) this.intent = freeze(structuredClone(command));
     return preview;
   }
-  cancel() { this.intent = null; }
+  preparePlan(move: Extract<Command, {type:'move'}>, ability: Extract<Command, {type:'useAbility'}>) {
+    this.cancel(); this.error = null;
+    if (this.phase !== 'player' || move.unitId !== this.active.id) return {ok:false,reason:'notActiveUnit'} as const;
+    const preview = previewTacticalPlan(this.current, move, ability, this.catalog);
+    if (preview.ok) this.plan = freeze(structuredClone({move, ability}));
+    return preview;
+  }
+  cancel() { this.intent = null; this.plan = null; this.plannedAbility = null; }
+  confirmPlan(): Presentation | null {
+    if (this.phase !== 'player' || !this.plan) return null;
+    const plan = this.plan; this.plan = null;
+    const preview = previewTacticalPlan(this.current, plan.move, plan.ability, this.catalog);
+    if (!preview.ok) { this.error = preview.reason; return null; }
+    const presentation = this.resolve(plan.move, false);
+    if (presentation) this.plannedAbility = plan.ability;
+    return presentation;
+  }
+  confirmPlannedAbility(): Presentation | null {
+    if (this.phase !== 'player' || !this.plannedAbility) return null;
+    const ability = this.plannedAbility; this.plannedAbility = null;
+    return this.resolve(ability, false);
+  }
   confirm(): Presentation | null {
     if (this.phase !== 'player' || !this.intent) return null;
     const command = this.intent; this.intent = null;
@@ -107,5 +131,5 @@ export class BattleSession {
     if (this.phase !== 'enemy') this.enemyQueue = [];
   }
   private fail(reason: string) { reportFailure('battle_resolution', { phase: this.phase }); this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
-  dispose() { this.generation++; this.phase = 'disposed'; this.intent = null; this.enemyQueue = []; }
+  dispose() { this.generation++; this.phase = 'disposed'; this.cancel(); this.enemyQueue = []; }
 }
