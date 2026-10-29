@@ -1,6 +1,6 @@
 # Issue #166: Goblin Shaman support combat
 
-Started: 2026-10-28; updated: 2026-10-29 (Asia/Jerusalem). Status: combined-main final qualification.
+Started: 2026-10-28; updated: 2026-10-29 (Asia/Jerusalem). Status: qualified; final publication audit.
 OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
 
 - Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
@@ -86,123 +86,88 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
 
 ## Implementation handoff (live)
 
-Snapshot: 2026-10-29. **7/9 OpenSpec tasks** are complete; final combined-input
-qualification (4.1) and delivery audit (4.2) remain open. The runtime includes new
-main **b343ab0** (#246/#155), all seven conflicts are resolved, and both branches
-are pushed. No issue acceptance or clean full-suite claim is made prematurely.
+Snapshot: 2026-10-29. **8/9 OpenSpec tasks complete**. Implementation and
+qualification are complete; only final publication/audit task 4.2 remains.
+No browser jobs are active. Both owned pipelines finished successfully.
 
-- Foundation branch: `branch/issue-166-goblin-shaman`,
-  **03b1e899ad091ba79ba65b08487204427b23de1e**, review-ready
-  [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251).
-- Runtime branch: `branch/issue-166-shaman-support`, frozen functional source
-  **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent
-  [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252), still draft.
-  The functional source is identical after the documentation checkpoint.
-- Shared Hex/heal previews, atomic saves/healing, one-source Weakened, stable
-  support AI, dungeon-only `forest_ruins_shaman_v1` and existing feedback are done.
-  State/rules/run/dungeon versions are **5/6/7/9**. RNG/wrapper remain 1.
-  Main independently allocated dungeon format 8; format 9 preserves its moving
-  encounters and current-format legacy exploration while recovering/exporting
-  exact incompatible 7/8 bytes. Literal-main 8 capture is in
-  `tests/fixtures/saves/issue-166/dungeon-main8.json`.
-- Legal moving-world witnesses: **Shaman 31** (54 commands, failed natural 5 and
-  successful natural 13 saves, two heals, live Weakened reload/expiry and victory),
-  **Fighter 28** (six battles, level three, healing/Taunt and depth-2/slot-2 defeat),
-  **Ranger 2** (five battles, Mark/Pin, level three and defeat), **Mage 12**.
-  The duplicate Fighter helper from the merged branches is consolidated.
+- Foundation: `branch/issue-166-goblin-shaman`, functional head **03b1e899ad091ba79ba65b08487204427b23de1e**,
+  [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251), review-ready.
+- Runtime: `branch/issue-166-shaman-support`, frozen functional source
+  **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252).
+  Later commits update documentation/evidence only. Publish the final packet and
+  mark this PR ready after the remaining link/hash/diff audit.
+- Main **b343ab0** (#246/#155) is integrated through the parent. All seven
+  conflicts are resolved. State/rules/run/dungeon versions are **5/6/7/9**;
+  moving encounters and current-format legacy exploration are retained. Exact
+  prior format-7/8 bytes remain recoverable/exportable without migration.
 
-### Completed current-source prerequisites
+Delivered: source-pinned Shaman stats/art, atomic exact Will-save Hex, one-source
+non-stacking Weakened, capped allied goblin healing, shared stable support AI,
+dungeon-only Forest Ruins composition and existing-surface save/heal/status feedback.
+The support-goal MapCell/x-y defect and fixed-frame backup test assumption are
+repaired. The existing strict reader and every acceptance assertion remain.
 
-Linux checkout **/tmp/tactics-issue-166-20261029** is clean at functional source
-f4616ae. Fresh results: **1,069/1,069 units**, both TypeScript scopes, **2/2** real
-root/prefix header integrations, root bundle and **18/18** performance samples.
-All **66** directly affected dungeon units also passed on Windows after integration.
-The integrated foundation separately passed **1,032 units**, both type scopes,
-header integrations/root bundle before publication. Its
-[published receipts](../qa/issue-166/full-run/foundation-main/manifest.json) are
-linked from #251. Local receipts:
-`verification-receipts/timings/issue166-integration-f4616ae/` and
-`verification-receipts/timings/issue166-foundation-main/` in the Linux checkout.
+### Qualified evidence
 
-Current input hash:
-**4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**.
-Root inventory: `tmp/issue166/integration-root-inputs.json`, hash
-**9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1**.
-Pinned Playwright 1.63.0, Chromium **153.0.8010.12**, WebKit **26.6**; Linux Node
-24.15.0/npm 12.0.2. All browser jobs use one worker, zero retries, serial GPU use.
-Device acceptance uses emulation; no physical hardware is claimed.
+[QA](../qa/issue-166/README.md) and its
+[19-family ledger](../qa/issue-166/full-run/qualification.json) contain the current
+acceptance mapping and immutable manifests. Fresh combined-source results:
+**1,069 units**, both type scopes, **two** root/prefix header integrations,
+production bundles, **18 performance samples**, and **360 passing browser
+executions**. Six expected preview map skips pass in their owning dev mode.
+One worker, zero retries/flaky cases, serial GPU use. Engines: Chromium
+**153.0.8010.12**, WebKit **26.6**, Playwright **1.63.0**; device emulation meets
+caller acceptance. Linux Node 24.15.0/npm 12.0.2. The parent separately passes
+**1,032 units** and its type/build gates; published foundation-main receipts are
+linked from #251.
 
-### Active serial qualification
+All four production witnesses pass all six profiles. Shaman **31** has 54 accepted
+commands, failed natural 5 and successful natural 13 saves, two heals, active
+Weakened reload/expiry and victory. Its six raw files are byte-identical:
+**e2c0cc8be5e8bfb307cc4e476d436ae4a01fdaca04dc448df7a3adf64fca5456**.
+Fighter **28** retains six battles/level three/heal/Taunt/depth-2-slot-2 defeat;
+Ranger **2** retains Mark/Pin/level three/defeat; Mage **12** retains Snare/multiple
+missiles and terminal replay. Actual states/events/RNG and continuation match.
 
-**Unified session 51122** runs `tmp/issue166/integration-browsers.mjs`. Its launch
-log is `tmp/issue166/integration-browsers-launch.log`; machine report, stage logs,
-JSON and artifacts are in `tmp/issue166/integration-browsers/`. Ordered stages:
-Chromium dungeon/exploration/lifecycle **105**, map **75** (six owning-dev skips),
-targeted battle/run restart and backup **9**, complete WebKit exploration **105**,
-targeted WebKit restart/backup **6**. All four complete production witnesses are
-selected on desktop/portrait/landscape in each engine. **Chromium completed:
-105/105 dungeon cases, 69 map passes/six owning-dev skips and 9/9 restart/backup**
-(183 passes total). All four complete production witnesses passed its three
-profiles. WebKit is active: desktop Shaman and Mage passed; remaining journeys
-and orientations are running. Inspect actual reports for later progress.
+Input hash: **4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**.
+Root/restored: **9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1**.
+Prefix: **86f20f9cf35f9e4b5f878b9964cb19a99c7fbd28822b28f55a1134bda5c57f40**.
+Root restoration is exact; source/test/config/dependency inputs after the frozen
+head are unchanged (native checkout newlines are recorded separately).
 
-**Queued unified session 61114** runs `tmp/issue166/integration-followup.mjs` and
-waits for the core report's final `passed` value; it cannot overlap core browsers.
-After success it runs six owning development-map cases, then 15 asset boot/direct-
-entry/cold-warm cases in each root/prefix preview/dev mode (**60**). It builds
-`/prototype/`, captures the inventory, restores root and checks byte identity.
-Log: `tmp/issue166/integration-followup.log`; reports:
-`tmp/issue166/integration-dev-map/report.json` and
-`tmp/issue166/integration-assets/report.json`. If core fails, the queued helper
-stops and the real finding needs repair; elapsed time is not a passing result.
+Original full source **4e765f8** remains **failed**: all 19 stages executed,
+17 passed/two failed; 1,286 browser passes/nine failures/nine expected skips.
+Bounded repair **28cba2a** passed 1,049 units and 80 fresh browser executions.
+The merged source then refreshed all affected movement/dungeon/restart/build
+consumers. Unchanged families retain explicit valid reuse. This is not labeled a
+clean new full-suite run. Original Fighter/readiness failures, the 3,844-ms cold
+overrun and controlled passing base/repair repeats remain intact; its timing cause
+is unestablished. Current cold-history cases pass unchanged budgets.
 
-### Retained evidence and reuse boundaries
+Portable evidence: `docs/qa/issue-166/full-run/{aggregate,repair,foundation-main,integration}/`.
+The current packet retains receipts, expanded unit metadata, reports/logs, all
+actual traces, representative reviewed screenshots, hashes and reproduction
+recipes. Raw data remains in **/tmp/tactics-issue-166-20261029**; current outputs
+are under `tmp/issue166/integration-{browsers,dev-map,assets}/`. The original raw
+full tree is `tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+Do not rerun application suites for final docs-only metadata.
 
-[QA](../qa/issue-166/README.md) retains original source **4e765f8**: every one of
-19 stages executed, **17 passed/two failed**, browser **1,286 pass/nine failures/
-nine expected skips**, no retries/flaky cases. Its original failed status remains.
-Six Fighter seed-190 failures, two mobile backup-readiness failures and one
-3,844-ms landscape cold-history failure have bounded follow-ups. Checkpoint
-**28cba2a** passes 1,049 units and **80** fresh browser executions, including all
-six 53-command Shaman histories, six Fighter profiles, five owning backup cases,
-controlled cold repeats and four asset modes. Literal-base cold repeats also
-pass; cause of the original timing failure is not established. The real support-
-goal MapCell/x-y bug was repaired by projecting exact `{x,y}`; strict admission
-remains intact. First failed unit/oracle/approach attempts remain preserved.
+### Final publication
 
-Portable evidence is in `docs/qa/issue-166/full-run/{aggregate,repair}/`; the
-original raw tree is Linux
-`tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`. Raw current evidence is
-under the paths above. Combat/content/AI/presentation, assets, tooling, telemetry
-and dependency implementations are unchanged after 28cba2a. The 14 changed app
-inputs are inherited movement/entry/focus consumers plus dungeon format 9; fresh
-consumer qualification above bounds their reach. Retain explicit stage-by-stage
-accounting instead of restarting unrelated full matrices or claiming all-current
-full-suite success. Current startup/performance limits and all acceptance gates
-remain unchanged.
+1. Validate OpenSpec strictly, verify local links and manifest artifact hashes,
+   inspect the final diff and confirm frozen input parity. Retain the audit output.
+2. Commit/push the final packet/docs; update #252 with `Closes #166` and
+   `Refs #161`, then mark ready. Record task 4.2 completion, publish the final
+   handoff and verify both remote branch heads and a clean working tree.
+3. Remove task-created scratch scripts/probes after preserving reproduction data;
+   retain required recovery evidence and unrelated work. Review #251 first, then
+   retarget #252 to main after its parent merges. Wider #161/#170 acceptance stays
+   open. OpenSpec archive/sync follows review when requested. Merge/release/
+   deployment are outside this delivery.
 
-### Finish and deliver
-
-1. Wait for both owned sessions and inspect every actual result. Resolve any real
-   failure autonomously, preserve failed/incomplete attempts, refresh only the
-   invalidated checks and prerequisite identities.
-2. After all reports pass, run task-local `tmp/issue166/pack-integration.py` under
-   WSL. It preserves receipts/reports/traces/screenshots and hash inventories in
-   `docs/qa/issue-166/full-run/integration/`, verifies six identical 54-command
-   Shaman records and native/Linux relevant-input parity (checkout newlines only),
-   and writes all 19 families' explicit `full-run/qualification.json` ledger.
-3. Review current Chromium/WebKit screenshots; update QA, this handoff and OpenSpec
-   4.1; validate strictly, verify local links/artifact hashes and review final diff.
-4. Commit/push final evidence/docs, update #252 with `Closes #166` and `Refs #161`,
-   mark it review-ready, then record 4.2 completion and final remote parity. Keep
-   #161/#170 wider scope open. Review/merge #251 first, then retarget #252 to main.
-   Remove task-created scratch scripts/probes after retaining recipes/evidence;
-   keep raw failures and unrelated work. No merge, tag, release or deployment.
-
-Use native Git for checkouts/merges in this Windows checkout: WSL sees CRLF files
-as dirty despite native clean status. WSL authenticated fetch/push is available;
-the independent Linux testing clone has normal LF files and unchanged dependencies.
-
+Use native Git for checkouts/merges in the Windows checkout; WSL reports CRLF files
+as modified despite native clean status. Authenticated WSL fetch/push is available.
+The independent Linux testing checkout is clean at the qualified functional head.
 
 ## Evidence and proposed implementation decisions
 
@@ -264,7 +229,9 @@ from legacy behavior are stated explicitly below.
 6. **Admission, identity and continuation.** Use an exact optional Weakened source
    field with eligible living source/target validation, following current bounded
    fields rather than a generic effects array. Bump state format 4→5, rules 5→6,
-   run envelope 6→7 and dungeon envelope 7→8; keep RNG and standalone wrapper at 1.
+   run envelope 6→7 and dungeon envelope 8→9; keep RNG and standalone wrapper at 1.
+   The initial dungeon 7→8 allocation was superseded when main independently
+   introduced format 8 for moving encounters; retain exact 7/8 recovery bytes.
    Existing content/dungeon identity hashing includes the new rule/catalog data.
    Preserve/export previous-format bytes as incompatible through existing recovery;
    no silent migration/reset. Retain battle-local status across active reload,

@@ -1,17 +1,16 @@
 # Goblin Shaman qualification (#166)
 
-Updated 2026-10-29 (Asia/Jerusalem). Checkpoint **28cba2a** is qualified through
-one retained complete attempt plus bounded repairs. Final readiness remains open
-while integrating new main **b343ab0** (#246/#155). See the
-[live plan](../../ongoing-projects/plan.md) and
-[OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md).
+Updated 2026-10-29 (Asia/Jerusalem). Implementation and qualification are complete
+on combined main/Shaman source **f4616ae301da4be133455334d4c2b38e3583c8f7**. All five issue criteria below are
+proven. Final PR publication is tracked in the [live plan](../../ongoing-projects/plan.md)
+and [OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md).
 
 [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251) supplies the
 source-pinned foundation; dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252)
 supplies support runtime, placement, feedback and continuation. No merge,
 deployment or physical-device testing is claimed.
 
-## Acceptance at the pre-integration checkpoint
+## Current acceptance
 
 1. Validated stats/assets/abilities and placement: exact closed profiles, pinned
    art and every encounter/survivor/fallback pass. Dungeon Forest Ruins alone uses
@@ -20,9 +19,9 @@ deployment or physical-device testing is claimed.
 2. Exact Will-save/Weakened and feedback: twenty-face enumeration, equality,
    extremes, no automatic natural 1/20, Guard/Mark composition, refresh, saved-cast
    preservation, immunity and defeat/turn expiry are tested. Inspection shows DC
-   12 and Fighter/Ranger/Mage 50%/45%/55% save chances. Shaman seed 3 fails on natural
-   3; Ranger seed 1 also saves with natural 17 + Will 0. One source applies -2
-   accuracy once.
+   12 and Fighter/Ranger/Mage 50%/45%/55% save chances. Shaman seed 31 records a
+   failed natural 5 and successful natural 13 against Ranger Will 0. One source
+   applies -2 accuracy once.
 3. Healing eligibility/cap/atomic rejection: tests cover injured living allied
    grunt/archer/Shaman, wrong side, dead/missing/full/self/range/LOS, missing HP
    1/4/7 and exhausted RNG. Production has two useful heals with no die/use pool;
@@ -32,13 +31,68 @@ deployment or physical-device testing is claimed.
    An injured ally opposite attack goals proves the repaired approach branch.
 5. Complete continuation and negatives: rejected malformed/source/immunity/range/
    LOS/action/target cases are atomic; old bytes stay recoverable. All six
-   Chromium/WebKit journeys have identical **53-command** histories, two heals,
+   Chromium/WebKit journeys have byte-identical **54-command** histories, two heals,
    Hex, active Weakened reload/expiry, victory and independent exact actual
    command/event/state/RNG replay.
 
-These claims describe the frozen checkpoint, not the combined movement build.
-State/rules/run/dungeon versions here are **5/6/7/8**; integration must resolve
-main's independent dungeon format 8 allocation.
+Current state/rules/run/dungeon versions are **5/6/7/9**. Main **b343ab0**
+(#246/#155) introduced moving encounters and independently allocated dungeon 8.
+The combined change resolves all seven conflicts and writes 9, retaining current-
+format legacy exploration behavior and exact incompatible format-7/8 recovery.
+The literal-main format-8 fixture is source-pinned in tests/fixtures/saves/issue-166/.
+
+## Combined-source qualification
+
+[Current manifest](full-run/integration/manifest.json) and the
+[19-family reconciliation](full-run/qualification.json) bind every required family
+to fresh affected checks or explicit unchanged-input reuse. This is a qualified
+combination of evidence, **not a clean new full-suite run**. Original failures,
+skips and incomplete attempts remain unchanged below.
+
+- **1,069/1,069 units**, both TypeScript scopes, **2/2** real root/prefix header
+  integrations, production builds and **18/18** performance samples passed.
+- **360 passing current-source browser executions**: Chromium dungeon 105, map
+  69, restart/backup 9; WebKit dungeon 105, restart/backup 6; owning dev map 6;
+  root/prefix preview/dev asset boot/cold-warm checks 60. Six expected preview map
+  skips are covered by the six owning development executions. Zero unexpected,
+  flaky or retry results. All jobs were serial with one worker.
+- All four complete Shaman/Fighter/Ranger/Mage production witnesses pass on each
+  engine's desktop/portrait/landscape profiles. Seeds are **31/28/2/12**. Fighter
+  retains six battles, level three, healing/Taunt and depth-2/slot-2 terminal defeat;
+  Ranger retains five battles, Mark/Pin, level three and defeat. Actual commands,
+  events, saved status, party/progression and terminal states replay exactly.
+- All six Shaman raw files have SHA-256
+  **e2c0cc8be5e8bfb307cc4e476d436ae4a01fdaca04dc448df7a3adf64fca5456**;
+  [compressed records](full-run/integration/shaman-journeys.json.gz) retain every
+  54-command history, both save outcomes, two heals, reload/expiry and victory.
+- Root/restored inventory: **9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1**.
+  Prefix inventory: **86f20f9cf35f9e4b5f878b9964cb19a99c7fbd28822b28f55a1134bda5c57f40**.
+  Root restoration is byte-identical. Input hash:
+  **4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**; all inputs stayed unchanged throughout the checks.
+
+Linux Node **24.15.0**, npm **12.0.2**, Playwright **1.63.0**;
+Chromium **153.0.8010.12**, WebKit **26.6**.
+This is browser/device emulation. Final serial version probes and source/build
+inventories are retained with the reports. Git input comparison shows no committed
+application/test/config/dependency difference after the qualified source; native
+working files differ only by checkout newlines. The 14 inputs changed since the
+prior repair are inherited movement/entry/focus consumers plus dungeon format 9.
+Shared Shaman rules/content/AI/presentation, tooling, loading and telemetry inputs
+retain their earlier qualified evidence with the ledger's explicit reach mapping.
+
+Portable archives include expanded units/metadata, stage commands/reports/logs,
+per-case traces and samples, all 604 current raw-artifact hashes, reproduction
+recipes and source parity. Full raw trees remain in the Linux checkout under
+tmp/issue166/integration-{browsers,dev-map,assets}/. Fresh
+[foundation-main receipts](full-run/foundation-main/manifest.json) independently
+retain 1,032 passing units, both type scopes, headers and root bundle for #251.
+
+Reviewed current [Chromium portrait](full-run/integration/chromium-portrait-inspection.png),
+[WebKit board](full-run/integration/webkit-desktop-board.png),
+[portrait inspection](full-run/integration/webkit-portrait-inspection.png),
+[landscape Weakened](full-run/integration/webkit-landscape-weakened.png) and
+[save log](full-run/integration/webkit-portrait-save-log.png): art, source/expiry,
+save math/ranges and heal rules are legible, with existing modal scrolling.
 
 ## Retained full attempt and repair evidence
 
@@ -80,8 +134,11 @@ The one-line repair projects `{x,y}` and keeps the reader strict. Original faili
 proof and passing 59-case AI/dungeon repair are retained. Complete old/new packets
 match for Ranger 1, Mage 17, Shaman 3, guardian 4, healed Fighter and selected
 victory boundaries, including commands/events/states/RNG/party/progression/replay.
-Only this guarded support branch and five test inputs changed after the aggregate;
+At that repair checkpoint, only the guarded support branch and five test inputs
+changed after the aggregate;
 loader/URL/cache/nonce/configuration/image bytes did not.
+
+## Pre-integration repair checkpoint (retained)
 
 [Repair manifest](full-run/repair/manifest.json): source **28cba2a**, input hash
 `51d3e7476a95e97d8fef65b03ea0fa1fc1f38d6aece503ae5ec53c71d532add7`;

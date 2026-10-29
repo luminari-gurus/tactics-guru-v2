@@ -77,8 +77,8 @@ path/hazard trigger order belong to #167/#168/#171.
 ## Persistence and acceptance gates
 
 Issue #166 advances battle state to format 5/rules 6, run envelope to 7 and dungeon
-envelope to 9 (following #165’s 4/5, 6 and 7 respectively); standalone wrapper and
-RNG remain 1. Earlier saves are incompatible and retain recovery/export of original
+envelope to 9 (following #165’s 4/5, 6 and 7, then movement’s dungeon 8).
+Standalone wrapper and RNG remain 1. Earlier saves are incompatible and retain recovery/export of original
 bytes. Historical defeated-unit `guarded` flags are read without normalization
 before digest checking; projection treats them as inactive. Inspection does not
 rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery.
