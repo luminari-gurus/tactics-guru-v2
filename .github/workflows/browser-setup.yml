@@ -8,7 +8,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
-    if: github.ref != 'refs/heads/work/issue-177-threat-planning'
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
@@ -37,60 +36,3 @@ jobs:
             test-results/
           retention-days: 7
           if-no-files-found: ignore
-
-  issue177-comparison:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-177-threat-planning'
-    runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 70
-    steps:
-      - name: Check host disposition
-        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
-      - uses: actions/checkout@v4
-        with:
-          ref: 1c53c5e52e5b691d9827799892d8c415f78a6331
-          path: base
-          persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          ref: 7f173bc9a2ef363acfefd0c4a3659d7f04aa9fcf
-          path: head
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Compare the same Fighter journey on base and PR
-        shell: bash
-        run: |
-          mkdir -p receipts
-          node --version > receipts/node.txt
-          uname -a > receipts/host.txt
-          for version in base head; do
-            cd "$GITHUB_WORKSPACE/$version"
-            git rev-parse HEAD > "$GITHUB_WORKSPACE/receipts/$version-sha.txt"
-            git status --porcelain > "$GITHUB_WORKSPACE/receipts/$version-status.txt"
-            if npm ci > "$GITHUB_WORKSPACE/receipts/$version-install.log" 2>&1 && npm run build > "$GITHUB_WORKSPACE/receipts/$version-build.log" 2>&1; then
-              git status --porcelain > "$GITHUB_WORKSPACE/receipts/$version-after-build-status.txt"
-              if PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/receipts/$version.json" npx --no-install playwright test tests/dungeon.spec.ts -g 'Fighter legal progression journey earns level three' --project=mobile-landscape --output="$GITHUB_WORKSPACE/receipts/$version-artifacts" --reporter=line,json > "$GITHUB_WORKSPACE/receipts/$version-test.log" 2>&1; then
-                echo 0 > "$GITHUB_WORKSPACE/receipts/$version-exit.txt"
-              else
-                echo "$?" > "$GITHUB_WORKSPACE/receipts/$version-exit.txt"
-              fi
-            else
-              echo blocked > "$GITHUB_WORKSPACE/receipts/$version-exit.txt"
-            fi
-          done
-          test "$(cat "$GITHUB_WORKSPACE/receipts/base-exit.txt")" = 0 && test "$(cat "$GITHUB_WORKSPACE/receipts/head-exit.txt")" = 0
-      - name: Exercise dev-only disposer case on all Chromium profiles
-        if: always()
-        working-directory: head
-        shell: bash
-        run: |
-          test -f "$GITHUB_WORKSPACE/receipts/head-exit.txt" && test "$(cat "$GITHUB_WORKSPACE/receipts/head-exit.txt")" != blocked
-          PLAYWRIGHT_SERVER_MODE=dev PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/receipts/disposer.json" npx --no-install playwright test tests/overworld-map.spec.ts -g 'direct map disposer is idempotent and detaches listeners' --output="$GITHUB_WORKSPACE/receipts/disposer-artifacts" --reporter=line,json > "$GITHUB_WORKSPACE/receipts/disposer-test.log" 2>&1
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue177-fighter-comparison-${{ github.run_id }}-${{ github.run_attempt }}
-          path: receipts/
-          retention-days: 30
-          if-no-files-found: warn
