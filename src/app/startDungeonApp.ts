@@ -72,7 +72,7 @@ function start(){
  engine.scene.remove('battle');engine.scene.add('battle',new BattleScene(value=>{status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';},message=>{status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;},host),true);
  evidence();
 }
-session.onChange=()=>render();restart.addEventListener('click',requestNew);
+session.onChange=()=>render();restart.addEventListener('click',()=>{restart.focus();requestNew();});
 document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
 window.addEventListener('pagehide',()=>{live=false;session.dispose();mapView.dispose();stop();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});

@@ -355,11 +355,11 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
   expect(actor.hasActed).toBe(true);expect(!!actor.guarded).toBe(ability==='ability:guarded_strike');
   const ac=catalog.heroes.fighter.stats.armorClass+(actor.guarded?2:0);
   await expect(page.locator('#battle-stats')).toContainText(`AC ${ac}`);
-  await expect(page.locator('#battle-status')).toHaveText(actor.guarded?'Guarded (+2 AC)':'No status effects');
+  await expect(page.locator('#battle-status')).toHaveText(actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects');
   await expect(page.locator('[data-action="basic"]')).toBeDisabled();await expect(page.locator('#battle-availability')).toContainText('Action spent');
   await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${actor.id}`).click();
   await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${ac}`);
-  await expect(page.locator('#battle-dialog-message')).toContainText(actor.guarded?'Guarded (+2 AC)':'No status effects');
+  await expect(page.locator('#battle-dialog-message')).toContainText(actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects');
   await page.locator('#inspection-close').click();expect((await readSession(page)).state).toEqual(state);
 });
 

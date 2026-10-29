@@ -13,7 +13,7 @@ import { dispatch } from '../src/domain/turns';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
-test('read-only entry, keyboard new dungeon, real action and active resume',async({page})=>{
+test('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('dungeon');
  await expect(page.getByRole('button',{name:'Continue saved dungeon',exact:true})).toBeDisabled();
  expect(await page.evaluate(()=>localStorage.length)).toBe(0);
@@ -23,6 +23,9 @@ test('read-only entry, keyboard new dungeon, real action and active resume',asyn
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
  await page.screenshot({path:test.info().outputPath('floor-entry.png'),fullPage:true});
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.locator('#battle-party').focus();
+ if(isMobile)await page.locator('#fit-restart').tap();else await page.locator('#fit-restart').click();
+ await page.locator('#dungeon-cancel-new').click();await expect(page.locator('#fit-restart')).toBeFocused();
  const before=await snapshot(page),cmd=playerDecision((await readSession(page)).state,dungeonBattle(before)!.catalog);
  await playCommand(page,cmd);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const saved=await snapshot(page);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
