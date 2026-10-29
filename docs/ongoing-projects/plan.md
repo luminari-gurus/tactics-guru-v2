@@ -231,6 +231,48 @@ unchanged combat/standalone/run/tooling evidence with explicit input comparison;
 do not restart every already-qualified suite. Keep both PRs open and leave actual
 PR merging/deployment to review. Final readiness now includes this integration.
 
+Integration progress: foundation **03b1e899ad091ba79ba65b08487204427b23de1e**
+contains main and is pushed on #251; fresh **1,032 units**, both type scopes,
+two build integrations and root bundle pass. Runtime merge **f4616ae** is committed
+locally on the dependent branch. Its 66 affected dungeon units pass after resolving
+all seven conflicts. Dungeon **format 9** replaces the independent 8 allocations;
+exact literal-main format-8 bytes are captured in
+`tests/fixtures/saves/issue-166/dungeon-main8.json` and proven recoverable/exportable.
+Current-format legacy exploration remains readable and upgrades only after an
+accepted movement/victory; prior format-7/8 data stays incompatible.
+
+Movement-aware witness search retained every assertion and selected **Shaman 31**
+(54 commands, failed natural 5 and successful natural 13 Will saves, two heals,
+victory), **Fighter 28** (six battles, level three, heal/Taunt and depth-2/slot-2
+defeat), **Ranger 2** (five battles, Mark/Pin, level three and defeat); Mage keeps
+main's **12**. A duplicate Fighter helper from the two branches is consolidated.
+Original pre-integration 62/66 failures and the interrupted/incorrect-selector
+search attempts are retained under native `tmp/issue166/`.
+
+Fresh integration preparation passed **1,069/1,069 units**, both type scopes,
+two build integrations, root bundle and **18/18 performance samples**. Receipt folder:
+`verification-receipts/timings/issue166-integration-f4616ae/`. It runs all units,
+both type scopes, header integrations/root bundle and performance, followed by
+`integration-root-inputs.json` capture. After it passes, discover and execute the
+changed dungeon/exploration/lifecycle and overworld browser consumers, including
+all four complete production witnesses on Chromium/WebKit profiles; relevant
+run/battle persistence and WebKit acceptance cover inherited restart-focus changes.
+Refresh root/prefix boot on the combined bundle, restore root exactly and retain
+all source/test IDs/artifacts. The original aggregate's remaining combat/fixture/
+telemetry/tooling evidence is reusable only after explicit unchanged-input reach
+accounting. Do not call this a clean new full run.
+
+**Active unified session 51122** runs `tmp/issue166/integration-browsers.mjs` in
+the Linux checkout, with unchanged source **f4616ae301da4be133455334d4c2b38e3583c8f7**
+and input hash **4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**.
+Launch log: `tmp/issue166/integration-browsers-launch.log`; report and per-stage
+logs/JSON/artifacts: `tmp/issue166/integration-browsers/`. Serial stages are
+Chromium dungeon/exploration/lifecycle (105 discovered), map (75; dev cases have
+their own mode), targeted battle/run restart plus backup (9), WebKit exploration
+(105), targeted WebKit restart/backup (6). All four complete production witnesses
+are selected in both engines' three profiles. Follow with owning dev-map checks
+and combined root/prefix boot verification, preserving root inventory afterward.
+
 ## Evidence and proposed implementation decisions
 
 Legacy evidence is pinned to `e9433f6b608ae6b2d95418615cce9cf17dadcf74`:
