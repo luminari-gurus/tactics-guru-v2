@@ -1,6 +1,6 @@
 # Issue #166: Goblin Shaman support combat
 
-Started: 2026-10-28; updated: 2026-10-29 (Asia/Jerusalem). Status: qualified; final publication audit.
+Started: 2026-10-28; updated: 2026-10-29 (Asia/Jerusalem). Status: complete; both PRs review-ready.
 OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
 
 - Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
@@ -86,16 +86,17 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
 
 ## Implementation handoff (live)
 
-Snapshot: 2026-10-29. **8/9 OpenSpec tasks complete**. Implementation and
-qualification are complete; only final publication/audit task 4.2 remains.
+Snapshot: 2026-10-29. **9/9 OpenSpec tasks complete**. Implementation,
+qualification and publication are complete. Both PRs are open and review-ready;
+all code/test inputs match the qualified functional source.
 No browser jobs are active. Both owned pipelines finished successfully.
 
 - Foundation: `branch/issue-166-goblin-shaman`, functional head **03b1e899ad091ba79ba65b08487204427b23de1e**,
   [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251), review-ready.
 - Runtime: `branch/issue-166-shaman-support`, frozen functional source
   **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252).
-  Later commits update documentation/evidence only. Publish the final packet and
-  mark this PR ready after the remaining link/hash/diff audit.
+  Later commits update documentation/evidence only. The complete packet is
+  published and the PR is confirmed open, mergeable and ready for review.
 - Main **b343ab0** (#246/#155) is integrated through the parent. All seven
   conflicts are resolved. State/rules/run/dungeon versions are **5/6/7/9**;
   moving encounters and current-format legacy exploration are retained. Exact
@@ -152,18 +153,25 @@ are under `tmp/issue166/integration-{browsers,dev-map,assets}/`. The original ra
 full tree is `tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
 Do not rerun application suites for final docs-only metadata.
 
-### Final publication
+### Review handoff
 
-1. Validate OpenSpec strictly, verify local links and manifest artifact hashes,
-   inspect the final diff and confirm frozen input parity. Retain the audit output.
-2. Commit/push the final packet/docs; update #252 with `Closes #166` and
-   `Refs #161`, then mark ready. Record task 4.2 completion, publish the final
-   handoff and verify both remote branch heads and a clean working tree.
-3. Remove task-created scratch scripts/probes after preserving reproduction data;
-   retain required recovery evidence and unrelated work. Review #251 first, then
-   retarget #252 to main after its parent merges. Wider #161/#170 acceptance stays
-   open. OpenSpec archive/sync follows review when requested. Merge/release/
-   deployment are outside this delivery.
+Strict OpenSpec validation passed. The final audit verifies **52 local links**,
+**71 packaged artifact hashes**, all 19 policy families and the untouched Mage
+archive. A checkout-only JSON newline conversion was restored after confirming
+the Git blob already matched its original hash. Git input comparison and the
+combined merge tree are clean; source/build evidence is retained unchanged.
+
+Both branches are published. #252 has the focused final description and
+Closes #166 / Refs #161; #161/#170 wider scope stays open. Review #251 first,
+then retarget #252 to main after the parent merges. Use the retained source-bound
+evidence for proportional merge checks; refresh only genuinely invalidated inputs.
+OpenSpec archive/sync follows review when requested. Merge/release/deployment
+are outside this completed implementation delivery.
+
+Task-created scratch scripts/probes are removed after preserving reproduction
+recipes; raw failures, screenshots, traces and receipts remain available at the
+paths above. No browser or queue job remains active. No implementation work is
+left open in this change.
 
 Use native Git for checkouts/merges in the Windows checkout; WSL reports CRLF files
 as modified despite native clean status. Authenticated WSL fetch/push is available.

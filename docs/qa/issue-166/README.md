@@ -2,8 +2,10 @@
 
 Updated 2026-10-29 (Asia/Jerusalem). Implementation and qualification are complete
 on combined main/Shaman source **f4616ae301da4be133455334d4c2b38e3583c8f7**. All five issue criteria below are
-proven. Final PR publication is tracked in the [live plan](../../ongoing-projects/plan.md)
-and [OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md).
+proven. Both PRs are published and review-ready; OpenSpec is **9/9 complete**.
+The [live plan](../../ongoing-projects/plan.md) and
+[OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md) contain
+the completed review handoff.
 
 [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251) supplies the
 source-pinned foundation; dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252)

@@ -19,7 +19,7 @@
 ## 4. Integration and delivery
 
 - [x] 4.1 Reconcile all required full-regression stages under verification-policy.md on frozen runtime/test inputs with proportional repairs and valid evidence reuse; retain every failure/skip/incomplete result and immutable source/build provenance in QA/plan. Complete: all 19 families are reconciled in full-run/qualification.json; f4616ae passes 1,069 units, both type scopes/build gates, 18 performance samples and 360 browser executions, with six expected preview skips covered in dev. Original failed attempts and valid explicit reuse remain preserved.
-- [ ] 4.2 Audit all five issue acceptance criteria and OpenSpec tasks, validate strictly, review final diff, update handoff/PR descriptions, commit/push review-ready dependent PRs and verify remote parity; leave merge/deployment to review.
+- [x] 4.2 Audit all five issue acceptance criteria and OpenSpec tasks, validate strictly, review final diff, update handoff/PR descriptions, commit/push review-ready dependent PRs and verify remote parity; leave merge/deployment to review. Complete: all five criteria are mapped to current proof; strict validation, source/merge-tree checks, 52 links and 71 artifact hashes pass. PR #251 and dependent #252 are published, mergeable and review-ready; final handoff and branch parity are verified. Wider #161/#170 scope stays open.
 
 ## Workflow follow-up
 
