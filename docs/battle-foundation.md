@@ -1,5 +1,7 @@
 # Battle foundation (#4)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/domain` is pure TypeScript checked separately with ES2022 libraries and no DOM or Node ambient types. It imports only the merged content contract and other domain modules. Unit tests guard imports and ambient entropy, and exercise the APIs with `Math.random`/`Date.now` disabled. The existing Node Vitest unit script is reused; Playwright remains a separate configured runner.
 
 ## State boundary

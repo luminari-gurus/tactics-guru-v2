@@ -1,6 +1,8 @@
 # Run items and reward offers
 
-[Issue #77](https://github.com/luminari-gurus/tactics-guru-v2/issues/77), branch `work/issue-77-reward-catalog`, base `220d40f0ad179a7ffe5a4e3c67188b99718e722e`. Caller `dubstylee` approved [the OpenSpec plan](../openspec/changes/issue-77-reward-catalog/proposal.md) at `4b719e0` on 2026-10-14. These are initial reviewed values; #81 owns later reviewed playtest tuning. #57 remains the feature-release gate.
+[Issue #77](https://github.com/luminari-gurus/tactics-guru-v2/issues/77), branch `work/issue-77-reward-catalog`, base `220d40f0ad179a7ffe5a4e3c67188b99718e722e`. Caller `dubstylee` approved [the OpenSpec plan](../openspec/changes/issue-77-reward-catalog/proposal.md) at `4b719e0` on 2026-10-14. The following historical issue references describe the original reviewed slice; current values and integration are described below.
+
+Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`. The [run session](../src/app/RunItemSession.ts) integrates reward claims, preparation controls, equipment projection and saved continuation; [dungeon session](../src/app/DungeonSession.ts) also uses the item contract. See [run contract](run-contract.md) and [dungeon](dungeon.md). The detailed #77/#78 handoffs and QA below retain their original historical scope.
 
 ## Reviewed catalog
 
@@ -12,7 +14,7 @@
 
 All entries allow Fighter, Ranger and Mage and use `context: betweenEncounters`. A hero with zero HP stays defeated; these items never revive. Healing requires a living injured hero; full-health targets are rejected without consumption. Equipment can be assigned only to a living eligible hero, with one shared charm slot per hero. Items do not automatically heal or grant max HP, power or signature damage. Separately, [hero progression](hero-progression.md) projects max HP before equipment and heals on level-up.
 
-Item use, equip and unequip are permitted at the first two reward boundaries and the subsequent encounter entry before constructing its active battle. Initial entry and terminal outcomes are excluded. A trusted adapter must check the run boundary and that no active battle exists; run `phase: battle` alone is not permission. Claim grants ownership and advances the reward boundary atomically. The next encounter preparation screen can then use the newly claimed item before battle construction. #78 supplies the pure context preflight; #79/#80 supply controls and the trusted active-battle context. Those implementations are outside this package.
+Item use, equip and unequip are permitted at the first two reward boundaries and the subsequent encounter entry before constructing its active battle. Initial entry and terminal outcomes are excluded. A trusted adapter must check the run boundary and that no active battle exists; run `phase: battle` alone is not permission. Claim grants ownership and advances the reward boundary atomically. The next encounter preparation screen can then use the newly claimed item before battle construction. #78 supplies the pure context preflight; #79/#80 delivered controls and the trusted active-battle context.
 
 For example, Fighter at 12/18 HP uses a draught and enters the next encounter at 18 HP; Fighter at 16/18 reaches 18, consuming one draught without carrying excess healing forward. A zero-HP Mage and an 18/18 Fighter are invalid healing targets. The explicit item transition updates carried HP; combat HP is checked before XP is awarded; a level-up then fully heals a living hero under [hero progression](hero-progression.md). Revival remains rejected.
 
@@ -24,7 +26,7 @@ For example, Fighter at 12/18 HP uses a draught and enters the next encounter at
 
 [items.ts](../src/content/items.ts) validates the authored catalog at runtime import and throws a descriptive error if authored definitions fail. `npm run validate:content` exercises this same validator and the authored import, including invalid definition fixtures; `npm run build` runs that content gate before both typechecks and bundling. [Item fixtures](../tests/unit/items.test.ts) cover rejection and a fourth item described entirely through an existing effect type. [Reward fixtures](../tests/unit/rewards.test.ts) show it participating in offers with its catalog-derived label. There are no item-ID-specific gameplay branches.
 
-The item catalog is separate from `ContentCatalog`. It does not enter current battle rules, single-battle content hashes, replays or save decoding. `itemCatalogIdentity` uses the existing canonical SHA-256 helper over every validated item field plus `REWARD_POLICY`. Labels and hero-list order count toward this identity. Future run codecs must retain this identity and offer version and preserve incompatible bytes for recovery; they must not silently reroll or discard offers. No run codec is added here.
+The item catalog is separate from `ContentCatalog`. It does not enter current battle rules, single-battle content hashes, replays or save decoding. `itemCatalogIdentity` uses the existing canonical SHA-256 helper over every validated item field plus `REWARD_POLICY`. Labels and hero-list order count toward this identity. The run codec retains this identity and offer version and preserves incompatible bytes for recovery; it does not silently reroll or discard offers. See [run save envelope](../src/domain/runSaveEnvelope.ts).
 
 ## Owned items and equipment contract
 
@@ -70,7 +72,9 @@ Run seed 123 produces reward seeds `1746306032` and `2025501471`. The independen
 
 The placeholder must be replaced with the computed identity when storing an actual offer. #79/#80 persist this generated value; previews render its options/labels without advancing RNG. `readRewardOffer` validates unknown stored data against the trusted current boundary/catalog, including exact version/ID/seed/hash and regenerated option order/quantities. It rejects stale, tampered, incompatible or malformed data and returns an owned copy. Regeneration here is pure validation of a fixed seed, not a new entropy draw. Fixture oracles use independent BigInt RNG/selection and Node SHA-256, including reordered catalog keys, input freezing, repeated previews, JSON round trips and fourth-item extension.
 
-## Atomic command and integration handoff
+## Historical #78 atomic command and integration handoff
+
+This section and the following #78 implementation and verification notes describe the original delivery; future-tense handoff language is historical. Current integration is summarized above.
 
 `RewardClaimIntent` carries `type: claimReward`, runId, expected revision, encounterId, boundaryId, offerId and selected itemId. #78 must validate the live run and stored offer, require matching identity/revision/phase, ensure the selected item is offered, and preflight grant/ownership capacity. Only one successful transition both grants the item and acknowledges the reward. Failure or a duplicate/stale request must neither grant nor acknowledge, consume RNG, change actions nor partially update party/ownership. Calling the existing acknowledgment independently is not an inventory grant and must not bypass the future atomic command.
 

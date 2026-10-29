@@ -1,5 +1,7 @@
 # Target preview overlays
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 Issue: [#142](https://github.com/luminari-gurus/tactics-guru-v2/issues/142).
 
 ## Legacy review

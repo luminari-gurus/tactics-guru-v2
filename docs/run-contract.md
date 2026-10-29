@@ -1,5 +1,7 @@
 # Three-encounter run contract
 
+Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+
 Current #163 extension: level-2 Fighter Second Wind can increase battle HP above
 encounter entry. The active-snapshot reader requires its spent-use flag and bounds
 HP by entry HP plus one `4 + projected power` heal, capped at projected max HP.
@@ -7,8 +9,7 @@ Completion supplies an exact optional `secondWindUsed: true` fact from that
 validated battle to the reducer, which applies the same bound; other heroes and
 unspent state retain entry-HP bounds. The fact does not enter party data and cannot
 revive a defeated hero. Current equipment modifies accuracy/AC, preserving the
-reducer's healing-power equivalence. Battle state 3/rules 4 and run envelope 5
-reject prior saves while retaining original bytes for recovery/export.
+reducer's healing-power equivalence. The current battle state format 4/rules 5 and run envelope 6 reject incompatible earlier saves while retaining original bytes for recovery/export; see [ability rules](signature-abilities.md).
 
 The #164 Ranger extension adds level-2 Mark Target and level-3 Pinning Shot;
 [their shared rules](signature-abilities.md#ranger-progression-164) govern the
@@ -22,11 +23,11 @@ the run's HP/award rules.
 
 The caller approved retaining survivors' remaining HP between encounters; [hero progression](hero-progression.md) now heals living heroes only when a victory award crosses a level. Fighter, Ranger and Mage are the initial party. A hero at zero HP stays defeated and does not participate again during this run. Revival is a future feature, outside this contract. One reward choice follows each of the first two victories; the third victory completes the run without another reward. Wiping the party ends the run immediately.
 
-Both final victory and defeat screens will contain **Start new run**. It resets to encounter 1 with the original full-HP party, empty inventory/equipment, and a fresh externally supplied seed and run identity. No separate restart modal is required. The actual outcome screen is #80 work; this issue provides its pure intent. Healing item definitions, balance, choice count and effects belong to #77; owned effects/commands belong to #78. Revival remains unavailable; level-up healing is explicitly defined by #160.
+Both final victory and defeat screens contain **Start new run**. It resets to encounter 1 with the original full-HP party, empty inventory/equipment, and a fresh externally supplied seed and run identity. No separate restart modal is required. The outcome screen and integrated item controls were delivered by #80; #77 and #78 supplied the item and ownership contracts. Revival remains unavailable; level-up healing is explicitly defined by #160.
 
 ## State and ownership
 
-`RunDefinition` is a trusted ordered tuple of exactly three distinct encounter IDs. #76 chooses actual IDs and binds them to validated authored maps. This reference contract tests synthetic encounter IDs and does not claim that real encounter content exists. Encounter IDs have prefix `encounter:` and a 1–64 character ASCII letters/digits/underscore/hyphen suffix. A state's encounter tuple must match its trusted definition exactly.
+`RunDefinition` is a trusted ordered tuple of exactly three distinct encounter IDs. #76 chooses actual IDs and binds them to validated authored maps. The production sources are described in [authored encounters](authored-encounters.md); the original reference-contract fixtures also use synthetic IDs. Encounter IDs have prefix `encounter:` and a 1–64 character ASCII letters/digits/underscore/hyphen suffix. A state's encounter tuple must match its trusted definition exactly.
 
 | Field | Contract |
 | --- | --- |
@@ -41,7 +42,7 @@ Both final victory and defeat screens will contain **Start new run**. It resets 
 | `phase` | `battle`, `reward`, `victory`, or `defeat` |
 | `pendingReward` | Exactly `{ id, seed }` in reward phase; null otherwise |
 
-Readers reject extra keys, symbols, accessors, sparse/extended arrays, duplicate/out-of-order/unknown heroes, unsafe numbers, unknown/future versions and inconsistent phases. Accepted data is copied. Run state does not include initiative, actions, Guarded, positions, animation/preview data or mutable battle RNG. Zero HP encodes defeat without a redundant flag. Current run format intentionally has no inventory fields; their future format requires explicit ownership validation.
+Readers reject extra keys, symbols, accessors, sparse/extended arrays, duplicate/out-of-order/unknown heroes, unsafe numbers, unknown/future versions and inconsistent phases. Accepted data is copied. Run state does not include initiative, actions, Guarded, positions, animation/preview data or mutable battle RNG. Zero HP encodes defeat without a redundant flag. Inventory is owned by the surrounding `RunItems` aggregate and validated by the run envelope; it is not a field of `RunState`.
 
 At the initial battle entry (index 0, revision 0), every hero must have catalog-max HP. Damaged or defeated initial entry parties are rejected, including when restored from JSON. Later encounter entries retain survivor HP. Current damage during encounter 1 belongs to the separate active battle snapshot, not the run entry party.
 
@@ -57,7 +58,7 @@ The catalog/definition are trusted validated inputs, not arbitrary uploaded obje
 | Battle at index i, revision 2i | Party wipe | Defeat at i, revision 2i+1 |
 | Final victory or defeat | Start new run | Fresh identity/seed, battle index 0, revision 0 |
 
-Battle/reward/victory phases require at least one living hero; defeat requires every hero at zero HP. Within one identity progression is acyclic. `completeBattle` requires a complete canonical party result and an outcome consistent with its survivors. HP may decrease or remain equal; completion cannot heal or revive a hero. The later item command layer must implement any reviewed explicit healing atomically, rather than smuggling it into a completion callback.
+Battle/reward/victory phases require at least one living hero; defeat requires every hero at zero HP. Within one identity progression is acyclic. `completeBattle` requires a complete canonical party result and an outcome consistent with its survivors. Completion accepts the bounded Second Wind healing described above and never revives a hero. Between-battle item healing is a separate atomic item command.
 
 Every command carries `runId`, expected `revision`, current `encounterId`, and `boundaryId`. The boundary identity is `<runId>:battle:<index>`, `<runId>:reward:<index>`, or `<runId>:outcome:<index>`. `completeBattle` also carries `outcome` and resulting `party`. `acknowledgeReward` carries no additional payload. `startNewRun` carries `newRunId` and `newSeed`, both different from the terminal run's values. A trusted adapter supplies a unique new attempt identity; the reducer rejects reuse of the immediate prior identity, but is not a global identity registry.
 
@@ -79,7 +80,11 @@ For run seed 123, encounter indices 0/1/2 derive `1167576323 / 1556857405 / 3704
 
 The module never obtains entropy; new-run seeds/identities come from an adapter. Repeated descriptor/offer previews and rejected/duplicate commands do not advance RNG. Reward consumers start from the persisted boundary seed, generate the reviewed catalog offer once, and retain its identity. Previewing an existing offer must not regenerate it by drawing from battle RNG.
 
-## Downstream interfaces
+## Historical #75 downstream handoff and evidence
+
+The following requirements and test receipts describe the original #75 handoff. #79/#80 subsequently integrated inventory, saves, controls and carried-party replay; consult the current source and contracts linked above for present behavior.
+
+### Downstream interfaces
 
 `RunBattleDescriptor` contains encounter ID, derived battle seed, boundary ID and copies of living party `{heroId,hp}` only. #76 ensures each supported survivor subset has legal validated spawns. #80 resets initiative, flags, Guarded/statuses and battle counters while carrying approved HP and later derived equipment stats. Current `createBattle` always uses full HP, and replay reconstructs a map/seed start exactly; #80 must adapt both together for carried-party starts. Existing APIs and single-battle replay remain untouched here.
 

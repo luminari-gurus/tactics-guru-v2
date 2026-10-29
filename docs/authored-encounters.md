@@ -1,6 +1,10 @@
 # Authored encounters
 
-Issue [#76](https://github.com/luminari-gurus/tactics-guru-v2/issues/76); approved OpenSpec change `issue-76-authored-encounters`. This package supplies fixed content for #80. Current battle startup, rules, stats, abilities, saves and Forest Ruins remain unchanged.
+Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`. The standalone battle uses authored Forest Ruins. The production short run uses two seeded generated Desert battlefields and the authored Ruined Approach finale, as configured in [encounters.ts](../src/content/encounters.ts); carried heroes, items and continuation are integrated by [run session](../src/app/RunItemSession.ts). The three authored maps below remain validated content and regression fixtures. See [run contract](run-contract.md) and [dungeon](dungeon.md) for their separate production flows.
+
+## Historical #76 authored package
+
+Issue [#76](https://github.com/luminari-gurus/tactics-guru-v2/issues/76) supplied the original fixed content for #80. The following handoff and evidence describe that historical slice, not the current production run.
 
 | Order | Encounter ID / map suffix | Layout | Hero spawns (IDs 1/2/3) | Enemy spawns (IDs 4/5/6) |
 | --- | --- | --- | --- | --- |

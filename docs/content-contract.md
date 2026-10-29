@@ -1,5 +1,7 @@
 # First-battle content contract (#26)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/content/types.ts` defines plain, immutable, renderer-independent records; `constants.ts` owns inclusive numeric bounds and the texture specification. The runtime validator in `src/content/validate.ts` checks unknown input without Phaser, DOM, combat rules, asset generation or an authored map. The existing diagnostic terrain catalog remains independent: its fourteen IDs are not the battle contract.
 
 ## Identity, references and numeric rules
@@ -24,7 +26,7 @@ Use the fixed legacy baseline documented in the repository's [source audit](phas
 | Goblin Grunt | 9 | 4 | 1 | 4 | 12 | 2 | 1 | 0 |
 | Goblin Archer | 8 | 4 | 1 | 4 | 11 | 2 | 2 | 0 |
 
-Heroes come from `scripts/combat/ForestRuinsMvpBuilder.gd:1190–1211`; archer from that builder at 1527–1538; grunt from `content/classes/` and `content/units/` resource definitions, as traced in the audit §3.3. The old three-enemy composition is a deliberate baseline choice, not today's seeded shaman roster. These values select a future catalog baseline; only synthetic test data is shipped here. No combat behavior is inferred from stats.
+Heroes come from `scripts/combat/ForestRuinsMvpBuilder.gd:1190–1211`; archer from that builder at 1527–1538; grunt from `content/classes/` and `content/units/` resource definitions, as traced in the audit §3.3. The old three-enemy composition is a deliberate baseline choice, not today's seeded shaman roster. These values selected the original catalog baseline; the authored production catalog was subsequently delivered in [#29](first-battle-content.md). No combat behavior is inferred from stats.
 
 ## Terrain production brief
 

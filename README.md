@@ -64,7 +64,7 @@ the game uses illustrated portraits, compact sprites and isometric tile boards.
   ends. Both controls use an action without damage or a roll.
 - **Mage** — **Magic Missile** deals automatic-hit force damage, subject to range
   and line of sight. Progression increases the missile count at levels 3 and 5.
-  It can target allies, so check the friendly-fire warning before confirming.
+  It can target allies, so check the friendly-fire warning before confirming. Level 3 also unlocks **Frost Snare**, which prevents an enemy from moving until its next turn ends.
 
 Runs and dungeons support **levels 1–5**. Victories award XP to living participants;
 level-ups increase maximum HP and heal them. Defeated heroes stay defeated.

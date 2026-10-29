@@ -1,5 +1,7 @@
 # Turn flow and combat (#7)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/domain/turns.ts`, `src/domain/combat.ts` and `src/domain/targeting.ts` add battle creation, the turn lifecycle, ordinary d20 attacks, defeat, the battle outcome, command dispatch and replay. Like #4 and #5, every API takes an untrusted snapshot and command plus a trusted, already validated catalog. It returns either one fresh snapshot with its events, or a typed rejection that changes nothing and draws nothing. Initiative, accepted d20 attacks and Magic Missile's d4 damage rolls use `rollDie` on the snapshot's own state. Rejected commands and previews draw nothing.
 
 Order, defeat and outcome are decided when a command resolves. Legacy deferred the outcome check while combat or movement animated ([BattleController.gd:1904-1908](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L1904-L1908)). Here the session (#10) only animates the events it is given, and timer APIs do not compile in `src/domain` (ES2022-only `tsconfig.domain.json`).
@@ -16,7 +18,7 @@ Creation emits one `initiativeRolled` per unit in roll order, then `turnStarted`
 
 **Restart is a new battle with a new seed** (D7, decided by dubstylee on 2026-10-09). The session calls `createBattle` again with the same map and a seed it supplies, because the domain never makes entropy. Legacy restart reloaded with the same seed ([BattleController.gd:124](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L124)), so a retry dealt the same dice in the same order; that is deliberately not kept. A seed override for testing still reproduces a battle, because the session passes the override as the seed.
 
-Resuming a saved battle is different: the snapshot carries the RNG state, so play continues from the next draw. Saves are a follow-up.
+Resuming a saved battle is different: the snapshot carries the RNG state, so play continues from the next draw. See [battle storage](battle-storage.md).
 
 ## Turns
 
@@ -68,7 +70,11 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed. Do not enforce this with a deep `Object.freeze`. PR #44's review tried it, and that replay took about 1.8 s instead of 0.5 s, because V8 is slower on frozen arrays.
 
-## Not included
+## Historical #7 scope and handoff
+
+The following scope, handoff and verification describe #7 at its delivery, not current runtime. Current abilities and effects are documented in [signature abilities](signature-abilities.md), enemy behavior in [enemy turns](enemy-turns.md), and live persistence in [battle storage](battle-storage.md).
+
+### Not included at #7
 
 - The three signatures and Guarded expiry are implemented for #8. Magic Missile adds its 1d4+1 automatic-hit path. Magic Missile replaces the previously planned Ember Burst Dex-save path (decision 2026-10-09); see `docs/signature-abilities.md`.
 - Enemy AI: #9.
