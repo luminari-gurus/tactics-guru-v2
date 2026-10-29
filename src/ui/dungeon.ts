@@ -2,7 +2,7 @@ import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, FloorCache, type DungeonItemCommand } from '../domain/dungeon';
+import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -16,8 +16,7 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   const el = dungeonElement, s = session.snapshot, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
-  const knownNext = floor.completed < 3 && floor.exploration.revealed.includes(poiCell(floor.exploration.pois[floor.completed]));
-  root.replaceChildren(title,el('p',floor.completed === 3 ? 'Guardian defeated. Walk to the stairs to continue.' : `Three encounters per floor. ${knownNext ? `Next: ${dungeonEncounterLabel(s,floor.completed)}.` : 'Explore to find the next encounter.'} Defeat the goblin guardian to unlock the stairs.`),status);
+  root.replaceChildren(title,el('p',floor.completed === 3 ? 'All encounters cleared. Walk to the stairs to continue.' : 'Walk onto any uncleared enemy to start its encounter. Clear all three encounters to unlock the stairs.'),status);
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
   };
@@ -27,10 +26,10 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   ]);
 
   mapView.render(s,cache.resolve(floor.descriptor.seed));root.append(mapView.root);
-  const canEnter=s.phase==='ready'&&floor.completed<3&&floor.position===poiCell(floor.exploration.pois[floor.completed]);
+  const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p));
   if(canEnter)root.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=el('section');travel.setAttribute('aria-label','Stairs');
-  travel.append(el('h2','Stairs'),el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, move off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'Guardian defeated. Descent is unlocked.':'Defeat the guardian and claim pending rewards to unlock descent.'));root.append(travel);
+  travel.append(el('h2','Stairs'),el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, move off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'All encounters cleared. Descent is unlocked.':'Clear all three encounters and claim pending rewards to unlock descent.'));root.append(travel);
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
   for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}root.append(party);

@@ -1,0 +1,1609 @@
+{
+  "iteration-preview": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/iteration-preview.json",
+    "sha256": "d5d674d158316db5a7b5d3940dc49a06472e7399d07e056552e600c453b87012",
+    "stats": {
+      "startTime": "2026-10-25T17:18:24.769Z",
+      "duration": 11761.030999999999,
+      "expected": 5,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-e3c5163994978ac9f6fb",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 857,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-db03059e479ccb8dcc5b",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5217,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f8578fdf5d3bbc2170e7",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3973,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e035b7210590420a8936",
+        "title": "Pause and Resume preserve the world across edits, art, regeneration and visibility",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 304,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-7c161bd058cce9623f8d",
+        "title": "art completion while hidden defers DOM updates and preserves movement and pending edits",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 311,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "iteration-dev": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/iteration-dev.json",
+    "sha256": "27c00d8d23ff3e2ce813f5012ea95449bc34819ac837bbf0a1c18b4b7cce0c69",
+    "stats": {
+      "startTime": "2026-10-25T17:19:35.143Z",
+      "duration": 6243.417,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-b62e62a247055bba7366",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "desktop",
+        "status": "unexpected",
+        "results": [
+          {
+            "status": "failed",
+            "duration": 5225,
+            "retry": 0,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 74,
+                  "line": 970
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#map-grid')\nExpected: \u001b[32m\"1\"\u001b[39m\nReceived: \u001b[31m\"0\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('#map-grid') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#map-grid')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <div role=\"img\" id=\"map-grid\" data-seed=\"1\" data-type=\"rooms\" data-art=\"simple\" data-fallback=\"false\" data-movement-step=\"0\" data-biome=\"grassland\" data-version=\"rooms-v1\" data-art-fallback=\"false\" aria-describedby=\"map-markers\" data-biome-version=\"grassland-v1\" data-placement-version=\"markers-v1\" data-commit=\"8df4239223c7a1139d51485b04a480f8b53ea8ad\" aria-label=\"20 by 20 Grassland map with 91 walkable and 309 blocked cells, 1 player and 3 enemies\">\u2026</div>\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  968 |   expect(await page.locator('#map-page').innerHTML()).toBe(before);\n  969 |   await page.reload();\n> 970 |   await page.clock.runFor(1000); await expect(page.locator('#map-grid')).toHaveAttribute('data-movement-step','1');\n      |                                                                          ^\n  971 | });\n  972 |\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:970:74"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "disposer-repair": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/disposer-repair.json",
+    "sha256": "798a6afd7c6efa05dffba333181938218fc72898322ec9acc7cbd1fc0e1bff5c",
+    "stats": {
+      "startTime": "2026-10-25T17:20:13.970Z",
+      "duration": 1275.22,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-b62e62a247055bba7366",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 247,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "map-preview": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/map-preview.json",
+    "sha256": "1ca1d77ec056f513f39618706c55b7747df4c911524fe97425ace9f85b46a21e",
+    "stats": {
+      "startTime": "2026-10-25T17:21:05.646Z",
+      "duration": 67760.425,
+      "expected": 78,
+      "skipped": 6,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-2118bb83db4f7da26628",
+        "title": "failed route import at /map shows a reload instruction",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 173,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1fe0e7cc45b309394461",
+        "title": "failed route import at / shows a reload instruction",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 721,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 607,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c5a3370431e318966ae6",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 522,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-4272eb10e486397f89fa",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 291,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-cb4cd2c5c20d1e5ed0d0",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 721,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ef1783fc7d77add807d2",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 1521,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1e4d904884f6e48686b7",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 338,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b2128bf522d1055e4daa",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 2743,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0b7f3b6bd5d3180c11e2",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 295,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f86c63086244ca9c988f",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 138,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-74030444265263fad28d",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 137,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-efcb1c855f933217bd15",
+        "title": "art late loads preserve newer selections and seed validation",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 276,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-aa14e33f5544d86facb9",
+        "title": "markers follow committed controls and preserve pending edits",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 383,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-34be7a6ededf01bd01c8",
+        "title": "markers survive delayed artwork success after a newer world",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 266,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-67c4e2f6e13d120e4fb2",
+        "title": "markers survive delayed artwork network after a newer world",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 165,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b72288cf4017a110588e",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 164,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f33cd453d8c4bcad96a2",
+        "title": "markers remain readable at 320px with usable native controls",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 650,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "desktop",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 90,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d7ce29f30a475d0e6a72",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 295,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e3c5163994978ac9f6fb",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 351,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5a63eade9978471e3a04",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 134,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-db03059e479ccb8dcc5b",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5006,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-00da32ec5fd091c0986f",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 260,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f8578fdf5d3bbc2170e7",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3967,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e035b7210590420a8936",
+        "title": "Pause and Resume preserve the world across edits, art, regeneration and visibility",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 295,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-7c161bd058cce9623f8d",
+        "title": "art completion while hidden defers DOM updates and preserves movement and pending edits",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 249,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b62e62a247055bba7366",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "desktop",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 85,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-a3e5f09fc3b1c031ede3",
+        "title": "failed route import at /map shows a reload instruction",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 172,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-3f7d57abf1deb9b71359",
+        "title": "failed route import at / shows a reload instruction",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 429,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 710,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d511284e776f3ad42fb6",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 355,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9632f5dd1d6b42832a5b",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 222,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0647db39d4c1f6f00ba0",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 788,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d95c6503e7e594449b5e",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 2009,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1593d99708aec4401b5e",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 337,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e8f0621fdc204c2aa068",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3285,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-dedaa9cc6aca9d47e5eb",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 287,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-125acf385dfeef9a1ef9",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 139,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-84d1b8e4c83cd63534ee",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 137,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1a8e62307f99291f805c",
+        "title": "art late loads preserve newer selections and seed validation",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 276,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1d389435d6a6a25130a2",
+        "title": "markers follow committed controls and preserve pending edits",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 350,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f9f64c0ea370f4d6faeb",
+        "title": "markers survive delayed artwork success after a newer world",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 266,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e1a679ad77f3e5a13757",
+        "title": "markers survive delayed artwork network after a newer world",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 165,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-cc4009f24d2ea2f1632f",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 159,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ad12b40a4b2f3a3ce187",
+        "title": "markers remain readable at 320px with usable native controls",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 982,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "mobile-portrait",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 91,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d86092afae4aa282c1a9",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 286,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-849d21d7c5cca9efbc89",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 478,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-df112e3d103d7ce93160",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 136,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9d409981cd05957e40dd",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5060,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9db9801f2cf8456879c3",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 268,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-10da89e3886624b99161",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3974,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-97fc5b048843d15280ee",
+        "title": "Pause and Resume preserve the world across edits, art, regeneration and visibility",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 397,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2474aeeb81dd2433e1ec",
+        "title": "art completion while hidden defers DOM updates and preserves movement and pending edits",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 256,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d7b80ba95f1538f519e5",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "mobile-portrait",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 84,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-00b8423b76c12e8f77aa",
+        "title": "failed route import at /map shows a reload instruction",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 175,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1f00aa65719e18a52902",
+        "title": "failed route import at / shows a reload instruction",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 354,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 652,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-8c08441ccb74e33b8e1d",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 372,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b8b5b68eaecc3206803c",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 230,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-858058270e2caa4f1875",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 820,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b24d584d877ca0a3fb4d",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 1945,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2c5771223f4fffb25262",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 339,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-44129a5d93bef81effea",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3715,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-03acd54bf4ef578ffdcf",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 288,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-04837b1fe55ca3c8dca1",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 137,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-dc1ab9448127116f7825",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 137,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-6964dfa6acd0de1859ee",
+        "title": "art late loads preserve newer selections and seed validation",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 279,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f316cb6d5ccccbe6dc75",
+        "title": "markers follow committed controls and preserve pending edits",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 368,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2bbf73a7f9c5dd9f2bd5",
+        "title": "markers survive delayed artwork success after a newer world",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 273,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-38e4a5331ffe2af5e5d9",
+        "title": "markers survive delayed artwork network after a newer world",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 159,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c3c52d12a5cfa2b9e026",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 160,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0efa2bf76d577b00e616",
+        "title": "markers remain readable at 320px with usable native controls",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 888,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "mobile-landscape",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 89,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-92f6d04ddc64244d269b",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 286,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1bdd125c23bdea2e452a",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 495,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ca459133277dee20ff4f",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 134,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2d7adfe85250113f54e1",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 5005,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-65f87a3616571d4b32c9",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 265,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-7baa41856dad3ad75d56",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 3965,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-216dcdbfe96f0bae1213",
+        "title": "Pause and Resume preserve the world across edits, art, regeneration and visibility",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 430,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1843c348ac3f5e496d40",
+        "title": "art completion while hidden defers DOM updates and preserves movement and pending edits",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 253,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-697cff1f0e35c0f7976a",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "mobile-landscape",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "duration": 84,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "map-dev": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/map-dev.json",
+    "sha256": "878f8ea12a89dd588662686c503357a9c2b16c966ccc8dc62dd04f866b9f6f79",
+    "stats": {
+      "startTime": "2026-10-25T17:22:46.885Z",
+      "duration": 3626.1960000000004,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 346,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b62e62a247055bba7366",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 201,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 343,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d7b80ba95f1538f519e5",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 196,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 320,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-697cff1f0e35c0f7976a",
+        "title": "direct map disposer is idempotent and detaches scheduling and listeners",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 199,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "root-entry": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/root-entry.json",
+    "sha256": "f07eb86363e56ad4215dd82ce8b47c88bf4179c2d7a1d40a06badacd40dde5bb",
+    "stats": {
+      "startTime": "2026-10-25T17:22:50.896Z",
+      "duration": 2459.995,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "65be83c730a4dc5a6388-b2fd555c96014b091f43",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 183,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-7138aa6bf9d2ed022539",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 168,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b1e6c3d63b0e0f0a4395",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 165,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "prefix-entry": {
+    "rawReport": "tmp/verification/issue-155/review-fixes/prefix-entry.json",
+    "sha256": "d31b955dd3ac9c14032c6bc0197b03960e6430cc12215fd2e19e91082f5b13c7",
+    "stats": {
+      "startTime": "2026-10-25T17:22:58.988Z",
+      "duration": 5990.982,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 625,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 674,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 682,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b2fd555c96014b091f43",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "desktop",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 165,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-7138aa6bf9d2ed022539",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 168,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b1e6c3d63b0e0f0a4395",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "results": [
+          {
+            "status": "passed",
+            "duration": 183,
+            "retry": 0,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "selection": {
+    "old": 75,
+    "current": 84,
+    "removed": [],
+    "added": [
+      "d9bd0a856cf9225a8852-1843c348ac3f5e496d40",
+      "d9bd0a856cf9225a8852-216dcdbfe96f0bae1213",
+      "d9bd0a856cf9225a8852-2474aeeb81dd2433e1ec",
+      "d9bd0a856cf9225a8852-697cff1f0e35c0f7976a",
+      "d9bd0a856cf9225a8852-7c161bd058cce9623f8d",
+      "d9bd0a856cf9225a8852-97fc5b048843d15280ee",
+      "d9bd0a856cf9225a8852-b62e62a247055bba7366",
+      "d9bd0a856cf9225a8852-d7b80ba95f1538f519e5",
+      "d9bd0a856cf9225a8852-e035b7210590420a8936"
+    ]
+  }
+}

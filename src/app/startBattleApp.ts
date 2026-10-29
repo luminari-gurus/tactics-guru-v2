@@ -51,6 +51,7 @@ function showError(message: string, handled = true): void {
 // Application-owned controls are bound once, never on scene restart.
 restartButton.addEventListener('click', () => {
   if (restartButton.disabled || !restart) return;
+  restartButton.focus();
   if (!battle) setStatus('loading');
   try { restart(); } catch { showError('Could not restart the scene'); }
 });
