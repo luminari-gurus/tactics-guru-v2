@@ -11,3 +11,9 @@ new-format data. Keep their bytes immutable.
 - `dungeon.json`: freshDungeon('issue166-prior',190) and encodeDungeon; envelope 7.
 
 Recovery tests must classify these as incompatible and preserve/export exact text.
+
+`dungeon-main8.json` was captured separately from literal main
+`b343ab02ae033a57f8c5f613f07883764f0752c0`, using
+`encodeDungeon(freshDungeon('prior-main-movement',3))`. Its original format-8 bytes
+prove recovery after the concurrent movement/Shaman format allocations were
+resolved to format 9. The capture unit passed before the combined runtime checkout.

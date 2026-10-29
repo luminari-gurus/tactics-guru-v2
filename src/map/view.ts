@@ -4,7 +4,7 @@ import { applyBiome, BIOMES, type Biome } from './biomes';
 import { ART_STYLES, createMapArt, type ArtStyle, type ArtTreatment } from './art';
 import { createOverworld, type OverworldState } from './state';
 
-export function startMap(): void {
+export function startMap(): () => void {
   document.title = 'Overworld map · Tactics Guru';
   document.body.className = 'map-page';
   document.body.innerHTML = `
@@ -22,7 +22,7 @@ export function startMap(): void {
       <p id="map-status" role="status" aria-live="polite"></p>
       <figure id="map-figure"><div id="map-grid" role="img" aria-describedby="map-markers"></div>
         <figcaption><span><i class="map-floor"></i> <span id="map-open-label">Walkable</span></span><span><i class="map-wall"></i> <span id="map-blocked-label">Blocked</span></span>
-          <span><i class="map-marker-key" data-marker-kind="player" aria-hidden="true"></i> Player · 1</span><span><i class="map-marker-key" data-marker-kind="enemy" aria-hidden="true"></i> Enemies · 3</span></figcaption>
+          <span><i class="map-marker-key" data-marker-kind="player" aria-hidden="true"></i> Player · 1</span>${[1, 2, 3].map(id => `<span><i class="map-marker-key" data-marker-kind="enemy" data-marker-label="${id}" aria-hidden="true"></i> Enemy ${id}</span>`).join('')}</figcaption>
       </figure>
       <p id="map-markers" class="map-visually-hidden"></p>
     </main>`;
@@ -34,7 +34,28 @@ export function startMap(): void {
   const artSelect = document.querySelector<HTMLSelectElement>('#map-art')!;
   const figure = document.querySelector<HTMLElement>('#map-figure')!;
   const description = document.querySelector<HTMLElement>('#map-markers')!;
+  const listeners = new AbortController();
   let world: OverworldState | undefined;
+  let disposed = false;
+  let pageHidden = false;
+  function visible(): boolean { return !disposed && !pageHidden && !document.hidden && grid.isConnected; }
+  function dispose(): void {
+    if (disposed) return;
+    disposed = true;
+    listeners.abort();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (visible()) render();
+  }, { signal: listeners.signal });
+  window.addEventListener('pagehide', event => {
+    pageHidden = true;
+    if (!event.persisted) dispose();
+  }, { signal: listeners.signal });
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    pageHidden = false;
+    if (visible()) render();
+  }, { signal: listeners.signal });
   let placementFailure = '';
   let art: ArtStyle = 'simple';
   let invalidSeed = false;
@@ -44,6 +65,7 @@ export function startMap(): void {
     element.style.backgroundImage = resolved.url ? `url("${resolved.url}")` : '';
   }
   function render(): void {
+    if (!visible()) return;
     restoreChoices();
     const validation = invalidSeed ? 'Enter a whole number from 0 to 4294967295. The map is unchanged. ' : '';
     if (!world) {
@@ -53,7 +75,7 @@ export function startMap(): void {
       status.textContent = validation + placementFailure;
       return;
     }
-    const { map, markers } = world;
+    const { map } = world;
     figure.dataset.biome = map.biome;
     const biome = BIOMES.find(entry => entry.id === map.biome)!;
     document.querySelector<HTMLElement>('#map-open-label')!.textContent = `Walkable · ${biome.open}`;
@@ -64,26 +86,17 @@ export function startMap(): void {
     decorate(document.querySelector<HTMLElement>('figcaption .map-wall')!, blocked);
     const walkable = map.cells.reduce<number>((total, cell) => total + cell, 0);
     const cells = document.createDocumentFragment();
-    const occupants = new Map(markers.map(marker => [marker.y * map.width + marker.x, marker]));
     for (const [index, terrain] of map.terrain.entries()) {
       const cell = document.createElement('span');
       cell.className = terrain.endsWith('-open') ? 'map-floor' : 'map-wall';
       cell.dataset.terrain = terrain;
       decorate(cell, terrain.endsWith('-open') ? open : blocked);
-      const marker = occupants.get(index);
-      if (marker) {
-        cell.dataset.markerId = marker.id;
-        cell.dataset.markerKind = marker.kind;
-        cell.dataset.markerX = String(marker.x);
-        cell.dataset.markerY = String(marker.y);
-      }
       cell.setAttribute('aria-hidden', 'true');
       cells.append(cell);
     }
     grid.replaceChildren(cells);
     grid.setAttribute('aria-label', `20 by 20 ${biome.label} map with ${walkable} walkable and ${400 - walkable} blocked cells, 1 player and 3 enemies`);
-    description.textContent = markers.map(marker =>
-      `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ');
+    projectMarkers();
     grid.dataset.placementVersion = world.placementVersion;
     grid.dataset.seed = String(map.seed);
     grid.dataset.version = map.version;
@@ -99,6 +112,17 @@ export function startMap(): void {
       : fallbacks.has('failed') ? ' · Artwork unavailable; using Simple for affected terrain'
       : fallbacks.has('loading') ? ' · Loading artwork; using Simple while loading' : '';
     status.textContent = `${validation}${placementFailure}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;
+  }
+  function projectMarkers(): void {
+    if (!world || !visible()) return;
+    for (const marker of world.markers) {
+      const cell = grid.children[marker.y * world.map.width + marker.x] as HTMLElement;
+      cell.dataset.markerId = marker.id; cell.dataset.markerKind = marker.kind;
+      cell.dataset.markerX = String(marker.x); cell.dataset.markerY = String(marker.y);
+      if (marker.kind === 'enemy') cell.dataset.markerLabel = marker.id.slice(-1);
+    }
+    description.textContent = world.markers.map(marker =>
+      `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' ');
   }
   function restoreChoices(): void {
     select.value = world?.map.type ?? 'rooms';
@@ -142,21 +166,22 @@ export function startMap(): void {
   document.querySelector<HTMLFormElement>('#map-controls')!.addEventListener('submit', event => {
     event.preventDefault();
     applySelection();
-  });
-  select.addEventListener('change', applySelection);
-  biomeSelect.addEventListener('change', applySelection);
+  }, { signal: listeners.signal });
+  select.addEventListener('change', applySelection, { signal: listeners.signal });
+  biomeSelect.addEventListener('change', applySelection, { signal: listeners.signal });
   artSelect.addEventListener('change', () => {
     const selected = artSelect.value as ArtStyle;
     if (validSeed() === undefined) return;
     art = selected;
     render();
-  });
+  }, { signal: listeners.signal });
   document.querySelector<HTMLButtonElement>('#map-new-seed')!.addEventListener('click', () => {
     const seed = world?.map.seed ?? 1;
     let next = (seed + 1) >>> 0;
     try { next = crypto.getRandomValues(new Uint32Array(1))[0]; } catch { /* Next seed remains usable without browser entropy. */ }
     if (next === seed) next = (seed + 1) >>> 0;
     regenerate(next, world?.map.type ?? 'rooms', world?.map.biome ?? 'grassland');
-  });
+  }, { signal: listeners.signal });
   regenerate(1, 'rooms', 'grassland');
+  return dispose;
 }

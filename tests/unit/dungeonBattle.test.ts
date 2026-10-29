@@ -7,7 +7,9 @@ import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
 import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
-import { dungeonBattle, acceptDungeonBattle } from '../../src/domain/dungeon';
+import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
+import { BattleSession } from '../../src/app/BattleSession';
+import { playerDecision } from '../helpers/playerPolicy';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
 import { resolveBattlefield } from '../../src/domain/battlefield';
@@ -17,7 +19,7 @@ import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 
 it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
-  const witness=shamanJourney(3),catalog=dungeonBattle(witness.entry)!.catalog;
+  const witness=shamanJourney(31),catalog=dungeonBattle(witness.entry)!.catalog;
   expect(witness.state.outcome).toBe('playerWin');
   expect(witness.events.filter(e=>e.type==='healed')).toHaveLength(2);
   expect(witness.events.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
@@ -36,7 +38,7 @@ it('completes production Shaman Hex and healing through the real session with ex
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
-  const witness=fighterJourney(17);
+  const witness=fighterJourney(28);
   expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
     .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
   expect(witness.records).toHaveLength(6);
@@ -74,7 +76,7 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(17);
+  const journey=mageJourney(12);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
@@ -103,7 +105,7 @@ it('roundtrips active Mage Snare in dungeon continuation and clears it before th
 });
 
 it('finds a legal earned Ranger level-three witness using both controls and retains replayable histories',()=>{
-  const journey=rangerJourney(1);
+  const journey=rangerJourney(2);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{mark:true,pin:true}});
   expect(journey.records.length).toBeGreaterThanOrEqual(4);
   expect(journey.state.phase).toBe('defeat');
@@ -258,3 +260,30 @@ it('legally clears both biome guardians and every encounter kind with carried re
   expect(witness.state.party.some(h=>h.hp>0)).toBe(true);
   expect(witness.state.party.filter(h=>h.hp>0).every(h=>h.xp>0 && h.level>=2)).toBe(true);
 },120000);
+
+it('wins a legal guardian-first battle and continues with an uncleared ordinary encounter', () => {
+  let victory: DungeonState | undefined;
+  for(let seed=1;seed<=30&&!victory;seed++) {
+    const started=startDungeonBattle(atEncounter(freshDungeon('guardian-first',seed),2));
+    if(!started.ok)throw Error(started.reason);
+    const source=dungeonBattle(started.state)!;
+    const battle=new BattleSession(source.catalog,started.state.activeBattle!,started.state.activeBattle!.seed,undefined,true,source.battlefield);
+    for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
+      if(battle.phase==='enemy'){const presentation=battle.nextEnemy();if(!presentation)throw Error('enemy stalled');battle.finishPresentation(presentation.token);continue;}
+      const command=playerDecision(battle.state,source.catalog);
+      if(!battle.prepare(command).ok)throw Error('policy rejected');
+      const presentation=battle.confirm();if(!presentation)throw Error('command rejected');battle.finishPresentation(presentation.token);
+    }
+    if(battle.state.outcome==='playerWin'){
+      const result=acceptDungeonBattle(started.state,battle.state);if(!result.ok)throw Error(result.reason);
+      victory=result.state;
+    }
+  }
+  expect(victory).toBeDefined();if(!victory)throw Error('No legal guardian-first victory found');
+  expect(victory.floors[0].exploration.cleared).toEqual([2]);
+  expect(victory.offer).not.toBeNull();
+  const claimed=dungeonItem(victory,{...dungeonBoundary(victory),type:'claimReward',offerId:victory.offer!.id,itemId:victory.offer!.options[0].itemId});
+  if(!claimed.ok)throw Error(claimed.reason);
+  const next=startDungeonBattle(atEncounter(claimed.state,0));if(!next.ok)throw Error(next.reason);
+  expect(next.state.floors[0].exploration.active).toBe(0);
+});

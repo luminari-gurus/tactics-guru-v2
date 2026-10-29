@@ -35,7 +35,10 @@ hero support buttons, UI redesign or generated artwork.
    scores/order. No hidden-roll lookahead or scoring configuration is needed.
 6. Replace only Forest Ruins dungeon composition spawn 6, retaining selection RNG
    and existing map adaptation. Do not edit canonical map spawns. Advance state
-   4→5, rules 5→6, run 6→7, dungeon 7→8; RNG/wrapper stay 1. Exact incompatible
+   4→5, rules 5→6, run 6→7, dungeon 8→9; RNG/wrapper stay 1. Main's concurrent
+   movement change allocated dungeon 8 while this increment was qualifying.
+   Preserve movement-aware exploration in format 9, including legacy exploration
+   payloads, but recover/export exact prior 7/8 bytes without migration. Exact incompatible
    bytes remain recoverable. Enemy healing does not broaden hero aggregate HP.
 7. Reuse existing logs, inspection, floating healing and cue contracts. Display
    source-specific saves/Weakened and correct support ranges without new controls.

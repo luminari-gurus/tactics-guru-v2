@@ -9,6 +9,7 @@ export interface DungeonInspection { readonly primary: Slot; readonly backup: Sl
 export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
+  let lastWritten: string | undefined;
   const error = (e: unknown) => {
     try { return (e as { name?: string })?.name === 'QuotaExceededError' ? 'quota' : (e as { name?: string })?.name === 'SecurityError' ? 'security' : 'unavailable'; }
     catch { return 'unavailable'; }
@@ -25,7 +26,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
-  function save(state: DungeonState): DungeonWrite {
+  function save(state: DungeonState, expectedPrimary?: string | null): DungeonWrite {
     if (uncertain) return { ok: false, reason: 'uncertainWrite' };
     const encoded = encodeDungeon(state); if (!encoded.ok) return encoded;
     try {
@@ -33,6 +34,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       const old = inspect();
       if (Object.values(old).some(s => s.status === 'unavailable')) return { ok: false, reason: 'unavailable' };
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
+      if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
       const backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
       if (backup !== null) {
         storage.setItem(DUNGEON_KEYS.backup, backup);
@@ -42,7 +44,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       uncertain = true;
       storage.setItem(DUNGEON_KEYS.primary, encoded.text);
       if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
-      uncertain = false; return { ok: true };
+      uncertain = false; lastWritten = encoded.text; return { ok: true };
     } catch (e) { return { ok: false, reason: error(e) }; }
   }
   function remove(slot: DungeonSlot, expected: string | null): DungeonWrite {
@@ -61,5 +63,5 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     if (equal) uncertain = false;
     return equal;
   }
-  return { inspect, save, remove, acknowledge };
+  return { inspect, save, remove, acknowledge, lastSavedText: () => lastWritten };
 }

@@ -3,26 +3,43 @@ import { createOverworld } from '../src/map/state';
 import { generateMap, type MapType } from '../src/map/generate';
 import { applyBiome, type Biome } from '../src/map/biomes';
 
+// Match existing persistence suites: exercise real cached documents when requested.
+test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, ignoreDefaultArgs: ['--disable-back-forward-cache'] } });
+
+// Controlled time supports delayed-art and stationary-marker checks.
+test.beforeEach(async ({ page }, info) => {
+  if (info.tags.includes('@native-clock')) return;
+  await page.clock.install({ time: new Date('2026-10-25T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
+});
+
 async function expectMarkers(page: Page) {
   const grid = page.locator('#map-grid');
-  const seed = Number(await grid.getAttribute('data-seed'));
-  const type = await grid.getAttribute('data-type') as MapType;
-  const biome = await grid.getAttribute('data-biome') as Biome;
-  const expected = createOverworld(applyBiome(generateMap(seed, type), biome));
-  if (!expected.ok) throw Error(expected.reason);
-  const markers = await grid.evaluate(element => [...element.querySelectorAll('[data-marker-id]')].map(cell => {
-    const { markerId: id, markerKind: kind, markerX: x, markerY: y } = (cell as HTMLElement).dataset;
-    return { id, kind, x: Number(x), y: Number(y), index: [...element.children].indexOf(cell), floor: cell.className };
+  // Capture marker and accessible description state together.
+  const snapshot = await grid.evaluate(element => ({
+    seed: Number(element.dataset.seed), type: element.dataset.type, biome: element.dataset.biome,
+    placement: element.dataset.placementVersion,
+    label: element.getAttribute('aria-label'), describedBy: element.getAttribute('aria-describedby'),
+    description: document.querySelector('#map-markers')!.textContent,
+    markers: [...element.querySelectorAll<HTMLElement>('[data-marker-id]')].map(cell => ({
+      id: cell.dataset.markerId, kind: cell.dataset.markerKind,
+      x: Number(cell.dataset.markerX), y: Number(cell.dataset.markerY),
+      index: [...element.children].indexOf(cell), floor: cell.className,
+    })),
   }));
+  const expected = createOverworld(applyBiome(generateMap(snapshot.seed, snapshot.type as MapType), snapshot.biome as Biome));
+  if (!expected.ok) throw Error(expected.reason);
+  const {markers} = snapshot;
   expect(markers).toHaveLength(4);
   for (const marker of expected.state.markers) {
     expect(markers.find(({ id }) => id === marker.id)).toEqual({
       ...marker, index: marker.y * 20 + marker.x, floor: 'map-floor',
     });
   }
-  await expect(grid).toHaveAttribute('data-placement-version', 'markers-v1');
-  await expect(grid).toHaveAccessibleName(/1 player and 3 enemies/);
-  await expect(grid).toHaveAccessibleDescription(expected.state.markers.map(marker =>
+  expect(snapshot.placement).toBe('markers-v1');
+  expect(snapshot.label).toMatch(/1 player and 3 enemies/);
+  expect(snapshot.describedBy).toBe('map-markers');
+  expect(snapshot.description).toBe(expected.state.markers.map(marker =>
     `${marker.id === 'player' ? 'Player' : `Enemy ${marker.id.slice(-1)}`} (${marker.id}): row ${marker.y + 1}, column ${marker.x + 1}.`).join(' '));
   await expect(grid.locator('[tabindex], button, a')).toHaveCount(0);
   return markers;
@@ -32,7 +49,7 @@ for (const { path, chunk, otherChunk } of [
   { path: '/map', chunk: 'view-', otherChunk: 'startBattleApp-' },
   { path: '/', chunk: 'startBattleApp-', otherChunk: 'view-' },
 ]) {
-  test(`failed route import at ${path} shows a reload instruction`, async ({ page }) => {
+  test(`failed route import at ${path} shows a reload instruction`, { tag: '@native-clock' }, async ({ page }) => {
     const errors: string[] = [];
     const scripts: string[] = [];
     let aborted = false;
@@ -62,7 +79,7 @@ for (const { path, chunk, otherChunk } of [
 test('map direct entry, refresh, seeds and responsive inspection', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/map');
+  await page.goto('map');
   const grid = page.locator('#map-grid');
   await expect(grid.locator('span')).toHaveCount(400);
   await expect(grid).toHaveAttribute('data-seed', '1');
@@ -140,6 +157,7 @@ test('map isolates battle storage and never initializes battle, audio or diagnos
   await expect(page.locator('canvas, audio, #fit-panel')).toHaveCount(0);
   expect(await page.evaluate(() => typeof window.fitDiagnostics)).toBe('undefined');
   scripts.length = 0;
+  await page.clock.resume();
   await page.goto('/');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   await expect(page.locator('canvas')).toHaveCount(1);
@@ -628,6 +646,9 @@ test('controlled placement failure preserves complete state and supports retry',
   await expect(status).toContainText('retry Generate');
   await page.getByRole('button', { name: 'Generate', exact: true }).click();
   const original = await expectMarkers(page);
+  await page.clock.runFor(1000);
+  const moving = await expectMarkers(page);
+  expect(moving).toEqual(original);
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/map-art/**', async route => { await held; await route.continue(); });
@@ -639,12 +660,12 @@ test('controlled placement failure preserves complete state and supports retry',
     await expect(page.getByLabel('Map type', { exact: true })).toHaveValue('rooms');
     await expect(page.getByLabel('Biome', { exact: true })).toHaveValue('grassland');
     await expect(status).toContainText('The previous world is unchanged');
-    expect(await expectMarkers(page)).toEqual(original);
+    expect(await expectMarkers(page)).toEqual(moving);
   }
   release();
   await expect(grid).toHaveAttribute('data-art-fallback', 'false');
   await expect(status).toContainText('Controlled placement failure');
-  expect(await expectMarkers(page)).toEqual(original);
+  expect(await expectMarkers(page)).toEqual(moving);
   await page.getByLabel('Art style', { exact: true }).selectOption('simple');
   await expect(status).toContainText('The previous world is unchanged');
   await page.getByLabel('Seed', { exact: true }).fill('2');
@@ -653,7 +674,7 @@ test('controlled placement failure preserves complete state and supports retry',
   await expect(status).not.toContainText('Marker placement failed');
 });
 
-test('art uses configured base, bounded transfers and no battle requests', async ({ page }, testInfo) => {
+test('art uses configured base, bounded transfers and no battle requests', { tag: '@native-clock' }, async ({ page }, testInfo) => {
   const requests: string[] = [];
   page.on('request', request => { if (request.url().includes('/map-art/')) requests.push(request.url()); });
   await page.goto('map');
@@ -683,4 +704,131 @@ test('art uses configured base, bounded transfers and no battle requests', async
   await page.goto('./');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   expect(requests).toEqual([]);
+});
+
+test('map markers remain stationary as time passes and generation remains reproducible', async ({ page }) => {
+  await page.goto('map');
+  const initial = await expectMarkers(page);
+  for (const id of ['1','2','3']) {
+    const marker=page.locator(`#map-grid [data-marker-id="enemy-${id}"]`), key=page.locator(`figcaption [data-marker-label="${id}"]`);
+    await expect(key.locator('..')).toHaveText(`Enemy ${id}`);
+    for(const glyph of [marker,key]) expect(await glyph.evaluate(el=>getComputedStyle(el,'::before').content)).toBe(`"${id}"`);
+  }
+  await page.clock.runFor(60000);
+  expect(await expectMarkers(page)).toEqual(initial);
+  await expect(page.locator('#map-motion')).toHaveCount(0);
+  await page.getByRole('button',{name:'Generate',exact:true}).click();
+  expect(await expectMarkers(page)).toEqual(initial);
+});
+
+test('disposal ignores late artwork and control callbacks', async ({ page }) => {
+  let release!: () => void;
+  const held = new Promise<void>(resolve => {release=resolve;});
+  await page.addInitScript(() => {
+    const decode = HTMLImageElement.prototype.decode;
+    Object.assign(window,{disposedArtCompletions:0});
+    HTMLImageElement.prototype.decode = async function () {
+      try { return await decode.call(this); }
+      finally { (window as unknown as {disposedArtCompletions:number}).disposedArtCompletions++; }
+    };
+  });
+  await page.route('**/map-art/**',async route => {await held;await route.continue();});
+  await page.goto('map');
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await expect(page.locator('#map-status')).toContainText('Loading artwork');
+  await page.clock.runFor(1000);
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
+    window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
+  });
+  release();
+  await expect.poll(() => page.evaluate(() => (window as unknown as {disposedArtCompletions:number}).disposedArtCompletions)).toBe(2);
+  await page.clock.runFor(60000);
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));
+    document.dispatchEvent(new Event('visibilitychange'));
+    document.querySelector<HTMLFormElement>('#map-controls')!.dispatchEvent(new Event('submit',{cancelable:true}));
+  });
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.unrouteAll(); await page.reload();
+  await expectMarkers(page);
+  await page.clock.runFor(1000); await expectMarkers(page);
+});
+
+test('BFCache restores static markers', { tag: '@native-clock' }, async ({ page, baseURL }) => {
+  await page.addInitScript(() => window.addEventListener('pageshow',event => {
+    if(event.persisted) Object.assign(window,{mapRestored:true});
+  }));
+  await page.goto('map');
+  const before=await expectMarkers(page);
+  await page.goto(new URL('run',baseURL).href);
+  await expect(page.locator('#run-start')).toBeVisible();
+  await page.goBack({waitUntil:'commit'});
+  expect(await page.evaluate(() => (window as unknown as {mapRestored?:boolean}).mapRestored)).toBe(true);
+  expect(await expectMarkers(page)).toEqual(before);
+});
+
+test('art completion while hidden defers DOM updates and preserves markers and pending edits', async ({ page }) => {
+  await page.addInitScript(() => {
+    const decode = HTMLImageElement.prototype.decode;
+    Object.assign(window,{hiddenArtCompletions:0});
+    HTMLImageElement.prototype.decode = async function () {
+      try {return await decode.call(this);}
+      finally {(window as unknown as {hiddenArtCompletions:number}).hiddenArtCompletions++;}
+    };
+  });
+  let release!: () => void;
+  const held = new Promise<void>(resolve => {release=resolve;});
+  await page.route('**/map-art/**',async route => {await held;await route.continue();});
+  await page.goto('map');
+  await page.getByLabel('Art style',{exact:true}).selectOption('legacy-8bit');
+  await page.getByLabel('Seed',{exact:true}).fill('12345');
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  release();
+  await expect.poll(() => page.evaluate(() => (window as unknown as {hiddenArtCompletions:number}).hiddenArtCompletions)).toBe(2);
+  await page.clock.runFor(60000);
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.evaluate(() => {
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback','false');
+  await expect(page.getByLabel('Seed',{exact:true})).toHaveValue('12345');
+  await page.clock.runFor(1000);
+  await expectMarkers(page);
+});
+
+test('direct map disposer is idempotent and detaches listeners', async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SERVER_MODE !== 'dev','Captures the ordinary return value through a dev source-module wrapper.');
+  await page.route(/\/src\/map\/view\.ts(?:\?|$)/,route => {
+    if (route.request().url().includes('?actual')) return route.continue();
+    return route.fulfill({contentType:'application/javascript',body:`
+      import {startMap as mount} from '/src/map/view.ts?actual';
+      export function startMap() {
+        const dispose = mount();
+        window.reviewDisposeMap = dispose;
+        return dispose;
+      }
+    `});
+  });
+  await page.goto('map');
+  await page.clock.runFor(1000);
+  const before = await page.locator('#map-page').innerHTML();
+  await page.evaluate(() => {
+    const dispose = (window as unknown as {reviewDisposeMap:()=>void}).reviewDisposeMap;
+    dispose(); dispose();
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));
+    document.querySelector<HTMLFormElement>('#map-controls')!.dispatchEvent(new Event('submit',{cancelable:true}));
+  });
+  await page.clock.runFor(60000);
+  expect(await page.locator('#map-page').innerHTML()).toBe(before);
+  await page.reload();
+  await expectMarkers(page);
+  await page.clock.runFor(1000); await expectMarkers(page);
 });

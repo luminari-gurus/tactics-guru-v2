@@ -85,7 +85,7 @@ Healing and Taunt use the existing native picker, board/self targets, direct
 confirmation, inspection, accepted-event log and floating feedback. Guarded Strike
 and Magic Missile retain their approved rules and Guarded retains its board shield.
 
-Current battle state format 5/rules 6, run envelope 7 and dungeon envelope 8 deliberately
+Current battle state format 5/rules 6, run envelope 7 and dungeon envelope 9 deliberately
 reject earlier versions as incompatible while preserving original bytes through
 existing recovery/export. The standalone wrapper remains format 1 and RNG stays 1.
 Run/dungeon readers admit healing above entry HP only within the spent Fighter's

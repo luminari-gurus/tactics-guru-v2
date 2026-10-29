@@ -28,7 +28,7 @@ function render(){
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
  if(startup){
   const title=el('h1','Dungeon floors');title.tabIndex=-1;
-  screen.replaceChildren(title,el('p','Continuing floors with deterministic battles, guardian-gated descent and backtracking. Saves stay on this device.'));
+  screen.replaceChildren(title,el('p','Continuing floors with deterministic battles, all encounters required for descent and backtracking. Saves stay on this device.'));
   const review=session.inspect(),valid=review.primary.status==='valid'||review.backup.status==='valid';
   const resume=button('Continue saved dungeon',()=>{if(session.continue(review)){startup=false;render();if(session.snapshot.activeBattle)start();}});resume.disabled=!valid;
   screen.append(resume,button('Start new dungeon',requestNew),button('Save recovery',recovery));
@@ -63,7 +63,7 @@ function recovery(){
 function start(){
  if(!live||playing)return;const battle=session.startEncounter();if(!battle){render();return;}
  playing=true;screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
- const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].completed)}`;
+ const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].exploration.active ?? state.floors[state.depth-1].completed)}`;
  document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
  document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
  restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(button('Save recovery',recovery),el('span',session.status));
@@ -72,7 +72,7 @@ function start(){
  engine.scene.remove('battle');engine.scene.add('battle',new BattleScene(value=>{status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';},message=>{status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;},host),true);
  evidence();
 }
-session.onChange=()=>render();restart.addEventListener('click',requestNew);
+session.onChange=()=>render();restart.addEventListener('click',()=>{restart.focus();requestNew();});
 document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
 window.addEventListener('pagehide',()=>{live=false;session.dispose();mapView.dispose();stop();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});

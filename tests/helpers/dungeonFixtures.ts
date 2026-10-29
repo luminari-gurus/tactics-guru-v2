@@ -1,5 +1,5 @@
 import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
@@ -123,8 +123,8 @@ export function dungeonJourney(seed: number, floorCount = 1, finishTargets = fal
 }
 
 /** Single production Shaman encounter from an unplayed seed; UI tests enact traversal and all commands. */
-export function shamanJourney(seed = 3) {
-  const entry=checkedDungeon(startDungeonBattle(atEncounter(freshDungeon('shaman-production-journey',seed))));
+export function shamanJourney(seed = 31) {
+  const entry=walkWitness(freshDungeon('shaman-production-journey',seed));
   const built=dungeonBattle(entry)!;
   if(!entry.activeBattle!.units.some(u=>u.defId==='goblin_shaman'))throw Error('Shaman witness selected another composition');
   const battle=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);
@@ -142,7 +142,7 @@ export function fighterJourney(seed:number) {
   const records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
   for(let depth=1;depth<=2;depth++) {
     for(let slot=0;slot<3;slot++) {
-      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      state=walkWitness(state);
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
         if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Fighter enemy stalled');battle.finishPresentation(p.token);continue;}
@@ -162,13 +162,35 @@ export function fighterJourney(seed:number) {
   return {seed,records,state,healed,taunted,depth:2,slot:2};
 }
 
+/** Follow the nearest live marker with actual player steps and enemy movement. */
+function walkWitness(initial:DungeonState):DungeonState {
+  let state=initial;
+  for(let attempt=0;attempt<400;attempt++) {
+    const f=state.floors[state.depth-1], live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
+    const blocked=new Set(live.map(poiCell));
+    if(state.depth>1)blocked.add(f.descriptor.upstairs);
+    if(f.completed===3)blocked.add(f.descriptor.downstairs);
+    const map=generateMap(f.descriptor.seed,'rooms'),previous=new Map<number,number>([[f.position,-1]]),queue=[f.position];
+    let destination:number|undefined;
+    for(let i=0;i<queue.length&&destination===undefined;i++)for(const n of neighbors(queue[i]))if(map.cells[n]&&!previous.has(n)){
+      if(blocked.has(n)){if(live.some(p=>poiCell(p)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
+      previous.set(n,queue[i]);queue.push(n);
+    }
+    if(destination===undefined)throw Error('No reachable encounter');
+    let n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!;
+    state=checkedDungeon(stepDungeon(state,{id:state.id,depth:state.depth,revision:state.revision,destination:n}));
+    if(state.phase==='battle')return state;
+  }
+  throw Error('Encounter not reached');
+}
+
 /** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */
 export function rangerJourney(seed:number) {
   let state=freshDungeon('ranger-production-journey',seed);
   const used={mark:false,pin:false},records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
   for(let depth=1;depth<=3;depth++) {
     for(let slot=0;slot<3;slot++) {
-      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      state=walkWitness(state);
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
         if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}
@@ -195,7 +217,7 @@ export function mageJourney(seed:number) {
   const used={snare:false,missiles:false},records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
   for(let depth=1;depth<=3;depth++) {
     for(let slot=0;slot<3;slot++) {
-      state=checkedDungeon(startDungeonBattle(atEncounter(state)));
+      state=walkWitness(state);
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
         if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}

@@ -160,7 +160,7 @@ function renderActions() {
  }
  actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true));mountTelemetryPreferences(actions);
 }
-restart.addEventListener('click',requestNew);
+restart.addEventListener('click',()=>{restart.focus();requestNew();});
 // Repeated activation must not cross replaced controls or trigger another destructive intent.
 document.addEventListener('keydown',e=>{if(e.repeat && (e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
 window.addEventListener('error',()=>fail('The run encountered a runtime error',false));
