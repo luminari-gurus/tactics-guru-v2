@@ -3,7 +3,7 @@
 ## 1. Planning and legality
 
 - [x] 1.1 Implement pure move-plus-ability preview and live preflight; unit-test unreachable destinations, stale targets, invalid plans, cancellation, RNG and resource invariance.
-- [ ] 1.2 Add bounded enemy danger evaluation from shared movement and attack legality; unit-test blockers, occupancy, height, LOS, movement restrictions, spent budgets and deterministic no-RNG behavior; document the displayed scope.
+- [x] 1.2 Add bounded enemy danger evaluation from shared movement and attack legality; unit-test blockers, occupancy, height, LOS, movement restrictions, spent budgets and deterministic no-RNG behavior; document the displayed scope.
 
 ## 2. Undo and persistence
 

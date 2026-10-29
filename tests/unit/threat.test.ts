@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import { previewAttack } from '../../src/domain/combat';
+import { catalogFixture } from './fixtures/contentContract';
+import { contentVersion } from '../../src/domain/battle';
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
+import { seedRng } from '../../src/domain/rng';
 import { enemyThreats } from '../../src/domain/threat';
 
 const initial = () => new BattleSession(catalog, 'map:forest_ruins', 2).state;
@@ -62,4 +66,24 @@ describe('enemy threat inspection', () => {
     const result = enemyThreats(state,catalog);
     expect(result.ok && result.targets.includes(hero.id)).toBe(false);
   });
+});
+
+it('honors a narrow occupied route and an impassable climb', () => {
+  const make = (blocked: boolean, high: boolean) => {
+    const map = {id:'map:threat_corridor' as const,width:4,height:1,
+      cells:Array.from({length:4},(_,x)=>({x,y:0,elevation:high && x===1?4:0,terrainId:'grass' as const})),
+      spawns:[{id:1,side:'heroes' as const,unitId:'fighter' as const,x:0,y:0},
+        {id:2,side:'enemies' as const,unitId:'goblin_grunt' as const,x:3,y:0},
+        ...(blocked?[{id:3,side:'heroes' as const,unitId:'ranger' as const,x:2,y:0}]:[])]};
+    const c = {...catalogFixture,maps:{[map.id]:map}};
+    const units = [{id:1,side:'player' as const,defId:'fighter' as const,cell:{x:0,y:0},hp:18,hasMoved:false,hasActed:false},
+      {id:2,side:'enemy' as const,defId:'goblin_grunt' as const,cell:{x:3,y:0},hp:18,hasMoved:false,hasActed:false},
+      ...(blocked?[{id:3,side:'player' as const,defId:'ranger' as const,cell:{x:2,y:0},hp:18,hasMoved:false,hasActed:false}]:[])];
+    return {c,state:{format:STATE_FORMAT_VERSION,versions:{rules:RULES_VERSION,rng:1 as const,content:contentVersion(c)},seed:1,rng:seedRng(1),mapId:map.id,
+      units,initiative:units.map(u=>u.id),activeIndex:0,round:1,outcome:'ongoing',commandCount:0} as import('../../src/domain/types').BattleState};
+  };
+  for (const [blocked,high,threatened] of [[false,false,true],[true,false,false],[false,true,false]] as const) {
+    const {c,state}=make(blocked,high), result=enemyThreats(state,c);
+    expect(result.ok && result.targets.includes(1)).toBe(threatened);
+  }
 });
