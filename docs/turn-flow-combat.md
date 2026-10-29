@@ -64,7 +64,7 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 ## Dispatch and replay
 
-`dispatch(state, command, catalog)` routes `move` to `moveUnit`, `useAbility` to `resolveAttack` and `endTurn` to `endTurn`. It reads the command type only after the shared intent check.
+`dispatch(state, command, catalog)` routes movement, ability profiles and turn ending to their authoritative resolvers. See [turns.ts](../src/domain/turns.ts) and [signature abilities](signature-abilities.md) for the implemented profiles. It reads the command type only after the shared intent check.
 
 `replayBattle(replay, catalog)` validates the envelope with `readReplay`. It then rebuilds `createBattle(initial.mapId, initial.seed)` and rejects the replay unless `initial` matches it exactly, compared as sorted-key JSON so key order does not matter. A replay therefore cannot start from chosen HP, dice, initiative, flags or outcome. Then it re-executes the commands. It returns the final snapshot and every event in order; creation's initiative events are not repeated. A bad envelope is `invalidReplay`. A command that does not apply is `invalidReplay` with its `index` and the `rejection`. AI commands are recorded, not recomputed.
 
@@ -90,7 +90,7 @@ The following scope, handoff and verification describe #7 at its delivery, not c
 - **#10** gets `createBattle`, which is also its restart, and the event stream to animate. Defeated units stay in the snapshot at their last cell, but that cell is free at once, so a living unit, or another defeated one, can end up on it (*defeats once, frees the cell, …* in `tests/unit/combat.test.ts` moves the ranger onto the defeated grunt's cell). The renderer must hide defeated units or draw them beneath any living unit on the cell, and a tap on that cell picks the living unit.
 - **The authored catalog (#29)** was not on `main` when #7 merged. Once it is, a test on its map adds coverage only if it dispatches commands. `createBattle` already passes its result through `readBattleState`, which requires one unit per spawn and a valid initiative, so re-checking a created battle, or wrapping it in a `readReplay` envelope, cannot fail while `createBattle` succeeds. Script a short battle on that map that includes an attack from higher ground (+2 bonus) and a shot rejected `blockedLos` across a blocking cell, and check that `replayBattle` reproduces its final state.
 
-## Verification commands
+## Historical #7 verification commands
 
 - Focused: `npm run test:unit -- tests/unit/targeting.test.ts tests/unit/turns.test.ts tests/unit/combat.test.ts`
 - Full unit suite: `npm run test:unit`

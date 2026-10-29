@@ -4,11 +4,13 @@
 **Inspected:** 2026-10-05 UTC; **re-verified 2026-10-06**. Legacy repository: `luminari-gurus/tactics-guru` (private), `main` at **`e9433f6b608ae6b2d95418615cce9cf17dadcf74`**, still the remote head on 2026-10-06. Local read-only mirror: `ORIGINAL/`, ignored through a local, uncommitted `.gitignore` edit; every legacy path in this plan resolves under it.
 **Goal:** recover the small, enjoyable browser tactics game Brian intended, not reproduce every Godot feature.
 **New project repository (Brian’s decision):** https://github.com/luminari-gurus/tactics-guru-v2 (public). Main contains the playable battle, tooling, documentation and task-specific OpenSpec changes; the legacy Godot repository remains the reference source, not the target runtime.
-**Where this plan lives:** `docs/phaser4-restart-plan.md` and the companion draft have been on main since merged PR #13 (2026-10-06). #82 updates those existing files; no migration or fresh setup is required. Task branches start from current `origin/main`. The unavailable discovery companion and historical `ORIGINAL/` mirror remain provenance references.
+**Historical location:** `docs/phaser4-restart-plan.md` and the companion draft have been on main since merged PR #13 (2026-10-06). #82 updates those existing files; no migration or fresh setup is required. Task branches start from current `origin/main`. The unavailable discovery companion and historical `ORIGINAL/` mirror remain provenance references.
 **Architecture:** deterministic, engine-independent TypeScript domain core; Phaser owns rendering/input/audio, not rules. Plain HTML/CSS handles responsive menus and accessible controls.
 **Stack at the 2026-10-16 snapshot:** Phaser **4.2.1**, TypeScript 7.0.2, Vite 8.3.2, Playwright 1.63.0 and Vitest 5.0.3; Node declared ≥22.12.0. Static browser build. Exact package/script versions are in `package.json`; PR #12’s release configuration is unmerged.
 
 **Map selection follow-up (#146, 2026-10-19):** [PR #149](https://github.com/luminari-gurus/tactics-guru-v2/pull/149) adds exposed opaque living-sprite hits and repeated click/tap cycling through overlapping terrain cells via the existing selection/preview path. Hidden bodies do not override foreground terrain; the proof scene keeps frontmost-solid picking and domain legality is unchanged. This branch implementation supersedes the dated D8/T4 tile-only disposition below for battles; it was merged in PR #149. See the [current contract and evidence](qa/issue-146-occluded-map-picking/README.md).
+
+Tracker check on 2026-10-29: #2, #11, #57–#60, #64, #66, #74, #81, #111 and #121 are closed; #153, #161 and #162 remain open. PRs #115 and #149 are merged. Issue status is separate from the original QA evidence and can change; consult GitHub for later updates.
 
 ### Historical state (verified 2026-10-16)
 

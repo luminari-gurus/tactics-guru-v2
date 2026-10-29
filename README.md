@@ -240,6 +240,8 @@ These routes also respect the configured base path.
 
 ## Project guide
 
+The gameplay contracts below were reconciled against source `b343ab02ae033a57f8c5f613f07883764f0752c0`. They cover [battle state](docs/battle-foundation.md), [movement](docs/grid-movement.md), [turns and combat](docs/turn-flow-combat.md), [effects](docs/combat-effects.md), [abilities](docs/signature-abilities.md), [enemy turns](docs/enemy-turns.md), [content](docs/content-contract.md), [first battle and run sources](docs/first-battle-content.md), [encounters](docs/authored-encounters.md), [run](docs/run-contract.md), [items](docs/run-items.md), [progression](docs/hero-progression.md), [dungeon](docs/dungeon.md), [map laboratory](docs/overworld-map.md), [target previews](docs/target-preview-overlays.md), and [battle save format](docs/battle-save-format.md) / [storage](docs/battle-storage.md). Original issue-specific handoffs and QA remain historical; source and tracker may advance after this audit.
+
 - **Visual identity:** [design guide](docs/DESIGN.md), [unit artwork](docs/art/unit-art-guide.md), [terrain](docs/art/terrain-textures.md), [header generation record](docs/art/readme/header-generation.json).
 - **Combat:** [battle foundation](docs/battle-foundation.md), [turn flow](docs/turn-flow-combat.md), [enemy decisions](docs/enemy-turns.md), [target previews](docs/target-preview-overlays.md).
 - **Adventures:** [dungeon contract](docs/dungeon.md), [run integration](docs/run-contract.md#live-integration-80), [hero progression](docs/hero-progression.md), [map laboratory](docs/overworld-map.md).

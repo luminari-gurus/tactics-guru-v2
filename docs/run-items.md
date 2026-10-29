@@ -140,7 +140,7 @@ Implementation follows the approved `4d59b01` plan on base `73fed0b`. Final sour
 
 Desktop and emulated mobile portrait/landscape regressions support this pure package. Rewards UI, run persistence/replay integration, real full-run controls and physical-device/release acceptance remain with #79/#80/#81/#57. No deployment or physical certification was performed.
 
-Delivery: [PR #115](https://github.com/luminari-gurus/tactics-guru-v2/pull/115), implementation revision `34dbb5e3631fcc7286cf9bf79c5b4711417132cf`. This revision contains the tested source/fixture bytes; the subsequent delivery commit updates documentation and the completed task checkbox only. The PR remains open for review, with no merge or OpenSpec archive performed.
+Delivery: [PR #115](https://github.com/luminari-gurus/tactics-guru-v2/pull/115), implementation revision `34dbb5e3631fcc7286cf9bf79c5b4711417132cf`. This revision contains the tested source/fixture bytes; the subsequent delivery commit updates documentation and the completed task checkbox only. At this historical delivery checkpoint the PR awaited review; PR #115 subsequently merged.
 
 ## Acceptance evidence
 

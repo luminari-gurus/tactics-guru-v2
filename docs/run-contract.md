@@ -68,7 +68,7 @@ The reference completion payload is trusted only after domain/session validation
 
 ## Deterministic seeds and preview behavior
 
-Run format 1 uses the existing RNG version 1 sfc32 warmup and these fixed mixing rules:
+The run seed derivation uses the existing RNG version 1 sfc32 warmup and these fixed mixing rules:
 
 1. Purpose tag is `0x454e4331` for encounter (`ENC1`) or `0x52574431` for reward (`RWD1`).
 2. `mixed = (seed XOR tag XOR uint32((index + 1) * 0x9e3779b9)) >>> 0`.
