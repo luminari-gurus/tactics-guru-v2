@@ -75,7 +75,7 @@ export class BattleHud {
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;log:(lines:readonly string[])=>void}) {
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -90,10 +90,11 @@ export class BattleHud {
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
-      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
+      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-danger-info">Danger shows living heroes currently reachable by a legal enemy ordinary attack, including a legal move; it does not predict enemy choice.</p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
     this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
+    this.root.querySelector('#battle-danger')!.addEventListener('click',callbacks.danger,{signal});
     this.root.querySelector('#battle-party')!.addEventListener('click',()=>callbacks.inspect(),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
     this.root.querySelector('#battle-log-open')!.addEventListener('click',()=>callbacks.log(this.log),{signal});
@@ -117,9 +118,12 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const movement=enabled?previewMovement(s.state,actor.id,s.catalog):null;
+    const dangerButton=this.root.querySelector<HTMLButtonElement>('#battle-danger')!;
+    dangerButton.disabled=!enabled; dangerButton.setAttribute('aria-pressed',String(danger));
+    dangerButton.textContent=danger?'Hide enemy danger':'Show enemy danger';
     const info=unitFeedback(s,actor);
     this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
@@ -163,7 +167,7 @@ export class BattleHud {
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
     document.querySelector('#battle-board-caption')!.textContent = (enabled && action && action!=='move' && !actor.hasActed
       ? 'Gold: active · ✓ valid target · × unavailable · Double outline: selected'
-      : 'Gold: active · White: selected · Teal: reachable') + ' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin';
+      : 'Gold: active · White: selected · Teal: reachable') + ' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin' + (danger?' · Orange triangle: hero potentially threatened':'');
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) options.push({cell:u.cell,label:unitLabel(s,u)});

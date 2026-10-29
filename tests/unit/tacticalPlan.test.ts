@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { BattleSession } from '../../src/app/BattleSession';
-import { previewMovement } from '../../src/domain/grid';
+import { previewMove, previewMovement } from '../../src/domain/grid';
 import { previewTacticalPlan } from '../../src/domain/tacticalPlan';
 
 const catalog = battleCatalog;
@@ -21,6 +21,13 @@ describe('tactical plan preview', () => {
     previewTacticalPlan(state, move, ability, catalog);
     expect(state).toEqual(before);
     expect(previewTacticalPlan(state, { ...move, to: { x: 999, y: 999 } }, ability, catalog).ok).toBe(false);
+    const unreachable = catalog.maps[state.mapId].cells.find(cell => {
+      const result = previewMove(state, { ...move, to: { x: cell.x, y: cell.y } }, catalog);
+      return !result.ok && result.reason === 'unreachable';
+    });
+    expect(unreachable).toBeDefined();
+    expect(previewTacticalPlan(state, { ...move, to: { x: unreachable!.x, y: unreachable!.y } }, ability, catalog))
+      .toEqual({ ok: false, reason: 'unreachable' });
     expect(previewTacticalPlan(state, move, { ...ability, unitId: enemy.id }, catalog)).toEqual({ ok: false, reason: 'notActiveUnit' });
     expect(state).toEqual(before);
   });
@@ -48,6 +55,15 @@ describe('tactical plan preview', () => {
         expect(session.confirmPlan()).toBeNull();
         expect(session.state).toEqual(before);
         expect(session.preparePlan(move, ability).ok).toBe(true);
+        // Simulate an intervening authoritative update after review. Confirmation
+        // must preflight both commands again and leave the updated state intact.
+        const staleState = { ...state, units: state.units.map(u => u.id === enemy.id ? { ...u, hp: 0 } : u) };
+        const staleSession = new BattleSession(catalog, state, state.seed);
+        expect(staleSession.preparePlan(move, ability).ok).toBe(true);
+        (staleSession as unknown as { current: typeof staleState }).current = staleState;
+        expect(staleSession.confirmPlan()).toBeNull();
+        expect(staleSession.state).toEqual(staleState);
+        expect(staleSession.continuation!.commands).toEqual([]);
         const moved = session.confirmPlan();
         expect(moved).not.toBeNull();
         expect(session.confirmPlannedAbility()).toBeNull();

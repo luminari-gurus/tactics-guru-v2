@@ -4,6 +4,21 @@ import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
 
+test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const danger=page.locator('#battle-danger');
+  const before=await page.locator('#game').getAttribute('data-session');
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await danger.focus(); await danger.press('Enter');
+  await expect(danger).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#battle-danger-info')).toContainText('does not predict enemy choice');
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await danger.press('Enter');
+  await expect(danger).toHaveAttribute('aria-pressed','false');
+});
+
 test('default Move initializes once per usable player turn and preserves explicit choices',async({page})=>{
   // Overrides, a full actor cycle and seeded restarts share one cumulative budget.
   // Keep individual actions bounded while allowing software-rendered desktop CI.
