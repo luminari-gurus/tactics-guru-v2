@@ -114,3 +114,35 @@ it('retains the restored position in a dungeon save and reconstructs its history
   const saved=encodeDungeon({...started.state,activeBattle:s.state});expect(saved.ok).toBe(true);
   if(saved.ok){const loaded=decodeDungeon(saved.text);expect(loaded.ok).toBe(true);if(loaded.ok)expect(loaded.state.activeBattle).toEqual(s.state);}
 });
+
+it('does not offer undo for a move made after an accepted action', async () => {
+  const {previewAbility}=await import('../../src/domain/combat');
+  const original=new BattleSession(catalog,'map:forest_ruins',2).state;
+  const hero=original.units.find(u=>u.defId==='fighter')!,enemy=original.units.find(u=>u.side==='enemy')!;
+  const ability={type:'useAbility' as const,unitId:hero.id,abilityId:'ability:basic_attack' as const,target:{unitId:enemy.id}};
+  let verified=false;
+  for(const tile of catalog.maps[original.mapId].cells){
+    if(!catalog.terrains[tile.terrainId].walkable || original.units.some(u=>u.id!==enemy.id&&u.hp>0&&u.cell.x===tile.x&&u.cell.y===tile.y))continue;
+    const state={...original,activeIndex:original.initiative.indexOf(hero.id),units:original.units.map(u=>u.id===enemy.id?{...u,cell:{x:tile.x,y:tile.y}}:u)};
+    if(!previewAbility(state,ability,catalog).ok)continue;
+    const s=new BattleSession(catalog,state,state.seed);s.prepare(ability);const attack=s.confirm()!;s.finishPresentation(attack.token);
+    if(s.phase!=='player')continue;
+    const reach=previewMovement(s.state,hero.id,catalog);if(!reach.ok)continue;const cell=reach.cells.find(c=>c.cost>0);if(!cell)continue;
+    expect(s.prepare({type:'move',unitId:hero.id,to:cell.cell}).ok).toBe(true);
+    const moved=s.confirm()!;s.finishPresentation(moved.token);expect(s.canUndoMove).toBe(false);expect(s.undoMove()).toBeNull();verified=true;break;
+  }
+  expect(verified).toBe(true);
+});
+
+it('does not offer undo when the accepted move exhausts the command limit', async () => {
+  const {RULE_BOUNDS}=await import('../../src/domain/constants');
+  const initial=new BattleSession(catalog,'map:forest_ruins',2).state;
+  const hero=initial.units.find(u=>u.side==='player')!;
+  const state={...initial,activeIndex:initial.initiative.indexOf(hero.id),commandCount:RULE_BOUNDS.commandCount.max-1};
+  const session=new BattleSession(catalog,state,state.seed),reach=previewMovement(session.state,hero.id,catalog);
+  expect(reach.ok).toBe(true);if(!reach.ok)return;
+  const cell=reach.cells.find(c=>c.cost>0);expect(cell).toBeDefined();if(!cell)return;
+  expect(session.prepare({type:'move',unitId:hero.id,to:cell.cell}).ok).toBe(true);
+  const move=session.confirm()!;session.finishPresentation(move.token);
+  expect(session.canUndoMove).toBe(false);expect(session.undoMove()).toBeNull();
+});

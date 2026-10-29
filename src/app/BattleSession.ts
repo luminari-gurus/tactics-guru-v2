@@ -9,7 +9,7 @@ import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { undoRecordedMove } from '../domain/movementUndo';
-import { REPLAY_FORMAT_VERSION } from '../domain/constants';
+import { REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
@@ -62,7 +62,7 @@ export class BattleSession {
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
   get pendingPlan() { return this.plan; }
-  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null; }
+  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null && this.current.commandCount < RULE_BOUNDS.commandCount.max; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
   get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
   get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
@@ -104,7 +104,7 @@ export class BattleSession {
   }
   undoMove(): Presentation | null {
     if (!this.canUndoMove || !this.lastMove) return null;
-    const before=this.current, previous=this.lastMove;this.lastMove=null;this.cancel();
+    const before=this.current, previous=this.lastMove;this.lastMove=null;this.cancel();this.error=null;
     const result=undoRecordedMove(previous.before,before,previous.move,this.catalog);
     if (!result.ok) {this.error=result.reason;return null;}
     this.current=freeze(result.state);this.commands.push(freeze({type:'undoMove',unitId:previous.move.unitId}));

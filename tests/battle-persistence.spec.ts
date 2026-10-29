@@ -19,6 +19,13 @@ const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(key
 async function seedTwo(page:Page) {
   await page.goto('/');await ready(page);await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
 }
+test('undo stays unavailable after a move exhausts the command limit',async({page})=>{
+  const initial=new BattleSession(catalog,'map:forest_ruins',2).state,hero=initial.units.find(u=>u.side==='player')!;
+  const state={...initial,activeIndex:initial.initiative.indexOf(hero.id),commandCount:RULE_BOUNDS.commandCount.max-1};
+  await continueSnapshot(page,state);await chooseMove(page);await page.locator('#battle-review').click();await ready(page);
+  expect((await readSession(page)).state.commandCount).toBe(RULE_BOUNDS.commandCount.max);
+  await expect(page.locator('#battle-undo')).toBeDisabled();
+});
 async function freeze(page:Page) {await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));}
 async function chooseMove(page:Page) {
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
