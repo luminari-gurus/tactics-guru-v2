@@ -22,3 +22,15 @@ These focused checks do not constitute the full matrix. An earlier Chromium capt
 ## Retained failures and pending full regression
 
 A local `npm run test:unit` attempt had 1,016 passes and 27 failures in `measureFitPreview.test.ts`: the sandbox rejected loopback listeners with `EPERM`. The focused file was rerun with local-server access and all 27 passed. That repair does not turn the original aggregate into a passing run; its truncated tool output remains in the task history. The self-hosted capture has separate preparation, unit, browser, telemetry, performance and aggregate receipts. Preserve any failed, skipped or incomplete stage and compare source/build identities before claiming full acceptance.
+
+## Acceptance audit while full regression is pending
+
+| Issue requirement | Evidence and remaining gate |
+| --- | --- |
+| Move-plus-ability preview, confirmation and cancellation | `tacticalPlan.test.ts` checks pure preflight, stale and unreachable inputs, cancellation and interruption. The retained HUD journeys review, cancel, interrupt and execute a plan. Final full-regression result remains pending. |
+| Enemy threat distinct from active reach | `threat.test.ts` covers occupied and elevated routes, line of sight, movement blocks, spent budgets and immutable state. The UI uses orange markers and explicitly limits the display to currently threatened living heroes and ordinary attacks; it is not an empty-cell threat map or an AI prediction. |
+| Safe move undo and history | `movementUndo.test.ts` covers exact preceding move validation, stale/consequence rejection, lock and reload boundaries, repeated/forged records, action/turn and command limits. New replay format 5 coexists with format 4; battle snapshots remain format 4. Retained journeys exercise save/reload and terminal outcomes. |
+| No unintended resources, RNG or duplicate events | Focused unit and browser checks compare the accepted boundaries, saved state, RNG, events and replay. An interrupted compound move remains accepted and its queued ability is cancelled. Full shared-turn and lifecycle regression remains pending. |
+| Input, lifecycle and edge cases | Retained desktop keyboard, narrow viewport, modal, portrait/landscape touch emulation and WebKit checks cover the new flow; stale targets and unsafe state changes are unit-tested. The pending full matrix owns broader fixtures, placement, lifecycle, telemetry and performance checks. No physical hardware was tested. |
+
+The current threat display deliberately reports occupied hero positions, not every hypothetical destination. Movement after an action remains allowed by the existing rules but is not undoable; the focused unit test covers that boundary.
