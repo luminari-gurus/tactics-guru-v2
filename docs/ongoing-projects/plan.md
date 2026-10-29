@@ -86,151 +86,102 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
 
 ## Implementation handoff (live)
 
-- Starting source: clean `b5b450f80405d14a28082c43ba555bcf02f2b11e` on the named
-  branch; fetched `origin/main` remains `7cea1e9`, with no intervening changes.
-- Current work (2026-10-29): foundation PR [#251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251)
-  is open and non-draft, pushed at `d2e211d`. OpenSpec task 1.1 is complete (1/9).
-  Gameplay/placement continues on `branch/issue-166-shaman-support`, based on this
-  branch, with its PR targeting `branch/issue-166-goblin-shaman` until #251 merges.
-  No tag/release/merge/deployment is needed for these review chunks.
-- Support branch is now active at base `56b0c8c`. Exact previous-format
-  standalone/run/dungeon bytes were captured with original encoders before edits
-  in `tests/fixtures/saves/issue-166/`; capture unit passed and was removed.
-- Implemented: fixed support profiles/immunity validation, pure Hex/heal preview
-  and resolver, one-source Weakened projection/refresh/expiry/defeat cleanup,
-  versions **5/6/7/8**, deterministic AI candidates and dungeon-only placement.
-  OpenSpec tasks 2.1/2.2/2.3/3.1 are complete; feedback/journey qualification and
-  final full-regression/delivery remain pending (6/9 complete, including feedback).
-- Latest proof: 172 focused rules/AI/turn tests, 167 existing save/session tests,
-  new aggregate roundtrip/hero-HP admission cases, 84 encounter/content cases,
-  both type scopes and 48 expanded ability/feedback tests pass. The first full
-  unit run retained 1,045 passes and two changed legal-witness failures. Source-
-  grounded replacement seeds preserve every assertion: Ranger 1 (was 190),
-  two-biome/six-battle guardian 4 (was 190). All 13 dungeon-battle cases now pass.
-- Shaman seed **3**, unplayed level-1/full-HP dungeon entry, legally yields a
-  **53-command victory**, one failed Hex, two ally heals and Weakened expiry.
-  `shamanJourney` supplies the exact pure witness; the new browser case enacts all
-  exploration/combat input, active status reload and full actual-command replay.
-  Both default Chromium and WebKit exploration discover all three device profiles.
-- Retained iteration findings: a test target 99 exceeded the existing ID bound
-  (corrected to missing valid ID 63); authored admission requires the dungeon-local
-  map's roster to match the selected composition (both now carry the same spawn-6
-  replacement). The first browser journey reached its terminal state but compared
-  equivalent single-missile array/unitId intents syntactically; only that oracle
-  comparison is normalized, while actual browser commands/events remain raw and
-  are replayed exactly. No application rule or acceptance gate was weakened.
-- All three Chromium production Shaman cases now pass (desktop/native-touch
-  portrait/landscape, 53-command victory, active Weakened reload, two heals and
-  exact actual command/event/RNG replay). Board/ability/status/save-log screenshots
-  are reviewed and retained with raw passing/failing reports under
-  `docs/qa/issue-166/iteration/`. Current checkpoint is ready for publication as a
-  dependent draft while Linux WebKit and full qualification proceed. Browser
-  evidence binds the dirty source/build at `56b0c8c`; immutable inputs are recorded.
-- Next: finish the clean Linux WebKit/full verification without replacing Windows dependencies,
-  reconcile failures with proportional repairs, then publish final review readiness.
-  Prior Linux checkout `/tmp/tactics-issue-165-20261028` and engine caches exist,
-  but old results do not qualify changed Shaman runtime. Keep browser/GPU work serial.
-- Runtime checkpoint is now committed/pushed at `4e765f89bf84ae2651f6a571f8b8370c4dd35d36`.
-  [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252) targets the
-  #251 branch and is draft/mergeable while qualification proceeds. No runtime/test
-  inputs changed after the Chromium pass (recorded input hash
-  `a6ce2adf4ffd5ba5529f05fcfcf92bad7fb742b68e45aad829da00882c211886`).
-- Linux qualification checkout: `/tmp/tactics-issue-166-20261029`, clean detached
-  `4e765f8`, Node 24.15.0/npm 12.0.2, independently installed Linux dependencies;
-  Windows dependencies are untouched. `npm ci` passed (zero audit vulnerabilities);
-  npm blocked the unused PostHog CLI postinstall under its existing allowScripts
-  policy. Initial smoke failed before tests because no dist bundle existed in the
-  fresh clone. Pilot build and corrected browser setup are in progress, with logs
-  in its `tmp/issue166/` and `verification-receipts/browser-runs/`.
-- Corrected Linux setup now passes Chromium and WebKit smoke (2/2). The original
-  full command `npm run verify:full` is running against clean `4e765f8`, unified
-  execution session 33257. Reports:
-  `/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
-  `summary.json` updates per stage; `tmp/issue166/full-launch.log` tracks progress.
-  Tooling, units, typecheck, build integrations and root bundle passed; Chromium
-  is in progress. Before/full-root input/build inventories are in that checkout's
-  `tmp/issue166/{before-full,during-full-root}.json`. Do not start parallel browser
-  work. Capture prefix inventory when its stage begins, then restored root and
-  after-source inventory. Preserve this original run even if focused repairs follow.
-- Original full-run Chromium found a Fighter witness regression at seed 190:
-  healing occurs, but the party loses at depth 2/slot 0 before Taunt, rather than
-  the expected depth 2/slot 2 terminal boundary. Do not erase this failure. A legal
-  pure search found seed **17**, retaining all six battles, both actions, level 3,
-  terminal position and exact replay. Test-only repair is prepared in the Windows
-  checkout (`fighterJourney` shared by unit/browser); its new targeted unit passes.
-  After the original serial run finishes, run only this repaired browser case in
-  three Chromium and three WebKit profiles. Application source/assets are unchanged.
-- Literal base `7cea1e9` has no differences in src/public/tests/scripts/config/
-  package inputs from the retained qualified source `4f8c194`; the prior raw
-  `docs/qa/issue-165/full-run/chromium.json.gz` records the Fighter case passing
-  all three profiles. This is valid baseline reuse for the changed witness,
-  avoiding a redundant base matrix. Current Ranger seed-1 browser trace also
-  naturally proves a successful Shaman Will save (17 vs DC 12), supplementing
-  Shaman seed 3's failed save without another test case.
-- Repair checkpoint: local commit `baa1402` (not pushed yet); only tests and
-  handoff docs differ from `4e765f8`. Both type scopes pass. Keep the Linux
-  checkout frozen until its original run ends. Then fetch its local Windows
-  origin and check out the repair commit, retaining the qualified `dist/` because
-  application/build/asset inputs are unchanged. Run the repaired case serially:
-  `npx --no-install playwright test tests/dungeon.spec.ts -g '^Fighter legal progression'`
-  and the same command with `-c playwright.exploration.config.ts` (three profiles
-  each). Capture expanded unit JSON once after this new pure Fighter case;
-  `vitest list --json` groups parameterized declarations (542 entries), so it is
-  discovery metadata, not the 1,048 executed-case inventory. Final repaired unit
-  selection is expected to contain 1,049 cases; verify the actual count.
-- Final ledger must retain the original aggregate failure and separately bind
-  focused repair results to their changed test inputs. Reuse unchanged consumers
-  with an explicit dependency comparison; do not rerun the full matrix for this
-  seed-only repair or relabel the original run clean. Complete QA/tasks, strict
-  validation, commit/push and mark #252 ready only after remaining gates pass.
-- Input comparison is retained in `tmp/issue166/repair-scope.json`: only
-  `tests/dungeon.spec.ts`, `tests/helpers/dungeonFixtures.ts` and
-  `tests/unit/dungeonBattle.test.ts` differ logically between the qualified Linux
-  checkout and repair checkpoint; other raw differences are line endings. A
-  metadata-only watcher (unified session 49387) captures `prefix-build.json` and
-  `after-full.json` into Linux `tmp/issue166/` when those stages finish. It runs
-  no browsers and refuses to mislabel restored-root bytes as a missed prefix.
-- **Latest bounded runtime repair (supersedes the seed-only build-reuse note):**
-  strengthening the support-approach fixture revealed that AI goal previews passed
-  whole map cells as unit positions, including terrain/elevation. Exact state
-  admission correctly rejected them, leaving support approach goals unused.
-  `src/domain/ai.ts` now projects only `{x,y}` for that hypothetical position.
-  The revised unit requires movement toward an injured ally opposite the hostile
-  attack goals, so ordinary approach cannot accidentally satisfy it. All 45 AI
-  and 14 dungeon-battle tests (59 total), plus both type scopes, pass.
-- The original Linux run remains frozen at `4e765f8`; continue it and preserve all
-  original failures. Final source needs a fresh build after this one-line repair.
-  Static reach is only the support-goal branch (Shaman); ordinary-enemy decisions,
-  turn/RNG/save contracts and renderer/transport code are unchanged. Full legal
-  old/new consumer traces are being compared in ignored `tmp/issue166/` to bound
-  reuse. After the original run, qualify fresh units/build/header/base-path/perf
-  obligations and Shaman/Fighter six-profile cases; expand any consumer whose
-  trace differs. Do not claim the old build qualified the repaired branch.
-- Before/after complete consumer packets are **identical** for Ranger seed 1,
-  Mage seed 17, Shaman seed 3, the six-battle guardian seed 4, healed Fighter
-  boundary and dynamically selected victory boundaries. This includes commands,
-  events, states/RNG, party/progression and replay data, recorded in
-  `tmp/issue166/consumer-equivalence.json` with canonical hashes and both capture
-  logs/packets. These equivalent histories justify reusing the original long
-  Mage/Ranger UI runs; fresh Shaman/Fighter six-profile checks and changed build/
-  asset/performance obligations still run after the original aggregate.
-- Environment: Windows Node and installed Windows dependencies work; WSL provides
-  npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
-  and browser runs; do not replace the shared installed node_modules.
-- Foundation proof: 199 focused content tests, 28 combat/turn fixture tests, 222
-  content-validation tests, both type scopes, production bundle and two root/prefix
-  header integrations pass. The final 27-case desktop/portrait/landscape browser
-  selection passes on installed Chrome via the supported executable override.
-  Setup failures, exact commands/input/build inventory and screenshots are retained
-  in [#166 QA](../qa/issue-166/README.md). No full-issue acceptance is claimed.
-- Browser environment: packaged Windows Chromium fails `spawn UNKNOWN`; installed
-  Chrome 155.0.8059.41 works. Native npm shim in ignored `tmp/issue166/tools/npm.cmd`
-  invokes Node + `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`.
-  Add that shim directory to PATH for nested npm/test-server commands. Keep one
-  browser worker; Linux WebKit qualification is still required later.
-- Ablation: retain the existing catalog, pure preview, candidate loop, bounded
-  optional state and event surfaces. No general effect interpreter, configurable
-  scoring framework, new UI controls or asset generation is needed.
+Snapshot: 2026-10-29. **6/9 OpenSpec tasks** are complete. Tasks 3.3 (complete
+browser evidence), 4.1 (qualification reconciliation) and 4.2 (final delivery)
+remain open. Do not claim complete issue acceptance yet.
+
+- Active branch: `branch/issue-166-shaman-support`, pushed at
+  **`ecab640e376888b22d3a71b84a5edcd545141a05`**, including `baa1402`.
+  A further test-only backup-readiness repair is currently local.
+- [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251): independently
+  verified catalog/art foundation on the requested branch, open/non-draft.
+  [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252): dependent
+  runtime change, draft during qualification. Its two issue-scoped hosted
+  workflows were skipped; do not call them green browser validation.
+- Implemented: exact Hex/heal profiles and bounded immunities; atomic pure
+  preview/resolution; one-source Weakened projection/lifecycle; deterministic
+  support AI; versions **state/rules/run/dungeon 5/6/7/8**; dungeon-only
+  `forest_ruins_shaman_v1`; existing inspection/log/floating feedback. Other
+  standalone/authored-run/desert rosters and wider #161/#170 ownership stay intact.
+- See [QA](../qa/issue-166/README.md) for retained original failures, artifact
+  identities and acceptance mapping. Original checkpoint `4e765f8` passed all
+  **1,048 units**, both type scopes, build integrations and root build. Shaman
+  seed 3 gives a legal 53-command victory, failed Hex, two heals, active Weakened
+  reload/expiry and exact actual command/event/RNG replay in Chromium's three
+  profiles. Ranger seed 1 also naturally proves a successful Shaman Will save.
+
+### Repairs and proof already prepared
+
+- Source-backed roster changes invalidated old fixed witnesses without changing
+  their acceptance gates. Ranger now uses **1**, guardian **4**, Fighter **17**.
+  Fighter 17 preserves six battles, level three, healing/Taunt, terminal defeat at
+  depth 2/slot 2 and exact replay. Original Fighter 190 loses at depth 2/slot 0
+  before Taunt; preserve that original failure.
+- A stronger AI fixture put an injured ally right and all attack goals left. It
+  exposed a real implementation defect: hypothetical support goals passed rich
+  MapCells as UnitState positions, which the exact reader correctly rejected.
+  The one-line `src/domain/ai.ts` repair projects `{x,y}`. All **45 AI + 14
+  dungeon-battle tests** and both type scopes pass after the fix.
+- Complete before/after packets are equal for Ranger 1, Mage 17, Shaman 3,
+  guardian 4, healed-Fighter and selected victory boundaries, including commands,
+  events, states/RNG, progression and replays. Windows `tmp/issue166/` holds
+  `consumer-traces.json`, `consumer-equivalence.json` and capture logs; the Linux
+  original packet is below. This bounds reuse of unchanged long UI histories.
+- Original Chromium additionally found two mobile backup-resume failures: a test
+  reads `data-session` after exactly 32 mocked milliseconds, before asynchronous
+  scene/asset readiness. A test-only local patch waits for the published restored
+  projection, advancing one frame only while absent. Exact continuation snapshot,
+  visibility, one-canvas and subsequent legal-defeat assertions remain unchanged.
+  It typechecks; its five browser profiles still need verification. Reuse a valid
+  retained literal-base comparison or run only that base case if attribution needs it.
+
+### Active serial qualification — do not start another browser run
+
+- Linux: **`/tmp/tactics-issue-166-20261029`**, clean detached **`4e765f8`**; keep it
+  frozen until the original aggregate ends. Node 24.15.0/npm 12.0.2 and separately
+  installed Linux dependencies; Windows node_modules is untouched. Corrected
+  Chromium/WebKit setup smoke passed 2/2; initial no-dist setup failure is retained.
+- Running `npm run verify:full`: unified session **33257**, runner PID **3061420**.
+  Reports: `/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+  Read `summary.json`, stage logs and Linux `tmp/issue166/full-launch.log`.
+  Chromium finished **734 passed / 3 expected mode skips / 5 failed**: three old
+  Fighter witnesses and two backup-readiness checks. Later stages are in progress.
+- Linux `tmp/issue166/{before-full,during-full-root}.json` binds the original
+  source/build. Root hash `ace84f9570c810d914d61abbc15861e2218f951ac5afd389334a2baf8bb26ba5`
+  equals pilot bytes. Metadata-only watcher session **49387** captures
+  `prefix-build.json` and `after-full.json`; it runs no browsers and refuses a
+  mislabeled prefix. Keep browser/GPU/performance work serial.
+- `tmp/issue166/repair-scope.json` currently binds ecab640: one application change
+  (support-goal position projection), four test files, other raw differences only
+  line endings. Regenerate after the backup test patch. Literal base `7cea1e9`
+  has zero relevant source/test/config/package differences from retained qualified
+  `4f8c194`; prior #165 raw reports supply valid baseline evidence where applicable.
+
+### Resume when the original run finishes
+
+1. Commit the remaining test/handoff repair, then fetch the Linux clone's local
+   Windows origin and check out that final repair head. **Build fresh**; the
+   superseded seed-only advice to reuse old dist no longer applies after the AI fix.
+2. Existing receipt tooling can run fresh units (expanded JSON; expected **1,049**,
+   verify actual), both type scopes, integrations/root, asset modes, performance,
+   prefix and root restoration. Select
+   `units,typecheck-app,typecheck-domain,build-integration,build-root,assets-root-dev,performance,build-prefix,assets-prefix-preview,assets-prefix-dev,restore-root`
+   via `npm run measure:verification -- --stages <list> --out <new-directory>`.
+   `vitest list --json` groups parameterized declarations (542 entries), so it is
+   discovery only. Capture final root/prefix/restored inventories separately.
+3. Fresh browser checks: default config on `tests/dungeon.spec.ts` and
+   `tests/run-progression.spec.ts` filtered by
+   `Shaman production journey|Fighter legal progression|review: in-flow Continue`;
+   exploration config for the two dungeon journeys (three WebKit profiles each);
+   device-acceptance config for `review: in-flow Continue` (two WebKit profiles).
+   Also run root-preview `tests/public-asset-base.spec.ts`. Retain all results,
+   screenshots, build identity and complete actual traces.
+4. Reconcile all original stages with fresh affected proof and explicit
+   dependency/trace equivalence. Do not rerun a whole matrix for these bounded
+   repairs or relabel the original aggregate clean. Investigate any other failure.
+5. Finish QA/acceptance mapping and task checkboxes, strict OpenSpec validation,
+   links and artifact/input hashes. Commit/push, update #252 and mark ready only
+   after all gates pass. No merge, tag, release or production deployment is requested.
 
 ## Evidence and proposed implementation decisions
 

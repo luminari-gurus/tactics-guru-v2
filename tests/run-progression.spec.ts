@@ -196,6 +196,11 @@ test('review: in-flow Continue resumes an ongoing backup battle after legal defe
  await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
  await page.clock.runFor(32);
  await expect(page.locator('#run-screen')).toBeHidden();await expect(page.locator('#game')).toHaveCSS('visibility','visible');
+ // Asset decoding may finish after the first two frames; advance only until the restored projection is published.
+ await expect.poll(async()=>{
+  if(await page.locator('#game').getAttribute('data-session'))return true;
+  await page.clock.runFor(16);return (await page.locator('#game').getAttribute('data-session'))!==null;
+ },{intervals:[50,100,200]}).toBe(true);
  expect((await readSession(page)).continuation?.snapshot).toEqual(expected);expect(await page.locator('canvas').count()).toBe(1);
  await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
 });

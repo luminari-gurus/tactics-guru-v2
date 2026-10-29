@@ -124,6 +124,17 @@ rosters have no Shaman and ordinary-enemy planning is untouched. Fresh final-sou
 units/build/header/base-path/performance and Shaman/Fighter six-profile checks
 will accompany reuse of demonstrably unchanged consumer histories.
 
+Original Chromium completed **734 passed / 3 expected mode skips / 5 failed**.
+Three failures are the old Fighter witness. Two mobile failures occur in the
+in-flow backup Continue test: after exactly 32 mocked milliseconds it reads a
+not-yet-published session and throws on null. A prepared test-only repair waits
+for actual restored-session publication, advancing one frame only while absent;
+the exact saved continuation, visibility, canvas count and final defeat assertions
+are retained. It typechecks; fresh Chromium/WebKit owning-profile checks remain
+pending. The retained #165 raw report records all three literal-base-equivalent
+cases passing; this does not make the fixed-frame readiness assumption reliable.
+No application save/recovery behavior was weakened or changed for this repair.
+
 ## Source and export evidence
 
 Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. Asset registry:
