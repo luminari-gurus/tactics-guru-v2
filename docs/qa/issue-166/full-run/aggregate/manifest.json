@@ -666,10 +666,16 @@
       "bytes": 23353,
       "sha256": "cb1bc189b6fb4d6bf0d988e8cc680f84e78ed4b29af56faa7587d9eb13e711c2",
       "originalSha256": "d1d3abd46a250c434e200ee1c54c379070c81f4e0028f681918ac561c25cee71"
+    },
+    {
+      "file": "artifact-inventory.json.gz",
+      "bytes": 69319,
+      "sha256": "90986c078681580370b5e0ab490f65956cf8db94e56ed3ae964c02957068d789",
+      "originalSha256": "348090594200e24a98e7ac484b02d6ed30c0941c47409c452c29edcfed6f9915"
     }
   ],
   "rawTree": "/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420",
   "rawArtifactCount": 1407,
   "rawTreeBytes": 560097864,
-  "visualEvidence": "All raw screenshots remain at rawTree with hashes in artifact-inventory.json; portable representative screenshots and final-source traces are retained separately."
+  "visualEvidence": "All raw screenshots remain at rawTree with hashes in artifact-inventory.json.gz; portable representative screenshots and final-source traces are retained separately."
 }
