@@ -21,6 +21,7 @@ SHA256(docs/qa/issue-177/selfhost-landscape-1-receipt.json.gz)= 6ba44a0faf489781
 SHA256(docs/qa/issue-177/selfhost-landscape-1.json.gz)= 4f766cc226cf579fc6dd3fb45df395a2e79a761fe02ebb5ac2f4c12e69be9e03
 SHA256(docs/qa/issue-177/selfhost-landscape-1.log.gz)= 33ad3227c84326a6d4c13d747da5ee9a49056ec1ba68b7b2f1d9ddee517debb7
 SHA256(docs/qa/issue-177/selfhost-landscape-2-receipt.json.gz)= c7942eeb2417a3e71d2f5c1bd31488479bb38c9e1a44ec0e95b355babb7485ad
+SHA256(docs/qa/issue-177/selfhost-landscape-3-receipt.json.gz)= e370d401a32ee4a4c4891116bacc3edc87f3f9e74ccf7925601ff253c713c35e
 SHA256(docs/qa/issue-177/selfhost-prepare.tar.gz)= 564b43327528dc1dedf8579f0cce058b1cfd3a1074b57430216e0c3a8e49d14f
 SHA256(docs/qa/issue-177/source-build-manifest.json.gz)= e82a601ca2f26b9b7a0939d51c5edb4d54aa3e7cda5f20e3cb2962c4caf6e0da
 SHA256(docs/qa/issue-177/webkit-config.ts.gz)= b5211804292fe04783875d29dc19e7f52f9aa2ea3eefcebd6ca068a5fa64b87f

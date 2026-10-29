@@ -48,3 +48,5 @@ The self-hosted capture preparation completed successfully on clean `abac1e2`: t
 The second landscape batch passed 102 cases with two expected preview-mode skips and no failures or retries. Both skipped cases require the dev server. The placement-failure case is owned by the existing `placement-dev` stage; the direct-disposer case was not selected by that stage and is explicitly queued in the replacement run above. `selfhost-landscape-2-receipt.json.gz` retains the result.
 
 The direct disposer dev-only case also passed locally in all three Chromium profiles (3/3) on clean source `e3d452b` in dev-server mode, using the same local host/browser conditions listed above. `dev-disposer-local.json.gz` retains the report. This does not replace the queued execution on qualified self-hosted capacity.
+
+The third landscape batch completed 62/62 cases with no skips or retries. Its receipt is retained as `selfhost-landscape-3-receipt.json.gz`.
