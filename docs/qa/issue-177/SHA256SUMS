@@ -4,6 +4,7 @@ SHA256(docs/qa/issue-177/chromium.json.gz)= fd896416a395a83ad0d792ff65a760e687b6
 SHA256(docs/qa/issue-177/command-limit-chromium.json.gz)= c114f444811698d291b13a105aac5d471bbae07a8c5c7bcdca291bc5f984a4be
 SHA256(docs/qa/issue-177/command-limit-units.json.gz)= 0e65583bf4af26cd3dc184bf0bd249229b8cb4b37de4ef8fb4dd27d62cf6cfa0
 SHA256(docs/qa/issue-177/command-limit-webkit.json.gz)= ba65ba2a223302219eda5ab88cec8dcd64892d78c8d22cfd235e385b22899e2b
+SHA256(docs/qa/issue-177/dev-disposer-local.json.gz)= 0cd4c2613a948fb4d3ae2889cce1177295d8ddfd67cab1097cba75e9a8fcb5e0
 SHA256(docs/qa/issue-177/dungeon-webkit.json.gz)= e738d3f2d1a625f2f0e0d4957d4151c61849810cf6279258bd2370c452f20644
 SHA256(docs/qa/issue-177/fighter-base-artifacts.tar.gz)= 9bd57a9f4f99f03ff33b670aa929f6b031fe8d513e906c057850f7cc712ac5c3
 SHA256(docs/qa/issue-177/fighter-base-build.log.gz)= 62bbbd0ebbdbcd4fe9e05d6d311dfe34d1af8011aea3e8a2f5fe370736f2b969
