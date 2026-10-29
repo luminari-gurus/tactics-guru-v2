@@ -1,5 +1,7 @@
 # Hero progression
 
+Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+
 The initial #160 slice supports Fighter, Ranger and Mage levels 1–5 in short runs
 and dungeons. Standalone battles retain level-1 rules. Canonical hero records carry
 cumulative XP, level, current/max HP and the sorted learned implemented ability IDs;

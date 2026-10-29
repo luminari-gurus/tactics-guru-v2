@@ -1,5 +1,7 @@
 # First-battle content contract (#26)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/content/types.ts` defines plain, immutable, renderer-independent records; `constants.ts` owns inclusive numeric bounds and the texture specification. The runtime validator in `src/content/validate.ts` checks unknown input without Phaser, DOM, combat rules, asset generation or an authored map. The existing diagnostic terrain catalog remains independent: its fourteen IDs are not the battle contract.
 
 ## Identity, references and numeric rules
@@ -24,7 +26,7 @@ Use the fixed legacy baseline documented in the repository's [source audit](phas
 | Goblin Grunt | 9 | 4 | 1 | 4 | 12 | 2 | 1 | 0 |
 | Goblin Archer | 8 | 4 | 1 | 4 | 11 | 2 | 2 | 0 |
 
-Heroes come from `scripts/combat/ForestRuinsMvpBuilder.gd:1190–1211`; archer from that builder at 1527–1538; grunt from `content/classes/` and `content/units/` resource definitions, as traced in the audit §3.3. The old three-enemy composition is a deliberate baseline choice, not today's seeded shaman roster. These values select a future catalog baseline; only synthetic test data is shipped here. No combat behavior is inferred from stats.
+Heroes come from `scripts/combat/ForestRuinsMvpBuilder.gd:1190–1211`; archer from that builder at 1527–1538; grunt from `content/classes/` and `content/units/` resource definitions, as traced in the audit §3.3. The old three-enemy composition is a deliberate baseline choice, not today's seeded shaman roster. These values selected the original catalog baseline; the authored production catalog was subsequently delivered in [#29](first-battle-content.md). No combat behavior is inferred from stats.
 
 ## Terrain production brief
 
@@ -42,8 +44,8 @@ Every image has stable asset ID, source/runtime paths, both pixel dimensions, PN
 
 Preserve the canonical Fighter/Ranger/Mage sprites and portraits. Fighter and its portrait already exist under `public/proof/`, with pinned source revision and hashes in [issue #16 asset evidence](qa/issue-16-assets.md); use those records rather than regenerate the hero. Ranger/Mage and selected goblin sprite/portrait records now pin their source revision in the [authored first-battle catalog](first-battle-content.md). The generated upright proof tree may be retained as a separate prop with its generation notes and foot anchor; the generated unlock tone may remain presentation audio outside this image contract. No bulk copy or mandatory legacy tile import is required. Runtime re-exports must preserve recognizable canonical art while addressing the open asset-size budget (#35).
 
-## Focused proof and subsequent work
+## Historical #26 focused proof and subsequent work
 
 Reuse the configured Node Vitest harness: `npm run test:unit -- tests/unit/contentContract.test.ts`. `tests/unit/fixtures/contentContract.ts` contains a complete synthetic catalog with a one-cell map, bounded placeholder stats for all five unit IDs and generated surface metadata, plus compile-time rejection fixtures for enemy references in hero spawns and canonical terrain surfaces. Paths/hashes are intentionally fake; no asset files are implied. Run `npm run validate:content` for the representative valid/invalid synthetic fixtures in `tests/unit/content.test.ts` and actual authored catalog regressions in `tests/unit/authoredContent.test.ts`; this is schema/reference validation, separate from the renderer diagnostic board. It does not read packaged files, verify image pixels or hashes against files, assess rights, or approve generated art. Content E owns packaged-file checks.
 
-Completion checks: `npm run test:unit`, `npm run typecheck`, `npm run build`, `npm test`, and `git diff --check`. Browser regression checks cover the existing diagnostic only. No physical-device or final battle acceptance is claimed by this schema change. The merged #20 [fit decision](qa/issue-20-fit-gate.md) permits first-battle work with its documented limitations and #35 loading follow-up; parent #2 remains open in the tracker.
+Completion checks: `npm run test:unit`, `npm run typecheck`, `npm run build`, `npm test`, and `git diff --check`. Browser regression checks cover the existing diagnostic only. No physical-device or final battle acceptance is claimed by this schema change. The merged #20 [fit decision](qa/issue-20-fit-gate.md) permits first-battle work with its documented limitations and #35 loading follow-up; parent #2 was open at that historical checkpoint and is now closed.

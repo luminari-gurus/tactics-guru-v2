@@ -1,5 +1,7 @@
 # Signature abilities (#8)
 
+Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+
 ## Mage progression (#165)
 
 Arc Bolt is intentionally consolidated into Magic Missile, available at level 1.

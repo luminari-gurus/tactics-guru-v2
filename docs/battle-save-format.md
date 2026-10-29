@@ -1,10 +1,7 @@
 # Battle save format 1
 
-Current #164 versions: the standalone wrapper remains format 1, containing battle
-state format 3 / rules 4; run envelope is 5 and dungeon envelope is 6. RNG remains
-1. Older versions are incompatible and preserve original bytes for recovery/export.
-The bounded active `markedBy`/`pinnedBy` references are validated with living,
-eligible Ranger sources and remain battle-local. See [current effect rules](combat-effects.md)
+Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`. The standalone wrapper remains format 1, containing battle state format 4 / rules 5; the run envelope is 6 and dungeon envelope is 8, with format 7 also accepted by the dungeon reader. RNG remains 1. Incompatible versions preserve original bytes for recovery/export.
+The bounded active `markedBy`, `tauntedBy`, and `movementBlock` references are validated against eligible living sources and remain battle-local. See [current effect rules](combat-effects.md)
 and [progression compatibility](hero-progression.md#save-compatibility). The
 procedural-format section below records its historical introduction.
 
@@ -29,9 +26,9 @@ The only root keys are `kind`, `format`, `payload`, and `digest`:
 }
 ```
 
-`format` is the independent **save format** version. The payload has exactly the existing BattleState keys: `format`, `versions`, `seed`, `rng`, `mapId`, `units`, `initiative`, `activeIndex`, `round`, `outcome`, `commandCount`. Its `format` must equal `STATE_FORMAT_VERSION` (currently 1). `versions` has exactly `rules`, `rng`, and `content`; the first two match `RULES_VERSION`/`RNG_VERSION` (currently 1), and `content` equals `contentVersion(trustedCatalog)`. Content identity includes rules-relevant catalog data and excludes art. Compatibility is exact; future/older/different identities fail explicitly. A format number alone cannot override rules/content/RNG compatibility.
+`format` is the independent **save format** version. The payload has exactly the existing BattleState keys: `format`, `versions`, `seed`, `rng`, `mapId`, `units`, `initiative`, `activeIndex`, `round`, `outcome`, `commandCount`. Its `format` must equal `STATE_FORMAT_VERSION` (4). `versions` has exactly `rules`, `rng`, and `content`; the first two match `RULES_VERSION` (5) and `RNG_VERSION` (1), and `content` equals `contentVersion(trustedCatalog)`. Content identity includes rules-relevant catalog data and excludes art. Compatibility is exact; future/older/different identities fail explicitly. A format number alone cannot override rules/content/RNG compatibility.
 
-Units retain `id`, `defId`, `side`, `{x,y}` cell, HP, `hasMoved`, `hasActed`, and optional `guarded: true` only for a player fighter. Initiative contains every unit ID exactly once. RNG retains exactly four uint32 `words` and its raw-draw `cursor`. The reader enforces catalog spawns/definitions, map bounds, living walkable/non-overlapping positions, valid active unit, HP and outcome consistency, and the RNG cursor/counter relationship. Refer to [battle.ts](../src/domain/battle.ts) and [types.ts](../src/domain/types.ts) for the shared authoritative shape. It does not infer the command history from a snapshot.
+Units retain `id`, `defId`, `side`, `{x,y}` cell, HP, `hasMoved`, `hasActed`, and bounded optional combat effects and resources. See [combat effects](combat-effects.md) for the enabled fields and their ownership/lifetime constraints. Initiative contains every unit ID exactly once. RNG retains exactly four uint32 `words` and its raw-draw `cursor`. The reader enforces catalog spawns/definitions, map bounds, living walkable/non-overlapping positions, valid active unit, HP and outcome consistency, and the RNG cursor/counter relationship. Refer to [battle.ts](../src/domain/battle.ts) and [types.ts](../src/domain/types.ts) for the shared authoritative shape. It does not infer the command history from a snapshot.
 
 ## Serialization and integrity
 
@@ -47,7 +44,7 @@ The digest detects accidental corruption. Anyone can recompute it; it provides n
 - Command count: 0–10,000. Coordinates: 0–31 and within the map. HP: 0 through the unit definition's max (content max 100). RNG words/seed: 0–4,294,967,295. Cursor: 0–Number.MAX_SAFE_INTEGER; round: 1–Number.MAX_SAFE_INTEGER. All numbers are finite safe integers.
 - All record keys/arrays are exact/dense; unknown fields, IDs, nested objects in scalar fields and unsupported versions fail. Unit definition IDs and side/outcome strings are fixed enums. RNG has exactly four words; versions has exactly three fields; all other object structure has fixed depth.
 
-The 16 Ki cap has room for the domain's 64 units: each canonical unit occupies fewer than 160 code units even with Guarded and maximal numeric fields; initiative is under 200, and the remaining fixed fields plus a 128-character map ID are under 1 Ki. This is below 12 Ki total. The smaller measured six-unit snapshots are not used as a universal worst-case estimate. A supported-limit fixture exercises 64 units, the maximum map ID, counters and text cap. A deeply nested malformed input still has the pre-parse bound and fails the fixed-shape reader before recursive hashing.
+The original #69 size estimates and supported-limit fixture describe its then-current unit shape, not a new maximum-size proof for later effects. The encoder and decoder enforce the 16 Ki code-unit limit; oversize text is rejected. A deeply nested malformed input has the pre-parse bound and fails the fixed-shape reader before recursive hashing.
 
 ## API and failures
 
@@ -63,7 +60,7 @@ The #73 integration provides `BattleSession.fromSnapshot(catalog, input, accepte
 
 The continuation tests compare decoded presentation snapshots against the **uninterrupted session's actual queued command, events and resulting state**, including seed 2/command 29 (archer 5 attacks without moving and must next Wait). Full authored battles for seeds 1–5 cover every accepted boundary. The original session's replay history is **not** contained in this snapshot; do not pass a mid-battle snapshot as `Replay.initial`, which requires an exact seed-created start. Fresh sessions expose a complete `replay`. Resumed sessions expose `replay: null` and `continuation: {snapshot, commands, events}`, recording only post-resume commands/events. Neither hydration nor diagnostic reads generate history, sounds or RNG draws. Session tests compare actual hydrated and uninterrupted queues for every boundary across seeds 1-5; browser coverage is recorded separately in the issue #73 QA report.
 
-The [#72 adapter](battle-storage.md) supplies Phaser-namespaced primary/backup storage, guarded failures, raw-data preservation and documented interrupted-write ordering without changing this pure codec. The #73 coordinator connects it to hydration, autosave, Continue/recovery/export controls and guarded restart invalidation. #74 retains physical persistence/lifecycle certification. Persistence is origin-scoped and best-effort. No live UI, Godot importer, run/reward model, deployment or parent-epic closure belongs to this codec contract.
+The [#72 adapter](battle-storage.md) supplies Phaser-namespaced primary/backup storage, guarded failures, raw-data preservation and documented interrupted-write ordering without changing this pure codec. The #73 coordinator connects it to hydration, autosave, Continue/recovery/export controls and guarded restart invalidation. The original #74 certification evidence retains its recorded device limits; current device acceptance follows [verification policy](verification-policy.md). Persistence is origin-scoped and best-effort. No live UI, Godot importer, run/reward model, deployment or parent-epic closure belongs to this codec contract.
 
 ## Procedural run snapshots: format 2 (historical introduction)
 

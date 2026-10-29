@@ -1,5 +1,7 @@
 # Combat effects
 
+Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`.
+
 Foundation audit: `2b5a063f4a7e8f4a6329eaf1f80630133754012a`, implemented by the
 approved [#161 staged change](../openspec/changes/issue-161-combat-effects/proposal.md).
 The #164 Ranger consumer builds on main `56e2b0d`; it enables the cases below

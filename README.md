@@ -64,7 +64,7 @@ the game uses illustrated portraits, compact sprites and isometric tile boards.
   ends. Both controls use an action without damage or a roll.
 - **Mage** — **Magic Missile** deals automatic-hit force damage, subject to range
   and line of sight. Progression increases the missile count at levels 3 and 5.
-  It can target allies, so check the friendly-fire warning before confirming.
+  It can target allies, so check the friendly-fire warning before confirming. Level 3 also unlocks **Frost Snare**, which prevents an enemy from moving until its next turn ends.
 
 Runs and dungeons support **levels 1–5**. Victories award XP to living participants;
 level-ups increase maximum HP and heal them. Defeated heroes stay defeated.
@@ -239,6 +239,8 @@ These routes also respect the configured base path.
 </details>
 
 ## Project guide
+
+The gameplay contracts below were reconciled against source `b343ab02ae033a57f8c5f613f07883764f0752c0`. They cover [battle state](docs/battle-foundation.md), [movement](docs/grid-movement.md), [turns and combat](docs/turn-flow-combat.md), [effects](docs/combat-effects.md), [abilities](docs/signature-abilities.md), [enemy turns](docs/enemy-turns.md), [content](docs/content-contract.md), [first battle and run sources](docs/first-battle-content.md), [encounters](docs/authored-encounters.md), [run](docs/run-contract.md), [items](docs/run-items.md), [progression](docs/hero-progression.md), [dungeon](docs/dungeon.md), [map laboratory](docs/overworld-map.md), [target previews](docs/target-preview-overlays.md), and [battle save format](docs/battle-save-format.md) / [storage](docs/battle-storage.md). Original issue-specific handoffs and QA remain historical; source and tracker may advance after this audit.
 
 - **Visual identity:** [design guide](docs/DESIGN.md), [unit artwork](docs/art/unit-art-guide.md), [terrain](docs/art/terrain-textures.md), [header generation record](docs/art/readme/header-generation.json).
 - **Combat:** [battle foundation](docs/battle-foundation.md), [turn flow](docs/turn-flow-combat.md), [enemy decisions](docs/enemy-turns.md), [target previews](docs/target-preview-overlays.md).
