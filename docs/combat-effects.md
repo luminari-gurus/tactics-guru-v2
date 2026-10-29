@@ -56,8 +56,7 @@ Proposed saves are d20 + the chosen save modifier >= DC, without automatic natur
 
 Issue #165 advances battle state to format 4/rules 5, run envelope to 6 and dungeon
 envelope to 7 (following #164’s 3/4, 5 and 6 respectively); standalone wrapper and
-RNG remain 1. Earlier saves are incompatible and retain recovery/export of original
-bytes. Historical defeated-unit `guarded` flags are read without normalization
+RNG remain 1. The dungeon movement integration subsequently advances the dungeon envelope to 8 while preserving format-7 reads. Earlier saves are incompatible and retain recovery/export of original bytes. Historical defeated-unit `guarded` flags are read without normalization
 before digest checking; projection treats them as inactive. Inspection does not
 rewrite storage. Unsupported/corrupt/incompatible data uses existing recovery.
 Effects are battle-local and never projected into carried party data. Second Wind

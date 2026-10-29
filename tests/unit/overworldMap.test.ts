@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { generateMap, validMapCells, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
 import { applyBiome, BIOMES, type Biome } from '../../src/map/biomes';
-import { createOverworld } from '../../src/map/state';
+import { createOverworld, type OverworldState, type OverworldMarker } from '../../src/map/state';
+import { createMovement, stepMovement, DEFAULT_BEHAVIORS, type EnemyBehavior, type OverworldMovement } from '../../src/map/movement';
 import * as rng from '../../src/domain/rng';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog } from '../../src/content/catalog';
@@ -270,5 +271,150 @@ describe('topology-preserving biome treatment', () => {
       expect(draw).not.toHaveBeenCalled();
     } finally { clock.mockRestore(); entropy.mockRestore(); draw.mockRestore(); }
     expect(rng.nextUint32(battle.state.rng)).toEqual(rng.nextUint32(before.rng));
+  });
+});
+
+describe('independent overworld enemy movement', () => {
+  function fixture(positions = [[10,10],[3,3],[3,10],[17,17]], walls: number[] = []): OverworldState {
+    const map = applyBiome(generateMap(1));
+    const cells = Array.from({ length: 400 }, (_, i): MapCell =>
+      i % 20 > 0 && i % 20 < 19 && i >= 20 && i < 380 && !walls.includes(i) ? 1 : 0);
+    return { map: { ...map, cells, terrain: cells.map(c => c ? 'grassland-open' : 'grassland-blocked') },
+      placementVersion: 'markers-v1', markers: positions.map(([x,y], i) => ({
+        id: ['player','enemy-1','enemy-2','enemy-3'][i] as OverworldMarker['id'], kind: i ? 'enemy' : 'player', x,y,
+      })) };
+  }
+  const idle: readonly EnemyBehavior[] = [
+    { id: 'enemy-1', kind: 'passive' }, { id: 'enemy-2', kind: 'aggressive', range: 1 },
+    { id: 'enemy-3', kind: 'aggressive', range: 1 },
+  ];
+  const position = (state: OverworldMovement, id = 'enemy-2') => state.world.markers.find(m => m.id === id)!;
+  it('copies and validates complete per-enemy configuration before initialization', () => {
+    const world = fixture();
+    const profiles = idle.map(b => ({ ...b }));
+    const state = createMovement(world, profiles);
+    profiles[0].kind = 'aggressive';
+    expect(state.behaviors[0].kind).toBe('passive');
+    expect(createMovement(world).behaviors).toEqual(DEFAULT_BEHAVIORS);
+    for (const invalid of [[], [...idle, idle[0]], [idle[0],idle[0],idle[2]],
+      [idle[0],{ id:'player',kind:'passive' },idle[2]],
+      [idle[0],{ id:'enemy-2',kind:'other' },idle[2]],
+      ...[0,39,1.5,NaN,Infinity].map(range => [idle[0],{ id:'enemy-2',kind:'aggressive',range },idle[2]])]) {
+      expect(() => createMovement(world, invalid as readonly EnemyBehavior[])).toThrow(RangeError);
+    }
+  });
+  it('wanders only to legal neighbors and draws once even when enclosed', () => {
+    const closed = [43,64,83,62]; // N/E/S/W around (3,3)
+    for (const [walls, expected] of [[closed,[3,3]], [closed.filter(c => c !== 64),[4,3]]] as const) {
+      const state = createMovement(fixture(undefined, [...walls]), idle);
+      const next = stepMovement(state);
+      expect([position(next,'enemy-1').x,position(next,'enemy-1').y]).toEqual(expected);
+      expect(next.rng.cursor).toBe(1);
+      expect(next.step).toBe(1);
+      expect(state.rng.cursor).toBe(0);
+      expect(state.world.markers[1]).toMatchObject({x:3,y:3});
+    }
+  });
+  it('excludes protected cells for wandering and pursuit', () => {
+    const passive=createMovement(fixture(undefined,[43,83,62]),idle);
+    expect(position(stepMovement(passive),'enemy-1')).toMatchObject({x:4,y:3});
+    expect(position(stepMovement(passive,[],[64]),'enemy-1')).toMatchObject({x:3,y:3});
+    expect(position(stepMovement(passive,[],[63]),'enemy-1')).toMatchObject({x:4,y:3}); // Existing occupant can leave.
+    const profiles: readonly EnemyBehavior[]=[idle[0],{id:'enemy-2',kind:'aggressive',range:38},idle[2]];
+    const pursuit=createMovement(fixture([[5,5],[2,2],[4,3],[17,17]],[44,65,85]),profiles);
+    expect(position(stepMovement(pursuit),'enemy-2')).toMatchObject({x:4,y:4});
+    expect(position(stepMovement(pursuit,[],[84]),'enemy-2')).not.toMatchObject({x:4,y:4});
+  });
+  it('uses inclusive Manhattan detection without terrain occlusion and loses detection immediately', () => {
+    const world = fixture(undefined, [204]); // wall directly between enemy-2 and player
+    const configured = (range: number) => createMovement(world, [idle[0],{ id:'enemy-2',kind:'aggressive',range },idle[2]]);
+    expect(position(stepMovement(configured(6)))).toMatchObject({x:3,y:10});
+    const detected = stepMovement(configured(7));
+    expect(position(detected)).toMatchObject({x:3,y:9}); // north wins equal detours
+    const movedPlayer = { ...detected, world: { ...detected.world, markers: detected.world.markers.map(m => m.id === 'player' ? {...m,x:18,y:1} : m) } };
+    expect(position(stepMovement(movedPlayer))).toEqual(position(detected));
+  });
+  it('waits adjacent and when every player approach is blocked', () => {
+    const profiles: readonly EnemyBehavior[] = idle.map(b => b.id === 'enemy-2' ? {...b,kind:'aggressive',range:38} : b);
+    const adjacent = createMovement(fixture([[10,10],[3,3],[9,10],[17,17]]), profiles);
+    expect(position(stepMovement(adjacent))).toEqual(position(adjacent));
+    const enclosed = createMovement(fixture(undefined,[190,211,230,209]),profiles);
+    expect(position(stepMovement(enclosed))).toEqual(position(enclosed));
+  });
+  it('resolves a genuinely contested only-exit cell in ID order', () => {
+    const profiles = DEFAULT_BEHAVIORS.map(b => ({id:b.id,kind:'aggressive' as const,range:38}));
+    // Both enemies have only (4,4) as a legal exit. It is initially free.
+    const walls = [63,82,103,44,65];
+    const state = createMovement(fixture([[5,5],[3,4],[4,3],[17,17]],walls),profiles);
+    const next = stepMovement(state);
+    expect(position(next,'enemy-1')).toMatchObject({x:4,y:4});
+    expect(position(next,'enemy-2')).toMatchObject({x:4,y:3});
+    // Without the earlier claim, enemy-2 really does choose that same cell.
+    const unclaimed = createMovement(fixture([[5,5],[2,2],[4,3],[17,17]],walls),profiles);
+    expect(position(stepMovement(unclaimed),'enemy-2')).toMatchObject({x:4,y:4});
+    expect(next.rng).toEqual(state.rng);
+  });
+  it('takes the shortest escape from a dead-end instead of moving greedily toward the player', () => {
+    // East gets closer but ends at x=7. North/south are walled off; the
+    // shortest path must first go west, then around the end of the U.
+    const walls = [207,...[3,4,5,6,7].flatMap(x => [180+x,220+x])];
+    const profiles: readonly EnemyBehavior[] = [idle[0],{id:'enemy-2',kind:'aggressive',range:38},idle[2]];
+    let state = createMovement(fixture([[10,10],[3,3],[5,10],[17,17]],walls),profiles);
+    state = stepMovement(state);
+    expect(position(state)).toMatchObject({x:4,y:10});
+    for (let i = 1; i < 13; i++) state = stepMovement(state);
+    const distance = (s: OverworldMovement) => Math.abs(position(s).x-10)+Math.abs(position(s).y-10);
+    expect(distance(state)).toBeGreaterThan(1);
+    state = stepMovement(state);
+    expect(distance(state)).toBe(1); // shortest route is 14 steps
+  });
+  it('never swaps occupied cells and later enemies can use vacated cells', () => {
+    // A one-cell-wide corridor. First passive has only its western exit;
+    // second passive may then enter the vacated cell, but cannot swap.
+    const world = fixture([[10,10],[3,3],[4,3],[17,17]], [43,83,44,84,65]);
+    const profiles: readonly EnemyBehavior[] = [idle[0],{id:'enemy-2',kind:'passive'},idle[2]];
+    const next = stepMovement(createMovement(world,profiles));
+    expect(position(next,'enemy-1')).toMatchObject({x:2,y:3});
+    expect(position(next,'enemy-2')).toMatchObject({x:3,y:3});
+  });
+  it('is pure, bounded and reproducible across seed/type/biome movement corpora', () => {
+    const battle = new BattleSession(battleCatalog, 'map:forest_ruins', 42);
+    const battleBefore = structuredClone(battle.state);
+    for (const type of MAP_TYPES) for (const biome of BIOMES) for (const seed of [0,1,2,12345,0xffffffff]) {
+      const result = createOverworld(applyBiome(generateMap(seed,type.id),biome.id));
+      if (!result.ok) throw Error(result.reason);
+      const initial = createMovement(result.state);
+      const before = structuredClone(initial);
+      Object.freeze(initial.world.map.cells); Object.freeze(initial.world.map.terrain);
+      initial.world.markers.forEach(Object.freeze); Object.freeze(initial.world.markers);
+      Object.freeze(initial.world); Object.freeze(initial);
+      let a = initial, b = createMovement(result.state);
+      for (let step = 1; step <= 30; step++) {
+        const previous = a;
+        a = stepMovement(a); b = stepMovement(b);
+        expect(a).toEqual(b);
+        expect(a.step).toBe(step); expect(a.rng.cursor).toBe(step);
+        expect(a.world.map).toBe(initial.world.map);
+        expect(a.world.markers[0]).toEqual(initial.world.markers[0]);
+        expect(new Set(a.world.markers.map(m => m.y*20+m.x)).size).toBe(4);
+        for (const marker of a.world.markers) {
+          expect(a.world.map.cells[marker.y*20+marker.x]).toBe(1);
+          const old = previous.world.markers.find(m => m.id === marker.id)!;
+          expect(Math.abs(marker.x-old.x)+Math.abs(marker.y-old.y)).toBeLessThanOrEqual(1);
+        }
+      }
+      expect(initial).toEqual(before);
+      expect(createMovement(result.state)).toEqual(before);
+    }
+    expect(battle.state).toEqual(battleBefore);
+    expect(rng.nextUint32(battle.state.rng)).toEqual(rng.nextUint32(battleBefore.rng));
+  });
+  it('uses no clock or ambient randomness and rejects exhausted state', () => {
+    const state = createMovement(fixture());
+    const clock = vi.spyOn(Date,'now').mockImplementation(() => {throw Error('clock');});
+    const random = vi.spyOn(Math,'random').mockImplementation(() => {throw Error('entropy');});
+    try { expect(stepMovement(state)).toEqual(stepMovement(state)); }
+    finally { clock.mockRestore(); random.mockRestore(); }
+    expect(() => stepMovement({...state,step:Number.MAX_SAFE_INTEGER})).toThrow(RangeError);
   });
 });
