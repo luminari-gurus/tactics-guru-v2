@@ -49,6 +49,12 @@ describe('tactical plan preview', () => {
         const move = { type: 'move' as const, unitId: fighter.id, to: cell };
         if (!previewTacticalPlan(state, move, ability, catalog).ok) continue;
         const before = structuredClone(state);
+        const interrupted = new BattleSession(catalog,state,state.seed);
+        expect(interrupted.preparePlan(move,ability).ok).toBe(true);
+        const prefix=interrupted.confirmPlan()!;interrupted.cancel();interrupted.finishPresentation(prefix.token);
+        expect(interrupted.confirmPlannedAbility()).toBeNull();
+        expect(interrupted.continuation!.commands).toEqual([move]);
+        expect(interrupted.state).toEqual(prefix.after);
         const session = new BattleSession(catalog, state, state.seed);
         expect(session.preparePlan(move, ability).ok).toBe(true);
         session.cancel();
@@ -68,9 +74,12 @@ describe('tactical plan preview', () => {
         expect(moved).not.toBeNull();
         expect(session.confirmPlannedAbility()).toBeNull();
         session.finishPresentation(moved!.token);
+        expect(session.canUndoMove).toBe(true);
         const acted = session.confirmPlannedAbility();
         expect(acted).not.toBeNull();
         expect(session.confirmPlannedAbility()).toBeNull();
+        session.finishPresentation(acted!.token);
+        expect(session.canUndoMove).toBe(false);
         expect(session.continuation!.commands).toEqual([move, ability]);
         const stale = { ...state, units: state.units.map(u => u.id === enemy.id ? { ...u, hp: 0 } : u) };
         expect(previewTacticalPlan(stale, move, ability, catalog).ok).toBe(false);

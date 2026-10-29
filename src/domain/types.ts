@@ -1,6 +1,6 @@
 import type { AbilityId, CellPosition, EnemyId, HeroId, MapId } from '../content/types';
 import type { RngState } from './rng';
-import type { RNG_VERSION, RULES_VERSION, STATE_FORMAT_VERSION } from './constants';
+import type { RNG_VERSION, RULES_VERSION, STATE_FORMAT_VERSION, REPLAY_FORMAT_VERSION } from './constants';
 export interface Versions {
   readonly rules: typeof RULES_VERSION;
   readonly rng: typeof RNG_VERSION;
@@ -51,6 +51,7 @@ export type BattleEvent =
   | { readonly type: 'turnStarted'; readonly unitId: number; readonly round: number }
   | { readonly type: 'turnEnded'; readonly unitId: number }
   | { readonly type: 'moved'; readonly unitId: number; readonly path: readonly CellPosition[] }
+  | { readonly type: 'moveUndone'; readonly unitId: number; readonly path: readonly CellPosition[] }
   | { readonly type: 'abilityUsed'; readonly unitId: number; readonly abilityId: AbilityId; readonly target: Extract<Command, {type:'useAbility'}>['target'] }
   | { readonly type: 'attackRolled'; readonly unitId: number; readonly targetId: number; readonly natural: number; readonly bonus: number; readonly total: number; readonly armorClass: number; readonly result: 'miss' | 'hit' | 'critical' }
   | { readonly type: 'saveRolled'; readonly unitId: number; readonly natural: number; readonly modifier: number; readonly total: number; readonly dc: number; readonly saved: boolean }
@@ -64,8 +65,9 @@ export type BattleEvent =
   | { readonly type: 'movementBlocked' | 'movementBlockExpired'; readonly unitId: number; readonly sourceId: number; readonly abilityId: MovementBlock['abilityId'] }
   | { readonly type: 'battleEnded'; readonly outcome: Exclude<BattleState['outcome'], 'ongoing'> };
 export type CommandResult = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Rejection;
+export type ReplayCommand = Command | {readonly type:'undoMove';readonly unitId:number};
 /** Initial boundary + accepted intents; replayBattle (turns.ts) re-executes them. */
 export interface Replay {
-  readonly format: typeof STATE_FORMAT_VERSION; readonly versions: Versions;
-  readonly initial: BattleState; readonly commands: readonly Command[];
+  readonly format: typeof STATE_FORMAT_VERSION | typeof REPLAY_FORMAT_VERSION; readonly versions: Versions;
+  readonly initial: BattleState; readonly commands: readonly ReplayCommand[];
 }

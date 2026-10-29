@@ -15,6 +15,8 @@ export function undoRecordedMove(before: BattleState, after: BattleState,
   if (!actor || actor.side !== 'player' || actor.hasActed || actor.hasMoved || current.state.commandCount >= RULE_BOUNDS.commandCount.max)
     return {ok:false,reason:'invalidState'};
   const expected = moveUnit(prior.state, move, catalog);
-  if (!expected.ok || canonical(expected.state) !== canonical(current.state)) return {ok:false,reason:'invalidState'};
-  return {ok:true,state:{...prior.state,commandCount:current.state.commandCount+1},events:[]};
+  if (!expected.ok || expected.events.length !== 1 || expected.events[0].type !== 'moved' ||
+    canonical(expected.state) !== canonical(current.state)) return {ok:false,reason:'invalidState'};
+  return {ok:true,state:{...prior.state,commandCount:current.state.commandCount+1},
+    events:[{type:'moveUndone',unitId:actor.id,path:[move.to,actor.cell]}]};
 }

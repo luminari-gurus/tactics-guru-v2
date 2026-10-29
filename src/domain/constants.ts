@@ -5,6 +5,8 @@
 export const RULES_VERSION = 5;
 export const RNG_VERSION = 1;
 export const STATE_FORMAT_VERSION = 4;
+/** Replay v5 adds an undo record; saved battle snapshots remain v4. */
+export const REPLAY_FORMAT_VERSION = 5;
 export const RULE_BOUNDS = {
   uint32: { min: 0, max: 0xffffffff },
   cursor: { min: 0, max: Number.MAX_SAFE_INTEGER },

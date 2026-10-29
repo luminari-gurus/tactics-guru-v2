@@ -91,3 +91,5 @@ identities; export retained bytes before choosing Start new run. Do not convert,
 delete or silently resolve a saved recipe with a different generator. Independent
 single-battle storage keeps its existing namespace and recovery behavior; the rules
 version change explicitly rejects its old autonomous-decision saves too.
+
+Tactical movement undo does not add fields to battle snapshots: it is available only when the current session retains the immediately preceding accepted move and its pre-move state. Reload discards that eligibility. A successful undo persists the restored position and movement budget as an ordinary snapshot. Replay records that include an undo use replay format 5 and are checked against the immediately preceding move; replay format 4 remains readable. Replay format is independent of the battle snapshot format.

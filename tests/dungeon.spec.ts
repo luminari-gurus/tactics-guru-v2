@@ -7,7 +7,7 @@ import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeo
 import { dungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { readSession,playCommand } from './helpers/battlePolicy';
+import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, rangerJourney, mageJourney, fighterMovingJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
@@ -196,6 +196,26 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
+test('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
+ test.setTimeout(300000);await page.goto('dungeon');
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const entry=await snapshot(page);const restored=await playUndo(page,dungeonBattle(entry)!.catalog,isMobile);
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
+ await expect(page.locator('#battle-undo')).toBeDisabled();
+ for(let i=0;i<100;i++){
+  if((await snapshot(page)).phase!=='battle')break;
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  if(isMobile)await page.locator('#battle-next').tap();else await page.locator('#battle-next').click();
+  await expect.poll(async()=>{const state=await snapshot(page);return state.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+ }
+ await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+ await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
+ await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
+});
 test('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('dungeon');
  await expect(page.getByRole('button',{name:'Continue saved dungeon',exact:true})).toBeDisabled();

@@ -29,6 +29,7 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
   switch(event.type) {
     case 'turnStarted': return `Round ${event.round}: ${name(event.unitId)}'s turn`;
     case 'turnEnded': return `${name(event.unitId)} waits`;
+    case 'moveUndone': { const cell=event.path.at(-1)!; return `${name(event.unitId)} undoes movement to (${cell.x}, ${cell.y})`; }
     case 'moved': { const cell=event.path.at(-1)!; return `${name(event.unitId)} moves to (${cell.x}, ${cell.y})`; }
     case 'abilityUsed': return `${name(event.unitId)} uses ${displayName(event.abilityId)}`;
     case 'attackRolled': return `${name(event.unitId)}: ${event.result} (${event.natural} + ${event.bonus} vs AC ${event.armorClass})`;
@@ -75,7 +76,7 @@ export class BattleHud {
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;log:(lines:readonly string[])=>void}) {
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -90,10 +91,12 @@ export class BattleHud {
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
-      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-danger-info">Danger shows living heroes currently reachable by a legal enemy ordinary attack, including a legal move; it does not predict enemy choice.</p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
+      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-danger-info">Danger shows living heroes currently reachable by a legal enemy ordinary attack, including a legal move; it does not predict enemy choice.</p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
     this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
+    this.root.querySelector('#battle-plan')!.addEventListener('click',callbacks.plan,{signal});
+    this.root.querySelector('#battle-undo')!.addEventListener('click',callbacks.undo,{signal});
     this.root.querySelector('#battle-danger')!.addEventListener('click',callbacks.danger,{signal});
     this.root.querySelector('#battle-party')!.addEventListener('click',()=>callbacks.inspect(),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
@@ -124,6 +127,8 @@ export class BattleHud {
     const dangerButton=this.root.querySelector<HTMLButtonElement>('#battle-danger')!;
     dangerButton.disabled=!enabled; dangerButton.setAttribute('aria-pressed',String(danger));
     dangerButton.textContent=danger?'Hide enemy danger':'Show enemy danger';
+    this.root.querySelector<HTMLButtonElement>('#battle-plan')!.disabled=!enabled || actor.hasMoved || actor.hasActed || !movement?.ok;
+    this.root.querySelector<HTMLButtonElement>('#battle-undo')!.disabled=!s.canUndoMove;
     const info=unitFeedback(s,actor);
     this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
@@ -157,7 +162,7 @@ export class BattleHud {
     });
     this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait ends the turn immediately.`;
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
-    (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || !s.pending;
+    (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || (!s.pending && !s.pendingPlan);
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;
     this.root.querySelector('#battle-selection')!.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
     const occupants=selected?s.state.units.filter(u=>u.cell.x===selected.x&&u.cell.y===selected.y):[];

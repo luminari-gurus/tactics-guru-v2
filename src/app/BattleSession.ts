@@ -8,9 +8,11 @@ import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
+import { undoRecordedMove } from '../domain/movementUndo';
+import { REPLAY_FORMAT_VERSION } from '../domain/constants';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
-import type { BattleEvent, BattleState, Command, Replay } from '../domain/types';
+import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
 
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
 export type AcceptedState = (state: BattleState) => void;
@@ -26,7 +28,8 @@ function freeze<T>(value: T): T {
 export class BattleSession {
   private current: BattleState;
   private readonly initial: BattleState;
-  private commands: Command[] = [];
+  private commands: ReplayCommand[] = [];
+  private lastMove: {before:BattleState;move:Extract<Command,{type:'move'}>} | null = null;
   private resolvedEvents: BattleEvent[] = [];
   private intent: Command | null = null;
   private plan: { move: Extract<Command, {type:'move'}>; ability: Extract<Command, {type:'useAbility'}> } | null = null;
@@ -58,8 +61,10 @@ export class BattleSession {
   get state() { return this.current; }
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
+  get pendingPlan() { return this.plan; }
+  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
+  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
   get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
@@ -81,7 +86,8 @@ export class BattleSession {
     if (preview.ok) this.plan = freeze(structuredClone({move, ability}));
     return preview;
   }
-  cancel() { this.intent = null; this.plan = null; this.plannedAbility = null; }
+  clearPrepared() { this.intent = null; this.plan = null; }
+  cancel() { this.clearPrepared(); this.plannedAbility = null; }
   confirmPlan(): Presentation | null {
     if (this.phase !== 'player' || !this.plan) return null;
     const plan = this.plan; this.plan = null;
@@ -95,6 +101,17 @@ export class BattleSession {
     if (this.phase !== 'player' || !this.plannedAbility) return null;
     const ability = this.plannedAbility; this.plannedAbility = null;
     return this.resolve(ability, false);
+  }
+  undoMove(): Presentation | null {
+    if (!this.canUndoMove || !this.lastMove) return null;
+    const before=this.current, previous=this.lastMove;this.lastMove=null;this.cancel();
+    const result=undoRecordedMove(previous.before,before,previous.move,this.catalog);
+    if (!result.ok) {this.error=result.reason;return null;}
+    this.current=freeze(result.state);this.commands.push(freeze({type:'undoMove',unitId:previous.move.unitId}));
+    const events=freeze(result.events);this.resolvedEvents.push(...events);
+    this.phase='presenting';setTelemetryContext({phase:'presenting'});
+    try {this.accepted?.(this.current);} catch { /* Persistence reports its own nonfatal status. */ }
+    return {before,after:this.current,events,token:++this.generation};
   }
   confirm(): Presentation | null {
     if (this.phase !== 'player' || !this.intent) return null;
@@ -115,6 +132,7 @@ export class BattleSession {
     const result = dispatch(before, command, this.catalog);
     if (!result.ok) { this.error = result.reason; if (enemy) this.fail(result.reason); return null; }
     this.current = freeze(result.state);
+    this.lastMove = !enemy && command.type === 'move' && result.events.length === 1 && result.events[0].type === 'moved' && !before.units.find(u=>u.id===command.unitId)!.hasActed ? {before,move:command} : null;
     this.commands.push(freeze(structuredClone(command)));
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);
@@ -131,5 +149,5 @@ export class BattleSession {
     if (this.phase !== 'enemy') this.enemyQueue = [];
   }
   private fail(reason: string) { reportFailure('battle_resolution', { phase: this.phase }); this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
-  dispose() { this.generation++; this.phase = 'disposed'; this.cancel(); this.enemyQueue = []; }
+  dispose() { this.generation++; this.phase = 'disposed'; this.cancel(); this.lastMove = null; this.enemyQueue = []; }
 }

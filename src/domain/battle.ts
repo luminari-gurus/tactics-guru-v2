@@ -1,6 +1,6 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
-import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, UINT32_RANGE } from './constants';
+import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashJson, rulesContent } from './contentIdentity';
@@ -123,10 +123,12 @@ export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { read
 /** Accepted log shape is checked, not simulated; replayBattle (turns.ts) checks `initial` against its seed and re-executes it. */
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
-  if (!shape(input, ['format','versions','initial','commands']) || input.format !== STATE_FORMAT_VERSION ||
+  if (!shape(input, ['format','versions','initial','commands']) ||
+    (input.format !== STATE_FORMAT_VERSION && input.format !== REPLAY_FORMAT_VERSION) ||
     !isDenseArray(input.commands, RULE_BOUNDS.commandCount.max) ||
-    !input.commands.every(isCommand)) return bad;
+    !input.commands.every(c => isCommand(c) || (input.format === REPLAY_FORMAT_VERSION &&
+      shape(c, ['type','unitId']) && c.type === 'undoMove' && unitId(c.unitId)))) return bad;
   const checked = readBattleState(input.initial, catalog);
   if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min) return bad;
-  return { ok: true, replay: { format: STATE_FORMAT_VERSION, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) } };
+  return { ok: true, replay: { format: input.format, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) as Replay['commands'] } };
 }
