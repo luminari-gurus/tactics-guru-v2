@@ -34,7 +34,8 @@ it('records an undo that replays and is unavailable after reload or a later acti
   expect(session.canUndoMove).toBe(false);session.finishPresentation(moved.token);expect(session.canUndoMove).toBe(true);
   const resumed=BattleSession.fromSnapshot(catalog,session.state);expect(resumed.ok).toBe(true);
   if(resumed.ok)expect(resumed.session.canUndoMove).toBe(false);
-  const undo=session.undoMove();expect(undo).not.toBeNull();expect(session.undoMove()).toBeNull();
+  session.error='invalidState';
+  const undo=session.undoMove();expect(undo).not.toBeNull();expect(session.error).toBeNull();expect(session.undoMove()).toBeNull();
   session.finishPresentation(undo!.token);expect(session.canUndoMove).toBe(false);
   expect(session.state).toEqual({...initial,commandCount:initial.commandCount+2});
   const result=replayBattle(session.replay,catalog);expect(result.ok).toBe(true);
