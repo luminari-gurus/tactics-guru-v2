@@ -88,10 +88,10 @@ effects require reviewed versioning, source/lifetime/resource bounds and recover
 
 | #161 criterion | This increment | Remaining acceptance |
 | --- | --- | --- |
-| Minimal model | Closed contract; Guarded, Second Wind, Taunt, Mark and Pin | Additional real consumers |
-| Typed damage/save/immunity | Explicit proposed ordering and source links; current attacks preserved | #166–#169/#171 implementation/proof |
-| Shared pure evaluation/preflight | Guarded/Fighter/Ranger combat, movement, AI and UI projection | Same integration for each new kind |
-| Lifecycle/scope | Bounded guard/use/taunt/mark/pin, target/source expiry and fresh-battle cleanup | Future consumer durations, stack/resource semantics |
+| Minimal model | Closed contract; Guarded, Second Wind, Taunt, Mark, Pin/Snare and Shaman support | Additional real consumers |
+| Typed damage/save/immunity | Shaman Will save and bounded weakened/debuff immunity; current attacks preserved | Typed damage/resistance and #167–#169/#171 consumers |
+| Shared pure evaluation/preflight | Fighter/Ranger/Mage/Shaman combat, movement, support AI and UI projection | Same integration for each remaining kind |
+| Lifecycle/scope | Bounded guard/use/taunt/mark/movement-block/Weakened, target/source expiry and fresh-battle cleanup | Future stack/resource semantics |
 | Serialization/replay | Bounded enabled effects and continuation | Future effects/resources |
 
 Keep #161 open until all consumer-dependent gates have production evidence. The original Guarded increment used `Refs #161` and a draft PR. Browser/device emulation is sufficient; physical hardware testing is not claimed. See the task-specific QA report for measured results.

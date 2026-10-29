@@ -1,6 +1,6 @@
 # Issue #166: Goblin Shaman support combat
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: implementation authorized and in progress.
+Started: 2026-10-28; updated: 2026-10-29 (Asia/Jerusalem). Status: integrate newly advanced main.
 OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
 
 - Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
@@ -22,7 +22,7 @@ OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
   Its QA backlink is updated. Its historical PR-ready wording is preserved;
   PR #250 is now merged and #165 is closed.
 
-## Selection and available work
+## Selection and available work (pickup snapshot)
 
 Reviewed all 30 open issues, their bodies/ownership/dependencies, the three open
 PRs, local/remote branch inventory, current source and uncompleted OpenSpec tasks.
@@ -86,13 +86,14 @@ testing, commits, pushes and focused review-ready PRs, including dependent stack
 
 ## Implementation handoff (live)
 
-Snapshot: 2026-10-29. **6/9 OpenSpec tasks** are complete. Tasks 3.3 (complete
-browser evidence), 4.1 (qualification reconciliation) and 4.2 (final delivery)
-remain open. Do not claim complete issue acceptance yet.
+Snapshot: 2026-10-29. **7/9 OpenSpec tasks** are complete. Tasks 4.1
+(qualification reconciliation) and 4.2 (final delivery) remain open. All six
+fresh Shaman journeys pass; final asset checks and evidence packaging remain.
 
 - Active branch: `branch/issue-166-shaman-support`, pushed at
   **`ecab640e376888b22d3a71b84a5edcd545141a05`**, including `baa1402`.
-  A further test-only backup-readiness repair is currently local.
+  Local **28cba2a3fe3aab8a36e9d87579945ec68768c19b** adds the verified test-only
+  backup-readiness repair; it must be pushed with the final QA handoff.
 - [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251): independently
   verified catalog/art foundation on the requested branch, open/non-draft.
   [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252): dependent
@@ -132,56 +133,103 @@ remain open. Do not claim complete issue acceptance yet.
   scene/asset readiness. A test-only local patch waits for the published restored
   projection, advancing one frame only while absent. Exact continuation snapshot,
   visibility, one-canvas and subsequent legal-defeat assertions remain unchanged.
-  It typechecks; its five browser profiles still need verification. Reuse a valid
-  retained literal-base comparison or run only that base case if attribution needs it.
+  It typechecks; all five owning Chromium/WebKit profiles now pass. Retained
+  literal-base-equivalent reports also show the original cases passing, while the
+  original loading/null failure remains recorded.
 
-### Active serial qualification — do not start another browser run
+### Current serial repair qualification
 
-- Linux: **`/tmp/tactics-issue-166-20261029`**, clean detached **`4e765f8`**; keep it
-  frozen until the original aggregate ends. Node 24.15.0/npm 12.0.2 and separately
-  installed Linux dependencies; Windows node_modules is untouched. Corrected
-  Chromium/WebKit setup smoke passed 2/2; initial no-dist setup failure is retained.
-- Running `npm run verify:full`: unified session **33257**, runner PID **3061420**.
-  Reports: `/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
-  Read `summary.json`, stage logs and Linux `tmp/issue166/full-launch.log`.
-  Chromium finished **734 passed / 3 expected mode skips / 5 failed**: three old
-  Fighter witnesses and two backup-readiness checks. Later stages are in progress.
-- Linux `tmp/issue166/{before-full,during-full-root}.json` binds the original
-  source/build. Root hash `ace84f9570c810d914d61abbc15861e2218f951ac5afd389334a2baf8bb26ba5`
-  equals pilot bytes. Metadata-only watcher session **49387** captures
-  `prefix-build.json` and `after-full.json`; it runs no browsers and refuses a
-  mislabeled prefix. Keep browser/GPU/performance work serial.
-- `tmp/issue166/repair-scope.json` currently binds ecab640: one application change
-  (support-goal position projection), four test files, other raw differences only
-  line endings. Regenerate after the backup test patch. Literal base `7cea1e9`
-  has zero relevant source/test/config/package differences from retained qualified
-  `4f8c194`; prior #165 raw reports supply valid baseline evidence where applicable.
+- Linux checkout: **`/tmp/tactics-issue-166-20261029`**, clean detached repair head
+  **`28cba2a3fe3aab8a36e9d87579945ec68768c19b`**. Keep browser/GPU work serial.
+  Default Chromium Shaman/Fighter/backup checks passed **9/9**, zero retries/skips.
+  WebKit Shaman/Fighter passed **6/6** and WebKit backup-resume **2/2**. All
+  **17/17 fresh journey/backup executions** pass without retries/skips. Actual
+  Shaman histories are identical across all six profiles (53 commands, two heals,
+  failed Hex, active Weakened reload/expiry and victory). Fresh Chromium portrait
+  and WebKit desktop/portrait/landscape inspections were reviewed.
+  Engines are Chromium **153.0.8010.12** and WebKit **26.6**, Playwright 1.63.0;
+  this is emulation, not physical hardware testing.
+- Fresh repair preparation passed: **1,049/1,049 units**, both TypeScript scopes,
+  **2/2 build integrations**, root build and **18/18 performance samples**.
+  Standard receipt bundle:
+  `verification-receipts/timings/issue166-repair-28cba2a/` (report.json, expanded
+  unit JSON/metadata and stage logs). Inputs remained unchanged. Final root
+  inventory: Linux `tmp/issue166/repair-root-inputs.json`.
+- Controlled landscape-WebKit cold-history comparison is complete: literal base
+  `7cea1e9` passed 3/3 at **1,058/1,066/1,088 ms** (924,857 bytes); repair head
+  passed 3/3 at **1,061/1,155/1,169 ms** (926,177 bytes), unchanged 2,500 ms budget.
+  Original 3,844 ms was not reproduced under these recorded idle conditions;
+  preserve it without claiming a timing cause. Baseline and repair reports,
+  build inventories and sample artifacts are in Linux `tmp/issue166/`. The first
+  anchored baseline filter selected no tests; that incomplete attempt is retained
+  separately as `base-cold-discovery-failure.*`.
 
-### Resume when the original run finishes
+### Original aggregate — completed, failed status retained
 
-1. Commit the remaining test/handoff repair, then fetch the Linux clone's local
-   Windows origin and check out that final repair head. **Build fresh**; the
-   superseded seed-only advice to reuse old dist no longer applies after the AI fix.
-2. Existing receipt tooling can run fresh units (expanded JSON; expected **1,049**,
-   verify actual), both type scopes, integrations/root, asset modes, performance,
-   prefix and root restoration. Select
-   `units,typecheck-app,typecheck-domain,build-integration,build-root,assets-root-dev,performance,build-prefix,assets-prefix-preview,assets-prefix-dev,restore-root`
-   via `npm run measure:verification -- --stages <list> --out <new-directory>`.
-   `vitest list --json` groups parameterized declarations (542 entries), so it is
-   discovery only. Capture final root/prefix/restored inventories separately.
-3. Fresh browser checks: default config on `tests/dungeon.spec.ts` and
-   `tests/run-progression.spec.ts` filtered by
-   `Shaman production journey|Fighter legal progression|review: in-flow Continue`;
-   exploration config for the two dungeon journeys (three WebKit profiles each);
-   device-acceptance config for `review: in-flow Continue` (two WebKit profiles).
-   Also run root-preview `tests/public-asset-base.spec.ts`. Retain all results,
-   screenshots, build identity and complete actual traces.
-4. Reconcile all original stages with fresh affected proof and explicit
-   dependency/trace equivalence. Do not rerun a whole matrix for these bounded
-   repairs or relabel the original aggregate clean. Investigate any other failure.
-5. Finish QA/acceptance mapping and task checkboxes, strict OpenSpec validation,
-   links and artifact/input hashes. Commit/push, update #252 and mark ready only
-   after all gates pass. No merge, tag, release or production deployment is requested.
+- Source **`4e765f8`**; all **19 stages executed: 17 passed, 2 failed**. Browser
+  executions: **1,286 passed / 9 failed / 9 expected mode skips**, no flaky/retry
+  cases. Chromium: 734/5/3; WebKit exploration: 92/4/0. Failures are six old
+  Fighter witnesses, two mobile backup-readiness checks, and one 3,844 ms cold-
+  history startup finding. Other stages passed, including fixtures 87, dev
+  placement, WebKit acceptance 54, health bars 25, both telemetry modes 36 each,
+  asset modes, integrations and all 18 performance samples.
+- Raw tree: `/tmp/tactics-issue-166-20261029/tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+  Its input hash stayed unchanged, source remained clean, and root restoration
+  was byte-identical. Root hash:
+  `ace84f9570c810d914d61abbc15861e2218f951ac5afd389334a2baf8bb26ba5`.
+  Original full session 33257 and metadata watcher 49387 have both finished.
+- Portable original evidence is now in `docs/qa/issue-166/full-run/aggregate/`:
+  all top-level reports/logs compressed, per-case JSON/error-context archive,
+  complete 1,407-artifact hash inventory, source/root/prefix/restored inventories
+  and manifest. Original raw screenshots remain at the raw tree above.
+- Linux Node 24.15.0/npm 12.0.2 and pinned engines; separately installed Linux
+  dependencies. Windows node_modules is untouched. Literal base and current
+  dependencies match. Retained #165 reports plus verified relevant-input equality
+  between qualified `4f8c194` and literal `7cea1e9` supply baseline proof where
+  applicable. Do not relabel the original aggregate clean.
+
+### Remaining execution and delivery
+
+1. Asset follow-up finished: **60/60** cases across four modes, zero skips/retries;
+   prefix/root builds passed and restored root is byte-identical. Portable repair
+   evidence is in `docs/qa/issue-166/full-run/repair/` (80 final-source passing
+   browser executions including 17 journeys/backup and three cold repeats;
+   three separate literal-base diagnostic repeats). The checks used
+   `tests/public-asset-base.spec.ts -g 'collector cold/warm|direct entry and refresh resolve public assets'`
+   (**15 executions per mode**) in root/prefix preview/dev. Build prefix with
+   `npm run build:bundle -- --base=/prototype/`, capture its inventory, then restore
+   root with `npm run build:bundle` and verify equality with the validated root.
+   Reuse the passed fresh unit/type prerequisites only while inputs stay unchanged.
+   The original full asset failure/nonce coverage is reusable: loader, URL/cache/
+   nonce generation, configurations and image bytes are unchanged by the AI fix.
+2. Retain final-source representative Chromium/WebKit screenshots and all
+   actual journey/replay traces. Reconcile original stages with fresh affected
+   proof and explicit dependency/trace equivalence; preserve every original
+   failure and the timing finding. No whole-matrix rerun is required for these
+   bounded repairs. Investigate any additional actual failure.
+3. Finish QA/acceptance mapping and OpenSpec tasks; validate strictly, check links
+   and artifact/input hashes, commit/push, update #252 and mark it ready only after
+   every gate passes. No merge, tag, release or production deployment is requested.
+
+### Newly advanced main: integration gate
+
+Final fetch discovered `origin/main` **b343ab02ae033a57f8c5f613f07883764f0752c0**,
+which merged #246/#155 overworld enemy movement after this work's base. The
+foundation merges cleanly, but the combined runtime has seven content conflicts:
+three combat/dungeon/ability docs, dungeon save envelope, dungeon browser suite,
+dungeon fixture helper and dungeon-battle units. Main now writes dungeon format 8
+with movement-aware exploration, colliding with this branch's independent 8 bump.
+Do not silently drop either reader contract, movement-aware witnesses or Shaman
+proof. Preserve all completed evidence above as the pre-integration checkpoint.
+
+Next: commit this checkpoint, merge main into the foundation branch and verify
+its bounded content/type scope, push #251; merge that updated parent into the
+runtime branch, resolve both features, allocate a new compatible dungeon format
+and retain exact incompatible bytes. Inspect the actual combined consumer reach,
+run changed units/types/builds and only invalidated browser/asset checks. Reuse
+unchanged combat/standalone/run/tooling evidence with explicit input comparison;
+do not restart every already-qualified suite. Keep both PRs open and leave actual
+PR merging/deployment to review. Final readiness now includes this integration.
 
 ## Evidence and proposed implementation decisions
 
@@ -193,8 +241,9 @@ Legacy evidence is pinned to `e9433f6b608ae6b2d95418615cce9cf17dadcf74`:
 [resolver](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L775-L824),
 [AI](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/AIController.gd),
 and [turn countdown](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L184-L225).
-These proposed v2 adaptations are reviewable design decisions, not implemented
-behavior or a claim of identical legacy AI.
+The following reviewed v2 adaptations define this change's implementation contract.
+Live progress and qualification are tracked above and in QA; deliberate departures
+from legacy behavior are stated explicitly below.
 
 1. **Content and placement.** Baseline HP 10, move 4, jump 1, accuracy 3, AC 11,
    power 2, Dexterity 1, Will 3. Extend the closed enemy/ability catalog and exact
@@ -321,8 +370,8 @@ Expected implementation owners, confirmed against current source:
    witnesses if one natural battle cannot demonstrate every save/heal branch;
    injected fixture state alone does not prove production reachability.
 5. **Qualify and hand off.** Audit all five #166 criteria against evidence, finish
-   docs, commit/push implementation and prepare a focused PR when implementation
-   is requested. Use `Closes #166` only with complete proof; use `Refs #161` and
+   docs, commit/push implementation and publish focused review-ready PRs.
+   Use `Closes #166` only with complete proof; use `Refs #161` and
    retain its wider remaining criteria. No unrelated issue closure or deployment.
 
 The five issue criteria map respectively to content/placement proof (1),
@@ -359,7 +408,7 @@ hashes, commands, test IDs, mode/engine/host and all failures/skips/incomplete r
 Reuse prior results only with unchanged relevant inputs and retained provenance;
 #165 evidence does not qualify changed Shaman rules or the new build.
 
-## Planning validation and estimate
+## Planning validation and estimate (historical)
 
 Planning checks passed: source/acceptance tracing, 21 local links across the three
 changed documents, 15 named test
