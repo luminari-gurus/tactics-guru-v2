@@ -94,8 +94,8 @@ are pushed. No issue acceptance or clean full-suite claim is made prematurely.
 - Foundation branch: `branch/issue-166-goblin-shaman`,
   **03b1e899ad091ba79ba65b08487204427b23de1e**, review-ready
   [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251).
-- Runtime branch: `branch/issue-166-shaman-support`, documentation head **2f7bb2e**,
-  frozen functional source **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent
+- Runtime branch: `branch/issue-166-shaman-support`, frozen functional source
+  **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent
   [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252), still draft.
   The functional source is identical after the documentation checkpoint.
 - Shared Hex/heal previews, atomic saves/healing, one-source Weakened, stable
@@ -118,7 +118,9 @@ f4616ae. Fresh results: **1,069/1,069 units**, both TypeScript scopes, **2/2** r
 root/prefix header integrations, root bundle and **18/18** performance samples.
 All **66** directly affected dungeon units also passed on Windows after integration.
 The integrated foundation separately passed **1,032 units**, both type scopes,
-header integrations/root bundle before publication. Receipts:
+header integrations/root bundle before publication. Its
+[published receipts](../qa/issue-166/full-run/foundation-main/manifest.json) are
+linked from #251. Local receipts:
 `verification-receipts/timings/issue166-integration-f4616ae/` and
 `verification-receipts/timings/issue166-foundation-main/` in the Linux checkout.
 
@@ -138,9 +140,11 @@ JSON and artifacts are in `tmp/issue166/integration-browsers/`. Ordered stages:
 Chromium dungeon/exploration/lifecycle **105**, map **75** (six owning-dev skips),
 targeted battle/run restart and backup **9**, complete WebKit exploration **105**,
 targeted WebKit restart/backup **6**. All four complete production witnesses are
-selected on desktop/portrait/landscape in each engine. Desktop journeys passed;
-mobile orientations and WebKit remain in progress. Inspect actual reports rather
-than relying on a prior progress count.
+selected on desktop/portrait/landscape in each engine. **Chromium completed:
+105/105 dungeon cases, 69 map passes/six owning-dev skips and 9/9 restart/backup**
+(183 passes total). All four complete production witnesses passed its three
+profiles. WebKit is active: desktop Shaman and Mage passed; remaining journeys
+and orientations are running. Inspect actual reports for later progress.
 
 **Queued unified session 61114** runs `tmp/issue166/integration-followup.mjs` and
 waits for the core report's final `passed` value; it cannot overlap core browsers.
