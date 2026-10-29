@@ -1,4 +1,4 @@
-import { clearDefeatedGuard, guardedEffect, removeGuard } from './effects';
+import { clearDefeatedGuard, guardedEffect, removeGuard, removeMovementBlock, removeTaunt } from './effects';
 import type { ContentCatalog, MapId } from '../content/types';
 import { contentVersion, previewCommand, readBattleState, readReplay, type ReplayRead } from './battle';
 import { resolveAttack } from './combat';
@@ -59,12 +59,17 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
   } while (snapshot.units.find(u => u.id === snapshot.initiative[index])!.hp === 0);
   const next = snapshot.initiative[index];
   const expires = guardedEffect(snapshot.units.find(u => u.id === next)!) !== null;
+  const tauntedBy = snapshot.units.find(u=>u.id===intent.command.unitId)!.tauntedBy;
+  const movementBlock = snapshot.units.find(u=>u.id===intent.command.unitId)!.movementBlock;
   return { ok: true, state: { ...snapshot, activeIndex: index, round, commandCount: snapshot.commandCount + 1,
     units: snapshot.units.map(u => {
+      if (u.id===intent.command.unitId) u=removeMovementBlock(removeTaunt(u));
       if (u.id !== next) return clearDefeatedGuard(u);
       return { ...removeGuard(u), hasMoved: false, hasActed: false };
     }) },
     events: [{ type: 'turnEnded', unitId: intent.command.unitId },
+      ...(tauntedBy!==undefined?[{type:'tauntExpired' as const,unitId:intent.command.unitId,sourceId:tauntedBy}]:[]),
+      ...(movementBlock!==undefined?[{type:'movementBlockExpired' as const,unitId:intent.command.unitId,...movementBlock}]:[]),
       ...(expires ? [{ type: 'guardExpired' as const, unitId: next }] : []), { type: 'turnStarted', unitId: next, round }] };
 }
 /** One entry point for every command; the type is read only after the shared intent check. */

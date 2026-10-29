@@ -1,0 +1,742 @@
+{
+  "status": "completed original attempt; failures retained",
+  "source": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+  "runDirectory": "/tmp/tactics-issue-164-20261027/tmp/verification/full-2026-10-27T11-14-39.281Z-2506569",
+  "inputHash": "c2763f7531404d1ed05b57410b1bfb6de06845049bbc52a5941776f1e0c1eb4c",
+  "stageCounts": {
+    "failed": 2,
+    "passed": 17
+  },
+  "components": [
+    {
+      "id": "assets-prefix-dev",
+      "counts": {
+        "total": 69,
+        "expected": 66,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": [
+        {
+          "id": "65be83c730a4dc5a6388-f315cf3a0a3e1643a118",
+          "project": "desktop",
+          "title": "built startup hints preserve a supplied script nonce"
+        },
+        {
+          "id": "65be83c730a4dc5a6388-ee0a840e2ceaf3a9bf15",
+          "project": "mobile-portrait",
+          "title": "built startup hints preserve a supplied script nonce"
+        },
+        {
+          "id": "65be83c730a4dc5a6388-01b9036bf8e48df75d03",
+          "project": "mobile-landscape",
+          "title": "built startup hints preserve a supplied script nonce"
+        }
+      ]
+    },
+    {
+      "id": "assets-prefix-preview",
+      "counts": {
+        "total": 69,
+        "expected": 69,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "assets-root-dev",
+      "counts": {
+        "total": 69,
+        "expected": 66,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": [
+        {
+          "id": "65be83c730a4dc5a6388-f315cf3a0a3e1643a118",
+          "project": "desktop",
+          "title": "built startup hints preserve a supplied script nonce"
+        },
+        {
+          "id": "65be83c730a4dc5a6388-ee0a840e2ceaf3a9bf15",
+          "project": "mobile-portrait",
+          "title": "built startup hints preserve a supplied script nonce"
+        },
+        {
+          "id": "65be83c730a4dc5a6388-01b9036bf8e48df75d03",
+          "project": "mobile-landscape",
+          "title": "built startup hints preserve a supplied script nonce"
+        }
+      ]
+    },
+    {
+      "id": "chromium",
+      "counts": {
+        "total": 718,
+        "expected": 710,
+        "unexpected": 5,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [
+        {
+          "id": "5b20c66b090c902460b9-83ca08ef6ff0cbf0febd",
+          "project": "mobile-landscape",
+          "title": "HTML5 per-element permission survives enabled restart"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d0c8b0be2f7bd0f69366",
+          "project": "desktop",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d66588facbe332f19920",
+          "project": "mobile-portrait",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-5c91861200b05c3970aa",
+          "project": "mobile-landscape",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "32f393a4e32272813f9b-2d79bf388bde84f15543",
+          "project": "mobile-portrait",
+          "title": "generated production board picks, moves and resumes the same desert after camera changes"
+        }
+      ],
+      "skips": [
+        {
+          "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+          "project": "desktop",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+          "project": "mobile-portrait",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+          "project": "mobile-landscape",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        }
+      ]
+    },
+    {
+      "id": "fixtures",
+      "counts": {
+        "total": 81,
+        "expected": 81,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "health-bars",
+      "counts": {
+        "total": 25,
+        "expected": 25,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "placement-dev",
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "telemetry-development",
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "telemetry-production",
+      "counts": {
+        "total": 36,
+        "expected": 36,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "webkit-acceptance",
+      "counts": {
+        "total": 54,
+        "expected": 54,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "webkit-exploration",
+      "counts": {
+        "total": 81,
+        "expected": 81,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    }
+  ],
+  "journeys": [
+    {
+      "profile": "portrait-webkit",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    },
+    {
+      "profile": "landscape-webkit",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    },
+    {
+      "profile": "desktop-webkit",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    },
+    {
+      "profile": "mobile-portrait",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    },
+    {
+      "profile": "mobile-landscape",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    },
+    {
+      "profile": "desktop",
+      "encounters": 5,
+      "commands": 338,
+      "used": {
+        "mark": true,
+        "pin": true
+      },
+      "consumed": true,
+      "phase": "defeat",
+      "ranger": {
+        "heroId": "ranger",
+        "hp": 0,
+        "xp": 205,
+        "level": 3,
+        "maxHp": 22,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot",
+          "ability:mark_target",
+          "ability:pinning_shot"
+        ]
+      }
+    }
+  ],
+  "performance": {
+    "passed": true,
+    "failedSamples": 0,
+    "captureFailures": [],
+    "warningSamples": 0
+  },
+  "artifacts": [
+    {
+      "file": "assets-prefix-dev.json.gz",
+      "rawSha256": "0f409b7f5dc7458bb9f8b79c1d8a7d3b095d66c2ab325a8f2b5cbf878dca3517",
+      "storedSha256": "4e64c13c0d99b82de38da2e0e35f03c8fe9fe594d8f81d2162f46b260e171d69",
+      "rawBytes": 80398
+    },
+    {
+      "file": "assets-prefix-dev.log.gz",
+      "rawSha256": "e3d07885d282cc650aa4ab704c08b1d0a6be23caca91524646511486311c8607",
+      "storedSha256": "d93a92952b05fbd8e752bbf69c9c2a7bfcadba8649d382fa3e764919d8fd643f",
+      "rawBytes": 9835
+    },
+    {
+      "file": "assets-prefix-preview.json.gz",
+      "rawSha256": "b456301bf646597a126e2851651c59de5f29070de46627f263c41880fa6c7015",
+      "storedSha256": "641bfec1fa1edcf85397a50ac6a73b855ce6df87e61e921d71608d4bff02c1f5",
+      "rawBytes": 78024
+    },
+    {
+      "file": "assets-prefix-preview.log.gz",
+      "rawSha256": "8b36ebabf81c5b8d4a1210b3865522a913ed8861bf007b30d757610aad3c58b2",
+      "storedSha256": "c7813dc7de218958eb3949a881476103b918ce3fe198cd1a9f316d8f2f6e52cb",
+      "rawBytes": 9839
+    },
+    {
+      "file": "assets-root-dev.json.gz",
+      "rawSha256": "58956d7525dec716ccf97f63c595b6e50d83087406cb415f25e94cb089e7f55b",
+      "storedSha256": "2d5f121ae2964578a7362ed0e485fca01ba264f8453291f5cced5250fe1dcacb",
+      "rawBytes": 80368
+    },
+    {
+      "file": "assets-root-dev.log.gz",
+      "rawSha256": "b391d790c6cfd33a5b966251f7a3c9291bd2bf8b85cbd061d22fee5b197b76b6",
+      "storedSha256": "3489f36abdd949c0bc6489e124d357ccb1a320dae8897da72823207c3133a869",
+      "rawBytes": 9823
+    },
+    {
+      "file": "build-integration.log.gz",
+      "rawSha256": "9193d894f3ea9b21e7cb60fd646b988f3f818d752d62c06baf58120b6502264c",
+      "storedSha256": "5d23b7ef6792ebb3b41514a5f5e84793b79505f76464ec8ac65c32c0035af089",
+      "rawBytes": 1158
+    },
+    {
+      "file": "build-prefix.log.gz",
+      "rawSha256": "68862cf7e2931eb0e991e6f0fec4bac1917170a1184039e3d7d26768bf0da050",
+      "storedSha256": "efd8497e9281279a1a8b7b5b4e988f464c097f1a82887a43a72643575197671d",
+      "rawBytes": 4839
+    },
+    {
+      "file": "build-root.log.gz",
+      "rawSha256": "26d71f9efd35e5fba1a52fd4b652d07c4415cf830f4bc1fca52b5d7adc425706",
+      "storedSha256": "891fdade163af0f39bb923bd6730fc9793694a353f3a7b19147ada533cdf9be0",
+      "rawBytes": 4820
+    },
+    {
+      "file": "chromium.json.gz",
+      "rawSha256": "9a27fb118eb159d1a920759ee8623cf8ea52c6d5c576ece69706a10aa1b5c64e",
+      "storedSha256": "170affcab1b216edb486006f30719d70b02f792fc765c061e6f8ff37891137c6",
+      "rawBytes": 875207
+    },
+    {
+      "file": "chromium.log.gz",
+      "rawSha256": "10889813106a43cdc02be5f25baf7b1cfda0ca70841a3cf177864be28d90dbf3",
+      "storedSha256": "c390b76af0afcf36d02712b8e66561edba4e46a0d18a5e3ceb712245329faa76",
+      "rawBytes": 111802
+    },
+    {
+      "file": "fixtures.json.gz",
+      "rawSha256": "4f45555061804390fe889e09d819dd2087c848a7646fcf0c62bd1a2f5910e5e6",
+      "storedSha256": "40fb10fecaa504cb6c473e036c60ccd3631399d0c64a42ed8adceeb5c27cb330",
+      "rawBytes": 91948
+    },
+    {
+      "file": "fixtures.log.gz",
+      "rawSha256": "8917338f3c97ae34937fc74ac80a9909651f427b2727075cdcd9d6a66091a2e9",
+      "storedSha256": "d6ad84d12f10af3999e96eb53b7d82b08f8267c0c4631ffc6f0c5901fe02b92b",
+      "rawBytes": 12306
+    },
+    {
+      "file": "health-bars.json.gz",
+      "rawSha256": "ba3c96502d1ea88a654cd85bafc10bc0e67bacd596fd7292262f4d80b0bfd3fc",
+      "storedSha256": "229f139cbc1f29243d5f9637e00d966c92eaba297902272314e64acd265064e1",
+      "rawBytes": 32839
+    },
+    {
+      "file": "health-bars.log.gz",
+      "rawSha256": "02f3c22062e60acf6d11b3059f80b39e1bf466690e55536d6430dd897b416495",
+      "storedSha256": "4df49e28bb7da148db9478efa1084c59ac6d7b29c2e981175a04f4589c554279",
+      "rawBytes": 4761
+    },
+    {
+      "file": "performance.json.gz",
+      "rawSha256": "f0c71eee8a5aa2087ba30eb2d66dc6a1bca3bf1e4dfa37ac5117a284e98fef2c",
+      "storedSha256": "4b21d79542774348254f4dda68070dd4929696aa59998009a9707c6ea3b0b67f",
+      "rawBytes": 716524
+    },
+    {
+      "file": "performance.log.gz",
+      "rawSha256": "9921f9b7d02a35486d16384083f3180cbfcc62eb5c640af7d1fb289da02c4b22",
+      "storedSha256": "c5f7f8c3ee16410ad99d4fc6bfeb7061739b5b196a8a91318df1a598b291fe21",
+      "rawBytes": 366
+    },
+    {
+      "file": "placement-dev.json.gz",
+      "rawSha256": "01bb97cdcadd37e58c516bb4b5eddda33521bb332bc0d8f2d9da1f55fb1b31f5",
+      "storedSha256": "302acb67e97cad7ceda44a94c9379cf17c5f81d378439fc9d94104cf4fbf47d5",
+      "rawBytes": 7023
+    },
+    {
+      "file": "placement-dev.log.gz",
+      "rawSha256": "b24cc74d599bc590a93c388c5db3ad62e1a37d2df39f52c81142d24b22441dc1",
+      "storedSha256": "4842d8eac7bb11fd2e9478c81e2701c393f99d50b4fb9e973bec1a71e77ac93f",
+      "rawBytes": 1516
+    },
+    {
+      "file": "restore-root.log.gz",
+      "rawSha256": "0e1a408c9e6302ab2cb47b0a4d325f5d06e3a13c62f67411664861aafaad1a66",
+      "storedSha256": "c0532b676c39ac24b3e2b23c712541e6e4b70d760d544b12e4d8039e95478ca3",
+      "rawBytes": 4820
+    },
+    {
+      "file": "summary.json.gz",
+      "rawSha256": "995f15faa986bd983d4a751afab5a2e8c8d8c753d3306af0fb8445ee8b717da1",
+      "storedSha256": "67d2a9e554fca36743e000fd48ca060772963a59200fdc47bbbd727ff2de0bfb",
+      "rawBytes": 9746
+    },
+    {
+      "file": "telemetry-development.json.gz",
+      "rawSha256": "203d2f911a44106c45da3a61ee30b2300f52ebbedf8250472d0540a764f22a82",
+      "storedSha256": "59581aa966670ca0defd2f3e40c7e0b423a7f9bfb41d6485c398f94f5c37f4ce",
+      "rawBytes": 42568
+    },
+    {
+      "file": "telemetry-development.log.gz",
+      "rawSha256": "5e3100f1bdd69166838968fdda76cf1348b643bb52a07468a08273dd1c961684",
+      "storedSha256": "fcc34719ea6e44bf513a3b931ba7ff65c4cddb610ec253ab61a7c428b2358628",
+      "rawBytes": 5819
+    },
+    {
+      "file": "telemetry-production.json.gz",
+      "rawSha256": "ba5f1255790a20d4e137f77ceec31da2d73cabe4684fb35116519fbbd12502d7",
+      "storedSha256": "1f864703c4e305b283302ff921cce810fee55b7b0e189c1d3ec12d464731238a",
+      "rawBytes": 42630
+    },
+    {
+      "file": "telemetry-production.log.gz",
+      "rawSha256": "f9f7812fb31f2d0491facf1948773cd3ee616f653de0ee5f8fca723221db722b",
+      "storedSha256": "fcab76164aab1895f7e883740fdcad8dd28b71f62da13868562ddc1f0f443247",
+      "rawBytes": 7552
+    },
+    {
+      "file": "tooling.log.gz",
+      "rawSha256": "c047c7727963930573e4a04864d0e10283ab314c317f1e60c9be17d2e687cbea",
+      "storedSha256": "82e8e36697bfa337852ce43bf63f920d59cd57c8828d94fa0cb03db589338e9c",
+      "rawBytes": 6808
+    },
+    {
+      "file": "typecheck.log.gz",
+      "rawSha256": "e169155b776999d5c89afe5b42cff7d0f4c2b0791b10dcb5a6dd6b9c63204e11",
+      "storedSha256": "090fbb1f2e3a0dbf33065f12f265844e75053a2300316cbdd023358e7dc4b8bb",
+      "rawBytes": 115
+    },
+    {
+      "file": "units.log.gz",
+      "rawSha256": "1a4b6ef0943dbbe8e89089e329f0e506703aad887e839b8d24bcd6027f8e76ea",
+      "storedSha256": "5c4edcf37a7013fd9b99dfb6425498ec9772498f0a9601e6d493243dd83b2854",
+      "rawBytes": 18811
+    },
+    {
+      "file": "webkit-acceptance.json.gz",
+      "rawSha256": "650098c732ad61e28990ccba025c7c207c26ec978dc77b7cc5631f077a6df077",
+      "storedSha256": "b4320dfc801ddf576709aae437fdab2e6fcc8d8972c79601ddd3fc52c5d85e90",
+      "rawBytes": 67347
+    },
+    {
+      "file": "webkit-acceptance.log.gz",
+      "rawSha256": "cff425ea3e8005417e81773ce1f889d40e02ab1dad7bd13b178c223745ad77df",
+      "storedSha256": "eb3a9320e05b7899703ad39b0f8d8a718d78945b565a17e7ff6c389d9a7ce638",
+      "rawBytes": 9916
+    },
+    {
+      "file": "webkit-exploration.json.gz",
+      "rawSha256": "faa4236d7ed4433e6a95a0d5683133fa0f38aab1d7ac80c0572fd864f32ff40f",
+      "storedSha256": "8d6a78d6968fe6d8ddafa9f7ba1c52c860f927cfa5ee48ca5f73ecf61c26770f",
+      "rawBytes": 93605
+    },
+    {
+      "file": "webkit-exploration.log.gz",
+      "rawSha256": "c5340c5278c069b03f8d32770984099fe482e88a42b74322e426c20bb2380a85",
+      "storedSha256": "5e9777c3bc9524e61a20114cc80f82bc805bb52d8173e5e78b34c36ebbe87ef5",
+      "rawBytes": 13504
+    },
+    {
+      "file": "performance-evaluation.json.gz",
+      "rawSha256": "48ed09e78dc78c19c2b2b564ae847b0f822453d174197872d1478beb6ce2687c",
+      "storedSha256": "93ae0dce9c9346f6dd26885ce5a2d56821ea4e40e6499d0f0e3ce1e8b4aa4222",
+      "rawBytes": 8636
+    },
+    {
+      "file": "source-identity.json.gz",
+      "rawSha256": "1081373c9c7d26c9dd5afdeb12d07c7e6a0df4ba84511f3d9db0099f7df336e6",
+      "storedSha256": "0cb42a4e05f3971b16d52c241638fdefd31226f8620097c113cef7f173fbaf6c",
+      "rawBytes": 39960
+    },
+    {
+      "file": "journeys/portrait-webkit.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/portrait-webkit-mark.png",
+      "rawSha256": "36cf9c2f7a792683d8b0f5eb069cdc404a881a250dd92dd56cf24da233265395",
+      "storedSha256": "36cf9c2f7a792683d8b0f5eb069cdc404a881a250dd92dd56cf24da233265395",
+      "rawBytes": 219443
+    },
+    {
+      "file": "journeys/portrait-webkit-pin.png",
+      "rawSha256": "3d68906773e4626b681cecec974a71f67c6fbd0bf8be1edff94148b96dc8af80",
+      "storedSha256": "3d68906773e4626b681cecec974a71f67c6fbd0bf8be1edff94148b96dc8af80",
+      "rawBytes": 207292
+    },
+    {
+      "file": "journeys/portrait-webkit-terminal.png",
+      "rawSha256": "b4cd714f26b3fb81991e32da66905966362519ee07cd3a8beffec5b91b6b92f1",
+      "storedSha256": "b4cd714f26b3fb81991e32da66905966362519ee07cd3a8beffec5b91b6b92f1",
+      "rawBytes": 188479
+    },
+    {
+      "file": "journeys/landscape-webkit.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/landscape-webkit-mark.png",
+      "rawSha256": "b36bf3719109895f0a4e8bf1c279275e4b29fd3542f9fd5f178e82c7a30dfa5c",
+      "storedSha256": "b36bf3719109895f0a4e8bf1c279275e4b29fd3542f9fd5f178e82c7a30dfa5c",
+      "rawBytes": 357760
+    },
+    {
+      "file": "journeys/landscape-webkit-pin.png",
+      "rawSha256": "9f7e5fe3b015cc6e67e06f0eac589e70fdd109ce61c724eb5823feb2fd544fe7",
+      "storedSha256": "9f7e5fe3b015cc6e67e06f0eac589e70fdd109ce61c724eb5823feb2fd544fe7",
+      "rawBytes": 346914
+    },
+    {
+      "file": "journeys/landscape-webkit-terminal.png",
+      "rawSha256": "7a39ef3b4a803297fcd3e7bca0fedda3739dc304bf79fd0e32ef2b1f6caaa1bc",
+      "storedSha256": "7a39ef3b4a803297fcd3e7bca0fedda3739dc304bf79fd0e32ef2b1f6caaa1bc",
+      "rawBytes": 173126
+    },
+    {
+      "file": "journeys/desktop-webkit.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/desktop-webkit-mark.png",
+      "rawSha256": "25601252b518a5371541d11bf03ff87a8c37b06347eb8936c4c45e03ef4b128d",
+      "storedSha256": "25601252b518a5371541d11bf03ff87a8c37b06347eb8936c4c45e03ef4b128d",
+      "rawBytes": 698917
+    },
+    {
+      "file": "journeys/desktop-webkit-pin.png",
+      "rawSha256": "472efbe444a81b1cd94b91e24fba1dc479cb78a3424dd2c23923753008876017",
+      "storedSha256": "472efbe444a81b1cd94b91e24fba1dc479cb78a3424dd2c23923753008876017",
+      "rawBytes": 714660
+    },
+    {
+      "file": "journeys/desktop-webkit-terminal.png",
+      "rawSha256": "158a4f472939a244f0ddb13f18bb3c7cfef98a34e76f90085a90ae86e732702e",
+      "storedSha256": "158a4f472939a244f0ddb13f18bb3c7cfef98a34e76f90085a90ae86e732702e",
+      "rawBytes": 129125
+    },
+    {
+      "file": "journeys/mobile-portrait.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/mobile-portrait-mark.png",
+      "rawSha256": "510ce0f96bee0349610a100e37b8d9b022d0dc0274fec09c285649a85c6fe858",
+      "storedSha256": "510ce0f96bee0349610a100e37b8d9b022d0dc0274fec09c285649a85c6fe858",
+      "rawBytes": 210369
+    },
+    {
+      "file": "journeys/mobile-portrait-pin.png",
+      "rawSha256": "dd3b53e06c09b35fca2abd50ab43ee7651a2171a587a4c59affc8a277419a45a",
+      "storedSha256": "dd3b53e06c09b35fca2abd50ab43ee7651a2171a587a4c59affc8a277419a45a",
+      "rawBytes": 205749
+    },
+    {
+      "file": "journeys/mobile-portrait-terminal.png",
+      "rawSha256": "653bbfa295c06f9fd0206699ddd0115777d86c565b167b590abf94a8e403a58b",
+      "storedSha256": "653bbfa295c06f9fd0206699ddd0115777d86c565b167b590abf94a8e403a58b",
+      "rawBytes": 159473
+    },
+    {
+      "file": "journeys/mobile-landscape.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/mobile-landscape-mark.png",
+      "rawSha256": "e06e829d924b25178ebd9146cd35b3eff948acfc760929561f157a75a4eb3dd4",
+      "storedSha256": "e06e829d924b25178ebd9146cd35b3eff948acfc760929561f157a75a4eb3dd4",
+      "rawBytes": 363861
+    },
+    {
+      "file": "journeys/mobile-landscape-pin.png",
+      "rawSha256": "ca1482e0cdd0a3fcdab7731215c117322a5a2a3701529749ad29546e7c9bfecb",
+      "storedSha256": "ca1482e0cdd0a3fcdab7731215c117322a5a2a3701529749ad29546e7c9bfecb",
+      "rawBytes": 371481
+    },
+    {
+      "file": "journeys/mobile-landscape-terminal.png",
+      "rawSha256": "a39027f37e6fb6b12c777dad4b3128f980a3c881d741b12d1d3a5ee85a67d6fc",
+      "storedSha256": "a39027f37e6fb6b12c777dad4b3128f980a3c881d741b12d1d3a5ee85a67d6fc",
+      "rawBytes": 135586
+    },
+    {
+      "file": "journeys/desktop.json.gz",
+      "rawSha256": "4922090587ec94b5ce57b6eaf74233a088e0bb157166cd6ac6f72472eb00108f",
+      "storedSha256": "a58200c79b0b745d8fcf7ac7f97a83a4cc36934ae4653c7862d8ad71838e373a",
+      "rawBytes": 142340
+    },
+    {
+      "file": "journeys/desktop-mark.png",
+      "rawSha256": "f7d83c35d85dd95336d3b1be29938bc181b196b7a2e44f10c30f646e83acae25",
+      "storedSha256": "f7d83c35d85dd95336d3b1be29938bc181b196b7a2e44f10c30f646e83acae25",
+      "rawBytes": 256638
+    },
+    {
+      "file": "journeys/desktop-pin.png",
+      "rawSha256": "23395e2fd7a2fcdaf5b44384130720f44a8d32a458c7a03911d94813a529d3c7",
+      "storedSha256": "23395e2fd7a2fcdaf5b44384130720f44a8d32a458c7a03911d94813a529d3c7",
+      "rawBytes": 254912
+    },
+    {
+      "file": "journeys/desktop-terminal.png",
+      "rawSha256": "ccebedbbecb726c5c983fe96f112e398a4d97faa8d9018045c32c45f25299af5",
+      "storedSha256": "ccebedbbecb726c5c983fe96f112e398a4d97faa8d9018045c32c45f25299af5",
+      "rawBytes": 48895
+    }
+  ]
+}

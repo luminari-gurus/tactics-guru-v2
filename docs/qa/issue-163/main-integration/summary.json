@@ -1,0 +1,38 @@
+{
+  "counts": {
+    "main-stairs-chromium": {
+      "total": 9,
+      "expected": 9,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "main-stairs-webkit": {
+      "total": 9,
+      "expected": 9,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "main-journey-desktop": {
+      "total": 1,
+      "expected": 1,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    }
+  },
+  "combatStatesAndEventsIdentical": true,
+  "partyIdentical": true,
+  "worldRevision": {
+    "before": 431,
+    "after": 430
+  },
+  "performance": {
+    "samples": 18,
+    "failures": []
+  }
+}

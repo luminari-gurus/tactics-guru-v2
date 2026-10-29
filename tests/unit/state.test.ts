@@ -1,3 +1,4 @@
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog, MapRecord } from '../../src/content/types';
@@ -12,7 +13,7 @@ const battleMap = {
 } as const satisfies MapRecord;
 const catalog = { ...copy(catalogFixture), maps: { [battleMap.id]: battleMap } };
 // The content validator (#28) is not required: synthetic input checked by runtime boundaries.
-const fixture = () => ({ format: 1, versions: { rules: 2, rng: 1, content: battle.contentVersion(catalog) }, seed: 1,
+const fixture = () => ({ format: STATE_FORMAT_VERSION, versions: { rules: RULES_VERSION, rng: 1, content: battle.contentVersion(catalog) }, seed: 1,
   rng: seedRng(1), mapId: battleMap.id, units: [{ id: 1, defId: 'fighter', side: 'player', cell: { x: 0, y: 0 }, hp: 18, hasMoved: false, hasActed: false }, {id:2,defId:'goblin_grunt',side:'enemy',cell:{x:1,y:0},hp:18,hasMoved:false,hasActed:false}],
   initiative: [1,2], activeIndex: 0, round: 1, outcome: 'ongoing', commandCount: 0 });
 function freeze<T>(value: T): T {
@@ -120,7 +121,7 @@ describe('battle foundation boundary', () => {
     }
     for (const commands of [new Array(2),Object.assign([{type:'endTurn',unitId:1}],{extra:1})]) {
       const initial = fixture();
-      expect(battle.readReplay({format:1,versions:initial.versions,initial,commands},catalog).ok).toBe(false);
+      expect(battle.readReplay({format: STATE_FORMAT_VERSION,versions:initial.versions,initial,commands},catalog).ok).toBe(false);
     }
   });
   it('rejects inconsistent outcomes, spawn references and blocked living cells', () => {
@@ -141,10 +142,10 @@ describe('battle foundation boundary', () => {
   });
   it('accepts replay initial snapshot after initiative has consumed RNG', () => {
     const initial=fixture(); initial.rng=nextUint32(nextUint32(initial.rng).rng).rng;
-    expect(battle.readReplay({format:1,versions:initial.versions,initial,commands:[]},catalog).ok).toBe(true);
+    expect(battle.readReplay({format: STATE_FORMAT_VERSION,versions:initial.versions,initial,commands:[]},catalog).ok).toBe(true);
   });
   it('replay envelope pins versions, initial cursor and accepted commands', () => {
-    const initial = fixture(); const input = freeze({ format: 1, versions: initial.versions, initial, commands: [{type:'endTurn',unitId:1}] });
+    const initial = fixture(); const input = freeze({ format: STATE_FORMAT_VERSION, versions: initial.versions, initial, commands: [{type:'endTurn',unitId:1}] });
     const a = battle.readReplay(input,catalog); const b = battle.readReplay(copy(input),catalog);
     assert(a.ok); expect(a).toEqual(b); expect(a.replay.initial).not.toBe(input.initial);
     expect(a.replay.commands[0]).not.toBe(input.commands[0]);

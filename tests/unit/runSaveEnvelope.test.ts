@@ -1,12 +1,73 @@
 import { combatStats } from '../../src/domain/effects';
+import { progressHero } from '../../src/domain/progression';
+import { createRunBattle, completeRunBattle, replayRunBattle } from '../../src/domain/runBattle';
 import { assert, expect, it } from 'vitest';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { decodeRunSave, encodeRunSave, readRunSnapshot, runBattleCatalog, resolveRunBattlefield, RUN_SAVE_MAX_CODE_UNITS } from '../../src/domain/runSaveEnvelope';
 import { createBattle, dispatch } from '../../src/domain/turns';
 import { nextUint32 } from '../../src/domain/rng';
 import { contentVersion } from '../../src/domain/battle';
-import { createRun, deriveRunSeed } from '../../src/domain/run';
+import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
+
+it('roundtrips active Mage Snare in progressed run state and expires identically after reload',()=>{
+  const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
+  const created=createRunBattle(items,runContext);assert(created.ok);const mage=created.state.units.find(u=>u.defId==='mage')!,target=created.state.units.find(u=>u.side==='enemy')!;
+  const battle={...created.state,activeIndex:created.state.initiative.indexOf(target.id),units:created.state.units.map(u=>u.id===target.id?{...u,movementBlock:{sourceId:mage.id,abilityId:'ability:frost_snare' as const}}:u)},snapshot={items,activeBattle:battle,battlefield:created.battlefield};
+  const encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);const decoded=decodeRunSave(encoded.text,runContext);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  const wait={type:'endTurn',unitId:target.id} as const,ended=dispatch(decoded.state.activeBattle!,wait,created.catalog);assert(ended.ok);expect(ended).toEqual(dispatch(battle,wait,created.catalog));expect(ended.state.units.find(u=>u.id===target.id)?.movementBlock).toBeUndefined();
+  for(const sourceId of [1,2,64])expect(readRunSnapshot({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,movementBlock:{sourceId,abilityId:'ability:frost_snare'}}:u)}},runContext).ok).toBe(false);
+});
+
+it('retains Ranger effects in progressed run saves and rejects the immediately previous envelope',()=>{
+  const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,
+    party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
+  const created=createRunBattle(items,runContext);assert(created.ok);
+  const ranger=created.state.units.find(u=>u.defId==='ranger')!,target=created.state.units.find(u=>u.side==='enemy')!;
+  const battle={...created.state,units:created.state.units.map(u=>u.id===target.id?{...u,markedBy:ranger.id,movementBlock:{sourceId:ranger.id,abilityId:'ability:pinning_shot' as const}}:u)};
+  const snapshot={items,activeBattle:battle,battlefield:created.battlefield},encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);
+  const decoded=decodeRunSave(encoded.text,runContext);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  expect(encodeRunSave(decoded.state,runContext)).toEqual(encoded);
+  const wait={type:'endTurn',unitId:battle.initiative[battle.activeIndex]} as const;
+  expect(dispatch(decoded.state.activeBattle!,wait,created.catalog)).toEqual(dispatch(battle,wait,created.catalog));
+  for(const source of [1,3,64])expect(readRunSnapshot({...snapshot,activeBattle:{...battle,units:battle.units.map(u=>u.id===target.id?{...u,markedBy:source}:u)}},runContext).ok).toBe(false);
+  expect(decodeRunSave(JSON.stringify({...JSON.parse(encoded.text),format:4}),runContext)).toEqual({ok:false,reason:'incompatible'});
+  const won={...battle,outcome:'playerWin' as const,units:battle.units.map(u=>{const {markedBy,movementBlock,...rest}=u;return u.side==='enemy'?{...rest,hp:0}:u;})};
+  const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
+  expect(completed.state.items.run.party.every(h=>!Object.hasOwn(h,'markedBy')&&!Object.hasOwn(h,'movementBlock'))).toBe(true);
+});
+
+it('admits only spent bounded Second Wind healing and carries it through run completion',()=>{
+  const prepared=preparedSnapshot();
+  const items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,
+    party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,h.heroId==='mage'?0:2,runContext.catalog))}};
+  const created=createRunBattle(items,runContext);assert(created.ok);
+  const start={...created.state,activeIndex:created.state.initiative.indexOf(1)};
+  const command={type:'useAbility',unitId:1,abilityId:'ability:second_wind',target:{unitId:1}} as const;
+  const used=dispatch(start,command,created.catalog);assert(used.ok);
+  const snapshot={items,activeBattle:used.state,battlefield:created.battlefield};
+  const encoded=encodeRunSave(snapshot,runContext);assert(encoded.ok);
+  expect(decodeRunSave(encoded.text,runContext)).toEqual({ok:true,state:snapshot});
+  expect(used.state.units[0].hp).toBe(9);expect(used.state.rng).toEqual(start.rng);
+  for(const [id,patch] of [[1,{hp:10}],[1,{secondWindUsed:false}],[2,{hp:3}],[2,{secondWindUsed:true}]] as const)
+    expect(readRunSnapshot({...snapshot,activeBattle:{...used.state,units:used.state.units.map(u=>u.id===id?{...u,...patch}:u)}},runContext).ok).toBe(false);
+  const won={...used.state,outcome:'playerWin' as const,units:used.state.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)};
+  const completion={type:'completeBattle',runId:items.run.id,revision:items.run.revision,encounterId:items.run.encounters[2],boundaryId:runBoundaryId(items.run),outcome:'victory',
+    party:items.run.party.map(h=>({...h,hp:won.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0}))};
+  expect(transitionRun(items.run,completion,runContext.definition,runContext.catalog).ok).toBe(false);
+  for(const secondWindUsed of [false,0,2,undefined])expect(transitionRun(items.run,{...completion,secondWindUsed},runContext.definition,runContext.catalog).ok).toBe(false);
+  expect(transitionRun(items.run,{...completion,secondWindUsed:true},runContext.definition,runContext.catalog).ok).toBe(true);
+  const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
+  expect(completed.state.items.run.party[0].hp).toBe(9);expect(completed.state.items.run.party[2].hp).toBe(0);
+  expect(completed.state.items.run.party[0]).not.toHaveProperty('secondWindUsed');
+  const old=JSON.stringify({...JSON.parse(encoded.text),format:3});expect(decodeRunSave(old,runContext)).toEqual({ok:false,reason:'incompatible'});
+  // Canonical entry replay follows legal turn ends to the Fighter before healing.
+  let live=created.state;const commands:import('../../src/domain/types').Command[]=[];const events:import('../../src/domain/types').BattleEvent[]=[];
+  while(live.initiative[live.activeIndex]!==1){const c={type:'endTurn',unitId:live.initiative[live.activeIndex]} as const;const r=dispatch(live,c,created.catalog);assert(r.ok);commands.push(c);events.push(...r.events);live=r.state;}
+  const r=dispatch(live,command,created.catalog);assert(r.ok);commands.push(command);events.push(...r.events);
+  const replay=replayRunBattle({format:live.format,versions:live.versions,initial:created.state,commands,battlefield:created.battlefield},items,runContext);assert(replay.ok);
+  expect(replay.state).toEqual(r.state);expect(replay.events).toEqual(events);
+});
 
 it('round trips reward, entry, active and terminal states with owned copies', () => {
   const fresh = createRun('fresh', 1, runContext.definition, runContext.catalog); assert(fresh.ok);

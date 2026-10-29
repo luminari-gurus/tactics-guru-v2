@@ -19,7 +19,7 @@ Entering any uncleared enemy marker SHALL start that enemy's encounter. All thre
 - **THEN** the guardian battle starts and remaining encounters stay available
 
 ### Requirement: Dungeon save continuation
-The dungeon SHALL persist movement and unordered completion while accepting valid format-4 saves without rerolling progress.
+The dungeon SHALL persist movement and unordered completion while accepting valid format-7 saves without rerolling progress.
 
 #### Scenario: Reload after movement
 - **WHEN** a saved dungeon is reopened

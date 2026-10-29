@@ -1,4 +1,144 @@
 import {expect,test} from '@playwright/test';
+import { readSession, playCommand } from './helpers/battlePolicy';
+import { abilityCatalog } from './helpers/abilityCatalog';
+import { progressHero, projectProgression } from '../src/domain/progression';
+import { HERO_IDS } from '../src/content/constants';
+import { previewMovement } from '../src/domain/grid';
+
+test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three',async({page})=>{
+  for(const [xp,count] of [[0,0],[60,0],[180,1]]) {
+    await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}&real`);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(page.locator('#battle-ability option[value="ability:magic_missile"]')).toHaveCount(1);
+    await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(count);
+    await expect(page.locator('#battle-ability option')).toHaveCount(count+1);
+    await expect(page.locator('#battle-ability-info')).toContainText('Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3');
+  }
+});
+
+test('Mage real Frost Snare preserves keyboard touch previews cancellation inspection and exact resume without attack audio',async({page,isMobile})=>{
+  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),before=await readSession(page);
+  if(isMobile)await page.locator('#battle-sound').tap();else{await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
+  const storage=await page.evaluate(()=>JSON.stringify(localStorage));
+  await picker.selectOption('ability:frost_snare');if(isMobile)await button.tap();else{await button.focus();await page.keyboard.press('Enter');}
+  await page.locator('#battle-target').selectOption('2,0');await expect(page.locator('#battle-preview')).toContainText('Snared by Mage #3');await expect(page.locator('#battle-preview')).toContainText('no damage or roll');
+  const pending=(await readSession(page)).pending;expect(pending).toMatchObject({abilityId:'ability:frost_snare'});
+  const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});await expect(picker).toHaveValue('ability:frost_snare');expect((await readSession(page)).pending).toEqual(pending);
+  await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('mage-snare-narrow-preview.png')});
+  expect((await readSession(page)).state).toEqual(before.state);expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(storage);
+  await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();
+  if(isMobile)await button.tap();else await button.click();await page.locator('#battle-target').selectOption('2,0');
+  if(isMobile)await page.locator('#battle-review').tap();else{await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const accepted=await readSession(page);
+  expect(accepted.state.units.find(u=>u.id===5)?.movementBlock).toEqual({sourceId:3,abilityId:'ability:frost_snare'});expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
+  expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
+  await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage #3');await expect(page.getByRole('dialog')).toContainText('expires after this unit’s next turn ends or source/target defeat');
+  await page.screenshot({path:test.info().outputPath('mage-snare-inspection.png')});await page.locator('#inspection-close').click();
+  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage');await page.locator('#log-close').click();
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const resumed=await readSession(page);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);expect(resumed.pending).toBeNull();expect(errors).toEqual([]);
+});
+
+test('Ranger learned actions follow level one, two and three through the real picker',async({page})=>{
+  for(const [xp,mark,pin] of [[0,0,0],[60,1,0],[180,1,1]]) {
+    await page.goto(`/tests/fixtures/abilities/index.html?hero=ranger&xp=${xp}`);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await expect(page.locator('#battle-ability option[value="ability:high_shot"]')).toHaveCount(1);
+    await expect(page.locator('#battle-ability option[value="ability:mark_target"]')).toHaveCount(mark);
+    await expect(page.locator('#battle-ability option[value="ability:pinning_shot"]')).toHaveCount(pin);
+    await expect(page.locator('#battle-ability-info')).toContainText('Mark Target unlocks at level 2; Pinning Shot at level 3');
+  }
+});
+
+for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${ability} preserves keyboard touch preview cancellation inspection and exact resume`,async({page,isMobile})=>{
+  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/tests/fixtures/abilities/index.html?hero=ranger&xp=180');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),abilityId=`ability:${ability}`;
+  const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
+  // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
+  // hide an accidental attack/magic cue in the presentation path.
+  if(isMobile)await page.locator('#battle-sound').tap();else {await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
+  expect((await readSession(page)).state).toEqual(before.state);
+  await picker.selectOption(abilityId);await expect(picker).toHaveValue(abilityId);await picker.focus();
+  if(isMobile)await button.tap();else await button.click();
+  await page.locator('#battle-target').selectOption('2,0');
+  await expect(page.locator('#battle-preview')).toContainText('no damage or roll');
+  await expect(page.locator('#battle-preview')).not.toContainText('Taunt');
+  const pending=(await readSession(page)).pending;expect(pending).toMatchObject({abilityId});
+  const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});
+  await expect(picker).toHaveValue(abilityId);expect((await readSession(page)).pending).toEqual(pending);
+  expect((await readSession(page)).state).toEqual(before.state);expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(storage);
+  await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath(`${ability}-narrow-preview.png`)});
+  await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();
+  expect((await readSession(page)).state).toEqual(before.state);
+  if(isMobile)await button.tap();else await button.click();await page.locator('#battle-target').selectOption('2,0');
+  if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page),target=accepted.state.units.find(u=>u.id===5)!;
+  expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
+  if(ability==='mark_target')expect(target.markedBy).toBe(2);
+  else expect(target.movementBlock).toEqual({sourceId:2,abilityId:'ability:pinning_shot'});
+  expect(accepted.state.rng).toEqual(before.state.rng);
+  expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
+  await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();
+  await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'Marked by Ranger #2':'Pinned by Ranger #2');
+  await page.screenshot({path:test.info().outputPath(`${ability}-inspection.png`)});await page.locator('#inspection-close').click();
+  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'marked by Ranger':'Pinned by Ranger');await page.locator('#log-close').click();
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);expect(resumed.pending).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+test('Fighter healing and Taunt preserve keyboard touch cancellation inspection and resume',async({page,isMobile})=>{
+  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&injured');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const picker=page.locator('#battle-ability'),signature=page.locator('[data-action=signature]');
+  await expect(picker.locator('option[value="ability:second_wind"]')).toHaveCount(1);await expect(picker.locator('option[value="ability:taunt"]')).toHaveCount(1);
+  const initial=await readSession(page);
+  await picker.selectOption('ability:second_wind');if(isMobile)await signature.tap();else await signature.click();
+  await page.locator('#battle-target').selectOption('0,0');await expect(page.locator('#battle-preview')).toContainText('Heal 7 HP');
+  await expect(page.locator('#battle-preview')).not.toContainText('Friendly fire');await expect(page.locator('#battle-ability-info')).toContainText('1/1 use');
+  await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');await page.locator('#inspection-close').click();
+  const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});await expect(picker).toHaveValue('ability:second_wind');
+  expect((await readSession(page)).state).toEqual(initial.state);
+  await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('fighter-heal-preview-narrow.png')});
+  await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();expect((await readSession(page)).state).toEqual(initial.state);
+  await signature.click();await page.locator('#battle-target').selectOption('0,0');
+  if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const healed=await readSession(page);expect(healed.state.rng).toEqual(initial.state.rng);expect(healed.state.units.find(u=>u.defId==='fighter')).toMatchObject({hp:27,secondWindUsed:true,hasActed:true});
+  await expect(page.locator('#battle-status')).toContainText('0/1');await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('heals 7 HP');await page.locator('#log-close').click();
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(healed.state);
+  await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  for(let i=0;i<8;i++) {const s=await readSession(page);if(s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!.defId==='fighter')break;await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+  let next=await readSession(page),fighter=next.state.units.find(u=>u.id===next.state.initiative[next.state.activeIndex])!;expect(fighter.defId).toBe('fighter');
+  await picker.selectOption('ability:second_wind');await expect(signature).toBeDisabled();await expect(page.locator('#battle-ability-info')).toContainText('Use exhausted');
+  let enemy=next.state.units.find(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-fighter.cell.x)+Math.abs(u.cell.y-fighter.cell.y)===1);
+  if(!enemy){
+    const base=abilityCatalog(2),catalog=projectProgression(HERO_IDS.map(id=>progressHero(id,180,1,base)),base),reach=previewMovement(next.state,fighter.id,catalog);if(!reach.ok)throw Error(reach.reason);
+    const move=reach.cells.find(c=>c.cost>0 && next.state.units.some(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-c.cell.x)+Math.abs(u.cell.y-c.cell.y)===1));if(!move)throw Error('No legal approach to Taunt');
+    await playCommand(page,{type:'move',unitId:fighter.id,to:move.cell});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    next=await readSession(page);fighter=next.state.units.find(u=>u.id===fighter.id)!;
+    enemy=next.state.units.find(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-fighter.cell.x)+Math.abs(u.cell.y-fighter.cell.y)===1);
+  }
+  expect(enemy).toBeDefined();if(!enemy)throw Error('No adjacent enemy');
+  await picker.selectOption('ability:taunt');if(isMobile)await signature.tap();else await signature.click();
+  await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);await expect(page.locator('#battle-preview')).toContainText('no roll');
+  await page.locator('#battle-review').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const taunted=await readSession(page);expect(taunted.state.rng).toEqual(next.state.rng);expect(taunted.state.units.find(u=>u.id===enemy.id)?.tauntedBy).toBe(fighter.id);
+  await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${enemy.id}`).click();await expect(page.getByRole('dialog')).toContainText(`Taunted by Fighter #${fighter.id}`);await expect(page.getByRole('dialog')).toContainText('next turn ends');
+  await page.screenshot({path:test.info().outputPath('fighter-taunt-inspection.png')});await page.locator('#inspection-close').click();
+  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('taunted by Fighter');await page.locator('#log-close').click();
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(taunted.state);expect((await readSession(page)).events).toEqual([]);
+  expect(errors).toEqual([]);
+});
 for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later ability survives inspection/layout and cancels without mutation`,async({page,isMobile})=>{
   await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}`);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -69,7 +209,8 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19],[600
  await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}`);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))??'null')?.units.find((u:{unitId:string})=>u.unitId==='mage')?.health.maxHp).toBe(maxHp);
  const health=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).units.find((u:{unitId:string})=>u.unitId==='mage').health;expect(health.hp).toBe(maxHp);expect(health.ratio).toBe(1);
- const picker=page.locator('#battle-ability');await expect(picker.locator('option')).toHaveCount(level===1?1:2);
+ const picker=page.locator('#battle-ability');await expect(picker.locator('option')).toHaveCount(level===1?1:level<3?2:3);
+ await expect(picker.locator('option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
  await expect(picker.locator('option[value="ability:zz_mage"]')).toHaveCount(level===1?0:1);
  await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
  await picker.selectOption('ability:magic_missile');await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();

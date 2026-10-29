@@ -1,4 +1,5 @@
 import { assert, beforeAll, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { battleCatalog } from '../../src/content/catalog';
 import { encodeBattleSave, SAVE_MAX_CODE_UNITS } from '../../src/domain/saveEnvelope';
 import { createBattle, dispatch } from '../../src/domain/turns';
@@ -38,6 +39,12 @@ const encodedNext = encodeBattleSave(next.state, battleCatalog); assert(encodedN
 const oldText = encoded.text;
 const newText = encodedNext.text;
 const reader = (storage: RecordingStorage) => createBattleStorage(battleCatalog, () => storage);
+
+it('preserves exact state-3 rules-4 bytes from e2f0cdd for incompatible-save recovery',()=>{
+  const raw=readFileSync('tests/fixtures/saves/issue-165/battle.json','utf8'),storage=new RecordingStorage(raw,raw),before=[...storage.data];
+  const loaded=reader(storage).load();assert(loaded.ok);expect(loaded.selected).toBeNull();expect(loaded.inspection.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
+  expect(reader(storage).save(initial.state)).toMatchObject({ok:false,reason:'recoveryRequired'});expect([...storage.data]).toEqual(before);expect(storage.calls.every(c=>c.operation==='read')).toBe(true);
+});
 
 describe('guarded acquisition and read-only recovery', () => {
   it('imports and acquires safely without a browser, and lazily guards the browser getter', () => {
@@ -317,7 +324,7 @@ describe('failure taxonomy and unchanged memory', () => {
       const plan = planEnemyTurn(fixture.state, actor.id, fixture.catalog);
       expect(planEnemyTurn(state, actor.id, fixture.catalog)).toEqual(plan);
       const command = state.outcome !== 'ongoing' || state.commandCount === 10_000 ? { type: 'endTurn' as const, unitId: actor.id }
-        : plan.ok ? plan.commands[0] : playerDecision(fixture.state);
+        : plan.ok ? plan.commands[0] : playerDecision(fixture.state,fixture.catalog);
       expect(dispatch(state, command, fixture.catalog)).toEqual(dispatch(fixture.state, command, fixture.catalog));
     }
   });

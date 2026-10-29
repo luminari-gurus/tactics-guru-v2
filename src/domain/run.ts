@@ -1,4 +1,5 @@
-import { awardHero, progressHero, readProgressHero, type ProgressHero } from './progression';
+import { awardHero, progressHero, projectProgression, readProgressHero, type ProgressHero } from './progression';
+import { encounterHpLimit } from './effects';
 import { HERO_PROGRESSION, SHORT_RUN_KINDS } from '../content/progression';
 import { HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
@@ -34,7 +35,7 @@ interface BoundaryCommand {
   readonly runId: string; readonly revision: number; readonly encounterId: EncounterId; readonly boundaryId: string;
 }
 export type RunCommand = BoundaryCommand & (
-  | { readonly type: 'completeBattle'; readonly outcome: 'victory' | 'defeat'; readonly party: readonly RunHero[] }
+  | { readonly type: 'completeBattle'; readonly outcome: 'victory' | 'defeat'; readonly party: readonly RunHero[]; readonly secondWindUsed?: true }
   | { readonly type: 'acknowledgeReward' }
   | { readonly type: 'startNewRun'; readonly newRunId: string; readonly newSeed: number }
 );
@@ -129,14 +130,19 @@ export function transitionRun(input: unknown, command: unknown, definition: RunD
   if (!read.ok) return read;
   const state = read.state;
   const common = ['type', 'runId', 'revision', 'encounterId', 'boundaryId'];
-  if (!hasShape(command, [...common, 'outcome', 'party']) && !hasShape(command, common) && !hasShape(command, [...common, 'newRunId', 'newSeed']))
+  const completionKeys=[...common,'outcome','party'];
+  if(command!==null && typeof command==='object' && Object.hasOwn(command,'secondWindUsed'))completionKeys.push('secondWindUsed');
+  if (!hasShape(command, completionKeys) && !hasShape(command, common) && !hasShape(command, [...common, 'newRunId', 'newSeed']))
     return { ok: false, reason: 'invalidCommand' };
   if (command.runId !== state.id || command.revision !== state.revision || command.encounterId !== state.encounters[state.encounterIndex] ||
     command.boundaryId !== runBoundaryId(state)) return { ok: false, reason: 'staleBoundary' };
-  if (command.type === 'completeBattle' && hasShape(command, [...common, 'outcome', 'party'])) {
+  if (command.type === 'completeBattle' && hasShape(command, completionKeys)) {
     if (state.phase !== 'battle') return { ok: false, reason: 'wrongPhase' };
     const party = readParty(command.party, catalog);
-    if (!party || party.some((hero, i) => hero.hp > state.party[i].hp) ||
+    const projected=projectProgression(state.party,catalog);
+    if(Object.hasOwn(command,'secondWindUsed') && (command.secondWindUsed!==true || !projected.abilities['ability:second_wind']))return {ok:false,reason:'invalidCommand'};
+    if (!party || party.some((hero, i) => hero.hp > encounterHpLimit({defId:hero.heroId,
+      ...(hero.heroId==='fighter' && command.secondWindUsed===true?{secondWindUsed:true}:{})},state.party[i].hp,projected)) ||
       (command.outcome !== 'victory' && command.outcome !== 'defeat') || (command.outcome === 'victory') !== party.some(h => h.hp > 0))
       return { ok: false, reason: 'invalidCommand' };
     // Command progression must equal entry facts; completion only supplies final combat HP.

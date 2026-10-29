@@ -1,5 +1,21 @@
 # Three-encounter run contract
 
+Current #163 extension: level-2 Fighter Second Wind can increase battle HP above
+encounter entry. The active-snapshot reader requires its spent-use flag and bounds
+HP by entry HP plus one `4 + projected power` heal, capped at projected max HP.
+Completion supplies an exact optional `secondWindUsed: true` fact from that
+validated battle to the reducer, which applies the same bound; other heroes and
+unspent state retain entry-HP bounds. The fact does not enter party data and cannot
+revive a defeated hero. Current equipment modifies accuracy/AC, preserving the
+reducer's healing-power equivalence. Battle state 3/rules 4 and run envelope 5
+reject prior saves while retaining original bytes for recovery/export.
+
+The #164 Ranger extension adds level-2 Mark Target and level-3 Pinning Shot;
+[their shared rules](signature-abilities.md#ranger-progression-164) govern the
+active battle. Exact Mark/Pin source references survive active-save continuation
+and reset in each new encounter. They never enter carried party data or alter
+the run's HP/award rules.
+
 [Issue #75](https://github.com/luminari-gurus/tactics-guru-v2/issues/75), branch `work/issue-75-run-contract`, base `79f7d983ff3a12ca38e93efdc72f3f317dfb789c`. Caller `dubstylee` approved the published OpenSpec implementation plan on 2026-10-13. The executable contract is [run.ts](../src/domain/run.ts), with [fixtures](../tests/unit/run.test.ts) and [plan](../openspec/changes/issue-75-run-contract/proposal.md).
 
 ## Reviewed gameplay decisions

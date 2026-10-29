@@ -82,6 +82,8 @@ async function chooseNativeDestination(target:Locator,index:0|1){
 
 test('clearing the native movement destination clears intent and preview without changing saves',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  // Phaser and its tweens must start on the same clock that this case pauses.
+  await page.clock.install();
   await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const target=page.locator('#battle-target'),review=page.locator('#battle-review');
   const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
@@ -102,7 +104,7 @@ test('clearing the native movement destination clears intent and preview without
   // A real new choice remains usable and still requires deliberate confirmation.
   await chooseNativeDestination(target,1);await expect(review).toBeEnabled();
   expect((await session(page)).pending).toEqual(pending);
-  await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
   await expect(review).toHaveText('Confirm action');await review.focus();await page.keyboard.press('Enter');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');await expect(review).toBeDisabled();
@@ -176,7 +178,7 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
 });
 
 import { playerDecision, session, readSession, playCommand } from './helpers/battlePolicy';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';
 import type { Command } from '../src/domain/types';
 

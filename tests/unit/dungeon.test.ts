@@ -5,6 +5,7 @@ import { applyBiome } from '../../src/map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { clearedDungeonSlots, freshDungeon, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
@@ -20,6 +21,12 @@ import { resolveBattlefield } from '../../src/domain/battlefield';
 import * as battlefields from '../../src/domain/battlefield';
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
+it('retains exact dungeon-6 bytes from e2f0cdd for recovery/export without migration',()=>{
+  const raw=readFileSync('tests/fixtures/saves/issue-165/dungeon.json','utf8'),data=new Map([[DUNGEON_KEYS.primary,raw],[DUNGEON_KEYS.backup,raw]]);
+  const storage={getItem:(key:string)=>data.get(key as typeof DUNGEON_KEYS.primary)??null,setItem:(key:string,value:string)=>{throw Error(`Unexpected write ${key} ${value.length}`);},removeItem:()=>{throw Error('Unexpected removal');}};
+  const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
+  expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review).map(v=>v.text)).toContain(raw);expect(data.get(DUNGEON_KEYS.primary)).toBe(raw);
+});
 function win(s: DungeonState) {
   s = good(startDungeonBattle(atEncounter(s)));
   const b = s.activeBattle!;
@@ -434,11 +441,11 @@ describe('unordered encounters and moving dungeon enemies', () => {
     expect(attempt({...e,active:2}).ok).toBe(false);
     expect(attempt({...e,movement:{...e.movement!,step:-1}}).ok).toBe(false);
   });
-  it('continues an authenticated format-4 active battle and upgrades after victory', () => {
+  it('continues an authenticated format-7 active battle and upgrades after victory', () => {
     const initial=fresh(), started=good(startDungeonBattle(atEncounter(initial,0)));
     const oldExploration={...initial.floors[0].exploration,revealed:started.floors[0].exploration.revealed,visited:started.floors[0].exploration.visited};
     const legacyState={...started,floors:[{...started.floors[0],exploration:oldExploration}]};
-    const body={kind:'tactics-guru:dungeon',format:4,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:legacyState};
+    const body={kind:'tactics-guru:dungeon',format:7,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:legacyState};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));if(!legacy.ok)throw Error(legacy.reason);
     const battle=legacy.state.activeBattle!;
     const won=good(acceptDungeonBattle(legacy.state,{...battle,outcome:'playerWin',units:battle.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)}));
@@ -459,14 +466,14 @@ describe('unordered encounters and moving dungeon enemies', () => {
     expect(m.getItem(DUNGEON_KEYS.primary)).toBe(primary);expect(m.getItem(DUNGEON_KEYS.backup)).toBe(backup);
     expect(second.retry(second.inspect())).toBe(true); // Explicit recovery adopts the reviewed storage boundary.
   });
-  it('reads an authenticated format-4 save and upgrades it only after movement', () => {
-    const s=fresh(), body={kind:'tactics-guru:dungeon',format:4,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
+  it('reads an authenticated format-7 save and upgrades it only after movement', () => {
+    const s=fresh(), body={kind:'tactics-guru:dungeon',format:7,identity:hashJson({dungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));
     if(!legacy.ok)throw Error(legacy.reason);
     expect(legacy.state.floors[0].exploration.version).toBe('exploration-v1');
     const upgraded=move(legacy.state);
     const next=encodeDungeon(upgraded);if(!next.ok)throw Error(next.reason);
-    expect(JSON.parse(next.text).format).toBe(5);
+    expect(JSON.parse(next.text).format).toBe(8);
     expect(decodeDungeon(next.text)).toEqual({ok:true,state:upgraded});
   });
 });

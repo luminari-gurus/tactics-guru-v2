@@ -5,6 +5,7 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots } from '../../src/domain/dungeon';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
+  await expect(page.locator('#dungeon-screen')).toBeVisible();
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];
   const targetPoi=target===undefined ? undefined : floor.exploration.pois.find(p=>poiCell(p)===target&&!clearedDungeonSlots(floor).includes(p.encounterSlot));
   const path:number[]=[];
@@ -15,14 +16,23 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     let destination=targetPoi ? poiCell(f.exploration.pois.find(p=>p.id===targetPoi.id)!) : target;
     if(f.position===destination)return path;
     const blocked=new Set(live.filter(p=>p.id!==targetPoi?.id).map(poiCell));
+    // Entering an available stair changes floors, so only route through the requested stair.
+    for(const stair of [...(s.depth>1?[f.descriptor.upstairs]:[]),...(f.completed===3?[f.descriptor.downstairs]:[])])if(stair!==destination)blocked.add(stair);
     const map=generateMap(f.descriptor.seed,'rooms'), previous=new Map<number,number>(), queue=[f.position];previous.set(f.position,-1);
     for(let i=0;i<queue.length&&(destination===undefined||!previous.has(destination));i++)for(const n of neighbors(queue[i]))if(map.cells[n]&&!previous.has(n)){
-      if(blocked.has(n)){if(target===undefined){previous.set(n,queue[i]);destination=n;break;}continue;}
+      if(blocked.has(n)){if(target===undefined&&live.some(p=>poiCell(p)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
       previous.set(n,queue[i]);queue.push(n);
     }
-    if(destination===undefined||!previous.has(destination))throw Error('Unreachable fixture destination');
-    let n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!;
+    // A moving enemy can temporarily block the only route. Take a safe step to
+    // advance the simulation, then plan again against the new positions.
+    let n: number;
+    if(destination===undefined||!previous.has(destination)) {
+      const choices=neighbors(f.position).filter(cell=>map.cells[cell]&&!blocked.has(cell));
+      if(!choices.length)throw Error('No safe step toward fixture destination');
+      n=choices[attempt%choices.length];
+    } else { n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!; }
     const delta=n-f.position,name=delta===-20?'north':delta===20?'south':delta===1?'east':'west';
+
     if(mode==='keyboard'){await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-20?'ArrowUp':delta===20?'ArrowDown':delta===1?'ArrowRight':'ArrowLeft');}
     else if(mode==='touch')await page.locator(`#dungeon-step-${name}`).tap();
     else await page.locator(`#dungeon-map [data-cell="${n}"]`).click();

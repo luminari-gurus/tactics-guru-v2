@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { battleCatalog } from '../src/content/catalog';
+import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
 import { readSession } from './helpers/battlePolicy';
+import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
@@ -78,7 +80,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
         } else {
           // A base change must not alter the seeded state or save identity.
           await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
-          const expectedSession = new BattleSession(battleCatalog, 'map:forest_ruins', 1);
+          const expectedSession = new BattleSession(standaloneCatalog, 'map:forest_ruins', 1);
           while (expectedSession.phase === 'enemy') {
             const step = expectedSession.nextEnemy()!;
             expectedSession.finishPresentation(step.token);
@@ -98,13 +100,18 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   });
 }
 
-for (const route of ['battle', 'run']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
+for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
   if (backend === 'HTML5') await page.addInitScript(() => {
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
   });
-  await page.goto(route === 'run' ? './run' : './');
+  await page.goto(route === 'battle' ? './' : `./${route}`);
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
+  if (route === 'dungeon') {
+    await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
+    await page.locator('#dungeon-confirm-new').click();
+    await walkDungeon(page, undefined, test.info().project.use.hasTouch ? 'touch' : 'keyboard');
+  }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load)).toBe('ready');
   await page.locator('#battle-sound').click();

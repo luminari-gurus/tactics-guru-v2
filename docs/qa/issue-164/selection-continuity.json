@@ -1,0 +1,477 @@
+{
+  "baseline": "18a6f63",
+  "results": [
+    {
+      "config": "playwright.config.ts",
+      "before": 715,
+      "after": 727,
+      "retained": 715,
+      "added": [
+        {
+          "id": "dc51ed921d1e48686c08-fdb1a24b4842f56b79e5",
+          "project": "desktop",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-0d040e273c757c00bb4a",
+          "project": "desktop",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-8976eac76a1e6c99f82c",
+          "project": "desktop",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-1efe365487113ca67506",
+          "project": "desktop",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-63448b0c9fd685e721b1",
+          "project": "mobile-portrait",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-012aa9e99aa8c4d62ec3",
+          "project": "mobile-portrait",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-a556c600b1959daa545b",
+          "project": "mobile-portrait",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-d1c74353d44bb6861edb",
+          "project": "mobile-portrait",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-16ce48e512a2f71b6a68",
+          "project": "mobile-landscape",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d5dd2f5928997f6768c9",
+          "project": "mobile-landscape",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-222e3e8a27d61328c8b7",
+          "project": "mobile-landscape",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-b6ad7b20f6c572819968",
+          "project": "mobile-landscape",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        }
+      ],
+      "rawSha256": "8b5bfeb8d45a6ede9d1ea5035b35a108120564886ad86f7a83f8f32df5f690aa",
+      "file": "playwright.config.ts.json.gz",
+      "gzipSha256": "65c249b75481edb0b157dd88d3ad770fc24fdb3aa4e6cf007141af0e8b22b571"
+    },
+    {
+      "config": "playwright.fixtures.config.ts",
+      "before": 72,
+      "after": 81,
+      "retained": 72,
+      "added": [
+        {
+          "id": "dc05b687c651765fa444-fa16ae790efa93bf675f",
+          "project": "desktop",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger learned actions follow level one, two and three through the real picker"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-d056811ca1a749b38f53",
+          "project": "desktop",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-082402b51096746b8058",
+          "project": "desktop",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-c3d42288bc59f69325d1",
+          "project": "mobile-portrait",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger learned actions follow level one, two and three through the real picker"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-25c3f2b2d6f49b6ebe63",
+          "project": "mobile-portrait",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-66c596feedb5a1974349",
+          "project": "mobile-portrait",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-c043ab516b1fc4b7520f",
+          "project": "mobile-landscape",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger learned actions follow level one, two and three through the real picker"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-fbf3f37b734f88ea0c44",
+          "project": "mobile-landscape",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger mark_target preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc05b687c651765fa444-356ce89497e45bb6498b",
+          "project": "mobile-landscape",
+          "file": "ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume",
+          "titlePath": [
+            "ability-picker.spec.ts",
+            "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and exact resume"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        }
+      ],
+      "rawSha256": "9616d2f8cc702d01cf092aafb9d137012e06df0127d9008c85a1d0b77005b92f",
+      "file": "playwright.fixtures.config.ts.json.gz",
+      "gzipSha256": "40887ac4921f6b14ec35cf6efdaab4295729050dd29d2e4291b7c7346710c830"
+    },
+    {
+      "config": "playwright.exploration.config.ts",
+      "before": 78,
+      "after": 90,
+      "retained": 78,
+      "added": [
+        {
+          "id": "dc51ed921d1e48686c08-3b88d5c9bc78a9fff4c2",
+          "project": "desktop-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d68fd8321f79ee6273c2",
+          "project": "desktop-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-5bfb63ba6bbe16ce527d",
+          "project": "desktop-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-347c600ae5d5d65f298f",
+          "project": "desktop-webkit",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-e215ebf77f3b75f86540",
+          "project": "portrait-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-f068b8b10c76d3d1b457",
+          "project": "portrait-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-2768ee00f51abf961ad5",
+          "project": "portrait-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-7c38c6e6f621fc1f0614",
+          "project": "portrait-webkit",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-b2553693741ab492654f",
+          "project": "landscape-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "battle previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d6bca5327f28cae251bf",
+          "project": "landscape-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "run previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "dc51ed921d1e48686c08-7e6d5e0ba1a42d5be1e3",
+          "project": "landscape-webkit",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "titlePath": [
+            "dungeon-lifecycle.spec.ts",
+            "dungeon previous-format recovery preserves and exports both original slots"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-71d264aac7397b9370be",
+          "project": "landscape-webkit",
+          "file": "dungeon.spec.ts",
+          "title": "Ranger legal progression journey earns level three uses Mark and Pin and resumes",
+          "titlePath": [
+            "dungeon.spec.ts",
+            "Ranger legal progression journey earns level three uses Mark and Pin and resumes"
+          ],
+          "tags": [],
+          "timeout": 30000,
+          "expectedStatus": "passed"
+        }
+      ],
+      "rawSha256": "b6914c55d399f28226b42b6b8293be5cef9fbc4f5497ec3518d8c08e5dcf486d",
+      "file": "playwright.exploration.config.ts.json.gz",
+      "gzipSha256": "ffec6d4fe5e2f307964b28d7dd300c956d4319769e058b4784e50a9731784b54"
+    },
+    {
+      "config": "playwright.device-acceptance.config.ts",
+      "before": 54,
+      "after": 54,
+      "retained": 54,
+      "added": [],
+      "rawSha256": "ab7c6872337a39cf8d861b505956cb16a386d56c17f17daa5625fac1c5472021",
+      "file": "playwright.device-acceptance.config.ts.json.gz",
+      "gzipSha256": "a3c3d6853173194a22ff043e6a61b1afea48f6784ee252d9ac98416902a68f68"
+    }
+  ]
+}

@@ -6,7 +6,9 @@ import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
 import {replayRunBattle} from '../src/domain/runBattle';
 // Exercise actual BFCache rather than Playwright's default disabled cache.
-test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+test.use({launchOptions:async({browserName},use)=>{
+  await use({executablePath:browserName==='chromium'?process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE:undefined,ignoreDefaultArgs:['--disable-back-forward-cache']});
+}});
 import {legalDefeatSaves} from './helpers/runRecoveryFixtures';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 async function loadLegalDefeat(page:Page){

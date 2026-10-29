@@ -1,0 +1,15 @@
+{
+  "parent": "04e9dbe28f2828c41bc4d8e0fb452b4f6b55a324",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "files": {
+    "src/phaser/BattleScene.ts": "874ffeb312761469d6d4d8be0f2c433d6b016add89fd6080a4637ce09f58e9b1",
+    "src/domain/progression.ts": "c1ce5a3f7b47bfabd7d82d5b2b4e5a7e27370353ab890c5646aa4e2c709fb9a1",
+    "src/content/catalog.ts": "a85cf530e5dc663fb7037621254296c8f15a0d1d39c7bb7f63615a5a828ebeaf",
+    "tests/unit/progression.test.ts": "ff0a9a81e99250c56d373e82b4d13a0e23fbf99e04be1617764af061b77c9fbe",
+    "tests/unit/battlePersistence.test.ts": "5605a075a8e3313c38ca2209e702220a893e25504136efea55087b8322a518f4",
+    "tests/battle-persistence.spec.ts": "737e59bdd85373718ffe5e0a6d0df0b18be15f28088a4527e6b99a2f9ba737c2",
+    "playwright.config.ts": "fbc65607c78c0a2a7edf0b8e931c69ba93225db4d9a362c8eba9a9310958d024",
+    "package-lock.json": "e31871b78d9c1444b26db7c3311c24e0234d4c6df4b694b9d3943fb9a67e62c7"
+  }
+}

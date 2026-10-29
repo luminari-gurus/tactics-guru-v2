@@ -17,13 +17,22 @@ test('generated production board picks, moves and resumes the same desert after 
  const region=await page.locator('#battle-board-region').boundingBox();expect(region).not.toBeNull();
  await page.mouse.move(region!.x+region!.width/2,region!.y+region!.height/2);await page.mouse.wheel(0,-100);
  await page.mouse.down();await page.mouse.move(region!.x+region!.width/2+18,region!.y+region!.height/2+12);await page.mouse.up();
- await page.setViewportSize({width:page.viewportSize()!.width,height:page.viewportSize()!.height+20});
+ const resized={width:page.viewportSize()!.width,height:page.viewportSize()!.height+20};
+ await page.setViewportSize(resized);
+ // Browser resize resolves before Phaser's next fit/report; use the settled camera.
+ await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
  const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 
  // Select a known flat central cell through production pointer picking.
  const cell={x:5,y:6};
  await page.mouse.click(report.transform.x+(cell.x-cell.y)*40*report.transform.scale,report.transform.y+(cell.x+cell.y)*20*report.transform.scale);
- expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected).toMatchObject(cell);
+ const clicked=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+ await test.info().attach('resize-picking.json',{contentType:'application/json',body:JSON.stringify({
+  expectedViewport:resized,before:{viewport:report.viewport,region:report.region,transform:report.transform},
+  after:{viewport:clicked.viewport,region:clicked.region,transform:clicked.transform},cell,
+  tile:catalog.maps[snapshot.activeBattle.mapId].cells.find(c=>c.x===cell.x&&c.y===cell.y),selected:clicked.selected,
+ })});
+ expect(clicked.selected).toMatchObject(cell);
  const session=await readSession(page),actor=session.state.initiative[session.state.activeIndex];
  const reach=previewMovement(session.state,actor,catalog);expect(reach.ok).toBe(true);
  if(!reach.ok)throw Error('Movement unavailable');
@@ -49,6 +58,7 @@ test('authored final entry preserves carried heroes and equipped projection',asy
  const current=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
  expect(current.battlefield.kind).toBe('authored');expect(current.activeBattle.mapId).toBe('map:ruined_approach');
  expect(current.activeBattle.units.filter((u:any)=>u.side==='player').map((u:any)=>({heroId:u.defId,hp:u.hp}))).toEqual(items.run.party.filter(h=>h.hp>0).map(({heroId,hp})=>({heroId,hp})));
+ expect(current.items.run.party).toEqual(items.run.party);
  expect(runBattleCatalog(current.items,runContext)!.heroes.fighter.stats.armorClass).toBe(runContext.catalog.heroes.fighter.stats.armorClass+1);
  await page.screenshot({path:test.info().outputPath('authored-final.png')});
 });

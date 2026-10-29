@@ -1,0 +1,177 @@
+{
+  "status": "partial; full run is live",
+  "source": "789161cc2efcb4c7dd9034b524d0e799bc27644b",
+  "runDirectory": "/tmp/tactics-issue-164-20261027/tmp/verification/full-2026-10-27T11-14-39.281Z-2506569",
+  "components": [
+    {
+      "id": "chromium",
+      "counts": {
+        "total": 718,
+        "expected": 710,
+        "unexpected": 5,
+        "flaky": 0,
+        "skipped": 3,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [
+        {
+          "id": "5b20c66b090c902460b9-83ca08ef6ff0cbf0febd",
+          "project": "mobile-landscape",
+          "title": "HTML5 per-element permission survives enabled restart"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d0c8b0be2f7bd0f69366",
+          "project": "desktop",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-d66588facbe332f19920",
+          "project": "mobile-portrait",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "048cec556759de4a1f3c-5c91861200b05c3970aa",
+          "project": "mobile-landscape",
+          "title": "clearing the native movement destination clears intent and preview without changing saves"
+        },
+        {
+          "id": "32f393a4e32272813f9b-2d79bf388bde84f15543",
+          "project": "mobile-portrait",
+          "title": "generated production board picks, moves and resumes the same desert after camera changes"
+        }
+      ],
+      "skips": [
+        {
+          "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+          "project": "desktop",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+          "project": "mobile-portrait",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        },
+        {
+          "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+          "project": "mobile-landscape",
+          "title": "controlled placement failure preserves complete state and supports retry"
+        }
+      ]
+    },
+    {
+      "id": "fixtures",
+      "counts": {
+        "total": 81,
+        "expected": 81,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "placement-dev",
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    },
+    {
+      "id": "webkit-acceptance",
+      "counts": {
+        "total": 54,
+        "expected": 54,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "workers": 1,
+      "failures": [],
+      "skips": []
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "chromium.json.gz",
+      "rawSha256": "9a27fb118eb159d1a920759ee8623cf8ea52c6d5c576ece69706a10aa1b5c64e",
+      "gzipSha256": "170affcab1b216edb486006f30719d70b02f792fc765c061e6f8ff37891137c6"
+    },
+    {
+      "file": "chromium.log.gz",
+      "rawSha256": "10889813106a43cdc02be5f25baf7b1cfda0ca70841a3cf177864be28d90dbf3",
+      "gzipSha256": "c390b76af0afcf36d02712b8e66561edba4e46a0d18a5e3ceb712245329faa76"
+    },
+    {
+      "file": "fixtures.json.gz",
+      "rawSha256": "4f45555061804390fe889e09d819dd2087c848a7646fcf0c62bd1a2f5910e5e6",
+      "gzipSha256": "40fb10fecaa504cb6c473e036c60ccd3631399d0c64a42ed8adceeb5c27cb330"
+    },
+    {
+      "file": "fixtures.log.gz",
+      "rawSha256": "8917338f3c97ae34937fc74ac80a9909651f427b2727075cdcd9d6a66091a2e9",
+      "gzipSha256": "d6ad84d12f10af3999e96eb53b7d82b08f8267c0c4631ffc6f0c5901fe02b92b"
+    },
+    {
+      "file": "placement-dev.json.gz",
+      "rawSha256": "01bb97cdcadd37e58c516bb4b5eddda33521bb332bc0d8f2d9da1f55fb1b31f5",
+      "gzipSha256": "302acb67e97cad7ceda44a94c9379cf17c5f81d378439fc9d94104cf4fbf47d5"
+    },
+    {
+      "file": "placement-dev.log.gz",
+      "rawSha256": "b24cc74d599bc590a93c388c5db3ad62e1a37d2df39f52c81142d24b22441dc1",
+      "gzipSha256": "4842d8eac7bb11fd2e9478c81e2701c393f99d50b4fb9e973bec1a71e77ac93f"
+    },
+    {
+      "file": "webkit-acceptance.json.gz",
+      "rawSha256": "650098c732ad61e28990ccba025c7c207c26ec978dc77b7cc5631f077a6df077",
+      "gzipSha256": "b4320dfc801ddf576709aae437fdab2e6fcc8d8972c79601ddd3fc52c5d85e90"
+    },
+    {
+      "file": "webkit-acceptance.log.gz",
+      "rawSha256": "cff425ea3e8005417e81773ce1f889d40e02ab1dad7bd13b178c223745ad77df",
+      "gzipSha256": "eb3a9320e05b7899703ad39b0f8d8a718d78945b565a17e7ff6c389d9a7ce638"
+    },
+    {
+      "file": "procedural-grids-generated-51ceb-desert-after-camera-changes-mobile-portrait--error-context.md.gz",
+      "rawSha256": "e74251aa70c785154ca2dd66168aabcf4a9ec754f2f55d2325fed7163065c744",
+      "gzipSha256": "d30a7c6e17750d43928a34ad78a3e9bf621afdf9b7eb73ae63360d12954f7d0c"
+    },
+    {
+      "file": "battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-portrait--error-context.md.gz",
+      "rawSha256": "fad835e083cb5f1cf77c231c646c4a8d0e2b88245db7b6fc8be82af2c089b4dc",
+      "gzipSha256": "4ccb8933ac3cd27a6b86032fb66d58a2a958e46b839d5dc0431f57402bab826d"
+    },
+    {
+      "file": "battle-loop-clearing-the-n-819ea-view-without-changing-saves-mobile-landscape--error-context.md.gz",
+      "rawSha256": "97b8e486775988b8aa5b18b09229aaca1852fc19f3cbce1d9d72ab6e4511e4cd",
+      "gzipSha256": "bf90e5fb51ec48da3ace0326deb885efd81427095d13365ab1c679d7426a7e9a"
+    },
+    {
+      "file": "battle-loop-clearing-the-n-819ea-view-without-changing-saves-desktop--error-context.md.gz",
+      "rawSha256": "fad835e083cb5f1cf77c231c646c4a8d0e2b88245db7b6fc8be82af2c089b4dc",
+      "gzipSha256": "4ccb8933ac3cd27a6b86032fb66d58a2a958e46b839d5dc0431f57402bab826d"
+    },
+    {
+      "file": "battle-audio-HTML5-per-ele-dbc98-on-survives-enabled-restart-mobile-landscape--error-context.md.gz",
+      "rawSha256": "b3d65486d8e9fbc3a5e36cf8b3a7ee4a236b05270b96d4c2e890e3ef5d908aca",
+      "gzipSha256": "34cac0598f434709b0623d546f4c5880ec74953eb4244b8f5c0508f3fd6488ff"
+    },
+    {
+      "file": "source-identity.json.gz",
+      "rawSha256": "1081373c9c7d26c9dd5afdeb12d07c7e6a0df4ba84511f3d9db0099f7df336e6",
+      "gzipSha256": "0cb42a4e05f3971b16d52c241638fdefd31226f8620097c113cef7f173fbaf6c"
+    }
+  ]
+}

@@ -6,11 +6,22 @@ export interface Versions {
   readonly rng: typeof RNG_VERSION;
   readonly content: string;
 }
+export interface MovementBlock {
+  readonly sourceId: number;
+  readonly abilityId: 'ability:pinning_shot' | 'ability:frost_snare';
+}
 export type UnitState = {
   readonly id: number; readonly cell: CellPosition; readonly hp: number;
   readonly hasMoved: boolean; readonly hasActed: boolean;
   /** Guarded Strike is active until this unit's next turn; absence means inactive. */
   readonly guarded?: true;
+  readonly secondWindUsed?: true;
+  /** One living opposing Fighter; expires after this unit's next accepted endTurn. */
+  readonly tauntedBy?: number;
+  /** One living opposing Ranger; consumed by the next player attack roll. */
+  readonly markedBy?: number;
+  /** Blocks ordinary movement until this target ends its next turn. */
+  readonly movementBlock?: MovementBlock;
 } & ({ readonly side: 'player'; readonly defId: HeroId } | { readonly side: 'enemy'; readonly defId: EnemyId });
 /** Snapshot data only: no duplicated grid/stats or scene references. */
 export interface BattleState {
@@ -30,7 +41,8 @@ export type Command =
 export type RejectionReason = 'malformedCommand' | 'invalidState' | 'battleOver' | 'commandLimit' | 'unknownUnit' |
   'unitDefeated' | 'notActiveUnit' | 'alreadyMoved' | 'outOfBounds' | 'sameCell' | 'notWalkable' |
   'occupied' | 'unreachable' | 'alreadyActed' | 'unknownAbility' | 'abilityNotOwned' |
-  'wrongTargetKind' | 'missingTarget' | 'targetDefeated' | 'sameSide' | 'outOfRange' | 'blockedLos' | 'wrongMissileCount' | 'targetsTooFarApart';
+  'wrongTargetKind' | 'missingTarget' | 'targetDefeated' | 'sameSide' | 'outOfRange' | 'blockedLos' | 'wrongMissileCount' | 'targetsTooFarApart' |
+  'fullHealth' | 'useExhausted' | 'selfTargetRequired' | 'tauntedTargetRequired' | 'alreadyImmobilized' | 'immobilized';
 export type Rejection = { readonly ok: false; readonly reason: RejectionReason };
 export type CommandPreview = { readonly ok: true; readonly command: Command } | Rejection;
 /** Events are data contracts, not implementations of combat or turn flow. */
@@ -46,6 +58,10 @@ export type BattleEvent =
   | { readonly type: 'damaged'; readonly unitId: number; readonly damage: number; readonly hp: number }
   | { readonly type: 'defeated'; readonly unitId: number }
   | { readonly type: 'guarded' | 'guardExpired'; readonly unitId: number }
+  | { readonly type: 'healed'; readonly unitId: number; readonly healing: number; readonly hp: number }
+  | { readonly type: 'taunted' | 'tauntExpired'; readonly unitId: number; readonly sourceId: number }
+  | { readonly type: 'marked' | 'markConsumed' | 'markExpired'; readonly unitId: number; readonly sourceId: number }
+  | { readonly type: 'movementBlocked' | 'movementBlockExpired'; readonly unitId: number; readonly sourceId: number; readonly abilityId: MovementBlock['abilityId'] }
   | { readonly type: 'battleEnded'; readonly outcome: Exclude<BattleState['outcome'], 'ongoing'> };
 export type CommandResult = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Rejection;
 /** Initial boundary + accepted intents; replayBattle (turns.ts) re-executes them. */

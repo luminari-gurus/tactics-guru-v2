@@ -2,7 +2,7 @@ import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, test, type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
-import { battleCatalog } from '../src/content/catalog';
+import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { previewMovement } from '../src/domain/grid';
 import { combatStats } from '../src/domain/effects';
 import { createBattle, dispatch } from '../src/domain/turns';

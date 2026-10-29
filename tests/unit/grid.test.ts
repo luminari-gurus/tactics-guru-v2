@@ -1,3 +1,4 @@
+import { STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { assert, expect, it, vi } from 'vitest';
 import { catalogFixture } from './fixtures/contentContract';
 import type { ContentCatalog } from '../../src/content/types';
@@ -14,7 +15,7 @@ function fixture(edit: (cells: { elevation: number; terrainId: import('../../src
     spawns: [{id:1,side:'heroes' as const,unitId:'fighter' as const,x:0,y:0},{id:2,side:'enemies' as const,unitId:'goblin_grunt' as const,x:3,y:2}] };
   edit(map.cells);
   const c = {...catalog,maps:{[map.id]:map}};
-  const state: BattleState = {format:1,versions:{rules:2,rng:1,content:contentVersion(c)},seed:1,rng:seedRng(1),mapId:map.id,
+  const state: BattleState = {format: STATE_FORMAT_VERSION,versions:{rules: RULES_VERSION,rng:1,content:contentVersion(c)},seed:1,rng:seedRng(1),mapId:map.id,
     units:[{id:1,side:'player',defId:'fighter',cell:{x:0,y:0},hp:18,hasMoved:false,hasActed:false},{id:2,side:'enemy',defId:'goblin_grunt',cell:{x:3,y:2},hp:18,hasMoved:false,hasActed:false}],initiative:[1,2],activeIndex:0,round:1,outcome:'ongoing',commandCount:0};
   return {catalog:c,map,state};
 }

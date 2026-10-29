@@ -2,7 +2,7 @@ import type { Command } from '../src/domain/types';
 import { expect, test, type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { dispatch } from '../src/domain/turns';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
@@ -12,7 +12,9 @@ import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPr
 import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
 
 // Include real cached-document return, matching the persistence regression suite.
-test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+test.use({launchOptions:async({browserName},use)=>{
+  await use({executablePath:browserName==='chromium'?process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE:undefined,ignoreDefaultArgs:['--disable-back-forward-cache']});
+}});
 
 const kinds = ['guarded_strike','high_shot','magic_missile'] as const;
 type Outcome = 'any'|'miss'|'critical'|'defeat';
@@ -355,11 +357,12 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
   expect(actor.hasActed).toBe(true);expect(!!actor.guarded).toBe(ability==='ability:guarded_strike');
   const ac=catalog.heroes.fighter.stats.armorClass+(actor.guarded?2:0);
   await expect(page.locator('#battle-stats')).toContainText(`AC ${ac}`);
-  await expect(page.locator('#battle-status')).toHaveText(actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects');
+  const status=actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects';
+  await expect(page.locator('#battle-status')).toHaveText(status);
   await expect(page.locator('[data-action="basic"]')).toBeDisabled();await expect(page.locator('#battle-availability')).toContainText('Action spent');
   await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${actor.id}`).click();
   await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${ac}`);
-  await expect(page.locator('#battle-dialog-message')).toContainText(actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects');
+  await expect(page.locator('#battle-dialog-message')).toContainText(status);
   await page.locator('#inspection-close').click();expect((await readSession(page)).state).toEqual(state);
 });
 

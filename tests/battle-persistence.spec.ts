@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
-import { battleCatalog as catalog } from '../src/content/catalog';
+import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { confirmRestart, playCommand, playerDecision, readSession } from './helpers/battlePolicy';
 import { BattleSession } from '../src/app/BattleSession';
 import { previewMovement } from '../src/domain/grid';
@@ -10,7 +10,9 @@ import { RULE_BOUNDS } from '../src/domain/constants';
 import type { BattleState } from '../src/domain/types';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
-test.use({launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,ignoreDefaultArgs:['--disable-back-forward-cache']}});
+test.use({launchOptions:async({browserName},use)=>{
+  await use({executablePath:browserName==='chromium'?process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE:undefined,ignoreDefaultArgs:['--disable-back-forward-cache']});
+}});
 
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);

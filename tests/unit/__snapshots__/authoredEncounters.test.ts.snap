@@ -8,4 +8,4 @@ exports[`resolves the ordered run and reuses immutable single-battle definitions
 ]
 `;
 
-exports[`resolves the ordered run and reuses immutable single-battle definitions and assets > unchanged single-battle identity 1`] = `"sha256:c5659e71918e4ebccc31be76ffc04153e2913678c1f04558161944e2ace96450"`;
+exports[`resolves the ordered run and reuses immutable single-battle definitions and assets > unchanged single-battle identity 1`] = `"sha256:d5e89333b0a4c8c7e88bb69c0bf2065ad67ebbf6b996a47ad984f27447bdee16"`;

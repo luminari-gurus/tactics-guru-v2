@@ -97,7 +97,7 @@ Keep exact commands, final relevant source hashes/build ID, browser/runtime/host
 
 ## Migration Plan
 
-The caller subsequently expanded scope: dungeon enemies advance once per accepted player step and entering any live marker starts its encounter. Format 5 stores positions, cleared slots and movement RNG, and reads format 4; older builds cannot be assumed to read format 5. No placement versions or dependencies change. Deliver one feature PR after explicit approval and verified acceptance; do not deploy or merge automatically. Reverting the feature removes movement without converting stored data. Keep OpenSpec unarchived until merge and a separate archive request.
+The caller subsequently expanded scope: dungeon enemies advance once per accepted player step and entering any live marker starts its encounter. After integrating the newer ability rules, format 8 stores positions, cleared slots and movement RNG and reads format 7; older builds cannot be assumed to read format 8. No placement versions or dependencies change. Deliver one feature PR after explicit approval and verified acceptance; do not deploy or merge automatically. Reverting the feature removes movement without converting stored data. Keep OpenSpec unarchived until merge and a separate archive request.
 
 ## Scope review
 
@@ -114,4 +114,4 @@ Use the full affected map browser file after final runtime changes, then run bot
 
 ## Dungeon integration (caller clarification)
 
-The `/map` prototype is independent, stationary and encounter-free. The earlier timer and pause design above is superseded by this caller clarification. In `/dungeon`, an accepted player step either enters the touched uncleared enemy battle or advances each live enemy once using the existing movement policy and a separate saved RNG. Waiting and rejected commands never advance movement. Position, enemy movement and entry are saved atomically in one revision. Encounters can be cleared in any order; descent requires all three. Continue validates format-4 saves and upgrades them on progress. Shared save and route changes require full regression under the verification policy.
+The `/map` prototype is independent, stationary and encounter-free. The earlier timer and pause design above is superseded by this caller clarification. In `/dungeon`, an accepted player step either enters the touched uncleared enemy battle or advances each live enemy once using the existing movement policy and a separate saved RNG. Waiting and rejected commands never advance movement. Position, enemy movement and entry are saved atomically in one revision. Encounters can be cleared in any order; descent requires all three. Continue validates format-7 saves and upgrades them on progress. Shared save and route changes require full regression under the verification policy.

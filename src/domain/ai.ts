@@ -8,6 +8,7 @@ import { cellKey, routeDistances } from './routes';
 import { dispatch } from './turns';
 import type { BattleEvent, BattleState, Command, Rejection } from './types';
 import { isDenseArray, isPlainRecord } from './validation';
+import { tauntSource } from './effects';
 
 export type EnemyRejection = Rejection | { readonly ok: false; readonly reason: 'notEnemyUnit' };
 export type EnemyPlan = { readonly ok: true; readonly commands: readonly Command[] } | EnemyRejection;
@@ -66,7 +67,8 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
       if (moved.ok) positions.push({ cell, cost, state: moved.state, move });
     }
   }
-  const targets = state.units.filter(u => u.side === 'player' && u.hp > 0).sort((a, b) => a.id - b.id);
+  const source=tauntSource(actor,state.units);
+  const targets = state.units.filter(u => u.side === 'player' && u.hp > 0 && (!source || u.id===source.id)).sort((a, b) => a.id - b.id);
   const abilities = Object.values(catalog.abilities).filter(a => a.kind === 'attack' && a.owners.includes(actor.defId))
     .sort((a, b) => lexical(a.id, b.id));
   const attacks: AttackCandidate[] = [];

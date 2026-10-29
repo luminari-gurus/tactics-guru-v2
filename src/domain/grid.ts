@@ -2,6 +2,7 @@ import type { CellPosition, ContentCatalog } from '../content/types';
 import { previewCommand, readBattleState } from './battle';
 import { movementEdgeCost } from './movementEdge';
 import { MOVEMENT_DIRECTIONS } from './constants';
+import { movementBlockSource } from './effects';
 import type { BattleState, Command, CommandResult, Rejection } from './types';
 
 type ReachableCell = { readonly cell: CellPosition; readonly cost: number };
@@ -43,7 +44,9 @@ export function previewMovement(state: unknown, unitId: number, catalog: Content
   const intent = previewCommand(state, { type: 'endTurn', unitId }, catalog);
   if (!intent.ok) return intent;
   const checked = readBattleState(state, catalog); if (!checked.ok) return checked;
-  if (checked.state.units.find(u => u.id === unitId)!.hasMoved) return { ok: false, reason: 'alreadyMoved' };
+  const unit = checked.state.units.find(u => u.id === unitId)!;
+  if (unit.hasMoved) return { ok: false, reason: 'alreadyMoved' };
+  if (movementBlockSource(unit, checked.state.units)) return { ok: true, cells: [{ cell: { ...unit.cell }, cost: 0 }] };
   return { ok: true, cells: [...search(checked.state, unitId, catalog).values()].sort(compare).map(({ cell, cost }) => ({ cell, cost })) };
 }
 export function previewMove(state: unknown, input: unknown, catalog: ContentCatalog): { readonly ok: true; readonly command: Extract<Command, {type: 'move'}>; readonly path: readonly CellPosition[]; readonly cost: number } | Rejection {
@@ -54,6 +57,7 @@ export function previewMove(state: unknown, input: unknown, catalog: ContentCata
   const snapshot = checked.state; const command = intent.command;
   const unit = snapshot.units.find(u => u.id === command.unitId)!;
   if (unit.hasMoved) return { ok: false, reason: 'alreadyMoved' };
+  if (movementBlockSource(unit, snapshot.units)) return { ok: false, reason: 'immobilized' };
   const map = catalog.maps[snapshot.mapId]; const to = command.to;
   if (to.x >= map.width || to.y >= map.height) return { ok: false, reason: 'outOfBounds' };
   if (key(to) === key(unit.cell)) return { ok: false, reason: 'sameCell' };

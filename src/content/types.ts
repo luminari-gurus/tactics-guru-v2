@@ -25,7 +25,27 @@ export interface MagicMissileAbility {
   readonly id: AbilityId; readonly kind: 'magicMissile'; readonly owners: readonly UnitId[];
   readonly casterLevel: number; readonly rangeMin: number; readonly rangeMax: number;
 }
-export type Ability = AttackAbility | MagicMissileAbility;
+export type FighterAbility = {
+  readonly id: AbilityId; readonly owners: readonly UnitId[];
+} & (
+  | { readonly kind: 'secondWind'; readonly requiredLevel: number; readonly rangeMin: number; readonly rangeMax: number;
+      readonly target: 'self'; readonly healBase: 4; readonly usesPerBattle: 1 }
+  | { readonly kind: 'taunt'; readonly requiredLevel: number; readonly rangeMin: number; readonly rangeMax: number;
+      readonly target: 'hostile'; readonly duration: 'targetTurnEnd' }
+);
+export type RangerAbility = {
+  readonly id: AbilityId; readonly owners: readonly UnitId[]; readonly requiredLevel: number;
+  readonly rangeMin: number; readonly rangeMax: number; readonly target: 'hostile';
+} & (
+  | { readonly kind: 'markTarget'; readonly accuracyBonus: 2; readonly duration: 'nextPlayerAttackRoll' }
+  | { readonly kind: 'pinningShot'; readonly duration: 'targetTurnEnd' }
+);
+export interface FrostSnareAbility {
+  readonly id: AbilityId; readonly kind: 'frostSnare'; readonly owners: readonly UnitId[];
+  readonly requiredLevel: number; readonly rangeMin: number; readonly rangeMax: number;
+  readonly target: 'hostile'; readonly duration: 'targetTurnEnd';
+}
+export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility;
 export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock';
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */

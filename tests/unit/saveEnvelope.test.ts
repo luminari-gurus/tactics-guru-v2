@@ -8,7 +8,7 @@ import { validateContent } from '../../src/content/validate';
 import { planEnemyTurn } from '../../src/domain/ai';
 import { contentVersion, readReplay } from '../../src/domain/battle';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { RNG_WARMUP_DRAWS, RULE_BOUNDS, UINT32_RANGE } from '../../src/domain/constants';
+import { RNG_WARMUP_DRAWS, RULE_BOUNDS, UINT32_RANGE, STATE_FORMAT_VERSION, RULES_VERSION } from '../../src/domain/constants';
 import { nextUint32 } from '../../src/domain/rng';
 import { createBattle, dispatch, replayBattle } from '../../src/domain/turns';
 import { decodeBattleSave, encodeBattleSave, SAVE_KIND, SAVE_MAX_CODE_UNITS, SAVE_MAX_MAP_ID_CODE_UNITS } from '../../src/domain/saveEnvelope';
@@ -40,14 +40,14 @@ describe('accepted snapshot boundaries', () => {
       const actor = state.units.find(u => u.id === state.initiative[state.activeIndex])!;
       const plan = actor.side === 'enemy' ? planEnemyTurn(state, actor.id, battleCatalog) : null;
       if (plan) assert(plan.ok);
-      const command = plan?.ok ? plan.commands[0] : playerDecision(state);
+      const command = plan?.ok ? plan.commands[0] : playerDecision(state,battleCatalog);
       if (seed === 2 && state.commandCount === 29) {
         postAttackBoundary = true;
         expect(actor).toMatchObject({ id: 5, cell: { x: 3, y: 4 }, hasActed: true, hasMoved: false });
         expect(command).toEqual({ type: 'endTurn', unitId: 5 });
       }
       // Select the original session's command independently; its existing queue is the oracle.
-      if (session.phase === 'player') expect(session.prepare(playerDecision(session.state)).ok).toBe(true);
+      if (session.phase === 'player') expect(session.prepare(playerDecision(session.state,session.catalog)).ok).toBe(true);
       const step = session.phase === 'player' ? session.confirm() : session.nextEnemy(); assert(step);
       expect(command).toEqual(session.replay!.commands.at(-1));
       expect(dispatch(state, command, battleCatalog)).toEqual({ ok: true, state: step.after, events: step.events });
@@ -75,7 +75,7 @@ describe('accepted snapshot boundaries', () => {
       expect(planEnemyTurn(result.state, actor.id, catalog)).toEqual(enemy);
       const stopped = state.outcome !== 'ongoing' || state.commandCount === RULE_BOUNDS.commandCount.max;
       const command = stopped ? { type: 'endTurn' as const, unitId: actor.id }
-        : enemy.ok ? enemy.commands[0] : playerDecision(state);
+        : enemy.ok ? enemy.commands[0] : playerDecision(state,battleCatalog);
       const next = dispatch(state, command, catalog);
       expect(dispatch(result.state, command, catalog)).toEqual(next);
       if (stopped) expect(next).toEqual({ ok: false, reason: state.outcome !== 'ongoing' ? 'battleOver' : 'commandLimit' });
@@ -91,7 +91,7 @@ describe('accepted snapshot boundaries', () => {
     const before = encoded(session.state, battleCatalog);
     expect(session.prepare({ type: 'move', unitId: session.active.id, to: { x: -1, y: -1 } }).ok).toBe(false);
     expect(encoded(session.state, battleCatalog)).toBe(before);
-    const command = playerDecision(session.state);
+    const command = playerDecision(session.state,session.catalog);
     expect(session.prepare(command).ok).toBe(true);
     expect(session.pending).not.toBeNull();
     expect(encoded(session.state, battleCatalog)).toBe(before);
@@ -169,8 +169,8 @@ describe('untrusted serialized input', () => {
     invalid(JSON.stringify({ ...envelope, digest: 'sha256:' + '0'.repeat(64) }), 'corrupt');
     for (const format of [0, 2, '1']) invalid(JSON.stringify({ ...envelope, format }), 'incompatible');
     invalid(JSON.stringify({ ...envelope, kind: 'tactics-guru:battle-replay' }), 'incompatible');
-    invalid(wrap({ ...envelope.payload, format: 2 }), 'incompatible');
-    for (const [key, value] of [['rules', 1], ['rng', 2], ['content', 'sha256:' + '0'.repeat(64)]]) {
+    invalid(wrap({ ...envelope.payload, format: STATE_FORMAT_VERSION+1 }), 'incompatible');
+    for (const [key, value] of [['rules', RULES_VERSION-1], ['rng', 2], ['content', 'sha256:' + '0'.repeat(64)]]) {
       invalid(wrap({ ...envelope.payload, versions: { ...envelope.payload.versions, [key]: value } }), 'incompatible');
     }
     const changed: ContentCatalog = { ...battleCatalog, heroes: { ...battleCatalog.heroes,

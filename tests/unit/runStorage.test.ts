@@ -1,4 +1,5 @@
 import { assert, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRunStorage, RUN_STORAGE_KEYS as keys } from '../../src/persistence/runStorage';
 import { BATTLE_STORAGE_KEYS } from '../../src/persistence/battleStorage';
@@ -11,6 +12,11 @@ function fixture() {
     removeItem(key: string) { if (fail === 'remove') throw Error('failed'); data.delete(key); } };
   return { data, storage: createRunStorage(runContext, () => store), fail(value: string) { fail = value; } };
 }
+it('preserves exact run-5 bytes from e2f0cdd without implicit migration or writes',()=>{
+  const f=fixture(),raw=readFileSync('tests/fixtures/saves/issue-165/run.json','utf8');f.data.set(keys.primary,raw);f.data.set(keys.backup,raw);const before=[...f.data];
+  const load=f.storage.load();assert(load.ok);expect(load.selected).toBeNull();expect(load.inspection.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
+  expect(f.storage.save(preparedSnapshot())).toMatchObject({ok:false,reason:'recoveryRequired'});expect([...f.data]).toEqual(before);
+});
 it('saves only owned keys, rotates validated backup and preserves recovery on failed primary publication', () => {
   const f = fixture();
   expect(f.storage.save(rewardSnapshot()).ok).toBe(true);
