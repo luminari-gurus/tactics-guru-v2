@@ -5,7 +5,7 @@ Implementation approval is pending. All tasks below remain unstarted.
 ## 1. Approval and supplied artwork
 
 - [ ] 1.1 Record explicit caller approval of this proposal/design, including Continue selection, dungeon New Game, bounded dialog destinations, and `/battle` routing; verify approval in the conversation before application/test edits.
-- [ ] 1.2 Recover the exact supplied title from an original attachment or renewed URL, inspect it and retain source/hash/provenance; verify aspect ratio and correspondence to the requested image. The current URL returns 403; do not substitute a concept image silently.
+- [x] 1.2 Receive the caller-designated title attachment, inspect it, and retain the unchanged original with source/hash/provenance. Supplied `Tactics Guru.webp` is saved at `docs/art/issue-153/source/tactics-guru.webp`; metadata confirms 2172×724 (3:1) with alpha. The caller explicitly identified it as the title image; the earlier Discord 403 no longer blocks source availability.
 - [ ] 1.3 Refresh current main and coordinate with active work without importing unmerged PRs; record source identity and confirm the approved scope still applies using status/diff and open-PR inspection.
 
 ## 2. Routes and isolated entry
@@ -24,7 +24,7 @@ Implementation approval is pending. All tasks below remain unstarted.
 ## 4. Menu presentation and bounded destinations
 
 - [ ] 4.1 Render the ordered action definition and separate title/control/background layers with portrait CSS, safe areas and scrolling; verify native keyboard focus/disabled state, minimum target size, touch portrait/landscape, 320px width, short viewport, 200% text and reduced motion. Retain screenshots and update design documentation to describe implemented behavior.
-- [ ] 4.2 Derive optimized background assets from the two supplied originals in `docs/art/issue-153/source/`, compare menu readability over both compositions, and import the recovered exact title as a separate stable optimized asset; verify provenance, preserved dimensions, readable composition, local root/prefix requests, transfer/build deltas and independent missing/corrupt image fallbacks. Do not mark this task complete using fallback text alone.
+- [ ] 4.2 Derive optimized background assets from the two supplied originals in `docs/art/issue-153/source/`, compare menu readability over both compositions, and import the supplied title as a separate stable optimized asset; verify provenance, preserved dimensions, readable composition, local root/prefix requests, transfer/build deltas and independent missing/corrupt image fallbacks. Do not mark this task complete using fallback text alone.
 - [ ] 4.3 Implement Records empty-state and Settings with existing privacy controls/audio guidance; verify exact scope, no invented records/settings, keyboard/touch/Escape close and focus return, unavailable preference storage, and privacy behavior without gameplay/save mutation. Document that #176/#180 remain separate work.
 
 ## 5. Integration qualification and delivery

@@ -16,5 +16,16 @@
     "height": 1672,
     "sha256": "5840b31eae166a13ddc13baccd017c5f70564d3b2c10cb33c4a08734339d4696",
     "provenance": "User supplied as menu background source in this conversation on 2026-10-28. Earlier generation/licensing provenance not supplied."
+  },
+  {
+    "name": "Tactics Guru.webp",
+    "file": "tactics-guru.webp",
+    "role": "title",
+    "bytes": 559932,
+    "width": 2172,
+    "height": 724,
+    "hasAlpha": true,
+    "sha256": "3f5c9ab5cb71ffb0a30ade1857b0177dc9c29b32fa39b082c6e2e2e1f3f61943",
+    "provenance": "User supplied and identified as the title image in this conversation on 2026-10-28. Original retained unchanged."
   }
 ]

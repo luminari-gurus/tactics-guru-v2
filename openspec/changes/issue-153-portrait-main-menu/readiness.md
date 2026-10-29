@@ -47,3 +47,7 @@ The host worktree API returned `Not a git repository` for this chat's parent-dir
 Physical availability: caller checkout has no `.env`; availability defaults to `none`, not the example file's value. Required physical platforms: none. AGENTS.md accepts Playwright device emulation.
 
 Planning discovered an external asset limitation: supplied title URL returns HTTP 403. The exact original image or a renewed link is required before artwork completion. No substitution, application edit, runtime test, deployment, or implementation approval is claimed.
+
+## Supplied-artwork follow-up
+
+On 2026-10-28 the caller supplied two background originals and then `Tactics Guru.webp`, explicitly identified as the title image. All three originals are retained unchanged under `docs/art/issue-153/source/`, with dimensions and SHA-256 in `provenance.json`. The title is 2172×724 with alpha. This resolves the earlier title-source availability gap; it does not assert runtime integration or implementation approval.
