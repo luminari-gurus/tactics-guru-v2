@@ -24,7 +24,7 @@ Implementation approval is pending. All tasks below remain unstarted.
 ## 4. Menu presentation and bounded destinations
 
 - [ ] 4.1 Render the ordered action definition and separate title/control/background layers with portrait CSS, safe areas and scrolling; verify native keyboard focus/disabled state, minimum target size, touch portrait/landscape, 320px width, short viewport, 200% text and reduced motion. Retain screenshots and update design documentation to describe implemented behavior.
-- [ ] 4.2 Produce a text-free forest-ruin backdrop using the imagegen skill after approval and import the recovered exact title as a stable optimized asset; verify provenance, preserved dimensions, readable composition, local root/prefix requests, transfer/build deltas and independent missing/corrupt image fallbacks. Do not mark this task complete using fallback text alone.
+- [ ] 4.2 Derive optimized background assets from the two supplied originals in `docs/art/issue-153/source/`, compare menu readability over both compositions, and import the recovered exact title as a separate stable optimized asset; verify provenance, preserved dimensions, readable composition, local root/prefix requests, transfer/build deltas and independent missing/corrupt image fallbacks. Do not mark this task complete using fallback text alone.
 - [ ] 4.3 Implement Records empty-state and Settings with existing privacy controls/audio guidance; verify exact scope, no invented records/settings, keyboard/touch/Escape close and focus return, unavailable preference storage, and privacy behavior without gameplay/save mutation. Document that #176/#180 remain separate work.
 
 ## 5. Integration qualification and delivery
