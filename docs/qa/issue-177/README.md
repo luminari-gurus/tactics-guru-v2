@@ -50,3 +50,5 @@ The second landscape batch passed 102 cases with two expected preview-mode skips
 The direct disposer dev-only case also passed locally in all three Chromium profiles (3/3) on clean source `e3d452b` in dev-server mode, using the same local host/browser conditions listed above. `dev-disposer-local.json.gz` retains the report. This does not replace the queued execution on qualified self-hosted capacity.
 
 The third landscape batch completed 62/62 cases with no skips or retries. Its receipt is retained as `selfhost-landscape-3-receipt.json.gz`.
+
+The self-hosted combined fixture stage passed 87/87 cases, and the separate dev-only placement-failure stage passed 3/3, with no skips or retries. Their receipts are retained as `selfhost-fixtures-receipt.json.gz` and `selfhost-placement-receipt.json.gz`. The separate direct-disposer dev case remains queued in the follow-up run.
