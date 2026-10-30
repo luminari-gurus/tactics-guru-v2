@@ -40,8 +40,8 @@ const oldText = encoded.text;
 const newText = encodedNext.text;
 const reader = (storage: RecordingStorage) => createBattleStorage(battleCatalog, () => storage);
 
-it('preserves exact state-3 rules-4 bytes from e2f0cdd for incompatible-save recovery',()=>{
-  const raw=readFileSync('tests/fixtures/saves/issue-165/battle.json','utf8'),storage=new RecordingStorage(raw,raw),before=[...storage.data];
+it.each(['issue-165','issue-166'])('preserves exact %s previous-format battle bytes for incompatible-save recovery',issue=>{
+  const raw=readFileSync(`tests/fixtures/saves/${issue}/battle.json`,'utf8'),storage=new RecordingStorage(raw,raw),before=[...storage.data];
   const loaded=reader(storage).load();assert(loaded.ok);expect(loaded.selected).toBeNull();expect(loaded.inspection.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
   expect(reader(storage).save(initial.state)).toMatchObject({ok:false,reason:'recoveryRequired'});expect([...storage.data]).toEqual(before);expect(storage.calls.every(c=>c.operation==='read')).toBe(true);
 });

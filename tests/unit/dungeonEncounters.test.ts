@@ -8,6 +8,8 @@ import { createBattle } from '../../src/domain/turns';
 import { dungeonSeed } from '../../src/domain/dungeon';
 import { freshExploration } from '../../src/domain/exploration';
 import { seedRng } from '../../src/domain/rng';
+import { battleCatalog } from '../../src/content/catalog';
+import { authoredEncounters, runCatalog } from '../../src/content/encounters';
 
 it('admits every pool pairing, including generated guardian fallback and all survivor subsets', () => {
   const checked = readDungeonEncounterCatalog(dungeonEncounterCatalog); assert(checked.ok, JSON.stringify(checked));
@@ -25,6 +27,22 @@ it('admits every pool pairing, including generated guardian fallback and all sur
     }
   }
 }, 30000);
+
+it('selects exactly one Shaman at dungeon Forest Ruins spawn 6 without changing canonical or other rosters',()=>{
+  const original=battleCatalog.maps['map:forest_ruins'].spawns;
+  expect(original.map(s=>s.unitId)).toEqual(['fighter','ranger','mage','goblin_grunt','goblin_archer','goblin_grunt']);
+  expect(runCatalog.maps['map:forest_ruins'].spawns).toBe(original);
+  const composition=dungeonEncounterCatalog.compositions.find(c=>c.id==='forest_ruins_shaman_v1')!;
+  expect(composition.roster).toEqual(original.map(s=>s.id===6?{...s,unitId:'goblin_shaman'}:s));
+  expect(composition.roster.filter(s=>s.unitId==='goblin_shaman')).toHaveLength(1);
+  for(const encounter of authoredEncounters.slice(1)) expect(dungeonEncounterCatalog.compositions.find(c=>c.id===encounter.id.slice(10))?.roster).toEqual(runCatalog.maps[encounter.mapId].spawns);
+  for(let seed=0;seed<64;seed++) for(const slot of [0,1]) {
+    const selection=selectDungeonEncounter(seed,1,slot);
+    if(selection.encounter.source.kind==='authored'&&selection.encounter.source.mapId==='map:forest_ruins') {
+      expect(selection.compositionId).toBe('forest_ruins_shaman_v1');expect(selection.encounter.roster).toEqual(composition.roster);
+    } else expect(selection.encounter.roster.some(s=>s.unitId==='goblin_shaman')).toBe(false);
+  }
+});
 
 it.each(['version', 'kind', 'empty', 'duplicate', 'biome', 'pool', 'boss', 'composition', 'authored', 'occupied', 'blocked', 'outside', 'unknownUnit', 'accessor', 'unreferenced'])('rejects invalid catalog %s', problem => {
   const c: any = structuredClone(dungeonEncounterCatalog);
@@ -68,12 +86,12 @@ it('pins deterministic selection, covers all kinds/biomes, and alternates only b
   }))).toMatchSnapshot('selection policy v1');
 });
 
-it('adds only the dungeon access step and preserves existing map geometry and spawns elsewhere', () => {
+it('keeps the dungeon access step and Shaman roster isolated from other modes', () => {
   const original = desertRunCatalog.maps['map:forest_ruins'], dungeon = dungeonBattleCatalog.maps[original.id];
   expect(original.cells.find(c => c.x === 4 && c.y === 2)?.elevation).toBe(0);
   expect(dungeon.cells.find(c => c.x === 4 && c.y === 2)).toEqual({ x: 4, y: 2, elevation: 1, terrainId: 'stone' });
   expect(dungeon.cells.filter((c, i) => c !== original.cells[i])).toHaveLength(1);
-  expect(dungeon.spawns).toEqual(original.spawns);
+  expect(dungeon.spawns).toEqual(original.spawns.map(s=>s.id===6?{...s,unitId:'goblin_shaman'}:s));
 });
 
 it('keeps identity independent of authored array ordering and separates every selection stream', () => {
@@ -122,7 +140,7 @@ it('never mutates baseline stats or scales a previous projection', () => {
   const baseline = structuredClone(desertRunCatalog);
   const a = projectDungeonEnemies(10, 'vault'), b = projectDungeonEnemies(10, 'vault');
   expect(a).toEqual(b); expect(a.enemies).not.toBe(b.enemies); expect(desertRunCatalog).toEqual(baseline);
-  for (const id of ['goblin_grunt', 'goblin_archer'] as const) {
+  for (const id of ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const) {
     const { maxHp, power, accuracy, armorClass, ...rest } = a.enemies[id].stats;
     const { maxHp: h, power: p, accuracy: ac, armorClass: armor, ...original } = baseline.enemies[id].stats;
     expect(rest).toEqual(original);

@@ -1,6 +1,6 @@
 # Issue #166: Goblin Shaman support combat
 
-Date: 2026-10-28 (Asia/Jerusalem). Status: implementation authorized and in progress.
+Started: 2026-10-28; updated: 2026-10-30 (Asia/Jerusalem). Status: implementation complete; foundation merged, runtime in final merge closeout.
 OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
 
 - Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
@@ -22,7 +22,7 @@ OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
   Its QA backlink is updated. Its historical PR-ready wording is preserved;
   PR #250 is now merged and #165 is closed.
 
-## Selection and available work
+## Selection and available work (pickup snapshot)
 
 Reviewed all 30 open issues, their bodies/ownership/dependencies, the three open
 PRs, local/remote branch inventory, current source and uncompleted OpenSpec tasks.
@@ -81,35 +81,108 @@ source-pinned and bounded by existing loading budgets.
 Non-goals: the full #161 effect engine, broader #170 roster, new hero buttons,
 typed damage/resistance, hazards, push/charge, generic resource/stack scripting,
 new services/dependencies, UI redesign, telemetry schema expansion, save migration,
-production deployment and merge. The caller has now authorized implementation,
-testing, commits, pushes and focused review-ready PRs, including dependent stacks.
+production deployment. The implementation authorization covered testing, commits,
+pushes and focused review-ready PRs, including dependent stacks. On 2026-10-30 the
+caller additionally authorized sequential merges, completed-issue closure and safe
+branch/worktree cleanup; release qualification and deployment remain separate.
 
 ## Implementation handoff (live)
 
-- Starting source: clean `b5b450f80405d14a28082c43ba555bcf02f2b11e` on the named
-  branch; fetched `origin/main` remains `7cea1e9`, with no intervening changes.
-- Current work (2026-10-29): foundation PR [#251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251)
-  is open and non-draft, pushed at `d2e211d`. OpenSpec task 1.1 is complete (1/9).
-  Gameplay/placement continues on `branch/issue-166-shaman-support`, based on this
-  branch, with its PR targeting `branch/issue-166-goblin-shaman` until #251 merges.
-  No tag/release/merge/deployment is needed for these review chunks.
-- Environment: Windows Node and installed Windows dependencies work; WSL provides
-  npm, authenticated gh and OpenSpec. Use Windows Node for native dependencies
-  and browser runs; do not replace the shared installed node_modules.
-- Foundation proof: 199 focused content tests, 28 combat/turn fixture tests, 222
-  content-validation tests, both type scopes, production bundle and two root/prefix
-  header integrations pass. The final 27-case desktop/portrait/landscape browser
-  selection passes on installed Chrome via the supported executable override.
-  Setup failures, exact commands/input/build inventory and screenshots are retained
-  in [#166 QA](../qa/issue-166/README.md). No full-issue acceptance is claimed.
-- Browser environment: packaged Windows Chromium fails `spawn UNKNOWN`; installed
-  Chrome 155.0.8059.41 works. Native npm shim in ignored `tmp/issue166/tools/npm.cmd`
-  invokes Node + `C:/Users/apexw/AppData/Local/node/corepack/v1/npm/12.0.2/bin/npm-cli.js`.
-  Add that shim directory to PATH for nested npm/test-server commands. Keep one
-  browser worker; Linux WebKit qualification is still required later.
-- Ablation: retain the existing catalog, pure preview, candidate loop, bounded
-  optional state and event surfaces. No general effect interpreter, configurable
-  scoring framework, new UI controls or asset generation is needed.
+Snapshot: 2026-10-30. **9/9 OpenSpec tasks complete**. Implementation,
+qualification and publication are complete. Foundation #251 is merged as
+`34235bf9dae66fdf63ac75cf6b0b90154a93cc0d`; #252 targets main for final merge.
+Main's intervening #253 changes only documentation. Its enemy-turn conflict is
+reconciled with Shaman scoring/support goals, and save-version descriptions agree
+with 5/6/7/9. All code/test inputs match the qualified functional source.
+No browser jobs are active. Both owned pipelines finished successfully.
+
+- Foundation: `branch/issue-166-goblin-shaman`, functional head **03b1e899ad091ba79ba65b08487204427b23de1e**,
+  [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251), merged.
+- Runtime: `branch/issue-166-shaman-support`, frozen functional source
+  **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252).
+  Later commits update documentation/evidence only. The complete packet is
+  published. #252 and #166 contain the authoritative merge/closure state.
+- Main **b343ab0** (#246/#155) is integrated through the parent. All seven
+  conflicts are resolved. State/rules/run/dungeon versions are **5/6/7/9**;
+  moving encounters and current-format legacy exploration are retained. Exact
+  prior format-7/8 bytes remain recoverable/exportable without migration.
+
+Delivered: source-pinned Shaman stats/art, atomic exact Will-save Hex, one-source
+non-stacking Weakened, capped allied goblin healing, shared stable support AI,
+dungeon-only Forest Ruins composition and existing-surface save/heal/status feedback.
+The support-goal MapCell/x-y defect and fixed-frame backup test assumption are
+repaired. The existing strict reader and every acceptance assertion remain.
+
+### Qualified evidence
+
+[QA](../qa/issue-166/README.md) and its
+[19-family ledger](../qa/issue-166/full-run/qualification.json) contain the current
+acceptance mapping and immutable manifests. Fresh combined-source results:
+**1,069 units**, both type scopes, **two** root/prefix header integrations,
+production bundles, **18 performance samples**, and **360 passing browser
+executions**. Six expected preview map skips pass in their owning dev mode.
+One worker, zero retries/flaky cases, serial GPU use. Engines: Chromium
+**153.0.8010.12**, WebKit **26.6**, Playwright **1.63.0**; device emulation meets
+caller acceptance. Linux Node 24.15.0/npm 12.0.2. The parent separately passes
+**1,032 units** and its type/build gates; published foundation-main receipts are
+linked from #251.
+
+All four production witnesses pass all six profiles. Shaman **31** has 54 accepted
+commands, failed natural 5 and successful natural 13 saves, two heals, active
+Weakened reload/expiry and victory. Its six raw files are byte-identical:
+**e2c0cc8be5e8bfb307cc4e476d436ae4a01fdaca04dc448df7a3adf64fca5456**.
+Fighter **28** retains six battles/level three/heal/Taunt/depth-2-slot-2 defeat;
+Ranger **2** retains Mark/Pin/level three/defeat; Mage **12** retains Snare/multiple
+missiles and terminal replay. Actual states/events/RNG and continuation match.
+
+Input hash: **4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**.
+Root/restored: **9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1**.
+Prefix: **86f20f9cf35f9e4b5f878b9964cb19a99c7fbd28822b28f55a1134bda5c57f40**.
+Root restoration is exact; source/test/config/dependency inputs after the frozen
+head are unchanged (native checkout newlines are recorded separately).
+
+Original full source **4e765f8** remains **failed**: all 19 stages executed,
+17 passed/two failed; 1,286 browser passes/nine failures/nine expected skips.
+Bounded repair **28cba2a** passed 1,049 units and 80 fresh browser executions.
+The merged source then refreshed all affected movement/dungeon/restart/build
+consumers. Unchanged families retain explicit valid reuse. This is not labeled a
+clean new full-suite run. Original Fighter/readiness failures, the 3,844-ms cold
+overrun and controlled passing base/repair repeats remain intact; its timing cause
+is unestablished. Current cold-history cases pass unchanged budgets.
+
+Portable evidence: `docs/qa/issue-166/full-run/{aggregate,repair,foundation-main,integration}/`.
+The current packet retains receipts, expanded unit metadata, reports/logs, all
+actual traces, representative reviewed screenshots, hashes and reproduction
+recipes. Raw data remains in **/tmp/tactics-issue-166-20261029**; current outputs
+are under `tmp/issue166/integration-{browsers,dev-map,assets}/`. The original raw
+full tree is `tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
+Do not rerun application suites for final docs-only metadata.
+
+### Review handoff
+
+Strict OpenSpec validation passed. The final audit verifies **52 local links**,
+**71 packaged artifact hashes**, all 19 policy families and the untouched Mage
+archive. A checkout-only JSON newline conversion was restored after confirming
+the Git blob already matched its original hash. Git input comparison and the
+combined merge tree are clean; source/build evidence is retained unchanged.
+
+Both branches were published. #251 merged first and #252 now targets main with
+Closes #166 / Refs #161; #161/#170 wider scope stays open. All 71 packaged artifact
+hashes were rechecked. The retained source-bound evidence applies because the
+combined runtime, tests/helpers, configuration, dependencies, assets and build
+inputs are unchanged; the merge reconciliation is documentation only. Original
+full-run failures remain explicit above. OpenSpec archive/sync follows when
+requested. See the PRs for final merge commits and #166 for closure; completed
+branches can be removed after their heads are verified as ancestors of main.
+
+Task-created scratch scripts/probes are removed after preserving reproduction
+recipes; raw failures, screenshots, traces and receipts remain available at the
+paths above. No browser or queue job remains active. No implementation work is
+left open in this change.
+
+Use native Git for checkouts/merges in the Windows checkout; WSL reports CRLF files
+as modified despite native clean status. Authenticated WSL fetch/push is available.
+The independent Linux testing checkout is clean at the qualified functional head.
 
 ## Evidence and proposed implementation decisions
 
@@ -121,8 +194,9 @@ Legacy evidence is pinned to `e9433f6b608ae6b2d95418615cce9cf17dadcf74`:
 [resolver](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L775-L824),
 [AI](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/AIController.gd),
 and [turn countdown](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L184-L225).
-These proposed v2 adaptations are reviewable design decisions, not implemented
-behavior or a claim of identical legacy AI.
+The following reviewed v2 adaptations define this change's implementation contract.
+Live progress and qualification are tracked above and in QA; deliberate departures
+from legacy behavior are stated explicitly below.
 
 1. **Content and placement.** Baseline HP 10, move 4, jump 1, accuracy 3, AC 11,
    power 2, Dexterity 1, Will 3. Extend the closed enemy/ability catalog and exact
@@ -170,7 +244,9 @@ behavior or a claim of identical legacy AI.
 6. **Admission, identity and continuation.** Use an exact optional Weakened source
    field with eligible living source/target validation, following current bounded
    fields rather than a generic effects array. Bump state format 4→5, rules 5→6,
-   run envelope 6→7 and dungeon envelope 7→8; keep RNG and standalone wrapper at 1.
+   run envelope 6→7 and dungeon envelope 8→9; keep RNG and standalone wrapper at 1.
+   The initial dungeon 7→8 allocation was superseded when main independently
+   introduced format 8 for moving encounters; retain exact 7/8 recovery bytes.
    Existing content/dungeon identity hashing includes the new rule/catalog data.
    Preserve/export previous-format bytes as incompatible through existing recovery;
    no silent migration/reset. Retain battle-local status across active reload,
@@ -249,8 +325,8 @@ Expected implementation owners, confirmed against current source:
    witnesses if one natural battle cannot demonstrate every save/heal branch;
    injected fixture state alone does not prove production reachability.
 5. **Qualify and hand off.** Audit all five #166 criteria against evidence, finish
-   docs, commit/push implementation and prepare a focused PR when implementation
-   is requested. Use `Closes #166` only with complete proof; use `Refs #161` and
+   docs, commit/push implementation and publish focused review-ready PRs.
+   Use `Closes #166` only with complete proof; use `Refs #161` and
    retain its wider remaining criteria. No unrelated issue closure or deployment.
 
 The five issue criteria map respectively to content/placement proof (1),
@@ -287,7 +363,7 @@ hashes, commands, test IDs, mode/engine/host and all failures/skips/incomplete r
 Reuse prior results only with unchanged relevant inputs and retained provenance;
 #165 evidence does not qualify changed Shaman rules or the new build.
 
-## Planning validation and estimate
+## Planning validation and estimate (historical)
 
 Planning checks passed: source/acceptance tracing, 21 local links across the three
 changed documents, 15 named test

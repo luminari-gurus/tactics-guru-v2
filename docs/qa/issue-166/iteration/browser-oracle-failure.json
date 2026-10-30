@@ -1,0 +1,202 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\node_modules\\playwright\\cli.js",
+      "test",
+      "tests/dungeon.spec.ts",
+      "-g",
+      "Shaman production journey",
+      "--project=desktop",
+      "--reporter=line,json",
+      "--output=tmp/issue166/shaman-desktop-1-artifacts"
+    ],
+    "configFile": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\playwright.config.ts",
+    "rootDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-desktop-1-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-desktop-1-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-desktop-1-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "dungeon.spec.ts",
+      "file": "dungeon.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 24004,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 3\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[33m@@ -212,13 +212,11 @@\u001b[39m\n\u001b[2m      \"unitId\": 2,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \"abilityId\": \"ability:magic_missile\",\u001b[22m\n\u001b[2m      \"target\": Object {\u001b[22m\n\u001b[32m-       \"missileTargets\": Array [\u001b[39m\n\u001b[32m-         4,\u001b[39m\n\u001b[32m-       ],\u001b[39m\n\u001b[31m+       \"unitId\": 4,\u001b[39m\n\u001b[2m      },\u001b[22m\n\u001b[2m      \"type\": \"useAbility\",\u001b[22m\n\u001b[2m      \"unitId\": 3,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 3\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[33m@@ -212,13 +212,11 @@\u001b[39m\n\u001b[2m      \"unitId\": 2,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \"abilityId\": \"ability:magic_missile\",\u001b[22m\n\u001b[2m      \"target\": Object {\u001b[22m\n\u001b[32m-       \"missileTargets\": Array [\u001b[39m\n\u001b[32m-         4,\u001b[39m\n\u001b[32m-       ],\u001b[39m\n\u001b[31m+       \"unitId\": 4,\u001b[39m\n\u001b[2m      },\u001b[22m\n\u001b[2m      \"type\": \"useAbility\",\u001b[22m\n\u001b[2m      \"unitId\": 3,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n    at C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tests\\dungeon.spec.ts:62:19",
+                    "location": {
+                      "file": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tests\\dungeon.spec.ts",
+                      "column": 19,
+                      "line": 62
+                    },
+                    "snippet": "  60 |  const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);\n  61 |  const commands=[...prefixCommands,...(record.replay?.commands??record.continuation.commands)],events=[...prefixEvents,...record.events];\n> 62 |  expect(commands).toEqual(witness.commands);expect(events).toEqual(witness.events);expect(record.state).toEqual(witness.state);\n     |                   ^\n  63 |  expect(events.filter(e=>e.type==='healed')).toHaveLength(2);expect(events.some(e=>e.type==='weakenedExpired')).toBe(true);\n  64 |  let replayed=witness.entry.activeBattle!;const replayEvents:BattleEvent[]=[];\n  65 |  for(const command of commands){const r=dispatch(replayed,command,catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;replayEvents.push(...r.events);}"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tests\\dungeon.spec.ts",
+                        "column": 19,
+                        "line": 62
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 3\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[33m@@ -212,13 +212,11 @@\u001b[39m\n\u001b[2m      \"unitId\": 2,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \"abilityId\": \"ability:magic_missile\",\u001b[22m\n\u001b[2m      \"target\": Object {\u001b[22m\n\u001b[32m-       \"missileTargets\": Array [\u001b[39m\n\u001b[32m-         4,\u001b[39m\n\u001b[32m-       ],\u001b[39m\n\u001b[31m+       \"unitId\": 4,\u001b[39m\n\u001b[2m      },\u001b[22m\n\u001b[2m      \"type\": \"useAbility\",\u001b[22m\n\u001b[2m      \"unitId\": 3,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\n  60 |  const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);\n  61 |  const commands=[...prefixCommands,...(record.replay?.commands??record.continuation.commands)],events=[...prefixEvents,...record.events];\n> 62 |  expect(commands).toEqual(witness.commands);expect(events).toEqual(witness.events);expect(record.state).toEqual(witness.state);\n     |                   ^\n  63 |  expect(events.filter(e=>e.type==='healed')).toHaveLength(2);expect(events.some(e=>e.type==='weakenedExpired')).toBe(true);\n  64 |  let replayed=witness.entry.activeBattle!;const replayEvents:BattleEvent[]=[];\n  65 |  for(const command of commands){const r=dispatch(replayed,command,catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;replayEvents.push(...r.events);}\n    at C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tests\\dungeon.spec.ts:62:19"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:25:41.043Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tmp\\issue166\\shaman-desktop-1-artifacts\\dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-desktop\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\tests\\dungeon.spec.ts",
+                    "column": 19,
+                    "line": 62
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-eaed78d8dba587d46eb2",
+          "file": "dungeon.spec.ts",
+          "line": 17,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-28T22:25:39.361Z",
+    "duration": 26591.947,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

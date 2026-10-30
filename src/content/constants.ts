@@ -14,6 +14,8 @@ export const CONTENT_BOUNDS = {
 export const FIRST_MAP_TERRAIN_IDS = ['grass', 'grass_path', 'stone', 'forest', 'water'] as const;
 export const HERO_IDS = ['fighter', 'ranger', 'mage'] as const;
 export const ENEMY_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
+/** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
+export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
 /** Initial attack catalog limits; runtime validation also requires min range <= max range. */
 export const ATTACK_BOUNDS = {
   rangeMin: { min: 1, max: 20 }, rangeMax: { min: 1, max: 20 },

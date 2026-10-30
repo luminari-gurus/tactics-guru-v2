@@ -1,4 +1,5 @@
-import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource } from '../domain/effects';
+import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
+import { saveFaceCounts } from '../domain/combat';
 import type { CellPosition } from '../content/types';
 import type { BattleEvent, UnitState } from '../domain/types';
 import { previewMovement } from '../domain/grid';
@@ -18,7 +19,8 @@ export function previewText(preview: ActionPreview): string {
     return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass}${preview.markBonus?` · Mark +${preview.markBonus} (consumed on roll)`:''} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
   }
   if ('missileCount' in preview) return `Automatic hit · ${preview.missileCount} ${preview.missileCount===1?'missile':'missiles'} · ${preview.minDamage}–${preview.maxDamage} force damage each · uses action`;
-  if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action and 1 battle use · no roll`;
+  if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action${preview.kind === 'secondWind' ? ' and 1 battle use' : ''} · no roll`;
+  if ('failedSaveFaces' in preview) return `Will save ${preview.savedFaces*5}% (${preview.savedFaces}/20 faces) · Weakened ${preview.failedSaveFaces*5}% (${preview.failedSaveFaces}/20 faces) · d20 + ${preview.modifier} vs DC ${preview.dc} · −2 accuracy until target ends its next turn or source/target defeat · uses action`;
   if ('kind' in preview && preview.kind === 'taunt') return `Taunt · only target Fighter #${preview.sourceId} until target ends its next turn · uses action · no roll`;
   if ('kind' in preview && preview.kind === 'markTarget') return 'Mark Target · next player attack roll gains +2 accuracy and consumes Mark, including a miss · uses action · no damage or roll';
   if ('kind' in preview && (preview.kind === 'pinningShot' || preview.kind === 'frostSnare'))
@@ -32,6 +34,9 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'moved': { const cell=event.path.at(-1)!; return `${name(event.unitId)} moves to (${cell.x}, ${cell.y})`; }
     case 'abilityUsed': return `${name(event.unitId)} uses ${displayName(event.abilityId)}`;
     case 'attackRolled': return `${name(event.unitId)}: ${event.result} (${event.natural} + ${event.bonus} vs AC ${event.armorClass})`;
+    case 'saveRolled': return `${name(event.unitId)} Will save ${event.saved ? 'succeeds' : 'fails'} (${event.natural} + ${event.modifier} = ${event.total} vs DC ${event.dc} · ${saveFaceCounts(event.modifier,event.dc).savedFaces*5}% save chance)`;
+    case 'weakened': return `${name(event.unitId)} Weakened by ${name(event.sourceId)} (−2 accuracy until its next turn ends or source/target defeat)`;
+    case 'weakenedExpired': return `${name(event.unitId)} Weakened expires`;
     case 'damaged': return `${name(event.unitId)} takes ${event.damage} damage · ${event.hp} HP`;
     case 'defeated': return `${name(event.unitId)} defeated`;
     case 'guarded': return `${name(event.unitId)} Guarded (+2 AC)`;
@@ -55,12 +60,18 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
   const source=tauntSource(unit,session.state.units);
   const marker=markSource(unit,session.state.units), pinner=movementBlockSource(unit,session.state.units);
+  const weakener=weakenedSource(unit,session.state.units);
   const statuses=[...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
     ...(source?[`Taunted by ${displayName(source.defId)} #${source.id} (only offensive target; expires after this unit’s next turn ends)`]:[]),
     ...(marker?[`Marked by Ranger #${marker.id} (+2 on next player attack roll; consumed even on miss; expires on source/target defeat)`]:[]),
     ...(pinner?[`${unit.movementBlock!.abilityId === 'ability:frost_snare' ? 'Snared by Mage' : 'Pinned by Ranger'} #${pinner.id} (movement blocked; no damage or roll; expires after this unit’s next turn ends or source/target defeat)`]:[]),
+    ...(weakener?[`Weakened by Goblin Shaman #${weakener.id} (−2 accuracy; expires after this unit’s next turn ends or source/target defeat)`]:[]),
     ...(unit.defId==='fighter' && Object.values(session.catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes(unit.defId))?[`Second Wind ${unit.secondWindUsed?'0':'1'}/1 use this battle`]:[])];
-  return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),
+  const support = unit.defId === 'goblin_shaman' ? `Basic Attack range 1. Weakening Hex range 2–4, clear LOS: d20 + target Will vs DC ${10+def.stats.power}; −2 accuracy on failure until target turn end or source/target defeat. Will save chances: ${session.state.units.filter(u=>u.side!==unit.side&&u.hp>0).map(u=>{
+    const target=u.side==='player'?session.catalog.heroes[u.defId]:session.catalog.enemies[u.defId];
+    return `${displayName(u.defId)} #${u.id} ${weakenedImmune(u,session.catalog)?'immune to Weakened':`${saveFaceCounts(target.stats.will,10+def.stats.power).savedFaces*5}%`}`;
+  }).join(', ')}. Heal Goblin range 1–4, clear LOS: injured living allied grunt, archer or Shaman, heal up to 4 HP, no revival/self heal, no roll. Each ability uses one action.` : '';
+  return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),support,
     status:unit.hp===0?'Defeated':statuses.join(' · ')||'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {
@@ -136,7 +147,7 @@ export class BattleHud {
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
     const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
+      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+info.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
     if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
     if(actor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';

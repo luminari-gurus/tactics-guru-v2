@@ -1,7 +1,7 @@
 # Battle save format 1
 
-Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`. The standalone wrapper remains format 1, containing battle state format 4 / rules 5; the run envelope is 6 and dungeon envelope is 8, with format 7 also accepted by the dungeon reader. RNG remains 1. Incompatible versions preserve original bytes for recovery/export.
-The bounded active `markedBy`, `tauntedBy`, and `movementBlock` references are validated against eligible living sources and remain battle-local. See [current effect rules](combat-effects.md)
+Source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`, extended by qualified Shaman source `f4616ae301da4be133455334d4c2b38e3583c8f7`. The standalone wrapper remains format 1, containing battle state format 5 / rules 6; the run envelope is 7 and dungeon envelope is 9. RNG remains 1. Earlier formats, including dungeon 7/8, are incompatible and preserve original bytes for recovery/export.
+The bounded active `markedBy`, `tauntedBy`, `movementBlock`, and `weakenedBy` references are validated against eligible living sources and remain battle-local. See [current effect rules](combat-effects.md)
 and [progression compatibility](hero-progression.md#save-compatibility). The
 procedural-format section below records its historical introduction.
 
@@ -26,7 +26,7 @@ The only root keys are `kind`, `format`, `payload`, and `digest`:
 }
 ```
 
-`format` is the independent **save format** version. The payload has exactly the existing BattleState keys: `format`, `versions`, `seed`, `rng`, `mapId`, `units`, `initiative`, `activeIndex`, `round`, `outcome`, `commandCount`. Its `format` must equal `STATE_FORMAT_VERSION` (4). `versions` has exactly `rules`, `rng`, and `content`; the first two match `RULES_VERSION` (5) and `RNG_VERSION` (1), and `content` equals `contentVersion(trustedCatalog)`. Content identity includes rules-relevant catalog data and excludes art. Compatibility is exact; future/older/different identities fail explicitly. A format number alone cannot override rules/content/RNG compatibility.
+`format` is the independent **save format** version. The payload has exactly the existing BattleState keys: `format`, `versions`, `seed`, `rng`, `mapId`, `units`, `initiative`, `activeIndex`, `round`, `outcome`, `commandCount`. Its `format` must equal `STATE_FORMAT_VERSION` (5). `versions` has exactly `rules`, `rng`, and `content`; the first two match `RULES_VERSION` (6) and `RNG_VERSION` (1), and `content` equals `contentVersion(trustedCatalog)`. Content identity includes rules-relevant catalog data and excludes art. Compatibility is exact; future/older/different identities fail explicitly. A format number alone cannot override rules/content/RNG compatibility.
 
 Units retain `id`, `defId`, `side`, `{x,y}` cell, HP, `hasMoved`, `hasActed`, and bounded optional combat effects and resources. See [combat effects](combat-effects.md) for the enabled fields and their ownership/lifetime constraints. Initiative contains every unit ID exactly once. RNG retains exactly four uint32 `words` and its raw-draw `cursor`. The reader enforces catalog spawns/definitions, map bounds, living walkable/non-overlapping positions, valid active unit, HP and outcome consistency, and the RNG cursor/counter relationship. Refer to [battle.ts](../src/domain/battle.ts) and [types.ts](../src/domain/types.ts) for the shared authoritative shape. It does not infer the command history from a snapshot.
 

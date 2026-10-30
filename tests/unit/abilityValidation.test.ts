@@ -25,7 +25,25 @@ it.each([
   ['ability:frost_snare','requiredLevel',2],['ability:frost_snare','rangeMin',1],['ability:frost_snare','rangeMax',5],
   ['ability:frost_snare','target','self'],['ability:frost_snare','duration','roundEnd'],['ability:frost_snare','owners',['ranger']],
   ['ability:frost_snare','immunity',false],['ability:frost_snare','baseDamage',0],
+  ['ability:weakening_hex','rangeMin',1],['ability:weakening_hex','rangeMax',5],['ability:weakening_hex','target','allied'],
+  ['ability:weakening_hex','accuracyPenalty',3],['ability:weakening_hex','duration','roundEnd'],['ability:weakening_hex','owners',['mage']],
+  ['ability:weakening_hex','requiredLevel',1],['ability:weakening_hex','baseDamage',1],
+  ['ability:heal_goblin','rangeMin',0],['ability:heal_goblin','healAmount',5],['ability:heal_goblin','targetFilter','injured'],
+  ['ability:heal_goblin','owners',['goblin_grunt']],['ability:heal_goblin','usesPerBattle',1],
 ])('rejects unsupported Fighter profile %s.%s=%j',(id,field,value)=>{
   const c=structuredClone(abilityCatalog());Object.assign(c.abilities[id as keyof typeof c.abilities],{[field]:value});
   expect(validateContent(c).ok).toBe(false);
+});
+
+it('admits only bounded explicit effect immunity IDs without assigning production immunities', () => {
+  const original = abilityCatalog();
+  expect(Object.values({ ...original.heroes, ...original.enemies }).every(u => u.immunities === undefined)).toBe(true);
+  for (const immunities of [['weakened'], ['debuff'], ['debuff','weakened']]) {
+    const c = structuredClone(original); Object.assign(c.heroes.fighter, { immunities });
+    expect(validateContent(c).ok).toBe(true);
+  }
+  for (const immunities of [[], ['fear'], ['Weakened'], ['weakened','weakened'], ['weakened','debuff','fear'], true, new Array(1)]) {
+    const c = structuredClone(original); Object.assign(c.heroes.fighter, { immunities });
+    expect(validateContent(c).ok).toBe(false);
+  }
 });

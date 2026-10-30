@@ -63,7 +63,10 @@ export function validateContent(input: unknown): ContentValidation {
     const fighterEffect = ability.kind === 'secondWind' || ability.kind === 'taunt';
     const rangerEffect = ability.kind === 'markTarget' || ability.kind === 'pinningShot';
     const controlEffect = rangerEffect || ability.kind === 'frostSnare';
-    const keys = ability.kind === 'secondWind' ? ['id','kind','owners','rangeMin','rangeMax','target','healBase','usesPerBattle'] :
+    const shamanEffect = ability.kind === 'weakeningHex' || ability.kind === 'healGoblin';
+    const keys = ability.kind === 'weakeningHex' ? ['id','kind','owners','rangeMin','rangeMax','target','duration','accuracyPenalty'] :
+      ability.kind === 'healGoblin' ? ['id','kind','owners','rangeMin','rangeMax','target','healAmount','targetFilter'] :
+      ability.kind === 'secondWind' ? ['id','kind','owners','rangeMin','rangeMax','target','healBase','usesPerBattle'] :
       ability.kind === 'taunt' ? ['id','kind','owners','rangeMin','rangeMax','target','duration'] :
       controlEffect ? ['id','kind','owners','requiredLevel','rangeMin','rangeMax','target','duration',...(ability.kind==='markTarget'?['accuracyBonus']:[])] :
       ability.kind === 'magicMissile' ? ['id','kind','owners','casterLevel','rangeMin','rangeMax'] : ['id','kind','owners','rangeMin','rangeMax','baseDamage','uphillDamage'];
@@ -74,7 +77,12 @@ export function validateContent(input: unknown): ContentValidation {
     if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
     if (!shape(ability, keys, path)) continue;
     const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
-    if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile','secondWind','taunt','markTarget','pinningShot','frostSnare'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile','secondWind','taunt','markTarget','pinningShot','frostSnare','weakeningHex','healGoblin'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
+    if (shamanEffect) {
+      const approved = ability.kind === 'weakeningHex' ? attackAbilities['ability:weakening_hex'] : attackAbilities['ability:heal_goblin'];
+      for (const [field, value] of Object.entries(approved).filter(([k]) => !['id','kind','owners'].includes(k)))
+        if (ability[field] !== value) fail('shape', `${path}.${field}`, 'Expected the approved Shaman rules.');
+    }
     if (fighterEffect || controlEffect) {
       const approved = ability.kind === 'secondWind' ? attackAbilities['ability:second_wind'] : ability.kind === 'taunt' ? attackAbilities['ability:taunt'] :
         ability.kind === 'markTarget' ? attackAbilities['ability:mark_target'] : ability.kind === 'pinningShot' ? attackAbilities['ability:pinning_shot'] : attackAbilities['ability:frost_snare'];
@@ -87,7 +95,7 @@ export function validateContent(input: unknown): ContentValidation {
       for (const [field, max] of [['casterLevel',20],['rangeMin',20],['rangeMax',20]] as const)
         if (typeof ability[field] !== 'number' || !Number.isSafeInteger(ability[field]) || ability[field] < 1 || ability[field] > max)
           fail('number', `${path}.${field}`, `Expected an integer in [1,${max}].`);
-    } else if (!fighterEffect && !controlEffect) for (const field of ['rangeMin','rangeMax','baseDamage','uphillDamage'] as const) {
+    } else if (!fighterEffect && !controlEffect && !shamanEffect) for (const field of ['rangeMin','rangeMax','baseDamage','uphillDamage'] as const) {
       const value = ability[field];
       const { min, max } = ATTACK_BOUNDS[field];
       if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max)
@@ -96,6 +104,8 @@ export function validateContent(input: unknown): ContentValidation {
     if (typeof ability.rangeMin === 'number' && typeof ability.rangeMax === 'number' && ability.rangeMin > ability.rangeMax)
       fail('number', path, 'Minimum range must not exceed maximum range.');
     if (array(ability.owners, `${path}.owners`)) {
+      if (shamanEffect && ability.owners.some(owner => owner !== 'goblin_shaman'))
+        fail('reference', `${path}.owners`, 'Support abilities require the Goblin Shaman lifecycle.');
       if ((ability.kind === 'guardedAttack' || fighterEffect) && ability.owners.some(owner=>owner!=='fighter'))
         fail('reference', `${path}.owners`, 'Guarded attacks require the Fighter effect lifecycle.');
       if (rangerEffect && ability.owners.some(owner=>owner!=='ranger'))
@@ -114,7 +124,10 @@ export function validateContent(input: unknown): ContentValidation {
   }
   for (const group of ['heroes', 'enemies'] as const) for (const [id, unit] of entries(group)) {
     const path = `${group}.${id}`;
-    if (!shape(unit, ['id','kind','stats','spriteAssetId','portraitAssetId'], path)) continue;
+    if (!shape(unit, ['id','kind','stats','spriteAssetId','portraitAssetId', ...(Object.hasOwn(unit, 'immunities') ? ['immunities'] : [])], path)) continue;
+    if (Object.hasOwn(unit, 'immunities') && (!isDenseArray(unit.immunities, 2) || unit.immunities.length === 0 ||
+      new Set(unit.immunities).size !== unit.immunities.length || unit.immunities.some(id => id !== 'weakened' && id !== 'debuff')))
+      fail('shape', `${path}.immunities`, 'Expected distinct bounded weakened/debuff immunity IDs.');
     if (unit.kind !== (group === 'heroes' ? 'hero' : 'enemy')) fail('shape', `${path}.kind`, `Expected ${group === 'heroes' ? 'hero' : 'enemy'}.`);
     const stats = ['maxHp','move','jump','accuracy','armorClass','power','dexterity','will'] as const;
     if (shape(unit.stats, stats, `${path}.stats`)) for (const stat of stats) number(unit.stats[stat], stat, `${path}.stats.${stat}`);
