@@ -84,10 +84,13 @@ at 320px. Compressed raw reports and logs include original failures.
 The branch-scoped manual job in `issue-200-baseline.yml` runs `npm run verify:full`
 under the shared `tactics-browser-exclusive` lock on `[self-hosted, tactics-browser]`.
 It retains original workers/retries/performance limits, full discovery, logs and
-artifacts for 30 days. Superseded queued revisions were cancelled before execution;
-no passing or failed suite result was discarded. No hosted fallback was added.
+artifacts for 30 days. Superseded revisions were cancelled during queue/startup to test the final PR
+head; their cancelled/incomplete runs remain in Actions history. No hosted fallback was added.
 
-Current execution is queued behind the busy self-hosted runner. Full Chromium,
+Full execution is dispatched for `6559b9c781edb39c91c48662f6e783884507d1c5`;
+see [Actions run 41105273512](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41105273512)
+for live status. Subsequent PR changes only update this evidence/links/tasks.
+[Draft PR #256](https://github.com/luminari-gurus/tactics-guru-v2/pull/256) contains the reviewable implementation. Full Chromium,
 fixtures/dev placement, both WebKit families, health bars, configured production/dev
 telemetry, root/prefix assets, performance and restoration remain acceptance gates.
 The issue is not closed and the draft PR must not be marked merge-ready from focused

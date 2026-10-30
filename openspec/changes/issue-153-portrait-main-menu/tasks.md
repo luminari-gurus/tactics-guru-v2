@@ -31,7 +31,7 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 
 - [ ] 5.1 Freeze final relevant inputs and complete source-bound full-regression accounting using `npm run verify:full` and explicit menu Chromium/WebKit selections on qualified exclusive self-hosted capacity. Verify both type scopes/build, units/build integrations, ordinary/fixture/dev-placement suites, both WebKit configs, health bars, separate production/dev telemetry, asset root/prefix preview/dev, performance and root restoration. Retain source/build/asset identity, commands, actual reports/skips/failures and valid reused evidence; do not weaken assertions or restart unaffected passing suites for prose edits.
 - [ ] 5.2 Audit every #153 criterion against the design acceptance table, including exact title availability and all menu states; retain a QA report, screenshots, discovery comparison and honest limitations. Verify `openspec validate issue-153-portrait-main-menu --strict` and `git diff --check`.
-- [ ] 5.3 Commit/push only approved issue work and open/attach one PR after checking for an existing branch PR; verify remote parity and PR base/body. Use `Closes #153` only with all acceptance verified, otherwise a draft with `Refs #153` and precise remaining gates.
+- [x] 5.3 Commit/push only approved issue work and open/attach one PR after checking for an existing branch PR; verify remote parity and PR base/body. Use `Closes #153` only with all acceptance verified, otherwise a draft with `Refs #153` and precise remaining gates.
 
 ## Workflow follow-up
 
@@ -41,5 +41,5 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 
 Runtime implemented and focused checks retained in `docs/qa/issue-153/README.md`.
 The remaining unchecked implementation tasks have code in place; their complete
-regression/edge-case qualification remains open. The self-hosted full job is queued
-behind the shared runner. No merge readiness or issue completion is claimed.
+regression/edge-case qualification remains open. The self-hosted full job is dispatched for the final runtime/test inputs;
+PR #256 is a draft pending that result. No merge readiness or issue completion is claimed.
