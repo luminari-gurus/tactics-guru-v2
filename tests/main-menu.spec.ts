@@ -65,7 +65,7 @@ test('main menu: portrait composition scrolls at narrow, short and enlarged text
  await page.goto('./');
  for(const [width,height] of [[320,568],[915,412],[1280,720]]){
   await page.setViewportSize({width,height});
-  await page.locator('#main-menu').evaluate(n=>{n.style.fontSize='200%';});
+  await page.evaluate(()=>{document.documentElement.style.fontSize='200%';});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   const bounds=await page.locator('#main-menu').boundingBox();expect(bounds!.width).toBeLessThanOrEqual(512);
   for(const button of await page.locator('[data-menu-action]').all())expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);

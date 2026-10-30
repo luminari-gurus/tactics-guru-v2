@@ -1,6 +1,6 @@
 .main-menu-page { margin:0; background:#101812; color:#f5eed7; font-family:Georgia,serif; color-scheme:dark; }
 .main-menu-page [hidden] { display:none!important; }
-#main-menu { position:relative; isolation:isolate; box-sizing:border-box; width:min(100%,32rem); min-height:100svh; margin:auto; overflow:hidden; background:#17251e; box-shadow:0 0 90px #000; }
+#main-menu { position:relative; isolation:isolate; box-sizing:border-box; width:min(100%,512px); min-height:100svh; margin:auto; overflow:hidden; background:#17251e; box-shadow:0 0 90px #000; }
 .menu-backdrop { position:absolute; z-index:-2; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
 #main-menu::before { content:''; position:absolute; z-index:-1; inset:0; background:linear-gradient(#0b171329 5%,#0b171340 25%,#08120cd9 65%,#08120cf5); }
 .menu-content { min-height:100svh; box-sizing:border-box; padding:max(2rem,env(safe-area-inset-top)) max(1.25rem,env(safe-area-inset-right)) max(1.5rem,env(safe-area-inset-bottom)) max(1.25rem,env(safe-area-inset-left)); display:flex; flex-direction:column; align-items:center; text-align:center; }
