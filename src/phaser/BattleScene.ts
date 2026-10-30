@@ -1,7 +1,7 @@
 import type { Command } from '../domain/types';
 import { enemyThreats, type Threat } from '../domain/threat';
-import { progressHero, projectProgression, progressionLabel } from '../domain/progression';
-import { HERO_IDS } from '../content/constants';
+import { progressionLabel } from '../domain/progression';
+import { standaloneBattleCatalog } from '../content/standaloneCatalog';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
 import type { CellPosition, ContentCatalog } from '../content/types';
@@ -37,7 +37,7 @@ export class BattleScene extends Phaser.Scene {
     let catalog:ContentCatalog;
     // Hosts supply trusted progression/equipment projections of validated raw content.
     try{catalog=this.host?.catalog??contentLoadPlan(battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
-    if(!this.host)catalog=projectProgression(HERO_IDS.map(id=>progressHero(id,0,catalog.heroes[id].stats.maxHp,catalog)),catalog);
+    if(!this.host)catalog=standaloneBattleCatalog(catalog);
     loadContentAssets(this,catalog,()=>{try{this.prepareBattle(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
   }
   private prepareBattle(catalog:ContentCatalog):void {

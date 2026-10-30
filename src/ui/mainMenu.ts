@@ -35,7 +35,8 @@ export function startMainMenu() {
   // Match native dialog focus behavior on WebKit's button-skipping Tab policy.
   dialog.addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;
-    const controls = [...dialog.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input, summary')];
+    const controls = [...dialog.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input, summary')]
+      .filter(node => node.getClientRects().length > 0);
     const index = controls.indexOf(document.activeElement as HTMLElement);
     event.preventDefault(); controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length]?.focus();
   });
