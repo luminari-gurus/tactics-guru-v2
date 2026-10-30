@@ -138,7 +138,12 @@ test('Fighter legal progression journey earns level three uses both abilities an
     const command=fighterDecision(before.state,built.catalog,taunted);
     await playCommand(page,command);
     await expect.poll(async()=>{const current=await snapshot(page);return current.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
-    await expect.poll(async()=>{const current=await snapshot(page);return current.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+    try {
+     await expect.poll(async()=>{const current=await snapshot(page);return current.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+    } catch (error) {
+     writeFileSync(test.info().outputPath('fighter-timeout-state.json'),JSON.stringify({command,before,dungeon:await snapshot(page),session:await readSession(page),errors}));
+     throw error;
+    }
     if(command.type==='useAbility' && (command.abilityId==='ability:second_wind'&&!healed || command.abilityId==='ability:taunt'&&!taunted)) {
      const after=await readSession(page);expect(after.state.rng).toEqual(before.state.rng);
      const fighter=after.state.units.find(u=>u.defId==='fighter')!;
