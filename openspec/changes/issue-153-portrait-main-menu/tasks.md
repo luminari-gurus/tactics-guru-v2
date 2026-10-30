@@ -1,12 +1,12 @@
 # Tasks
 
-Implementation approval is pending. All tasks below remain unstarted.
+Implementation authorized by the caller on 2026-10-30: “pick up the issue and start working on it”. Work is in progress.
 
 ## 1. Approval and supplied artwork
 
-- [ ] 1.1 Record explicit caller approval of this proposal/design, including Continue selection, dungeon New Game, bounded dialog destinations, and `/battle` routing; verify approval in the conversation before application/test edits.
+- [x] 1.1 Record explicit caller approval of this proposal/design, including Continue selection, dungeon New Game, bounded dialog destinations, and `/battle` routing; verify approval in the conversation before application/test edits.
 - [x] 1.2 Receive the caller-designated title attachment, inspect it, and retain the unchanged original with source/hash/provenance. Supplied `Tactics Guru.webp` is saved at `docs/art/issue-153/source/tactics-guru.webp`; metadata confirms 2172×724 (3:1) with alpha. The caller explicitly identified it as the title image; the earlier Discord 403 no longer blocks source availability.
-- [ ] 1.3 Refresh current main and coordinate with active work without importing unmerged PRs; record source identity and confirm the approved scope still applies using status/diff and open-PR inspection.
+- [x] 1.3 Refresh current main and coordinate with active work without importing unmerged PRs; record source identity and confirm the approved scope still applies using status/diff and open-PR inspection.
 
 ## 2. Routes and isolated entry
 

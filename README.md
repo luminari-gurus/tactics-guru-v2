@@ -31,7 +31,10 @@ the game uses illustrated portraits, compact sprites and isometric tile boards.
 
 ## Choose your adventure
 
-- **[Standalone battle](https://tactics-guru-v2.pages.dev/) — `/`**<br>
+- **Main menu — `/`**<br>
+  Continue a saved journey, start a new dungeon, or open Records and Settings.
+  Continue offers a mode choice when several saves exist; recovery never removes saves.
+- **Standalone battle — `/battle`**<br>
   Fight the authored 12×12 Forest Ruins encounter with a level-1 party, enemy AI,
   attack previews, combat feedback and a saved battle you can continue.
 - **[Three-encounter run](https://tactics-guru-v2.pages.dev/run) — `/run`**<br>
@@ -272,3 +275,23 @@ Keep gameplay rules in the pure domain, preserve deterministic RNG and save
 contracts, and record evidence for the behavior your change affects. For a bug
 report, include the route, reproduction steps, browser/device profile and any
 relevant seed or recovery message.
+
+## Main menu navigation
+
+Plain `/` now opens a portrait main menu; standalone battle bookmarks should use
+`/battle`. Existing `/run`, `/dungeon` and `/map` routes remain available. Root
+`?scene=battle`, `?scene=proof` and `?scene=content-smoke` diagnostic entries remain
+supported. Every route respects Vite's configured base path.
+
+Continue checks the three save families without writing or starting a session.
+A sole eligible mode opens directly; several eligible modes require a choice.
+A valid backup is eligible and marked as potentially losing progress. Invalid or
+unreadable saves expose Save recovery, even when Continue is disabled. The
+destination re-inspects its storage; requests carry no save bytes or review token.
+New Game opens the existing dungeon replacement confirmation and affects only
+dungeon saves. Main menu links warn before leaving progress reported as unsaved.
+
+Hall of Records is an empty-state dialog pending #176. Settings exposes existing
+privacy controls and explains current in-game Sound controls; it adds no audio or
+records subsystem. The menu starts no telemetry, Phaser engine or audio loader.
+See [menu artwork and behavior](docs/main-menu.md) for implementation details.

@@ -85,4 +85,8 @@ Implementation adds routes/UI/assets and relocates battle entry references; exis
 
 ## Planning review
 
-These are proposed product choices for caller approval, not recorded implementation approval. No implementation tasks may begin until that approval arrives. Both background sources and the caller-designated title are now available; this asset clarification does not change the proposed route/save architecture or constitute implementation approval.
+The caller authorized implementation of these product choices on 2026-10-30 by requesting pickup and work on the issue. Both background sources and the caller-designated title are now available; this asset clarification does not change the proposed route/save architecture or constitute implementation approval.
+
+## Implementation authorization
+
+On 2026-10-30 the caller requested that this agent pick up the issue and start work. This authorizes implementation of the existing plan. Main refreshed and merged at `c8ca3c2`; no unmerged feature branches imported.
