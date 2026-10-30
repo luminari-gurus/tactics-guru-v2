@@ -38,3 +38,6 @@ SHA256(docs/qa/issue-177/selfhost-comparison-head.json.gz)= 3d9823069b293bfac6c1
 SHA256(docs/qa/issue-177/selfhost-full-aggregate.json.gz)= a3555f02d7113bec0d149f4585077c7a3349eb45806abdefad49bb567eb0b94c
 SHA256(docs/qa/issue-177/selfhost-full-aggregate.md.gz)= 7313cc7d1309d8122ccbeb31cf10b02103afe32fa08fdb613c497d35de6e472b
 SHA256(docs/qa/issue-177/selfhost-fighter-diagnosis.json.gz)= 5ab3b3c99a755e5c944f4024e7b1513ffa5925aa13109189809e2dc306c939f5
+SHA256(docs/qa/issue-177/selfhost-landscape-followup-aggregate.json.gz)= 7c8dc34b9ccd9b2112b1a75fb7c4908951950830375cd7d141b149365934ec03
+SHA256(docs/qa/issue-177/selfhost-landscape-followup-receipt.json.gz)= 0c1d21c14cee60bbe75b7843422d6b1b94e75b0b9f9082801e23c34f7c07287b
+SHA256(docs/qa/issue-177/selfhost-landscape-followup.json.gz)= 3802c372d944cc6d723d9724295911e606abfb9113eb763a9b91fb3a569e5b2f
