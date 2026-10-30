@@ -8,7 +8,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
-    if: github.ref != 'refs/heads/work/issue-177-threat-planning'
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
@@ -37,30 +36,3 @@ jobs:
             test-results/
           retention-days: 7
           if-no-files-found: ignore
-
-  issue177-diagnosis:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-177-threat-planning'
-    runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 45
-    steps:
-      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
-      - uses: actions/checkout@v4
-        with:
-          ref: 287ad0a
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - run: npm ci && npm run build
-      - name: Run Fighter journey with timeout diagnostics
-        run: npx --no-install playwright test tests/dungeon.spec.ts -g 'Fighter legal progression journey earns level three' --project=mobile-landscape --repeat-each=3 --workers=1 --reporter=line,json
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: fighter-diagnosis.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue177-diagnosis-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            fighter-diagnosis.json
-            test-results/
-          retention-days: 30
