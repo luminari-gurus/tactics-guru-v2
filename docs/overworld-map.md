@@ -1,6 +1,8 @@
 # Overworld map contract
 
-Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
+Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+
+Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls plus stationary markers; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
 
 ## Layout and biome
 
@@ -23,7 +25,7 @@ and `createOverworld(map: BiomeMap)`. The result is `{ ok: true, state }` or
 `{ ok: false, reason }`, with no partial world on failure. A complete state retains the map,
 `placementVersion: 'markers-v1'` and four ordered markers: `player`, `enemy-1`, `enemy-2`,
 `enemy-3`. Each has a `player`/`enemy` kind and zero-based integer `x`/`y`.
-Issue #155 can transform this model directly; DOM attributes are only its projection.
+DOM attributes project this state. The dungeon movement model reuses the marker shape.
 
 Placement validates the existing connected 20×20 layout and matching terrain, then samples
 four distinct row-major walkable indices without replacement. A fresh local RNG is seeded
@@ -34,8 +36,8 @@ The same layout and seed reproduce positions. Biome and artwork never affect the
 All terrain versions and outputs are preserved; placement changes require their own version.
 Modulo bias is accepted for these prototype spawns, with no distance or center-spawn rule.
 
-The view retains this complete state. A cyan circle marks the player; coral diamonds mark
-enemies, with dark borders and light edging above the existing terrain. The matching legend
+The view retains this complete state. A cyan circle marks the player; coral diamonds numbered 1–3 mark
+individual enemies with matching numbered legend keys, with dark borders and light edging above the existing terrain. The matching legend
 wraps on narrow displays. The grid's accessible name includes occupant counts and its associated
 description lists IDs at one-based row/column. Markers are noninteractive and add no tab stops.
 See [issue #154 acceptance evidence](qa/issue-154-overworld-markers.md) for placement,
@@ -70,3 +72,10 @@ Reference revision: [`e9433f6b608ae6b2d95418615cce9cf17dadcf74`](https://github.
 - The pinned inventory contains [grass/forest/mountain overworld files](https://github.com/luminari-gurus/tactics-guru/tree/e9433f6b608ae6b2d95418615cce9cf17dadcf74/art/overworld/8bit/generated/individual_32), corresponding 48px exports, and grass/forest tiles. File presence does not establish verified style coverage, licensing or suitable desert overworld art. Desert is an approved Simple treatment, not a claim of existing imported assets. #98 owns exact style/provenance/export verification.
 
 See [issue #99](https://github.com/luminari-gurus/tactics-guru-v2/issues/99), [approved plan](../openspec/changes/issue-99-map-biomes/design.md), and [map algorithm evidence](qa/issue-97-map-algorithms.md).
+
+
+## Dungeon movement model
+
+`src/map/movement.ts` supplies the pure movement transition used by `/dungeon`. Enemy 1 wanders passively; enemies 2 and 3 pursue within Manhattan ranges 6 and 10. Detection ignores terrain. Each accepted dungeon player step advances living enemies at most one cardinal cell, in stable ID order, with collision resolution, avoidance of available stairs and an independent saved RNG. Aggressive enemies use a shortest walkable path to a free player-adjacent cell. See [Dungeon floors](dungeon.md) for encounters and persistence.
+
+The `/map` inspection prototype has no movement timer, encounters, or player movement. Markers remain stationary until the user regenerates the map. The view's idempotent disposer removes lifecycle listeners; hidden or detached views ignore delayed artwork callbacks, and cached-page restoration redraws the retained map. Earlier movement demonstrations in [issue 155 QA](qa/issue-155-overworld-movement.md) describe historical revisions.

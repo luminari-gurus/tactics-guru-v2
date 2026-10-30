@@ -8,7 +8,7 @@ import { rollDie, seedRng } from '../../src/domain/rng';
 import { createBattle, dispatch, replayBattle } from '../../src/domain/turns';
 import { RULE_BOUNDS } from '../../src/domain/constants';
 import { battleCatalog } from '../../src/content/catalog';
-import { previewAttack } from '../../src/domain/combat';
+import { previewAttack, previewSupportAbility } from '../../src/domain/combat';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
 
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
@@ -27,6 +27,76 @@ function setup(archer = false) {
   return { catalog, state };
 }
 const wait = { type: 'endTurn', unitId: 3 } as const;
+
+function supportSetup() {
+  const map: MapRecord = { id:'map:ai_support',width:12,height:3,
+    cells:Array.from({length:36},(_,i)=>({x:i%12,y:Math.floor(i/12),elevation:0,terrainId:'grass'})),
+    spawns:[{id:1,side:'heroes',unitId:'fighter',x:0,y:0},{id:2,side:'heroes',unitId:'ranger',x:0,y:1},
+      {id:3,side:'enemies',unitId:'goblin_shaman',x:4,y:0},{id:4,side:'enemies',unitId:'goblin_grunt',x:5,y:1},
+      {id:5,side:'enemies',unitId:'goblin_archer',x:6,y:1},{id:6,side:'heroes',unitId:'mage',x:0,y:2}] };
+  const catalog:ContentCatalog={...battleCatalog,maps:{[map.id]:map}};
+  const created=createBattle(map.id,17,catalog);assert(created.ok);
+  return {catalog,state:{...created.state,activeIndex:created.state.initiative.indexOf(3)}};
+}
+const support = (id:'weakening_hex'|'heal_goblin',targetId:number):Command =>
+  ({type:'useAbility',unitId:3,abilityId:`ability:${id}`,target:{unitId:targetId}});
+it('compares useful Shaman healing, Hex and attacks in common integer score units without preview RNG',()=>{
+  const {catalog,state}=supportSetup(),injured=changeUnit(state,4,{hp:4});
+  expect(previewSupportAbility(injured,support('heal_goblin',4),catalog)).toMatchObject({ok:true,healing:4});
+  // Healing 80 beats Ranger Hex 77 and all baseline attack scores.
+  expect(commands(injured,catalog)).toEqual([support('heal_goblin',4),wait]);
+  const before=copy(injured),rng=copy(injured.rng);
+  for(let i=0;i<3;i++)expect(commands(injured,catalog)).toEqual(commands({...injured,units:[...injured.units].reverse()},
+    {...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).reverse())}));
+  expect(injured).toEqual(before);expect(injured.rng).toEqual(rng);checkLegal(injured,catalog,commands(injured,catalog));
+  // One HP healing scores 20; a legal Hex is more useful.
+  const slight=changeUnit(state,4,{hp:8}),plan=commands(slight,catalog);
+  expect(plan.find(c=>c.type==='useAbility')).toEqual(support('weakening_hex',2));checkLegal(slight,catalog,plan);
+  const immuneCatalog:ContentCatalog={...catalog,heroes:{
+    fighter:{...catalog.heroes.fighter,immunities:['weakened']},
+    ranger:{...catalog.heroes.ranger,immunities:['weakened']},mage:{...catalog.heroes.mage,immunities:['weakened']}}};
+  const adjacent={...changeUnit(changeUnit(slight,1,{cell:{x:3,y:0}}),3,{hasMoved:true}),versions:{...slight.versions,content:contentVersion(immuneCatalog)}};
+  expect(commands(adjacent,immuneCatalog)).toEqual([{...attack(),abilityId:'ability:basic_attack'},wait]);
+  checkLegal(adjacent,immuneCatalog,commands(adjacent,immuneCatalog));
+});
+it('support ties use target ID then ability ID and movement cost without depending on catalog order',()=>{
+  const {catalog:base,state:initial}=supportSetup();
+  const catalog:ContentCatalog={...base,heroes:{...base.heroes,fighter:{...base.heroes.fighter,stats:{...base.heroes.fighter.stats,accuracy:5,power:2,will:0}}},
+    abilities:{...base.abilities,'ability:aa_hex':{...base.abilities['ability:weakening_hex'],id:'ability:aa_hex'}}};
+  const state={...initial,versions:{...initial.versions,content:contentVersion(catalog)}};
+  expect(commands(state,catalog)).toEqual([{...support('weakening_hex',1),abilityId:'ability:aa_hex'},wait]);
+  checkLegal(state,catalog,commands(state,catalog));
+});
+it('Taunted Shamans can heal allies while Hex/attack remain restricted and spent actions only Wait',()=>{
+  const {catalog,state}=supportSetup(),taunted=changeUnit(changeUnit(state,3,{tauntedBy:1}),4,{hp:4});
+  expect(commands(taunted,catalog)).toEqual([support('heal_goblin',4),wait]);
+  const healed=dispatch(taunted,support('heal_goblin',4),catalog);assert(healed.ok);
+  expect(commands(healed.state,catalog)).toEqual([wait]);
+  const healthy=changeUnit(taunted,4,{hp:9});
+  expect(commands(healthy,catalog).find(c=>c.type==='useAbility')).toEqual(support('weakening_hex',1));
+  checkLegal(healthy,catalog,commands(healthy,catalog));
+});
+it.each(['ability:pinning_shot','ability:frost_snare'] as const)('movement-blocked Shaman uses legal in-place support or Wait: %s',abilityId=>{
+  const {catalog,state}=supportSetup(),blocked=changeUnit(state,3,{movementBlock:{sourceId:abilityId==='ability:pinning_shot'?2:6,abilityId}});
+  const injured=changeUnit(blocked,4,{hp:4});expect(commands(injured,catalog)).toEqual([support('heal_goblin',4),wait]);
+  checkLegal(injured,catalog,commands(injured,catalog));
+  const noUseful={...blocked,units:blocked.units.map(u=>u.side==='player'?{...u,weakenedBy:3}:u)};
+  expect(commands(noUseful,catalog)).toEqual([wait]);
+});
+it('approaches useful support goals, skips defeated/already-Weakened/immune/zero-value targets and waits when none are reachable',()=>{
+  const {catalog:base,state:initial}=supportSetup();
+  const catalog:ContentCatalog={...base,enemies:{...base.enemies,goblin_shaman:{...base.enemies.goblin_shaman,stats:{...base.enemies.goblin_shaman.stats,move:1}}}};
+  const state={...initial,versions:{...initial.versions,content:contentVersion(catalog)},units:initial.units.map(u=>u.id===3?{...u,cell:{x:5,y:0}}:
+    u.id===4?{...u,hp:4,cell:{x:11,y:1}}:u.id===2?{...u,hp:0}:u.side==='player'?{...u,weakenedBy:3}:u)};
+  // The useful ally is right of the caster; ordinary attack goals lead left. Only support approach chooses right.
+  const plan=commands(state,catalog);expect(plan[0]).toEqual({type:'move',unitId:3,to:{x:6,y:0}});expect(plan.at(-1)).toEqual(wait);
+  expect(plan.some(c=>c.type==='useAbility')).toBe(false);checkLegal(state,catalog,plan);
+  const exhausted=changeUnit(state,3,{hasMoved:true});expect(commands(exhausted,catalog)).toEqual([wait]);
+  const noAbilities={...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).map(([id,a])=>
+    [id,{...a,owners:a.owners.filter(owner=>owner!=='goblin_shaman')}]))};
+  const noUseful={...state,versions:{...state.versions,content:contentVersion(noAbilities)},units:state.units.map(({weakenedBy,...u})=>u)};
+  expect(commands(noUseful,noAbilities)).toEqual([wait]);
+});
 
 it.each([false,true])('Taunt restricts legal enemy plans, including minimum bow range (%s)',archer=>{
   const {catalog,state}=setup(archer);

@@ -262,7 +262,7 @@ test('changed saved data refuses an old confirmation and requires fresh review',
   await page.evaluate(keys=>localStorage.setItem(keys.primary,'changed'),keys);
   await page.locator('#save-confirm-reset').click();await expect(page.getByRole('dialog')).toContainText('Reset incomplete');
   expect((await stored(page)).primary).toBe('changed');expect((await readSession(page)).state.seed).toBe(2);
-  await page.locator('#save-close').click();await page.locator('#fit-restart').click();await page.locator('#save-cancel-reset').click();
+  await page.locator('#save-close').click();await page.locator('#battle-party').focus();await page.locator('#fit-restart').click();await page.locator('#save-cancel-reset').click();
   expect((await stored(page)).primary).toBe('changed');await expect(page.locator('#fit-restart')).toBeFocused();
 });
 

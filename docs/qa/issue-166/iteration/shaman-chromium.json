@@ -1,0 +1,239 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\node_modules\\playwright\\cli.js",
+      "test",
+      "tests/dungeon.spec.ts",
+      "-g",
+      "Shaman production journey",
+      "--reporter=line,json",
+      "--output=tmp/issue166/shaman-chromium-2-artifacts"
+    ],
+    "configFile": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\playwright.config.ts",
+    "rootDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-chromium-2-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-chromium-2-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/shaman-chromium-2-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "dungeon.spec.ts",
+      "file": "dungeon.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 23380,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:27:14.431Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-eaed78d8dba587d46eb2",
+          "file": "dungeon.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 23209,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:27:38.550Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-824c487c3218d65255fe",
+          "file": "dungeon.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 24268,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:28:02.496Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0c4b8190b0300a84706b",
+          "file": "dungeon.spec.ts",
+          "line": 17,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-28T22:27:12.933Z",
+    "duration": 74667.17300000001,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

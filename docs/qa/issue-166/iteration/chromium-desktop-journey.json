@@ -1,0 +1,2284 @@
+{
+  "seed": 3,
+  "entry": {
+    "id": "shaman-production-journey",
+    "seed": 3,
+    "encounterPolicy": "dungeon-encounters-v1",
+    "revision": 1,
+    "depth": 1,
+    "floors": [
+      {
+        "descriptor": {
+          "depth": 1,
+          "seed": 1094822266,
+          "template": "three-encounters-v1",
+          "generator": "rooms-v1",
+          "biome": "forest-v1",
+          "mapHash": "sha256:ff20d24e1335d243821f46f597ee4a0ecf0c8c3726e69e0bbc5abe52ee3c0450",
+          "upstairs": 52,
+          "downstairs": 310,
+          "encounters": [
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "normal",
+                "depth": 1,
+                "poolId": "forest",
+                "mapId": "forest_ruins",
+                "compositionId": "forest_ruins_shaman_v1",
+                "bossId": null,
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:forest_ruins",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:forest_ruins"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 1,
+                      "y": 8
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 2,
+                      "y": 8
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 1,
+                      "y": 9
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 4
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 9,
+                      "y": 2
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_shaman",
+                      "x": 8,
+                      "y": 5
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:forest_ruins",
+                "mapId": "map:forest_ruins",
+                "mapHash": "sha256:ac422194c5abcd30346b185319d8ec97393bf82b49f9bccb9b983102c95e80d2",
+                "kind": "authored"
+              }
+            },
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "elite",
+                "depth": 1,
+                "poolId": "forest",
+                "mapId": "woodland_crossing",
+                "compositionId": "woodland_crossing",
+                "bossId": null,
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:woodland_crossing",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:woodland_crossing"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 3,
+                      "y": 9
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 4,
+                      "y": 9
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 3,
+                      "y": 10
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 3,
+                      "y": 3
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 7,
+                      "y": 2
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 4
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:woodland_crossing",
+                "mapId": "map:woodland_crossing",
+                "mapHash": "sha256:15aefd548f329327020abbf1501aefe146bc7226547fc556ad2f871ea4a43136",
+                "kind": "authored"
+              }
+            },
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "boss",
+                "depth": 1,
+                "poolId": "forest_boss",
+                "mapId": "ruined_approach",
+                "compositionId": "ruined_approach",
+                "bossId": "forest_guardian",
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:ruined_approach",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:ruined_approach"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 5,
+                      "y": 9
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 6,
+                      "y": 9
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 5,
+                      "y": 10
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 4,
+                      "y": 5
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 7,
+                      "y": 5
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 3
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:ruined_approach",
+                "mapId": "map:ruined_approach",
+                "mapHash": "sha256:749eeaf90e79e43f6141410b171498e8d28c61295ec223a3e6cfde573addd431",
+                "kind": "authored"
+              }
+            }
+          ]
+        },
+        "position": 305,
+        "completed": 0,
+        "exploration": {
+          "version": "exploration-v1",
+          "pois": [
+            {
+              "id": "enemy-1",
+              "kind": "enemy",
+              "x": 5,
+              "y": 15,
+              "encounterSlot": 0
+            },
+            {
+              "id": "enemy-2",
+              "kind": "enemy",
+              "x": 2,
+              "y": 7,
+              "encounterSlot": 1
+            },
+            {
+              "id": "enemy-3",
+              "kind": "enemy",
+              "x": 11,
+              "y": 4,
+              "encounterSlot": 2
+            }
+          ],
+          "revealed": [
+            12,
+            31,
+            32,
+            33,
+            50,
+            51,
+            52,
+            53,
+            54,
+            71,
+            72,
+            73,
+            92,
+            265,
+            284,
+            285,
+            286,
+            303,
+            304,
+            305,
+            306,
+            307,
+            324,
+            325,
+            326,
+            345
+          ],
+          "visited": [
+            52,
+            305
+          ]
+        }
+      }
+    ],
+    "party": [
+      {
+        "heroId": "fighter",
+        "hp": 18,
+        "xp": 0,
+        "level": 1,
+        "maxHp": 18,
+        "learned": [
+          "ability:basic_attack",
+          "ability:guarded_strike"
+        ]
+      },
+      {
+        "heroId": "ranger",
+        "hp": 12,
+        "xp": 0,
+        "level": 1,
+        "maxHp": 12,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot"
+        ]
+      },
+      {
+        "heroId": "mage",
+        "hp": 11,
+        "xp": 0,
+        "level": 1,
+        "maxHp": 11,
+        "learned": [
+          "ability:basic_attack",
+          "ability:magic_missile"
+        ]
+      }
+    ],
+    "ownership": {
+      "consumables": [],
+      "equipment": [],
+      "assignments": []
+    },
+    "phase": "battle",
+    "offer": null,
+    "activeBattle": {
+      "format": 5,
+      "versions": {
+        "rules": 6,
+        "rng": 1,
+        "content": "sha256:f10972ab228c65e59f938aa1c584412c92035b85b9fd9161ffd8375afcb88cdc"
+      },
+      "seed": 1147525835,
+      "rng": {
+        "words": [
+          3212334569,
+          1694218034,
+          1623762141,
+          19
+        ],
+        "cursor": 6
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 1,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 9
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 8,
+            "y": 4
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 9,
+            "y": 2
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 8,
+            "y": 5
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_shaman",
+          "hp": 10
+        }
+      ],
+      "initiative": [
+        2,
+        3,
+        6,
+        5,
+        4,
+        1
+      ],
+      "activeIndex": 0,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 0
+    },
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:forest_ruins",
+      "mapHash": "sha256:ac422194c5abcd30346b185319d8ec97393bf82b49f9bccb9b983102c95e80d2",
+      "kind": "authored"
+    }
+  },
+  "commands": [
+    {
+      "type": "move",
+      "unitId": 2,
+      "to": {
+        "x": 3,
+        "y": 5
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "move",
+      "unitId": 3,
+      "to": {
+        "x": 2,
+        "y": 7
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 3
+    },
+    {
+      "type": "move",
+      "unitId": 6,
+      "to": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 6,
+      "abilityId": "ability:weakening_hex",
+      "target": {
+        "unitId": 2
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 6
+    },
+    {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 5,
+        "y": 2
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "move",
+      "unitId": 4,
+      "to": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 4
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 3,
+        "y": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 1
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "move",
+      "unitId": 3,
+      "to": {
+        "x": 5,
+        "y": 6
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 3,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 3
+    },
+    {
+      "type": "move",
+      "unitId": 6,
+      "to": {
+        "x": 7,
+        "y": 4
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 6,
+      "abilityId": "ability:heal_goblin",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 6
+    },
+    {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 4,
+        "y": 3
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "useAbility",
+      "unitId": 4,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 4
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 6,
+        "y": 7
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 1
+    },
+    {
+      "type": "move",
+      "unitId": 2,
+      "to": {
+        "x": 3,
+        "y": 8
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "useAbility",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 3
+    },
+    {
+      "type": "useAbility",
+      "unitId": 6,
+      "abilityId": "ability:heal_goblin",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 6
+    },
+    {
+      "type": "useAbility",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "useAbility",
+      "unitId": 4,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 4
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 1
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 2
+    },
+    {
+      "type": "move",
+      "unitId": 5,
+      "to": {
+        "x": 4,
+        "y": 5
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 2
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 5
+    },
+    {
+      "type": "move",
+      "unitId": 1,
+      "to": {
+        "x": 4,
+        "y": 6
+      }
+    },
+    {
+      "type": "useAbility",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "endTurn",
+      "unitId": 1
+    },
+    {
+      "type": "useAbility",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    }
+  ],
+  "events": [
+    {
+      "type": "moved",
+      "unitId": 2,
+      "path": [
+        {
+          "x": 2,
+          "y": 8
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 2,
+          "y": 6
+        },
+        {
+          "x": 2,
+          "y": 5
+        },
+        {
+          "x": 3,
+          "y": 5
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 6,
+      "natural": 7,
+      "bonus": 5,
+      "total": 12,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 6,
+      "damage": 4,
+      "hp": 6
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 3,
+      "path": [
+        {
+          "x": 1,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 8
+        },
+        {
+          "x": 2,
+          "y": 7
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 3
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 6,
+      "path": [
+        {
+          "x": 8,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 5
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 6,
+      "abilityId": "ability:weakening_hex",
+      "target": {
+        "unitId": 2
+      }
+    },
+    {
+      "type": "saveRolled",
+      "unitId": 2,
+      "natural": 3,
+      "modifier": 0,
+      "total": 3,
+      "dc": 12,
+      "saved": false
+    },
+    {
+      "type": "weakened",
+      "unitId": 2,
+      "sourceId": 6
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 5,
+      "path": [
+        {
+          "x": 9,
+          "y": 2
+        },
+        {
+          "x": 8,
+          "y": 2
+        },
+        {
+          "x": 7,
+          "y": 2
+        },
+        {
+          "x": 6,
+          "y": 2
+        },
+        {
+          "x": 5,
+          "y": 2
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 4,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 4,
+      "path": [
+        {
+          "x": 8,
+          "y": 4
+        },
+        {
+          "x": 8,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 6
+        },
+        {
+          "x": 7,
+          "y": 6
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 4
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 1
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 1,
+          "y": 8
+        },
+        {
+          "x": 1,
+          "y": 7
+        },
+        {
+          "x": 1,
+          "y": 6
+        },
+        {
+          "x": 2,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 2
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 5,
+      "natural": 16,
+      "bonus": 3,
+      "total": 19,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 5,
+      "damage": 4,
+      "hp": 4
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "weakenedExpired",
+      "unitId": 2,
+      "sourceId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 3,
+      "path": [
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 3,
+          "y": 7
+        },
+        {
+          "x": 4,
+          "y": 7
+        },
+        {
+          "x": 4,
+          "y": 6
+        },
+        {
+          "x": 5,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 3,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 3,
+      "targetId": 4,
+      "natural": 3,
+      "bonus": 3,
+      "total": 6,
+      "armorClass": 12,
+      "result": "miss"
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 3
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 6,
+      "path": [
+        {
+          "x": 7,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 4
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 6,
+      "abilityId": "ability:heal_goblin",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "healed",
+      "unitId": 5,
+      "healing": 4,
+      "hp": 8
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 5,
+      "path": [
+        {
+          "x": 5,
+          "y": 2
+        },
+        {
+          "x": 4,
+          "y": 2
+        },
+        {
+          "x": 4,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 5,
+      "targetId": 3,
+      "natural": 8,
+      "bonus": 6,
+      "total": 14,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 3,
+      "damage": 4,
+      "hp": 7
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 4,
+      "round": 2
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 4,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 4,
+      "targetId": 3,
+      "natural": 1,
+      "bonus": 4,
+      "total": 5,
+      "armorClass": 11,
+      "result": "miss"
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 4
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 2
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 7
+        },
+        {
+          "x": 6,
+          "y": 7
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 1,
+      "targetId": 4,
+      "natural": 11,
+      "bonus": 2,
+      "total": 13,
+      "armorClass": 12,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 5,
+      "hp": 4
+    },
+    {
+      "type": "guarded",
+      "unitId": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 3
+    },
+    {
+      "type": "moved",
+      "unitId": 2,
+      "path": [
+        {
+          "x": 3,
+          "y": 5
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 3,
+          "y": 7
+        },
+        {
+          "x": 3,
+          "y": 8
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 4,
+      "natural": 2,
+      "bonus": 7,
+      "total": 9,
+      "armorClass": 12,
+      "result": "miss"
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 3,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 3,
+      "abilityId": "ability:magic_missile",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "missileRolled",
+      "unitId": 3,
+      "targetId": 4,
+      "missile": 1,
+      "natural": 2,
+      "damage": 3
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 3,
+      "hp": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 3
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 6,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 6,
+      "abilityId": "ability:heal_goblin",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "healed",
+      "unitId": 4,
+      "healing": 4,
+      "hp": 5
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 6
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 5,
+      "targetId": 3,
+      "natural": 15,
+      "bonus": 6,
+      "total": 21,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 3,
+      "damage": 4,
+      "hp": 3
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 4,
+      "round": 3
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 4,
+      "abilityId": "ability:basic_attack",
+      "target": {
+        "unitId": 3
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 4,
+      "targetId": 3,
+      "natural": 17,
+      "bonus": 4,
+      "total": 21,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 3,
+      "damage": 4,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 3
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 4
+    },
+    {
+      "type": "guardExpired",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 3
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 6,
+          "y": 7
+        },
+        {
+          "x": 7,
+          "y": 7
+        },
+        {
+          "x": 7,
+          "y": 6
+        },
+        {
+          "x": 7,
+          "y": 5
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 6
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 1,
+      "targetId": 6,
+      "natural": 20,
+      "bonus": 2,
+      "total": 22,
+      "armorClass": 11,
+      "result": "critical"
+    },
+    {
+      "type": "damaged",
+      "unitId": 6,
+      "damage": 10,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 6
+    },
+    {
+      "type": "guarded",
+      "unitId": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 4
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 4
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 4,
+      "natural": 16,
+      "bonus": 7,
+      "total": 23,
+      "armorClass": 12,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 4,
+      "damage": 6,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 4
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 2
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 5,
+      "round": 4
+    },
+    {
+      "type": "moved",
+      "unitId": 5,
+      "path": [
+        {
+          "x": 4,
+          "y": 3
+        },
+        {
+          "x": 4,
+          "y": 4
+        },
+        {
+          "x": 4,
+          "y": 5
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 5,
+      "abilityId": "ability:shortbow_shot",
+      "target": {
+        "unitId": 2
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 5,
+      "targetId": 2,
+      "natural": 4,
+      "bonus": 6,
+      "total": 10,
+      "armorClass": 12,
+      "result": "miss"
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 5
+    },
+    {
+      "type": "guardExpired",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 1,
+      "round": 4
+    },
+    {
+      "type": "moved",
+      "unitId": 1,
+      "path": [
+        {
+          "x": 7,
+          "y": 5
+        },
+        {
+          "x": 7,
+          "y": 6
+        },
+        {
+          "x": 6,
+          "y": 6
+        },
+        {
+          "x": 5,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 1,
+      "abilityId": "ability:guarded_strike",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 1,
+      "targetId": 5,
+      "natural": 15,
+      "bonus": 0,
+      "total": 15,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 5,
+      "damage": 5,
+      "hp": 3
+    },
+    {
+      "type": "guarded",
+      "unitId": 1
+    },
+    {
+      "type": "turnEnded",
+      "unitId": 1
+    },
+    {
+      "type": "turnStarted",
+      "unitId": 2,
+      "round": 5
+    },
+    {
+      "type": "abilityUsed",
+      "unitId": 2,
+      "abilityId": "ability:high_shot",
+      "target": {
+        "unitId": 5
+      }
+    },
+    {
+      "type": "attackRolled",
+      "unitId": 2,
+      "targetId": 5,
+      "natural": 18,
+      "bonus": 3,
+      "total": 21,
+      "armorClass": 11,
+      "result": "hit"
+    },
+    {
+      "type": "damaged",
+      "unitId": 5,
+      "damage": 4,
+      "hp": 0
+    },
+    {
+      "type": "defeated",
+      "unitId": 5
+    },
+    {
+      "type": "battleEnded",
+      "outcome": "playerWin"
+    }
+  ],
+  "state": {
+    "activeIndex": 0,
+    "commandCount": 53,
+    "format": 5,
+    "initiative": [
+      2,
+      3,
+      6,
+      5,
+      4,
+      1
+    ],
+    "mapId": "map:forest_ruins",
+    "outcome": "playerWin",
+    "rng": {
+      "words": [
+        3479775799,
+        1141712907,
+        498737641,
+        35
+      ],
+      "cursor": 22
+    },
+    "round": 5,
+    "seed": 1147525835,
+    "units": [
+      {
+        "cell": {
+          "x": 4,
+          "y": 6
+        },
+        "defId": "fighter",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 18,
+        "id": 1,
+        "side": "player",
+        "guarded": true
+      },
+      {
+        "cell": {
+          "x": 3,
+          "y": 8
+        },
+        "defId": "ranger",
+        "hasActed": true,
+        "hasMoved": false,
+        "hp": 12,
+        "id": 2,
+        "side": "player"
+      },
+      {
+        "cell": {
+          "x": 5,
+          "y": 6
+        },
+        "defId": "mage",
+        "hasActed": true,
+        "hasMoved": false,
+        "hp": 0,
+        "id": 3,
+        "side": "player"
+      },
+      {
+        "cell": {
+          "x": 6,
+          "y": 6
+        },
+        "defId": "goblin_grunt",
+        "hasActed": true,
+        "hasMoved": false,
+        "hp": 0,
+        "id": 4,
+        "side": "enemy"
+      },
+      {
+        "cell": {
+          "x": 4,
+          "y": 5
+        },
+        "defId": "goblin_archer",
+        "hasActed": true,
+        "hasMoved": true,
+        "hp": 0,
+        "id": 5,
+        "side": "enemy"
+      },
+      {
+        "cell": {
+          "x": 7,
+          "y": 4
+        },
+        "defId": "goblin_shaman",
+        "hasActed": true,
+        "hasMoved": false,
+        "hp": 0,
+        "id": 6,
+        "side": "enemy"
+      }
+    ],
+    "versions": {
+      "content": "sha256:f10972ab228c65e59f938aa1c584412c92035b85b9fd9161ffd8375afcb88cdc",
+      "rng": 1,
+      "rules": 6
+    }
+  },
+  "reloaded": true,
+  "final": {
+    "activeBattle": null,
+    "battlefield": null,
+    "depth": 1,
+    "encounterPolicy": "dungeon-encounters-v1",
+    "floors": [
+      {
+        "descriptor": {
+          "biome": "forest-v1",
+          "depth": 1,
+          "downstairs": 310,
+          "encounters": [
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "normal",
+                "depth": 1,
+                "poolId": "forest",
+                "mapId": "forest_ruins",
+                "compositionId": "forest_ruins_shaman_v1",
+                "bossId": null,
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:forest_ruins",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:forest_ruins"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 1,
+                      "y": 8
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 2,
+                      "y": 8
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 1,
+                      "y": 9
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 4
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 9,
+                      "y": 2
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_shaman",
+                      "x": 8,
+                      "y": 5
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:forest_ruins",
+                "kind": "authored",
+                "mapHash": "sha256:ac422194c5abcd30346b185319d8ec97393bf82b49f9bccb9b983102c95e80d2",
+                "mapId": "map:forest_ruins"
+              }
+            },
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "elite",
+                "depth": 1,
+                "poolId": "forest",
+                "mapId": "woodland_crossing",
+                "compositionId": "woodland_crossing",
+                "bossId": null,
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:woodland_crossing",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:woodland_crossing"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 3,
+                      "y": 9
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 4,
+                      "y": 9
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 3,
+                      "y": 10
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 3,
+                      "y": 3
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 7,
+                      "y": 2
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 4
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:woodland_crossing",
+                "kind": "authored",
+                "mapHash": "sha256:15aefd548f329327020abbf1501aefe146bc7226547fc556ad2f871ea4a43136",
+                "mapId": "map:woodland_crossing"
+              }
+            },
+            {
+              "selection": {
+                "policy": "dungeon-encounters-v1",
+                "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
+                "biome": "forest",
+                "kind": "boss",
+                "depth": 1,
+                "poolId": "forest_boss",
+                "mapId": "ruined_approach",
+                "compositionId": "ruined_approach",
+                "bossId": "forest_guardian",
+                "scalingPolicy": "enemy-depth-v1",
+                "encounter": {
+                  "id": "encounter:ruined_approach",
+                  "source": {
+                    "kind": "authored",
+                    "mapId": "map:ruined_approach"
+                  },
+                  "roster": [
+                    {
+                      "id": 1,
+                      "side": "heroes",
+                      "unitId": "fighter",
+                      "x": 5,
+                      "y": 9
+                    },
+                    {
+                      "id": 2,
+                      "side": "heroes",
+                      "unitId": "ranger",
+                      "x": 6,
+                      "y": 9
+                    },
+                    {
+                      "id": 3,
+                      "side": "heroes",
+                      "unitId": "mage",
+                      "x": 5,
+                      "y": 10
+                    },
+                    {
+                      "id": 4,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 4,
+                      "y": 5
+                    },
+                    {
+                      "id": 5,
+                      "side": "enemies",
+                      "unitId": "goblin_archer",
+                      "x": 7,
+                      "y": 5
+                    },
+                    {
+                      "id": 6,
+                      "side": "enemies",
+                      "unitId": "goblin_grunt",
+                      "x": 8,
+                      "y": 3
+                    }
+                  ]
+                }
+              },
+              "battlefield": {
+                "encounterId": "encounter:ruined_approach",
+                "kind": "authored",
+                "mapHash": "sha256:749eeaf90e79e43f6141410b171498e8d28c61295ec223a3e6cfde573addd431",
+                "mapId": "map:ruined_approach"
+              }
+            }
+          ],
+          "generator": "rooms-v1",
+          "mapHash": "sha256:ff20d24e1335d243821f46f597ee4a0ecf0c8c3726e69e0bbc5abe52ee3c0450",
+          "seed": 1094822266,
+          "template": "three-encounters-v1",
+          "upstairs": 52
+        },
+        "position": 305,
+        "completed": 1,
+        "exploration": {
+          "version": "exploration-v1",
+          "pois": [
+            {
+              "id": "enemy-1",
+              "kind": "enemy",
+              "x": 5,
+              "y": 15,
+              "encounterSlot": 0
+            },
+            {
+              "id": "enemy-2",
+              "kind": "enemy",
+              "x": 2,
+              "y": 7,
+              "encounterSlot": 1
+            },
+            {
+              "id": "enemy-3",
+              "kind": "enemy",
+              "x": 11,
+              "y": 4,
+              "encounterSlot": 2
+            }
+          ],
+          "revealed": [
+            12,
+            31,
+            32,
+            33,
+            50,
+            51,
+            52,
+            53,
+            54,
+            70,
+            71,
+            72,
+            73,
+            74,
+            90,
+            91,
+            92,
+            93,
+            94,
+            110,
+            111,
+            112,
+            113,
+            114,
+            130,
+            131,
+            132,
+            133,
+            134,
+            150,
+            151,
+            152,
+            153,
+            154,
+            170,
+            171,
+            172,
+            173,
+            174,
+            190,
+            191,
+            192,
+            193,
+            194,
+            210,
+            211,
+            212,
+            213,
+            214,
+            230,
+            231,
+            232,
+            233,
+            234,
+            249,
+            250,
+            251,
+            252,
+            253,
+            254,
+            265,
+            266,
+            267,
+            268,
+            269,
+            270,
+            271,
+            272,
+            273,
+            284,
+            285,
+            286,
+            287,
+            288,
+            289,
+            290,
+            291,
+            292,
+            293,
+            303,
+            304,
+            305,
+            306,
+            307,
+            308,
+            309,
+            310,
+            311,
+            312,
+            324,
+            325,
+            326,
+            327,
+            328,
+            329,
+            330,
+            331,
+            345,
+            346,
+            347,
+            348,
+            349,
+            350
+          ],
+          "visited": [
+            52,
+            72,
+            92,
+            112,
+            132,
+            152,
+            172,
+            192,
+            212,
+            232,
+            251,
+            252,
+            271,
+            290,
+            291,
+            305,
+            306,
+            307,
+            308,
+            309,
+            310
+          ]
+        }
+      }
+    ],
+    "id": "shaman-production-journey",
+    "offer": {
+      "version": 1,
+      "id": "shaman-production-journey:floor:1:reward:0",
+      "seed": 603909282,
+      "catalogIdentity": "sha256:30219b13cb4e46b13e8275be5a61fc845a3c96d6f933d1168801881629a81ac9",
+      "options": [
+        {
+          "itemId": "item:aiming_charm",
+          "quantity": 1
+        },
+        {
+          "itemId": "item:healing_draught",
+          "quantity": 1
+        }
+      ]
+    },
+    "ownership": {
+      "consumables": [],
+      "equipment": [],
+      "assignments": []
+    },
+    "party": [
+      {
+        "heroId": "fighter",
+        "hp": 18,
+        "xp": 30,
+        "level": 1,
+        "maxHp": 18,
+        "learned": [
+          "ability:basic_attack",
+          "ability:guarded_strike"
+        ]
+      },
+      {
+        "heroId": "ranger",
+        "hp": 12,
+        "xp": 30,
+        "level": 1,
+        "maxHp": 12,
+        "learned": [
+          "ability:basic_attack",
+          "ability:high_shot"
+        ]
+      },
+      {
+        "heroId": "mage",
+        "hp": 0,
+        "xp": 0,
+        "level": 1,
+        "maxHp": 11,
+        "learned": [
+          "ability:basic_attack",
+          "ability:magic_missile"
+        ]
+      }
+    ],
+    "phase": "reward",
+    "revision": 73,
+    "seed": 3
+  }
+}

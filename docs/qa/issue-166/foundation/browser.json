@@ -1,0 +1,1073 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\apexw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\node_modules\\playwright\\cli.js",
+      "test",
+      "tests/content-loading.spec.ts",
+      "tests/battle-board.spec.ts",
+      "tests/public-asset-base.spec.ts",
+      "-g",
+      "content smoke|default authored board renders|collector cold/warm|public assets respect",
+      "--reporter=line,json",
+      "--output=tmp/issue166/foundation-browser-repaired-artifacts"
+    ],
+    "configFile": "C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\playwright.config.ts",
+    "rootDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/foundation-browser-repaired-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/foundation-browser-repaired-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tmp/issue166/foundation-browser-repaired-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "C:/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru/tests",
+        "testIgnore": [
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "battle-board.spec.ts",
+      "file": "battle-board.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:40.548Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2285cd14e26b4e18f62c-82089feb62f9efa00fa2",
+          "file": "battle-board.spec.ts",
+          "line": 436,
+          "column": 1
+        },
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6401,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:10.472Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2285cd14e26b4e18f62c-c610e0be1a259e8d4301",
+          "file": "battle-board.spec.ts",
+          "line": 436,
+          "column": 1
+        },
+        {
+          "title": "default authored board renders canonical units, highlights and stable restarts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6571,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:39.386Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2285cd14e26b4e18f62c-219af80335b65d1aed1e",
+          "file": "battle-board.spec.ts",
+          "line": 436,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "content-loading.spec.ts",
+      "file": "content-loading.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "content smoke: success",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 991,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:47.605Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-cc32c6e937595c053dad",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: malformed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 807,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:48.617Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-245534db910f071cd083",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: unknown",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1136,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:49.455Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-135433c6851d12f6e526",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: missing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 943,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:50.610Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-b4539d36bbb7a7d5c62d",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: corrupt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 841,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:51.589Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-dc8b5f219eee5e1b5faa",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: stalled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11053,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T21:59:52.444Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-b96d0f4259b9795b5834",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: success",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1062,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:17.278Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-cdde41c00b0367a5114e",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: malformed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 744,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:18.356Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-a423d16de42217bfe40e",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: unknown",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 745,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:19.114Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-d83d345b98cd918295da",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: missing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 684,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:19.870Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-10ecb07b83b731cfdfdb",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: corrupt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 670,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:20.567Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-d1c452b7082e016da36d",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: stalled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11020,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:21.247Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-b741f6340526032adf3c",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: success",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1062,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:46.286Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-34eb753459a93cd12a87",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: malformed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 680,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:47.374Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-5e5d8a8cd92fd12f7ed0",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: unknown",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 699,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:48.065Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-a5aa29673472e491aa7d",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: missing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 737,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:48.775Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-da45e2c276dcf5e8b0c7",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: corrupt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 698,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:49.524Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-edec9f4ef7d78d6015e5",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        },
+        {
+          "title": "content smoke: stalled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11033,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:50.232Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cfd2027d0e3ff159996d-a7e6edd9015232784b10",
+          "file": "content-loading.spec.ts",
+          "line": 5,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "public-asset-base.spec.ts",
+      "file": "public-asset-base.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2683,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:03.555Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-ad01dde95bc4d767f1d8",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3420,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:06.249Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-1a54672bf9c4708ada61",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2790,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:32.325Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-4db72e73bb57472d8b3d",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-portrait",
+              "projectName": "mobile-portrait",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3393,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:00:35.127Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-3dfbd4b365fecbd573cf",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm battle uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2822,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:01:01.319Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-de0d75c8ea7094081a51",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        },
+        {
+          "title": "collector cold/warm run uses real controls and isolates only v2 saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3124,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-28T22:01:04.153Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "65be83c730a4dc5a6388-f9dc6cc9b2646591bb4d",
+          "file": "public-asset-base.spec.ts",
+          "line": 12,
+          "column": 34
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-28T21:59:38.769Z",
+    "duration": 89483.964,
+    "expected": 27,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

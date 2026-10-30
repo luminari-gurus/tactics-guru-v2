@@ -1,0 +1,1711 @@
+{
+  "map-preview": {
+    "mode": "preview",
+    "command": "npx --no-install playwright test tests/overworld-map.spec.ts --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/map-preview.json",
+    "rawSha256": "f9a68b89fe5fbc33c3f385606b2b756474f1cda5bbe40a49cb79a0b3d9cb933e",
+    "stats": {
+      "startTime": "2026-10-25T16:06:20.963Z",
+      "duration": 59265.358,
+      "expected": 69,
+      "skipped": 3,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-2118bb83db4f7da26628",
+        "title": "failed route import at /map shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 173,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1fe0e7cc45b309394461",
+        "title": "failed route import at / shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 361,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 612,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c5a3370431e318966ae6",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 362,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-4272eb10e486397f89fa",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 230,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-cb4cd2c5c20d1e5ed0d0",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 734,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ef1783fc7d77add807d2",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 1519,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1e4d904884f6e48686b7",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 408,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b2128bf522d1055e4daa",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 2840,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0b7f3b6bd5d3180c11e2",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 290,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f86c63086244ca9c988f",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 135,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-74030444265263fad28d",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 143,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-efcb1c855f933217bd15",
+        "title": "art late loads preserve newer selections and seed validation",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 283,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-aa14e33f5544d86facb9",
+        "title": "markers follow committed controls and preserve pending edits",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 388,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-34be7a6ededf01bd01c8",
+        "title": "markers survive delayed artwork success after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 282,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-67c4e2f6e13d120e4fb2",
+        "title": "markers survive delayed artwork network after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 176,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b72288cf4017a110588e",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 173,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f33cd453d8c4bcad96a2",
+        "title": "markers remain readable at 320px with usable native controls",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 687,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "skipped",
+        "expectedStatus": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "retry": 0,
+            "duration": 93,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d7ce29f30a475d0e6a72",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 164,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 62,
+                  "line": 693
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1118\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\n  691 |     }));\n  692 |   expect(new Set(requests).size).toBe(3);\n> 693 |   expect(entries.reduce((n, entry) => n + entry.encoded, 0)).toBe(1118);\n      |                                                              ^\n  694 |   const base = new URL(testInfo.project.use.baseURL as string);\n  695 |   expect(requests.every(url => new URL(url).pathname.startsWith(`${base.pathname}map-art/legacy-8bit/`))).toBe(true);\n  696 |   await testInfo.attach('art-transfers', { body: JSON.stringify(entries, null, 2), contentType: 'application/json' });\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:693:62"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e3c5163994978ac9f6fb",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 455,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5a63eade9978471e3a04",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 141,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-db03059e479ccb8dcc5b",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3223,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-00da32ec5fd091c0986f",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 266,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f8578fdf5d3bbc2170e7",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3455,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-a3e5f09fc3b1c031ede3",
+        "title": "failed route import at /map shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 177,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-3f7d57abf1deb9b71359",
+        "title": "failed route import at / shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 361,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 639,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d511284e776f3ad42fb6",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 355,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9632f5dd1d6b42832a5b",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 227,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0647db39d4c1f6f00ba0",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 735,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d95c6503e7e594449b5e",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 1723,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1593d99708aec4401b5e",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 338,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e8f0621fdc204c2aa068",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3268,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-dedaa9cc6aca9d47e5eb",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 287,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-125acf385dfeef9a1ef9",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 135,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-84d1b8e4c83cd63534ee",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 139,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1a8e62307f99291f805c",
+        "title": "art late loads preserve newer selections and seed validation",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 283,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1d389435d6a6a25130a2",
+        "title": "markers follow committed controls and preserve pending edits",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 391,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f9f64c0ea370f4d6faeb",
+        "title": "markers survive delayed artwork success after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 273,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-e1a679ad77f3e5a13757",
+        "title": "markers survive delayed artwork network after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 171,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-cc4009f24d2ea2f1632f",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 277,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ad12b40a4b2f3a3ce187",
+        "title": "markers remain readable at 320px with usable native controls",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 883,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "skipped",
+        "expectedStatus": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "retry": 0,
+            "duration": 92,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d86092afae4aa282c1a9",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 148,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 62,
+                  "line": 693
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1118\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\n  691 |     }));\n  692 |   expect(new Set(requests).size).toBe(3);\n> 693 |   expect(entries.reduce((n, entry) => n + entry.encoded, 0)).toBe(1118);\n      |                                                              ^\n  694 |   const base = new URL(testInfo.project.use.baseURL as string);\n  695 |   expect(requests.every(url => new URL(url).pathname.startsWith(`${base.pathname}map-art/legacy-8bit/`))).toBe(true);\n  696 |   await testInfo.attach('art-transfers', { body: JSON.stringify(entries, null, 2), contentType: 'application/json' });\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:693:62"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-849d21d7c5cca9efbc89",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 559,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-df112e3d103d7ce93160",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 141,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9d409981cd05957e40dd",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3224,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-9db9801f2cf8456879c3",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 260,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-10da89e3886624b99161",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3398,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-00b8423b76c12e8f77aa",
+        "title": "failed route import at /map shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 175,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1f00aa65719e18a52902",
+        "title": "failed route import at / shows a reload instruction",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 355,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 628,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-8c08441ccb74e33b8e1d",
+        "title": "map isolates battle storage and never initializes battle, audio or diagnostics",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 376,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b8b5b68eaecc3206803c",
+        "title": "new seed still works when browser entropy fails or returns the current seed",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 213,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-858058270e2caa4f1875",
+        "title": "map types apply the displayed seed and retain committed choices",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 842,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-b24d584d877ca0a3fb4d",
+        "title": "biome combinations preserve topology and render matching Simple legends",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 1917,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2c5771223f4fffb25262",
+        "title": "biome and type changes apply edited seeds and roll back invalid selections",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 340,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-44129a5d93bef81effea",
+        "title": "art styles preserve map data across all combinations and match legends",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3717,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-03acd54bf4ef578ffdcf",
+        "title": "art controls retain pending seeds, reject invalid edits and retain selections",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 288,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-04837b1fe55ca3c8dca1",
+        "title": "art network failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 135,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-dc1ab9448127116f7825",
+        "title": "art decode failure uses partial Simple fallback and matching legend",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 138,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-6964dfa6acd0de1859ee",
+        "title": "art late loads preserve newer selections and seed validation",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 280,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-f316cb6d5ccccbe6dc75",
+        "title": "markers follow committed controls and preserve pending edits",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 389,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2bbf73a7f9c5dd9f2bd5",
+        "title": "markers survive delayed artwork success after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 281,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-38e4a5331ffe2af5e5d9",
+        "title": "markers survive delayed artwork network after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 170,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c3c52d12a5cfa2b9e026",
+        "title": "markers survive delayed artwork decode after a newer world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 167,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0efa2bf76d577b00e616",
+        "title": "markers remain readable at 320px with usable native controls",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 922,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "skipped",
+        "expectedStatus": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "retry": 0,
+            "duration": 92,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-92f6d04ddc64244d269b",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 163,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 62,
+                  "line": 693
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1118\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\n  691 |     }));\n  692 |   expect(new Set(requests).size).toBe(3);\n> 693 |   expect(entries.reduce((n, entry) => n + entry.encoded, 0)).toBe(1118);\n      |                                                              ^\n  694 |   const base = new URL(testInfo.project.use.baseURL as string);\n  695 |   expect(requests.every(url => new URL(url).pathname.startsWith(`${base.pathname}map-art/legacy-8bit/`))).toBe(true);\n  696 |   await testInfo.attach('art-transfers', { body: JSON.stringify(entries, null, 2), contentType: 'application/json' });\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:693:62"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-1bdd125c23bdea2e452a",
+        "title": "enemy movement preserves controls, shows both profiles and resets reproducibly",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 565,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-ca459133277dee20ff4f",
+        "title": "movement pauses hidden time and resumes one full interval without duplicate loops",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 143,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-2d7adfe85250113f54e1",
+        "title": "real-time enemy movement advances automatically and departure starts a fresh world",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3224,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-65f87a3616571d4b32c9",
+        "title": "disposal cancels movement and ignores late artwork and control callbacks",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 261,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-7baa41856dad3ad75d56",
+        "title": "BFCache restores the retained movement world without hidden-time catch-up",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 3385,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "transfer-repair": {
+    "mode": "preview",
+    "command": "npx --no-install playwright test tests/overworld-map.spec.ts -g \"art uses configured base\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/transfer-repair.json",
+    "rawSha256": "df83df60cb01bc3ff44f04715b8295f4a21a539f5841f9d04665947d2a134d8a",
+    "stats": {
+      "startTime": "2026-10-25T16:07:47.453Z",
+      "duration": 3420.525,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-d7ce29f30a475d0e6a72",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 430,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-d86092afae4aa282c1a9",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 433,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-92f6d04ddc64244d269b",
+        "title": "art uses configured base, bounded transfers and no battle requests",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 440,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "dev-placement": {
+    "mode": "dev",
+    "command": "PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g \"controlled placement failure preserves complete state and supports retry\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/dev-placement.json",
+    "rawSha256": "b91810ad8d3a840340ee58915e5d2b38adc2d303e8f784fb6fb93e6cc30fdfca",
+    "stats": {
+      "startTime": "2026-10-25T16:07:51.264Z",
+      "duration": 3067.735,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-c80b18069c33767e3038",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 376,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-055b697dc15e8ecedec3",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 362,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-c58c836c5938e8531610",
+        "title": "controlled placement failure preserves complete state and supports retry",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 367,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "root-route": {
+    "mode": "preview /",
+    "command": "npx --no-install playwright test tests/public-asset-base.spec.ts -g \"extracted map route still loads directly and on refresh at the base\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/root-route.json",
+    "rawSha256": "8ad64ce65f82b92151f9589d054f9332ebadb112682cf81f7365477585f84cba",
+    "stats": {
+      "startTime": "2026-10-25T16:08:50.467Z",
+      "duration": 2597.473,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "65be83c730a4dc5a6388-b2fd555c96014b091f43",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 173,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-7138aa6bf9d2ed022539",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 166,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b1e6c3d63b0e0f0a4395",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 183,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "prefix-routes": {
+    "mode": "preview /prototype/",
+    "command": "PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test tests/overworld-map.spec.ts tests/public-asset-base.spec.ts -g \"map direct entry|extracted map route\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/prefix-routes.json",
+    "rawSha256": "4541390e5d12ebe918fd1bec768177fc430b9364ca94b032fa4a52c580f5bb61",
+    "stats": {
+      "startTime": "2026-10-25T16:08:58.770Z",
+      "duration": 19525.721,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 5144,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 38,
+                  "line": 82
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#map-grid').locator('span')\nExpected: \u001b[32m400\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('#map-grid').locator('span') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#map-grid').locator('span')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  80 |   await page.goto('/map');\n  81 |   const grid = page.locator('#map-grid');\n> 82 |   await expect(grid.locator('span')).toHaveCount(400);\n     |                                      ^\n  83 |   await expect(grid).toHaveAttribute('data-seed', '1');\n  84 |   await expectMarkers(page);\n  85 |   await page.reload();\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:82:38"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 5140,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 38,
+                  "line": 82
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#map-grid').locator('span')\nExpected: \u001b[32m400\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('#map-grid').locator('span') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#map-grid').locator('span')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  80 |   await page.goto('/map');\n  81 |   const grid = page.locator('#map-grid');\n> 82 |   await expect(grid.locator('span')).toHaveCount(400);\n     |                                      ^\n  83 |   await expect(grid).toHaveAttribute('data-seed', '1');\n  84 |   await expectMarkers(page);\n  85 |   await page.reload();\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:82:38"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "unexpected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 5142,
+            "errors": [
+              {
+                "location": {
+                  "file": "/Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts",
+                  "column": 38,
+                  "line": 82
+                },
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#map-grid').locator('span')\nExpected: \u001b[32m400\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('#map-grid').locator('span') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#map-grid').locator('span')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  80 |   await page.goto('/map');\n  81 |   const grid = page.locator('#map-grid');\n> 82 |   await expect(grid.locator('span')).toHaveCount(400);\n     |                                      ^\n  83 |   await expect(grid).toHaveAttribute('data-seed', '1');\n  84 |   await expectMarkers(page);\n  85 |   await page.reload();\n    at /Users/brian/Code/tactics-guru-v2/tests/overworld-map.spec.ts:82:38"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b2fd555c96014b091f43",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 170,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-7138aa6bf9d2ed022539",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 164,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "65be83c730a4dc5a6388-b1e6c3d63b0e0f0a4395",
+        "title": "extracted map route still loads directly and on refresh at the base",
+        "file": "public-asset-base.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 166,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "prefix-repair": {
+    "mode": "preview /prototype/",
+    "command": "PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test tests/overworld-map.spec.ts -g \"map direct entry\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/prefix-repair.json",
+    "rawSha256": "00615fb6622a92dcb12fdc216199711aeca8eae0a63599746bc13a270c4ff351",
+    "stats": {
+      "startTime": "2026-10-25T16:10:07.321Z",
+      "duration": 4033.749,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 642,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 652,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 674,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  },
+  "final-entry": {
+    "mode": "preview /",
+    "command": "npx --no-install playwright test tests/overworld-map.spec.ts -g \"map direct entry\" --reporter=line,json",
+    "executableOverride": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "rawReport": "tmp/verification/issue-155/final-entry.json",
+    "rawSha256": "18281b477db1a17e4b384be9eeedc920f68ddac17692416bad2d52eecac7ea90",
+    "stats": {
+      "startTime": "2026-10-25T16:10:43.919Z",
+      "duration": 4002.981,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "cases": [
+      {
+        "id": "d9bd0a856cf9225a8852-53e66be88fada3d5d101",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "desktop",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 649,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-5de3d9c5591d294d6178",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-portrait",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 660,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "id": "d9bd0a856cf9225a8852-0412a7ed78f91674ff8a",
+        "title": "map direct entry, refresh, seeds and responsive inspection",
+        "file": "overworld-map.spec.ts",
+        "project": "mobile-landscape",
+        "status": "expected",
+        "expectedStatus": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "retry": 0,
+            "duration": 666,
+            "errors": []
+          }
+        ]
+      }
+    ]
+  }
+}

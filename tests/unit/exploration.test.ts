@@ -88,7 +88,7 @@ describe('movement onto stairs',()=>{
   expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
   const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));
   const revisit=good(stepDungeon(reentered,command(reentered,currentFloor(reentered).descriptor.downstairs)));
-  expect(revisit.depth).toBe(2);expect(currentFloor(revisit)).toEqual({...currentFloor(off),position:currentFloor(off).descriptor.upstairs});
+  expect(revisit.depth).toBe(2);expect(currentFloor(revisit)).toEqual(first.floors[1]);
   expect(canonical(before)).toBe(original);
  });
  it('allows movement onto unavailable stairs without traveling, and rejects phase and counter boundaries',()=>{

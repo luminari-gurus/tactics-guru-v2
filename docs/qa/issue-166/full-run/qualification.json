@@ -1,0 +1,135 @@
+{
+  "qualifiedSource": "f4616ae301da4be133455334d4c2b38e3583c8f7",
+  "inputHash": "4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575",
+  "base": "b343ab02ae033a57f8c5f613f07883764f0752c0",
+  "complete": true,
+  "readiness": "All required behavior and full-policy families accounted for using current affected checks plus valid explicit reuse.",
+  "cleanFullSuiteRun": false,
+  "originalAggregatePassed": false,
+  "originalFailuresPreserved": 9,
+  "original": "aggregate/manifest.json",
+  "boundedRepair": "repair/manifest.json",
+  "integration": "integration/manifest.json",
+  "stages": [
+    {
+      "id": "tooling",
+      "originalStatus": "passed",
+      "currentEvidence": "reuse",
+      "basis": "Original tooling passed; all scripts/config/package inputs unchanged."
+    },
+    {
+      "id": "units",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Integration prerequisites: 1069/1069, including every changed dungeon/movement consumer."
+    },
+    {
+      "id": "typecheck",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Both integration TypeScript scopes passed."
+    },
+    {
+      "id": "build-integration",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Both real root/prefix header builds passed."
+    },
+    {
+      "id": "build-root",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Frozen integration root production build passed."
+    },
+    {
+      "id": "chromium",
+      "originalStatus": "failed",
+      "currentEvidence": "fresh + reuse",
+      "basis": "All affected dungeon/exploration/lifecycle/map and restart/backup cases refreshed; unchanged combat/input/renderer/fixture families retain the original full source-bound results. Every original failed owning case is superseded by passing current witnesses/backup checks."
+    },
+    {
+      "id": "fixtures",
+      "originalStatus": "passed",
+      "currentEvidence": "reuse",
+      "basis": "All 87 dev fixture cases passed originally; fixture suites, catalogs/ability pickers and their pure/session/Phaser consumers unchanged since the qualified 28c repair. Main changes map/dungeon entry and focus, covered separately."
+    },
+    {
+      "id": "placement-dev",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Both dev-only map cases across all three profiles pass (6), including original placement and inherited disposer."
+    },
+    {
+      "id": "webkit-acceptance",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh + reuse",
+      "basis": "Original 54 acceptance cases plus all current affected standalone/run focus and backup cases (6). Changed dungeon flows are in the complete fresh WebKit exploration matrix."
+    },
+    {
+      "id": "webkit-exploration",
+      "originalStatus": "failed",
+      "currentEvidence": "fresh",
+      "basis": "Complete 105-case current WebKit exploration config passed, including four production journeys per device profile."
+    },
+    {
+      "id": "health-bars",
+      "originalStatus": "passed",
+      "currentEvidence": "reuse",
+      "basis": "Original 25 pass; health-bar code, unit projection, presentation and test inputs unchanged; current Shaman board/inspection screenshots reviewed."
+    },
+    {
+      "id": "telemetry-production",
+      "originalStatus": "passed",
+      "currentEvidence": "reuse",
+      "basis": "Original dedicated instrumented-production 36 pass; telemetry modules/schema, transport, instrumentation, commands/config/dependencies and test inputs unchanged. Current changes are movement/entry/focus, with their consumers separately refreshed; ordinary build is not substituted for instrumented proof."
+    },
+    {
+      "id": "telemetry-development",
+      "originalStatus": "passed",
+      "currentEvidence": "reuse",
+      "basis": "Original dedicated configured-dev 36 pass under the same unchanged telemetry input/reach basis; retained independently from production."
+    },
+    {
+      "id": "assets-root-dev",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh + reuse",
+      "basis": "15 current root-dev direct-entry/cold-warm cases plus immutable original unchanged resource failure/cache/nonce coverage; no loader/URL/config/dependency/image byte changes."
+    },
+    {
+      "id": "performance",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "18 current-source proof cold/warm samples, zero budget failures."
+    },
+    {
+      "id": "build-prefix",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Current-source /prototype/ bundle built with unchanged passing prerequisites."
+    },
+    {
+      "id": "assets-prefix-preview",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh + reuse",
+      "basis": "15 current prefixed-preview cases plus retained original unchanged failure/cache/nonce coverage."
+    },
+    {
+      "id": "assets-prefix-dev",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh + reuse",
+      "basis": "15 current prefixed-dev cases plus retained original unchanged failure/cache/nonce coverage."
+    },
+    {
+      "id": "restore-root",
+      "originalStatus": "passed",
+      "currentEvidence": "fresh",
+      "basis": "Current root restored byte-identically; report records both inventories."
+    }
+  ],
+  "limits": [
+    "Physical devices not tested; Playwright device emulation meets caller acceptance.",
+    "Original 3844ms cold-start failure remains; controlled base/28cba2a repeats passed and the current cold test is in the complete refreshed exploration matrix. Cause of the original overrun is not established.",
+    "Hosted issue-scoped checks may be skipped; local source-bound receipts qualify this work.",
+    "Review/merge parent PR 251 before retargeting dependent PR 252 to main. No merge/release/deployment performed."
+  ]
+}

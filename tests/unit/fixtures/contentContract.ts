@@ -50,6 +50,7 @@ export const catalogFixture = {
   enemies: {
     goblin_grunt: { id: 'goblin_grunt', kind: 'enemy', stats: statsFixture, ...fixtureArt },
     goblin_archer: { id: 'goblin_archer', kind: 'enemy', stats: statsFixture, ...fixtureArt },
+    goblin_shaman: { id: 'goblin_shaman', kind: 'enemy', stats: statsFixture, ...fixtureArt },
   },
   terrains: {
     grass: { id: 'grass', ...fixtureTerrain },

@@ -1,5 +1,7 @@
 # Hero progression
 
+Source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`, extended by qualified Shaman source `f4616ae301da4be133455334d4c2b38e3583c8f7`. Historical evidence retains its original revision and test limits.
+
 The initial #160 slice supports Fighter, Ranger and Mage levels 1–5 in short runs
 and dungeons. Standalone battles retain level-1 rules. Canonical hero records carry
 cumulative XP, level, current/max HP and the sorted learned implemented ability IDs;
@@ -49,14 +51,14 @@ imported into this slice.
 
 ## Save compatibility
 
-Run state format 2 / envelope 6 and dungeon envelope 7 bind progression rules to
+Run state format 2 / envelope 7 and dungeon envelope 9 bind progression rules to
 save identities. Older run/dungeon formats are incompatible: inspection preserves
 raw primary/backup bytes for export/recovery instead of reconstructing past awards
 or silently resetting heroes. Return to the originating build to continue an old
 save; export it before explicitly replacing it. Older code cannot be assumed to
 read the new formats. Standalone catalogs explicitly project the level-1 party;
-battle state format 4 / rules 5 apply across routes, while the standalone save
-wrapper remains format 1. Mark and shared Pin/Snare source references are battle-local and do not
+battle state format 5 / rules 6 apply across routes, while the standalone save
+wrapper remains format 1. Mark, shared Pin/Snare and Weakened source references are battle-local and do not
 enter the carried progression records.
 
 Party and battle inspection show level, XP/next threshold (or MAX), learned actions

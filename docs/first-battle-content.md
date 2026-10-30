@@ -1,5 +1,7 @@
 # Authored first battle (#29)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/content/catalog.ts` exports `battleCatalog` only after `validateContent` succeeds. The catalogs and the explicit 144 cells in `forestRuins.ts` are pure TypeScript data with no renderer, browser dependencies, resource parser, or runtime generation. `npm run validate:content` now checks both schema fixtures and the actual authored definitions, including malformed copies. The scripted integration test creates a seeded battle on this exact catalog, dispatches legal moves and turns, verifies Ranger’s +2 high-ground attack and an archer shot rejected `blockedLos` across forest at (1,3), then replays accepted commands to the identical final state and events. Rejected attempts leave the snapshot/RNG unchanged and are excluded from the replay log.
 
 The three heroes and two enemy definitions use the baseline HP/Move/Jump/Acc/AC/Power/Dex/Will rows documented in [the existing design evidence, §4.3](tech_design.phaser4.draft.md). Those rows trace to the legacy builder/resources pinned at `e9433f6b608ae6b2d95418615cce9cf17dadcf74` in [the existing baseline evidence, §3.4](phaser4-restart-plan.md). The fixed six spawns use the documented earlier two-grunt/one-archer trio, not the later seeded shaman roster. No abilities, AI, inventory, or combat behavior are imported.
@@ -10,9 +12,28 @@ The 12×12 map retains the baseline platform (8–10,1–3), ledge (2–3,8–10
 
 Canonical files are extracted from Git blobs in `luminari-gurus/tactics-guru` at `9303d9916d99e7bf4ecda36b55fbb038983af834`, not from uncommitted files. Every record pins the original path, revision, dimensions and SHA-256. Sources under `public/battle/source` preserve the PNGs unchanged; Fighter reuses its existing `public/proof` sources instead of duplicating them. Sprites remain 64×80 with foot anchor (32,76); portraits retain the full frame and use Pillow 10.2.0 Lanczos 96×96 optimized PNG exports, following the [issue 35 portrait rule](qa/issue-35-proof-asset-export.md) of 48 CSS pixels × density 2. Fighter matches the previously recorded canonical hashes. These are owner-repository project assets; available evidence does not establish a per-file third-party license or generation method, and none is asserted. Rights uncertainty is retained explicitly in each record.
 
-Content E verifies packaged-file/image loading in a separate [catalog-loading and terrain-surface smoke scene](qa/issue-30-content-loading.md). The authored catalog still does not feed a full battle renderer; full board rendering/picking, canopy and selection remain issue 6. Browser emulation does not claim physical-device acceptance.
+Historically, Content E verified packaged-file/image loading in a separate [catalog-loading and terrain-surface smoke scene](qa/issue-30-content-loading.md). That original smoke did not prove the full battle renderer; #6 subsequently delivered board rendering and picking. Browser emulation does not claim physical-device acceptance.
 
 For future unit artwork, use the [unit-art guide and annotated five-pair reference sheet](art/unit-art-guide.md), with separate [sprite](art/unit-sprite-brief.md) and [portrait](art/unit-portrait-brief.md) briefs. It distinguishes the current 32-pixel battle HUD from the 48-pixel portrait export target and records source identity/padding differences without changing canonical assets.
+
+## Goblin Shaman content foundation (#166)
+
+The catalog now also admits `goblin_shaman` with baseline HP/Move/Jump/Acc/AC/Power/
+Dex/Will **10/4/1/3/11/2/1/3** and Basic Attack ownership. The standalone map's
+six original spawns and the authored-run/desert rosters remain unchanged. Support
+rules and dungeon placement are tracked in [the current plan](ongoing-projects/plan.md)
+and are not enabled by the content foundation alone.
+
+The [sprite](../public/battle/source/goblin_shaman_sprite.png) and
+[full portrait source](../public/battle/source/goblin_shaman_portrait.png) are
+unchanged Git blobs from legacy revision `e9433f6b608ae6b2d95418615cce9cf17dadcf74`.
+The registry records exact paths/hashes and the same rights uncertainty as the
+existing artwork. Sprite dimensions are 64×80 RGBA, alpha bounds (4,13)–(60,80),
+foot anchor (32,76); original lower-edge foliage is retained. The full-frame
+portrait export uses Pillow 10.2.0 Lanczos, optimized RGB PNG, 96×96 without cropping.
+The eager loader adds **28,208 runtime image bytes** (7,817 sprite + 20,391 portrait);
+the retained 3,245,364-byte portrait source is packaged but is not requested by
+the runtime loader. See [#166 QA](qa/issue-166/README.md) for actual checks.
 
 ## Run battlefield sources (procedural follow-up to PR #147)
 

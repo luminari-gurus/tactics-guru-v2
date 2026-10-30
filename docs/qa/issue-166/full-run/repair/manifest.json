@@ -1,0 +1,192 @@
+{
+  "source": "28cba2a3fe3aab8a36e9d87579945ec68768c19b",
+  "inputHash": "51d3e7476a95e97d8fef65b03ea0fa1fc1f38d6aece503ae5ec53c71d532add7",
+  "engines": {
+    "chromium": {
+      "channel": "chromium",
+      "executableOverride": null,
+      "executablePath": "/home/aiwithapex/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+      "version": "153.0.8010.12"
+    },
+    "webkit": {
+      "channel": null,
+      "executableOverride": null,
+      "executablePath": "/home/aiwithapex/.cache/ms-playwright/webkit-2359/pw_run.sh",
+      "version": "26.6"
+    }
+  },
+  "prerequisitesPassed": true,
+  "units": 1049,
+  "buildHeaderIntegrations": 2,
+  "performanceSamples": 18,
+  "browserStages": {
+    "repair-chromium-journeys": {
+      "startTime": "2026-10-29T01:42:44.149Z",
+      "duration": 930867.196,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "repair-webkit-journeys": {
+      "startTime": "2026-10-29T01:59:33.021Z",
+      "duration": 718097.814,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "repair-webkit-backup": {
+      "startTime": "2026-10-29T02:12:51.128Z",
+      "duration": 9931.881000000001,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "base-cold-history": {
+      "startTime": "2026-10-29T01:33:51.082Z",
+      "duration": 18545.85,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "repair-cold-history": {
+      "startTime": "2026-10-29T01:40:09.709Z",
+      "duration": 19150.517,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "freshFinalSourceBrowserExecutions": 80,
+  "separateBaseDiagnosticExecutions": 3,
+  "assetExecutions": 60,
+  "rootBuildHash": "6b54b1d6a8786a4557ded45a6b2ce2e23ff3d6c1c84392349ea14228cd720598",
+  "prefixBuildHash": "958698f51cd0788c943f62818191d0c2fa21e8fdd69f09f06dbd73deb19fb99c",
+  "rootRestorationIdentical": true,
+  "inputsUnchanged": true,
+  "originalAggregateStatus": "failed, preserved unchanged",
+  "fullPolicyAccounting": "../qualification.json",
+  "rawRepairRoots": [
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-chromium-journey-artifacts",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-backup-artifacts",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/base-cold-history-artifacts",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-cold-history-artifacts",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-assets"
+  ],
+  "rawArtifactCount": 164,
+  "rawArtifactBytes": 65421178,
+  "portable": [
+    {
+      "file": "shaman-journeys.json.gz",
+      "bytes": 4801,
+      "sha256": "3ac2219e2d93ff96f613a93b96d9ebf81001507ca6ee93772345fcf95160e6bc"
+    },
+    {
+      "file": "prerequisites.tar.gz",
+      "bytes": 173484,
+      "sha256": "e0d544da24c472663b2123014e4637530c5fbe16dabae4394b09ef9c26df4866",
+      "entries": 13
+    },
+    {
+      "file": "reports.tar.gz",
+      "bytes": 111271,
+      "sha256": "ce16210f600160f48cc490cfc9bfa22cd63b346f7755f5688666a666f8bee7fe",
+      "entries": 28
+    },
+    {
+      "file": "details.tar.gz",
+      "bytes": 77643,
+      "sha256": "c98a78a802eff5ed4a6672d637ea18546b8ac5ead604007467ffbd0a16f94d10",
+      "entries": 27
+    },
+    {
+      "file": "artifact-inventory.json.gz",
+      "bytes": 6607,
+      "sha256": "6108c2551e7cb81573b42abe36045853e20431c59f5fca7ab318cfb45a82581c",
+      "originalSha256": "91cfaa346197e54ce6cd5416daff199caecff02bbedd19887fed313b7bf933ed"
+    },
+    {
+      "file": "focused-repairs.tar.gz",
+      "bytes": 7070,
+      "sha256": "e1b00fa419bd2e59e3c4745c6a9a1c02557208d72c559dc875af17082f7cb431",
+      "entries": 10
+    },
+    {
+      "file": "consumer-before.json.gz",
+      "bytes": 20884,
+      "sha256": "3b23670161ef09355004c4cc9b662faa717c63d190b814037533700818d24a22",
+      "originalSha256": "02e498204e082d1544ca64b4a9c6172075832e2cf5f62f40a5f20a12e4a22eba"
+    },
+    {
+      "file": "consumer-after.json.gz",
+      "bytes": 20884,
+      "sha256": "3b23670161ef09355004c4cc9b662faa717c63d190b814037533700818d24a22",
+      "originalSha256": "02e498204e082d1544ca64b4a9c6172075832e2cf5f62f40a5f20a12e4a22eba"
+    },
+    {
+      "file": "consumer-equivalence.json.gz",
+      "bytes": 405,
+      "sha256": "d7f744ef45b8d0f3ece76cc08b5cb6df2af3749f0f912402cd40dc8aa7e8a9e1",
+      "originalSha256": "ec63119944236ddea86e5836e5e47ab0a518b0c5867e25f1ddd90e9784eb9f30"
+    },
+    {
+      "file": "repair-scope.json.gz",
+      "bytes": 2754,
+      "sha256": "b29a7b6c11d9d8846a8626c0b93b8a0ed6322473dd3c93185bfcc87cbacb2018",
+      "originalSha256": "9b8da8f6d91ead8b2fe19ac67fd7ef7cc2a5c3631af382d03c75f973cfafa167"
+    },
+    {
+      "file": "reproduction.json.gz",
+      "bytes": 2590,
+      "sha256": "2bcd728aff0344f1d1689e182cf2b8b24e6da5b92e78acbff7d4566252779340",
+      "originalSha256": "4c4d8d53c57ddd35d535ea00d8c7b87ae9fa5557ae39f73cc40e5dc706e225c4"
+    },
+    {
+      "file": "final-input-parity.json",
+      "bytes": 10482,
+      "sha256": "4c28d812ff0cdbd73538aacbe8c2cc4084db5c00200f5c4abb77ddce29f71837"
+    },
+    {
+      "file": "chromium-portrait-inspection.png",
+      "bytes": 260740,
+      "sha256": "bce5ef8656aa9753d33fa5fd0215125549939f34e9df41561b64842b58928d3e",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-chromium-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-mobile-portrait/shaman-abilities-inspection.png"
+    },
+    {
+      "file": "webkit-desktop-inspection.png",
+      "bytes": 773205,
+      "sha256": "01a0b5e662402fa0f9bc98d5a5b0c9695367d32f8e933c8706f17e91f635bf57",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-desktop-webkit/shaman-abilities-inspection.png"
+    },
+    {
+      "file": "webkit-portrait-inspection.png",
+      "bytes": 302833,
+      "sha256": "60974da50f2f686bfbf6684dd0d9d20dcf37e5c14f1dab7708e7c7e45cdabcc4",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-portrait-webkit/shaman-abilities-inspection.png"
+    },
+    {
+      "file": "webkit-landscape-weakened.png",
+      "bytes": 371380,
+      "sha256": "dcd7b8fdea47ec1c780ad8b5d79d1c50f553c937ddd193261537a801b324bb7a",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-landscape-webkit/shaman-weakened-inspection.png"
+    },
+    {
+      "file": "webkit-landscape-board.png",
+      "bytes": 951838,
+      "sha256": "ef94617129a0ab5a8c4877004096b1746ed26fe2bc89e38b5937cdfd93cb7648",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-landscape-webkit/shaman-production-board.png"
+    },
+    {
+      "file": "webkit-portrait-terminal.png",
+      "bytes": 632057,
+      "sha256": "9185ec6837ee8ada35eb43ba61a1433b4eeb8dac01109d1462793a0f0b75f1a1",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/repair-webkit-journey-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-portrait-webkit/shaman-terminal.png"
+    }
+  ],
+  "note": "17 journey/backup + 3 final cold diagnostic repeats + 60 assets = 80 fresh passing executions; repeats are explicitly identified, zero retry attempts. Three base repeats are separate. No clean full-suite run or physical-device claim."
+}

@@ -1,0 +1,146 @@
+{
+  "source": "f4616ae301da4be133455334d4c2b38e3583c8f7",
+  "inputHash": "4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575",
+  "engines": {
+    "chromium": {
+      "version": "153.0.8010.12",
+      "configuredDefaultPath": "/home/aiwithapex/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome"
+    },
+    "webkit": {
+      "version": "26.6",
+      "configuredDefaultPath": "/home/aiwithapex/.cache/ms-playwright/webkit-2359/pw_run.sh"
+    }
+  },
+  "node": "v24.15.0",
+  "playwright": "1.63.0",
+  "foundationSource": "03b1e899ad091ba79ba65b08487204427b23de1e",
+  "foundationEvidence": "../foundation-main/manifest.json",
+  "units": 1069,
+  "foundationUnits": 1032,
+  "typeScopes": 2,
+  "buildHeaderIntegrations": 2,
+  "performanceSamples": 18,
+  "coreBrowserCounts": {
+    "total": 300,
+    "expected": 294,
+    "unexpected": 0,
+    "skipped": 6,
+    "flaky": 0,
+    "retryAttempts": 0
+  },
+  "developmentMap": {
+    "total": 6,
+    "expected": 6,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "retryAttempts": 0
+  },
+  "assetBootExecutions": 60,
+  "rootBuildHash": "9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1",
+  "prefixBuildHash": "86f20f9cf35f9e4b5f878b9964cb19a99c7fbd28822b28f55a1134bda5c57f40",
+  "rootRestorationIdentical": true,
+  "inputsUnchanged": true,
+  "allSixShamanHistoriesIdentical": true,
+  "shamanCommands": 54,
+  "witnessSeeds": {
+    "shaman": 31,
+    "fighter": 28,
+    "ranger": 2,
+    "mage": 12
+  },
+  "portable": [
+    {
+      "file": "prerequisites.tar.gz",
+      "bytes": 176311,
+      "sha256": "e2ac759da7423b5e5c6576a7182815266533a557f930702fa837e8bf557df902",
+      "entries": 13
+    },
+    {
+      "file": "reports.tar.gz",
+      "bytes": 242855,
+      "sha256": "091ec5dc76f27bf428e6654a2d07feb39ab72f137a6e6218e35933a06a91d6b4",
+      "entries": 32
+    },
+    {
+      "file": "details.tar.gz",
+      "bytes": 209293,
+      "sha256": "d34cd754c2ee886c94555b01c9d25da8e883fff3324d95c82fb1276b0d77de66",
+      "entries": 70
+    },
+    {
+      "file": "artifact-inventory.json.gz",
+      "bytes": 27661,
+      "sha256": "b566f56df2454a2ac2284d4434f2bd2764c36a6fb5da743491d0b520cc3bf953",
+      "originalSha256": "d2ff4efa4993513c1b6a796a1c0213e0d6590ddf18db7be98c545e7ff92be50c"
+    },
+    {
+      "file": "iteration.tar.gz",
+      "bytes": 7140,
+      "sha256": "3c20e43ab617c83858f23926bdb8825d6e9b09ebd7b66ff0ba1488a04e33df2f",
+      "entries": 10
+    },
+    {
+      "file": "shaman-journeys.json.gz",
+      "bytes": 23179,
+      "sha256": "752f318925751ed14caf9b4c4ff426c28f08ccf658bac0814ec2260626c3964b",
+      "originalSha256": "d6c053c801a60d468e5ca6ccc349c68572d62cccb1630d0cff57664ab09fb3e9"
+    },
+    {
+      "file": "chromium-portrait-inspection.png",
+      "bytes": 261146,
+      "sha256": "f8a4422797cb06e94b766791c5a743a5bd062fa2d2dee965bd53cbaf2b95e29a",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/chromium-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-mobile-portrait/shaman-abilities-inspection.png"
+    },
+    {
+      "file": "webkit-desktop-board.png",
+      "bytes": 1490182,
+      "sha256": "c6828ceda4fa11d057829142317949c485ee94cd8d2982df163054e3cb47284b",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/webkit-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-desktop-webkit/shaman-production-board.png"
+    },
+    {
+      "file": "webkit-portrait-inspection.png",
+      "bytes": 301484,
+      "sha256": "f3089d084eea9c8cd49872318f8e95947224f3922f5aca57ee8bc162fdbee5bd",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/webkit-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-portrait-webkit/shaman-abilities-inspection.png"
+    },
+    {
+      "file": "webkit-landscape-weakened.png",
+      "bytes": 371369,
+      "sha256": "714e7d4de5ddb6acf9dcb1c7092af097f8cecd58b374a30f5ff1d9e8366d371c",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/webkit-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-landscape-webkit/shaman-weakened-inspection.png"
+    },
+    {
+      "file": "webkit-portrait-save-log.png",
+      "bytes": 297878,
+      "sha256": "00199e7466e03d962cee0ecb27d7b50472a833c08ebb923816339f3ee519965e",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/webkit-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-portrait-webkit/shaman-will-save-log.png"
+    },
+    {
+      "file": "webkit-landscape-terminal.png",
+      "bytes": 929995,
+      "sha256": "64affcc998832ecb919061c273b08891d28ce198782aedc39691e9254c97bdad",
+      "rawPath": "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers/webkit-dungeon-artifacts/dungeon-Shaman-production--0b30f-ays-a-complete-legal-battle-landscape-webkit/shaman-terminal.png"
+    },
+    {
+      "file": "source-parity.json.gz",
+      "bytes": 6002,
+      "sha256": "781803b2a50670cec68c54d9a4ff806887f62b49334d05a236e8eb797e4d7d7b",
+      "originalSha256": "2a5c92ec79a52e30c328d35ba5cf08beb8882f9cb0acbe7740725e617c866d07"
+    },
+    {
+      "file": "reproduction.json.gz",
+      "bytes": 4630,
+      "sha256": "09ea95aac0287e048d79aae8e6db7bf97dbc8e033e85384296003695e2fb3141",
+      "originalSha256": "74d1488b5a3673ee49bb844e08099a2c3b187997cbb21a4fdffd9e48f4793c9b"
+    }
+  ],
+  "rawRoots": [
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-browsers",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-dev-map",
+    "/tmp/tactics-issue-166-20261029/tmp/issue166/integration-assets"
+  ],
+  "rawArtifacts": 604,
+  "rawBytes": 135633524,
+  "note": "Current-source consumer qualification plus explicitly reused original coverage; not a clean full-suite run. All device evidence is emulation. Six preview map skips pass in the separate owning dev-mode run."
+}

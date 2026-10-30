@@ -36,6 +36,11 @@ const authoredCatalog = {
       spriteAssetId: 'asset:goblin_archer_sprite', portraitAssetId: 'asset:goblin_archer_portrait',
       stats: { maxHp: 8, move: 4, jump: 1, accuracy: 4, armorClass: 11, power: 2, dexterity: 2, will: 0 },
     },
+    goblin_shaman: {
+      id: 'goblin_shaman', kind: 'enemy',
+      spriteAssetId: 'asset:goblin_shaman_sprite', portraitAssetId: 'asset:goblin_shaman_portrait',
+      stats: { maxHp: 10, move: 4, jump: 1, accuracy: 3, armorClass: 11, power: 2, dexterity: 1, will: 3 },
+    },
   },
   terrains: {
     grass: { id: 'grass', surfaceAssetId: 'asset:terrain_grass', moveCost: 1, walkable: true, blocksLineOfSight: false },

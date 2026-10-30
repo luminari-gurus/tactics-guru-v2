@@ -165,7 +165,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
  await activate('#run-start-encounter');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.locator('#fit-restart').click();await expect(page.getByRole('dialog')).toBeVisible();const before=await snapshot(page);await page.mouse.click(3,3);expect(await snapshot(page)).toEqual(before);await page.locator('#run-cancel-new').click();
+ await page.locator('#battle-party').focus();await page.locator('#fit-restart').click();await expect(page.getByRole('dialog')).toBeVisible();const before=await snapshot(page);await page.mouse.click(3,3);expect(await snapshot(page)).toEqual(before);await page.locator('#run-cancel-new').click();
  await expect(page.locator('#fit-restart')).toBeFocused();
  await page.locator('#battle-sound').click();await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
 });
@@ -196,6 +196,11 @@ test('review: in-flow Continue resumes an ongoing backup battle after legal defe
  await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
  await page.clock.runFor(32);
  await expect(page.locator('#run-screen')).toBeHidden();await expect(page.locator('#game')).toHaveCSS('visibility','visible');
+ // Asset decoding may finish after the first two frames; advance only until the restored projection is published.
+ await expect.poll(async()=>{
+  if(await page.locator('#game').getAttribute('data-session'))return true;
+  await page.clock.runFor(16);return (await page.locator('#game').getAttribute('data-session'))!==null;
+ },{intervals:[50,100,200]}).toBe(true);
  expect((await readSession(page)).continuation?.snapshot).toEqual(expected);expect(await page.locator('canvas').count()).toBe(1);
  await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
 });

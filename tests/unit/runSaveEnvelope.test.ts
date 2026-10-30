@@ -9,6 +9,29 @@ import { nextUint32 } from '../../src/domain/rng';
 import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
+import { previewSupportAbility } from '../../src/domain/combat';
+
+it('roundtrips enemy healing and active Weakened in a controlled run roster without relaxing hero-entry HP',()=>{
+  const prepared=preparedSnapshot(),encounterId=prepared.items.run.encounters[prepared.items.run.encounterIndex];
+  const context={...runContext,encounters:runContext.encounters.map(e=>e.id===encounterId?{...e,roster:e.roster.map(s=>
+    s.id===6&&s.side==='enemies'?{...s,unitId:'goblin_shaman' as const}:s)}:e)};
+  const created=createRunBattle(prepared.items,context);assert(created.ok);
+  const source=created.state.units.find(u=>u.defId==='goblin_shaman')!;assert(source);
+  const initial={...created.state,activeIndex:created.state.initiative.indexOf(source.id),units:created.state.units.map(u=>
+    u.side==='enemy'&&u.id!==source.id?{...u,hp:1}:u.side==='player'?{...u,weakenedBy:source.id}:u)};
+  const command=initial.units.filter(u=>u.side==='enemy'&&u.id!==source.id).map(u=>
+    ({type:'useAbility' as const,unitId:source.id,abilityId:'ability:heal_goblin' as const,target:{unitId:u.id}}))
+    .find(c=>previewSupportAbility(initial,c,created.catalog).ok);assert(command);
+  const healed=dispatch(initial,command,created.catalog);assert(healed.ok);
+  const snapshot={...prepared,activeBattle:healed.state,battlefield:created.battlefield};
+  const encoded=encodeRunSave(snapshot,context);assert(encoded.ok);
+  const decoded=decodeRunSave(encoded.text,context);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  const target=healed.state.units.find(u=>u.side==='player')!,active={...healed.state,activeIndex:healed.state.initiative.indexOf(target.id)};
+  const wait={type:'endTurn' as const,unitId:target.id};
+  expect(dispatch({...decoded.state.activeBattle!,activeIndex:active.activeIndex},wait,created.catalog)).toEqual(dispatch(active,wait,created.catalog));
+  expect(readRunSnapshot({...snapshot,activeBattle:{...healed.state,units:healed.state.units.map(u=>u.id===target.id?{...u,hp:u.hp+1}:u)}},context).ok).toBe(false);
+  expect(healed.state.units.find(u=>u.id===source.id)?.secondWindUsed).toBeUndefined();
+});
 
 it('roundtrips active Mage Snare in progressed run state and expires identically after reload',()=>{
   const prepared=preparedSnapshot(),items={...prepared.items,run:{...prepared.items.run,encounterIndex:2,revision:4,party:prepared.items.run.party.map(h=>progressHero(h.heroId,180,2,runContext.catalog))}};
