@@ -1,6 +1,6 @@
 # Issue 177 verification
 
-Issue [#177](https://github.com/luminari-gurus/tactics-guru-v2/issues/177); PR [#255](https://github.com/luminari-gurus/tactics-guru-v2/pull/255). Full-regression capture [40929820198](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40929820198) is in progress; it must not be described as passing until its complete aggregate is reviewed.
+Issue [#177](https://github.com/luminari-gurus/tactics-guru-v2/issues/177); PR [#255](https://github.com/luminari-gurus/tactics-guru-v2/pull/255). Full-regression capture [40929820198](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40929820198) completed with a failed landscape batch and a failed aggregate.
 
 ## Focused browser evidence
 
@@ -54,3 +54,7 @@ The third landscape batch completed 62/62 cases with no skips or retries. Its re
 The self-hosted combined fixture stage passed 87/87 cases, and the separate dev-only placement-failure stage passed 3/3, with no skips or retries. Their receipts are retained as `selfhost-fixtures-receipt.json.gz` and `selfhost-placement-receipt.json.gz`. The separate direct-disposer dev case remains queued in the follow-up run.
 
 The self-hosted WebKit battle/run acceptance stage passed 54/54 cases with no skips or retries. Its receipt is retained as `selfhost-webkit-acceptance-receipt.json.gz`.
+
+### Completed same-runner comparison
+
+[Run 40935030048](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40935030048) completed on the same self-hosted Linux runner. The literal base Fighter journey passed (1/1, 5.8 minutes). The PR run failed at initial setup waiting for Continue saved dungeon, a different failure from the original enemy-phase timeout; its error snapshot shows the button present after the timeout. This comparison does not establish the cause of the original failure. The dev-only disposer check passed all three Chromium profiles. The [comparison artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40935030048/artifacts/12938341210) contains full reports and context; compact logs and reports are retained as `selfhost-comparison-*.gz`. The original full capture remains failed and the original timeout remains unresolved.
