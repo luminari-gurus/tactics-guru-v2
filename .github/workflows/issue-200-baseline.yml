@@ -183,3 +183,42 @@ jobs:
           path: verification-receipts/serial/aggregate/
           retention-days: 30
           if-no-files-found: warn
+
+  issue153-full:
+    if: inputs.mode == 'capture' && github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-153-portrait-main-menu'
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 240
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 10
+      - name: Record source and complete discovery
+        run: |
+          mkdir -p verification-receipts/issue153
+          git rev-parse HEAD > verification-receipts/issue153/source.txt
+          node scripts/verification-selection.mjs capture verification-receipts/issue153/selection.json
+          npm run verify:batches -- discover verification-receipts/serial/issue153-discovery
+      - name: Execute full regression with original limits
+        run: npm run verify:full
+        timeout-minutes: 210
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue153-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            verification-receipts/
+            tmp/verification/
+          retention-days: 30
+          if-no-files-found: warn
