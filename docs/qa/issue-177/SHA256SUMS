@@ -35,3 +35,6 @@ SHA256(docs/qa/issue-177/selfhost-comparison-disposer-test.log.gz)= ab2ddea3cff3
 SHA256(docs/qa/issue-177/selfhost-comparison-disposer.json.gz)= 72d13b34cad7f1cce786bb218ae2bbdef02a1c2cad3644449ed6bc024f1548e3
 SHA256(docs/qa/issue-177/selfhost-comparison-head-test.log.gz)= 12f40c6814ab50beb1324b4d4f69dff2c122aea0043b7464b580ca95e13d3811
 SHA256(docs/qa/issue-177/selfhost-comparison-head.json.gz)= 3d9823069b293bfac6c172d10e853770703a892a5ef922ac62fa11375e8a6028
+SHA256(docs/qa/issue-177/selfhost-full-aggregate.json.gz)= a3555f02d7113bec0d149f4585077c7a3349eb45806abdefad49bb567eb0b94c
+SHA256(docs/qa/issue-177/selfhost-full-aggregate.md.gz)= 7313cc7d1309d8122ccbeb31cf10b02103afe32fa08fdb613c497d35de6e472b
+SHA256(docs/qa/issue-177/selfhost-fighter-diagnosis.json.gz)= 5ab3b3c99a755e5c944f4024e7b1513ffa5925aa13109189809e2dc306c939f5
