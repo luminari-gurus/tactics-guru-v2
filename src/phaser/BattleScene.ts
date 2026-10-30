@@ -51,7 +51,7 @@ export class BattleScene extends Phaser.Scene {
     this.persistence??=new BattlePersistence(catalog,FIRST_BATTLE_MAP_ID);
     let modalTransition=()=>{};
     const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
-    const saves=new BattleSaveControls(this.persistence,dialogs,session=>this.begin(catalog,session,dialogs,fn=>{modalTransition=fn;}),()=>{
+    const saves=new BattleSaveControls(this.persistence,dialogs,session=>this.begin(catalog,session,dialogs,fn=>{modalTransition=fn;},()=>saves.returnToMenu()),()=>{
       this.status('loading');this.scene.restart();
     });
     this.restartAction=()=>{if(!dialogs.open)saves.requestNew();};
@@ -59,7 +59,7 @@ export class BattleScene extends Phaser.Scene {
     saves.start();
     if(!this.persistence.session)this.status('ready');
   }
-  private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
+  private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void,returnToMenu?:()=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false,showDanger=false,planning=false,planInFlight=false,planInterrupted=false;
     let planMove: Extract<Command,{type:'move'}>|null=null;
@@ -93,7 +93,7 @@ export class BattleScene extends Phaser.Scene {
       caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
-      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
+      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
     };
     const describe=(command: Command)=>{
       if(planning && command.type==='move') {

@@ -1,5 +1,5 @@
-import { consumeEntryIntent } from '../app/routes';
-import { menuReturnLink } from './menuReturn';
+import { consumeEntryIntent, routeHref } from '../app/routes';
+import { menuReturnLink, confirmMenuDeparture } from './menuReturn';
 import { BattlePersistence } from '../app/BattlePersistence';
 import type { BattleSession } from '../app/BattleSession';
 import type { BattleLoadResult, BattleStorageSlot } from '../persistence/battleStorage';
@@ -19,6 +19,11 @@ export class BattleSaveControls {
     },{signal:this.abort.signal});
     this.root.append(menuReturnLink(() => /unsaved|incomplete/i.test(this.persistence.status), () => this.recovery()));
     persistence.onChange=()=>this.render();this.render();
+  }
+  returnToMenu() {
+    if (confirmMenuDeparture(() => /unsaved|incomplete/i.test(this.persistence.status), () => this.recovery())) {
+      location.assign(routeHref('menu', import.meta.env.BASE_URL));
+    }
   }
   private render(){this.root.querySelector('#battle-save-status')!.textContent=this.persistence.status;}
   start(){
@@ -53,6 +58,7 @@ export class BattleSaveControls {
       if(!hadSession && p.session)this.activate(p.session);else this.recovery(p.inspection??p.inspect());
     }});
     if(p.session)choices.push({id:'save-close',label:'Back to battle',run:()=>{}});
+    else choices.push({id:'save-main-menu',label:'Main menu',run:()=>this.returnToMenu()});
     this.dialogs.showChoices(p.session?'Save recovery':'Saved battle',`${p.status} ${this.details(review)}`,choices,p.session?()=>{}:null);
   }
   requestNew(review:BattleLoadResult=this.persistence.inspect()) {
