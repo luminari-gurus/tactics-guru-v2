@@ -20,6 +20,8 @@
     "setup:browsers": "playwright install chromium webkit",
     "setup:browsers:linux": "playwright install --with-deps chromium webkit",
     "check:browsers": "node scripts/browser-check.mjs",
+    "test:extended": "playwright test -c playwright.extended.config.ts",
+    "test:extended:webkit": "playwright test -c playwright.extended-webkit.config.ts",
     "test:browser": "node scripts/browser-test.mjs",
     "test:browser-smoke": "node scripts/browser-test.mjs -c playwright.setup-smoke.config.ts",
     "test:fixtures": "playwright test -c playwright.fixtures.config.ts",
