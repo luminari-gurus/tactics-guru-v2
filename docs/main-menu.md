@@ -1,7 +1,7 @@
 # Portrait main menu (#153)
 
 The menu is a native HTML surface with separate background, title-image and
-ordered control layers. Its column is at most 32rem on wider displays and scrolls
+ordered control layers. Its column is at most 512px on wider displays and scrolls
 at short heights. Safe-area padding, visible focus and 48px controls are retained.
 Dawn Beyond the Ivy Ruins is the delivered composition. Midnight Strategist’s War
 Room is retained as an optimized alternative and compared in Playwright screenshots;
@@ -12,7 +12,7 @@ Runtime assets are derived from the caller-supplied originals in
 `docs/art/issue-153/source/`. The title keeps its transparent 3:1 aspect ratio and
 lettering. `public/menu/dawn.webp` is 269,424 bytes, `midnight.webp` is 234,010
 bytes and `title.webp` is 89,178 bytes (see the runtime manifest for exact sizes and
-hashes). The unused alternative is not requested during ordinary menu boot.
+hashes). The two requested WebP images total 358,602 bytes. The unused alternative is not requested during ordinary menu boot.
 Background and title failures leave readable fallback text and native controls.
 
 `src/app/routes.ts` is the base-aware route classifier and bounded intent builder.

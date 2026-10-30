@@ -10,22 +10,22 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 
 ## 2. Routes and isolated entry
 
-- [ ] 2.1 Add the base-aware route classifier/builders and menu dispatch, preserving the three explicit root scene values and supported mode routes; verify root/prefix/trailing-slash/unknown-query cases with `tests/unit/routes.test.ts`, both type scopes, and focused boot tests.
-- [ ] 2.2 Audit root-as-battle consumers across browser helpers, specs, telemetry, collector modules and batch selection. Update canonical URLs without dropping query flags/assertions; verify before/after test discovery accounting and `measureFitOptions`/preview units. Document route migration in README with working links.
+- [x] 2.1 Add the base-aware route classifier/builders and menu dispatch, preserving the three explicit root scene values and supported mode routes; verify root/prefix/trailing-slash/unknown-query cases with `tests/unit/routes.test.ts`, both type scopes, and focused boot tests.
+- [x] 2.2 Audit root-as-battle consumers across browser helpers, specs, telemetry, collector modules and batch selection. Update canonical URLs without dropping query flags/assertions; verify before/after test discovery accounting and `measureFitOptions`/preview units. Document route migration in README with working links.
 - [ ] 2.3 Keep menu outside Phaser/audio and existing battle telemetry classification; verify browser network/canvas/no-audio assertions, existing telemetry unit cases, and configured production/development entry cases.
 
 ## 3. Save discovery and explicit handoffs
 
-- [ ] 3.1 Implement read-only per-mode save summaries using existing readers and a side-effect-free run context; verify the full slot/status matrix, zero writes/session creation/RNG use, terminal saves and legacy-key preservation in `tests/unit/menuSaves.test.ts`. Document eligibility/backup warnings.
-- [ ] 3.2 Implement single-mode Continue and stable multiple-mode chooser plus explicit recovery access, refreshing on storage/focus/pageshow; verify real validated saves, invalid/backup/unavailable states, changed-save races, cancellation and no write on menu entry in `tests/main-menu.spec.ts`.
+- [x] 3.1 Implement read-only per-mode save summaries using existing readers and a side-effect-free run context; verify the full slot/status matrix, zero writes/session creation/RNG use, terminal saves and legacy-key preservation in `tests/unit/menuSaves.test.ts`. Document eligibility/backup warnings.
+- [x] 3.2 Implement single-mode Continue and stable multiple-mode chooser plus explicit recovery access, refreshing on storage/focus/pageshow; verify real validated saves, invalid/backup/unavailable states, changed-save races, cancellation and no write on menu entry in `tests/main-menu.spec.ts`.
 - [ ] 3.3 Add one-shot closed-set destination intents to battle/run/dungeon startup through their existing continuation/recovery/replacement owners; verify legal resume, stale/missing data, corrupt primary/valid backup, New Game confirmation/cancel/failure/repeat input, and unchanged unselected save families.
 - [ ] 3.4 Add mode Main menu links with existing unsaved-state/recovery conventions and lifecycle cleanup; verify accepted progress, reload/back/forward and unsaved leave confirmation without stale callbacks. Document the handoff and return behavior alongside the navigation contract.
 
 ## 4. Menu presentation and bounded destinations
 
-- [ ] 4.1 Render the ordered action definition and separate title/control/background layers with portrait CSS, safe areas and scrolling; verify native keyboard focus/disabled state, minimum target size, touch portrait/landscape, 320px width, short viewport, 200% text and reduced motion. Retain screenshots and update design documentation to describe implemented behavior.
+- [x] 4.1 Render the ordered action definition and separate title/control/background layers with portrait CSS, safe areas and scrolling; verify native keyboard focus/disabled state, minimum target size, touch portrait/landscape, 320px width, short viewport, 200% text and reduced motion. Retain screenshots and update design documentation to describe implemented behavior.
 - [ ] 4.2 Derive optimized background assets from the two supplied originals in `docs/art/issue-153/source/`, compare menu readability over both compositions, and import the supplied title as a separate stable optimized asset; verify provenance, preserved dimensions, readable composition, local root/prefix requests, transfer/build deltas and independent missing/corrupt image fallbacks. Do not mark this task complete using fallback text alone.
-- [ ] 4.3 Implement Records empty-state and Settings with existing privacy controls/audio guidance; verify exact scope, no invented records/settings, keyboard/touch/Escape close and focus return, unavailable preference storage, and privacy behavior without gameplay/save mutation. Document that #176/#180 remain separate work.
+- [x] 4.3 Implement Records empty-state and Settings with existing privacy controls/audio guidance; verify exact scope, no invented records/settings, keyboard/touch/Escape close and focus return, unavailable preference storage, and privacy behavior without gameplay/save mutation. Document that #176/#180 remain separate work.
 
 ## 5. Integration qualification and delivery
 
@@ -36,3 +36,10 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 ## Workflow follow-up
 
 - Leave merge and deployment outside this workflow. Archive the OpenSpec change only after merge under repository instructions.
+
+## Implementation progress (2026-10-30)
+
+Runtime implemented and focused checks retained in `docs/qa/issue-153/README.md`.
+The remaining unchecked implementation tasks have code in place; their complete
+regression/edge-case qualification remains open. The self-hosted full job is queued
+behind the shared runner. No merge readiness or issue completion is claimed.

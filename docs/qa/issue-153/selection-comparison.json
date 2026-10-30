@@ -1,0 +1,107 @@
+[
+  {
+    "stage": "chromium",
+    "before": 766,
+    "after": 808,
+    "removed": 0,
+    "added": 42
+  },
+  {
+    "stage": "fixtures",
+    "before": 87,
+    "after": 87,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "placement-dev",
+    "before": 3,
+    "after": 3,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "webkit-acceptance",
+    "before": 54,
+    "after": 80,
+    "removed": 0,
+    "added": 26
+  },
+  {
+    "stage": "webkit-exploration",
+    "before": 105,
+    "after": 105,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "health-bars",
+    "before": 25,
+    "after": 25,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "telemetry-production",
+    "before": 36,
+    "after": 36,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "telemetry-development",
+    "before": 36,
+    "after": 36,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "assets-root-dev",
+    "before": 75,
+    "after": 78,
+    "removed": 0,
+    "added": 3
+  },
+  {
+    "stage": "assets-prefix-preview",
+    "before": 75,
+    "after": 78,
+    "removed": 0,
+    "added": 3
+  },
+  {
+    "stage": "assets-prefix-dev",
+    "before": 75,
+    "after": 78,
+    "removed": 0,
+    "added": 3
+  },
+  {
+    "stage": "playwright.encounters.config.ts",
+    "before": 24,
+    "after": 24,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "playwright.run-items.config.ts",
+    "before": 21,
+    "after": 21,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "playwright.abilities.config.ts",
+    "before": 42,
+    "after": 42,
+    "removed": 0,
+    "added": 0
+  },
+  {
+    "stage": "playwright.setup-smoke.config.ts",
+    "before": 2,
+    "after": 2,
+    "removed": 0,
+    "added": 0
+  }
+]
