@@ -113,3 +113,12 @@ test('main menu: terminal battle saves resume their existing outcome UI',async({
  await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
  await expect(page.getByRole('dialog')).toContainText(/Victory|Defeat/);
 });
+test('main menu: unsaved return cancellation opens recovery and accepted leave reaches menu',async({page})=>{
+ await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
+ await page.goto('./run');await page.getByRole('button',{name:'Play unsaved run',exact:true}).click();
+ page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
+ await expect(page.getByRole('dialog')).toContainText('Run save recovery');
+ await page.locator('#run-close-recovery').click();
+ page.once('dialog',dialog=>dialog.accept());await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
+ await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+});
