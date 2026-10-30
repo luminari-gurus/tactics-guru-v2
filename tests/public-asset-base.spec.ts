@@ -194,3 +194,21 @@ for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
     expect(errors).toEqual([]);
   });
 }
+
+test('menu public artwork and navigation respect the configured base',async({page,baseURL})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.goto('./');
+ const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
+ const base=new URL(baseURL!).pathname;
+ for(const image of await page.locator('#main-menu img').all()){
+  expect(new URL(await image.getAttribute('src')??'',baseURL).pathname.startsWith(`${base}menu/`)).toBe(true);
+  expect(await image.evaluate(node=>(node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+ }
+ for(const anchor of await page.locator('.menu-secondary a').all())expect(new URL(await anchor.getAttribute('href')??'',baseURL).pathname.startsWith(base)).toBe(true);
+ await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.getByRole('link',{name:'Main menu',exact:true}).click();
+ await expect(page.locator('#main-menu')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeEnabled();
+ expect(errors).toEqual([]);
+});
