@@ -31,7 +31,9 @@ recovery with unsaved status. Existing save keys/formats/rules are unchanged.
 Save inspection refreshes on focus, pageshow, storage changes and action. Menu
 dialogs are native, support Escape and restore the invoking control's focus.
 Settings reuses privacy controls; collection remains off on the menu. Mode return
-links preserve pagehide cleanup and ask before leaving reported unsaved progress.
+links preserve pagehide cleanup. Dungeon departures consult explicit save/adoption
+state, so rejected input cannot clear an unsaved warning. Terminal and startup
+battle dialogs offer a Main menu button inside the modal.
 
 The `main-menu.spec.ts` suite belongs to the default three-profile Chromium matrix
 and the existing two-profile iPhone WebKit acceptance stage. Serial batch selection

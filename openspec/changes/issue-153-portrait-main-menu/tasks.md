@@ -43,3 +43,9 @@ Runtime implemented and focused checks retained in `docs/qa/issue-153/README.md`
 The remaining unchecked implementation tasks have code in place; their complete
 regression/edge-case qualification remains open. The self-hosted full job is dispatched for the final runtime/test inputs;
 PR #256 is a draft pending that result. No merge readiness or issue completion is claimed.
+
+## PR #256 review repairs
+
+Both review findings are implemented and covered by focused Chromium/WebKit and
+session tests. See `docs/qa/issue-153/review-fixes/README.md` for retained results
+and timeouts. Full/CI acceptance remains open; merge and deployment remain excluded.

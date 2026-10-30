@@ -222,3 +222,39 @@ jobs:
             tmp/verification/
           retention-days: 30
           if-no-files-found: warn
+
+  issue153-review:
+    if: inputs.mode == 'pilot' && github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-153-portrait-main-menu'
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 35
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 10
+      - name: Qualify review fixes
+        run: |
+          mkdir -p verification-receipts/issue153-review
+          git rev-parse HEAD > verification-receipts/issue153-review/source.txt
+          npm run test:unit -- tests/unit/dungeon.test.ts -t 'authoritative unsaved departure state|saves confirmed disposal|refuses an automatic movement write|enters and clears slots' > verification-receipts/issue153-review/dungeon-units.log 2>&1
+          npm run test:unit -- tests/unit/battlePersistence.test.ts > verification-receipts/issue153-review/battle-units.log 2>&1
+          npm run build > verification-receipts/issue153-review/build.log 2>&1
+          PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/issue153-review/chromium.json npx --no-install playwright test tests/main-menu.spec.ts --reporter=list,json --output=verification-receipts/issue153-review/chromium
+          PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/issue153-review/webkit.json npx --no-install playwright test tests/main-menu.spec.ts -c playwright.device-acceptance.config.ts --reporter=list,json --output=verification-receipts/issue153-review/webkit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue153-review-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue153-review/
+          retention-days: 30
+          if-no-files-found: warn

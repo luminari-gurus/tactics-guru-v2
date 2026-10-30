@@ -95,3 +95,10 @@ fixtures/dev placement, both WebKit families, health bars, configured production
 telemetry, root/prefix assets, performance and restoration remain acceptance gates.
 The issue is not closed and the draft PR must not be marked merge-ready from focused
 results alone. No merge or deployment was performed.
+
+## Review repairs
+
+See [review-fix qualification](review-fixes/README.md) for the authoritative unsaved
+departure guard and reachable battle modal returns, their updated test inventory,
+original timeout reports, passing focused reruns and pending CI scope. Earlier
+runtime/full-run identities above remain historical and do not execute the repairs.
