@@ -37,6 +37,7 @@ export class BoardRenderer {
   private fitScale = 1;
   private snapshot: BattleState | undefined;
   private reachable: readonly CellPosition[] = [];
+  private path: readonly CellPosition[] = [];
   private targets: readonly TargetOverlay[] = [];
   private hoverPreview: HoverPreview | null = null;
   private selected: Tile | null = null;
@@ -258,6 +259,7 @@ export class BoardRenderer {
     snapshot = this.animatedSnapshot ?? snapshot;
     this.snapshot = snapshot;
     this.reachable = reachable;
+    this.path = path;
     this.targets = this.animatedSnapshot ? [] : targets;
     this.hoverPreview = this.animatedSnapshot ? null : hover;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
@@ -668,7 +670,7 @@ export class BoardRenderer {
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
       viewport: this.viewport, region: this.region, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
-      reachable: this.reachable, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
+      reachable: this.reachable, path: this.path, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
       shapeTextures: this.scene.textures.getTextureKeys().filter(key=>key.startsWith('battle-shape-v1-')).sort().map(key=>{
         const source=this.scene.textures.get(key).getSourceImage();

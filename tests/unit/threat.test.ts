@@ -11,10 +11,10 @@ import { enemyThreats } from '../../src/domain/threat';
 const initial = () => new BattleSession(catalog, 'map:forest_ruins', 2).state;
 
 describe('enemy threat inspection', () => {
-  it('reports legal direct attacks while respecting action budget and keeping state and RNG unchanged', () => {
+  it('reports attacks on the next turn even when action and movement were spent, without changing state or RNG', () => {
     const base = initial(), enemy = base.units.find(u => u.defId === 'goblin_archer')!, hero = base.units.find(u => u.side === 'player')!;
     const ability = { type:'useAbility' as const, unitId:enemy.id, abilityId:'ability:shortbow_shot' as const, target:{unitId:hero.id} };
-    const isolated = { ...base, activeIndex:base.initiative.indexOf(enemy.id), units:base.units.map(u => u.side === 'enemy' ? { ...u, hasMoved:true, hasActed:u.id !== enemy.id } : u) };
+    const isolated = { ...base, activeIndex:base.initiative.indexOf(enemy.id), units:base.units.map(u => u.side === 'enemy' ? u.id === enemy.id ? { ...u, hasMoved:false, hasActed:false } : { ...u, hp:0 } : u) };
     let legal = false;
     for (const tile of catalog.maps[base.mapId].cells) {
       if (!catalog.terrains[tile.terrainId].walkable || isolated.units.some(u => u.id !== hero.id && u.hp > 0 && u.cell.x === tile.x && u.cell.y === tile.y)) continue;
@@ -28,25 +28,26 @@ describe('enemy threat inspection', () => {
       expect(state).toEqual(before);
       if (attack.ok) {
         legal = true;
-        const spent = {...state, units:state.units.map(u => u.id === enemy.id ? {...u,hasActed:true} : u)};
-        expect(enemyThreats(spent,catalog)).toEqual({ok:true,targets:[]});
+        const spent = {...state, units:state.units.map(u => u.id === enemy.id ? {...u,hasMoved:true,hasActed:true} : u)};
+        expect(enemyThreats(spent,catalog)).toEqual(threats);
       }
       if (legal) break;
     }
     expect(legal).toBe(true);
 
   });
-  it('includes reachable attacks and excludes them when movement is spent', () => {
+  it('includes reachable attacks after movement was spent and respects movement blocks', () => {
     const base = initial(), enemy = base.units.find(u => u.defId === 'goblin_grunt')!, hero = base.units.find(u => u.side === 'player')!;
     const isolated = {...base, activeIndex:base.initiative.indexOf(enemy.id), units:base.units.map(u =>
-      u.side === 'enemy' ? {...u,hasMoved:false,hasActed:u.id !== enemy.id} : u)};
+      u.side === 'enemy' && u.id !== enemy.id ? {...u,hp:0} : u)};
     let found = false;
     for (const tile of catalog.maps[base.mapId].cells) {
       if (!catalog.terrains[tile.terrainId].walkable || isolated.units.some(u => u.id !== hero.id && u.hp > 0 && u.cell.x === tile.x && u.cell.y === tile.y)) continue;
       const state = {...isolated,units:isolated.units.map(u => u.id === hero.id ? {...u,cell:{x:tile.x,y:tile.y}} : u)};
       const moving = enemyThreats(state,catalog);
       const spent = enemyThreats({...state,units:state.units.map(u => u.id === enemy.id ? {...u,hasMoved:true} : u)},catalog);
-      if (moving.ok && spent.ok && moving.targets.includes(hero.id) && !spent.targets.includes(hero.id)) {
+      if (moving.ok && spent.ok && moving.targets.includes(hero.id)) {
+        expect(spent).toEqual(moving);
         const ranger = state.units.find(u => u.defId === 'ranger')!;
         const pinned = enemyThreats({...state,units:state.units.map(u => u.id === enemy.id ?
           {...u,movementBlock:{sourceId:ranger.id,abilityId:'ability:pinning_shot' as const}} : u)},catalog);
@@ -59,8 +60,8 @@ describe('enemy threat inspection', () => {
   it('excludes attacks blocked by line of sight', () => {
     const base = initial(), enemy = base.units.find(u => u.defId === 'goblin_archer')!, hero = base.units.find(u => u.defId === 'ranger')!;
     const state = {...base, activeIndex:base.initiative.indexOf(enemy.id), units:base.units.map(u =>
-      u.id === enemy.id ? {...u,cell:{x:0,y:3},hasMoved:true,hasActed:false} : u.id === hero.id ? {...u,cell:{x:2,y:3}} :
-      u.side === 'enemy' ? {...u,hasActed:true} : u)};
+      u.id === enemy.id ? {...u,cell:{x:0,y:3},hasMoved:false,hasActed:false,movementBlock:{sourceId:hero.id,abilityId:'ability:pinning_shot' as const}} : u.id === hero.id ? {...u,cell:{x:2,y:3}} :
+      u.side === 'enemy' ? {...u,hp:0} : u)};
     const attack = previewAttack(state, {type:'useAbility',unitId:enemy.id,abilityId:'ability:shortbow_shot',target:{unitId:hero.id}}, catalog);
     expect(attack).toEqual({ok:false,reason:'blockedLos'});
     const result = enemyThreats(state,catalog);

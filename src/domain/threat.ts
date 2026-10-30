@@ -12,10 +12,11 @@ export function enemyThreats(input: BattleState, catalog: ContentCatalog): { rea
   if (state.outcome !== 'ongoing') return { ok: true, targets: [] } as const;
   const targets = new Set<number>();
   for (const enemy of state.units) {
-    if (enemy.side !== 'enemy' || enemy.hp === 0 || enemy.hasActed) continue;
-    // Only change the decision owner in this disposable copy. Budgets and
-    // statuses are retained; the real initiative and RNG never change.
-    const hypothetical = { ...state, activeIndex: state.initiative.indexOf(enemy.id) };
+    if (enemy.side !== 'enemy' || enemy.hp === 0) continue;
+    // Starting the next turn refreshes this enemy’s action and movement budgets.
+    // Retain current positions and statuses; no other future actions are predicted.
+    const hypothetical: BattleState = { ...state, activeIndex: state.initiative.indexOf(enemy.id),
+      units: state.units.map(u => u.id === enemy.id ? {...u,hasMoved:false,hasActed:false} : u) };
     const positions = [hypothetical];
     const reach = previewMovement(hypothetical, enemy.id, catalog);
     if (reach.ok) for (const {cell, cost} of reach.cells) {

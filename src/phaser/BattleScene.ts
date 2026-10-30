@@ -78,7 +78,8 @@ export class BattleScene extends Phaser.Scene {
         if(previewMovement(session.state,session.active.id,catalog).ok){action='move';message='Select a destination';}
       }
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
-      const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
+      const reviewMove=planning && planMove ? planMove : session.pending?.type==='move' ? session.pending : null;
+      const preview=reviewMove?previewMove(session.state,reviewMove,catalog):null;
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
       if(showDanger && session.phase==='player' && threatState!==session.state){
@@ -99,7 +100,7 @@ export class BattleScene extends Phaser.Scene {
         return result.ok?'Move planned. Choose an ability and target.':previewText(result);
       }
       const plan=planning && planMove && command.type==='useAbility'?session.preparePlan(planMove,command):null;
-      const text=plan?(plan.ok?`Move + ability · ${previewText(plan.preview)}`:previewText(plan)):previewText(session.prepare(command));
+      const text=plan?(plan.ok?`Move to (${planMove!.to.x}, ${planMove!.to.y}) + ability · ${previewText(plan.preview)}`:previewText(plan)):previewText(session.prepare(command));
       if(command.type!=='useAbility')return text;
       const ability=catalog.abilities[command.abilityId];
       const effect=ability.kind==='guardedAttack'?` · −${ability.attackPenalty} attack / +${ability.armorClassBonus} AC until your next turn`:'';

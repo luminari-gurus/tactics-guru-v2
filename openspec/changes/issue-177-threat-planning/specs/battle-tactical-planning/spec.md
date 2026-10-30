@@ -22,7 +22,7 @@ The player SHALL be able to review a reachable move and a legal ability from its
 - **THEN** its move and ability resolve in order under normal presentation locks and authoritative rules
 
 ### Requirement: Enemy danger inspection
-The player SHALL be able to inspect a clearly distinguished enemy danger overlay derived from legal currently available movement and attacks, without drawing RNG or exposing hidden future outcomes.
+The player SHALL be able to inspect a clearly distinguished enemy danger overlay derived from legal movement and attacks on each enemy’s next turn using current positions and statuses, without drawing RNG or exposing hidden future outcomes.
 
 #### Scenario: Blocked attack
 - **WHEN** terrain, occupancy, status, range or line of sight prevents an enemy attack
