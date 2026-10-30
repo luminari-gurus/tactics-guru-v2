@@ -19,7 +19,7 @@ it('resolves the ordered run and reuses immutable single-battle definitions and 
   for (const asset of Object.values(runCatalog.assets)) expect(existsSync(`public${asset.runtimePath}`)).toBe(true);
   const created = createRun('fixture', 1, authoredRun, runCatalog); assert(created.ok);
   expect(describeRunBattle(created.state)?.encounterId).toBe(authoredRun.encounters[0]);
-  expect(contentVersion(battleCatalog)).toMatchSnapshot('unchanged single-battle identity');
+  expect(contentVersion(battleCatalog)).toMatchSnapshot('single-battle rules identity');
   expect(authoredEncounters.map(e => hashJson(runCatalog.maps[e.mapId]))).toMatchSnapshot('fixed authored maps');
   for (const e of authoredEncounters) {
     const start = createBattle(e.mapId, 1, runCatalog); assert(start.ok);

@@ -16,6 +16,25 @@ Historically, Content E verified packaged-file/image loading in a separate [cata
 
 For future unit artwork, use the [unit-art guide and annotated five-pair reference sheet](art/unit-art-guide.md), with separate [sprite](art/unit-sprite-brief.md) and [portrait](art/unit-portrait-brief.md) briefs. It distinguishes the current 32-pixel battle HUD from the 48-pixel portrait export target and records source identity/padding differences without changing canonical assets.
 
+## Goblin Shaman content foundation (#166)
+
+The catalog now also admits `goblin_shaman` with baseline HP/Move/Jump/Acc/AC/Power/
+Dex/Will **10/4/1/3/11/2/1/3** and Basic Attack ownership. The standalone map's
+six original spawns and the authored-run/desert rosters remain unchanged. Support
+rules and dungeon placement are tracked in [the current plan](ongoing-projects/plan.md)
+and are not enabled by the content foundation alone.
+
+The [sprite](../public/battle/source/goblin_shaman_sprite.png) and
+[full portrait source](../public/battle/source/goblin_shaman_portrait.png) are
+unchanged Git blobs from legacy revision `e9433f6b608ae6b2d95418615cce9cf17dadcf74`.
+The registry records exact paths/hashes and the same rights uncertainty as the
+existing artwork. Sprite dimensions are 64×80 RGBA, alpha bounds (4,13)–(60,80),
+foot anchor (32,76); original lower-edge foliage is retained. The full-frame
+portrait export uses Pillow 10.2.0 Lanczos, optimized RGB PNG, 96×96 without cropping.
+The eager loader adds **28,208 runtime image bytes** (7,817 sprite + 20,391 portrait);
+the retained 3,245,364-byte portrait source is packaged but is not requested by
+the runtime loader. See [#166 QA](qa/issue-166/README.md) for actual checks.
+
 ## Run battlefield sources (procedural follow-up to PR #147)
 
 The independent `battleCatalog` retains its authored forest map and terrain

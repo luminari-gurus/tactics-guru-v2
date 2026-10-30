@@ -1,0 +1,87 @@
+# Goblin Shaman qualification (#166)
+
+Date: 2026-10-29 (Asia/Jerusalem). Work is in progress. This is an evidence and
+continuation index, not completed issue acceptance.
+
+- [Live plan](../../ongoing-projects/plan.md).
+- [OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md).
+- Starting commit: `b5b450f80405d14a28082c43ba555bcf02f2b11e`.
+- First chunk: validated Shaman stats/art and Basic Attack ownership, with no
+  production encounter/AI changes. New support rules/placement are pending.
+- Foundation: [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251),
+  open/non-draft at `d2e211ddc87a7ff57ee9b719fd9fd7a9be1fff93`. Final handoff
+  metadata changes only documentation/OpenSpec progress and reuses identical
+  qualified inputs; no application/browser rerun is needed.
+
+## Source and export evidence
+
+Legacy revision: `e9433f6b608ae6b2d95418615cce9cf17dadcf74`. Asset registry:
+[assets.ts](../../../src/content/assets.ts). Source files are exact Git blobs.
+
+- Sprite: `art/units/goblin_shaman.png`, SHA-256
+  `43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f`;
+  64×80 RGBA, alpha bounds (4,13)–(60,80), anchor (32,76), 7,817 bytes.
+- Portrait: `art/portraits/goblin_shaman_portrait.png`, SHA-256
+  `55cc13df61bab3b51581a5be52c42c21a7c5b376607ef92dbd6b3f8901efbbe2`;
+  1254×1254 RGB, 3,245,364 bytes.
+- Full-frame Lanczos 96×96 optimized RGB PNG export using Pillow 10.2.0:
+  SHA-256 `c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0`,
+  20,391 bytes. No crop, repaint or new generation.
+- Local sprite/96px portrait inspected: staff/hood/foliage silhouette and matching
+  hood/staff portrait are visible. Original bottom-edge foliage is preserved;
+  board/HUD integration screenshots remain pending.
+- Runtime eager-load delta: 28,208 image bytes plus two requests. The full portrait
+  source is retained in public output but not requested by the asset loader.
+
+## Validation log
+
+- Strict OpenSpec validation passed before implementation (nine tasks pending).
+- Asset import setup: the Contents endpoint omits large-file base64 for the
+  portrait; initial import therefore failed. Git Blob API supplied the original
+  bytes, whose dimensions/hash now validate. No corrupted export was retained.
+- First content run: 198 passed / one failed expected rules-identity snapshot.
+  The new catalog actor/Basic Attack owner deliberately changes identity from
+  `sha256:d5e89333b0a4c8c7e88bb69c0bf2065ad67ebbf6b996a47ad984f27447bdee16`
+  to `sha256:89149927608032823b58b67683a15edb63e9711bb1b42e04e7df4bb670d27bb9`.
+  Updated only that identity assertion; all authored map hashes remain unchanged.
+- Initial build failed because the local npm launcher resolved the wrong nested
+  CLI path. A task-local ignored npm shim points to the installed native CLI.
+  The next build passed 222 content tests then found two synthetic catalogs and
+  one Dexterity lookup missing the new closed ID. Their fixtures now preserve
+  the complete base catalog; no new spawns or combat behavior were added.
+- Final focused content command: `npm run test:unit -- tests/unit/content.test.ts
+  tests/unit/authoredContent.test.ts tests/unit/abilityValidation.test.ts
+  tests/unit/authoredEncounters.test.ts tests/unit/dungeonEncounters.test.ts`:
+  **199/199 passed**. Existing combat/turn fixture suites: **28/28 passed**.
+- Content validation as part of the build: **222/222 passed**. Both TypeScript
+  scopes passed after fixture repair, then `npm run build:bundle` passed using
+  those unchanged prerequisites. Existing Vite future native-loader and chunk-size
+  warnings remain warnings; no compiler/bundle error remains.
+- `npm run test:build -- tests/integration/buildHeaders.test.ts`: **2/2 passed**,
+  proving root and prefix hashed exports/cache rules include both new assets.
+- Packaged Chromium 1243 could not spawn on this Windows host: all 27 selected
+  cases failed at browser launch before app execution. The full original
+  [failure report](foundation/browser-launch-failure.json) is retained.
+- With `PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:/Program Files/Google/Chrome/Application/chrome.exe`,
+  one desktop content-success smoke passed, then the original selection passed
+  **27/27**, zero skips/retries/flaky cases. Exact command:
+  `node node_modules/playwright/cli.js test tests/content-loading.spec.ts
+  tests/battle-board.spec.ts tests/public-asset-base.spec.ts -g 'content smoke|default authored board renders|collector cold/warm|public assets respect'
+  --reporter=line,json --output=tmp/issue166/foundation-browser-repaired-artifacts`.
+  [Raw report](foundation/browser.json). Preview/root base, one worker, installed
+  Chrome **155.0.8059.41**, Playwright **1.63.0**, Node **24.19.0**, npm **12.0.2**,
+  Windows x64; browser/device emulation only. Ordinary unconfigured telemetry.
+- [Portrait](foundation/portrait.png) and [landscape](foundation/landscape.png)
+  screenshots reviewed: board fit, units, selection and HUD remain readable and
+  unchanged. These screenshots prove the unchanged canonical board, not Shaman
+  battle placement. New pair loading/decode/dimensions are covered by loader success.
+- [Source/build inventory](foundation/inputs.json) binds the tested dirty source
+  at starting commit `b5b450f`, including all untracked asset bytes. Relevant input
+  hash before/after browser verification is identical:
+  `61aafd0995baf926a2311e9b0b2d07f2b1b76f8ef3fed468ca47f1b7f5b5e822`.
+  Build metadata still names `b5b450f`; later commit/doc metadata reuses these
+  functional results after comparing all recorded input hashes. This is focused
+  foundation readiness, not a full regression or complete #166 acceptance.
+- Raw setup/unit/build logs and extra screenshots remain under ignored
+  `tmp/issue166/`; required full qualification and production Shaman journey
+  remain tracked in the plan/OpenSpec tasks.
