@@ -1,0 +1,813 @@
+{
+  "source": {
+    "commit": "56b0c8c3b568f7524d7886a17d6ffdf8af867525",
+    "dirty": true,
+    "inputHash": "a6ce2adf4ffd5ba5529f05fcfcf92bad7fb742b68e45aad829da00882c211886",
+    "hashes": {
+      "docs/qa/issue-127-performance-budgets/playwright-cache.config.ts.txt": "5afe5a2a8723a27272736bbf8ed30fcbc772dd8a7e5f02833805143a6c4f1550",
+      "docs/qa/issue-127-performance-budgets/playwright-engine-initial.config.ts.txt": "c4031ce0a0ff18322ec831ca30bb58fd757d1c6bde1a043b4971bee8dd64096c",
+      "docs/qa/issue-127-performance-budgets/playwright-engine-no-tests.config.ts.txt": "8b9facfc89bade5cceb4e47aa6cd3429661a49967d8e24eaef6564781d4b7e96",
+      "docs/qa/issue-127-performance-budgets/playwright-engine.config.ts.txt": "8eb5805e304374134d4650a22b852a05cef90610059dfdc24ec134990dbd0034",
+      "docs/qa/issue-127-performance-budgets/playwright-external-webkit.config.ts.txt": "d61f790a90876f6cb75490e64a40e2e42c206a64505cedda2cfb3556dba41741",
+      "docs/qa/issue-127-performance-budgets/playwright-owned.config.ts.txt": "22bbc4dc81b3784fcfab28eaba23b0f203f965d687ec941a92c14c0ce4d140b7",
+      "docs/qa/issue-127-performance-budgets/playwright-prefix.config.ts.txt": "821fac6606c2a654311fd66ada03c9d39bb634c798cc58f95e9ce277c720eb9c",
+      "docs/qa/issue-127-performance-budgets/review-repair/playwright-dev.config.ts.txt": "b82e51057e34b13d8e102bdef0ccee14e4501af71dba3c051e437b1cb7833978",
+      "docs/qa/issue-127-performance-budgets/review-repair/playwright-final-webkit.config.ts.txt": "8f8e665bfe1e8497e347cc94df3d3f649c1ffe09138d9f5c2a7397c9a0d73781",
+      "docs/qa/issue-127-performance-budgets/review-repair/playwright-prefix.config.ts.txt": "d06e4f8da72a5d044020e5bc69917172d6ab0c59e5ae49b3c24b9c37b1a1ef5f",
+      "docs/qa/issue-127-performance-budgets/review-repair/playwright.config.ts.txt": "e26d4e4873311936163aead7666002ad928d000a17e48db72b449f0ab653e5e0",
+      "docs/qa/issue-127-performance-budgets/startup-board-recheck-no-tests.config.ts.txt": "e7c6fa1a35963c1a88847dfd311ba83b58fd7889f899cd2053885b039f197206",
+      "docs/qa/issue-127-performance-budgets/startup-board-recheck.config.ts.txt": "4b688b4a5762af0db3932e45c7720c913eddcaa92febc64115fa976a061fef0f",
+      "docs/qa/issue-127-performance-budgets/startup-input-probe.config.ts.txt": "f03599d8809cef6abc3af3fd7873be840acab6f7e1e42826de661f40666efe97",
+      "docs/qa/issue-127-performance-budgets/startup-native-touch-prefix.config.ts.txt": "08265c21a8715fc9d40d89fe24da4226ba75829c7578f543850a86971f013514",
+      "docs/qa/issue-127-performance-budgets/startup-native-touch-root.config.ts.txt": "91d192948912596d8a9d0590ec199cd3cf634d623fc0022541e394b19095bdec",
+      "docs/qa/issue-127-performance-budgets/startup-playwright-final.config.ts.txt": "5547c9e2acd205b78d0a4f57ba86c778f99ebfd9ac5317ae6ce82387b7362e7c",
+      "docs/qa/issue-127-performance-budgets/startup-playwright-prefix.config.ts.txt": "efe855f0de5e50764b34f3adeeaaa6d52b9b6346d56cfc6c3eaf973ae9c59bda",
+      "docs/qa/issue-127-performance-budgets/startup-playwright-webkit-boundaries.config.ts.txt": "29d9a0028d38b8ebb12dc54a088b85d3daf09ec7742ba818d31a5f7fc996113b",
+      "docs/qa/issue-127-performance-budgets/startup-preload-v1-vite.config.ts.txt": "96190f0d38f8458d2c38160a782eb4ca2c4f807e4daa485eb00368f368c3665b",
+      "docs/qa/issue-127-performance-budgets/startup-proof-compare.config.ts.txt": "7919ae1ee4b3585edd135c42ed45e41362de66470fc7603d0edd8087e3a9ccf9",
+      "docs/qa/issue-127-performance-budgets/startup-proof-sequence.config.ts.txt": "5cecaaa05d4a73d60ceab539ca5bd224744795ab5a659029e8b5b5fb46dcc7d2",
+      "docs/qa/issue-127-performance-budgets/warm-loading/candidate-unit-fixed-config.txt": "73adf955689ad4e043cd2a11a3e97cada122ab76f5064297e2f913169eba45a6",
+      "docs/qa/issue-128-telemetry/build-configured.log.gz": "9f092ead99c0293666408e65419eef8529033bf834217fbff4e493d1818b80e2",
+      "docs/qa/issue-146-occluded-map-picking/playwright-webkit.config.ts.txt": "0c9634622f6b94b4526b709c57e57923485308bed843a01f6e1f0760d90d1a24",
+      "docs/qa/issue-146-occluded-map-picking/review/playwright-webkit.config.ts.txt": "98009310d51deb0741f26b6dcc40fe16bb347036318fff032490a7a6e7d113dd",
+      "docs/qa/issue-157/evidence/baseline-runner-config.txt": "b6ad8d21ec4fb70f3bbd6d196b6816dab627a2e08481ed572b2100e196ee8d4e",
+      "docs/qa/issue-157/evidence/prefix-runner-config.txt": "8a2c56c0900829bc270c9cb6fec99f04bebb469769ffca0eb56944be48119989",
+      "docs/qa/issue-161/webkit.config.mts": "af6ff1af8b4517474b4b9a2dbe36a9e00497c65f8c39a37b12093cbff921e50f",
+      "docs/qa/issue-163/browser-engines/webkit-animation.config.ts.txt.gz": "9b53c4075c77233c7df51a5373fe059cf8cc13c408db6172eeac52f3d87dc36f",
+      "docs/qa/issue-164/playwright.config.ts.json.gz": "65c249b75481edb0b157dd88d3ad770fc24fdb3aa4e6cf007141af0e8b22b571",
+      "docs/qa/issue-164/playwright.device-acceptance.config.ts.json.gz": "a3c3d6853173194a22ff043e6a61b1afea48f6784ee252d9ac98416902a68f68",
+      "docs/qa/issue-164/playwright.exploration.config.ts.json.gz": "ffec6d4fe5e2f307964b28d7dd300c956d4319769e058b4784e50a9731784b54",
+      "docs/qa/issue-164/playwright.fixtures.config.ts.json.gz": "40887ac4921f6b14ec35cf6efdaab4295729050dd29d2e4291b7c7346710c830",
+      "docs/qa/issue-164/webkit-fixtures.config.ts": "d2ef5d29d6409162f79ba58cb910907470ebe666c7048fb3021163eecfce7c28",
+      "docs/qa/issue-80/focus-webkit.config.ts.txt": "220189e22371b574955fd23de819ba02b256ed3b050077ebd7fd756ad616047b",
+      "docs/qa/issue-80/review-webkit.config.ts.txt": "c2b8343ffe5487a3b2fcc17988a5be9589ba42be6dcfbe5775d551864867316c",
+      "docs/qa/issue-80/webkit.config.ts.txt": "0a5319da9aa7e452eb5c18488174e2c6ebe6540989c04aae4dfa6e2801303eb6",
+      "docs/qa/pr-131-run-recovery/playwright-edge.config.ts.txt": "b9977fbbd8d148db9852a8d7be6c9a9ab387e9c852b651cac565a0d3d5f25b8c",
+      "docs/qa/pr-131-run-recovery/playwright-webkit.config.ts.txt": "1ab12155ceb6d55c12ca1f93002b1402f473f26e882e92833b3b351045129d0a",
+      "index.html": "56519d6cf1de455adc8b00f50a5c6d9a51834289ebffecc882f73fa4371c5c8e",
+      "openspec/config.yaml": "4fc3ab6168ceb3d947e7d5174a6f3270be73dc9134d793935cda23cc7c0f541e",
+      "package-lock.json": "e31871b78d9c1444b26db7c3311c24e0234d4c6df4b694b9d3943fb9a67e62c7",
+      "package.json": "639ca11241bbac2999fb2cc2ceb9243e1a815cc72553997f29e3cef60538630b",
+      "playwright.abilities.config.ts": "d20e741b0fec5c063ddc6012a19b704ffd124eb7162797becdf1ddb372634d6a",
+      "playwright.config.ts": "fbc65607c78c0a2a7edf0b8e931c69ba93225db4d9a362c8eba9a9310958d024",
+      "playwright.device-acceptance.config.ts": "fe7c30b442d1f30a5df17f04351cd5249cd2eb0d417bf0578b686b626ff4c157",
+      "playwright.encounters.config.ts": "3fa7a752987e693247f52f5cca08b37da2a3b94e2b7a7ef4bdd5c492401dd437",
+      "playwright.exploration.config.ts": "dc37f58bd7ff45ecda15db2d03c66ef834594e2bfc01b38c25a8b3c6351be3c0",
+      "playwright.fixtures.config.ts": "63a01998f1f6802017389591246183555cb5df05961fd4dc00350221f9878525",
+      "playwright.health-bars.config.ts": "25f7cc41b01d335664bb524bbb976a01c07c13982e032c46fbd2952441acca6d",
+      "playwright.run-items.config.ts": "6e264c956b4e741f266fddfe5b81c957aa77781129f62064e5052d0a9034c326",
+      "playwright.setup-smoke.config.ts": "e94a07bad64f318c4bceb169a7df772ace69cb3a7be6ac37e15ceb08e32b5322",
+      "playwright.telemetry.config.ts": "b5796e12819db49514d0f7ca826375d23b4098e91683e7e3a09a6bff3c43f1fc",
+      "public/audio/battle/critical.mp3": "f419892404a9224fd4bf984892eb69f33a2c0704d8776873ee21bc58bd5901f8",
+      "public/audio/battle/hit.mp3": "607244384c2d238211fa46631325a07232728d15fbfca68bcaaa87a5b65bee41",
+      "public/audio/battle/loss.mp3": "cee68cbe441f8622a7b559414305e3bcc459fb48f46115951f9f5097291ca6a5",
+      "public/audio/battle/magic.mp3": "ddab11c45966c473523560aed11b3722cca9e8108b4eb49f1e46387dcc2a6a65",
+      "public/audio/battle/miss.mp3": "46c4680c22025042552972330e4237ce23c5480eac6db0e08a65e2ca0e8381e6",
+      "public/audio/battle/move.mp3": "987ac8ce55959343212675696e3201821717fca9718ad7e5b26bd420f45e5d34",
+      "public/audio/battle/unit-defeat.mp3": "a9a5264dacbfacba180c562dbfe4f4aeed8848f73171c3413009a8e2a2396df4",
+      "public/audio/battle/victory.mp3": "1d6e4fd2177d1013b4cce4c9ee480ba67cf107a81e6ae1033b561f6619790758",
+      "public/battle/portraits/fighter.png": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3",
+      "public/battle/portraits/goblin_archer.png": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b",
+      "public/battle/portraits/goblin_grunt.png": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7",
+      "public/battle/portraits/goblin_shaman.png": "c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0",
+      "public/battle/portraits/mage.png": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95",
+      "public/battle/portraits/ranger.png": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7",
+      "public/battle/source/goblin_archer_portrait.png": "a4ee1b8eb0ab4ed959a6cb160f9b8db330c2e4125b99122c17e175cd2becde4e",
+      "public/battle/source/goblin_archer_sprite.png": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e",
+      "public/battle/source/goblin_grunt_portrait.png": "73248f68e4ada0036bb8cf379352631acec98b058ef63cc35ee17bc97f0b8992",
+      "public/battle/source/goblin_grunt_sprite.png": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97",
+      "public/battle/source/goblin_shaman_portrait.png": "55cc13df61bab3b51581a5be52c42c21a7c5b376607ef92dbd6b3f8901efbbe2",
+      "public/battle/source/goblin_shaman_sprite.png": "43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f",
+      "public/battle/source/mage_portrait.png": "f40dcba51ab801afbbcb6588579e18229cb74360497972991bfa50e679610c5c",
+      "public/battle/source/mage_sprite.png": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b",
+      "public/battle/source/ranger_portrait.png": "bd8c8786e1006f85df5db3dc423d3535ee7664dee4b32b1a679041b59cc1cb8a",
+      "public/battle/source/ranger_sprite.png": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332",
+      "public/battle/terrain/forest.png": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26",
+      "public/battle/terrain/grass.png": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8",
+      "public/battle/terrain/grass_path.png": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9",
+      "public/battle/terrain/rock.png": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5",
+      "public/battle/terrain/sand.png": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810",
+      "public/battle/terrain/stone.png": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a",
+      "public/battle/terrain/water.png": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622",
+      "public/map-art/legacy-8bit/00_terrain_grass_plains.png": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f",
+      "public/map-art/legacy-8bit/01_terrain_forest.png": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013",
+      "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e",
+      "public/proof/fighter-portrait-96.webp": "e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8",
+      "public/proof/fighter-portrait.png": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190",
+      "public/proof/fighter.png": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981",
+      "public/proof/grass-material-v1-348.png": "002fe98dc7d904b4813205b076e90bf605b594e8a51767e1e6abadbb7605920d",
+      "public/proof/grass-material-v1.png": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2",
+      "public/proof/tree-grass-v1-480.webp": "d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32",
+      "public/proof/tree-grass-v1.png": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5",
+      "public/proof/unlock-tone.mp3": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec",
+      "public/proof/unlock-tone.ogg": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d",
+      "public/textures/terrain/ash-top-down-v1.png": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b",
+      "public/textures/terrain/cliff-top-down-v1.png": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06",
+      "public/textures/terrain/forest-top-down-v1.png": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
+      "public/textures/terrain/grass-top-down-v1.png": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
+      "public/textures/terrain/grass_path-top-down-v1.png": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
+      "public/textures/terrain/lava-top-down-v1.png": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea",
+      "public/textures/terrain/mud-top-down-v1.png": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8",
+      "public/textures/terrain/runtime/ash-top-down-v1.png": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74",
+      "public/textures/terrain/runtime/cliff-top-down-v1.png": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295",
+      "public/textures/terrain/runtime/forest-top-down-v1.png": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7",
+      "public/textures/terrain/runtime/grass-top-down-v1.png": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93",
+      "public/textures/terrain/runtime/grass_path-top-down-v1.png": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61",
+      "public/textures/terrain/runtime/lava-top-down-v1.png": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86",
+      "public/textures/terrain/runtime/mud-top-down-v1.png": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f",
+      "public/textures/terrain/runtime/sand-top-down-v1.png": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d",
+      "public/textures/terrain/runtime/stone-top-down-v1.png": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442",
+      "public/textures/terrain/runtime/water-top-down-v1.png": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1",
+      "public/textures/terrain/sand-top-down-v1.png": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db",
+      "public/textures/terrain/stone-top-down-v1.png": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
+      "public/textures/terrain/water-top-down-v1.png": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
+      "scripts/battle-audio-inventory.ts": "3d8967ce7fb3588f5987a3fb5241eeedac479da58de2329cdbbc8b0e0bf1452b",
+      "scripts/browser-check.mjs": "cf3e539f938b214014fd85e418d5804fd9ebe8f14ee6dc7bf190dd8dafe45e73",
+      "scripts/browser-test.mjs": "42f82f946f4b6c8484feb6aff0129074c5d8db14e153d09bf27f7cc8aea80080",
+      "scripts/evaluate-fit.ts": "f940ffc79ac0134601d34fc2a45213dba28254cf9f9f3b210bec8aaa7db825e8",
+      "scripts/generate-battle-audio.py": "4dab24545d61ceae1aed9a82b4fa0f3e8636794233e4422fecdcb01fa1c83236",
+      "scripts/measure-battle-audio.ts": "60af5c959fe767b0c08d5219db6d2510ad92be2df38cb513723173cdfcdcb5f6",
+      "scripts/measure-fit-controls.ts": "685b9032545025524f21839c642a237bb2fe58969726136aaf3be0f4dfb5a1f8",
+      "scripts/measure-fit-evaluate.ts": "d9074efc425f7db8a0ab3f7045f4c79c21e80ccdfb2768b40944fa8c76b89664",
+      "scripts/measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+      "scripts/measure-fit-preview.ts": "3c64be91bf3bd38463ca0060425014f30aba9b5d27613c0f136a6598fcfccb0a",
+      "scripts/measure-fit.ts": "d05b44271c24eafa38ed9962eac80504f0b7cd0eeb5b73b46477c4e2ed1d4af6",
+      "scripts/measure-save-envelope.ts": "7a226b31b65ed10957abcc40c057142c3ff41ee69d8c67b837d4a7593cb2159b",
+      "scripts/posthog-release.mjs": "5e3aaaa2e67627147945c4d6a26852ecc95dffd2ca2d1219a781ff9d921eb218",
+      "scripts/verification-batches.mjs": "474a48eabad70ca21f80725f2f0fac7f34745a4335783c30a7e2261d48790874",
+      "scripts/verification-playwright-reporter.mjs": "a7fb4f96a7b265b997e6d3707269edf036b2464128f67aebaf7045bf0619d3ae",
+      "scripts/verification-processes.mjs": "feac886ae66cf92eb980beeb9627d00362b685d38b923297093152d56242fe83",
+      "scripts/verification-report.mjs": "5b89be43d9de277787f725ee5e85c52095af6408ad5bb0beb5247f90c2f3ea77",
+      "scripts/verification-selection.mjs": "906b3923e748f9d4d961303b068abb3731efadbbf83278d4613e468298a3f7ab",
+      "scripts/verification-timings.mjs": "d081790254cb7c2522e9e26a3af46cd6c126eb5ea3219da5d1443a5398f080fb",
+      "scripts/verification-vitest-reporter.mjs": "15380f711585e92214a5164af996b2425bf13b7738acced7670821af56e6f050",
+      "scripts/verify-full.mjs": "6e476ee419cdbe26a4a30c3c92b7350767cc8de644176aaff3aaf9887104389c",
+      "src/app/BattlePersistence.ts": "cdcad700096f17b3aad575dd3bbec6e6a0c3e25fecc729a15159b25b0d979ecd",
+      "src/app/BattleSession.ts": "bc91cf19994ffb6b9d1bd0c0d0bfe732547fce5a6135c1058c60bb00365c53e6",
+      "src/app/DungeonSession.ts": "70d595552edb41294bb3473013c710960e2ddad604a452288aca568e2766c465",
+      "src/app/RunItemSession.ts": "7d587221386a4bd047962c8195cb4b8cc7bb9075457adbae74f0047803125023",
+      "src/app/startBattleApp.ts": "76d70abf3bb34482742e947afedf3c4cb7ef9a54df8a35344fcdee8497296e80",
+      "src/app/startDungeonApp.ts": "aa0f81f9ade09e4362ad81f0fe343541fcc7e025aceeaed2c42c188e92d87d58",
+      "src/app/startRunApp.ts": "430334217a41a39cb70f76c041d6fc6f7f86ee9b9a79597c63d89bcb18ec8607",
+      "src/audio/battleCues.ts": "5c8d0a1d8f50cb218ac427d6a2c2aa864d8c637b4ecbdc5bcbce8c6776c0cf91",
+      "src/content/abilities.ts": "47546f3f3bc2687f711ddff1976b8a1104a5c2670f808bfd65aec5265b77bdf6",
+      "src/content/assets.ts": "f3652e154f0d1b900c6dd659bcd45efcb00ede304987a1d7720bbd9792421e3b",
+      "src/content/battlefieldTypes.ts": "1d5f9e0f1c8ecfb1061a5c3862e681dc6b8a4429f4c6bd4d0f10ff1b22c65178",
+      "src/content/catalog.ts": "3b7d95539ad57abb28fa768687d72762568976e6201894f2d9c56bff78f1bebc",
+      "src/content/constants.ts": "dbb46bc522069c35e2af1a015f0b135238f6fe41a44a37b51bce568b987e2d0a",
+      "src/content/desertAssets.ts": "9fc6df3271d650cc528a029e2eb8b492d545322a0d044258c376c02ae28e8748",
+      "src/content/desertCatalog.ts": "dda70c31ae3a622c2626e19e6d5a9e5536498d7315dd72b960153dadc7aca08b",
+      "src/content/dungeon.ts": "5c971b25c32ddce4def6aed79b2d358222dcfe25964672f3c024851d7f2a9d36",
+      "src/content/dungeonEncounters.ts": "95e425db7ce5ded5e35e399a33123ff3cbe0b1379876c360dafe62fc06b4ca8b",
+      "src/content/encounters.ts": "bc72024007ab383a0eddcf988817ccf9d7cb70f4a8c7ca8b283b96dc878bea63",
+      "src/content/forestRuins.ts": "f95e996a3c8abb73c699fc72435f5f45547352bdc6d4d113f52a97a620a47ecf",
+      "src/content/itemTypes.ts": "b0b884f9dbfc03e6c556815d06e1eab2c7119bb8e44c142c2adf026f336f4a13",
+      "src/content/items.ts": "f2f1a07c1e59ab6bd125dcc8b7e159ddf0b88dd0860d822981701437ab624c48",
+      "src/content/progression.ts": "43f2eaeb720cfffe77c9e79c28f415ed79e80ce24ce0421902dd7a9978221369",
+      "src/content/ruinedApproach.ts": "61d6f931af9ee40b466acdcddec151b0d060107808df5a9828614393e41966de",
+      "src/content/types.ts": "34d746c798a6396465130324feb5bbdcb506807a3561fe1ee467cf42f50f514d",
+      "src/content/validate.ts": "d03ce8dd984f89bc89c762a3939528dc9248cb35c97fb942ec7f1cc5ae666950",
+      "src/content/validateItems.ts": "5228a46bc1d7f7148f5030f7cb87e147fbe90b356aa0579f7657f4f28071ce08",
+      "src/content/woodlandCrossing.ts": "e33568d149f8fea4061232d72b38d2c9d9d68596c659a40a65d98730faeef660",
+      "src/diagnostics/audioState.ts": "cb32bf78bd7142ba437697078c71f50a4cd887d3d03bdb5b98f7eaa61796391f",
+      "src/diagnostics/boardFixture.ts": "c5cf2e0ae533ff0ea83252c2a3a873fd1fe131d0a1101f40022221f0be079bcb",
+      "src/diagnostics/browser.ts": "78a5a1b8b8219514de355a9334a72131cd86523d8e7e4780761bfe3713b96bca",
+      "src/diagnostics/measurements.ts": "5ed799458ef37993b9e09c51da4321a35506b702df921840591bbef01a426bc7",
+      "src/diagnostics/proofAssets.ts": "b308d53fb427085c3fc15454e233f85298e86bed72387ba26d15e138cba516df",
+      "src/diagnostics/scriptedMove.ts": "0d733335c9a2f9f39997265c3027c43821c1dd26ae4b832f05cff799d50615a6",
+      "src/domain/ai.ts": "153b4397711c032eb950d89249d61ee70f79255549e75f72e8ff96da5c798259",
+      "src/domain/battle.ts": "aeb28ffeb26d195e99644895240c81016b04cef65d04a42fc3d73440a5941227",
+      "src/domain/battlefield.ts": "873a591eada40a37a81f5c59c3157cfa34a4a08cc97850d26aa2e61129bc1185",
+      "src/domain/battlefieldValidation.ts": "2b955ff31f61f192068b0e9fdb46a59a3fb7217e5fe8a4e3c892311595942de4",
+      "src/domain/combat.ts": "86af36a384d2b94b9508d6adb7afe7bb3b6d17662aca85fb7e12b24631c767d6",
+      "src/domain/constants.ts": "568d34b7ff111ead1fa37686e0ed673a971f54e97afe8a89045c1dddc4e9fcf2",
+      "src/domain/contentIdentity.ts": "8debe271ea4755b8063fa985e24b96009c285e0c6c0b4d78d64a10aea8d01002",
+      "src/domain/dungeon.ts": "71e4daf8b9535d0f358d57ec8e9f60f9b5c02af9cfdc3d79bbf3d97e285accae",
+      "src/domain/dungeonEncounters.ts": "9706afbec3b71c07c79826923ff1bd3a01e98ebc9025428775b1385b949c7a34",
+      "src/domain/dungeonSaveEnvelope.ts": "b870ab8cbf417731b95f945c7b1391f7efd77abe056c94011cce67478a5195be",
+      "src/domain/effects.ts": "f66daa866b7801b57734fed08a70c7525e871fa78a64b2b7d81b86428cb6dd21",
+      "src/domain/exploration.ts": "252f14bbb27e6e0e17f7b19bdf0ad3deb0a595d75bd06d3486ef4e48edb16ed2",
+      "src/domain/grid.ts": "9964d2f4f582bafb6b0b54a8ea47668b70c6956274d58183d3f71a2081c7169f",
+      "src/domain/items.ts": "29362042fccdefd21d709803fddb541ce15f770425416773f9c3d156acf6d8de",
+      "src/domain/movementEdge.ts": "167538673dfcc4822fa52ba0cfe8d30c8c0d2200f1c4c13001d48bba49c3da31",
+      "src/domain/progression.ts": "c1ce5a3f7b47bfabd7d82d5b2b4e5a7e27370353ab890c5646aa4e2c709fb9a1",
+      "src/domain/rewards.ts": "865232ccf3078e751184f36811cb7e609c83aac949a0a1bbf9389280d0df730a",
+      "src/domain/rng.ts": "d962b6aadf7f89d6ffcb0e506eaf7ba7778e0d90f27960b9b046f917c156af44",
+      "src/domain/routes.ts": "e141580ded38bc4a0f07b6338c21e2d6239d2b980c58a7f76fabb802ddd17c7b",
+      "src/domain/run.ts": "b2fdeb8d525a87c7a5ab3c03254efa0b1d27f49b08ebc369ca6d786a5b0934fc",
+      "src/domain/runBattle.ts": "1ea2f641039ba1322eeeedcb4f91cdc0c339a9975fd13a4bd92a072c595f1e42",
+      "src/domain/runSaveEnvelope.ts": "670e7c34371a3b33480114b7d49c8b4c2cd00817b9748f68653b368afb5d46a7",
+      "src/domain/saveEnvelope.ts": "ba40f5b8badcabe21da0adca09cfc36c14b484f2ffe4024233b0ec65bb42e6c4",
+      "src/domain/targeting.ts": "e6fd495d0fc0bbb241ca51d349f924cfd9f9b2fbb1fc9852004110dfbd0301d5",
+      "src/domain/turns.ts": "b24e473f763cd3d01c0b5723b345b892c31a78a086e3ff82124bdc04c8f90f1f",
+      "src/domain/types.ts": "2583e909d53d1cd34de49a84c3d99e010b76c8a1a6ac3b2e80ad55da5832bfe9",
+      "src/domain/validation.ts": "db2c07d783b2a382794ce5be0413b74fef59b7bafb3804c563843b20d5fe7327",
+      "src/geometry/boardPresentation.ts": "2a5526862b8eba5dd5f8a610f52b903ef2b9fce53e6d988ab582b2635eb897d5",
+      "src/geometry/canopy.ts": "b69b41888f6cab81891536428d812dc3e88ccfecd80ca7ba3eb09cfaf3ad2b23",
+      "src/geometry/iso.ts": "94f33e4819a53e695e087acdde96a08b436b696a90167fecf0015cee3c2007f5",
+      "src/geometry/picking.ts": "9a999b60346c0f919e94f11e8201db4ba61ecffe457380f00d0bf35c47e89627",
+      "src/main.ts": "0f58364b234a1ffc697b2de050a66cc43b67ab388a6de110ef55852179204fd1",
+      "src/map/art.ts": "18f1b5f275245e0771d224ac6dbaac3dc9b862a32bc6152e202abb7499f67c67",
+      "src/map/biomes.ts": "29fa28b68a0fe6ab91843b028fcec4a7ef538be8250903fc3fcd883d7abdbdd1",
+      "src/map/generate.ts": "7c48cd6c1be08b9f60e042155299b6cc262dd22b6ec2cd3b6da392f6f2fd928e",
+      "src/map/state.ts": "a920b2924fd5c663a4241ee9dc2adfc06572f4a6394ef073c97528d63adfa655",
+      "src/map/style.css": "3df6d64c06990febaabbf00f21a72b266d8b6c239a0609e98a35fdbaacc8e3cd",
+      "src/map/view.ts": "eb51c713a6818a36e260873800d6ac7e5a3696be57333e0423ff66e51c2da510",
+      "src/persistence/battleStorage.ts": "8f59ab814c8d48342a5354a1e28ad170794e15f5440947d63ed943569d0249fd",
+      "src/persistence/dungeonStorage.ts": "f8abf2da803f7821cce93fb0c1c70e06263be8517b2e659c1cab0d5475e2d143",
+      "src/persistence/runStorage.ts": "223a4023c1677295ad0e0e803907ebcdb97075ab1a51a1bfbe3ee20ca403af94",
+      "src/phaser/BattleAudio.ts": "39e97d6bf85ecc339534c1863e3565929aa4be89d4e8b946dca1c476878aff2e",
+      "src/phaser/BattleScene.ts": "ba86d41bd373aa78eee1148574b83687f0d38492292317481df1eec11ac76e56",
+      "src/phaser/BoardInput.ts": "0cef8c0199c689deec6654b0e184d566bdb7b4cbf5ba83972d4c671fdedf565c",
+      "src/phaser/BoardRenderer.ts": "d01b8995ab8ef33d3cd7604f6960328fba7f4b7e1a7260914d55b634ad76f3b2",
+      "src/phaser/ContentSmokeScene.ts": "7577e5364502eca5236a32ac22adfa45d0623ad9fa925846a6445242d9859e51",
+      "src/phaser/FitScene.ts": "c7172abe67bf8ceb8fe77d924dadcd6f4102de6bad959db4ca0221eb24744859",
+      "src/phaser/ProofAudio.ts": "c0ee62ce825ac2374b275a2645c2b67125d92813b04497a67332995679c9ca70",
+      "src/phaser/ProofBoardRenderer.ts": "c035ec117ec9f923261fe7bf6f4f274b2960506d308c5a44f7e5b0daf523920d",
+      "src/phaser/abilityPresentation.ts": "677be1bdff6b68de1cf60c16b82f6c1bc88cbb678651272c7bccc933999eeb22",
+      "src/phaser/contentLoading.ts": "f5a56fe3ea40c47b2a2b4beccab48367d3d3bec108b98463d26820a7a87cbbc4",
+      "src/phaser/healthBar.ts": "00aa78fbc2fd0b94e3af7ad2aaf0f8f8a7f70f84196ef816b79db31c7f453921",
+      "src/phaser/start.ts": "2903db8965ca6122d53a073283883aff9f5fbae7a40bc52080ee2a894a8d6e25",
+      "src/style.css": "4addf724e7a30b8d1485cda60d6598dd6d2dc63fdef81d1897c1f924b05cded9",
+      "src/telemetry/browser.ts": "11b7345cef249bca01d5697ced2aa369408e045add840a7c5cf7e1cc8cff869e",
+      "src/telemetry/preferences.css": "ef8b9c2a9ea4bf53e49411c01bdc63f0b0a0c38f0040c96c56d084a728cac459",
+      "src/telemetry/preferences.ts": "6736e35dd28b0100228a8716b48330460630232d6db5dcd8e786dabb5b6442c6",
+      "src/telemetry/privacy.ts": "9d4bc99a92a046db58cba3b123fdcfa82f2caacf24f2046d53e6bee6ec1bda77",
+      "src/telemetry/telemetry.ts": "25332e383f70156196509ca5e37a5584558e464fc5bfd40fae6c718ec9b2e258",
+      "src/telemetry/transport.ts": "e7b814e0c54323344efb69caa95e572290a36da64fd87c493a06d9ec6d0dfc8d",
+      "src/terrain/materials.ts": "ec2ddd6e8934189e247565032c4f41e1c4ddb8512217749d5334a1be783966e7",
+      "src/ui/battleActions.ts": "73419315a09897f07537ae8f13e9c52b0a8f66b6988fbb548ed9aa497b111037",
+      "src/ui/battleLayout.ts": "6064fe4d506984253a395031d21e012b4354095335daca5ec380aca629ec9f22",
+      "src/ui/dialogs.ts": "eeec3336a439f259c24974986afa54ccf5d0411a57a14b7524d2d4e25922feed",
+      "src/ui/dungeon.css": "6126b93515540f147d4f119d828a9e5b4b4aa358ed4015af2361b37760b88c6e",
+      "src/ui/dungeon.ts": "c989976384eaf934749ae0387728222163599248aef16e7fc4ad7235bdb5a25d",
+      "src/ui/dungeonMap.ts": "01ae279b267b1445d4f99c177461e40c9a8eabdd8e2c535f58d8668068bfb83f",
+      "src/ui/hud.ts": "d52f0ce9fcbb30d7a85eef568ea88899edf060408cbe21701de6be25b2087468",
+      "src/ui/persistence.ts": "715a933cbc6469322d6169e1f846db4bfcaac17237d73911657e706d6254c6e0",
+      "src/ui/publicAssetUrl.ts": "abdc0cfa8971cc00d77fcf11d72616bcf9d05fa6cb5fe890e6d2f11353068128",
+      "src/ui/runFlow.css": "c3221a04e9138212ec5889dee3090d93352cf5d2754debadcfcb800039bdf671",
+      "src/ui/runItems.css": "d5209511bd1f7455df1d2672fcf0832af5d00c3479f9e19a3a4743e42021f800",
+      "src/ui/runItems.ts": "83503ad1f8a7c4790c62e62c5771cf46b080b697fa39a20c62bfee6b297b102c",
+      "src/ui/targetPreview.ts": "34cc8d6a1b7a3db7b1aae126ce30300fc0681b83a012d504ac5a97853556f70d",
+      "tests/ability-picker.spec.ts": "636cecc608088a89974b6728c560b13ee20212a3c112aef95c38e9456f7e8cfa",
+      "tests/assets.spec.ts": "2ad260b5e4db19bd30a3442b811ef360fd780a96366a1a9dc44dd6b822da8a1c",
+      "tests/audio.spec.ts": "e5346ef007c76f6d252f43aa7560f1ad59c5e267cd1373f27a54992fbd561fcc",
+      "tests/authored-encounters.spec.ts": "b1375d0fc9906b7cbb4fafe462218d786c8ae2969fd5fb3d8db69380ca356e7a",
+      "tests/battle-animations.spec.ts": "b4f336b927c0d1fe7baa3662ba6d860f44f354f99f0689463c012720b211ea64",
+      "tests/battle-audio.spec.ts": "758b06acc304184a3cefebef417b7f2c48d4114c1b6d1f8f8383ba694756a142",
+      "tests/battle-board.spec.ts": "bccd310674665d281d3575a9b04796873ea13fa93b0f8febd888b8540d04011d",
+      "tests/battle-loop.spec.ts": "6fd2a5629a28b30ad0cec990dd42a3d82ae21cdcec437ba4ef905c14077fb5a4",
+      "tests/battle-persistence.spec.ts": "df8e186e4e6efc45f08ec834ecd2c4f3c80796b1e94fbb531c6eaa536437214b",
+      "tests/board.spec.ts": "9f23281436ef5d16f675c69ebeb5a3063fe49ddcea57d079bbdc86b28f211d84",
+      "tests/boot.spec.ts": "0b4854e20001ed9266415e7bbda859692a3174a190251f402217d87bbf2c6444",
+      "tests/content-loading.spec.ts": "d4470b2e7cdecc7bdea9c0496f35109aab93a7d9da6751f175d6d76474d5b33e",
+      "tests/dungeon-exploration.spec.ts": "3e9bbeda5d7b0156a0bdb2b8d7a97d862c864bf4236a59a374076ee4ba3a7808",
+      "tests/dungeon-lifecycle.spec.ts": "472ebd0b5e2a52f7c9ba62755de38491065633cd93305f2e6460b467a6511b02",
+      "tests/dungeon.spec.ts": "f46b0f3367af1ce921c880819a65fb13632b733b79cbf7e3207a9f22a2c7a5f0",
+      "tests/engine-fit.spec.ts": "1db99383067327d262244c18c00b44fd18f1fe2aae293eee70bcf1497e7d822c",
+      "tests/fixtures/abilities/index.html": "cc410e9780bcd8f7c6e2134aac2a3352a388d7893aefd5fa428646b04bbd91f9",
+      "tests/fixtures/abilities/main.ts": "a1ff607cafb7a4ef4a21c4c42527ba866c6cc35faabf553d78ba36d563d50674",
+      "tests/fixtures/encounters/index.html": "1aeef75ad341d9f313c44caeb37d1747465bad89ebbbcfcfee0e930bffbaa050",
+      "tests/fixtures/encounters/main.ts": "66b88fcbc55b5c06eda1a34a2a92252255d320075b1da4ccd45063f1ccc0844d",
+      "tests/fixtures/run-items/index.html": "c37ddb14040d6fbcffe2c4ca2237cc7d00c3ecb29e8b48dbba4fdd19d36124dd",
+      "tests/fixtures/run-items/main.ts": "737057d8eb24eedb0167b4d82428d65eeb70b90bb0d1387f6b9dc5ec2e411511",
+      "tests/fixtures/saves/issue-165/README.md": "94714e4837402f9f9240be86d01e52a01f93503262494afce4daebf4d306c6f3",
+      "tests/fixtures/saves/issue-165/battle.json": "b66ae5cce1e3eb1312653f7ee2980c5995b2f7ccdc76fd5754e53c34285c8143",
+      "tests/fixtures/saves/issue-165/dungeon.json": "3bafd83794f77099623f85f74fb9dab8962976578c44adcd15baa873a33d5842",
+      "tests/fixtures/saves/issue-165/run.json": "f77a10f0f770e5bd5a533d69eb0e234b337eb8f8f1ded681faa3dc4f463e52e1",
+      "tests/fixtures/saves/issue-166/README.md": "f509f6f3cdd2095f11e3def8d4a43dd9f81e5f1c1a5c1bfa2417d4cb87870d4b",
+      "tests/fixtures/saves/issue-166/battle.json": "8ba7beac57461794a1d9e4d863eaee4f527138e2cac3affabc24f7834710aefe",
+      "tests/fixtures/saves/issue-166/dungeon.json": "f4699c6f8ccdfc281332a9f3642c08e6fc713f4a895296759c4fcb9ae9a47aca",
+      "tests/fixtures/saves/issue-166/run.json": "e934b96cd1df2bcc18279d2db676799600785de12e16a0969609e18f7cbbe731",
+      "tests/grass-surface.spec.ts": "7ebba6c2fc1deebddc583b74fac02c1ae8ffcda353fb9f144150836f1ca51236",
+      "tests/guarded-effects.spec.ts": "c26219e44256d2a941d9c3d7febe86524488766714f47a773f2d963d0053ad07",
+      "tests/helpers/abilityCatalog.ts": "b2b3a304c87a6c5db87c56211a0d4cd1624ce26d15e596b33cab660889841120",
+      "tests/helpers/battlePolicy.ts": "4304272ff28cd4e65ac1a6d8e59070dd9b440ff772c1c1a98b7c8aca7bfb7f2f",
+      "tests/helpers/dungeonFixtures.ts": "03bb81fd5a723cfb35dc969f820fd1d923cab14d4d83926ffc646394ed99a4de",
+      "tests/helpers/dungeonTraversal.ts": "a02f41b4d3bc8f3f8b3fdd0dea22beb5c6bf20bb434a40654356b73a789c8a34",
+      "tests/helpers/guardedBoundary.ts": "43bf3b7d4583f80442f43153a7117c6cef9bacafbfcb36d7a2adf034d4af7848",
+      "tests/helpers/playerPolicy.ts": "d95cc04792adbf39b9206575bc4158fe2ed412bf2929a0a72fd300fde5cc3dcf",
+      "tests/helpers/runItemFixtures.ts": "6ef75f29e7f4054ef51bd6dea7c64fd10dc8b956ecc74f148f0c0844a5dc9370",
+      "tests/helpers/runRecoveryFixtures.ts": "918e0a293d343d0b4f2bc226e5cdac96ecc255cc8e5c10fadf6cd8325838074f",
+      "tests/helpers/saveFixtures.ts": "2e48c8dcd988650743d6f83cb43b94198aa515834e5ec10c206fb460206de7bb",
+      "tests/input.spec.ts": "1b66ad4d7c0b41b738f2fa6de7c616a2543326d410e7c928cb092c49dbf371a1",
+      "tests/integration/buildHeaders.test.ts": "fee0b7edde588d6c64e54dcafb3070e423c41e4c5730a1878fd01d88870171f8",
+      "tests/layout.spec.ts": "e442f14bf8e1a3045562f465d8c19662465d89ebb87c59417480edf3c7f9937b",
+      "tests/lifecycle.spec.ts": "d3abf093b3bbed800d9b03dc71f833a0a717aeaa4f3768274a121795ebd2da55",
+      "tests/move.spec.ts": "88cfc8c343f3eb4a218f93cad18bffcd5a2d56d889132455ccce5604819f4596",
+      "tests/opacity.spec.ts": "db439a04a9ed39938589ab8b77726465c90f93bc93b2bfdc981650fb8dde23c2",
+      "tests/overworld-map.spec.ts": "98ec54fc4cb7b88975db904c6b99287d5ec0af19b0d0c68fffd6dd3273b858e7",
+      "tests/procedural-grids.spec.ts": "fcd3f41219b53cfdb1d1c67691d0aca47e5ddc5b7292c52e94050dc3f8120f85",
+      "tests/public-asset-base.spec.ts": "a39d321867669e1d9a582fddd045084221c531f5f27afa1a0fa180f6d716fd0b",
+      "tests/run-items.spec.ts": "2b963eb7ae03f9d702a8c5c704cdfdfa727791f07c009ddebac66d8de723259c",
+      "tests/run-progression.spec.ts": "a436b55130b1e598ccdde36eec70c8f2643ff88742338414d9cfc4f70fd37c83",
+      "tests/telemetry.spec.ts": "e82c151a1be4570caf2c7ece3b0c8cb5fd519bfa3222b25fbc7549c842bb495c",
+      "tests/terrain-materials.spec.ts": "5e4fbcabad76c50b1fac9f19b90f638dbd0d4dbfd7ed29c7e142de5c0f8d52dc",
+      "tests/tooling/browser-diagnostics.test.mjs": "d6c3eb281a4371da6d6e19a74442ebb08efdf67cbe169aa7c679950451be2b74",
+      "tests/tooling/verification-batches.test.mjs": "de47fc55b7a7b0dcb8df709ad2c17996c514398bc9ba703a2469be9db8da26d3",
+      "tests/tooling/verification-browser.test.mjs": "06d22d2ee86ea326a15fb601dab23019028366d8bb4bbb33efeb664a9ece55e4",
+      "tests/tooling/verification-processes.test.mjs": "2dc6abfa1af65d9f24946dc68f2f924b340a777fca857a65b8f2cc45ffcfe163",
+      "tests/tooling/verification-reporters.test.mjs": "54c58ca10a8fd5597b3e1eaeaa16dd4b535c3e21b1a9c56981e9a75d5592caf3",
+      "tests/tooling/verification-selection.test.mjs": "4508d88c849a278748eb7ffba6f03b84a6b084e22ae29f91508394c989302c09",
+      "tests/tooling/verification-timings.test.mjs": "461dbeb89ef34da9e7aa9c8e13af1a66ee921aedc3602ee646a8adc8fb294857",
+      "tests/tooling/verify-full.test.mjs": "7021ebf41b7c55cd12921877a1c2a11b8ef8b019bdb05d25a5c4123995ff7792",
+      "tests/unit-health-bars.spec.ts": "3d354d14499c6674ecf8f5b7d583081631e2f2c8701291b3e7c5c6a365a50aa4",
+      "tests/unit/RunItemSession.test.ts": "efd3433e4243f41891925dc3383717bb049968517545b08657c33a3427f59c9c",
+      "tests/unit/__snapshots__/authoredEncounters.test.ts.snap": "d2d92689447dfb3674035aa6e4bd3b4d76b6a148a58491bece687ff2fc829bac",
+      "tests/unit/__snapshots__/battlefield.test.ts.snap": "f8fac2780d3dfd375b87f1c63b3418ae66d84e9c6b722c56e085e3f01a66efea",
+      "tests/unit/__snapshots__/dungeonEncounters.test.ts.snap": "2bb3b68bd4de0d73011dbddfb6c3fe31bce46150ed11df7887989b19df4529ca",
+      "tests/unit/abilities.test.ts": "beb73e0754218fd721ca98bd451dfea81e89cd335da07d2c07500f9f1dd0f0f5",
+      "tests/unit/abilityValidation.test.ts": "cfabab7fe91c8a7518044c9d1bb809b8ea30fad6f5b230991105770e64ce81ed",
+      "tests/unit/ai.test.ts": "5efa5b4b591776def88f4e98d2da43e1997431c514f2e8638f76d631d0a54cdf",
+      "tests/unit/audioState.test.ts": "dc210650d635cc2fc34174041701df2d97a39db4737aff58f421f77fc0bde955",
+      "tests/unit/authoredContent.test.ts": "930aeba905adac10963a64fd288d6bae699fecc811e504468cc08aa94b25511e",
+      "tests/unit/authoredEncounters.test.ts": "bf3db8a5c43e8cc9d80d9f62db5883211cacb3917affb9b52e44d0d8ec50ac39",
+      "tests/unit/battleActions.test.ts": "c2405080727f3e628438721ad260ab532257921467ffeaef3b80d99e11585d33",
+      "tests/unit/battleAudio.test.ts": "970ff1016dfaac611a2b88b58897ed85b7eaed4759d75a7471e848683e54925c",
+      "tests/unit/battleAudioInventory.test.ts": "9a4035c2acb1f2a1508ff602a49ba29b62ac814452bd0f91caee6fd1e1826cf3",
+      "tests/unit/battleCues.test.ts": "62d1bf30ac222c1990cfdef3b341ef4c4ac9c906af1f4cf81db89b282f90508f",
+      "tests/unit/battlePersistence.test.ts": "5605a075a8e3313c38ca2209e702220a893e25504136efea55087b8322a518f4",
+      "tests/unit/battleSession.test.ts": "1714b523f991165d939ec3225024028feb83511df3b2f5d0ceec79dfad8a0d03",
+      "tests/unit/battleStorage.test.ts": "b633076338bc23b6ad826e1f7921a0bb72b49f9f2e1c3d61c7b562786743a508",
+      "tests/unit/battlefield.test.ts": "b28d07341bd8e8b82a861cd6dbc2d85dd69bf0b21896e43c79bf2be3d86cc730",
+      "tests/unit/battlefieldContinuation.test.ts": "39efe0958435827f88287ea27d5df95e89cacd787ca0ff8d25a4348499dc22c6",
+      "tests/unit/battlefieldCorpus.test.ts": "811a767bfbc4790fc9e1c9e1dc961944cc0cd45ce2954ef0b7789ca49800b550",
+      "tests/unit/battlefieldSimulation.test.ts": "24cf7ec1177bfbfef8842bf4df8a7e236b05af8939ffb36d728e2bcb6f3fc84f",
+      "tests/unit/battlefieldSources.test.ts": "a0835e8c2219f10641c217e659e268cb9992d81e81d622d4da353547a5f774f8",
+      "tests/unit/boardPresentation.test.ts": "67527eeea0ca23c6896eb75a26c4d09d329ab6bf8ff81d1ff5f61c17ab0cb6b9",
+      "tests/unit/canopy.test.ts": "6ecb01218476074627924a4ae9b56a24b98d6f875b6f472ca9d606e3922f09ad",
+      "tests/unit/combat.test.ts": "b9f156daeb8a93b3cc98bdaff3621f12b96fa334763e0dec0d2416d3958512dc",
+      "tests/unit/content.test.ts": "99388720895544e1577749639250fe3e23fde17ea6ba1b764053d1163364ab24",
+      "tests/unit/contentContract.test.ts": "9f5a3a8db40531cb79ce1ccde449effcb854bc5d250d93a0f748c2a94dbad2d5",
+      "tests/unit/domainBoundary.test.ts": "f3d770ba058f4099f60d09b7b75a57ac75c0d4e73fa937661ec9f6dc094fba73",
+      "tests/unit/dungeon.test.ts": "f0d20dbf6624caae84acc167a2b60ba5df6a35eb40b2058a8c86d97fe7d712cb",
+      "tests/unit/dungeonBattle.test.ts": "a72c3382c303603d6e251032afdb00d705e4616c04d070ecf981e416a1ee1e22",
+      "tests/unit/dungeonEncounters.test.ts": "2a4299c8bd94610553b546945e5960b789a66d80565d82e7cc673cb59159a6ef",
+      "tests/unit/exploration.test.ts": "29d16b56e0156f63d7d05d89d6696c46ce6396b599d2af65dc7c1cb33ee358ef",
+      "tests/unit/fixtures/contentContract.ts": "77758f6036eea5617c54dc75df955764adcfdc13b6c0c5df7cb499f1e5163204",
+      "tests/unit/grid.test.ts": "cf91ad4924937595571fe48be9b308d019308c20b35a0b81bd997da621bc3880",
+      "tests/unit/healthBar.test.ts": "ea8283ca82826f222a9f20d77c60feb041c086bd2bbb3da6d798b95e59d7653a",
+      "tests/unit/input.test.ts": "9554404090e93067f4cdf847320c43c57251f0fb6521e9b5d3becd3f3e2b6592",
+      "tests/unit/iso.test.ts": "897db5fd29e821293c344f7064d47c52175a7e2a7efe288fd6e03e376a6696a8",
+      "tests/unit/itemCommands.test.ts": "96ab1e432eadf25ef7927e93090e7b8ba577558b537a6169c9d36b6f1910d236",
+      "tests/unit/items.test.ts": "eb6b221fd25059e0691d0d2fd8aa7cba7a58d420f9a903cb6a0904f5ccb7ae03",
+      "tests/unit/measureFitOptions.test.ts": "af066456ccf1a9efc146e779283ad5668c30e0d5ab8a9d7082b40b929e55ef8b",
+      "tests/unit/measureFitPreview.test.ts": "0fec44abe1423317997fca99a13d7e3adf4178eaf3e003ad68ea36d2614a246b",
+      "tests/unit/measurements.test.ts": "2cab42f9e963dc7d472b3d6b8829126f2b010a7869183f173bc4a3f6d6f32458",
+      "tests/unit/move.test.ts": "3ae9bd9de4453424ea0f88eda98f32082e3e1a941e97af1c629606cc48617766",
+      "tests/unit/overworldMap.test.ts": "710ac3938887243e0f4991186e3c758eba802663f9a79efd91464e0449ffaf36",
+      "tests/unit/picking.test.ts": "6c09d5d3ef1038c19cfa91194bee97ed6dd9cb0784abfa513dc017d77c27403c",
+      "tests/unit/progression.test.ts": "6770799ed8e5084a88c769a26cee856d08f3bb64120136159fc259c3000e6249",
+      "tests/unit/proofAssetExports.test.ts": "ff3333d95a0b5c110c3c0ac98a574425951529e6d0445b4067d5ddf59727cccb",
+      "tests/unit/rewards.test.ts": "d0c48d60fad89b68918ac4541650d99f5a0d7f9386e864487b3618bba31bd5d6",
+      "tests/unit/rng.test.ts": "b3a1974c1ba01183498b8e8f0dc1020a4c72527502b8c220d73099897a20706f",
+      "tests/unit/run.test.ts": "e79e788d0285a4de6a42da0d7989e22d07c08e8a429e3564fa88060c08d3e97c",
+      "tests/unit/runBattle.test.ts": "3abcbb2291d36865c4ba2750805502439bd85e30303b1168830be00b623e0fa6",
+      "tests/unit/runRecoveryFixtures.test.ts": "4c416c60ee2815a6d83b4dcc61678f255a213673dbc12fd989ba579766ac73d3",
+      "tests/unit/runSaveEnvelope.test.ts": "13100bcc97d2f64a1085be4f2053d0505ead440de68c042636852a07366e0a15",
+      "tests/unit/runStorage.test.ts": "0320dfc7f3e1714dcf14747ea1e290d9210fd06281fd978d6d5043dcc82fb44e",
+      "tests/unit/saveEnvelope.test.ts": "09fbf77483b4850640b870b233003db2bcd42663796756773e68e1f735f184e0",
+      "tests/unit/state.test.ts": "b7bedc83462e39e4af6ee9b8b841017bb08d8022d7cd9b15ea34070bdf7e83b2",
+      "tests/unit/targeting.test.ts": "2171bbeb823c6cfb3acd00765a2081e6b5fb13b5862b0a1653c8bec520654d00",
+      "tests/unit/telemetry.test.ts": "714fa0094edaaffbd85965165f869af61836eec60e42db846c00fd7a2eaf5b3b",
+      "tests/unit/turns.test.ts": "368c29ae4b9ed13ab8c7adf9415f6bacecdd795c2ce33dfb8bfbc86d30f33187",
+      "tsconfig.domain.json": "94b255ca7ab890df804d9e4b06d9ed62b5f0e01a9f77ace3ac9798d47572591e",
+      "tsconfig.json": "0dd83947555cc594acbd955a45ef4789e9387a99cff759b460fd988a6e5c97da",
+      "vite.config.ts": "ab342823509326a2ccf26245bb06ec2f8c130720d754a66a8711b2c058e42e3a",
+      "vitest.all.config.ts": "46e39525da304339468cb43d31cd4500212f81ad71e35158b51cb90023bbef71",
+      "vitest.build.config.ts": "58f3bccff5edbe319cd611271e23c88dcef213109057c41c26e0619f2235d84e",
+      "vitest.config.ts": "8b967780731d5b199a8eff59c600789b2ccc84584d523c07796b8c896e09c2cf"
+    }
+  },
+  "build": [
+    {
+      "path": "assets/070fb462027ed7a5/battle/source/goblin_archer_sprite.png",
+      "sha256": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e"
+    },
+    {
+      "path": "assets/0bf5465d7ad8396a/battle/terrain/sand.png",
+      "sha256": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810"
+    },
+    {
+      "path": "assets/37fcb2969f129de5/battle/source/mage_sprite.png",
+      "sha256": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b"
+    },
+    {
+      "path": "assets/43d287a0d5e801bb/battle/source/goblin_shaman_sprite.png",
+      "sha256": "43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f"
+    },
+    {
+      "path": "assets/57972fe37b1c0579/battle/source/goblin_grunt_sprite.png",
+      "sha256": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97"
+    },
+    {
+      "path": "assets/58625a5a9febe514/battle/terrain/grass.png",
+      "sha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8"
+    },
+    {
+      "path": "assets/70f30350ea20aac9/battle/portraits/goblin_archer.png",
+      "sha256": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b"
+    },
+    {
+      "path": "assets/7203e2b3a992c9c8/battle/source/ranger_sprite.png",
+      "sha256": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332"
+    },
+    {
+      "path": "assets/72b7f789a242de12/battle/portraits/ranger.png",
+      "sha256": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7"
+    },
+    {
+      "path": "assets/74e8838120256800/battle/terrain/rock.png",
+      "sha256": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5"
+    },
+    {
+      "path": "assets/9f88a273b676fa0e/battle/terrain/forest.png",
+      "sha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26"
+    },
+    {
+      "path": "assets/b47c382b0be6e6fe/battle/terrain/water.png",
+      "sha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622"
+    },
+    {
+      "path": "assets/b5b947941d91b972/proof/fighter.png",
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "assets/battleLayout-CfYoACL1.css",
+      "sha256": "4e499ed7487d898511005768c765aa2933373a6f59c6be069334d63957ec6b81"
+    },
+    {
+      "path": "assets/battleLayout-RW58LTUw.js",
+      "sha256": "8e91a614079fb7e8f7ab6857df5345f6db1c97244e099a228940479f45cd98a3"
+    },
+    {
+      "path": "assets/be249ec3f8849929/battle/terrain/grass_path.png",
+      "sha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9"
+    },
+    {
+      "path": "assets/biomes-B5t1B-JD.js",
+      "sha256": "9d39bc42811f6adf1b8f6f6e07c13ab2375c153446ce3b861a63c0e9fcb5914f"
+    },
+    {
+      "path": "assets/browser-YwsEvihp.js",
+      "sha256": "76c229e6087b642b81d53b8f17cf16668d182fb4d87e50f2d5128e421e20bc0c"
+    },
+    {
+      "path": "assets/c81d18f2d8692582/battle/portraits/goblin_shaman.png",
+      "sha256": "c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0"
+    },
+    {
+      "path": "assets/cc6494048e8cd6a8/battle/portraits/goblin_grunt.png",
+      "sha256": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7"
+    },
+    {
+      "path": "assets/da44b5706aaadefb/battle/portraits/mage.png",
+      "sha256": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95"
+    },
+    {
+      "path": "assets/f0c4ab9c2859f59e/battle/portraits/fighter.png",
+      "sha256": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3"
+    },
+    {
+      "path": "assets/f8322179450af915/battle/terrain/stone.png",
+      "sha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a"
+    },
+    {
+      "path": "assets/index-BUgMG9ih.js",
+      "sha256": "0603bb211baa0ec8e67f9f659efa400e347aa0d64dd0fe589a8558a221c9bfd1"
+    },
+    {
+      "path": "assets/items-Cl3hby7-.js",
+      "sha256": "f22ea4b348f2461eed92389731d0f3cefde41dda250dd92427219ea3b08007a9"
+    },
+    {
+      "path": "assets/preferences-CeGGWQBX.js",
+      "sha256": "dd2bd658c1485df2cc71cd967c1af0facbedd9aac66d580f54dbeb1ae393cd6b"
+    },
+    {
+      "path": "assets/preferences-D1bXSLXU.css",
+      "sha256": "af92c2a36a8b5c528ff17e44b44197aa3cbb79844a123d21b454aab3889769b6"
+    },
+    {
+      "path": "assets/preload-helper-BLdHbfdN.js",
+      "sha256": "8aec9ff75ffa86a03d51268b63126abadb3754aa5a6b6c5bb16e4e2446a63dee"
+    },
+    {
+      "path": "assets/rng-BCcJOpRP.js",
+      "sha256": "a36512236773db7cad93c6d902cfe1ef59696b32723561bfedce717c19b0a68f"
+    },
+    {
+      "path": "assets/start-BqnICiKW.js",
+      "sha256": "071c9af1196d55be0d03a938f38012abeecc21665d6479bb1a14c94d5b914bc2"
+    },
+    {
+      "path": "assets/start-CUmMBbCm.js",
+      "sha256": "5bcad62f59ba9f1606ed6c9ac0ccae7796f8fbd4ae1753e0a1f98222f65dd94f"
+    },
+    {
+      "path": "assets/startBattleApp-IrJEH0f6.js",
+      "sha256": "082b48fefae938a528dae4588db13f20c860a4fb47998cbf9b186956066c1658"
+    },
+    {
+      "path": "assets/startDungeonApp-Bs6ZGJ6B.css",
+      "sha256": "dff4daa8908f3ec8bb5ba2ebe2f45914f6a338e6a4cb4c78162412ebfe05797f"
+    },
+    {
+      "path": "assets/startDungeonApp-DCVDsc7C.js",
+      "sha256": "d619d331803e6b5e92d3eb92f55b65eb39a2c56b962e4e21e2906033afb27aa8"
+    },
+    {
+      "path": "assets/startRunApp-ih15l7Wy.js",
+      "sha256": "83a46614f1572ffb45ac5541216c6e2a09632c7a8d550df55e3b893b6e472c1f"
+    },
+    {
+      "path": "assets/startRunApp-y3YtRGS5.css",
+      "sha256": "7a4922a8bfc63cd587b74f7d0854b755c719392f9e500350885eccfa1043ae73"
+    },
+    {
+      "path": "assets/telemetry-DUsjSLnt.js",
+      "sha256": "d4699af1274635cfc24c4b0947f067a263ff2801c863e4a566f97eb2280c7b29"
+    },
+    {
+      "path": "assets/transport-CPtkaPOU.js",
+      "sha256": "b1b393c4936bc63e359090a7ac2e0f2049d25c72cb763380c4e20efffb31eab0"
+    },
+    {
+      "path": "assets/view-Bah2FNyz.js",
+      "sha256": "912dde998165496b6164377814507912aa54cd75ca97b14d350910cea19220e4"
+    },
+    {
+      "path": "assets/view-BJiQju0W.css",
+      "sha256": "7017c70ef0e651e00c8b76c0044a527e0e66e9389e75db2321be4d7f41974bc4"
+    },
+    {
+      "path": "audio/battle/critical.mp3",
+      "sha256": "f419892404a9224fd4bf984892eb69f33a2c0704d8776873ee21bc58bd5901f8"
+    },
+    {
+      "path": "audio/battle/hit.mp3",
+      "sha256": "607244384c2d238211fa46631325a07232728d15fbfca68bcaaa87a5b65bee41"
+    },
+    {
+      "path": "audio/battle/loss.mp3",
+      "sha256": "cee68cbe441f8622a7b559414305e3bcc459fb48f46115951f9f5097291ca6a5"
+    },
+    {
+      "path": "audio/battle/magic.mp3",
+      "sha256": "ddab11c45966c473523560aed11b3722cca9e8108b4eb49f1e46387dcc2a6a65"
+    },
+    {
+      "path": "audio/battle/miss.mp3",
+      "sha256": "46c4680c22025042552972330e4237ce23c5480eac6db0e08a65e2ca0e8381e6"
+    },
+    {
+      "path": "audio/battle/move.mp3",
+      "sha256": "987ac8ce55959343212675696e3201821717fca9718ad7e5b26bd420f45e5d34"
+    },
+    {
+      "path": "audio/battle/unit-defeat.mp3",
+      "sha256": "a9a5264dacbfacba180c562dbfe4f4aeed8848f73171c3413009a8e2a2396df4"
+    },
+    {
+      "path": "audio/battle/victory.mp3",
+      "sha256": "1d6e4fd2177d1013b4cce4c9ee480ba67cf107a81e6ae1033b561f6619790758"
+    },
+    {
+      "path": "battle/portraits/fighter.png",
+      "sha256": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3"
+    },
+    {
+      "path": "battle/portraits/goblin_archer.png",
+      "sha256": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b"
+    },
+    {
+      "path": "battle/portraits/goblin_grunt.png",
+      "sha256": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7"
+    },
+    {
+      "path": "battle/portraits/goblin_shaman.png",
+      "sha256": "c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0"
+    },
+    {
+      "path": "battle/portraits/mage.png",
+      "sha256": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95"
+    },
+    {
+      "path": "battle/portraits/ranger.png",
+      "sha256": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7"
+    },
+    {
+      "path": "battle/source/goblin_archer_portrait.png",
+      "sha256": "a4ee1b8eb0ab4ed959a6cb160f9b8db330c2e4125b99122c17e175cd2becde4e"
+    },
+    {
+      "path": "battle/source/goblin_archer_sprite.png",
+      "sha256": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e"
+    },
+    {
+      "path": "battle/source/goblin_grunt_portrait.png",
+      "sha256": "73248f68e4ada0036bb8cf379352631acec98b058ef63cc35ee17bc97f0b8992"
+    },
+    {
+      "path": "battle/source/goblin_grunt_sprite.png",
+      "sha256": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97"
+    },
+    {
+      "path": "battle/source/goblin_shaman_portrait.png",
+      "sha256": "55cc13df61bab3b51581a5be52c42c21a7c5b376607ef92dbd6b3f8901efbbe2"
+    },
+    {
+      "path": "battle/source/goblin_shaman_sprite.png",
+      "sha256": "43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f"
+    },
+    {
+      "path": "battle/source/mage_portrait.png",
+      "sha256": "f40dcba51ab801afbbcb6588579e18229cb74360497972991bfa50e679610c5c"
+    },
+    {
+      "path": "battle/source/mage_sprite.png",
+      "sha256": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b"
+    },
+    {
+      "path": "battle/source/ranger_portrait.png",
+      "sha256": "bd8c8786e1006f85df5db3dc423d3535ee7664dee4b32b1a679041b59cc1cb8a"
+    },
+    {
+      "path": "battle/source/ranger_sprite.png",
+      "sha256": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332"
+    },
+    {
+      "path": "battle/terrain/forest.png",
+      "sha256": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26"
+    },
+    {
+      "path": "battle/terrain/grass.png",
+      "sha256": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8"
+    },
+    {
+      "path": "battle/terrain/grass_path.png",
+      "sha256": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9"
+    },
+    {
+      "path": "battle/terrain/rock.png",
+      "sha256": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5"
+    },
+    {
+      "path": "battle/terrain/sand.png",
+      "sha256": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810"
+    },
+    {
+      "path": "battle/terrain/stone.png",
+      "sha256": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a"
+    },
+    {
+      "path": "battle/terrain/water.png",
+      "sha256": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622"
+    },
+    {
+      "path": "index.html",
+      "sha256": "9c85476966bdd26b0db7c3ff264386caf9f9109b6672199a9cd26a4bd9634fff"
+    },
+    {
+      "path": "map-art/legacy-8bit/00_terrain_grass_plains.png",
+      "sha256": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f"
+    },
+    {
+      "path": "map-art/legacy-8bit/01_terrain_forest.png",
+      "sha256": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013"
+    },
+    {
+      "path": "map-art/legacy-8bit/04_terrain_mountain_blocked.png",
+      "sha256": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e"
+    },
+    {
+      "path": "proof/fighter-portrait-96.webp",
+      "sha256": "e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8"
+    },
+    {
+      "path": "proof/fighter-portrait.png",
+      "sha256": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190"
+    },
+    {
+      "path": "proof/fighter.png",
+      "sha256": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981"
+    },
+    {
+      "path": "proof/grass-material-v1-348.png",
+      "sha256": "002fe98dc7d904b4813205b076e90bf605b594e8a51767e1e6abadbb7605920d"
+    },
+    {
+      "path": "proof/grass-material-v1.png",
+      "sha256": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2"
+    },
+    {
+      "path": "proof/tree-grass-v1-480.webp",
+      "sha256": "d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32"
+    },
+    {
+      "path": "proof/tree-grass-v1.png",
+      "sha256": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5"
+    },
+    {
+      "path": "proof/unlock-tone.mp3",
+      "sha256": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec"
+    },
+    {
+      "path": "proof/unlock-tone.ogg",
+      "sha256": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d"
+    },
+    {
+      "path": "textures/terrain/ash-top-down-v1.png",
+      "sha256": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b"
+    },
+    {
+      "path": "textures/terrain/cliff-top-down-v1.png",
+      "sha256": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06"
+    },
+    {
+      "path": "textures/terrain/forest-top-down-v1.png",
+      "sha256": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b"
+    },
+    {
+      "path": "textures/terrain/grass-top-down-v1.png",
+      "sha256": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8"
+    },
+    {
+      "path": "textures/terrain/grass_path-top-down-v1.png",
+      "sha256": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154"
+    },
+    {
+      "path": "textures/terrain/lava-top-down-v1.png",
+      "sha256": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea"
+    },
+    {
+      "path": "textures/terrain/mud-top-down-v1.png",
+      "sha256": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8"
+    },
+    {
+      "path": "textures/terrain/runtime/ash-top-down-v1.png",
+      "sha256": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74"
+    },
+    {
+      "path": "textures/terrain/runtime/cliff-top-down-v1.png",
+      "sha256": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295"
+    },
+    {
+      "path": "textures/terrain/runtime/forest-top-down-v1.png",
+      "sha256": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7"
+    },
+    {
+      "path": "textures/terrain/runtime/grass-top-down-v1.png",
+      "sha256": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93"
+    },
+    {
+      "path": "textures/terrain/runtime/grass_path-top-down-v1.png",
+      "sha256": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61"
+    },
+    {
+      "path": "textures/terrain/runtime/lava-top-down-v1.png",
+      "sha256": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86"
+    },
+    {
+      "path": "textures/terrain/runtime/mud-top-down-v1.png",
+      "sha256": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f"
+    },
+    {
+      "path": "textures/terrain/runtime/sand-top-down-v1.png",
+      "sha256": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d"
+    },
+    {
+      "path": "textures/terrain/runtime/stone-top-down-v1.png",
+      "sha256": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442"
+    },
+    {
+      "path": "textures/terrain/runtime/water-top-down-v1.png",
+      "sha256": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1"
+    },
+    {
+      "path": "textures/terrain/sand-top-down-v1.png",
+      "sha256": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db"
+    },
+    {
+      "path": "textures/terrain/stone-top-down-v1.png",
+      "sha256": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7"
+    },
+    {
+      "path": "textures/terrain/water-top-down-v1.png",
+      "sha256": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e"
+    },
+    {
+      "path": "_headers",
+      "sha256": "ff5f04cb89563947df2c689a69e05fc8037867550093ec9bfbc76f657fdd4dfe"
+    }
+  ],
+  "node": "v24.19.0",
+  "os": "win32 x64 10.0.26300",
+  "playwright": "1.63.0",
+  "workers": 1,
+  "retries": 0,
+  "mode": "preview",
+  "base": "/",
+  "browserExecutable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "browserVersion": "155.0.8059.41"
+}

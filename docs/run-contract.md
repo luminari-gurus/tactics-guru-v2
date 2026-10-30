@@ -1,6 +1,6 @@
 # Three-encounter run contract
 
-Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+Source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`, extended by qualified Shaman source `f4616ae301da4be133455334d4c2b38e3583c8f7`. Historical evidence retains its original revision and test limits.
 
 Current #163 extension: level-2 Fighter Second Wind can increase battle HP above
 encounter entry. The active-snapshot reader requires its spent-use flag and bounds
@@ -9,7 +9,7 @@ Completion supplies an exact optional `secondWindUsed: true` fact from that
 validated battle to the reducer, which applies the same bound; other heroes and
 unspent state retain entry-HP bounds. The fact does not enter party data and cannot
 revive a defeated hero. Current equipment modifies accuracy/AC, preserving the
-reducer's healing-power equivalence. The current battle state format 4/rules 5 and run envelope 6 reject incompatible earlier saves while retaining original bytes for recovery/export; see [ability rules](signature-abilities.md).
+reducer's healing-power equivalence. The current battle state format 5/rules 6 and run envelope 7 reject incompatible earlier saves while retaining original bytes for recovery/export; see [ability rules](signature-abilities.md). Shaman ally healing does not grant heroes any additional entry-HP allowance.
 
 The #164 Ranger extension adds level-2 Mark Target and level-3 Pinning Shot;
 [their shared rules](signature-abilities.md#ranger-progression-164) govern the

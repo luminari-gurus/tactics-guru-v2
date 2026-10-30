@@ -70,6 +70,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
     });observer.observe(game,{attributes:true,attributeFilter:['data-phase']});
   });
   await activate('#battle-review');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.locator('#battle-preview')).toContainText('Planned ability cancelled after interruption');
   const interrupted=await session(page);expect(interrupted.replay.commands.at(-1)?.type).toBe('move');
   expect(interrupted.replay.commands.length).toBe(before.replay.commands.length+1);
   await expect(page.locator('#battle-undo')).toBeEnabled();await activate('#battle-undo');

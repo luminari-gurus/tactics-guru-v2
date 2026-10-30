@@ -1,6 +1,6 @@
 # Signature abilities (#8)
 
-Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+Source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`, extended by qualified Shaman source `f4616ae301da4be133455334d4c2b38e3583c8f7`. Historical evidence retains its original revision and test limits.
 
 ## Mage progression (#165)
 
@@ -87,10 +87,27 @@ Healing and Taunt use the existing native picker, board/self targets, direct
 confirmation, inspection, accepted-event log and floating feedback. Guarded Strike
 and Magic Missile retain their approved rules and Guarded retains its board shield.
 
-Current battle state format 4/rules 5 and run envelope 6 reject earlier versions as incompatible while preserving original bytes through existing recovery/export. Dungeon envelope 8 accepts format 7 and rejects earlier versions with the same recovery/export safeguards. The standalone wrapper remains format 1 and RNG stays 1.
+Current battle state format 5/rules 6, run envelope 7 and dungeon envelope 9 deliberately
+reject earlier versions as incompatible while preserving original bytes through
+existing recovery/export. The standalone wrapper remains format 1 and RNG stays 1.
 Run/dungeon readers admit healing above entry HP only within the spent Fighter's
 single heal bound and projected max HP. Short-run completion carries the spent-use
 fact from the validated battle into its reducer; it is never stored in party data.
+
+## Goblin Shaman support (#166)
+
+Enemy-only Weakening Hex uses one action at hostile range 2–4 with LOS. The target
+saves on d20 + Will at least 10 + projected Shaman power, with no automatic natural
+outcomes. Failure gives one non-stacking −2 accuracy Weakened source until target
+turn end or source/target defeat; another failure refreshes/replaces, while a
+successful save preserves existing Weakened. Save percentages count all twenty
+faces consistently in preview, log and inspection. Optional bounded weakened/debuff
+immunity rejects before spending; no production actor receives an immunity.
+
+Heal Goblin uses one action at allied range 1–4 with LOS and no RNG or use counter.
+Only living injured grunt/archer/Shaman allies qualify; healing is min(4, missing
+projected HP), never self-healing or revival. Both abilities reject atomically.
+Their shared AI scores and target ordering are documented in [enemy turns](enemy-turns.md).
 Dead heroes stay dead and new encounters carry HP while resetting battle-local flags.
 
 ## Current ability controls (#162)

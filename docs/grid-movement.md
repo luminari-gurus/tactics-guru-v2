@@ -26,10 +26,12 @@ positions with actual range/LOS. For structural engagement only the chosen targe
 is fixed; other units may move. This proves terrain access to combat, not freedom
 from every congestion state, a winning strategy, or a finite battle duration.
 
-Enemy immediate expected-damage attack ordering is unchanged. Without an attack,
+For ordinary enemies, immediate expected-damage attack ordering is unchanged. Without an attack,
 weighted routes target legal ordinary-attack cells. Goals sort by route cost,
 target ID, ability ID and cell y/x; one-turn destinations sort by remaining cost,
 move cost and y/x. A strictly improving route may increase Manhattan distance.
 Planning draws no RNG and serializes no route commitment. Accepted movement/action
 flags reproduce the remaining move/attack/Wait suffix after reload. Rules version
-2 explicitly rejects saves using the previous autonomous decisions.
+2 explicitly rejected saves using the previous autonomous decisions. #166 extends
+the same routing with useful Shaman support goals; see [enemy turns](enemy-turns.md)
+and [current save versions](battle-save-format.md).

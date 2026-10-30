@@ -9,7 +9,7 @@ import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { undoRecordedMove } from '../domain/movementUndo';
-import { REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
+import { BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
@@ -62,9 +62,9 @@ export class BattleSession {
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
   get pendingPlan() { return this.plan; }
-  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null && this.current.commandCount < RULE_BOUNDS.commandCount.max; }
+  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null && this.current.commandCount < RULE_BOUNDS.commandCount.max - 2; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
+  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:BASE_REPLAY_FORMAT_VERSION, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
   get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
@@ -100,16 +100,24 @@ export class BattleSession {
   confirmPlannedAbility(): Presentation | null {
     if (this.phase !== 'player' || !this.plannedAbility) return null;
     const ability = this.plannedAbility; this.plannedAbility = null;
+    const preview = this.preview(ability);
+    if (!preview.ok) { this.error = preview.reason; return null; }
     return this.resolve(ability, false);
   }
   undoMove(): Presentation | null {
     if (!this.canUndoMove || !this.lastMove) return null;
-    const before=this.current, previous=this.lastMove;this.lastMove=null;this.cancel();this.error=null;
+    const before = this.current, previous = this.lastMove;
+    this.lastMove = null;
+    this.cancel();
+    this.error = null;
     const result=undoRecordedMove(previous.before,before,previous.move,this.catalog);
-    if (!result.ok) {this.error=result.reason;return null;}
-    this.current=freeze(result.state);this.commands.push(freeze({type:'undoMove',unitId:previous.move.unitId}));
-    const events=freeze(result.events);this.resolvedEvents.push(...events);
-    this.phase='presenting';setTelemetryContext({phase:'presenting'});
+    if (!result.ok) { this.error = result.reason; return null; }
+    this.current = freeze(result.state);
+    this.commands.push(freeze({type:'undoMove',unitId:previous.move.unitId}));
+    const events = freeze(result.events);
+    this.resolvedEvents.push(...events);
+    this.phase = 'presenting';
+    setTelemetryContext({phase:'presenting'});
     try {this.accepted?.(this.current);} catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
   }
@@ -132,7 +140,10 @@ export class BattleSession {
     const result = dispatch(before, command, this.catalog);
     if (!result.ok) { this.error = result.reason; if (enemy) this.fail(result.reason); return null; }
     this.current = freeze(result.state);
-    this.lastMove = !enemy && command.type === 'move' && result.events.length === 1 && result.events[0].type === 'moved' && !before.units.find(u=>u.id===command.unitId)!.hasActed ? {before,move:command} : null;
+    const actor = before.units.find(u => u.id === command.unitId)!;
+    this.lastMove = !enemy && command.type === 'move' && result.events.length === 1
+      && result.events[0].type === 'moved' && !actor.hasActed && !actor.hasMoved
+      ? {before,move:command} : null;
     this.commands.push(freeze(structuredClone(command)));
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);

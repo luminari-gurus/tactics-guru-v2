@@ -1,14 +1,15 @@
-import type { CellPosition, ContentCatalog } from '../content/types';
+import type { Ability, CellPosition, ContentCatalog } from '../content/types';
 import { previewCommand, readBattleState } from './battle';
-import { previewAttack, type AttackPreview } from './combat';
+import { previewAttack, previewSupportAbility, type AttackPreview } from './combat';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from './constants';
 import { moveUnit, previewMovement } from './grid';
 import { lineOfSightBlocked, manhattanDistance } from './targeting';
 import { cellKey, routeDistances } from './routes';
 import { dispatch } from './turns';
-import type { BattleEvent, BattleState, Command, Rejection } from './types';
+import type { BattleEvent, BattleState, Command, Rejection, UnitState } from './types';
 import { isDenseArray, isPlainRecord } from './validation';
-import { tauntSource } from './effects';
+import { combatStats, tauntSource, weakenedImmune } from './effects';
+import { HEAL_GOBLIN_IDS } from '../content/constants';
 
 export type EnemyRejection = Rejection | { readonly ok: false; readonly reason: 'notEnemyUnit' };
 export type EnemyPlan = { readonly ok: true; readonly commands: readonly Command[] } | EnemyRejection;
@@ -47,7 +48,7 @@ function damageScore(preview: AttackPreview): number {
 const attackOrder = (a: AttackCandidate, b: AttackCandidate) => b.score - a.score || a.cost - b.cost ||
   a.targetId - b.targetId || lexical(a.command.abilityId, b.command.abilityId) || cellOrder(a, b);
 
-/** Ordered optional move, optional ordinary attack, then Wait; also reconstructs an accepted plan's remainder. */
+/** Ordered optional move, optional useful ability, then Wait; reconstructs an accepted plan's remainder. */
 export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCatalog): EnemyPlan {
   const checked = readEnemyState(input, catalog); if (!checked.ok) return checked;
   const state = checked.state;
@@ -69,13 +70,29 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   }
   const source=tauntSource(actor,state.units);
   const targets = state.units.filter(u => u.side === 'player' && u.hp > 0 && (!source || u.id===source.id)).sort((a, b) => a.id - b.id);
-  const abilities = Object.values(catalog.abilities).filter(a => a.kind === 'attack' && a.owners.includes(actor.defId))
+  const abilities = Object.values(catalog.abilities).filter(a => ['attack','weakeningHex','healGoblin'].includes(a.kind) && a.owners.includes(actor.defId))
     .sort((a, b) => lexical(a.id, b.id));
+  const abilityTargets = (ability: Ability) => ability.kind === 'healGoblin' ? state.units.filter(u =>
+    u.id !== actor.id && u.side === actor.side && u.side === 'enemy' && u.hp > 0 && u.hp < catalog.enemies[u.defId].stats.maxHp &&
+    HEAL_GOBLIN_IDS.some(id => id === u.defId)).sort((a,b) => a.id - b.id) :
+    ability.kind === 'weakeningHex' ? targets.filter(u => u.weakenedBy === undefined && !weakenedImmune(u, catalog)) : targets;
+  const supportScore = (snapshot: BattleState, command: Extract<Command,{type:'useAbility'}>, target: UnitState) => {
+    const preview = previewSupportAbility(snapshot, command, catalog);
+    if (!preview.ok) return 0;
+    if (preview.kind === 'healGoblin') return D20_SIDES * preview.healing;
+    const power = target.side === 'player' ? catalog.heroes[target.defId].stats.power : catalog.enemies[target.defId].stats.power;
+    return preview.failedSaveFaces * Math.max(1, combatStats(target, catalog).accuracy + power);
+  };
   const attacks: AttackCandidate[] = [];
-  for (const position of positions) for (const target of targets) for (const ability of abilities) {
+  for (const position of positions) for (const ability of abilities) for (const target of abilityTargets(ability)) {
     const command = { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } } as const;
-    const preview = previewAttack(position.state, command, catalog);
-    if (preview.ok) attacks.push({ ...position, command, score: damageScore(preview), targetId: target.id });
+    if (ability.kind === 'attack') {
+      const preview = previewAttack(position.state, command, catalog);
+      if (preview.ok) attacks.push({ ...position, command, score: damageScore(preview), targetId: target.id });
+    } else {
+      const score = supportScore(position.state, command, target);
+      if (score > 0) attacks.push({ ...position, command, score, targetId: target.id });
+    }
   }
   const best = attacks.sort(attackOrder)[0];
   if (best) return { ok: true, commands: [...(best.move ? [best.move] : []), best.command, wait] };
@@ -84,10 +101,12 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   const stats = catalog.enemies[actor.defId].stats;
   const fromOrigin = routeDistances(map, catalog, stats, actor.cell, occupied);
   const goals = [];
-  for (const target of targets) for (const ability of abilities) for (const cell of map.cells) {
+  for (const ability of abilities) for (const target of abilityTargets(ability)) for (const cell of map.cells) {
     const distance = manhattanDistance(cell, target.cell);
     if (occupied.has(cellKey(cell)) || !catalog.terrains[cell.terrainId].walkable || distance < ability.rangeMin ||
       distance > ability.rangeMax || lineOfSightBlocked(catalog, map.id, cell, target.cell)) continue;
+    if (ability.kind !== 'attack' && supportScore({ ...state, units: state.units.map(u => u.id === unitId ? { ...u, cell: { x: cell.x, y: cell.y } } : u) },
+      { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } }, target) <= 0) continue;
     const cost = fromOrigin.get(cellKey(cell));
     if (cost !== undefined) goals.push({cell, cost, targetId: target.id, abilityId: ability.id});
   }

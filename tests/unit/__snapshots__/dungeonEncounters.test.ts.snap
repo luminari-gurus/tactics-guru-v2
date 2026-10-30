@@ -65,7 +65,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "forest",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "woodland_crossing",
       "depth": 2,
       "kind": "normal",
@@ -89,7 +89,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "forest",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "woodland_crossing",
       "depth": 2,
       "kind": "vault",
@@ -113,7 +113,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "forest",
       "bossId": "forest_guardian",
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "ruined_approach",
       "depth": 2,
       "kind": "boss",
@@ -139,7 +139,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_1",
       "depth": 2,
       "kind": "normal",
@@ -165,7 +165,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_1",
       "depth": 2,
       "kind": "vault",
@@ -191,7 +191,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": "desert_guardian",
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_2",
       "depth": 2,
       "kind": "boss",
@@ -219,7 +219,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_0",
       "depth": 2,
       "kind": "normal",
@@ -245,7 +245,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_1",
       "depth": 2,
       "kind": "elite",
@@ -271,7 +271,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": "desert_guardian",
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_2",
       "depth": 2,
       "kind": "boss",
@@ -299,7 +299,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_1",
       "depth": 2,
       "kind": "normal",
@@ -325,7 +325,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": null,
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_1",
       "depth": 2,
       "kind": "elite",
@@ -351,7 +351,7 @@ exports[`pins deterministic selection, covers all kinds/biomes, and alternates o
     {
       "biome": "desert",
       "bossId": "desert_guardian",
-      "catalogIdentity": "sha256:442464920a0c9fe98ba4cba81fd10129ed9e603026900a9c140c00b70b352179",
+      "catalogIdentity": "sha256:38fa042a77da3fbc27bf4c3afbe4ad78cb938f10dfb3de4b8476f20928defff7",
       "compositionId": "desert_2",
       "depth": 2,
       "kind": "boss",

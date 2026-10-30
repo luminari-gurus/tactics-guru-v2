@@ -36,7 +36,7 @@ function setup(o: Setup = {}): { catalog: ContentCatalog; state: BattleState } {
   const withStats = <T extends { stats: UnitStats }>(r: T, id: UnitId): T => ({ ...r, stats: { ...r.stats, ...o.stats?.[id] } });
   const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
     heroes: { fighter: withStats(base.heroes.fighter, 'fighter'), ranger: withStats(base.heroes.ranger, 'ranger'), mage: base.heroes.mage },
-    enemies: { goblin_grunt: withStats(base.enemies.goblin_grunt, 'goblin_grunt'), goblin_archer: withStats(base.enemies.goblin_archer, 'goblin_archer') },
+    enemies: { ...base.enemies, goblin_grunt: withStats(base.enemies.goblin_grunt, 'goblin_grunt'), goblin_archer: withStats(base.enemies.goblin_archer, 'goblin_archer') },
     terrains: { ...base.terrains, forest: { ...base.terrains.forest, blocksLineOfSight: true } } };
   const unit = (id: number, side: 'player' | 'enemy', defId: UnitId, x: number, y: number) =>
     ({ id, side, defId, cell: { x, y }, hp: 18, hasMoved: false, hasActed: false, ...o.units?.[id] }) as UnitState;

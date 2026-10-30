@@ -1,5 +1,7 @@
 # Issue 177 verification
 
+The captures below predate integration of main `c8ca3c2` and are historical evidence for their stated revisions, not a full regression of the merged source. Main now uses battle snapshot format 5 and rules 6; current-rules replay format 5 is the baseline and replay format 6 adds undo. Older rules and snapshots are incompatible. A new full capture is required for the merged source.
+
 Issue [#177](https://github.com/luminari-gurus/tactics-guru-v2/issues/177); PR [#255](https://github.com/luminari-gurus/tactics-guru-v2/pull/255). Full-regression capture [40929820198](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/40929820198) completed with a failed landscape batch and a failed aggregate.
 
 ## Focused browser evidence
@@ -78,3 +80,7 @@ The issue and approved plan were checked against the acceptance table above, inc
 ### PR review follow-up
 
 The review follow-up refreshes each enemy’s movement and action budgets for its next turn while retaining current positions and statuses, and keeps the planned movement path and destination visible during compound review. This changes runtime and browser-test inputs after the earlier captures; those captures do not verify these two changes. On macOS arm64, the follow-up working tree based on `c491ee0` passed 14 focused threat, plan and undo unit tests, the production build (including 221 content checks and both typechecks), six focused Chromium desktop/Pixel portrait/landscape cases, and four focused iPhone WebKit portrait/landscape cases, one worker and no retries. The WebKit cases used `playwright.device-acceptance.config.ts` with an explicit temporary grep override; the first CLI grep attempt selected no tests and did not run coverage. The browser tests assert the reviewed destination and retained path. OpenSpec strict validation and `git diff --check` passed. Device tests are emulated. The first build attempt failed on a TypeScript inferred-array type and the second failed on a test variable reference; both were corrected before the successful final build. The earlier full capture and landscape follow-up retain their original identities and results and were not rerun for this follow-up.
+
+### Review and main integration
+
+Review changes integrate main `c8ca3c2`, separate replay formats 5 and 6 from snapshot format 5, bound undo near the command cap, include Shaman Weakening Hex in danger inspection, retain turn-start effects, and report interrupted planned abilities. Previous source-specific results above remain historical. The merged working tree passed the full 1,085-unit local suite with local-server access, production build and both typechecks, and six focused Chromium interaction cases on desktop and Pixel portrait/landscape emulation; no physical hardware was used. Full self-hosted regression of the merged source remains pending.

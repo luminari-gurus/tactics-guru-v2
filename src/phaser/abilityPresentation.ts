@@ -33,6 +33,8 @@ export function abilityPresentation(events: readonly BattleEvent[]) {
     if (event.type === 'defeated') feedback.push({unitId: event.unitId, kind: 'defeat', text: 'Defeated'});
     if (event.type === 'guarded') feedback.push({unitId: event.unitId, kind: 'guard', text: 'Guarded'});
     if (event.type === 'healed') feedback.push({unitId:event.unitId,kind:'result',text:`+${event.healing} HP`});
+    if (event.type === 'saveRolled') feedback.push({unitId:event.unitId,kind:'result',text:event.saved?'Will save succeeds':'Will save fails'});
+    if (event.type === 'weakened') feedback.push({unitId:event.unitId,kind:'guard',text:'Weakened · −2 accuracy'});
     if (event.type === 'taunted') feedback.push({unitId:event.unitId,kind:'guard',text:'Taunted'});
     if (event.type === 'marked') feedback.push({unitId:event.unitId,kind:'guard',text:'Marked'});
     if (event.type === 'movementBlocked') feedback.push({unitId:event.unitId,kind:'guard',text:event.abilityId === 'ability:frost_snare' ? 'Snared' : 'Pinned'});

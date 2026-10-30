@@ -12,8 +12,8 @@ function fixture() {
     removeItem(key: string) { if (fail === 'remove') throw Error('failed'); data.delete(key); } };
   return { data, storage: createRunStorage(runContext, () => store), fail(value: string) { fail = value; } };
 }
-it('preserves exact run-5 bytes from e2f0cdd without implicit migration or writes',()=>{
-  const f=fixture(),raw=readFileSync('tests/fixtures/saves/issue-165/run.json','utf8');f.data.set(keys.primary,raw);f.data.set(keys.backup,raw);const before=[...f.data];
+it.each(['issue-165','issue-166'])('preserves exact %s previous-format run bytes without implicit migration or writes',issue=>{
+  const f=fixture(),raw=readFileSync(`tests/fixtures/saves/${issue}/run.json`,'utf8');f.data.set(keys.primary,raw);f.data.set(keys.backup,raw);const before=[...f.data];
   const load=f.storage.load();assert(load.ok);expect(load.selected).toBeNull();expect(load.inspection.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
   expect(f.storage.save(preparedSnapshot())).toMatchObject({ok:false,reason:'recoveryRequired'});expect([...f.data]).toEqual(before);
 });

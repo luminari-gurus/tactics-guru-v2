@@ -79,21 +79,25 @@ export function readDungeonEncounterCatalog(input: unknown, content: ContentCata
   return { ok: true, catalog: input as unknown as DungeonEncounterCatalog };
 }
 
-const forestCompositions = authoredEncounters.map(e => ({ id: e.id.slice(10), roster: runCatalog.maps[e.mapId].spawns }));
+const forestCompositionId = (id: string) => id === 'encounter:forest_ruins' ? 'forest_ruins_shaman_v1' : id.slice(10);
+const forestCompositions = authoredEncounters.map(e => ({ id: forestCompositionId(e.id),
+  roster: runCatalog.maps[e.mapId].spawns.map(s => e.id === 'encounter:forest_ruins' && s.id === 6 && s.side === 'enemies'
+    ? { ...s, unitId: 'goblin_shaman' as const } : s) }));
 const desertCompositions = battlefieldEncounters.map((e, i) => ({ id: `desert_${i}`, roster: i < 2 ? e.roster :
   e.roster.map((s, n) => ({ ...s, x: 3 + (n % 3) * 2, y: s.side === 'heroes' ? 10 : 1 })) }));
 const generated = { kind: 'generated', biome: 'desert', generatorVersion: 1, profileVersion: 'desert-v1' } as const;
 // One step connects the isolated height-2 ruin to jump-1 actors. Other modes keep their original map.
 const forestRuins = desertRunCatalog.maps['map:forest_ruins'];
 export const dungeonBattleCatalog: ContentCatalog = { ...desertRunCatalog, maps: { ...desertRunCatalog.maps,
-  [forestRuins.id]: { ...forestRuins, cells: forestRuins.cells.map(c => c.x === 4 && c.y === 2 ? { ...c, elevation: 1, terrainId: 'stone' } : c) },
+  [forestRuins.id]: { ...forestRuins, spawns: forestCompositions.find(c => c.id === 'forest_ruins_shaman_v1')!.roster,
+    cells: forestRuins.cells.map(c => c.x === 4 && c.y === 2 ? { ...c, elevation: 1, terrainId: 'stone' } : c) },
 } };
 export const dungeonEncounterCatalog: DungeonEncounterCatalog = {
   version: 1, kinds: ENCOUNTER_KINDS,
   biomes: [{ id: 'forest', poolId: 'forest', bossId: 'forest_guardian' }, { id: 'desert', poolId: 'desert', bossId: 'desert_guardian' }],
   compositions: [...forestCompositions, ...desertCompositions],
   pools: [
-    { id: 'forest', biome: 'forest', maps: authoredEncounters.slice(0, 2).map(e => ({ id: e.id.slice(10), source: { kind: 'authored', mapId: e.mapId }, compositionIds: [e.id.slice(10)] })) },
+    { id: 'forest', biome: 'forest', maps: authoredEncounters.slice(0, 2).map(e => ({ id: e.id.slice(10), source: { kind: 'authored', mapId: e.mapId }, compositionIds: [forestCompositionId(e.id)] })) },
     { id: 'forest_boss', biome: 'forest', maps: [{ id: 'ruined_approach', source: { kind: 'authored', mapId: authoredEncounters[2].mapId }, compositionIds: ['ruined_approach'] }] },
     { id: 'desert', biome: 'desert', maps: [{ id: 'desert_arena', source: generated, compositionIds: ['desert_0', 'desert_1'] }] },
     { id: 'desert_boss', biome: 'desert', maps: [{ id: 'desert_guardian', source: generated, compositionIds: ['desert_2'] }] },

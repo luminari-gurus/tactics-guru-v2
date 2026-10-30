@@ -3,7 +3,7 @@
 Date: 2026-10-28, Asia/Jerusalem. Implementation, policy qualification and
 publication audit are complete. [PR #250](https://github.com/luminari-gurus/tactics-guru-v2/pull/250)
 is open and ready for review, with non-draft/mergeable state read back.
-See [the handoff plan](../../ongoing-projects/plan.md) and
+See [the handoff plan](../../ongoing-projects/issue-165-mage-frost-snare-plan.md) and
 [OpenSpec tasks](../../../openspec/changes/issue-165-mage-frost-snare/tasks.md).
 
 ## Delivered behavior

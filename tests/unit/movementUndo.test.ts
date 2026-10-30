@@ -54,7 +54,9 @@ it('rejects forged, repeated and old-format undo records', async () => {
   const reach=previewMovement(session.state,session.active.id,catalog);expect(reach.ok).toBe(true);if(!reach.ok)return;
   const move={type:'move' as const,unitId:session.active.id,to:reach.cells.find(c=>c.cost>0)!.cell};
   session.prepare(move);const moved=session.confirm()!;session.finishPresentation(moved.token);
-  const beforeUndo=session.replay!;
+  const beforeUndo=JSON.parse(JSON.stringify(session.replay!));
+  const restored=replayBattle(beforeUndo,catalog);
+  expect(restored.ok && restored.state).toEqual(session.state);
   const undo={type:'undoMove' as const,unitId:move.unitId};
   expect(readReplay({...beforeUndo,commands:[...beforeUndo.commands,undo]},catalog).ok).toBe(false);
   const forged={...beforeUndo,format:REPLAY_FORMAT_VERSION,commands:[...beforeUndo.commands,{...undo,unitId:move.unitId+100}]};
@@ -146,4 +148,21 @@ it('does not offer undo when the accepted move exhausts the command limit', asyn
   expect(session.prepare({type:'move',unitId:hero.id,to:cell.cell}).ok).toBe(true);
   const move=session.confirm()!;session.finishPresentation(move.token);
   expect(session.canUndoMove).toBe(false);expect(session.undoMove()).toBeNull();
+});
+
+it('stops repeated undo before the final command slots are exhausted', async () => {
+  const {RULE_BOUNDS}=await import('../../src/domain/constants');
+  const initial=new BattleSession(catalog,'map:forest_ruins',2).state;
+  const hero=initial.units.find(u=>u.side==='player')!;
+  const state={...initial,activeIndex:initial.initiative.indexOf(hero.id),commandCount:RULE_BOUNDS.commandCount.max-7};
+  const session=new BattleSession(catalog,state,state.seed);
+  const reach=previewMovement(state,hero.id,catalog);expect(reach.ok).toBe(true);if(!reach.ok)return;
+  const move={type:'move' as const,unitId:hero.id,to:reach.cells.find(c=>c.cost>0)!.cell};
+  for(let i=0;i<2;i++){
+    expect(session.prepare(move).ok).toBe(true);const moved=session.confirm()!;session.finishPresentation(moved.token);
+    expect(session.canUndoMove).toBe(true);const undo=session.undoMove()!;session.finishPresentation(undo.token);
+  }
+  expect(session.prepare(move).ok).toBe(true);const moved=session.confirm()!;session.finishPresentation(moved.token);
+  expect(session.canUndoMove).toBe(false);expect(session.undoMove()).toBeNull();
+  expect(session.prepare({type:'endTurn',unitId:hero.id}).ok).toBe(true);
 });

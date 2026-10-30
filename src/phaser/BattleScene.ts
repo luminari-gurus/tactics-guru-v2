@@ -1,3 +1,4 @@
+import type { Command } from '../domain/types';
 import { enemyThreats } from '../domain/threat';
 import { progressHero, projectProgression, progressionLabel } from '../domain/progression';
 import { HERO_IDS } from '../content/constants';
@@ -60,8 +61,8 @@ export class BattleScene extends Phaser.Scene {
   }
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
-    let movingPresentation=false,showDanger=false,planning=false;
-    let planMove: Extract<import('../domain/types').Command,{type:'move'}>|null=null;
+    let movingPresentation=false,showDanger=false,planning=false,planInFlight=false,planInterrupted=false;
+    let planMove: Extract<Command,{type:'move'}>|null=null;
     let threatState: typeof session.state | null=null, threatIds: readonly number[]=[];
     let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
@@ -94,7 +95,7 @@ export class BattleScene extends Phaser.Scene {
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
     };
-    const describe=(command: import('../domain/types').Command)=>{
+    const describe=(command: Command)=>{
       if(planning && command.type==='move') {
         const result=session.preview(command);planMove=result.ok?command:null;
         return result.ok?'Move planned. Choose an ability and target.':previewText(result);
@@ -133,6 +134,7 @@ export class BattleScene extends Phaser.Scene {
       && point.x>=region.x && point.x<region.x+region.width && point.y>=region.y && point.y<region.y+region.height);
     const present=async(step:Presentation|null,followPlan=false)=>{
       if(!step){refresh();return;}
+      if(followPlan){planInFlight=true;planInterrupted=false;}
       clear(followPlan);selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       const moving=step.events.some(event=>event.type==='moved');movingPresentation=moving;
@@ -142,7 +144,8 @@ export class BattleScene extends Phaser.Scene {
       if(moving)measurements.workload('move',performance.now(),0);movingPresentation=false;
       session.finishPresentation(step.token);cursor=session.active.cell;
       if(followPlan){
-        if(document.hidden || dialogs.open){session.cancel();message='Planned ability cancelled after interruption';}
+        planInFlight=false;
+        if(planInterrupted || document.hidden || dialogs.open){session.cancel();message='Planned ability cancelled after interruption';}
         else {const next=session.confirmPlannedAbility();if(next){await present(next);return;}}
       }
       refresh();
@@ -161,9 +164,9 @@ export class BattleScene extends Phaser.Scene {
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const inspect=(id:number=session.active.id)=>{
       const unit=session.state.units.find(u=>u.id===id);if(!unit)return;
-      const {def,name,armorClass,accuracy,status}=unitFeedback(session,unit);
+      const {def,name,armorClass,accuracy,status,support}=unitFeedback(session,unit);
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
-        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
+        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
           {id:'inspection-close',label:'Close inspection',run:()=>{}},
         ],()=>{});
@@ -201,7 +204,7 @@ export class BattleScene extends Phaser.Scene {
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
     document.addEventListener('keydown',escape);
-    const visibility=()=>{if(document.hidden){if(movingPresentation)session.cancel();measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
+    const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
     const fit=()=>{

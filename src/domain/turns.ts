@@ -1,4 +1,4 @@
-import { clearDefeatedGuard, guardedEffect, removeGuard, removeMovementBlock, removeTaunt } from './effects';
+import { clearDefeatedGuard, guardedEffect, removeGuard, removeMovementBlock, removeTaunt, removeWeakened } from './effects';
 import type { ContentCatalog, MapId } from '../content/types';
 import { contentVersion, previewCommand, readBattleState, readReplay, type ReplayRead } from './battle';
 import { resolveAttack } from './combat';
@@ -7,7 +7,7 @@ import { D20_SIDES, RNG_VERSION, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSIO
 import { moveUnit } from './grid';
 import { undoRecordedMove } from './movementUndo';
 import { isIntegerIn, rollDie, seedRng } from './rng';
-import type { BattleEvent, BattleState, CommandResult, ReplayCommand, RejectionReason, UnitState } from './types';
+import type { BattleEvent, BattleState, Command, CommandResult, ReplayCommand, RejectionReason, UnitState } from './types';
 
 export type InitiativeEntry = { readonly unitId: number; readonly side: UnitState['side']; readonly natural: number; readonly dexterity: number };
 /** Legacy TurnManager.gd:101-108: total, Dexterity, player side, lower ID. IDs are unique, so the order is total. */
@@ -62,15 +62,17 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
   const expires = guardedEffect(snapshot.units.find(u => u.id === next)!) !== null;
   const tauntedBy = snapshot.units.find(u=>u.id===intent.command.unitId)!.tauntedBy;
   const movementBlock = snapshot.units.find(u=>u.id===intent.command.unitId)!.movementBlock;
+  const weakenedBy = snapshot.units.find(u => u.id === intent.command.unitId)!.weakenedBy;
   return { ok: true, state: { ...snapshot, activeIndex: index, round, commandCount: snapshot.commandCount + 1,
     units: snapshot.units.map(u => {
-      if (u.id===intent.command.unitId) u=removeMovementBlock(removeTaunt(u));
+      if (u.id===intent.command.unitId) u=removeWeakened(removeMovementBlock(removeTaunt(u)));
       if (u.id !== next) return clearDefeatedGuard(u);
       return { ...removeGuard(u), hasMoved: false, hasActed: false };
     }) },
     events: [{ type: 'turnEnded', unitId: intent.command.unitId },
       ...(tauntedBy!==undefined?[{type:'tauntExpired' as const,unitId:intent.command.unitId,sourceId:tauntedBy}]:[]),
       ...(movementBlock!==undefined?[{type:'movementBlockExpired' as const,unitId:intent.command.unitId,...movementBlock}]:[]),
+      ...(weakenedBy !== undefined ? [{ type: 'weakenedExpired' as const, unitId: intent.command.unitId, sourceId: weakenedBy }] : []),
       ...(expires ? [{ type: 'guardExpired' as const, unitId: next }] : []), { type: 'turnStarted', unitId: next, round }] };
 }
 /** One entry point for every command; the type is read only after the shared intent check. */
@@ -94,7 +96,7 @@ export function replayBattle(input: unknown, catalog: ContentCatalog): ReplayRun
 /** Reconstruct a validated history from its known entry boundary. */
 export function replayCommandSequence(initial: BattleState, commands: readonly ReplayCommand[], catalog: ContentCatalog): ReplayRun {
   let state = initial; const events: BattleEvent[] = [];
-  let previous: {before:BattleState;move:Extract<import('./types').Command,{type:'move'}>} | null = null;
+  let previous: {before:BattleState;move:Extract<Command,{type:'move'}>} | null = null;
   for (const [index, command] of commands.entries()) {
     const before = state;
     const result = command.type === 'undoMove'

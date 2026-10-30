@@ -26,12 +26,12 @@ const map = {
     { id: 3, side: 'enemies', unitId: 'goblin_grunt', x: 3, y: 2 }, { id: 2, side: 'heroes', unitId: 'ranger', x: 0, y: 1 },
   ],
 } as const satisfies MapRecord;
-const dexterity = { fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1 } as const;
+const dexterity = { fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1, goblin_shaman: 0 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
   heroes: { ...base.heroes, fighter: { ...base.heroes.fighter, stats: { ...base.heroes.fighter.stats, maxHp: 20, dexterity: dexterity.fighter } },
     ranger: { ...base.heroes.ranger, stats: { ...base.heroes.ranger.stats, maxHp: 16, dexterity: dexterity.ranger } } },
-  enemies: { goblin_grunt: { ...base.enemies.goblin_grunt, stats: { ...base.enemies.goblin_grunt.stats, maxHp: 12, dexterity: dexterity.goblin_grunt } },
+  enemies: { ...base.enemies, goblin_grunt: { ...base.enemies.goblin_grunt, stats: { ...base.enemies.goblin_grunt.stats, maxHp: 12, dexterity: dexterity.goblin_grunt } },
     goblin_archer: { ...base.enemies.goblin_archer, stats: { ...base.enemies.goblin_archer.stats, maxHp: 10, dexterity: dexterity.goblin_archer } } } };
 // A hand-built mid-battle snapshot: initiative 1, 3, 2, 4 with unit 1 active.
 function snapshot(): BattleState {

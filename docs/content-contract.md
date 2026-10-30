@@ -1,12 +1,12 @@
 # First-battle content contract (#26)
 
-Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+Source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`, extended by qualified Shaman source `f4616ae301da4be133455334d4c2b38e3583c8f7`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
 
 `src/content/types.ts` defines plain, immutable, renderer-independent records; `constants.ts` owns inclusive numeric bounds and the texture specification. The runtime validator in `src/content/validate.ts` checks unknown input without Phaser, DOM, combat rules, asset generation or an authored map. The existing diagnostic terrain catalog remains independent: its fourteen IDs are not the battle contract.
 
 ## Identity, references and numeric rules
 
-Map IDs use `map:` and asset IDs use `asset:` prefixes with nonempty stable snake_case suffixes. Hero IDs are fighter/ranger/mage; minimal enemy IDs are goblin_grunt/goblin_archer. Terrain IDs are grass/grass_path/stone/forest/water. IDs survive file relocation. Catalog keys must equal record IDs; references resolve within the same catalog. Spawn IDs are unique positive integers within a map and remain stable for ordering; multiple spawns can reference one enemy definition. Side determines the allowed unit-reference family. Cell identity is the unique (x,y) pair within its map, not a renderer coordinate.
+Map IDs use `map:` and asset IDs use `asset:` prefixes with nonempty stable snake_case suffixes. Hero IDs are fighter/ranger/mage; enemy IDs are goblin_grunt/goblin_archer/goblin_shaman (#166). Terrain IDs are grass/grass_path/stone/forest/water. IDs survive file relocation. Catalog keys must equal record IDs; references resolve within the same catalog. Spawn IDs are unique positive integers within a map and remain stable for ordering; multiple spawns can reference one enemy definition. Side determines the allowed unit-reference family. Cell identity is the unique (x,y) pair within its map, not a renderer coordinate.
 
 All numeric fields are finite safe integers within `CONTENT_BOUNDS`. Width/height are 1–32; coordinates are 0–31 and additionally less than the map dimensions; elevation is 0–4. Every coordinate must appear exactly once (width × height cells). Spawns must name existing, walkable, unoccupied cells; spawn IDs are 1–64. Move cost stays positive even on unwalkable terrain; `walkable` determines whether it can be entered. Prop art is optional and separate from terrain; a prop reference does not implicitly change movement or LOS.
 

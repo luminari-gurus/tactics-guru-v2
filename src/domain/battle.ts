@@ -1,10 +1,10 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
-import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
+import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashJson, rulesContent } from './contentIdentity';
-import { movementBlockSource } from './effects';
+import { movementBlockSource, weakenedImmune, weakenedSource } from './effects';
 
 import { hasShape as shape, isDenseArray } from './validation';
 function cell(v: unknown): v is { x: number; y: number } {
@@ -50,12 +50,13 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'secondWindUsed')) unitKeys.push('secondWindUsed');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'tauntedBy')) unitKeys.push('tauntedBy');
-    for (const field of ['markedBy','movementBlock']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
+    for (const field of ['markedBy','movementBlock','weakenedBy']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
     if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
       (Object.hasOwn(u, 'secondWindUsed') && (u.secondWindUsed !== true || u.side !== 'player' || u.defId !== 'fighter' ||
         !Object.values(catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes('fighter')))) ||
       (Object.hasOwn(u, 'tauntedBy') && (!unitId(u.tauntedBy) || u.side !== 'enemy' || u.hp === 0)) ||
       (Object.hasOwn(u, 'markedBy') && (!unitId(u.markedBy) || u.side !== 'enemy' || u.hp === 0)) ||
+      (Object.hasOwn(u, 'weakenedBy') && (!unitId(u.weakenedBy) || u.side !== 'player' || u.hp === 0)) ||
       (Object.hasOwn(u, 'movementBlock') && (!shape(u.movementBlock, ['sourceId','abilityId']) || !unitId(u.movementBlock.sourceId) ||
         !['ability:pinning_shot','ability:frost_snare'].includes(u.movementBlock.abilityId as string))) ||
       !unitId(u.id) || u.id <= previous ||
@@ -91,6 +92,11 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     const kind = u.movementBlock.abilityId === 'ability:pinning_shot' ? 'pinningShot' : 'frostSnare';
     if (!source || !profile || profile.id !== u.movementBlock.abilityId || profile.kind !== kind || !profile.owners.includes(source.defId)) return bad;
   }
+  for (const u of units) if (u.weakenedBy !== undefined) {
+    const source = weakenedSource(u, units);
+    if (!source || weakenedImmune(u, catalog) || !Object.values(catalog.abilities).some(a =>
+      a.kind === 'weakeningHex' && a.owners.includes(source.defId))) return bad;
+  }
   if (input.initiative.some(id => !unitId(id) || !ids.has(id)) || new Set(input.initiative).size !== ids.size) return bad;
   const activeId = input.initiative[input.activeIndex];
   const active = units.find(u => u.id === activeId)!;
@@ -124,7 +130,7 @@ export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { read
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) ||
-    (input.format !== STATE_FORMAT_VERSION && input.format !== REPLAY_FORMAT_VERSION) ||
+    (input.format !== BASE_REPLAY_FORMAT_VERSION && input.format !== REPLAY_FORMAT_VERSION) ||
     !isDenseArray(input.commands, RULE_BOUNDS.commandCount.max) ||
     !input.commands.every(c => isCommand(c) || (input.format === REPLAY_FORMAT_VERSION &&
       shape(c, ['type','unitId']) && c.type === 'undoMove' && unitId(c.unitId)))) return bad;

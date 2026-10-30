@@ -331,5 +331,30 @@ export const battleAssets = {
       "rightsNote": "Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.",
       "productionNotes": "Canonical full frame retained; Pillow Lanczos 96x96 PNG export for 48 CSS pixels at density 2, following issue 35 portrait rule."
     }
-  }
+  },
+  'asset:goblin_shaman_sprite': {
+    id: 'asset:goblin_shaman_sprite', kind: 'unit-sprite',
+    sourcePath: 'public/battle/source/goblin_shaman_sprite.png', runtimePath: '/battle/source/goblin_shaman_sprite.png',
+    sourceWidth: 64, sourceHeight: 80, runtimeWidth: 64, runtimeHeight: 80, format: 'png',
+    anchor: { x: 32, y: 76 },
+    provenance: {
+      origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru',
+      revision: 'e9433f6b608ae6b2d95418615cce9cf17dadcf74', originalPath: 'art/units/goblin_shaman.png',
+      sourceSha256: '43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f',
+      rightsNote: 'Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.',
+      productionNotes: 'Unchanged 64x80 RGBA canonical PNG; alpha bounds (4,13)-(60,80), source-pixel foot anchor (32,76). Original lower-edge foliage retained.',
+    },
+  },
+  'asset:goblin_shaman_portrait': {
+    id: 'asset:goblin_shaman_portrait', kind: 'portrait',
+    sourcePath: 'public/battle/source/goblin_shaman_portrait.png', runtimePath: '/battle/portraits/goblin_shaman.png',
+    sourceWidth: 1254, sourceHeight: 1254, runtimeWidth: 96, runtimeHeight: 96, format: 'png',
+    provenance: {
+      origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru',
+      revision: 'e9433f6b608ae6b2d95418615cce9cf17dadcf74', originalPath: 'art/portraits/goblin_shaman_portrait.png',
+      sourceSha256: '55cc13df61bab3b51581a5be52c42c21a7c5b376607ef92dbd6b3f8901efbbe2',
+      rightsNote: 'Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.',
+      productionNotes: 'Canonical full frame retained; Pillow 10.2.0 Lanczos 96x96 optimized RGB PNG export for 48 CSS pixels at density 2, following issue 35 portrait rule. Runtime SHA-256 c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0.',
+    },
+  },
 } satisfies Record<AssetId, AssetRecord>;

@@ -1,0 +1,44 @@
+{
+  "source": "03b1e899ad091ba79ba65b08487204427b23de1e",
+  "inputHash": "f7443ca99693737b342f3035404c662fda72a183000471cce50a2d1f2c6307db",
+  "complete": true,
+  "passed": true,
+  "inputsUnchanged": true,
+  "units": {
+    "total": 1032,
+    "passed": 1032,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0
+  },
+  "stages": [
+    {
+      "id": "units",
+      "status": "passed"
+    },
+    {
+      "id": "typecheck-app",
+      "status": "passed"
+    },
+    {
+      "id": "typecheck-domain",
+      "status": "passed"
+    },
+    {
+      "id": "build-integration",
+      "status": "passed"
+    },
+    {
+      "id": "build-root",
+      "status": "passed"
+    }
+  ],
+  "portable": [
+    {
+      "file": "receipts.tar.gz",
+      "bytes": 127996,
+      "sha256": "41ddcdbd136b5da92602dba718d0c80046c5d98afdffca6b8509b0e424872427"
+    }
+  ],
+  "scope": "Fresh foundation plus main b343ab0: all units, both type scopes, real root/prefix build integrations and root bundle. Original unchanged image/loading evidence is retained in foundation/."
+}

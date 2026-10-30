@@ -5,7 +5,7 @@ import { BattleSession } from '../../src/app/BattleSession';
 import { assert, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
 import { contentVersion, readBattleState } from '../../src/domain/battle';
-import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility, previewControlAbility } from '../../src/domain/combat';
+import { previewAttack, previewMagicMissile, previewAbility, previewFighterAbility, previewControlAbility, previewSupportAbility } from '../../src/domain/combat';
 import { createBattle, dispatch, endTurn, replayBattle } from '../../src/domain/turns';
 import { validateContent } from '../../src/content/validate';
 import { rollDie, seedRng } from '../../src/domain/rng';
@@ -13,7 +13,7 @@ import { abilityPresentation } from '../../src/phaser/abilityPresentation';
 import { previewMove, previewMovement } from '../../src/domain/grid';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
 import { decodeBattleSave, encodeBattleSave } from '../../src/domain/saveEnvelope';
-import { previewText } from '../../src/ui/hud';
+import { eventText, previewText } from '../../src/ui/hud';
 import type { BattleState } from '../../src/domain/types';
 import { battleCues } from '../../src/audio/battleCues';
 
@@ -98,6 +98,179 @@ function naturalState(state: BattleState, natural: number): BattleState {
   let seed=0; while (rollDie(seedRng(seed),20).value !== natural) seed++;
   return { ...state, rng: seedRng(seed) };
 }
+
+const hex = { type: 'useAbility', unitId: 6, abilityId: 'ability:weakening_hex', target: { unitId: 1 } } as const;
+const healGoblin = { ...hex, abilityId: 'ability:heal_goblin', target: { unitId: 4 } } as const;
+function shamanSetup(secondShaman = false) {
+  const source = battleCatalog.maps['map:forest_ruins'];
+  const map = { ...source, cells: source.cells.map(c => ({ ...c, elevation: 0, terrainId: 'grass' as const })),
+    spawns: source.spawns.map(s => s.side === 'enemies' && (s.id === 6 || secondShaman && s.id === 5)
+      ? { ...s, unitId: 'goblin_shaman' as const } : s) };
+  const catalog = { ...battleCatalog, maps: { [map.id]: map } };
+  const created = createBattle(map.id, 17, catalog); assert(created.ok);
+  const cells = [{x:0,y:0},{x:2,y:0},{x:4,y:0},{x:1,y:1},{x:3,y:1},{x:0,y:2}];
+  const state = activate({ ...created.state, units: created.state.units.map((u,i) => ({ ...u, cell: cells[i] })) }, 6);
+  assert(readBattleState(state, catalog).ok); return { catalog, state };
+}
+it('Hex previews every face exactly, saves on equality, spends one action/d20 and otherwise changes only accuracy', () => {
+  for (let natural = 1; natural <= 20; natural++) {
+    const { catalog, state } = shamanSetup(), before = freeze(naturalState(state, natural));
+    const snapshot = structuredClone(before), preview = previewSupportAbility(before, hex, catalog); assert(preview.ok);
+    expect(preview).toMatchObject({ kind:'weakeningHex',modifier:1,dc:12,savedFaces:10,failedSaveFaces:10 });
+    expect(previewText(preview)).toContain('Will save 50% (10/20 faces)');
+    const result = dispatch(before, hex, catalog); assert(result.ok);
+    expect(result.events).toEqual([{type:'abilityUsed',unitId:6,abilityId:hex.abilityId,target:hex.target},
+      {type:'saveRolled',unitId:1,natural,modifier:1,total:natural+1,dc:12,saved:natural>=11},
+      ...(natural<11?[{type:'weakened',unitId:1,sourceId:6}]:[])]);
+    expect(result.state.rng).toEqual(rollDie(before.rng,20).rng);
+    const save=result.events.find(e=>e.type==='saveRolled')!;
+    expect(eventText(save,id=>`Unit ${id}`)).toContain(`Will save ${natural>=11?'succeeds':'fails'}`);
+    expect(eventText(save,id=>`Unit ${id}`)).toContain('50% save chance');
+    expect(battleCues(result.events,catalog)).toEqual([]);
+    expect(result.state.commandCount).toBe(before.commandCount+1);
+    expect(result.state.units.find(u=>u.id===6)).toMatchObject({hasActed:true,hasMoved:false});
+    const target = result.state.units.find(u=>u.id===1)!;
+    expect(target.weakenedBy).toBe(natural<11?6:undefined);
+    expect(combatStats(target,catalog)).toEqual({accuracy:natural<11?2:4,armorClass:14});
+    expect(result.state.units.map(u=>u.hp)).toEqual(before.units.map(u=>u.hp));
+    expect(result.state.activeIndex).toBe(before.activeIndex); expect(before).toEqual(snapshot);
+    expect(readBattleState(result.state,catalog).ok).toBe(true);
+  }
+});
+it('Hex uses projected power/Will and never automatic natural save outcomes', () => {
+  for (const [power,will,natural,saved,faces] of [[0,20,1,true,20],[20,-10,20,false,0],[5,2,13,true,8]] as const) {
+    const {catalog:base,state:initial}=shamanSetup();
+    const catalog={...base,heroes:{...base.heroes,fighter:{...base.heroes.fighter,stats:{...base.heroes.fighter.stats,will}}},
+      enemies:{...base.enemies,goblin_shaman:{...base.enemies.goblin_shaman,stats:{...base.enemies.goblin_shaman.stats,power}}}};
+    const state=naturalState({...initial,versions:{...initial.versions,content:contentVersion(catalog)}},natural);
+    const preview=previewAbility(state,hex,catalog);assert(preview.ok);
+    expect(preview).toMatchObject({dc:10+power,modifier:will,savedFaces:faces});
+    const result=dispatch(state,hex,catalog);assert(result.ok);
+    expect(result.events.find(e=>e.type==='saveRolled')).toMatchObject({saved});
+  }
+});
+it('Weakened refreshes one source, preserves it on save, combines once with Guard/Mark, and expires at target turn end', () => {
+  const {catalog,state}=shamanSetup(true);
+  const first=dispatch(naturalState(state,1),hex,catalog);assert(first.ok);
+  const fromOther={...hex,unitId:5};
+  const second=dispatch(naturalState(activate(first.state,5),1),fromOther,catalog);assert(second.ok);
+  expect(second.state.units.find(u=>u.id===1)?.weakenedBy).toBe(5);
+  const saved=dispatch(naturalState(activate(second.state,6),20),hex,catalog);assert(saved.ok);
+  expect(saved.state.units.find(u=>u.id===1)?.weakenedBy).toBe(5);
+  expect(saved.events.some(e=>e.type==='weakened')).toBe(false);
+  let active=activate({...saved.state,units:saved.state.units.map(u=>u.id===1?{...u,guarded:true as const}:
+    u.id===4?{...u,markedBy:2,cell:{x:1,y:0}}:u)},1);
+  const attack={type:'useAbility' as const,unitId:1,abilityId:'ability:guarded_strike' as const,target:{unitId:4}};
+  const preview=previewAttack(active,attack,catalog);assert(preview.ok);
+  expect(preview.bonus).toBe(2); // baseline 4 - Guard 2 - Weakened 2 + Mark 2
+  expect(combatStats(active.units[0],catalog,true)).toEqual({accuracy:0,armorClass:16});
+  const encoded=encodeBattleSave(active,catalog);assert(encoded.ok);
+  const decoded=decodeBattleSave(encoded.text,catalog);assert(decoded.ok);expect(decoded.state).toEqual(active);
+  const ended=endTurn(decoded.state,{type:'endTurn',unitId:1},catalog);assert(ended.ok);
+  expect(ended.events).toContainEqual({type:'weakenedExpired',unitId:1,sourceId:5});
+  expect(ended.state.units[0].weakenedBy).toBeUndefined();
+  expect(combatStats(ended.state.units[0],catalog).accuracy).toBe(2); // Guard remains until next turn start
+});
+it('Hex and healing reject invalid casts atomically, including immunity and exhausted RNG', () => {
+  for (const ability of [hex,healGoblin]) {
+    const base=shamanSetup();
+    const healthy={...base.state,units:base.state.units.map(u=>u.id===4?{...u,hp:2}:u)};
+    const cases:[BattleState,unknown,string][]=[
+      [healthy,{...ability,target:{unitId:63}},'missingTarget'],
+      [healthy,{...ability,target:{cell:{x:0,y:0}}},'wrongTargetKind'],
+      [healthy,{...ability,unitId:1},'notActiveUnit'],
+      [healthy,{...ability,abilityId:'ability:missing'},'unknownAbility'],
+      [{...healthy,units:healthy.units.map(u=>u.id===6?{...u,hasActed:true}:u)},ability,'alreadyActed'],
+      [{...healthy,units:healthy.units.map(u=>u.id===ability.target.unitId?{...u,hp:0}:u)},ability,'targetDefeated'],
+      [{...healthy,units:healthy.units.map(u=>u.id===ability.target.unitId?{...u,cell:{x:10,y:10}}:u)},ability,'outOfRange'],
+    ];
+    for(const [snapshot,input,reason] of cases) {
+      const before=structuredClone(snapshot);freeze(snapshot);
+      expect(previewSupportAbility(snapshot,input,base.catalog)).toEqual({ok:false,reason});
+      expect(dispatch(snapshot,input,base.catalog)).toEqual({ok:false,reason});expect(snapshot).toEqual(before);
+    }
+    const catalog={...base.catalog,maps:{...base.catalog.maps,'map:forest_ruins':{...base.catalog.maps['map:forest_ruins'],
+      cells:base.catalog.maps['map:forest_ruins'].cells.map(c=>c.x===0&&c.y===1?{...c,terrainId:'forest' as const}:c)}}};
+    const snapshot={...healthy,versions:{...healthy.versions,content:contentVersion(catalog)}};
+    const blocked=ability===hex?ability:{...healGoblin,target:{unitId:5}};
+    // Target archer is relocated behind the same blocking forest cell.
+    const adjusted=ability===hex?snapshot:{...snapshot,units:snapshot.units.map(u=>u.id===5?{...u,cell:{x:0,y:0},hp:2}:u.id===1?{...u,cell:{x:7,y:0}}:u)};
+    expect(dispatch(adjusted,blocked,catalog)).toEqual({ok:false,reason:'blockedLos'});
+  }
+  for(const id of ['weakened','debuff'] as const) {
+    const {catalog:base,state:initial}=shamanSetup(),catalog={...base,heroes:{...base.heroes,fighter:{...base.heroes.fighter,immunities:[id]}}};
+    assert(validateContent(catalog).ok);const state={...initial,versions:{...initial.versions,content:contentVersion(catalog)}};
+    const before=structuredClone(state);expect(dispatch(freeze(state),hex,catalog)).toEqual({ok:false,reason:'immune'});expect(state).toEqual(before);
+  }
+  const {catalog,state}=shamanSetup();
+  const cursor=RULE_BOUNDS.cursor.max,rng={...state.rng,cursor,words:[state.rng.words[0],state.rng.words[1],state.rng.words[2],(cursor%UINT32_RANGE+RNG_WARMUP_DRAWS+1)%UINT32_RANGE] as const};
+  const exhausted={...state,rng};assert(readBattleState(exhausted,catalog).ok);
+  expect(dispatch(exhausted,hex,catalog)).toEqual({ok:false,reason:'invalidState'});
+});
+it('Heal Goblin heals only injured living allies by four or missing HP, without rolls or use counters', () => {
+  for(const second of [false,true]) for(const targetId of [4,5]) for(const missing of [1,4,7]) {
+    const {catalog,state}=shamanSetup(second),target=state.units.find(u=>u.id===targetId)!;
+    const maxHp=catalog.enemies[target.defId as 'goblin_grunt'|'goblin_archer'|'goblin_shaman'].stats.maxHp;
+    const initial=freeze({...state,units:state.units.map(u=>u.id===targetId?{...u,hp:maxHp-missing}:u)});
+    const command={...healGoblin,target:{unitId:targetId}},preview=previewAbility(initial,command,catalog);assert(preview.ok);
+    expect(preview).toMatchObject({kind:'healGoblin',healing:Math.min(4,missing),hp:maxHp-missing+Math.min(4,missing)});
+    expect(previewText(preview)).not.toContain('battle use');expect(previewText(preview)).toContain('no roll');
+    const result=dispatch(initial,command,catalog);assert(result.ok);
+    expect(result.state.rng).toEqual(initial.rng);expect(result.state.units.find(u=>u.id===targetId)?.hp).toBe(maxHp-Math.max(0,missing-4));
+    expect(battleCues(result.events,catalog)).toEqual([]);
+    expect(result.state.units.find(u=>u.id===6)).toMatchObject({hasActed:true,hasMoved:false});
+    expect(result.state.units.find(u=>u.id===6)?.secondWindUsed).toBeUndefined();
+    expect(result.events).toEqual([{type:'abilityUsed',unitId:6,abilityId:healGoblin.abilityId,target:command.target},
+      {type:'healed',unitId:targetId,healing:Math.min(4,missing),hp:maxHp-Math.max(0,missing-4)}]);
+    assert(readBattleState(result.state,catalog).ok);
+  }
+  const {catalog,state}=shamanSetup();
+  expect(dispatch(state,healGoblin,catalog)).toEqual({ok:false,reason:'fullHealth'});
+  expect(dispatch(state,{...healGoblin,target:{unitId:1}},catalog)).toEqual({ok:false,reason:'ineligibleAlly'});
+  const injuredSelf={...state,units:state.units.map(u=>u.id===6?{...u,hp:2}:u)};
+  expect(dispatch(injuredSelf,{...healGoblin,target:{unitId:6}},catalog)).toEqual({ok:false,reason:'outOfRange'});
+  expect(dispatch(state,{...hex,target:{unitId:4}},catalog)).toEqual({ok:false,reason:'sameSide'});
+});
+it('accepted attack and missile damage clear Weakened on source or target defeat', () => {
+  for(const defeat of ['source','target','missile'] as const) {
+    const {catalog,state}=shamanSetup();
+    const initial=naturalState(activate({...state,units:state.units.map(u=>u.id===1?{...u,weakenedBy:6,hp:defeat==='target'?1:u.hp}:
+      u.id===6?{...u,cell:{x:0,y:1},hp:defeat==='target'?10:1}:u.id===3?{...u,cell:{x:1,y:0}}:u)},defeat==='target'?6:defeat==='missile'?3:1),20);
+    const command=defeat==='target'?{...hex,abilityId:'ability:basic_attack' as const}:
+      {type:'useAbility' as const,unitId:defeat==='missile'?3:1,abilityId:defeat==='missile'?'ability:magic_missile' as const:'ability:basic_attack' as const,target:{unitId:6}};
+    const result=dispatch(initial,command,catalog);assert(result.ok,JSON.stringify(result));
+    expect(result.events).toContainEqual({type:'weakenedExpired',unitId:1,sourceId:6});
+    expect(result.state.units[0].weakenedBy).toBeUndefined();assert(readBattleState(result.state,catalog).ok);
+  }
+});
+it('admits only a living opposing learned Shaman source and rejects forged or immune Weakened snapshots',()=>{
+  const {catalog,state}=shamanSetup();
+  const valid={...state,units:state.units.map(u=>u.id===1?{...u,weakenedBy:6}:u)};
+  assert(readBattleState(valid,catalog).ok);
+  for(const weakenedBy of [undefined,null,'6',0,65,1,2,4,5]) {
+    const input={...state,units:state.units.map(u=>u.id===1?{...u,weakenedBy}:u)};
+    expect(readBattleState(input,catalog)).toEqual({ok:false,reason:'invalidState'});
+  }
+  for(const defeatedId of [1,6]) expect(readBattleState({...valid,units:valid.units.map(u=>u.id===defeatedId?{...u,hp:0}:u)},catalog).ok).toBe(false);
+  const enemyTarget={...state,units:state.units.map(u=>u.id===4?{...u,weakenedBy:6}:u)};
+  expect(readBattleState(enemyTarget,catalog).ok).toBe(false);
+  const immune={...catalog,heroes:{...catalog.heroes,fighter:{...catalog.heroes.fighter,immunities:['debuff'] as const}}};
+  expect(readBattleState({...valid,versions:{...valid.versions,content:contentVersion(immune)}},immune).ok).toBe(false);
+  const absent={...catalog,abilities:Object.fromEntries(Object.entries(catalog.abilities).filter(([,a])=>a.kind!=='weakeningHex'))};
+  expect(readBattleState({...valid,versions:{...valid.versions,content:contentVersion(absent)}},absent).ok).toBe(false);
+});
+it('a Weakened Mage keeps identical automatic missiles and an injured last ally can heal at RNG exhaustion',()=>{
+  const {catalog,state}=shamanSetup(),mage=activate({...state,units:state.units.map(u=>u.id===3?{...u,cell:{x:1,y:0}}:u)},3);
+  const command={type:'useAbility' as const,unitId:3,abilityId:'ability:magic_missile' as const,target:{unitId:6}};
+  const weak={...mage,units:mage.units.map(u=>u.id===3?{...u,weakenedBy:6}:u)};
+  expect(previewMagicMissile(weak,command,catalog)).toEqual(previewMagicMissile(mage,command,catalog));
+  const ordinary=dispatch(mage,command,catalog),weakened=dispatch(weak,command,catalog);assert(ordinary.ok&&weakened.ok);
+  expect(ordinary.events).toEqual(weakened.events);expect(ordinary.state.rng).toEqual(weakened.state.rng);
+  const cursor=RULE_BOUNDS.cursor.max,rng={...state.rng,cursor,words:[state.rng.words[0],state.rng.words[1],state.rng.words[2],(cursor%UINT32_RANGE+RNG_WARMUP_DRAWS+1)%UINT32_RANGE] as const};
+  const exhausted={...state,rng,units:state.units.map(u=>u.id===4?{...u,hp:1}:u.id===5?{...u,hp:0}:u)};
+  const healed=dispatch(exhausted,healGoblin,catalog);assert(healed.ok);expect(healed.state.rng).toEqual(rng);
+  expect(healed.state.units.find(u=>u.id===4)?.hp).toBe(5);
+});
 
 it('Frost Snare uses one action and shared immobilization for both real goblins without rolls or Mark consumption',()=>{
   for(const targetId of [4,5]) {

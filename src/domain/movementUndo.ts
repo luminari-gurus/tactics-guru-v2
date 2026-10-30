@@ -12,7 +12,7 @@ export function undoRecordedMove(before: BattleState, after: BattleState,
   const prior = readBattleState(before, catalog), current = readBattleState(after, catalog);
   if (!prior.ok || !current.ok) return {ok:false,reason:'invalidState'};
   const actor = prior.state.units.find(u => u.id === move.unitId);
-  if (!actor || actor.side !== 'player' || actor.hasActed || actor.hasMoved || current.state.commandCount >= RULE_BOUNDS.commandCount.max)
+  if (!actor || actor.side !== 'player' || actor.hasActed || actor.hasMoved || current.state.commandCount >= RULE_BOUNDS.commandCount.max - 2)
     return {ok:false,reason:'invalidState'};
   const expected = moveUnit(prior.state, move, catalog);
   if (!expected.ok || expected.events.length !== 1 || expected.events[0].type !== 'moved' ||

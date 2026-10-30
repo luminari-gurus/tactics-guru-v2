@@ -55,6 +55,11 @@ describe('tactical plan preview', () => {
         expect(interrupted.confirmPlannedAbility()).toBeNull();
         expect(interrupted.continuation!.commands).toEqual([move]);
         expect(interrupted.state).toEqual(prefix.after);
+        const undo = interrupted.undoMove();
+        expect(undo).not.toBeNull();
+        interrupted.finishPresentation(undo!.token);
+        expect(interrupted.state.units.find(u=>u.id===fighter.id)!.cell).toEqual(fighter.cell);
+        expect(interrupted.confirmPlannedAbility()).toBeNull();
         const session = new BattleSession(catalog, state, state.seed);
         expect(session.preparePlan(move, ability).ok).toBe(true);
         session.cancel();
