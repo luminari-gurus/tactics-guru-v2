@@ -1,16 +1,25 @@
 # Goblin Shaman qualification (#166)
 
-Updated 2026-10-29 (Asia/Jerusalem). Implementation and qualification are complete
+Updated 2026-10-30 (Asia/Jerusalem). Implementation and qualification are complete
 on combined main/Shaman source **f4616ae301da4be133455334d4c2b38e3583c8f7**. All five issue criteria below are
-proven. Both PRs are published and review-ready; OpenSpec is **9/9 complete**.
+proven. Foundation #251 is merged; runtime #252 targets main for final merge closeout. OpenSpec is **9/9 complete**.
 The [live plan](../../ongoing-projects/plan.md) and
 [OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md) contain
 the completed review handoff.
 
 [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251) supplies the
 source-pinned foundation; dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252)
-supplies support runtime, placement, feedback and continuation. No merge,
-deployment or physical-device testing is claimed.
+supplies support runtime, placement, feedback and continuation. See those PRs and
+#166 for authoritative merge/closure state. No physical-device testing or release
+qualification is claimed.
+
+Merge audit (2026-10-30): main's #253 advance since b343ab0 changes documentation
+only. The enemy-turn collision is reconciled with the support contract, preserving
+the newer historical-scope corrections; current save descriptions use 5/6/7/9.
+The combined runtime, tests/helpers, configs, dependencies, assets and build inputs
+remain identical to the qualified source. All 71 packaged artifact hashes were
+verified. Existing functional evidence below is reused under the verification
+policy; these documentation edits do not claim a new app/browser run.
 
 ## Current acceptance
 

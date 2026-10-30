@@ -1,6 +1,8 @@
 # Guarded local battle storage
 
-[#72](https://github.com/luminari-gurus/tactics-guru-v2/issues/72) adds a storage adapter around the [accepted snapshot codec](battle-save-format.md). It does not hydrate a session or enable autosave/Continue controls; those belong to #73. The caller supplies a validated immutable catalog and can continue in-memory play when persistence fails.
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
+[#72](https://github.com/luminari-gurus/tactics-guru-v2/issues/72) adds a storage adapter around the [accepted snapshot codec](battle-save-format.md). The adapter itself does not hydrate a session; #73 integrated autosave and Continue controls as described below. The caller supplies a validated immutable catalog and can continue in-memory play when persistence fails.
 
 ## API and owned keys
 
@@ -63,4 +65,4 @@ The reload does not itself write or remove existing slots. With both slots absen
 
 ## Delivery boundary
 
-Storage is synchronous, origin-scoped and best-effort. Browser policy/private mode, quota, eviction and other tabs can invalidate assumptions. This adapter does not provide cross-tab transactions, permanent retention or power-loss durability. #73 owns live hydration, accepted-command autosave, player-facing warning/recovery/export controls and safe restart invalidation. #74 owns browser lifecycle and physical-device certification. #58/#57 remain open.
+Storage is synchronous, origin-scoped and best-effort. Browser policy/private mode, quota, eviction and other tabs can invalidate assumptions. This adapter does not provide cross-tab transactions, permanent retention or power-loss durability. #73 owns live hydration, accepted-command autosave, player-facing warning/recovery/export controls and safe restart invalidation. Historical #74/#58/#57 acceptance records retain their original results; see [verification policy](verification-policy.md) for current device acceptance.

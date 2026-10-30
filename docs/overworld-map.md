@@ -1,5 +1,7 @@
 # Overworld map contract
 
+Current source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Historical evidence retains its original revision and test limits.
+
 Open `/map` under the configured Vite base. The independent 20×20 inspection prototype has Map type, Biome and Art style controls plus stationary markers; it does not initialize a battle, audio or game-save storage. The shared privacy control may read the telemetry opt-out preference.
 
 ## Layout and biome

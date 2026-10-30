@@ -1,5 +1,7 @@
 # Turn flow and combat (#7)
 
+Source reference: `b343ab02ae033a57f8c5f613f07883764f0752c0`. Original implementation and verification notes describe their named historical slices; see [current gameplay overview](../README.md) and linked contracts for later integration.
+
 `src/domain/turns.ts`, `src/domain/combat.ts` and `src/domain/targeting.ts` add battle creation, the turn lifecycle, ordinary d20 attacks, defeat, the battle outcome, command dispatch and replay. Like #4 and #5, every API takes an untrusted snapshot and command plus a trusted, already validated catalog. It returns either one fresh snapshot with its events, or a typed rejection that changes nothing and draws nothing. Initiative, accepted d20 attacks and Magic Missile's d4 damage rolls use `rollDie` on the snapshot's own state. Rejected commands and previews draw nothing.
 
 Order, defeat and outcome are decided when a command resolves. Legacy deferred the outcome check while combat or movement animated ([BattleController.gd:1904-1908](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L1904-L1908)). Here the session (#10) only animates the events it is given, and timer APIs do not compile in `src/domain` (ES2022-only `tsconfig.domain.json`).
@@ -16,7 +18,7 @@ Creation emits one `initiativeRolled` per unit in roll order, then `turnStarted`
 
 **Restart is a new battle with a new seed** (D7, decided by dubstylee on 2026-10-09). The session calls `createBattle` again with the same map and a seed it supplies, because the domain never makes entropy. Legacy restart reloaded with the same seed ([BattleController.gd:124](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/BattleController.gd#L124)), so a retry dealt the same dice in the same order; that is deliberately not kept. A seed override for testing still reproduces a battle, because the session passes the override as the seed.
 
-Resuming a saved battle is different: the snapshot carries the RNG state, so play continues from the next draw. Saves are a follow-up.
+Resuming a saved battle is different: the snapshot carries the RNG state, so play continues from the next draw. See [battle storage](battle-storage.md).
 
 ## Turns
 
@@ -62,13 +64,17 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 ## Dispatch and replay
 
-`dispatch(state, command, catalog)` routes `move` to `moveUnit`, `useAbility` to `resolveAttack` and `endTurn` to `endTurn`. It reads the command type only after the shared intent check.
+`dispatch(state, command, catalog)` routes movement, ability profiles and turn ending to their authoritative resolvers. See [turns.ts](../src/domain/turns.ts) and [signature abilities](signature-abilities.md) for the implemented profiles. It reads the command type only after the shared intent check.
 
 `replayBattle(replay, catalog)` validates the envelope with `readReplay`. It then rebuilds `createBattle(initial.mapId, initial.seed)` and rejects the replay unless `initial` matches it exactly, compared as sorted-key JSON so key order does not matter. A replay therefore cannot start from chosen HP, dice, initiative, flags or outcome. Then it re-executes the commands. It returns the final snapshot and every event in order; creation's initiative events are not repeated. A bad envelope is `invalidReplay`. A command that does not apply is `invalidReplay` with its `index` and the `rejection`. AI commands are recorded, not recomputed.
 
 Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed. Do not enforce this with a deep `Object.freeze`. PR #44's review tried it, and that replay took about 1.8 s instead of 0.5 s, because V8 is slower on frozen arrays.
 
-## Not included
+## Historical #7 scope and handoff
+
+The following scope, handoff and verification describe #7 at its delivery, not current runtime. Current abilities and effects are documented in [signature abilities](signature-abilities.md), enemy behavior in [enemy turns](enemy-turns.md), and live persistence in [battle storage](battle-storage.md).
+
+### Not included at #7
 
 - The three signatures and Guarded expiry are implemented for #8. Magic Missile adds its 1d4+1 automatic-hit path. Magic Missile replaces the previously planned Ember Burst Dex-save path (decision 2026-10-09); see `docs/signature-abilities.md`.
 - Enemy AI: #9.
@@ -84,7 +90,7 @@ Each command re-validates its snapshot against the content version. `contentVers
 - **#10** gets `createBattle`, which is also its restart, and the event stream to animate. Defeated units stay in the snapshot at their last cell, but that cell is free at once, so a living unit, or another defeated one, can end up on it (*defeats once, frees the cell, …* in `tests/unit/combat.test.ts` moves the ranger onto the defeated grunt's cell). The renderer must hide defeated units or draw them beneath any living unit on the cell, and a tap on that cell picks the living unit.
 - **The authored catalog (#29)** was not on `main` when #7 merged. Once it is, a test on its map adds coverage only if it dispatches commands. `createBattle` already passes its result through `readBattleState`, which requires one unit per spawn and a valid initiative, so re-checking a created battle, or wrapping it in a `readReplay` envelope, cannot fail while `createBattle` succeeds. Script a short battle on that map that includes an attack from higher ground (+2 bonus) and a shot rejected `blockedLos` across a blocking cell, and check that `replayBattle` reproduces its final state.
 
-## Verification commands
+## Historical #7 verification commands
 
 - Focused: `npm run test:unit -- tests/unit/targeting.test.ts tests/unit/turns.test.ts tests/unit/combat.test.ts`
 - Full unit suite: `npm run test:unit`
