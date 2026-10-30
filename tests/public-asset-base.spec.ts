@@ -105,7 +105,7 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
   });
-  await page.goto(route === 'battle' ? './' : `./${route}`);
+  await page.goto(route === 'battle' ? './battle' : `./${route}`);
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   if (route === 'dungeon') {
     await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
@@ -155,7 +155,7 @@ test('built startup hints preserve a supplied script nonce', async ({page})=>{
     for(const name of ['content-encoding','content-length','transfer-encoding'])delete headers[name];
     await route.fulfill({status:response.status(),headers,body});
   });
-  await page.goto('./');
+  await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(page.locator('script[data-game-preloads]')).toHaveCount(1);
   const engineHints=page.locator('link[rel="modulepreload"][href*="/assets/start-"]');
@@ -185,7 +185,7 @@ for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
     page.on('pageerror', error => errors.push(error.message));
     await page.route('**/audio/battle/move.mp3', route => failure === 'stalled' ? undefined
       : route.fulfill(failure === 'missing' ? { status: 404 } : { contentType: 'audio/mpeg', body: 'invalid MP3' }));
-    await page.goto('./');
+    await page.goto('./battle');
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
     await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load), { timeout: 10000 }).toBe('unavailable');
     await expect(page.locator('#battle-next')).toBeEnabled();

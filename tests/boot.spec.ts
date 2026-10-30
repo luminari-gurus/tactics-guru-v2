@@ -4,7 +4,7 @@ for (const route of ['', '?scene=proof', '?scene=content-smoke', 'run']) {
   test(`missing engine chunk reports a recoverable startup error on ${route || 'battle'}`, { tag: '@canonical' }, async ({page}) => {
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
     await page.route(/\/start-[^/]+\.js$/,r=>r.abort());
-    await page.goto('./'+route);
+    await page.goto('./battle'+route);
     await expect(page.locator('#fit-status')).toContainText('Could not load');
     await expect(page.locator('#fit-status')).toContainText('Reload');
     await expect(page.locator('canvas')).toHaveCount(0);
@@ -20,7 +20,7 @@ test('battle keeps its Canvas renderer fallback without WebGL', async ({page}) =
       return original.call(this,id,options);
     } as typeof HTMLCanvasElement.prototype.getContext;
   });
-  await page.goto('./');
+  await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect(await page.locator('canvas').evaluate(canvas=>(canvas as HTMLCanvasElement).getContext('2d')!==null)).toBe(true);
   await page.screenshot({path:test.info().outputPath('canvas-fallback.png')});

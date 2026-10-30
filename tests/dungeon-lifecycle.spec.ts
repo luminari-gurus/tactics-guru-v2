@@ -26,7 +26,7 @@ for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-f
  if(route==='battle'){body.payload.format=2;body.payload.versions.rules=3;}else body.format=route==='run'?4:5;
  const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
  const keys=route==='battle'?BATTLE_STORAGE_KEYS:route==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS;
- await page.goto(route==='battle'?'/':route);
+ await page.goto(route==='battle'?'battle':route);
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
  await page.reload();
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);

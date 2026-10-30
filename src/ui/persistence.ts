@@ -1,3 +1,5 @@
+import { consumeEntryIntent } from '../app/routes';
+import { menuReturnLink } from './menuReturn';
 import { BattlePersistence } from '../app/BattlePersistence';
 import type { BattleSession } from '../app/BattleSession';
 import type { BattleLoadResult, BattleStorageSlot } from '../persistence/battleStorage';
@@ -15,10 +17,19 @@ export class BattleSaveControls {
       // WebKit touch activation does not focus buttons; retain the actual invoker.
       (event.currentTarget as HTMLButtonElement).focus();this.recovery();
     },{signal:this.abort.signal});
+    this.root.append(menuReturnLink(() => /unsaved|incomplete/i.test(this.persistence.status), () => this.recovery()));
     persistence.onChange=()=>this.render();this.render();
   }
   private render(){this.root.querySelector('#battle-save-status')!.textContent=this.persistence.status;}
-  start(){const session=this.persistence.startup();if(session)this.activate(session);else this.recovery(this.persistence.inspection!);}
+  start(){
+    const intent=consumeEntryIntent();
+    if(intent){
+      const review=this.persistence.inspect();
+      if(intent==='continue') {const session=this.persistence.continue(review);if(session){this.activate(session);return;}}
+      this.recovery(review);return;
+    }
+    const session=this.persistence.startup();if(session)this.activate(session);else this.recovery(this.persistence.inspection!);
+  }
   private details(review:BattleLoadResult) {
     if(!review.ok)return 'Storage is unavailable. Retry after allowing storage for this site. Existing saves have not been discarded.';
     const describe=(slot:BattleStorageSlot)=>{
