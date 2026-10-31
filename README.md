@@ -27,14 +27,14 @@ carry your surviving party into the next encounter.
 This repository is the playable **v2 prototype**. The header is promotional art;
 the game uses illustrated portraits, compact sprites and isometric tile boards.
 
-**[Play a battle](https://tactics-guru-v2.pages.dev/) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
+**[Play a battle](https://tactics-guru-v2.pages.dev/battle) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
 
 ## Choose your adventure
 
-- **Main menu — `/`**<br>
+- **[Main menu](https://tactics-guru-v2.pages.dev/) — `/`**<br>
   Continue a saved journey, start a new dungeon, or open Records and Settings.
   Continue offers a mode choice when several saves exist; recovery never removes saves.
-- **Standalone battle — `/battle`**<br>
+- **[Standalone battle](https://tactics-guru-v2.pages.dev/battle) — `/battle`**<br>
   Fight the authored 12×12 Forest Ruins encounter with a level-1 party, enemy AI,
   attack previews, combat feedback and a saved battle you can continue.
 - **[Three-encounter run](https://tactics-guru-v2.pages.dev/run) — `/run`**<br>
@@ -278,8 +278,9 @@ relevant seed or recovery message.
 
 ## Main menu navigation
 
-Plain `/` now opens a portrait main menu; standalone battle bookmarks should use
-`/battle`. Existing `/run`, `/dungeon` and `/map` routes remain available. Root
+Plain `/` opens a portrait main menu; standalone battle bookmarks should use
+`/battle`. Unknown paths such as `/foo` open the menu. Existing `/run`, `/dungeon`
+and `/map` routes remain available. Root
 `?scene=battle`, `?scene=proof` and `?scene=content-smoke` diagnostic entries remain
 supported. Every route respects Vite's configured base path.
 
