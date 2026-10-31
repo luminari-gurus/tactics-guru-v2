@@ -2,6 +2,6 @@
 # issue-200-baseline.yml. Humans with Actions write can instead dispatch
 # extra_job=full-verify. Do not treat a bump on main as release qualification
 # unless that was the intent.
-requested: 2026-10-31T15:02:00Z
-head: 5e6d8ab6d2254c32c708178685f51223b202aa9d
-reason: PR 256 recapture after SERIAL_MODE=capture on full-verify (run 41202559174 died in discover)
+requested: 2026-10-31T20:40:00Z
+head: ab175b40fac6ffcb20509836ba528a06ee2c9045
+reason: PR 256 recapture after landscape-webkit dungeon stairs Continue wait (run 41212901716)

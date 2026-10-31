@@ -1,7 +1,7 @@
 import { expect,test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { dungeonSnapshot, walkDungeon } from './helpers/dungeonTraversal';
+import { dungeonSnapshot, walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
 import { freshDungeon, floorDescriptor, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
@@ -84,13 +84,14 @@ test('stairs remain visible under cleared saved markers and live markers stay vi
 });
 
 for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs travel once per entry with ${control}, stay on arrival and restore, and respect locks`,async({page,isMobile})=>{
+ test.setTimeout(120000);
  const base=freshDungeon('stairs-browser',1),cleared={...base,floors:[{...base.floors[0],completed:3}]};
  const load=async(state:DungeonState)=>{
   const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
+  await page.reload();await continueSavedDungeon(page);
  };
- const reload=async()=>{await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();};
+ const reload=async()=>{await page.reload();await continueSavedDungeon(page);};
  const move=async(destination:number)=>{
   const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position;
   const direction=delta===-20?'north':delta===20?'south':delta===1?'east':'west';

@@ -4,6 +4,14 @@ import { generateMap } from '../../src/map/generate';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots } from '../../src/domain/dungeon';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
+/** Phaser.Game construction runs before startup render, so Continue is absent until the heading appears. */
+export async function continueSavedDungeon(page: Page) {
+  const ready = { timeout: 15_000 };
+  await expect(page.getByRole('heading', { name: 'Dungeon floors', exact: true })).toBeVisible(ready);
+  const resume = page.getByRole('button', { name: 'Continue saved dungeon', exact: true });
+  await expect(resume).toBeEnabled(ready);
+  await resume.click();
+}
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
   await expect(page.locator('#dungeon-screen')).toBeVisible();
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];
