@@ -5,8 +5,9 @@ return links. Source art remains in `docs/art/issue-153/source/`; runtime art is
 `public/menu/`.
 
 Run logs, Playwright JSON, and screenshots are workflow artifacts, not tree
-files. Dispatch `issue-200-baseline.yml` with `extra_job=full-verify` on the PR
-head and retain the `full-verify-<run>-<attempt>` artifact for 30 days.
+files. Start a full capture by dispatching `issue-200-baseline.yml` with
+`extra_job=full-verify`, or by bumping `.github/full-verify-request`. Retain the
+`full-verify-<run>-<attempt>` artifact for 30 days.
 
 ## Status
 
