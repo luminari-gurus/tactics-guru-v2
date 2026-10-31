@@ -57,3 +57,31 @@ for(const choice of ['continue','replace'] as const)it(`keeps explicit unsaved i
   expect(s.isUnsavedOnly).toBe(false);expect(s.save().ok).toBe(true);
   expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).payload.items.run.id).toBe(choice==='continue'?'saved-run':'new-run');
 });
+
+it('keeps unsaved departure after a rejected item or reward command',()=>{
+  const s=new RunItemSession(rewardSnapshot(),runContext,unavailable());
+  s.playUnsaved();
+  expect(s.hasUnsavedProgress).toBe(true);
+  expect(s.status).toMatch(/unsaved/i);
+  const stale={...s.boundary(),type:'claimReward' as const,offerId:'stale-offer',itemId:s.snapshot.items.offer!.options[0].itemId};
+  expect(s.dispatch(stale)).toMatchObject({ok:false,reason:'staleBoundary'});
+  expect(s.status).toContain('Nothing changed');
+  expect(/unsaved/i.test(s.status)).toBe(false);
+  expect(s.hasUnsavedProgress).toBe(true);
+  const use={...s.boundary(),type:'useItem' as const,itemId:'item:healing_draught' as const,heroId:'mage' as const};
+  expect(s.dispatch(use).ok).toBe(false);
+  expect(s.status).toContain('Nothing changed');
+  expect(s.hasUnsavedProgress).toBe(true);
+});
+
+it('keeps unsaved departure after a failed save then a rejected reward command',()=>{
+  const s=new RunItemSession(rewardSnapshot(),runContext,unavailable());
+  const command={...s.boundary(),type:'claimReward' as const,offerId:s.snapshot.items.offer!.id,itemId:s.snapshot.items.offer!.options[0].itemId};
+  expect(s.dispatch(command).ok).toBe(true);
+  expect(s.hasUnsavedProgress).toBe(true);
+  expect(s.status).toMatch(/unsaved/i);
+  expect(s.dispatch(command)).toMatchObject({ok:false,reason:'staleBoundary'});
+  expect(s.status).toContain('Nothing changed');
+  expect(/unsaved/i.test(s.status)).toBe(false);
+  expect(s.hasUnsavedProgress).toBe(true);
+});

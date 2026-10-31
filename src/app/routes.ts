@@ -13,7 +13,8 @@ export function classifyRoute(pathname: string, search = '', base = '/'): AppRou
 export function routeHref(route: AppRoute, base = '/', intent?: EntryIntent): string {
   return `${base.replace(/\/+$/, '')}/${route === 'menu' ? '' : route}${intent ? `?entry=${intent}` : ''}`;
 }
-/** Remove the request from history before using it; reloading cannot repeat it. */
+/** Remove the request from history before using it; reloading cannot repeat it.
+ * Unknown `entry` values are consumed and ignored so startup is unchanged. */
 export function consumeEntryIntent(): EntryIntent | null {
   const url = new URL(location.href), value = url.searchParams.get('entry');
   if (value === null) return null;
