@@ -21,4 +21,12 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
 - Recapture [41202559174](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41202559174)
   (`60ec6b6`) failed before `verify:full`: `verify:batches discover` saw empty
   `SERIAL_MODE` on the request-file push. The full-verify job now pins
-  `SERIAL_MODE=capture`. Draft PR #256. No merge claim.
+  `SERIAL_MODE=capture`.
+- Recapture [41212901716](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41212901716)
+  (`2d5f3a0`) ran `verify:full` to completion and **failed**. Chromium
+  820 expected / 0 unexpected; `assets-prefix-preview` and `assets-prefix-dev`
+  passed. The only failed stage is `webkit-exploration`: 104 passed, 1 timed
+  out (`landscape-webkit` dungeon stairs / `cell` waiting on Continue after
+  reload, Phaser still `Loading`). Same case passed desktop and portrait
+  WebKit in that run. Not a routing/base-prefix regression. Draft PR #256.
+  No merge claim.
