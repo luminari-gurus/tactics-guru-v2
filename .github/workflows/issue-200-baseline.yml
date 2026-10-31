@@ -198,6 +198,9 @@ jobs:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.event_name == 'push' || inputs.extra_job == 'full-verify')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 420
+    # Push and extra_job=full-verify do not set inputs.mode=capture; discover requires it.
+    env:
+      SERIAL_MODE: capture
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"

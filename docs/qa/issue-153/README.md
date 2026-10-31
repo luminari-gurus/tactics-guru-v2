@@ -17,5 +17,8 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
 - Prior full capture [41105273512](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41105273512)
   (`6559b9c`) failed: Chromium 798 expected / 4 unexpected (all
   `mobile-landscape`), then the 210-minute step budget ended while
-  `assets-prefix-preview` was still progressing. That run does not accept this
-  branch. Draft PR #256. No merge claim.
+  `assets-prefix-preview` was still progressing.
+- Recapture [41202559174](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41202559174)
+  (`60ec6b6`) failed before `verify:full`: `verify:batches discover` saw empty
+  `SERIAL_MODE` on the request-file push. The full-verify job now pins
+  `SERIAL_MODE=capture`. Draft PR #256. No merge claim.
