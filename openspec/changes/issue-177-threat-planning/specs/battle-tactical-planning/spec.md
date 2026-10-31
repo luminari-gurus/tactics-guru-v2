@@ -29,7 +29,7 @@ The player SHALL be able to inspect a clearly distinguished enemy danger overlay
 - **THEN** the inspection does not represent that attack as legal
 
 ### Requirement: Safe movement undo
-The player SHALL be able to undo the most recent eligible player move before committing an action, restoring its position and move budget without changing RNG or duplicating events, while preserving replay and saved-state consistency.
+The player SHALL be able to undo the most recent eligible player move before committing an action, restoring its position and move budget without changing RNG or duplicating events, while preserving replay and saved-state consistency. The player may undo at most once per turn; a resumed turn cannot use undo because its snapshot does not prove whether it was already used.
 
 #### Scenario: Unsafe boundary
 - **WHEN** an action, turn transition, reload, restart, hazard consequence, reveal or enemy reaction intervenes

@@ -41,7 +41,7 @@ it('records an undo that replays and is unavailable after reload or a later acti
   const result=replayBattle(session.replay,catalog);expect(result.ok).toBe(true);
   if(result.ok){expect(result.state).toEqual(session.state);expect(result.events).toEqual(session.events);}
   expect(session.prepare(move).ok).toBe(true);const next=session.confirm()!;session.finishPresentation(next.token);
-  expect(session.canUndoMove).toBe(true);expect(session.prepare({type:'endTurn',unitId:session.active.id}).ok).toBe(true);
+  expect(session.canUndoMove).toBe(false);expect(session.prepare({type:'endTurn',unitId:session.active.id}).ok).toBe(true);
   const end=session.confirm()!;session.finishPresentation(end.token);expect(session.canUndoMove).toBe(false);
 });
 
@@ -150,19 +150,29 @@ it('does not offer undo when the accepted move exhausts the command limit', asyn
   expect(session.canUndoMove).toBe(false);expect(session.undoMove()).toBeNull();
 });
 
-it('stops repeated undo before the final command slots are exhausted', async () => {
-  const {RULE_BOUNDS}=await import('../../src/domain/constants');
-  const initial=new BattleSession(catalog,'map:forest_ruins',2).state;
-  const hero=initial.units.find(u=>u.side==='player')!;
-  const state={...initial,activeIndex:initial.initiative.indexOf(hero.id),commandCount:RULE_BOUNDS.commandCount.max-7};
-  const session=new BattleSession(catalog,state,state.seed);
-  const reach=previewMovement(state,hero.id,catalog);expect(reach.ok).toBe(true);if(!reach.ok)return;
-  const move={type:'move' as const,unitId:hero.id,to:reach.cells.find(c=>c.cost>0)!.cell};
-  for(let i=0;i<2;i++){
-    expect(session.prepare(move).ok).toBe(true);const moved=session.confirm()!;session.finishPresentation(moved.token);
-    expect(session.canUndoMove).toBe(true);const undo=session.undoMove()!;session.finishPresentation(undo.token);
+it('permits one undo per turn, including across reload, without exhausting command history', async () => {
+  const {replayBattle}=await import('../../src/domain/turns');
+  const session=new BattleSession(catalog,'map:forest_ruins',2);
+  while(session.phase==='enemy'){const step=session.nextEnemy()!;session.finishPresentation(step.token);}
+  const before=session.state, reach=previewMovement(before,session.active.id,catalog);
+  expect(reach.ok).toBe(true);if(!reach.ok)return;
+  const move={type:'move' as const,unitId:session.active.id,to:reach.cells.find(c=>c.cost>0)!.cell};
+  expect(session.prepare(move).ok).toBe(true);let step=session.confirm()!;session.finishPresentation(step.token);
+  expect(session.canUndoMove).toBe(true);step=session.undoMove()!;session.finishPresentation(step.token);
+  const replay=replayBattle(session.replay,catalog);expect(replay.ok && replay.state).toEqual(session.state);
+  const reloaded=BattleSession.fromSnapshot(catalog,session.state);expect(reloaded.ok).toBe(true);if(!reloaded.ok)return;
+  for(const current of [session,reloaded.session]) {
+    expect(current.prepare(move).ok).toBe(true);const moved=current.confirm()!;current.finishPresentation(moved.token);
+    for(let attempt=0;attempt<100;attempt++) {expect(current.canUndoMove).toBe(false);expect(current.undoMove()).toBeNull();}
+    expect(current.state.commandCount).toBe(before.commandCount+3);
+    expect(current.prepare({type:'endTurn',unitId:move.unitId}).ok).toBe(true);
+    const end=current.confirm()!;current.finishPresentation(end.token);
+    while(current.phase==='enemy'){const enemy=current.nextEnemy()!;current.finishPresentation(enemy.token);}
+    expect(current.phase).toBe('player');
+    const next=previewMovement(current.state,current.active.id,catalog);expect(next.ok).toBe(true);if(!next.ok)continue;
+    const cell=next.cells.find(c=>c.cost>0);expect(cell).toBeDefined();if(!cell)continue;
+    expect(current.prepare({type:'move',unitId:current.active.id,to:cell.cell}).ok).toBe(true);
+    const nextMove=current.confirm()!;current.finishPresentation(nextMove.token);
+    expect(current.canUndoMove).toBe(true);
   }
-  expect(session.prepare(move).ok).toBe(true);const moved=session.confirm()!;session.finishPresentation(moved.token);
-  expect(session.canUndoMove).toBe(false);expect(session.undoMove()).toBeNull();
-  expect(session.prepare({type:'endTurn',unitId:hero.id}).ok).toBe(true);
 });

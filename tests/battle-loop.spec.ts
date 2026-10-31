@@ -32,6 +32,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
   const undone=await session(page);expect(undone.state.units.find(u=>u.id===actor.id)!.cell).toEqual(actor.cell);
   expect(undone.state.rng).toEqual(initial.state.rng);expect(undone.replay.commands.at(-1)?.type).toBe('undoMove');
   const replay=replayBattle(undone.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(undone.state);
+  await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   let plan:{move:Extract<Command,{type:'move'}>;target:number}|null=null;
   for(let i=0;i<12&&!plan;i++){
     const current=await session(page),active=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
