@@ -1,16 +1,19 @@
 import { mountTelemetryPreferences } from './telemetry/preferences';
 import { startTelemetry } from './telemetry/browser';
 import { reportFailure } from './telemetry/telemetry';
-const basePath = new URL(import.meta.env.BASE_URL, location.origin).pathname.replace(/\/$/, '');
-const path = location.pathname.replace(/\/$/, '');
-// The dungeon has no approved telemetry taxonomy yet; keep collection off on this route.
-if (path !== `${basePath}/dungeon`) startTelemetry();
+import { classifyRoute } from './app/routes';
+const route = classifyRoute(location.pathname, location.search, import.meta.env.BASE_URL);
+// Menu and dungeon have no approved collection taxonomy.
+if (route !== 'menu' && route !== 'dungeon') startTelemetry();
 try {
-  if (path === `${basePath}/dungeon`) {
+  if (route === 'menu') {
+    const { startMainMenu } = await import('./ui/mainMenu');
+    startMainMenu();
+  } else if (route === 'dungeon') {
     await import('./app/startDungeonApp');
-  } else if (path === `${basePath}/run`) {
+  } else if (route === 'run') {
     await import('./app/startRunApp');
-  } else if (path === `${basePath}/map`) {
+  } else if (route === 'map') {
     const { startMap } = await import('./map/view');
     const disposeMap = startMap();
     import.meta.hot?.on('vite:beforeFullReload', disposeMap);
@@ -27,4 +30,4 @@ try {
 }
 
 const privacyTools = document.querySelector<HTMLElement>('#battle-scroll') ?? document.querySelector<HTMLElement>('#fit-panel, #map-page');
-if (privacyTools) mountTelemetryPreferences(privacyTools);
+if (route !== 'menu' && privacyTools) mountTelemetryPreferences(privacyTools);

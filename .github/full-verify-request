@@ -1,0 +1,7 @@
+# Bump this file to start npm run verify:full on the pushed ref via
+# issue-200-baseline.yml. Humans with Actions write can instead dispatch
+# extra_job=full-verify. Do not treat a bump on main as release qualification
+# unless that was the intent.
+requested: 2026-10-31T12:45:00Z
+head: 0dc3d0605bcc3874979c0cc19b14b89b15bfcc7e
+reason: PR 256 review blocker — full capture on repaired head

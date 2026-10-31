@@ -47,9 +47,9 @@ async function expectMarkers(page: Page) {
 
 for (const { path, chunk, otherChunk } of [
   { path: '/map', chunk: 'view-', otherChunk: 'startBattleApp-' },
-  { path: '/', chunk: 'startBattleApp-', otherChunk: 'view-' },
+  { path: '/battle', chunk: 'startBattleApp-', otherChunk: 'view-' },
 ]) {
-  test(`failed route import at ${path} shows a reload instruction`, { tag: '@native-clock' }, async ({ page }) => {
+  test(`failed route import at ${path === "/battle" ? "/" : path} shows a reload instruction`, { tag: '@native-clock' }, async ({ page }) => {
     const errors: string[] = [];
     const scripts: string[] = [];
     let aborted = false;
@@ -158,7 +158,7 @@ test('map isolates battle storage and never initializes battle, audio or diagnos
   expect(await page.evaluate(() => typeof window.fitDiagnostics)).toBe('undefined');
   scripts.length = 0;
   await page.clock.resume();
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   await expect(page.locator('canvas')).toHaveCount(1);
   expect(scripts.some(url => /\/(?:view-|src\/map\/)/.test(url))).toBe(false);
@@ -701,7 +701,7 @@ test('art uses configured base, bounded transfers and no battle requests', { tag
   await page.getByLabel('Art style', { exact: true }).selectOption('legacy-8bit');
   await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
   requests.length = 0;
-  await page.goto('./');
+  await page.goto('./battle');
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   expect(requests).toEqual([]);
 });
