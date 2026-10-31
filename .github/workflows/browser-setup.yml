@@ -36,3 +36,63 @@ jobs:
             test-results/
           retention-days: 7
           if-no-files-found: ignore
+  issue254-verify:
+    if: github.ref == 'refs/heads/work/issue-254-dungeon-enemy-behaviors'
+    needs: browser-setup
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 180
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and toolchain
+        run: |
+          mkdir -p verification-receipts/issue254
+          git rev-parse HEAD > verification-receipts/issue254/source.txt
+          node --version > verification-receipts/issue254/node.txt
+          npx --no-install playwright --version > verification-receipts/issue254/playwright.txt
+          uname -a > verification-receipts/issue254/host.txt
+          git status --short > verification-receipts/issue254/status.txt
+          sha256sum package-lock.json src/map/movement.ts src/domain/dungeon.ts tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-extended.spec.ts > verification-receipts/issue254/inputs.sha256
+          node --input-type=module -e "import {chromium,webkit} from '@playwright/test'; for (const type of [chromium,webkit]) { const browser=await type.launch(); console.log(type.name(),browser.version(),type.executablePath()); await browser.close(); }" > verification-receipts/issue254/browsers.txt
+      - run: npm run test:unit -- tests/unit/overworldMap.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts
+      - id: build
+        run: npm run build
+      - name: Record served build identity
+        if: ${{ steps.build.outcome == 'success' }}
+        run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue254/build.sha256
+      - name: Chromium exploration and Shaman journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/chromium.json
+        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'dungeon enemies move only|walking onto a guardian|real traversal, art independence|read-only entry, keyboard new dungeon|chase follows|Shaman production journey|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/chromium-artifacts
+      - name: WebKit exploration and Shaman journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'dungeon enemies move only|walking onto a guardian|real traversal, art independence|read-only entry, keyboard new dungeon|chase follows|Shaman production journey|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-artifacts
+      - name: Chromium Mage and Ranger journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/extended-chromium.json
+        run: npx --no-install playwright test -c playwright.extended.config.ts -g 'Mage legal progression|Ranger legal progression' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/extended-chromium-artifacts
+      - name: WebKit Mage and Ranger journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/extended-webkit.json
+        run: npx --no-install playwright test -c playwright.extended-webkit.config.ts -g 'Mage legal progression|Ranger legal progression' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/extended-webkit-artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue254-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue254/
+          retention-days: 30
+          if-no-files-found: warn

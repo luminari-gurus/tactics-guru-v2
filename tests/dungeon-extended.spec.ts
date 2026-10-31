@@ -15,8 +15,8 @@ async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(
 
 test('Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=mageJourney(12),used={snare:false,missiles:false};expect(witness.used).toEqual({snare:true,missiles:true});expect(witness.state.phase).toBe('defeat');
- await seed(page,freshDungeon('mage-production-journey',12));
+ const witness=mageJourney(46),used={snare:false,missiles:false};expect(witness.used).toEqual({snare:true,missiles:true});expect(witness.state.phase).toBe('defeat');
+ await seed(page,freshDungeon('mage-production-journey',46));
  const records:unknown[]=[];let expired=false,blocked=false;
  for(const expected of witness.records) {
   const position=await snapshot(page);
@@ -62,15 +62,15 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- const final=await snapshot(page);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:12,records,final,used,blocked,expired}));
+ const final=await snapshot(page);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:46,records,final,used,blocked,expired}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({snare:true,missiles:true});expect(blocked&&expired).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('mage-terminal-journey.png'),fullPage:true});
 });
 
 test('Ranger legal progression journey earns level three uses Mark and Pin and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=rangerJourney(2),used={mark:false,pin:false};expect(witness.used).toEqual({mark:true,pin:true});expect(witness.state.phase).toBe('defeat');
- await seed(page,freshDungeon('ranger-production-journey',2));
+ const witness=rangerJourney(12),used={mark:false,pin:false};expect(witness.used).toEqual({mark:true,pin:true});expect(witness.state.phase).toBe('defeat');
+ await seed(page,freshDungeon('ranger-production-journey',12));
  const records:unknown[]=[];let consumed=false;
  for(const expected of witness.records) {
   const position=await snapshot(page);
@@ -114,7 +114,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:2,records,final,used,consumed}));
+ const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:12,records,final,used,consumed}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({mark:true,pin:true});expect(consumed).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('ranger-terminal-journey.png'),fullPage:true});
 });

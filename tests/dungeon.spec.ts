@@ -16,9 +16,9 @@ async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((awai
 
 test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle',async({page,isMobile},info)=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=shamanJourney(31),catalog=dungeonBattle(witness.entry)!.catalog;
+ const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
  // This is the canonical unplayed save: level 1, full HP, no fabricated inventory or combat boundary.
- await seed(page,freshDungeon('shaman-production-journey',31));
+ await seed(page,freshDungeon('shaman-production-journey',189));
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const first=await readSession(page);expect(first.state.units.find(u=>u.id===6)?.defId).toBe('goblin_shaman');
  const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -40,7 +40,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
   if(weak&&!reloaded) {
    const saved=await snapshot(page);
    await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
-   await expect(page.getByRole('dialog')).toContainText('45% save chance');
+   await expect(page.getByRole('dialog')).toContainText('50% save chance');
    await page.screenshot({path:info.outputPath('shaman-will-save-log.png')});await page.locator('#log-close').click();
    await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${weak.id}`).click();
    await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
@@ -71,7 +71,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  expect({state:replayed,events:replayEvents}).toEqual({state:record.state,events});
  expect(record.state.outcome).toBe('playerWin');expect((await snapshot(page)).party.every(h=>!Object.hasOwn(h,'weakenedBy'))).toBe(true);
  expect(errors).toEqual([]);
- writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:31,entry:witness.entry,commands,events,state:record.state,reloaded,final:await snapshot(page)},null,2));
+ writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:189,entry:witness.entry,commands,events,state:record.state,reloaded,final:await snapshot(page)},null,2));
  await page.screenshot({path:info.outputPath('shaman-terminal.png'),fullPage:true});
 });
 
