@@ -17,5 +17,5 @@
 
 ## 4. Integration verification
 
-- [ ] 4.1 Map affected consumers and discover all required suites/modes; run final full regression under the verification policy on qualified exclusive self-hosted capacity, preserving source/build identity, failures, skips and limitations.
-- [ ] 4.2 Compare each issue acceptance criterion and approved plan against evidence, run `git diff --check`, and record results and unresolved limitations for the PR.
+- [x] 4.1 Map affected consumers and discover all required suites/modes; run final full regression under the verification policy on qualified exclusive self-hosted capacity, preserving source/build identity, failures, skips and limitations.
+- [x] 4.2 Compare each issue acceptance criterion and approved plan against evidence, run `git diff --check`, and record results and unresolved limitations for the PR.

@@ -43,3 +43,5 @@ SHA256(docs/qa/issue-177/selfhost-landscape-followup-receipt.json.gz)= 0c1d21c14
 SHA256(docs/qa/issue-177/selfhost-landscape-followup.json.gz)= 3802c372d944cc6d723d9724295911e606abfb9113eb763a9b91fb3a569e5b2f
 SHA256(docs/qa/issue-177/startup-dev-local.log.gz)= 8a08927bbd685d0b55a9fd3cf84abf66020e72a5703ab999ed9bb64b3b11d584
 SHA256(docs/qa/issue-177/startup-preview-local.log.gz)= aa2d266aff5ec982cb2585ea2d28cecc29d4b1780a3dc34255ee2593066dc83e
+SHA256(docs/qa/issue-177/merged-full-aggregate.json.gz)= e7b8dd20c94ae1b3e9389335372930bed08ea3f89fc09a46db966f3b24363c01
+SHA256(docs/qa/issue-177/shortened-followup-aggregate.json.gz)= 5bcaba84c5730cf315a2b9743f87c40e0a37d0648644855206805f198597e43f
