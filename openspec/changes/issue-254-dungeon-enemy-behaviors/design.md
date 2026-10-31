@@ -1,5 +1,7 @@
 # Design
 
+Approval: User approved this plan in the conversation on 2026-10-31.
+
 ## Context
 
 Issue [#254](https://github.com/luminari-gurus/tactics-guru-v2/issues/254); caller `dubstylee`; base `main` at `a8b87c199fb2ae171a9bb72961ac7114622c4d60`; branch `work/issue-254-dungeon-enemy-behaviors`. Device access: `CAN_TEST_MOBILE` missing or invalid, treated as none. No physical platforms required; Playwright emulation satisfies the standing device instruction.

@@ -1,0 +1,11 @@
+# Issue 254 verification (incomplete)
+
+Planning base: `a8b87c199fb2ae171a9bb72961ac7114622c4d60`; implementation was tested with a dirty working tree on macOS. The Playwright runs below are local browser emulation, not self-hosted CI or physical hardware. The final build after the last runtime edit passed content validation, both TypeScript scopes and Vite; it retains existing Vite loader and chunk-size warnings.
+
+- `npm run test:unit -- tests/unit/overworldMap.test.ts tests/unit/dungeon.test.ts`: 109 passed before the final test-only refinement.
+- `npm run test:unit -- tests/unit/overworldMap.test.ts tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts`: 121 passed, 3 failed. Existing Shaman witness selected another encounter; Mage and Ranger witnesses did not reach an encounter within their 400-step limit. The new chase behavior changes their movement trajectories. No base attribution is claimed. The focused map and dungeon files passed in this invocation.
+- A subsequent experimental witness-search repair failed four journey cases. That experiment was discarded; the failure is not represented as a passing full unit suite.
+- Chromium and WebKit each passed 15 affected local cases across desktop, portrait and landscape profiles, including pursuit, traversal, encounter entry and reload. Reports: `tmp/verification/issue-254/chromium.json` and `webkit.json` (local ignored files). A separate desktop legal reward/guardian journey passed (`journey.json`). These browser runs preceded a later error-message-only runtime edit, which does not affect their exercised behavior.
+- The initial new pursuit-browser fixture failed on all three Chromium profiles because its saved position was not marked visited. After correcting the fixture, the new test passed all three Chromium and three WebKit profiles. The original failure output was retained in the task transcript; its default Playwright artifact directory was overwritten by subsequent runs.
+
+Outstanding: repair and verify the legal production journey witnesses, run affected browser journeys against the final implementation on qualified self-hosted capacity, preserve reports and source/build identity, and complete the approved plan's final acceptance accounting. The current results do not establish PR readiness or a clean full regression.

@@ -303,6 +303,31 @@ describe('independent overworld enemy movement', () => {
       expect(() => createMovement(world, invalid as readonly EnemyBehavior[])).toThrow(RangeError);
     }
   });
+  it('uses the pre-step cell for chase and the resulting cell for block', () => {
+    const world = fixture([[5,5],[2,2],[3,5],[17,17]]);
+    const configured = (kind: 'chase' | 'block', range = 38) => createMovement(world,
+      [idle[0], {id:'enemy-2',kind,range}, idle[2]]);
+    const oldCell = 4 * 20 + 5;
+    expect(position(stepMovement(configured('chase'), [], [], oldCell))).toMatchObject({x:3,y:4});
+    expect(position(stepMovement(configured('block'), [], [], oldCell))).toMatchObject({x:4,y:5});
+    // Old target is farther than range 2, but the new target is detectable.
+    expect(position(stepMovement(configured('chase',2), [], [], oldCell))).toMatchObject({x:3,y:5});
+    expect(position(stepMovement(configured('block',2), [], [], oldCell))).toMatchObject({x:4,y:5});
+  });
+  it('keeps actual occupants and blocked cells authoritative when chasing an old cell', () => {
+    const profiles: readonly EnemyBehavior[] = [idle[0], {id:'enemy-2',kind:'chase',range:38}, {id:'enemy-3',kind:'block',range:38}];
+    // The old player cell is now occupied by enemy 1; the new one remains occupied by the player.
+    const state = createMovement(fixture([[5,5],[5,4],[3,5],[6,4]],[65,86]), profiles);
+    const next = stepMovement(state, [], [84], 85);
+    expect(new Set(next.world.markers.map(m => m.y*20+m.x)).size).toBe(4);
+    expect(position(next).y*20+position(next).x).not.toBe(105);
+    expect(position(next).y*20+position(next).x).not.toBe(84);
+    expect(next.rng.cursor).toBe(state.rng.cursor + 1);
+    const adjacent = createMovement(fixture([[6,5],[2,2],[4,4],[17,17]]), profiles);
+    expect(position(stepMovement(adjacent,[],[],85))).toEqual(position(adjacent));
+    const enclosed = createMovement(fixture([[6,5],[2,2],[3,5],[17,17]],[83,102,104,123]),profiles);
+    expect(position(stepMovement(enclosed,[],[],85))).toEqual(position(enclosed));
+  });
   it('wanders only to legal neighbors and draws once even when enclosed', () => {
     const closed = [43,64,83,62]; // N/E/S/W around (3,3)
     for (const [walls, expected] of [[closed,[3,3]], [closed.filter(c => c !== 64),[4,3]]] as const) {
