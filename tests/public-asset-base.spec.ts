@@ -207,6 +207,7 @@ test('menu public artwork and navigation respect the configured base',async({pag
  for(const anchor of await page.locator('.menu-secondary a').all())expect(new URL(await anchor.getAttribute('href')??'',baseURL).pathname.startsWith(base)).toBe(true);
  await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ page.once('dialog',dialog=>dialog.accept());
  await page.getByRole('link',{name:'Main menu',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeEnabled();

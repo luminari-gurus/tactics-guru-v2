@@ -17,22 +17,24 @@ export class BattleSaveControls {
       // WebKit touch activation does not focus buttons; retain the actual invoker.
       (event.currentTarget as HTMLButtonElement).focus();this.recovery();
     },{signal:this.abort.signal});
-    this.root.append(menuReturnLink(() => /unsaved|incomplete/i.test(this.persistence.status), () => this.recovery()));
+    this.root.append(menuReturnLink(() => this.persistence.hasUnsavedProgress, () => this.recovery()));
     persistence.onChange=()=>this.render();this.render();
   }
   returnToMenu() {
-    if (confirmMenuDeparture(() => /unsaved|incomplete/i.test(this.persistence.status), () => this.recovery())) {
+    if (confirmMenuDeparture(() => this.persistence.hasUnsavedProgress, () => this.recovery())) {
       location.assign(routeHref('menu', import.meta.env.BASE_URL));
     }
   }
   private render(){this.root.querySelector('#battle-save-status')!.textContent=this.persistence.status;}
   start(){
     const intent=consumeEntryIntent();
-    if(intent){
+    if(intent==='continue'){
       const review=this.persistence.inspect();
-      if(intent==='continue') {const session=this.persistence.continue(review);if(session){this.activate(session);return;}}
+      const session=this.persistence.continue(review);if(session){this.activate(session);return;}
       this.recovery(review);return;
     }
+    if(intent==='new'){this.requestNew();return;}
+    if(intent==='recovery'){this.recovery();return;}
     const session=this.persistence.startup();if(session)this.activate(session);else this.recovery(this.persistence.inspection!);
   }
   private details(review:BattleLoadResult) {

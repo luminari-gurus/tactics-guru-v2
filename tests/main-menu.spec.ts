@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
-import { menuFixture, terminalMenuBattle } from './helpers/menuFixtures';
+import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/menuFixtures';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -93,6 +93,14 @@ test('main menu: stale Continue and closed-set intents preserve missing or damag
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')||key.includes(':run:')))).toEqual([]);
  await page.goto('./dungeon?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
  await expect(page).toHaveURL(/\/dungeon$/);
+ await page.goto('./battle?entry=new');await expect(page.getByRole('dialog')).toContainText('Start a new battle?');
+ await page.getByRole('button',{name:'Cancel',exact:true}).click();
+ await page.goto('./run?entry=new');await expect(page.getByRole('dialog')).toContainText('Start new run?');
+ await page.getByRole('button',{name:'Cancel',exact:true}).click();
+ await page.goto('./battle?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
+ await expect(page).toHaveURL(/\/battle$/);
+ await page.goto('./run?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
+ await expect(page).toHaveURL(/\/run$/);
 });
 test('main menu: failed new-game write retains exportable recovery copies',async({page})=>{
  const text=menuFixture('dungeon');
@@ -116,6 +124,25 @@ test('main menu: terminal battle saves resume their existing outcome UI',async({
  await page.keyboard.press('Enter');
  await expect(page.locator('#main-menu')).toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe(text);
+});
+test('main menu: unsaved run still warns after a rejected reward command',async({page})=>{
+ const text=rewardRunFixture();
+ await page.addInitScript(({key,text})=>{
+  localStorage.setItem(key,text);const original=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(key,value){if(String(key).includes(':run:'))throw new DOMException('full','QuotaExceededError');original.call(this,key,value);};
+ },{key:keys.run.primary,text});
+ await page.goto('./run');await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
+ const claim=page.getByRole('button',{name:/^Claim /}).first();
+ await expect(claim).toBeVisible();await claim.click();await page.locator('#item-confirm').click();
+ await expect(page.locator('#run-item-status')).toContainText(/unsaved/i);
+ const action=page.getByRole('button',{name:/^(Use|Equip) /}).first();
+ await expect(action).toBeVisible();
+ const select=page.locator('#run-screen select').first();
+ if(await select.count())await select.evaluate(node=>{const target=node as HTMLSelectElement;const mage=[...target.options].find(option=>option.value==='mage');if(mage){mage.disabled=false;target.value='mage';}});
+ await action.click({force:true});await page.locator('#item-confirm').click();
+ await expect(page.locator('#run-item-status')).toContainText('Nothing changed');
+ page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
+ await expect(page.getByRole('dialog')).toContainText('Run save recovery');
 });
 test('main menu: unsaved return cancellation opens recovery and accepted leave reaches menu',async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
