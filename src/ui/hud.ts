@@ -1,3 +1,4 @@
+import type { Threat } from '../domain/threat';
 import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
 import { saveFaceCounts } from '../domain/combat';
 import type { CellPosition } from '../content/types';
@@ -102,7 +103,7 @@ export class BattleHud {
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
-      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
+      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
     this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
@@ -132,12 +133,16 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const movement=enabled?previewMovement(s.state,actor.id,s.catalog):null;
     const dangerButton=this.root.querySelector<HTMLButtonElement>('#battle-danger')!;
     dangerButton.disabled=!enabled; dangerButton.setAttribute('aria-pressed',String(danger));
     dangerButton.textContent=danger?'Hide enemy danger':'Show enemy danger';
+    const label=(id:number)=>{const unit=s.state.units.find(u=>u.id===id)!;return `${displayName(unit.defId)} #${id}`;};
+    const dangerText=!danger ? '' : !threats ? 'Danger information is unavailable.' : threats.length ? threats.map(t=>`${label(t.targetId)}: threatened by ${t.enemyIds.map(label).join(', ')}`).join('. ') + '.' : 'No living heroes are currently threatened.';
+    const results=this.root.querySelector<HTMLElement>('#battle-danger-results')!;
+    if(results.textContent!==dangerText)results.textContent=dangerText;
     this.root.querySelector<HTMLButtonElement>('#battle-plan')!.disabled=!enabled || actor.hasMoved || actor.hasActed || !movement?.ok;
     this.root.querySelector<HTMLButtonElement>('#battle-undo')!.disabled=!s.canUndoMove;
     const info=unitFeedback(s,actor);

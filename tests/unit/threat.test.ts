@@ -88,3 +88,18 @@ it('honors a narrow occupied route and an impassable climb', () => {
     expect(result.ok && result.targets.includes(1)).toBe(threatened);
   }
 });
+
+it('attributes each threatened hero to every legal enemy exactly once', async () => {
+  const {createBattle}=await import('../../src/domain/turns');
+  const map={id:'map:threat_sources' as const,width:5,height:2,
+    cells:Array.from({length:10},(_,i)=>({x:i%5,y:Math.floor(i/5),elevation:0,terrainId:'grass' as const})),
+    spawns:[{id:1,side:'heroes' as const,unitId:'fighter' as const,x:0,y:0},
+      {id:2,side:'enemies' as const,unitId:'goblin_grunt' as const,x:2,y:0},
+      {id:3,side:'enemies' as const,unitId:'goblin_grunt' as const,x:3,y:1}]};
+  const c={...catalogFixture,maps:{[map.id]:map}};
+  const created=createBattle(map.id,1,c);expect(created.ok).toBe(true);if(!created.ok)return;
+  const result=enemyThreats(created.state,c);
+  expect(result).toEqual({ok:true,targets:[1],threats:[{targetId:1,enemyIds:[2,3]}]});
+  const oneDead={...created.state,units:created.state.units.map(u=>u.id===3?{...u,hp:0}:u),activeIndex:created.state.initiative.indexOf(1)};
+  expect(enemyThreats(oneDead,c)).toEqual({ok:true,targets:[1],threats:[{targetId:1,enemyIds:[2]}]});
+});

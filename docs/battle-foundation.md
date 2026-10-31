@@ -41,7 +41,7 @@ RNG and state availability assertions failed before production files existed, fo
 
 ### Enemy danger inspection
 
-The battle HUD can show potential danger to living heroes. It checks current enemy ordinary attacks and Weakening Hex from the enemy's current position and legal reachable positions, with refreshed next-turn movement and action budgets, current occupancy, terrain, line of sight and movement-blocking effects. Orange triangle markers identify hero positions with at least one legal hostile action; they do not predict the enemy's choice, a hit or a damage roll. Inspection does not change battle state or draw randomness. This first scope does not depict danger on empty tiles or future ability profiles.
+The battle HUD can show potential danger to living heroes. It checks current enemy ordinary attacks and Weakening Hex from the enemy's current position and legal reachable positions, with refreshed next-turn movement and action budgets, current occupancy, terrain, line of sight and movement-blocking effects. Orange triangle markers identify hero positions with at least one legal hostile action; a live text summary names each threatened hero and the enemies that can threaten them. The display does not predict the enemy's choice, a hit or a damage roll. Inspection does not change battle state or draw randomness. This first scope does not depict danger on empty tiles or future ability profiles.
 
 ### Tactical planning and undo
 

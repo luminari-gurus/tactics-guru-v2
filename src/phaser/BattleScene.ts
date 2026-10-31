@@ -1,5 +1,5 @@
 import type { Command } from '../domain/types';
-import { enemyThreats } from '../domain/threat';
+import { enemyThreats, type Threat } from '../domain/threat';
 import { progressHero, projectProgression, progressionLabel } from '../domain/progression';
 import { HERO_IDS } from '../content/constants';
 import Phaser from 'phaser';
@@ -63,7 +63,7 @@ export class BattleScene extends Phaser.Scene {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
     let movingPresentation=false,showDanger=false,planning=false,planInFlight=false,planInterrupted=false;
     let planMove: Extract<Command,{type:'move'}>|null=null;
-    let threatState: typeof session.state | null=null, threatIds: readonly number[]=[];
+    let threatState: typeof session.state | null=null, threatIds: readonly number[]=[], threats: readonly Threat[] | null=null;
     let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
@@ -84,11 +84,11 @@ export class BattleScene extends Phaser.Scene {
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
       if(showDanger && session.phase==='player' && threatState!==session.state){
-        const result=enemyThreats(session.state,catalog);threatIds=result.ok?result.targets:[];threatState=session.state;
+        const result=enemyThreats(session.state,catalog);threatIds=result.ok?result.targets:[];threats=result.ok?result.threats:null;threatState=session.state;
       }
       const danger=showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected,planning?planMove:null),hover,danger);
-      hud.render(action,selected,message,showDanger && session.phase==='player');
+      hud.render(action,selected,message,showDanger && session.phase==='player',threats);
       const caption=document.querySelector('#battle-board-caption')!;
       caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;

@@ -4,20 +4,35 @@ import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
 import { previewTacticalPlan } from '../src/domain/tacticalPlan';
+import { enemyThreats } from '../src/domain/threat';
+import { displayName } from '../src/ui/hud';
 
 test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
   await page.goto('/');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  const danger=page.locator('#battle-danger');
+  let current=await session(page), assessment=enemyThreats(current.state,catalog);
+  for(let i=0;i<12 && assessment.ok && assessment.threats.length===0;i++){
+    await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    current=await session(page);assessment=enemyThreats(current.state,catalog);
+  }
+  expect(assessment.ok && assessment.threats.length>0).toBe(true);if(!assessment.ok)return;
+  const danger=page.locator('#battle-danger'),results=page.locator('#battle-danger-results');
+  await expect(results).toHaveAttribute('aria-live','polite');
+  await expect(results).toBeEmpty();
   const before=await page.locator('#game').getAttribute('data-session');
   const saved=await page.evaluate(()=>JSON.stringify(localStorage));
   await danger.focus(); await danger.press('Enter');
   await expect(danger).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#battle-danger-info')).toContainText('does not predict enemy choice');
+  for(const threat of assessment.threats){
+    const label=(id:number)=>{const unit=current.state.units.find(u=>u.id===id)!;return `${displayName(unit.defId)} #${id}`;};
+    await expect(results).toContainText(`${label(threat.targetId)}: threatened by ${threat.enemyIds.map(label).join(', ')}`);
+  }
   expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
   await danger.press('Enter');
   await expect(danger).toHaveAttribute('aria-pressed','false');
+  await expect(results).toBeEmpty();
 });
 
 test('undo and compound plan use the live HUD without bypassing review',async({page})=>{
