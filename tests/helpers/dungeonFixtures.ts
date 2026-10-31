@@ -3,7 +3,11 @@ import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonB
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
-import type { Command } from '../../src/domain/types';
+import type { Command, ReplayCommand } from '../../src/domain/types';
+function witnessCommands(commands:readonly ReplayCommand[]):readonly Command[] {
+  if(commands.some(command=>command.type==='undoMove')) throw Error('Unexpected undo in witness history');
+  return commands.filter((command):command is Command=>command.type!=='undoMove');
+}
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounterPolicy } from '../../src/domain/dungeonEncounters';
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
@@ -152,7 +156,7 @@ export function fighterJourney(seed:number) {
         healed ||= command.type==='useAbility'&&command.abilityId==='ability:second_wind';
         taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
       }
-      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,healed,taunted,depth,slot};
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
@@ -199,7 +203,7 @@ export function rangerJourney(seed:number) {
         if(command.type==='useAbility'&&command.abilityId==='ability:mark_target')used.mark=true;
         if(command.type==='useAbility'&&command.abilityId==='ability:pinning_shot')used.pin=true;
       }
-      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
@@ -226,7 +230,7 @@ export function mageJourney(seed:number) {
         if(command.type==='useAbility'&&command.abilityId==='ability:frost_snare')used.snare=true;
         if(p.events.filter(e=>e.type==='missileRolled').length>=2)used.missiles=true;
       }
-      records.push({entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events});
+      records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}

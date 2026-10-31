@@ -5,6 +5,9 @@
 export const RULES_VERSION = 6;
 export const RNG_VERSION = 1;
 export const STATE_FORMAT_VERSION = 5;
+/** Replay formats are independent of snapshot versions. */
+export const BASE_REPLAY_FORMAT_VERSION = 5;
+export const REPLAY_FORMAT_VERSION = 6;
 export const RULE_BOUNDS = {
   uint32: { min: 0, max: 0xffffffff },
   cursor: { min: 0, max: Number.MAX_SAFE_INTEGER },

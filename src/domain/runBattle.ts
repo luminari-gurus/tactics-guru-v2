@@ -2,12 +2,12 @@ import { hasShape } from './validation';
 import { sameBattlefield } from './battlefield';
 import { readBattleState, readReplay } from './battle';
 import { canonical } from './contentIdentity';
-import { createBattle, dispatch } from './turns';
+import { createBattle, replayCommandSequence } from './turns';
 import { createRun, describeRunBattle, runBoundaryId, transitionRun } from './run';
 import { emptyItemOwnership, readRunItems } from './items';
 import { createRewardOffer } from './rewards';
 import { readRunSnapshot, runBattleCatalog, resolveRunBattlefield, type RunSaveContext, type RunSnapshot } from './runSaveEnvelope';
-import type { BattleEvent, BattleState } from './types';
+import type { BattleState } from './types';
 
 /** The single canonical entry boundary for a run battle, including carried HP. */
 export function createRunBattle(input: unknown, context: RunSaveContext) {
@@ -33,13 +33,7 @@ export function replayRunBattle(input: unknown, entry: unknown, context: RunSave
   const {battlefield: _,...record}=input;
   const read = readReplay(record, created.catalog);
   if (!read.ok || canonical(read.replay.initial) !== canonical(created.state)) return { ok: false, reason: 'invalidReplay' } as const;
-  let state = created.state; const events: BattleEvent[] = [];
-  for (const command of read.replay.commands) {
-    const result = dispatch(state, command, created.catalog);
-    if (!result.ok) return result;
-    state = result.state; events.push(...result.events);
-  }
-  return { ok: true, state, events } as const;
+  return replayCommandSequence(created.state,read.replay.commands,created.catalog);
 }
 
 export function freshRunSnapshot(id: string, seed: number, context: RunSaveContext): RunSnapshot {

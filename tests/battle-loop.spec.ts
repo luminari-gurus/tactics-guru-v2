@@ -3,6 +3,100 @@ import { expect, test, type Locator } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
+import { previewTacticalPlan } from '../src/domain/tacticalPlan';
+import { enemyThreats } from '../src/domain/threat';
+import { displayName } from '../src/ui/hud';
+
+test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  let current=await session(page), assessment=enemyThreats(current.state,catalog);
+  for(let i=0;i<12 && assessment.ok && assessment.threats.length===0;i++){
+    await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    current=await session(page);assessment=enemyThreats(current.state,catalog);
+  }
+  expect(assessment.ok && assessment.threats.length>0).toBe(true);if(!assessment.ok)return;
+  const danger=page.locator('#battle-danger'),results=page.locator('#battle-danger-results');
+  await expect(results).toHaveAttribute('aria-live','polite');
+  await expect(results).toBeEmpty();
+  const before=await page.locator('#game').getAttribute('data-session');
+  const saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await danger.focus(); await danger.press('Enter');
+  await expect(danger).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#battle-danger-info')).toContainText('does not predict enemy choice');
+  for(const threat of assessment.threats){
+    const label=(id:number)=>{const unit=current.state.units.find(u=>u.id===id)!;return `${displayName(unit.defId)} #${id}`;};
+    await expect(results).toContainText(`${label(threat.targetId)}: threatened by ${threat.enemyIds.map(label).join(', ')}`);
+  }
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await danger.press('Enter');
+  await expect(danger).toHaveAttribute('aria-pressed','false');
+  await expect(results).toBeEmpty();
+});
+
+test('undo and compound plan use the live HUD without bypassing review',async({page})=>{
+  test.setTimeout(90000);await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const activate=async(selector:string)=>{const element=page.locator(selector);if(await page.evaluate(()=>navigator.maxTouchPoints>0))await element.tap();else {await element.focus();await element.press('Enter');}};
+  const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
+  const reach=previewMovement(initial.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);
+  const cell=reach.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
+  await activate('#battle-review');await expect(page.locator('#battle-undo')).toBeEnabled();
+  await activate('#battle-undo');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const undone=await session(page);expect(undone.state.units.find(u=>u.id===actor.id)!.cell).toEqual(actor.cell);
+  expect(undone.state.rng).toEqual(initial.state.rng);expect(undone.replay.commands.at(-1)?.type).toBe('undoMove');
+  const replay=replayBattle(undone.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(undone.state);
+  await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  let plan:{move:Extract<Command,{type:'move'}>;target:number}|null=null;
+  for(let i=0;i<12&&!plan;i++){
+    const current=await session(page),active=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
+    const moves=previewMovement(current.state,active.id,catalog);
+    if(moves.ok)for(const destination of moves.cells.filter(c=>c.cost>0))for(const target of current.state.units.filter(u=>u.side==='enemy'&&u.hp>0)){
+      const move={type:'move' as const,unitId:active.id,to:destination.cell};
+      const ability={type:'useAbility' as const,unitId:active.id,abilityId:'ability:basic_attack' as const,target:{unitId:target.id}};
+      if(previewTacticalPlan(current.state,move,ability,catalog).ok){plan={move,target:target.id};break;}
+    }
+    if(!plan){await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+  }
+  expect(plan).not.toBeNull();if(!plan)return;
+  const before=await session(page),target=before.state.units.find(u=>u.id===plan!.target)!;
+  await activate('#battle-plan');await page.locator('#battle-target').selectOption(`${plan.move.to.x},${plan.move.to.y}`);
+  await activate('[data-action=basic]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await expect(page.locator('#battle-preview')).toContainText(`Move to (${plan.move.to.x}, ${plan.move.to.y}) + ability`);
+  const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+  expect(report.path.at(-1)).toEqual(plan.move.to);
+  const overlays=report.targets;
+  expect(overlays.find((entry:{selected:boolean})=>entry.selected)?.valid).toBe(true);
+  expect((await session(page)).state).toEqual(before.state);
+  await activate('#battle-party');await activate('#inspection-close');
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  if(!(await page.evaluate(()=>navigator.maxTouchPoints>0))){
+    const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:700});
+    await expect(page.locator('#battle-review')).toBeEnabled();await page.setViewportSize(viewport);
+  }
+  await activate('#battle-cancel');expect((await session(page)).state).toEqual(before.state);
+  await activate('#battle-plan');await page.locator('#battle-target').selectOption(`${plan.move.to.x},${plan.move.to.y}`);
+  await activate('[data-action=basic]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await page.evaluate(()=>{
+    const game=document.querySelector('#game')!;
+    const observer=new MutationObserver(()=>{if(game.getAttribute('data-phase')!=='presenting')return;observer.disconnect();
+      Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));
+      setTimeout(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));},100);
+    });observer.observe(game,{attributes:true,attributeFilter:['data-phase']});
+  });
+  await activate('#battle-review');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.locator('#battle-preview')).toContainText('Planned ability cancelled after interruption');
+  const interrupted=await session(page);expect(interrupted.replay.commands.at(-1)?.type).toBe('move');
+  expect(interrupted.replay.commands.length).toBe(before.replay.commands.length+1);
+  await expect(page.locator('#battle-undo')).toBeEnabled();await activate('#battle-undo');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await activate('#battle-plan');await page.locator('#battle-target').selectOption(`${plan.move.to.x},${plan.move.to.y}`);
+  await activate('[data-action=basic]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await activate('#battle-review');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await session(page);expect(after.replay.commands.slice(-2).map(c=>c.type)).toEqual(['move','useAbility']);
+  const result=replayBattle(after.replay,catalog);expect(result.ok).toBe(true);if(result.ok)expect(result.state).toEqual(after.state);
+});
 
 test('default Move initializes once per usable player turn and preserves explicit choices',async({page})=>{
   // Overrides, a full actor cycle and seeded restarts share one cumulative budget.
@@ -177,18 +271,19 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
 
 });
 
-import { playerDecision, session, readSession, playCommand } from './helpers/battlePolicy';
+import { playerDecision, session, readSession, playCommand, playUndo } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';
 import type { Command } from '../src/domain/types';
 
 for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
-  test(`complete legal authored battle seed ${seed} reaches ${outcome} through controls and replays`,async({page})=>{
+  test(`complete legal authored battle seed ${seed} reaches ${outcome} through controls and replays`,async({page,isMobile})=>{
     test.setTimeout(180000);const errors:string[]=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     if(seed===2){await page.getByRole('button',{name:'Restart battle',exact:true}).click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(2);}
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await playUndo(page,catalog,isMobile);
     const boardObjects=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).objectCount;
     for(let i=0;i<200;i++){
       await expect.poll(async()=> (await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);

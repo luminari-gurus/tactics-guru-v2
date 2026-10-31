@@ -5,8 +5,9 @@ import { resolveAttack } from './combat';
 import { canonical } from './contentIdentity';
 import { D20_SIDES, RNG_VERSION, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION } from './constants';
 import { moveUnit } from './grid';
+import { undoRecordedMove } from './movementUndo';
 import { isIntegerIn, rollDie, seedRng } from './rng';
-import type { BattleEvent, BattleState, CommandResult, RejectionReason, UnitState } from './types';
+import type { BattleEvent, BattleState, Command, CommandResult, ReplayCommand, RejectionReason, UnitState } from './types';
 
 export type InitiativeEntry = { readonly unitId: number; readonly side: UnitState['side']; readonly natural: number; readonly dexterity: number };
 /** Legacy TurnManager.gd:101-108: total, Dexterity, player side, lower ID. IDs are unique, so the order is total. */
@@ -90,10 +91,19 @@ export function replayBattle(input: unknown, catalog: ContentCatalog): ReplayRun
   const read = readReplay(input, catalog); if (!read.ok) return read;
   const created = createBattle(read.replay.initial.mapId, read.replay.initial.seed, catalog);
   if (!created.ok || canonical(created.state) !== canonical(read.replay.initial)) return { ok: false, reason: 'invalidReplay' };
-  let state = created.state; const events: BattleEvent[] = [];
-  for (const [index, command] of read.replay.commands.entries()) {
-    const result = dispatch(state, command, catalog);
+  return replayCommandSequence(created.state,read.replay.commands,catalog);
+}
+/** Reconstruct a validated history from its known entry boundary. */
+export function replayCommandSequence(initial: BattleState, commands: readonly ReplayCommand[], catalog: ContentCatalog): ReplayRun {
+  let state = initial; const events: BattleEvent[] = [];
+  let previous: {before:BattleState;move:Extract<Command,{type:'move'}>} | null = null;
+  for (const [index, command] of commands.entries()) {
+    const before = state;
+    const result = command.type === 'undoMove'
+      ? previous && previous.move.unitId === command.unitId ? undoRecordedMove(previous.before,state,previous.move,catalog) : {ok:false,reason:'invalidState'} as const
+      : dispatch(state, command, catalog);
     if (!result.ok) return { ok: false, reason: 'invalidReplay', index, rejection: result.reason };
+    previous = command.type === 'move' ? {before,move:command} : null;
     state = result.state; events.push(...result.events);
   }
   return { ok: true, state, events };

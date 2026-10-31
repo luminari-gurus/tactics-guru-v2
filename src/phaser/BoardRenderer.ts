@@ -37,6 +37,7 @@ export class BoardRenderer {
   private fitScale = 1;
   private snapshot: BattleState | undefined;
   private reachable: readonly CellPosition[] = [];
+  private path: readonly CellPosition[] = [];
   private targets: readonly TargetOverlay[] = [];
   private hoverPreview: HoverPreview | null = null;
   private selected: Tile | null = null;
@@ -218,6 +219,10 @@ export class BoardRenderer {
     return this.shapeTexture(`highlight-${flags}`,{left:-44,top:-24,right:44,bottom:24},graphics=>{
       const vertices=tileFaces({x:0,y:0,elevation:0}).top.map(p=>new Phaser.Math.Vector2(p.x,p.y));
       graphics.lineStyle(0.8,0x17291f,0.6).strokePoints(vertices,true);
+      if(flags&1024) {
+        graphics.lineStyle(3,0xff9c42).strokePoints(vertices.map(p=>new Phaser.Math.Vector2(p.x*0.65,p.y*0.65)),true);
+        graphics.fillStyle(0xff9c42).fillTriangle(-4,12,4,12,0,5);
+      }
       if(flags&1) {
         graphics.fillStyle(REACHABLE_COLOR,0.26).fillPoints(vertices,true);
         graphics.lineStyle(1.5,REACHABLE_COLOR,0.85).strokePoints(vertices,true);
@@ -249,16 +254,18 @@ export class BoardRenderer {
     });
   }
 
-  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = [], targets: readonly TargetOverlay[] = [], hover: HoverPreview | null = null): void {
+  present(snapshot: BattleState, reachable: readonly CellPosition[], selected: CellPosition | null, path: readonly CellPosition[] = [], targets: readonly TargetOverlay[] = [], hover: HoverPreview | null = null, danger: readonly CellPosition[] = []): void {
     // Modal/layout refreshes must not remove a defeated target before impact.
     snapshot = this.animatedSnapshot ?? snapshot;
     this.snapshot = snapshot;
     this.reachable = reachable;
+    this.path = path;
     this.targets = this.animatedSnapshot ? [] : targets;
     this.hoverPreview = this.animatedSnapshot ? null : hover;
     this.selected = selected ? this.byCell.get(cellKey(selected)) ?? null : null;
     const activeId = snapshot.initiative[snapshot.activeIndex];
     const active = snapshot.units.find(unit => unit.id === activeId)!;
+    const dangerKeys = new Set((this.animatedSnapshot ? [] : danger).map(cellKey));
     const reachableKeys = new Set(reachable.map(cellKey));
     const pathKeys = new Set(path.map(cellKey));
     const targetByCell = new Map(this.targets.map(target => [cellKey(target.cell),target]));
@@ -271,7 +278,7 @@ export class BoardRenderer {
         | (key === cellKey(active.cell) ? 2 : 0) | (pathKeys.has(key) ? 4 : 0) | (this.selected === tile && !target ? 8 : 0)
         | (target ? target.valid ? 16 : 32 : 0) | (target?.selected ? 64 : 0)
         | (hoverKeys.has(key) ? 128 : 0) | (this.hoverPreview && key===cellKey(this.hoverPreview.origin) ? 256 : 0)
-        | (hoverTargetKeys.has(key) && !target ? 512 : 0);
+        | (hoverTargetKeys.has(key) && !target ? 512 : 0) | (dangerKeys.has(key) ? 1024 : 0);
       this.highlights.get(key)!.setTexture(this.highlightTexture(flags));
     }
     for (const unit of snapshot.units) {
@@ -663,7 +670,7 @@ export class BoardRenderer {
     document.querySelector<HTMLElement>('#game')!.dataset.battleReport = JSON.stringify({
       viewport: this.viewport, region: this.region, transform: this.view, tiles: this.board.tiles, units,
       activeId: this.snapshot.initiative[this.snapshot.activeIndex], commandCount: this.snapshot.commandCount,
-      reachable: this.reachable, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
+      reachable: this.reachable, path: this.path, targets: this.targets, hover: this.hoverPreview, selected: this.selected ? { x: this.selected.x, y: this.selected.y, elevation: this.selected.elevation } : null,
       selectionEvents: this.selectionEvents, objectCount: this.scene.children.length + this.root.length + this.surfaces.length,
       shapeTextures: this.scene.textures.getTextureKeys().filter(key=>key.startsWith('battle-shape-v1-')).sort().map(key=>{
         const source=this.scene.textures.get(key).getSourceImage();

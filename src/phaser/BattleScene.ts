@@ -1,3 +1,5 @@
+import type { Command } from '../domain/types';
+import { enemyThreats, type Threat } from '../domain/threat';
 import { progressHero, projectProgression, progressionLabel } from '../domain/progression';
 import { HERO_IDS } from '../content/constants';
 import Phaser from 'phaser';
@@ -59,7 +61,9 @@ export class BattleScene extends Phaser.Scene {
   }
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void):void {
     let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
-    let movingPresentation=false;
+    let movingPresentation=false,showDanger=false,planning=false,planInFlight=false,planInterrupted=false;
+    let planMove: Extract<Command,{type:'move'}>|null=null;
+    let threatState: typeof session.state | null=null, threatIds: readonly number[]=[], threats: readonly Threat[] | null=null;
     let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
@@ -67,7 +71,7 @@ export class BattleScene extends Phaser.Scene {
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
-    const clear=()=>{board.resetPicking();session.cancel();action=null;hovered=null;message='Choose an action and target';};
+    const clear=(preserveQueued=false)=>{board.resetPicking();if(preserveQueued)session.clearPrepared();else session.cancel();planning=false;planMove=null;action=null;hovered=null;message='Choose an action and target';};
     const refresh=()=>{
       if(!live)return;
       if(ready && session.phase==='player' && (initializedTurn?.round!==session.state.round || initializedTurn.unitId!==session.active.id)){
@@ -75,19 +79,29 @@ export class BattleScene extends Phaser.Scene {
         if(previewMovement(session.state,session.active.id,catalog).ok){action='move';message='Select a destination';}
       }
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
-      const preview=session.pending?.type==='move'?previewMove(session.state,session.pending,catalog):null;
+      const reviewMove=planning && planMove ? planMove : session.pending?.type==='move' ? session.pending : null;
+      const preview=reviewMove?previewMove(session.state,reviewMove,catalog):null;
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
-      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected),hover);
-      hud.render(action,selected,message);
+      if(showDanger && session.phase==='player' && threatState!==session.state){
+        const result=enemyThreats(session.state,catalog);threatIds=result.ok?result.targets:[];threats=result.ok?result.threats:null;threatState=session.state;
+      }
+      const danger=showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
+      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected,planning?planMove:null),hover,danger);
+      hud.render(action,selected,message,showDanger && session.phase==='player',threats);
       const caption=document.querySelector('#battle-board-caption')!;
       caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.show(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',null,null);}
     };
-    const describe=(command: import('../domain/types').Command)=>{
-      const text=previewText(session.prepare(command));
+    const describe=(command: Command)=>{
+      if(planning && command.type==='move') {
+        const result=session.preview(command);planMove=result.ok?command:null;
+        return result.ok?'Move planned. Choose an ability and target.':previewText(result);
+      }
+      const plan=planning && planMove && command.type==='useAbility'?session.preparePlan(planMove,command):null;
+      const text=plan?(plan.ok?`Move to (${planMove!.to.x}, ${planMove!.to.y}) + ability · ${previewText(plan.preview)}`:previewText(plan)):previewText(session.prepare(command));
       if(command.type!=='useAbility')return text;
       const ability=catalog.abilities[command.abilityId];
       const effect=ability.kind==='guardedAttack'?` · −${ability.attackPenalty} attack / +${ability.armorClassBonus} AC until your next turn`:'';
@@ -118,25 +132,33 @@ export class BattleScene extends Phaser.Scene {
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
     },()=>({width:this.scale.width,height:this.scale.height}),point=>ready && !initialFit && !dialogs.open
       && point.x>=region.x && point.x<region.x+region.width && point.y>=region.y && point.y<region.y+region.height);
-    const present=async(step:Presentation|null)=>{
+    const present=async(step:Presentation|null,followPlan=false)=>{
       if(!step){refresh();return;}
-      clear();selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
+      if(followPlan){planInFlight=true;planInterrupted=false;}
+      clear(followPlan);selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       const moving=step.events.some(event=>event.type==='moved');movingPresentation=moving;
       if(moving)measurements.workload('move',performance.now());
       // Suspension may finish presentation early, but never resolve the command again.
       await animation.done;if(!live)return;animation=null;
       if(moving)measurements.workload('move',performance.now(),0);movingPresentation=false;
-      session.finishPresentation(step.token);cursor=session.active.cell;refresh();
+      session.finishPresentation(step.token);cursor=session.active.cell;
+      if(followPlan){
+        planInFlight=false;
+        if(planInterrupted || document.hidden || dialogs.open){session.cancel();message='Planned ability cancelled after interruption';}
+        else {const next=session.confirmPlannedAbility();if(next){await present(next);return;}}
+      }
+      refresh();
       if(initialFit && session.phase==='player'){initialFit=false;fit();board.resetView();measurements.controlsUsable(performance.now());}
       pump();
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
     setModalTransition(()=>{removeInput.reset();queueMicrotask(()=>{if(live){refresh();pump();}});});
     const confirm=()=>{
-      if(session.phase!=='player' || !session.pending || dialogs.open)return;
+      if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
-      void present(session.confirm());
+      const compound=Boolean(session.pendingPlan);
+      void present(compound?session.confirmPlan():session.confirm(),compound);
       if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
@@ -150,7 +172,14 @@ export class BattleScene extends Phaser.Scene {
         ],()=>{});
     };
     const hud=new BattleHud(session,{
-      action:a=>{board.resetPicking();session.cancel();hovered=null;action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
+      action:a=>{board.resetPicking();session.cancel();hovered=null;
+        if(planning && a!=='move' && !planMove){message='Choose a reachable move destination first';refresh();return;}
+        if(planning && a==='move')planMove=null;
+        if(planning && a!=='move')selected=null;
+        action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
+      plan:()=>{if(session.phase==='player' && !dialogs.open){clear();planning=true;action='move';selected=null;message='Choose a reachable move destination';refresh();}},
+      undo:()=>{if(session.phase==='player' && !dialogs.open)void present(session.undoMove());},
+      danger:()=>{if(session.phase==='player' && !dialogs.open){showDanger=!showDanger;refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
@@ -175,7 +204,7 @@ export class BattleScene extends Phaser.Scene {
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
     document.addEventListener('keydown',escape);
-    const visibility=()=>{if(document.hidden){measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
+    const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
     const fit=()=>{

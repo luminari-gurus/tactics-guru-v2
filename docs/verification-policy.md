@@ -21,7 +21,7 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 | --- | --- | --- |
 | Iteration | While changing one behavior | Run the smallest affected unit/test file and relevant browser case; use file/project/title filters. Record failures. This is feedback, not PR acceptance. |
 | PR readiness | Final affected inputs are frozen | Apply the change matrix below, include transitive consumers and meaningful negative cases, verify the final build identity, and account for reused evidence. Include required device/engine cases. |
-| Full regression | Cross-cutting runtime/save/input changes, broad shared harness changes, major engine/compiler/browser compatibility changes with broad impact, affected consumers that remain unbounded after focused inspection, release qualification, or explicit issue/caller requirement | Account for every suite in the inventory, including dev-only checks and distinct telemetry builds. Reuse qualifying existing evidence; run invalidated coverage. |
+| Full regression | Cross-cutting runtime/save/input changes, broad shared harness changes, major engine/compiler/browser compatibility changes with broad impact, affected consumers that remain unbounded after focused inspection, release qualification, or explicit issue/caller requirement | Account for every routine suite in the inventory, including dev-only checks and distinct telemetry builds. Run extended journeys when an explicit acceptance gate or the affected behavior requires them. Reuse qualifying existing evidence; run invalidated coverage. |
 
 Choose the union of affected checks for mixed changes. A dependency or browser
 upgrade does not automatically select full regression; inspect its actual changes
@@ -52,9 +52,7 @@ Check imports, callers, fixtures and config before choosing exact tests.
 Use complete legal journeys, not mocked unit tests, as browser interaction proof.
 Retain touch/pointer, orientation, keyboard/focus, audio unlock and engine-specific
 lifecycle checks on their actual profiles. Viewport resizing does not substitute
-for touch-device or WebKit coverage when those behaviors are affected. Selecting
-focused checks under this policy does not remove tests from the configured full
-matrices. #203 owns measured matrix changes and #204/#205 own fixture/audio refactors.
+for touch-device or WebKit coverage when those behaviors are affected. The three long progression journeys are excluded from routine full regression and remain available through the extended commands. Selecting other focused checks does not remove tests from the configured routine matrices. #203 owns measured matrix changes and #204/#205 own fixture/audio refactors.
 
 ### Browser profile selection
 
@@ -71,7 +69,7 @@ Metadata is in Playwright test details, preserving titles and retained test IDs.
 Neither tag is a runtime skip, a replacement for touch or WebKit, nor permission
 to classify additional cases without reviewing their assertions. Current approved
 scope is nine canonical startup/asset cases and five explicit-viewport layout
-cases. All other interactions and complete journeys retain their matrix.
+cases. Other routine interactions retain their matrix. The three extended progression journeys retain their matrix in the explicit extended commands.
 
 `npm run test:verification-batches` also checks real selection discovery, exact
 removed-to-retained mappings and negative selection/device drift. Batch discovery
@@ -130,7 +128,7 @@ suites or add release/performance qualification merely to finish a merge.
 Run from the repository root after `npm ci`. Production-preview checks require a
 successful `npm run build` for the selected source and base path. Do not serve an
 old `dist/` after a failed build. Run browser commands sequentially: most own port
-4173; telemetry owns 4288. The table maps all configured suites to full regression;
+4173; telemetry owns 4288. The table distinguishes routine full regression from explicit extended coverage;
 PR readiness selects the applicable rows under the change matrix.
 
 | Coverage | Current command | Mode and selection |
@@ -142,7 +140,8 @@ PR readiness selects the applicable rows under the change matrix.
 | App and domain type boundaries | `npm run typecheck` | Both tsconfig scopes; also part of standalone build. |
 | Standalone production build | `npm run build` | Content validation, both typechecks and Vite; remains safe when run on its own, including prefix builds. |
 | Aggregate bundle step | `npm run build:bundle` | Internal to full verification after successful units/content and both type scopes. Creates the root, prefix or restored-root bundle without revalidating unchanged prerequisites. Use `npm run build` directly outside that guarded sequence. |
-| Default Chromium | `npx --no-install playwright test` | All default files listed below, desktop + mobile portrait/landscape. The dev-only placement case skips in preview and must run separately. |
+| Default Chromium | `npx --no-install playwright test` | Routine default files, desktop + mobile portrait/landscape; the three long progression journeys are in the extended suite below. The dev-only placement case skips in preview and must run separately. |
+| Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Explicit, non-routine complete Mage, Ranger and Fighter progression journeys across three Chromium and three WebKit profiles; run when their full progression behavior needs certification. |
 | Authored encounter fixtures | `npm run test:fixtures -- authored-encounters.spec.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
 | Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
 | Run-item fixtures | `npm run test:fixtures -- run-items.spec.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
@@ -155,7 +154,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Root/prefix asset behavior | `npx --no-install playwright test tests/public-asset-base.spec.ts` | Run root preview, prefixed preview and corresponding dev modes for full regression or affected build/base changes; recipe below. |
 | Performance capture | `npm run measure:fit` | Isolated production proof-scene collector; this is not a substitute for runtime budget assertions in browser tests. Required for affected performance work and release qualification, not every docs/UI-copy edit. |
 
-The 27 default browser files (all included by the default config) are grouped here
+The routine default browser files (all included by the default config) are grouped here
 so every browser file has an owner in the inventory:
 
 - Assets/boot/rendering: `assets.spec.ts`, `boot.spec.ts`, `content-loading.spec.ts`,

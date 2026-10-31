@@ -1,9 +1,11 @@
 import { expect, type Page } from '@playwright/test';
-import type { BattleState, Command, Replay, BattleEvent } from '../../src/domain/types';
+import type { BattleState, Command, Replay, ReplayCommand, BattleEvent } from '../../src/domain/types';
+import type { ContentCatalog } from '../../src/content/types';
+import { previewMovement } from '../../src/domain/grid';
 
 export { playerDecision } from './playerPolicy';
 
-export async function readSession(page:Page):Promise<{state:BattleState;replay:Replay|null;continuation:{snapshot:BattleState;commands:Command[];events:BattleEvent[]}|null;events:BattleEvent[];pending:Command|null;phase:string}> {
+export async function readSession(page:Page):Promise<{state:BattleState;replay:Replay|null;continuation:{snapshot:BattleState;commands:ReplayCommand[];events:BattleEvent[]}|null;events:BattleEvent[];pending:Command|null;phase:string}> {
   return JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
 }
 /** Existing replay checks require a fresh seed-origin session explicitly. */
@@ -27,4 +29,18 @@ export async function playCommand(page:Page,command:Command){
   const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
   await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
   await page.getByRole('button',{name:'Confirm action'}).click();
+}
+
+/** Exercise a real movement and reversal before continuing a legal journey. */
+export async function playUndo(page:Page,catalog:ContentCatalog,touch:boolean) {
+  const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
+  const reach=previewMovement(before.state,actor,catalog);if(!reach.ok)throw Error(reach.reason);
+  const destination=reach.cells.find(cell=>cell.cost>0);if(!destination)throw Error('No legal movement');
+  const activate=async(selector:string)=>{const element=page.locator(selector);if(touch)await element.tap();else await element.click();};
+  await activate('#battle-move');await page.locator('#battle-target').selectOption(`${destination.cell.x},${destination.cell.y}`);
+  await activate('#battle-review');await expect(page.locator('#battle-undo')).toBeEnabled();await activate('#battle-undo');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);
+  expect(after.state.units.find(u=>u.id===actor)?.cell).toEqual(before.state.units.find(u=>u.id===actor)?.cell);
+  expect(after.state.rng).toEqual(before.state.rng);return after.state;
 }
