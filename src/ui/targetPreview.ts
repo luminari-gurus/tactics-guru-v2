@@ -3,6 +3,8 @@ import type { BattleSession } from '../app/BattleSession';
 import { actionCommand, actionTargets, type Action } from './battleActions';
 import { lineOfSightBlocked, manhattanDistance } from '../domain/targeting';
 import { previewAbility } from '../domain/combat';
+import { previewTacticalPlan } from '../domain/tacticalPlan';
+import type { Command } from '../domain/types';
 
 export interface HoverPreview {
   readonly origin: CellPosition;
@@ -39,13 +41,13 @@ export interface TargetOverlay {
 }
 
 /** Presentation only: use the same preview as confirmation, without preparing a command or drawing RNG. */
-export function targetOverlays(session: BattleSession, action: Action | null, selected: CellPosition | null): TargetOverlay[] {
+export function targetOverlays(session: BattleSession, action: Action | null, selected: CellPosition | null, move: Extract<Command,{type:'move'}> | null = null): TargetOverlay[] {
   if (session.phase !== 'player' || !action || action === 'move' || session.active.hasActed) return [];
   const cells = actionTargets(session, action).map(unit => unit.cell);
   if (selected && !cells.some(cell => cell.x === selected.x && cell.y === selected.y)) cells.push(selected);
   return cells.map(cell => {
     const command = actionCommand(session, action, cell);
-    const preview = command ? session.preview(command) : null;
+    const preview = command ? move && command.type==='useAbility' ? previewTacticalPlan(session.state,move,command,session.catalog) : session.preview(command) : null;
     return { cell, valid: preview?.ok === true,
       selected: cell.x === selected?.x && cell.y === selected.y,
       reason: preview?.ok ? null : preview?.reason ?? 'missingTarget' };

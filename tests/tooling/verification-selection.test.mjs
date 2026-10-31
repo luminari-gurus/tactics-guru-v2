@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { captureSelections, compareSelections } from '../../scripts/verification-selection.mjs';
+import { captureSelections, compareSelections, discoverSelection } from '../../scripts/verification-selection.mjs';
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
@@ -47,4 +47,22 @@ test('real nine-batch discovery partitions the entire reduced default selection'
   const jobs = plan.jobs.filter(job => job.id.startsWith('chromium-'));
   assert.equal(jobs.length, 9);
   exactCoverage(expected, jobs.flatMap(job => job.stages.flatMap(stage => stage.expected)));
+});
+
+
+test('long progression journeys are excluded from routine selection and remain available on all extended profiles', () => {
+  const titles = ['Mage legal progression', 'Ranger legal progression', 'Fighter legal progression'];
+  const routine = captureSelections();
+  for (const stage of ['chromium', 'webkit-exploration']) {
+    assert.equal(routine.selections[stage].tests.filter(row => titles.some(title => row.title.startsWith(title))).length, 0);
+  }
+  for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
+    const selection = discoverSelection(['-c', config]);
+    assert.equal(selection.tests.length, 9);
+    for (const project of selection.projects) {
+      const cases = selection.tests.filter(row => row.project === project.name);
+      assert.equal(cases.length, 3);
+      for (const title of titles) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+    }
+  }
 });

@@ -1,6 +1,6 @@
 import {expect,test,type Page} from '@playwright/test';
 import {readFileSync,writeFileSync} from 'node:fs';
-import {readSession,playCommand} from './helpers/battlePolicy';
+import {readSession,playCommand,playUndo} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
@@ -56,6 +56,15 @@ async function prepare(page:Page){
   await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();await page.locator('#item-confirm').click();
  }
 }
+test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
+ test.setTimeout(300000);await start(page);const entry=await snapshot(page);
+ const catalog=runBattleCatalog(entry.items,runContext)!;const restored=await playUndo(page,catalog,isMobile);
+ await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await readSession(page)).state).toEqual(restored);await expect(page.locator('#battle-undo')).toBeDisabled();
+ await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ await page.reload();await page.locator('#run-continue').click();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ await page.locator('#run-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+});
 test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
  for(let index=0;index<3;index++){

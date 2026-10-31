@@ -7,9 +7,12 @@ import type { ContentCatalog, MapId } from '../content/types';
 import { previewCommand, readBattleState } from '../domain/battle';
 import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
+import { previewTacticalPlan } from '../domain/tacticalPlan';
+import { undoRecordedMove } from '../domain/movementUndo';
+import { BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch } from '../domain/turns';
-import type { BattleEvent, BattleState, Command, Replay } from '../domain/types';
+import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
 
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
 export type AcceptedState = (state: BattleState) => void;
@@ -25,17 +28,23 @@ function freeze<T>(value: T): T {
 export class BattleSession {
   private current: BattleState;
   private readonly initial: BattleState;
-  private commands: Command[] = [];
+  private commands: ReplayCommand[] = [];
+  private lastMove: {before:BattleState;move:Extract<Command,{type:'move'}>} | null = null;
   private resolvedEvents: BattleEvent[] = [];
   private intent: Command | null = null;
+  private plan: { move: Extract<Command, {type:'move'}>; ability: Extract<Command, {type:'useAbility'}> } | null = null;
+  private plannedAbility: Extract<Command, {type:'useAbility'}> | null = null;
   private enemyQueue: Command[] = [];
   private generation = 0;
+  // Resumed snapshots cannot prove whether this turn already used undo.
+  private undoUsedThisTurn: boolean;
   phase: SessionPhase;
   error: string | null = null;
   readonly resumed: boolean;
   progression: readonly ProgressHero[] = [];
   constructor(readonly catalog: ContentCatalog, mapId: MapId | BattleState, seed: number, private readonly accepted?: AcceptedState, fresh = false, readonly battlefield?: BattlefieldDescriptor) {
     this.resumed = typeof mapId !== 'string' && !fresh;
+    this.undoUsedThisTurn = this.resumed;
     const created = typeof mapId === 'string' ? createBattle(mapId, seed, catalog) : readBattleState(mapId, catalog);
     if (!created.ok) throw new Error(`Could not create battle: ${created.reason}`);
     this.current = this.initial = freeze(created.state);
@@ -55,8 +64,10 @@ export class BattleSession {
   get state() { return this.current; }
   get active() { return this.current.units.find(u=>u.id === this.current.initiative[this.current.activeIndex])!; }
   get pending() { return this.intent; }
+  get pendingPlan() { return this.plan; }
+  get canUndoMove() { return this.phase === 'player' && this.lastMove !== null && !this.undoUsedThisTurn && this.current.commandCount < RULE_BOUNDS.commandCount.max - 2; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.initial.format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
+  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:BASE_REPLAY_FORMAT_VERSION, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
   get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
@@ -65,13 +76,55 @@ export class BattleSession {
     return previewCommand(this.current, command, this.catalog);
   }
   prepare(command: Command): ActionPreview {
-    this.intent = null; this.error = null;
+    this.cancel(); this.error = null;
     if (this.phase !== 'player' || command.unitId !== this.active.id) return {ok:false,reason:'notActiveUnit'};
     const preview = this.preview(command);
     if (preview.ok) this.intent = freeze(structuredClone(command));
     return preview;
   }
-  cancel() { this.intent = null; }
+  preparePlan(move: Extract<Command, {type:'move'}>, ability: Extract<Command, {type:'useAbility'}>) {
+    this.cancel(); this.error = null;
+    if (this.phase !== 'player' || move.unitId !== this.active.id) return {ok:false,reason:'notActiveUnit'} as const;
+    const preview = previewTacticalPlan(this.current, move, ability, this.catalog);
+    if (preview.ok) this.plan = freeze(structuredClone({move, ability}));
+    return preview;
+  }
+  clearPrepared() { this.intent = null; this.plan = null; }
+  cancel() { this.clearPrepared(); this.plannedAbility = null; }
+  confirmPlan(): Presentation | null {
+    if (this.phase !== 'player' || !this.plan) return null;
+    const plan = this.plan; this.plan = null;
+    const preview = previewTacticalPlan(this.current, plan.move, plan.ability, this.catalog);
+    if (!preview.ok) { this.error = preview.reason; return null; }
+    const presentation = this.resolve(plan.move, false);
+    if (presentation) this.plannedAbility = plan.ability;
+    return presentation;
+  }
+  confirmPlannedAbility(): Presentation | null {
+    if (this.phase !== 'player' || !this.plannedAbility) return null;
+    const ability = this.plannedAbility; this.plannedAbility = null;
+    const preview = this.preview(ability);
+    if (!preview.ok) { this.error = preview.reason; return null; }
+    return this.resolve(ability, false);
+  }
+  undoMove(): Presentation | null {
+    if (!this.canUndoMove || !this.lastMove) return null;
+    const before = this.current, previous = this.lastMove;
+    this.lastMove = null;
+    this.cancel();
+    this.error = null;
+    const result=undoRecordedMove(previous.before,before,previous.move,this.catalog);
+    if (!result.ok) { this.error = result.reason; return null; }
+    this.current = freeze(result.state);
+    this.undoUsedThisTurn = true;
+    this.commands.push(freeze({type:'undoMove',unitId:previous.move.unitId}));
+    const events = freeze(result.events);
+    this.resolvedEvents.push(...events);
+    this.phase = 'presenting';
+    setTelemetryContext({phase:'presenting'});
+    try {this.accepted?.(this.current);} catch { /* Persistence reports its own nonfatal status. */ }
+    return {before,after:this.current,events,token:++this.generation};
+  }
   confirm(): Presentation | null {
     if (this.phase !== 'player' || !this.intent) return null;
     const command = this.intent; this.intent = null;
@@ -91,6 +144,11 @@ export class BattleSession {
     const result = dispatch(before, command, this.catalog);
     if (!result.ok) { this.error = result.reason; if (enemy) this.fail(result.reason); return null; }
     this.current = freeze(result.state);
+    if (command.type === 'endTurn') this.undoUsedThisTurn = false;
+    const actor = before.units.find(u => u.id === command.unitId)!;
+    this.lastMove = !enemy && command.type === 'move' && result.events.length === 1
+      && result.events[0].type === 'moved' && !actor.hasActed && !actor.hasMoved
+      ? {before,move:command} : null;
     this.commands.push(freeze(structuredClone(command)));
     const events = freeze(result.events);
     this.resolvedEvents.push(...events);
@@ -107,5 +165,5 @@ export class BattleSession {
     if (this.phase !== 'enemy') this.enemyQueue = [];
   }
   private fail(reason: string) { reportFailure('battle_resolution', { phase: this.phase }); this.error = reason; this.phase = 'error'; this.enemyQueue = []; }
-  dispose() { this.generation++; this.phase = 'disposed'; this.intent = null; this.enemyQueue = []; }
+  dispose() { this.generation++; this.phase = 'disposed'; this.cancel(); this.lastMove = null; this.enemyQueue = []; }
 }

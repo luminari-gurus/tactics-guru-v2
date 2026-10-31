@@ -10,6 +10,7 @@ import { RULE_BOUNDS } from '../../src/domain/constants';
 import { battleCatalog } from '../../src/content/catalog';
 import { previewAttack, previewSupportAbility } from '../../src/domain/combat';
 import { planEnemyTurn, runEnemyTurn } from '../../src/domain/ai';
+import { enemyThreats } from '../../src/domain/threat';
 
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 function setup(archer = false) {
@@ -441,4 +442,14 @@ it('uses shared Guarded AC when choosing between otherwise tied targets', () => 
   const guarded = changeUnit(tied, 1, { guarded: true });
   expect(previewAttack(guarded, attack(1, true), catalog)).toMatchObject({ ok: true, armorClass: 16 });
   expect(commands(guarded, catalog)).toEqual([attack(2, true), wait]);
+});
+
+it('includes a pinned Shaman’s legal Hex from its origin even after its budgets were spent',()=>{
+  const {catalog,state}=supportSetup();
+  const pinned={...state,units:state.units.map(u=>u.id===3?{...u,hasMoved:true,hasActed:true,movementBlock:{sourceId:2,abilityId:'ability:pinning_shot' as const}}:u.side==='enemy'?{...u,hp:0}:u)};
+  const result=enemyThreats(pinned,catalog);
+  expect(result.ok && result.targets.includes(1)).toBe(true);
+  const blocked={...pinned,units:pinned.units.map(u=>u.id===1?{...u,cell:{x:11,y:0}}:u)};
+  const far=enemyThreats(blocked,catalog);
+  expect(far.ok && far.targets.includes(1)).toBe(false);
 });
