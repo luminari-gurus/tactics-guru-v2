@@ -79,6 +79,13 @@ cases are the regression witness, with earlier failed runs retained rather than
 replaced by a synthetic security or network reproducer. The complete issue gate
 remains distinct and is running at candidate e3e9ebf in 41362013777.
 
+The completion inventory also exposed a separate aggregate-selection omission:
+the existing dev-only direct map-disposer test is skipped in preview and absent
+from the dev filter. Publish a separate selector-only repair, preserving its
+existing assertions and three profiles. Prove exact added coverage and execute
+the affected dev selection; reuse #263's unchanged full-run inputs explicitly,
+without representing that run as execution of the later selector.
+
 Preserve the existing viewport/touch/DPR and screen behavior. Playwright 1.64
 starts forwarding device-descriptor screen options that 1.63's test runner
 ignored; explicitly retain the old effective behavior and record actual profile

@@ -15,3 +15,4 @@
 
 - [ ] 3.1 Qualify the final integration candidate with the complete full-verification inventory, including passing WebKit exploration without post-reload boot timeouts on all three profiles and any affected extended journeys; audit both #263 criteria against source-bound evidence and keep incomplete/failed runs explicit.
 - [ ] 3.2 Finish the current-session handoff and focused PR descriptions, verify clean Git status, remote parity and issue links, and leave completed work ready for review without merging, deploying or creating an unrequested release tag.
+- [ ] 3.3 Repair the independently found full-verification dev-selector omission in a separate focused PR: preserve all existing coverage, add exactly the three existing direct map-disposer profile cases, execute the six affected dev cases and verification contracts, and retain source-bound comparison evidence without restarting unchanged #263 coverage.

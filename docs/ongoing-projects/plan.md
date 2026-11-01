@@ -70,6 +70,16 @@ assigned to `moshehbenavraham`. The branch-to-PR conversion is expected GitHub
 behavior ([GitHub documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-a-branch-for-an-issue));
 the current Development link now follows the actual repair branch.
 
+**Separate verification omission:** the aggregate's `placement-dev` filter runs
+the controlled-placement case but omits the existing dev-only direct map-disposer
+case, which is skipped in production preview. Fix this selector separately,
+stacked on the runtime repair: retain the stage ID, add the existing title to its
+grep, prove exactly three added profile cases with no omissions elsewhere, run
+the six affected dev cases and existing verification contracts, then publish a
+focused PR. No application, assertion, timeout, budget or routine profile change
+is needed. Account for this extra dev coverage alongside the unchanged #263 full
+run; never claim that the earlier run executed the later selector.
+
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
 library replacement is needed for the evidenced pre-application network fault.
