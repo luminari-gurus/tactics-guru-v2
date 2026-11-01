@@ -1,8 +1,8 @@
 name: Browser setup smoke
 on:
   workflow_dispatch:
-  push:
-    branches: [work/issue-254-dungeon-enemy-behaviors]
+  pull_request:
+    types: [opened, synchronize, reopened]
 permissions:
   contents: read
 concurrency:
@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 260
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
@@ -17,6 +18,7 @@ jobs:
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -39,7 +41,7 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
   issue254-verify:
-    if: github.ref == 'refs/heads/work/issue-254-dungeon-enemy-behaviors'
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 260
     needs: browser-setup
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 360
@@ -47,7 +49,7 @@ jobs:
       - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
