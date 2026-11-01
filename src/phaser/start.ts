@@ -23,6 +23,12 @@ export function startProof(status: (state: 'loading' | 'ready' | 'error') => voi
   return () => { if(scene instanceof BattleScene)scene.requestRestart();else scene.scene.restart(); };
 }
 
+/** Phaser.Game constructor returns before textures/READY; tests wait on this. */
+export function whenGameReady(game: Phaser.Game, ready: () => void) {
+  if (game.isRunning) ready();
+  else game.events.once(Phaser.Core.Events.READY, ready);
+}
+
 /** Shared engine/audio initialization; caller owns the scene lifecycle. */
 export function createGame(scene: Phaser.Scene | Phaser.Scene[], battle: boolean) {
   return new Phaser.Game({

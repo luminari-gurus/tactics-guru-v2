@@ -56,7 +56,7 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     }
     inventory.append(row);
   }root.append(inventory,button('Save recovery',actions.recover),button('Start new dungeon',actions.restart));
-  const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}root.append(nav);
+  const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}root.append(nav);
   if(focusId){
     const target=root.querySelector<HTMLElement>(`#${focusId}`);
     const focusTarget=target?.matches('.dungeon-directions button:disabled')?root.querySelector<HTMLElement>('#dungeon-map'):target;

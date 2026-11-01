@@ -1,3 +1,4 @@
+import { continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, test, type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -78,12 +79,12 @@ function boundary(mode: 'standalone' | 'run' | 'dungeon', miss: boolean) {
 for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle and saved feedback: ${mode} ${miss?'miss':'hit'}`, async ({ page }) => {
   test.setTimeout(90000);
   const f = boundary(mode, miss), key = mode === 'standalone' ? BATTLE_STORAGE_KEYS.primary : mode === 'run' ? RUN_STORAGE_KEYS.primary : DUNGEON_KEYS.primary;
-  const path = mode === 'standalone' ? '/' : mode === 'run' ? '/run' : '/dungeon';
+  const path = mode === 'standalone' ? './battle' : mode === 'run' ? '/run' : '/dungeon';
   const resume = mode === 'standalone' ? '#save-continue' : mode === 'run' ? '#run-continue' : '#dungeon-continue';
   await page.goto(path);
   await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key, text: f.saved });
   await page.reload();
-  if (mode === 'dungeon') await page.getByRole('button', { name: 'Continue saved dungeon', exact: true }).click();
+  if (mode === 'dungeon') await continueSavedDungeon(page);
   else await page.locator(resume).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(f.before);
@@ -126,7 +127,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-inspection.png`) });
   await page.keyboard.press('Escape');
   await page.reload();
-  if (mode === 'dungeon') await page.getByRole('button', { name: 'Continue saved dungeon', exact: true }).click();
+  if (mode === 'dungeon') await continueSavedDungeon(page);
   else await page.locator(resume).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(cast.state);
@@ -195,7 +196,7 @@ function guardedWitness(kind:'move'|'defeat') {
 for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal ${kind} presentation`,async({page,browserName})=>{
   const state=guardedWitness(kind), encoded=encodeBattleSave(state,battleCatalog);
   if(!encoded.ok)throw Error(encoded.reason);
-  await page.clock.install();await page.goto('/');
+  await page.clock.install();await page.goto('./battle');
   await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:BATTLE_STORAGE_KEYS.primary,text:encoded.text});
   await page.reload();
   await page.locator('#save-continue').waitFor({state:'visible'});
@@ -262,7 +263,7 @@ test('Guarded badge stays attached when panning the Fighter offscreen and back',
   if(!cast.ok)throw Error(cast.reason);
   const state=cast.state, encoded=encodeBattleSave(state,battleCatalog);
   if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('/');
+  await page.goto('./battle');
   await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:BATTLE_STORAGE_KEYS.primary,text:encoded.text});
   await page.reload();await page.locator('#save-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

@@ -75,7 +75,7 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
   if (process.env.PLAYWRIGHT_TELEMETRY_DEV !== 'true') expect(errors[0].properties.$exception_list[0].stacktrace.frames.length).toBeGreaterThan(0);
 });
 test('blocked ingestion leaves battle continue and save working', async ({ page }) => {
-  await ingest(page, true); await page.goto('/'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await ingest(page, true); await page.goto('./battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const before = (await readSession(page)).state;
   await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const after = (await readSession(page)).state; expect(after.commandCount).toBeGreaterThan(before.commandCount);
@@ -88,12 +88,12 @@ for (const signal of ['opt-out','DNT','GPC'] as const) test(`${signal} prevents 
     if (signal === 'opt-out') localStorage.setItem('tactics-guru:telemetry-opt-out', 'true');
     else Object.defineProperty(navigator, signal === 'DNT' ? 'doNotTrack' : 'globalPrivacyControl', { value: signal === 'DNT' ? '1' : true });
   }, signal);
-  await page.goto('/'); await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect(events).toEqual([]); expect(sdk).toEqual([]);
 });
 test('uncaught errors and rejections are sanitized and duplicate objects are reported once', async ({ page }) => {
   const events = await ingest(page);
-  await page.goto('/'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await page.goto('./battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => events.filter(e => e.event === '$exception').length).toBe(1); // Controlled verification.
   await page.evaluate(() => {
     const error = new TypeError('private error with save contents');
@@ -110,7 +110,7 @@ test('uncaught errors and rejections are sanitized and duplicate objects are rep
 test('failed parser loading preserves gameplay and saving without a reporting loop', async ({ page }) => {
   const events = await ingest(page);
   await page.route(process.env.PLAYWRIGHT_TELEMETRY_DEV === 'true' ? '**/src/telemetry/transport.ts' : '**/assets/transport-*.js', route => route.abort());
-  await page.goto('/'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await page.goto('./battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect(page.locator('#battle-persistence')).toContainText('saved'); expect(events).toEqual([]);
 });
@@ -124,7 +124,7 @@ test('recovery inspections and retries report no raw data and no duplicate failu
 });
 test('privacy controls stop collection immediately, persist across routes, and allow future visits', async ({ page }) => {
   const events = await ingest(page);
-  await page.goto('/'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await page.goto('./battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => events.filter(e => e.event === 'battle_started').length).toBe(1);
   const privacy = page.locator('#battle-scroll .telemetry-preferences');
   await privacy.locator('summary').focus(); await page.keyboard.press('Enter');

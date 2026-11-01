@@ -480,3 +480,43 @@ describe('unordered encounters and moving dungeon enemies', () => {
     }
   });
 });
+
+describe('authoritative unsaved departure state',()=>{
+  it('survives rejected commands and clears only after successful recovery saving',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m),session=new DungeonSession(fresh(),store);
+    session.playUnsaved();
+    const before=session.snapshot;
+    expect(session.step({id:before.id,depth:before.depth,revision:before.revision,destination:-1})).toBe(false);
+    expect(session.status).toContain('Movement refused');
+    expect(session.hasUnsavedProgress).toBe(true);
+    expect(session.retry(session.inspect())).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(false);
+    const saved=session.snapshot;
+    session.step({id:saved.id,depth:saved.depth,revision:saved.revision,destination:-1});
+    expect(session.hasUnsavedProgress).toBe(false);
+  });
+  it('retains unsaved state after failed replacement saving and unrelated feedback',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m),session=new DungeonSession(fresh(),store);
+    expect(session.save()).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(false);
+    const setItem=m.setItem;
+    m.setItem=()=>{throw new DOMException('full','QuotaExceededError');};
+    const review=session.inspect();
+    expect(session.replace(review,'replacement-unsaved',session.snapshot.seed+1)).toBe(true);
+    const before=session.snapshot;
+    session.step({id:before.id,depth:before.depth,revision:before.revision,destination:-1});
+    expect(session.status).toContain('Movement refused');
+    expect(session.hasUnsavedProgress).toBe(true);
+    m.setItem=setItem;
+    expect(session.retry(session.inspect())).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(false);
+    expect(session.remove('primary',session.inspect())).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(true);
+  });
+  it('adopts a valid saved dungeon without an unsaved warning',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m);expect(store.save(fresh()).ok).toBe(true);
+    const session=new DungeonSession(fresh(),store);
+    expect(session.continue(session.inspect())).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(false);
+  });
+});

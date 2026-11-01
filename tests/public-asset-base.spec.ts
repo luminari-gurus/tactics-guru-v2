@@ -105,7 +105,7 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
   });
-  await page.goto(route === 'battle' ? './' : `./${route}`);
+  await page.goto(route === 'battle' ? './battle' : `./${route}`);
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   if (route === 'dungeon') {
     await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
@@ -155,7 +155,7 @@ test('built startup hints preserve a supplied script nonce', async ({page})=>{
     for(const name of ['content-encoding','content-length','transfer-encoding'])delete headers[name];
     await route.fulfill({status:response.status(),headers,body});
   });
-  await page.goto('./');
+  await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(page.locator('script[data-game-preloads]')).toHaveCount(1);
   const engineHints=page.locator('link[rel="modulepreload"][href*="/assets/start-"]');
@@ -185,7 +185,7 @@ for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
     page.on('pageerror', error => errors.push(error.message));
     await page.route('**/audio/battle/move.mp3', route => failure === 'stalled' ? undefined
       : route.fulfill(failure === 'missing' ? { status: 404 } : { contentType: 'audio/mpeg', body: 'invalid MP3' }));
-    await page.goto('./');
+    await page.goto('./battle');
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
     await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load), { timeout: 10000 }).toBe('unavailable');
     await expect(page.locator('#battle-next')).toBeEnabled();
@@ -194,3 +194,22 @@ for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
     expect(errors).toEqual([]);
   });
 }
+
+test('menu public artwork and navigation respect the configured base',async({page,baseURL})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.goto('./');
+ const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
+ const base=new URL(baseURL!).pathname;
+ for(const image of await page.locator('#main-menu img').all()){
+  expect(new URL(await image.getAttribute('src')??'',baseURL).pathname.startsWith(`${base}menu/`)).toBe(true);
+  expect(await image.evaluate(node=>(node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+ }
+ for(const anchor of await page.locator('.menu-secondary a').all())expect(new URL(await anchor.getAttribute('href')??'',baseURL).pathname.startsWith(base)).toBe(true);
+ await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('link',{name:'Main menu',exact:true}).click();
+ await expect(page.locator('#main-menu')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeEnabled();
+ expect(errors).toEqual([]);
+});

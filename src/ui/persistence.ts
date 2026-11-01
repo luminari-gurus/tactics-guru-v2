@@ -1,3 +1,5 @@
+import { consumeEntryIntent, routeHref } from '../app/routes';
+import { menuReturnLink, confirmMenuDeparture } from './menuReturn';
 import { BattlePersistence } from '../app/BattlePersistence';
 import type { BattleSession } from '../app/BattleSession';
 import type { BattleLoadResult, BattleStorageSlot } from '../persistence/battleStorage';
@@ -15,10 +17,26 @@ export class BattleSaveControls {
       // WebKit touch activation does not focus buttons; retain the actual invoker.
       (event.currentTarget as HTMLButtonElement).focus();this.recovery();
     },{signal:this.abort.signal});
+    this.root.append(menuReturnLink(() => this.persistence.hasUnsavedProgress, () => this.recovery()));
     persistence.onChange=()=>this.render();this.render();
   }
+  returnToMenu() {
+    if (confirmMenuDeparture(() => this.persistence.hasUnsavedProgress, () => this.recovery())) {
+      location.assign(routeHref('menu', import.meta.env.BASE_URL));
+    }
+  }
   private render(){this.root.querySelector('#battle-save-status')!.textContent=this.persistence.status;}
-  start(){const session=this.persistence.startup();if(session)this.activate(session);else this.recovery(this.persistence.inspection!);}
+  start(){
+    const intent=consumeEntryIntent();
+    if(intent==='continue'){
+      const review=this.persistence.inspect();
+      const session=this.persistence.continue(review);if(session){this.activate(session);return;}
+      this.recovery(review);return;
+    }
+    if(intent==='new'){this.requestNew();return;}
+    if(intent==='recovery'){this.recovery();return;}
+    const session=this.persistence.startup();if(session)this.activate(session);else this.recovery(this.persistence.inspection!);
+  }
   private details(review:BattleLoadResult) {
     if(!review.ok)return 'Storage is unavailable. Retry after allowing storage for this site. Existing saves have not been discarded.';
     const describe=(slot:BattleStorageSlot)=>{
@@ -42,6 +60,7 @@ export class BattleSaveControls {
       if(!hadSession && p.session)this.activate(p.session);else this.recovery(p.inspection??p.inspect());
     }});
     if(p.session)choices.push({id:'save-close',label:'Back to battle',run:()=>{}});
+    else choices.push({id:'save-main-menu',label:'Main menu',run:()=>this.returnToMenu()});
     this.dialogs.showChoices(p.session?'Save recovery':'Saved battle',`${p.status} ${this.details(review)}`,choices,p.session?()=>{}:null);
   }
   requestNew(review:BattleLoadResult=this.persistence.inspect()) {
