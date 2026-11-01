@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence recovery and causal diagnosis.
+Started: 2026-11-01 (Asia/Jerusalem). Status: repair published; focused and full acceptance running.
 
 **Active repair branch:** `branch/issue-263-patched-webkit-runtime`, stacked on
 diagnostic PR #264 at `6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
@@ -21,7 +21,33 @@ native-library replacements are outside this candidate.
 
 ## Current implementation handoff
 
-Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
+Updated 2026-11-02 (Asia/Jerusalem). **Native entry-resource failures are captured;
+the supported runtime repair is published in stacked PR #265. Full acceptance remains open.**
+
+**Live continuation checkpoint:** candidate source **`e3e9ebf`** is clean and
+published in [PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265),
+base diagnostic PR #264. Candidate focused run **41361259848**, CI source
+`3f93ce3`, has passed its ordinary 90-case prefix; its traced 60-case repetitions
+are still running. Full acceptance **41362013777** was dispatched against
+`branch/issue-263-patched-webkit-runtime` at `e3e9ebf`, using the existing
+`issue-200-baseline.yml` full-verify job, original limits and shared exclusive
+self-hosted concurrency group. Observe these exact run IDs; do not duplicate or
+cancel them because an observation call times out.
+
+Clean-candidate locked installation, browser preflight, build/content/both type
+scopes pass. Both browser-diagnostic contracts and all 38 selection/batch/full
+orchestrator contracts pass. Fifteen before/after selection inventories retain
+all **1,541 test IDs and metadata**. Actual Chromium and WebKit probes on all six
+profiles preserve viewport, effective screen, DPR and touch; only the browser
+version/user-agent intentionally changes. Canonical local outputs are under
+`/tmp/tactics-issue263-evidence/` with `candidate-*`, `runtime-*-selection.json`,
+`runtime-selection-comparison.json` and `device-compatibility.json` names.
+
+The repair stays limited to the supported browser runtime and required device
+compatibility. No application fallback, retries, save changes or custom native
+library replacement is needed for the evidenced pre-application network fault.
+The diagnostic PR remains independently reviewable. Do not close #263 or claim a
+complete fix until the focused artifacts and complete full-run gate are audited.
 
 **2026-11-02 continuation:** qualified ordinary runs **41349975828** and
 **41356666822** reproduced the missing-screen stall. Their bounded attachments
@@ -35,20 +61,22 @@ that a security reproducer was executed. See the new QA section for archive hash
 reports and exact failed/passed/incomplete counts.
 
 The old-runtime debug run **41358705036** completed successfully (90 prefix + 60
-traced cases), so no CI process is currently live. Earlier cancelled/pending/live
-notes below are historical. The temporary CI branch is now **`f30e65e`** and its
-latest run is terminal. Additional local transfer/cancellation controls and both
+traced cases). Earlier cancelled/pending/live notes below are historical; the
+current candidate/full run handles are recorded above. The temporary CI branch
+advanced from `f30e65e` to **`3f93ce3`** to pin candidate `e3e9ebf` and record its
+active WebKit executable. Additional local transfer/cancellation controls and both
 54-case exact-runtime observer/control selections passed without reproducing the
-host fault. The next work is the minimal supported runtime update, preserving
-device geometry, then qualified before/after evidence and full acceptance.
+host fault. The next work is to audit the qualified candidate artifacts and full
+acceptance, preserve final-source evidence, and finish the review handoff.
 
 - Diagnostic PR [#264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264)
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **2/7 complete**: original
-  evidence recovery (1.1) and diagnostic publication (1.3). The causal witness
-  (1.2), repair (2.1), repair integration proof (2.2), full acceptance (3.1) and
+- OpenSpec change `issue-263-webkit-reload-boot` is **3/7 complete**: original
+  evidence recovery (1.1), causal pre-application native request-failure witness
+  (1.2) and diagnostic publication (1.3). Repair (2.1), repair integration proof
+  (2.2), full acceptance (3.1) and
   final project handoff (3.2) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
 - Final diagnostic code `495d08d` is unchanged by main integration. On clean
