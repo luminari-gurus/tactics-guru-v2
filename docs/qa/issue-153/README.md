@@ -17,33 +17,36 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
 - Focused Chromium/WebKit menu coverage lives in `tests/main-menu.spec.ts`.
 - Run, dungeon, and standalone battle use explicit `hasUnsavedProgress` owner
   state so rejected commands cannot clear a leave warning.
-- Passing full capture [41239917772](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41239917772)
-  (`c39e10b`) completed every `verify:full` stage **before** the #255 rebase.
-  It does not qualify this head. Recapture is started from
-  `.github/full-verify-request` after the rebase. Device evidence is
-  Playwright/WebKit emulation. Draft PR #256. No merge claim.
+- Post-rebase capture [41303583877](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303583877)
+  (`68004c4`) completed every `verify:full` stage and **failed**. Artifact
+  `full-verify-41303583877-1`. Device evidence is Playwright/WebKit emulation.
+  Draft PR #256. No merge claim.
 
   | Stage | Result | Notes |
   | --- | --- | --- |
   | tooling | passed | 0.4s |
-  | units | passed | 1086 tests, 52s |
+  | units | passed | 1103 tests, 49s |
   | typecheck | passed | both scopes |
   | build-integration | passed | |
   | build-root | passed | |
-  | chromium | passed | 820 expected / 0 unexpected / 6 skipped (~118 min) |
+  | chromium | passed | 829 expected / 0 unexpected / 6 skipped (~78 min) |
   | fixtures | passed | 87 expected |
   | placement-dev | passed | 3 expected |
   | webkit-acceptance | passed | 92 expected |
-  | webkit-exploration | passed | 105 expected / 0 unexpected, including landscape-webkit stairs/`cell` |
+  | webkit-exploration | **failed** | 98 passed, 1 timeout: `portrait-webkit` stairs / `compass` waiting 15s for heading `Dungeon floors` after reload while Phaser status was still Loading. Landscape-webkit stairs arrows/wasd/compass/`cell` all passed in this run. |
   | health-bars | passed | 25 expected |
   | telemetry-production | passed | 36 expected |
   | telemetry-development | passed | 36 expected |
   | assets-root-dev | passed | 75 expected / 3 skipped |
-  | performance | passed | 18 proof cold/warm samples |
+  | performance | passed | |
   | build-prefix | passed | `--base=/prototype/` |
   | assets-prefix-preview | passed | 78 expected, ~3.7 min |
   | assets-prefix-dev | passed | 75 expected / 3 skipped |
   | restore-root | passed | |
+
+- Passing full capture [41239917772](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41239917772)
+  (`c39e10b`) completed every `verify:full` stage **before** the #255 rebase.
+  Chromium 820/0; `webkit-exploration` 105/0. It does not qualify this head.
 
 - Prior full capture [41105273512](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41105273512)
   (`6559b9c`) failed: Chromium 798 expected / 4 unexpected (all
