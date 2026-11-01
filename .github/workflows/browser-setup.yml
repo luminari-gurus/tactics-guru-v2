@@ -55,7 +55,7 @@ jobs:
           cp scripts/issue263-linux-inventory.py "$RUNNER_TEMP/issue263-${{ github.run_id }}/"
       - uses: actions/checkout@v4
         with:
-          ref: 9b543cbafecf1cce48f966ff1d8998a46a7ae32d
+          ref: e3e9ebf11aff78d395f65df6c3f74cded6733e83
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -72,8 +72,12 @@ jobs:
           file=Path('tests/dungeon-exploration.spec.ts')
           old="import { expect,test } from '@playwright/test';"
           text=file.read_text()
-          assert text.count(old)==1
-          file.write_text(text.replace(old,"import { expect,test } from './helpers/startupDiagnostics';",1))
+          new="import { expect,test } from './helpers/startupDiagnostics';"
+          if old in text:
+              assert text.count(old)==1
+              file.write_text(text.replace(old,new,1))
+          else:
+              assert text.count(new)==1
           PY
           mkdir -p verification-receipts/issue263
           git rev-parse HEAD > verification-receipts/issue263/runtime-source.txt
@@ -95,8 +99,6 @@ jobs:
         run: python3 "$RUNNER_TEMP/issue263-${{ github.run_id }}/issue263-linux-inventory.py" verification-receipts/issue263/native-before.json
       - name: Original exploration order with bounded startup evidence
         # Keep the embedded startup-budget case in its ordinary untraced mode.
-        env:
-          DEBUG: pw:browser
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'map markers respect|stairs remain visible|stairs travel once per entry' --repeat-each=5 --max-failures=2
       - name: Restore the full observer for traced stair repetitions
         run: |
