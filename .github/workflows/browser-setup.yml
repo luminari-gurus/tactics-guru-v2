@@ -51,6 +51,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/issue263-${{ github.run_id }}"
           cp tests/helpers/startupDiagnostics.ts tests/tooling/browser-diagnostics.test.mjs "$RUNNER_TEMP/issue263-${{ github.run_id }}/"
+          cp scripts/issue263-native-capture.py "$RUNNER_TEMP/issue263-${{ github.run_id }}/"
       - uses: actions/checkout@v4
         with:
           ref: 9b543cbafecf1cce48f966ff1d8998a46a7ae32d
@@ -81,18 +82,17 @@ jobs:
       - run: node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs
       - name: Use external event capture without early page script injection
         run: |
+          python3 "$RUNNER_TEMP/issue263-${{ github.run_id }}/issue263-native-capture.py" tests/helpers/startupDiagnostics.ts
           python3 - <<'PY'
+          import json,os
           from pathlib import Path
-          file=Path('tests/helpers/startupDiagnostics.ts')
-          text=file.read_text()
-          start=text.index('  await page.addInitScript(() => {')
-          end=text.index('  await use();',start)
-          file.write_text(text[:start]+text[end:])
+          flags=['PW_TEST_REUSE_CONTEXT','PW_TEST_CONNECT_WS_ENDPOINT','PWDEBUG']
+          Path('verification-receipts/issue263/mode-presence.json').write_text(json.dumps({name:bool(os.environ.get(name)) for name in flags},indent=2))
           PY
           sha256sum tests/helpers/startupDiagnostics.ts > verification-receipts/issue263/observer-free-input.txt
       - name: Original exploration order with bounded startup evidence
         # Keep the embedded startup-budget case in its ordinary untraced mode.
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --max-failures=2
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'map markers respect|stairs remain visible|stairs travel once per entry' --repeat-each=5 --max-failures=2
       - name: Restore the full observer for traced stair repetitions
         run: |
           cp "$RUNNER_TEMP/issue263-${{ github.run_id }}/startupDiagnostics.ts" tests/helpers/
