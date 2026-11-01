@@ -4,12 +4,12 @@ import type { OverworldMarker, OverworldState } from './state';
 type EnemyId = Exclude<OverworldMarker['id'], 'player'>;
 export type EnemyBehavior =
   | { readonly id: EnemyId; readonly kind: 'passive' }
-  | { readonly id: EnemyId; readonly kind: 'aggressive'; readonly range: number };
+  | { readonly id: EnemyId; readonly kind: 'aggressive' | 'chase' | 'block'; readonly range: number };
 const ENEMIES: readonly EnemyId[] = ['enemy-1', 'enemy-2', 'enemy-3'];
 export const DEFAULT_BEHAVIORS: readonly EnemyBehavior[] = [
   { id: 'enemy-1', kind: 'passive' },
-  { id: 'enemy-2', kind: 'aggressive', range: 6 },
-  { id: 'enemy-3', kind: 'aggressive', range: 10 },
+  { id: 'enemy-2', kind: 'chase', range: 6 },
+  { id: 'enemy-3', kind: 'block', range: 10 },
 ];
 export interface OverworldMovement {
   readonly world: OverworldState;
@@ -22,14 +22,14 @@ export interface OverworldMovement {
 export function createMovement(world: OverworldState, behaviors = DEFAULT_BEHAVIORS): OverworldMovement {
   if (behaviors.length !== 3 || !ENEMIES.every(id => behaviors.filter(b => b?.id === id).length === 1) ||
       !behaviors.every(b => b && (b.kind === 'passive' ||
-        b.kind === 'aggressive' && Number.isInteger(b.range) && b.range >= 1 && b.range <= 38))) {
-    throw new RangeError('Expected one passive or aggressive profile per enemy, with detection range 1–38.');
+        (b.kind === 'aggressive' || b.kind === 'chase' || b.kind === 'block') && Number.isInteger(b.range) && b.range >= 1 && b.range <= 38))) {
+    throw new RangeError('Expected one passive, chase, block or aggressive profile per enemy, with detection range 1–38.');
   }
   return { world, behaviors: behaviors.map(b => ({ ...b })), rng: seedRng((world.map.seed ^ 0x4d4f5645) >>> 0), step: 0 };
 }
 
 export function describeBehavior(behavior: EnemyBehavior): string {
-  return behavior.kind === 'passive' ? 'passive wandering' : `aggressive pursuit · range ${behavior.range}`;
+  return behavior.kind === 'passive' ? 'passive wandering' : `${behavior.kind} pursuit · range ${behavior.range}`;
 }
 
 const cellOf = (marker: OverworldMarker) => marker.y * 20 + marker.x;
@@ -40,25 +40,32 @@ function neighbors(cell: number): number[] {
 }
 
 /** FIFO search with fixed neighbor order; at most 400 cells, no RNG or terrain mutation. */
-function pursue(start: number, player: number, legal: (cell: number) => boolean): number {
-  if (distance(start, player) === 1) return start;
+function pursue(start: number, target: number, legal: (cell: number) => boolean, occupyTarget = false): number {
+  const canOccupy = occupyTarget && legal(target);
+  if (canOccupy ? start === target : distance(start, target) === 1) return start;
   const queue = [{ cell: start, first: start }];
   const visited = new Set([start]);
+  const isGoal = (cell: number) => canOccupy ? cell === target : distance(cell, target) === 1;
   for (let cursor = 0; cursor < queue.length; cursor++) {
     const current = queue[cursor];
     for (const next of neighbors(current.cell)) {
       if (visited.has(next) || !legal(next)) continue;
       visited.add(next);
       const first = current.cell === start ? next : current.first;
-      if (distance(next, player) === 1) return first;
+      if (isGoal(next)) return first;
       queue.push({ cell: next, first });
     }
   }
   return start;
 }
 
+function chaseTarget(previousPlayer: number | undefined, player: number): number {
+  return previousPlayer !== undefined && Number.isInteger(previousPlayer) && previousPlayer >= 0 && previousPlayer < 400 && previousPlayer !== player
+    ? previousPlayer : player;
+}
+
 /** One simultaneous cadence, resolved in stable ID order against updated occupancy. */
-export function stepMovement(state: OverworldMovement, inactive: readonly EnemyId[] = [], blocked: readonly number[] = []): OverworldMovement {
+export function stepMovement(state: OverworldMovement, inactive: readonly EnemyId[] = [], blocked: readonly number[] = [], previousPlayer?: number): OverworldMovement {
   if (!Number.isSafeInteger(state.step) || state.step < 0 || state.step === Number.MAX_SAFE_INTEGER) {
     throw new RangeError('Invalid or exhausted movement step.');
   }
@@ -80,8 +87,12 @@ export function stepMovement(state: OverworldMovement, inactive: readonly EnemyI
       rng = draw.rng;
       const choices = neighbors(start).filter(legal);
       if (choices.length) destination = choices[draw.value % choices.length];
-    } else if (distance(start, player) <= behavior.range) {
-      destination = pursue(start, player, legal);
+    } else {
+      const target = behavior.kind === 'chase' ? chaseTarget(previousPlayer, player) : player;
+      if (distance(start, target) <= behavior.range) {
+        const next = pursue(start, target, legal, target !== player);
+        destination = next === player ? start : next;
+      }
     }
     markers[index] = { ...marker, x: destination % 20, y: Math.floor(destination / 20) };
   }

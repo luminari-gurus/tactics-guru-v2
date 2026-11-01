@@ -428,7 +428,9 @@ describe('unordered encounters and moving dungeon enemies', () => {
     if(s.offer)s=good(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:s.offer.options[0].itemId}));
     const cleared=s.floors[0].exploration.pois[2];
     for(let i=0;i<5;i++) {s=move(s);expect(s.floors[0].exploration.pois[2]).toEqual(cleared);}
+    const beforeRejected = structuredClone(s);
     expect(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination:-1})).toEqual({ok:false,reason:'blockedStep'});
+    expect(s).toEqual(beforeRejected);
     expect(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision-1,destination:-1})).toEqual({ok:false,reason:'staleBoundary'});
   });
   it('rejects malformed movable markers, completion state and RNG rather than admitting unsafe saves', () => {

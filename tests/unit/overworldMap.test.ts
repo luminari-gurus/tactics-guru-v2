@@ -303,6 +303,70 @@ describe('independent overworld enemy movement', () => {
       expect(() => createMovement(world, invalid as readonly EnemyBehavior[])).toThrow(RangeError);
     }
   });
+  it('uses the pre-step cell for chase and the resulting cell for block', () => {
+    const world = fixture([[5,5],[2,2],[3,5],[17,17]]);
+    const configured = (kind: 'chase' | 'block', range = 38) => createMovement(world,
+      [idle[0], {id:'enemy-2',kind,range}, idle[2]]);
+    const oldCell = 4 * 20 + 5;
+    expect(position(stepMovement(configured('chase'), [], [], oldCell))).toMatchObject({x:3,y:4});
+    expect(position(stepMovement(configured('block'), [], [], oldCell))).toMatchObject({x:4,y:5});
+    // Old target is farther than range 2, but the new target is detectable.
+    expect(position(stepMovement(configured('chase',2), [], [], oldCell))).toMatchObject({x:3,y:5});
+    expect(position(stepMovement(configured('block',2), [], [], oldCell))).toMatchObject({x:4,y:5});
+  });
+  it('keeps actual occupants and blocked cells authoritative when chasing an old cell', () => {
+    const profiles: readonly EnemyBehavior[] = [idle[0], {id:'enemy-2',kind:'chase',range:38}, {id:'enemy-3',kind:'block',range:38}];
+    // The old player cell is now occupied by enemy 1; the new one remains occupied by the player.
+    const state = createMovement(fixture([[5,5],[5,4],[3,5],[6,4]],[65,86]), profiles);
+    const next = stepMovement(state, [], [84], 85);
+    expect(new Set(next.world.markers.map(m => m.y*20+m.x)).size).toBe(4);
+    expect(position(next).y*20+position(next).x).not.toBe(105);
+    expect(position(next).y*20+position(next).x).not.toBe(84);
+    expect(next.rng.cursor).toBe(state.rng.cursor + 1);
+    const adjacent = createMovement(fixture([[6,5],[2,2],[4,4],[17,17]]), profiles);
+    expect(position(stepMovement(adjacent,[],[],85))).toMatchObject({x:5,y:4});
+    const enclosed = createMovement(fixture([[6,5],[2,2],[3,5],[17,17]],[83,102,104,123]),profiles);
+    expect(position(stepMovement(enclosed,[],[],85))).toEqual(position(enclosed));
+  });
+  it('chases into the vacated cell so a trailing enemy keeps pace without leaving range', () => {
+    const profiles: readonly EnemyBehavior[] = [idle[0], {id:'enemy-2',kind:'chase',range:6}, idle[2]];
+    let state = createMovement(fixture([[10,10],[2,2],[10,11],[17,17]]), profiles);
+    for (let step = 1; step <= 8; step++) {
+      const previousY = 11 - step;
+      const playerY = previousY - 1;
+      const previous = previousY * 20 + 10;
+      const markers = state.world.markers.map(m => m.id === 'player' ? {...m,x:10,y:playerY} : m);
+      const start = position(state);
+      expect(Math.abs(start.x - 10) + Math.abs(start.y - previousY)).toBeLessThanOrEqual(6);
+      state = stepMovement({...state, world: {...state.world, markers}}, [], [], previous);
+      expect(position(state)).toMatchObject({x:10,y:previousY});
+      expect(Math.abs(position(state).x - 10) + Math.abs(position(state).y - playerY)).toBe(1);
+    }
+  });
+  it('block still follows the resulting cell and stays when already adjacent', () => {
+    const profiles: readonly EnemyBehavior[] = [idle[0], idle[1], {id:'enemy-3',kind:'block',range:10}];
+    let state = createMovement(fixture([[10,10],[2,2],[17,17],[10,11]]), profiles);
+    for (let step = 1; step <= 8; step++) {
+      const previousY = 11 - step;
+      const playerY = previousY - 1;
+      const markers = state.world.markers.map(m => m.id === 'player' ? {...m,x:10,y:playerY} : m);
+      state = stepMovement({...state, world: {...state.world, markers}}, [], [], previousY * 20 + 10);
+      expect(position(state,'enemy-3')).toMatchObject({x:10,y:previousY});
+    }
+    const adjacent = createMovement(fixture([[10,10],[2,2],[3,3],[11,10]]), profiles);
+    expect(position(stepMovement(adjacent,[],[],9*20+10),'enemy-3')).toEqual(position(adjacent,'enemy-3'));
+  });
+  it('ignores out-of-range previousPlayer and never occupies the current player cell', () => {
+    const world = fixture([[5,5],[2,2],[3,5],[17,17]]);
+    const chase = createMovement(world, [idle[0], {id:'enemy-2',kind:'chase',range:38}, idle[2]]);
+    const fallback = position(stepMovement(chase));
+    expect(fallback).toMatchObject({x:4,y:5});
+    for (const invalid of [-1, 400, 401, 999, 1.5, Number.NaN, Infinity, 5*20+5]) {
+      const next = stepMovement(chase, [], [], invalid);
+      expect(position(next)).toEqual(fallback);
+      expect(position(next)).not.toMatchObject({x:5,y:5});
+    }
+  });
   it('wanders only to legal neighbors and draws once even when enclosed', () => {
     const closed = [43,64,83,62]; // N/E/S/W around (3,3)
     for (const [walls, expected] of [[closed,[3,3]], [closed.filter(c => c !== 64),[4,3]]] as const) {
