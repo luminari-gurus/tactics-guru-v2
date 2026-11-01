@@ -47,6 +47,20 @@ version/user-agent intentionally changes. Canonical local outputs are under
 `/tmp/tactics-issue263-evidence/` with `candidate-*`, `runtime-*-selection.json`,
 `runtime-selection-comparison.json` and `device-compatibility.json` names.
 
+**Other live work:** local clean-candidate extended journeys run serially in
+`/tmp/tactics-issue263-candidate` with isolated official browser cache
+`PLAYWRIGHT_BROWSERS_PATH=/tmp/tactics-issue263-runtime-inspect/browsers`.
+Exec session **98824** runs Chromium's nine cases, then WebKit's nine cases;
+`/tmp/tactics-issue263-evidence/candidate-extended/{chromium,webkit}.log` and
+matching `.exit` files identify terminal outcomes. Chromium Mage and Ranger
+desktop cases have passed so far. Do not start another local browser/server
+while that process is active. After it finishes, retain both complete JSON
+reports from its printed `verification-receipts/browser-runs/run-*` directories,
+then run the existing `tests/tooling/verification-browser.test.mjs` cleanup
+contract against the candidate runtime (preview/dev), serially. All other
+local contracts are terminal and passed. Pending CI acceptance is run
+**41362013777**, job **125015648051**; never poll the completed focused run as live.
+
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
 library replacement is needed for the evidenced pre-application network fault.
