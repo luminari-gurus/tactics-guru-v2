@@ -30,7 +30,7 @@ describe('startup and recovery',()=>{
     const count=h.calls.length;expect(h.app.startup()).toBe(s);expect(h.calls).toHaveLength(count);
   });
   it.each(['SecurityError','QuotaExceededError','Error'])('initial save %s keeps a playable session after known absence',error=>{
-    const h=setup();h.fail(7,error);const s=h.app.startup();assert(s);expect(h.app.status).toContain('unsaved');expect(s.nextEnemy()).not.toBeNull();
+    const h=setup();h.fail(7,error);const s=h.app.startup();assert(s);expect(h.app.status).toContain('unsaved');expect(h.app.hasUnsavedProgress).toBe(true);expect(s.nextEnemy()).not.toBeNull();
   });
   it.each([
     [encoded(2),encoded(1),'primary'],[encoded(2),'broken','primary'],[undefined,encoded(1),'backup'],['broken',encoded(1),'backup'],
@@ -39,7 +39,8 @@ describe('startup and recovery',()=>{
     const review=h.app.inspection!;expect(review).toMatchObject({ok:true,selected:{slot}});
     const s=h.app.continue(review);assert(s);expect(s.replay).toBeNull();expect(s.events).toEqual([]);
     expect(h.data).toEqual(before);expect(h.calls.some(c=>c.startsWith('write'))).toBe(false);
-    if(primary==='broken' || backup==='broken') {expect(h.app.status).toContain('unsaved');h.app.save();expect(h.data).toEqual(before);}
+    if(primary==='broken' || backup==='broken') {expect(h.app.status).toContain('unsaved');expect(h.app.hasUnsavedProgress).toBe(true);h.app.save();expect(h.data).toEqual(before);expect(h.app.hasUnsavedProgress).toBe(true);}
+    else {expect(h.app.hasUnsavedProgress).toBe(false);}
   });
   it.each([1,2,3])('does not silently start when startup read/acquisition %i fails',at=>{
     const h=setup();h.fail(at);expect(h.app.startup()).toBeNull();expect(h.app.session).toBeNull();expect(h.data.has(keys.primary)).toBe(false);
@@ -62,6 +63,22 @@ describe('startup and recovery',()=>{
     expect(h.app.remove('primary',review)).toBe(false);expect(h.data.get(keys.primary)).toBe('second');
     expect(h.app.recoveryTexts()).toEqual(expect.arrayContaining([{slot:'primary',text:'first'},{slot:'primary',text:'second'}]));
     expect(h.app.remove('primary',review)).toBe(false);
+  });
+});
+
+describe('authoritative unsaved departure state',()=>{
+  it('tracks durable save state independently of status text',()=>{
+    const h=setup();const s=h.app.startup();assert(s);
+    expect(h.app.hasUnsavedProgress).toBe(false);
+    h.fail(1);h.app.save();
+    expect(h.app.status).toContain('unsaved');
+    expect(h.app.hasUnsavedProgress).toBe(true);
+    h.app.inspect();
+    expect(h.app.hasUnsavedProgress).toBe(true);
+    h.fail(0);h.app.save();
+    expect(h.app.hasUnsavedProgress).toBe(false);
+    expect(h.app.remove('primary',h.app.inspect())).toBe(true);
+    expect(h.app.hasUnsavedProgress).toBe(true);
   });
 });
 

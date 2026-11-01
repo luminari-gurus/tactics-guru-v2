@@ -1,3 +1,4 @@
+import { routeHref } from '../app/routes';
 import './style.css';
 import { generateMap, MAP_TYPES, type MapType } from './generate';
 import { applyBiome, BIOMES, type Biome } from './biomes';
@@ -26,6 +27,7 @@ export function startMap(): () => void {
       </figure>
       <p id="map-markers" class="map-visually-hidden"></p>
     </main>`;
+  const menuLink=document.createElement('a');menuLink.href=routeHref('menu',import.meta.env.BASE_URL);menuLink.textContent='Main menu';document.querySelector('#map-page header')!.append(menuLink);
   const input = document.querySelector<HTMLInputElement>('#map-seed')!;
   const grid = document.querySelector<HTMLElement>('#map-grid')!;
   const status = document.querySelector<HTMLElement>('#map-status')!;

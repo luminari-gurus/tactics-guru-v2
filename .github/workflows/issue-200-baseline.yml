@@ -15,6 +15,19 @@ on:
         description: Host workloads and cache conditions; coordinate unrelated workloads
         type: string
         default: 'Persistent runner; background workloads not independently verified'
+      extra_job:
+        description: Optional extra job on the dispatched ref; does not start serial batches
+        type: choice
+        options: [none, full-verify]
+        default: none
+  # Agents with contents:write but not Actions dispatch can start a full capture
+  # by bumping this token file. Serial-batch jobs ignore push events.
+  # branches-ignore keeps a merge of this path from starting a ~7h run on main.
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - '.github/full-verify-request'
 permissions:
   contents: read
   actions: read
@@ -27,7 +40,7 @@ env:
   SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
   qualify:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 25
     steps:
@@ -65,7 +78,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 35
     outputs:
@@ -153,7 +166,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 10
     steps:
@@ -181,5 +194,47 @@ jobs:
         with:
           name: issue208-aggregate-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/serial/aggregate/
+          retention-days: 30
+          if-no-files-found: warn
+
+  full-verify:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.event_name == 'push' || inputs.extra_job == 'full-verify')
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 420
+    # Push and extra_job=full-verify do not set inputs.mode=capture; discover requires it.
+    env:
+      SERIAL_MODE: capture
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 10
+      - name: Record source and complete discovery
+        run: |
+          mkdir -p verification-receipts/full-verify
+          git rev-parse HEAD > verification-receipts/full-verify/source.txt
+          node scripts/verification-selection.mjs capture verification-receipts/full-verify/selection.json
+          npm run verify:batches -- discover verification-receipts/serial/full-verify-discovery
+      - name: Execute full regression with original limits
+        run: npm run verify:full
+        timeout-minutes: 390
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-verify-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            verification-receipts/
+            tmp/verification/
           retention-days: 30
           if-no-files-found: warn

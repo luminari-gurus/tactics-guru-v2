@@ -14,7 +14,10 @@ export class BattlePersistence {
   inspection: BattleLoadResult | null = null;
   status = 'Checking saved battle';
   onChange: (() => void) | null = null;
+  private progressSaved = false;
   private retained: RecoveryText[] = [];
+  /** Durable progress is independent of transient recovery feedback. */
+  get hasUnsavedProgress() { return this.session !== null && !this.progressSaved; }
   constructor(private readonly catalog: ContentCatalog, private readonly mapId: MapId,
     private readonly storage: StorageAdapter = createBattleStorage(catalog)) {}
 
@@ -67,6 +70,7 @@ export class BattlePersistence {
     this.adopt(session, false);
     track('battle_continued', { route: 'battle', phase: session.phase });
     const blocked = slots.some(slot => ['invalid', 'unavailable'].includes(review.inspection[slot].status));
+    this.progressSaved = !blocked;
     this.report(blocked ? 'Continued recovery. Progress is unsaved until damaged or unreadable storage is resolved.'
       : review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved battle');
     return session;
@@ -74,6 +78,7 @@ export class BattlePersistence {
   save() {
     if (!this.session || this.session.phase === 'disposed') return;
     const result = this.storage.save(this.session.state);
+    this.progressSaved = result.ok;
     if (!result.ok) reportFailure('save_write', { route: 'battle', phase: this.session.phase });
     this.report(result.ok ? 'Battle saved on this device' : result.reason === 'recoveryRequired'
       ? 'Progress unsaved. Saved data needs recovery.'
@@ -98,6 +103,7 @@ export class BattlePersistence {
   private failedReset() {
     reportFailure('save_reset', { route: 'battle' });
     this.inspect();
+    if (this.session) this.progressSaved = false;
     this.report('Reset incomplete. Battle and seed unchanged; some slots may have been removed. Export recovery copies, review again, then retry or cancel.');
   }
   remove(slot: BattleStorageSlot, review: BattleLoadResult): boolean {
@@ -110,6 +116,7 @@ export class BattlePersistence {
     if (!result.ok) { reportFailure('save_remove', { route: 'battle' }); this.report('Removal refused. Saved data changed or storage failed; review again before retrying.'); return false; }
     // A successful explicit removal no longer requires retaining that slot's copies.
     this.retained = this.retained.filter(v => v.slot !== slot);
+    this.progressSaved = false;
     this.report(`${slot === 'primary' ? 'Primary' : 'Backup'} save removed. Retry saving when recovery is complete.`);
     return true;
   }
