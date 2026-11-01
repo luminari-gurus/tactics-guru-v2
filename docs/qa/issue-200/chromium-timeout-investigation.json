@@ -376,7 +376,8 @@
           "tests/grass-surface.spec.ts",
           "tests/input.spec.ts",
           "tests/opacity.spec.ts",
-          "tests/overworld-map.spec.ts"
+          "tests/overworld-map.spec.ts",
+          "tests/main-menu.spec.ts"
         ],
         "cases": 77,
         "estimatedTestWorkMs": 697521,
@@ -443,7 +444,8 @@
           "tests/layout.spec.ts",
           "tests/move.spec.ts",
           "tests/opacity.spec.ts",
-          "tests/public-asset-base.spec.ts"
+          "tests/public-asset-base.spec.ts",
+          "tests/main-menu.spec.ts"
         ],
         "cases": 73,
         "estimatedTestWorkMs": 483630,
@@ -510,7 +512,8 @@
           "tests/layout.spec.ts",
           "tests/move.spec.ts",
           "tests/opacity.spec.ts",
-          "tests/public-asset-base.spec.ts"
+          "tests/public-asset-base.spec.ts",
+          "tests/main-menu.spec.ts"
         ],
         "cases": 74,
         "estimatedTestWorkMs": 484314,

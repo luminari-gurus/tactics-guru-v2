@@ -25,7 +25,10 @@ export class RunItemSession {
   private retained: { slot: RunStorageSlot; text: string }[] = [];
   private disposed = false;
   private unsavedOnly = false;
+  private progressSaved = false;
   get isUnsavedOnly() { return this.unsavedOnly; }
+  /** Durable progress is independent of transient command/recovery feedback. */
+  get hasUnsavedProgress() { return this.unsavedOnly || !this.progressSaved; }
   private lastRecord: unknown = null;
   get completedBattle(): unknown { return JSON.parse(JSON.stringify(this.lastRecord)); }
   status = 'Progress has not been saved';
@@ -152,6 +155,7 @@ export class RunItemSession {
     }
     setTelemetryContext({ phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     const result = this.storage.save(this.current);
+    this.progressSaved = result.ok;
     if (!result.ok) reportFailure('save_write', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
       ? `Progress unsaved: storage ${result.kind}. Open Save recovery to retry.`
@@ -178,6 +182,7 @@ export class RunItemSession {
     this.review = null; this.unsavedOnly = false;
     track('run_continued', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     const blocked = Object.values(review.inspection).some(slot => slot.status === 'invalid' || slot.status === 'unavailable');
+    this.progressSaved = !blocked;
     this.report((review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved run') +
       (blocked ? ' Progress unsaved until Save recovery resolves damaged or unreadable data.' : ''));
     return true;
@@ -190,6 +195,7 @@ export class RunItemSession {
     const removed = this.storage.removeSlot(slot, value.text);
     this.review = null;
     if (!removed.ok) reportFailure('save_remove', { route: 'run' });
+    else this.progressSaved = false;
     this.report(removed.ok ? 'Save removed. Retry saving when recovery is complete.' : 'Removal refused: saved data changed or storage failed. Review again.');
     return removed.ok;
   }

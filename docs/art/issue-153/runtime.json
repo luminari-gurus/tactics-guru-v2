@@ -1,0 +1,17 @@
+[
+  {
+    "file": "public/menu/dawn.webp",
+    "bytes": 269424,
+    "sha256": "5520cba31b303811e6e6bb39a92fa480ee850e426dcbe38d06e835ef1e0900f0"
+  },
+  {
+    "file": "public/menu/midnight.webp",
+    "bytes": 234010,
+    "sha256": "fb56f92e25f9e92c7075068f5aaaa6155bb168dc8deb14ebe4d653a76700207d"
+  },
+  {
+    "file": "public/menu/title.webp",
+    "bytes": 89178,
+    "sha256": "7933dfbe3e9607226a94eeee73677454212ce32387500aa0102a16f2d42080ec"
+  }
+]

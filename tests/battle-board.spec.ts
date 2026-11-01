@@ -24,7 +24,7 @@ async function occlusionBoundary(page: Page, count: number) {
   const save = encodeBattleSave(session.state, battleCatalog);
   if (!save.ok) throw Error(save.reason);
   await page.addInitScript(({key, text}) => localStorage.setItem(key, text), {key:BATTLE_STORAGE_KEYS.primary, text:save.text});
-  await page.goto('/'); await page.locator('#save-continue').click();
+  await page.goto('./battle'); await page.locator('#save-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect(page).toHaveTitle('Tactics Guru v2');
   await expect(page.locator('#battle-shell')).toBeVisible();
@@ -234,7 +234,7 @@ test('layout clamping resets overlap history when the actual camera changes',asy
 });
 
 test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
-  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
   const state=JSON.parse(before!).state,origin={x:11,y:11};
   expect(initial.reachable).not.toContainEqual(origin);
@@ -301,7 +301,7 @@ test('hovered origins show only ability reach without changing selection, pendin
 });
 
 test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial = await settledReport(page);
@@ -384,7 +384,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
 });
 
 test('authored camera keeps zoom bounds and refits on real orientation changes', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   for (const viewport of [{ width: 412, height: 839 }, { width: 915, height: 412 }]) {
@@ -440,7 +440,7 @@ test('default authored board renders canonical units, highlights and stable rest
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const assetPaths = new Set(Object.values(battleCatalog.assets).map(asset => asset.runtimePath));
   page.on('request', request => { const path = new URL(request.url()).pathname.replace(/^\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, ''); if (assetPaths.has(path)) assetRequests.push(path); });
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial = await report(page);
@@ -496,7 +496,7 @@ for (const failure of ['missing', 'corrupt'] as const) {
     page.on('pageerror', error => errors.push(error.message));
     await page.route('**/proof/fighter.png', route => failure === 'missing'
       ? route.fulfill({ status: 404 }) : route.fulfill({ contentType: 'image/png', body: 'invalid PNG bytes' }));
-    await page.goto('/');
+    await page.goto('./battle');
     await expect(page.getByRole('status')).toContainText('Asset load failed');
     await expect(page.locator('#game')).toHaveAttribute('data-ready', 'false');
     await expect(page.getByRole('button', { name: 'Restart battle' })).toBeDisabled();
@@ -506,7 +506,7 @@ for (const failure of ['missing', 'corrupt'] as const) {
 }
 
 test('picks authored elevated tops and visible side faces outside living unit art', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const { tiles } = buildBoardPresentation(battleCatalog, 'map:forest_ruins');
@@ -541,7 +541,7 @@ test('picks authored elevated tops and visible side faces outside living unit ar
 });
 
 test('authored visible picking survives resize, pan, zoom, DPR and drag completion', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const tiles = buildBoardPresentation(battleCatalog, 'map:forest_ruins').tiles;
@@ -579,7 +579,7 @@ test('authored visible picking survives resize, pan, zoom, DPR and drag completi
 });
 
 test('legal player movement updates elevation, reachability and canopy occlusion', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial = await settledReport(page);
   const elevated = initial.reachable.find((c: {x:number;y:number}) => initial.tiles.find((t:any)=>t.x===c.x && t.y===c.y)?.elevation===1);
@@ -617,7 +617,7 @@ test('legal player movement updates elevation, reachability and canopy occlusion
 const catalogMapHeight=battleCatalog.maps['map:forest_ruins'].height;
 
 test('touch pinch and cancelled pointer cannot select or move a unit', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const value = await report(page);
@@ -640,7 +640,7 @@ test('touch pinch and cancelled pointer cannot select or move a unit', async ({ 
 });
 
 test('drawable boundaries and layout changes discard captured gestures without board pass-through',async({page})=>{
-  await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await settledReport(page),r=initial.region,x=r.x+r.width/2,y=r.y+r.height/2;
   await page.mouse.move(x,y);await page.mouse.down();
   await page.mouse.move(r.x+r.width+15,y);await page.mouse.move(x+15,y);await page.mouse.up();

@@ -73,8 +73,8 @@ async function boot(page:Page,fixture:Boundary) {
       sessionStorage.setItem('test:animation-seeded','yes');
     }
   },{keys,text:encoded.text});
-  await page.clock.install();await page.goto('./');await page.locator('#save-continue').click();await ready(page);
-  expect(new URL(page.url()).pathname).toBe(process.env.PLAYWRIGHT_BASE_PATH ?? '/');
+  await page.clock.install();await page.goto('./battle');await page.locator('#save-continue').click();await ready(page);
+  expect(new URL(page.url()).pathname).toBe(`${process.env.PLAYWRIGHT_BASE_PATH ?? '/'}battle`);
   expect((await readSession(page)).state).toEqual(fixture.before);
 }
 async function press(page:Page,selector:string,keyboard=false) {

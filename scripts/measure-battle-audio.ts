@@ -69,7 +69,7 @@ try {
           page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
           for(const cache of ['cold','warm']) {
             const cpuBefore=cpuTimes();
-            if(cache==='cold')await page.goto(url);else await page.reload();
+            if(cache==='cold')await page.goto(`${url}/?scene=battle`);else await page.reload();
             await page.waitForFunction(()=>document.querySelector<HTMLElement>('#game')?.dataset.ready==='true');
             if(sound && label==='candidate')await page.locator('#battle-sound').click();
             await page.waitForFunction(()=>document.querySelector<HTMLElement>('#game')?.dataset.phase==='player');
