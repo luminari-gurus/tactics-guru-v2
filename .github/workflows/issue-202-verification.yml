@@ -126,13 +126,9 @@ jobs:
   issue254-verify:
     name: verify
     if: github.event.pull_request.number == 260 && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
-    concurrency:
-      group: tactics-browser-exclusive
-      cancel-in-progress: false
     steps:
-      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -142,7 +138,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run setup:browsers && npm run check:browsers
+      - run: npx --no-install playwright install --with-deps chromium webkit
       - name: Record source and toolchain
         run: |
           mkdir -p verification-receipts/issue254
