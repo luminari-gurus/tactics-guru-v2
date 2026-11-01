@@ -223,6 +223,11 @@
       "originalSha256": "25494fdae4d7f6e82b1bc41ab7e930c54ecfb13521c96e83e323e283338b0506"
     },
     {
+      "file": "exact-runtime-module-graph.json.gz",
+      "sha256": "76bed20aba040722664db8da8ede9553d7f1c4c25518c297f76b5effc0fe1000",
+      "originalSha256": "c95eabf8a743854d1cbf214d7d669b8d78e5f94d55a4a0b1391352de0565aa7d"
+    },
+    {
       "file": "integrated-source.json",
       "sha256": "3077c3e74d7d036863fdc1540baacb36f2bac4de6962741d5c4eb9ba4de35445"
     }

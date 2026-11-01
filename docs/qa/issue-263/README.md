@@ -165,3 +165,12 @@ remaining event listener ran; it reported a false late-listener miss. Corrected
 checks recorded 2,000 such early checkpoints followed by successful listeners.
 Both the invalid first probe and corrected result are retained as `css-event-probe*`
 reports/logs, with no application change inferred from either.
+
+Parsing all 22 exact-runtime generated JS chunks with Node's native module parser
+(without evaluating them) found no static import cycles, no chunk importing the
+entry, and no top-level await in the dungeon route's static dependency closure.
+All static dependencies were local and present. The entry and standalone battle
+entry do contain top-level await; the latter is outside the dungeon closure.
+`exact-runtime-module-graph.json.gz` preserves this graph. This narrows the
+source-level wait-cycle hypothesis; it does not establish a browser/import or
+initialization cause.

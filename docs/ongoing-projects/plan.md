@@ -45,6 +45,11 @@ Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
   events in 2,000 insertions. Its first event-checkpoint mistake and correction
   are retained in QA. Original/local exact-runtime build logs have matching sets
   of 28 generated JS/CSS names, without an original served-byte comparison.
+- The native module parser inspected all 22 exact-runtime JS chunks without
+  evaluation: no static import cycle, no dependency importing the entry, and
+  no top-level await in the dungeon route's static closure. The graph is retained
+  in QA. Loading/native import or synchronous initialization still need actual
+  failure evidence; no source-level wait-cycle repair is justified by this graph.
 - Other checkouts: `/tmp/tactics-issue263-main` (older diagnostic qualification),
   `/tmp/tactics-issue263-integrated` (clean tested `cdc39cf`), and
   `/tmp/tactics-issue263-current-base` (literal `78a3f75` comparison). Common logs,
