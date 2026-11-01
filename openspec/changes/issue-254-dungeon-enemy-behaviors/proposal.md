@@ -6,7 +6,7 @@ Dungeon pursuers currently target the player's already-updated position, so thei
 
 ## What Changes
 
-- Retain passive wandering and distinguish chase of the pre-step player position from block of the resulting position, with explicit profile assignments.
+- Retain passive wandering and distinguish chase of the pre-step player position from block of the resulting position, with explicit profile assignments. Chase steps into the vacated cell when that cell is reachable, so a trailing enemy keeps pace with a player walking straight away.
 - Preserve actual occupancy, encounter entry, deterministic cadence, movement RNG and compatible continuation of current saves.
 - Cover divergent pursuit, legal collision edge cases and real dungeon interaction; document the rules.
 

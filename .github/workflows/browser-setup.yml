@@ -36,3 +36,59 @@ jobs:
             test-results/
           retention-days: 7
           if-no-files-found: ignore
+  issue254-verify:
+    if: github.ref == 'refs/heads/work/issue-254-dungeon-enemy-behaviors'
+    needs: browser-setup
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 180
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and toolchain
+        run: |
+          mkdir -p verification-receipts/issue254
+          git rev-parse HEAD > verification-receipts/issue254/source.txt
+          node --version > verification-receipts/issue254/node.txt
+          npx --no-install playwright --version > verification-receipts/issue254/playwright.txt
+          uname -a > verification-receipts/issue254/host.txt
+          git status --short > verification-receipts/issue254/status.txt
+          sha256sum package-lock.json src/map/movement.ts src/domain/dungeon.ts tests/unit/overworldMap.test.ts tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/overworld-map.spec.ts > verification-receipts/issue254/inputs.sha256
+          node --input-type=module -e "import {chromium,webkit} from '@playwright/test'; for (const type of [chromium,webkit]) { const browser=await type.launch(); console.log(type.name(),browser.version(),type.executablePath()); await browser.close(); }" > verification-receipts/issue254/browsers.txt
+      - run: npm run test:unit
+      - run: npm run typecheck
+      - id: build
+        run: npm run build
+      - name: Record served build identity
+        if: ${{ steps.build.outcome == 'success' }}
+        run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue254/build.sha256
+      - name: Chromium exploration including lifecycle and overworld map
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/chromium.json
+        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/overworld-map.spec.ts --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/chromium-artifacts
+      - name: WebKit exploration including lifecycle
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-artifacts
+      - name: WebKit overworld map
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit-overworld.json
+        run: printf '%s\n' "import { defineConfig } from '@playwright/test';" "import base from './playwright.exploration.config';" "export default defineConfig({ ...base, testMatch: ['**/overworld-map.spec.ts'] });" > tmp-overworld-webkit.config.ts && npx --no-install playwright test -c tmp-overworld-webkit.config.ts --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-overworld-artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue254-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue254/
+          retention-days: 30
+          if-no-files-found: warn

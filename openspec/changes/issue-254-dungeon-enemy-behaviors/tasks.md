@@ -2,8 +2,8 @@
 
 ## 1. Movement profiles
 
-- [x] 1.1 Implement passive/chase/block profiles and pass the pre-step target separately from actual occupancy in `src/map/movement.ts` and `src/domain/dungeon.ts`; verify detection and routing divergence with focused map units.
-- [x] 1.2 Extend existing map units for adjacent, unreachable, blocked, multi-enemy, contested old/new cells, no overlap, stable ordering, passive RNG and rejected steps; run the affected unit files.
+- [x] 1.1 Implement passive/chase/block profiles and pass the pre-step target separately from actual occupancy in `src/map/movement.ts` and `src/domain/dungeon.ts`; chase occupies the vacated cell when it is reachable. Verify detection and routing divergence with focused map units.
+- [x] 1.2 Extend existing map units for trailing chase that keeps pace, block's unchanged adjacent stay, invalid previous-player cells, unreachable, blocked, multi-enemy, contested old/new cells, no overlap, stable ordering, passive RNG and rejected steps; run the affected unit files.
 - [x] 1.3 Update `docs/overworld-map.md` and `docs/dungeon.md` with assignments, targeting and actual collision/encounter behavior; check documentation against implementation.
 
 ## 2. Dungeon integration and compatibility
