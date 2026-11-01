@@ -13,5 +13,5 @@
 
 ## 3. Integration verification
 
-- [ ] 3.1 Map affected consumers and apply `docs/verification-policy.md`: run relevant map/dungeon/session/storage units, both type scopes and production build, affected exploration/lifecycle browser journeys and required engine/device cases; use full regression if shared runtime/persistence reach is unbounded. Record final source/build identity and evidence reuse.
-- [ ] 3.2 Compare every issue criterion and approved plan against results; run `git diff --check` and record any limitations before PR creation.
+- [x] 3.1 Map affected consumers and apply `docs/verification-policy.md`: run relevant map/dungeon/session/storage units, both type scopes and production build, affected exploration/lifecycle browser journeys and required engine/device cases; use full regression if shared runtime/persistence reach is unbounded. Record final source/build identity and evidence reuse.
+- [x] 3.2 Compare every issue criterion and approved plan against results; run `git diff --check` and record any limitations before PR creation.

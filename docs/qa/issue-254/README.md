@@ -1,4 +1,4 @@
-# Issue 254 verification (incomplete)
+# Issue 254 verification
 
 Planning base: `a8b87c199fb2ae171a9bb72961ac7114622c4d60`; implementation was tested with a dirty working tree on macOS. The Playwright runs below are local browser emulation, not self-hosted CI or physical hardware. The final build after the last runtime edit passed content validation, both TypeScript scopes and Vite; it retains existing Vite loader and chunk-size warnings.
 
@@ -8,14 +8,27 @@ Planning base: `a8b87c199fb2ae171a9bb72961ac7114622c4d60`; implementation was te
 - Chromium and WebKit each passed 15 affected local cases across desktop, portrait and landscape profiles, including pursuit, traversal, encounter entry and reload. Reports: `tmp/verification/issue-254/chromium.json` and `webkit.json` (local ignored files). A separate desktop legal reward/guardian journey passed (`journey.json`). These browser runs preceded a later error-message-only runtime edit, which does not affect their exercised behavior.
 - The initial new pursuit-browser fixture failed on all three Chromium profiles because its saved position was not marked visited. After correcting the fixture, the new test passed all three Chromium and three WebKit profiles. The original failure output was retained in the task transcript; its default Playwright artifact directory was overwritten by subsequent runs.
 
-Outstanding: repair and verify the legal production journey witnesses, run affected browser journeys against the final implementation on qualified self-hosted capacity, preserve reports and source/build identity, and complete the approved plan's final acceptance accounting. The current results do not establish PR readiness or a clean full regression.
+The original failures above remain historical failures; later focused repairs do not turn the earlier run into a passing full regression.
 
-## Witness refresh in progress
+## Witness refresh
 
 The legal journey helpers and their assertions are unchanged. Replacement seeds under the new pursuit rules are Shaman 189, Mage 46 and Ranger 12. `npm run test:unit -- tests/unit/dungeonBattle.test.ts` passed all 15 cases with those seeds, including combat-event and replay assertions. The prior 3-failure wider run remains a failure, not a passing full-unit run.
 
 The first local Chromium Shaman run on seed 189 failed all three profiles because the new witness targeted the Fighter (50% Will save chance), whereas the old seed had targeted the Ranger (45%). After correcting the exact expectation, all three Chromium profiles passed. Original failed report: `tmp/verification/issue-254/shaman-local.json`; corrected report: `tmp/verification/issue-254/shaman-corrected.json` (local ignored files). The desktop Mage/Ranger browser run passed both complete journeys (`tmp/verification/issue-254/extended-local.json`, local ignored file).
 
-[Self-hosted run 41224946470](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41224946470) is queued for source `b6dc96263938188b64ceba3e3d26613c589d18ce` on the exclusive runner. Its branch-scoped job records source, toolchain, browser, input and build identities and uploads separate engine reports. No result is claimed while it is pending.
+[Self-hosted run 41224946470](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41224946470) passed on source `b6dc96263938188b64ceba3e3d26613c589d18ce` (clean checkout). The job ran 124 map/dungeon/battle units; the production build included 223 content tests and both type scopes. Chromium and WebKit each passed 21 exploration, save/reload, Shaman and legal journey cases and six extended Mage/Ranger cases across desktop, portrait and landscape: zero unexpected failures, skips, or retries. This is affected coverage, not a full regression claim.
+
+The runner was Linux x86-64, Node 24.22.1, Playwright 1.63.0, Chromium 153.0.8010.12 and WebKit 26.6; one worker, zero retries, ordinary root preview. Background load and cache conditions were not independently verified. [Retained artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41224946470/artifacts/13055625874) contains source, browser executable, input and build hashes, reports and case artifacts (30-day retention). JSON SHA-256: Chromium `fe768f345f71e61f04f3fdd28107eba894c2976a2eb28f3cbc44624d8a010289`; WebKit `6404e8d24c34e1cd00e3432a4e99095f1a6ae846f332b75d4c4061bfc852b813`; extended Chromium `c4c4ec28ce800714d7d5a901a5bdfbaaecb93dd41b56481489a22b35d1c34739`; extended WebKit `5b11ad089a6ed09c4fa2407d1b5c89ea63ca831bd23a06d887e38239d09c918e`. Only verification workflow and documentation changed after the tested commit; runtime, tests, dependencies and build inputs remain unchanged.
+
+Focused self-hosted [run 41303140732](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303140732), source `7c90f843d29f2c37a01b52ba760059c667c2927d`, passed nine Chromium and nine WebKit hidden-page input, previous-format recovery and corrupt/uncertain-save cases across desktop and both mobile orientations, with no skips or retries. The [30-day artifact](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303140732/artifacts/13082088722) retains the reports and source/build identities. Report SHA-256: Chromium `e3e92ba8043aa12b096e44d5b308d7c70e1df6d4b92c64f8a7202c52c2f70879`; WebKit `b98f9211622fd2115ac7fcb5bc70355972d6768c1dacf9257eef1ff642cd55f4`. The temporary branch-only verification job was removed afterward; the final source, tests and build inputs match those tested.
 
 - Exact-base comparison: an archive of `a8b87c199fb2ae171a9bb72961ac7114622c4d60`, using the same local `node_modules`, passed all 15 `tests/unit/dungeonBattle.test.ts` cases with the original seeds. The earlier source `5083c6d` run failed three of those cases under changed pursuit; the replacement-seed run at `b6dc962` passed all 15. The failed original run remains distinct.
+
+## Acceptance mapping
+
+- The default assignments and pre-/post-step detection and routing are covered by the movement units and the browser pursuit case. The latter uses valid saved-state fixtures, then real keyboard or touch input and reload.
+- Actual player/enemy occupancy, blocked terrain, stairs, adjacent/unreachable targets and stable resolution are covered by movement and dungeon units; direct encounter entry is exercised in both browser engines.
+- Passive RNG, deterministic continuation, current and legacy exploration admission, rejected steps and save/reload are covered by the focused units and browser journeys. Existing format 9 state retains its data and adopts the new assignment on its next accepted step; old and new builds are not claimed to choose identical routes.
+- Documentation is updated in `docs/overworld-map.md` and `docs/dungeon.md`. The prior literal-base comparison and failed attempts are retained above.
+
+The change is confined to the dungeon's shared movement transition and its direct consumers. The `/map` inspection view has stationary markers; its movement units remain included. No shared battle command, save format, input harness or global lifecycle contract changed, so the affected-coverage tier applies rather than a full regression. Browser profiles are emulated; physical-device execution is not claimed.
