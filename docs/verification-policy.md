@@ -195,7 +195,7 @@ projects and assertions. The old individual config entry points remain supported
 `npm run verify:full` executes the complete inventory sequentially: tooling,
 all fast units (including content), both type scopes, root/prefix build integrations,
 then the root bundle and default Chromium,
-combined fixtures, dev placement, both WebKit configs, health bars, production and
+combined fixtures, dev map placement/cleanup, both WebKit configs, health bars, production and
 dev telemetry, root dev assets, isolated performance capture, prefix build/assets
 in preview and dev, then root-build restoration. Root preview assets already run
 in the default Chromium suite. The 19 stages validate ordinary content and both

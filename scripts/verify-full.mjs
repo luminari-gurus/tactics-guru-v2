@@ -23,7 +23,7 @@ export const stages = [
   preview('chromium'),
   browser('fixtures', ['-c', 'playwright.fixtures.config.ts']),
   browser('placement-dev', ['tests/overworld-map.spec.ts', '-g',
-    'controlled placement failure preserves complete state and supports retry'],
+    'controlled placement failure preserves complete state and supports retry|direct map disposer is idempotent and detaches listeners'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   preview('webkit-acceptance', ['-c', 'playwright.device-acceptance.config.ts']),
   preview('webkit-exploration', ['-c', 'playwright.exploration.config.ts']),

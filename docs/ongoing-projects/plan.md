@@ -2,8 +2,10 @@
 
 Started: 2026-11-01 (Asia/Jerusalem). Status: repair published; focused and full acceptance running.
 
-**Active repair branch:** `branch/issue-263-patched-webkit-runtime`, stacked on
-diagnostic PR #264 at `6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
+**Active follow-up branch:** `branch/verify-map-disposer-coverage`, stacked on
+runtime PR #265 at `1dfc3a6`. The runtime repair branch is
+`branch/issue-263-patched-webkit-runtime`, stacked on diagnostic PR #264 at
+`6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
 packages only), retain the old effective screen behavior with `screen: undefined`
 in the existing device project definitions, and preserve other branches' browser
 caches during setup with `--no-remove`. Viewports, touch, DPR, project IDs, test
@@ -110,12 +112,12 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **4/7 complete**: original
+- OpenSpec change `issue-263-webkit-reload-boot` is **4/8 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
   (1.2), diagnostic publication (1.3), and the supported runtime repair with the
   retained before/after stair regression witness (2.1). Repair integration proof
-  (2.2), full acceptance (3.1) and
-  final project handoff (3.2) remain open. Use live `openspec instructions apply`
+  (2.2), full acceptance (3.1), final project handoff (3.2), and the separately
+  found dev-selector omission (3.3) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
 - Final diagnostic code `495d08d` is unchanged by main integration. On clean
   **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
