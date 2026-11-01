@@ -79,8 +79,9 @@ jobs:
           sha256sum tests/helpers/startupDiagnostics.ts tests/tooling/browser-diagnostics.test.mjs tests/dungeon-exploration.spec.ts package-lock.json > verification-receipts/issue263/input-hashes.txt
       - run: npm run build
       - run: node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs
-      - name: Original exploration order with failure traces
-        run: npm run test:browser -- --diagnostics -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --max-failures=2
+      - name: Original exploration order with bounded startup evidence
+        # Keep the embedded startup-budget case in its ordinary untraced mode.
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --max-failures=2
       - name: Bounded stair repetitions with failure traces
         run: npm run test:browser -- --diagnostics -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'stairs travel once per entry' --repeat-each=5 --max-failures=2
       - uses: actions/upload-artifact@v4
