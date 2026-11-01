@@ -1,3 +1,4 @@
+import { continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, test, type Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -83,7 +84,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await page.goto(path);
   await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key, text: f.saved });
   await page.reload();
-  if (mode === 'dungeon') await page.getByRole('button', { name: 'Continue saved dungeon', exact: true }).click();
+  if (mode === 'dungeon') await continueSavedDungeon(page);
   else await page.locator(resume).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(f.before);
@@ -126,7 +127,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-inspection.png`) });
   await page.keyboard.press('Escape');
   await page.reload();
-  if (mode === 'dungeon') await page.getByRole('button', { name: 'Continue saved dungeon', exact: true }).click();
+  if (mode === 'dungeon') await continueSavedDungeon(page);
   else await page.locator(resume).click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(cast.state);

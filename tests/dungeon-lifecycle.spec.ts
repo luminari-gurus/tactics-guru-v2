@@ -1,4 +1,5 @@
 import { atEncounter } from './helpers/dungeonFixtures';
+import {continueSavedDungeon} from './helpers/dungeonTraversal';
 import {expect,test,type Page} from '@playwright/test';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,type DungeonState} from '../src/domain/dungeon';
@@ -47,7 +48,7 @@ for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-f
  await page.reload();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();}
+async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.reload();await continueSavedDungeon(page);}
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
@@ -58,7 +59,7 @@ test('restart during accepted presentation discards old callbacks and history',a
  const accepted=await snapshot(page);
  await page.locator('#fit-restart').click({force:true});await page.locator('#dungeon-confirm-new').click({force:true});await page.clock.resume();
  await expect(page.locator('#dungeon-screen')).toBeVisible();const fresh=await snapshot(page);expect(fresh.id).not.toBe(accepted.id);expect(fresh.phase).toBe('ready');expect(fresh.ownership).toEqual({consumables:[],equipment:[],assignments:[]});
- await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(fresh);await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(fresh);
+ await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(fresh);await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(fresh);
 });
 test('legal enemy defeat boundary resumes once and a confirmed new dungeon resets it',async({page})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
@@ -68,7 +69,7 @@ test('legal enemy defeat boundary resumes once and a confirmed new dungeon reset
  }
  expect(session.state.outcome).toBe('playerLoss');await load(page,{...entry,activeBattle:before});await expect(page.getByRole('heading',{name:/^Dungeon defeat/})).toBeVisible();
  const defeat=await snapshot(page);await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.locator('#dungeon-ascend')).toHaveCount(0);
- await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();expect(await snapshot(page)).toEqual(defeat);
+ await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(defeat);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-cancel-new').click();expect(await snapshot(page)).toEqual(defeat);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });

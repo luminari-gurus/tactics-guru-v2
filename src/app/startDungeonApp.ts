@@ -9,16 +9,15 @@ import { createDungeonStorage } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
-import { createGame } from '../phaser/start';
+import { createGame, whenGameReady } from '../phaser/start';
 import { mountBattleLayout } from '../ui/battleLayout';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 const storage=createDungeonStorage(),session=new DungeonSession(freshDungeon(crypto.randomUUID(),13),storage),cache=new FloorCache();
-const screen=el('main');screen.id='dungeon-screen';document.body.append(screen);
+const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,host:RunBattleHost|null=null;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>host?.modalTransition(),()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
-const engine=createGame([],true);
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
 const mapView=new DungeonMap(destination=>{if(!live||playing||dialogs.open)return;const s=session.snapshot;if(session.step({id:s.id,depth:s.depth,revision:s.revision,destination})&&session.snapshot.phase==='battle')start();},()=>!live||playing||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
@@ -80,6 +79,8 @@ document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key==='
 window.addEventListener('pagehide',()=>{live=false;session.dispose();mapView.dispose();stop();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 render();
+const engine=createGame([],true);
+whenGameReady(engine,()=>{screen.dataset.boot='ready';});
 
 const entryIntent=consumeEntryIntent();
 if(entryIntent==='new')requestNew();

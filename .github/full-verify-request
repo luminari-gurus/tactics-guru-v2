@@ -2,6 +2,8 @@
 # issue-200-baseline.yml. Humans with Actions write can instead dispatch
 # extra_job=full-verify. Do not treat a bump on main as release qualification
 # unless that was the intent.
-requested: 2026-11-01T11:50:00Z
-head: rebase-onto-main-after-pr255
-reason: PR 256 recapture after rebase onto main (merged #255 tactical planning/undo)
+# Delete this file before merging PR #256; the push trigger now ignores main,
+# but the token still should not land on main.
+requested: 2026-11-01T15:05:00Z
+head: phaser-ready-continue-wait
+reason: PR 256 recapture after Phaser READY wait in continueSavedDungeon, helper on all post-reload Continue, branches-ignore main, drop review-pilot

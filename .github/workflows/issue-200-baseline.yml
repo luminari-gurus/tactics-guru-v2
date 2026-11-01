@@ -18,11 +18,14 @@ on:
       extra_job:
         description: Optional extra job on the dispatched ref; does not start serial batches
         type: choice
-        options: [none, full-verify, review-pilot]
+        options: [none, full-verify]
         default: none
   # Agents with contents:write but not Actions dispatch can start a full capture
   # by bumping this token file. Serial-batch jobs ignore push events.
+  # branches-ignore keeps a merge of this path from starting a ~7h run on main.
   push:
+    branches-ignore:
+      - main
     paths:
       - '.github/full-verify-request'
 permissions:
@@ -37,7 +40,7 @@ env:
   SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
   qualify:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && inputs.extra_job != 'full-verify' && inputs.extra_job != 'review-pilot' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 25
     steps:
@@ -75,7 +78,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && inputs.extra_job != 'review-pilot' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 35
     outputs:
@@ -163,7 +166,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && inputs.extra_job != 'review-pilot' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 10
     steps:
@@ -233,40 +236,5 @@ jobs:
           path: |
             verification-receipts/
             tmp/verification/
-          retention-days: 30
-          if-no-files-found: warn
-
-  review-pilot:
-    if: inputs.extra_job == 'review-pilot' && github.repository == 'luminari-gurus/tactics-guru-v2'
-    runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 35
-    steps:
-      - name: Check host disposition
-        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-      - run: npm ci
-        timeout-minutes: 10
-      - run: npm run setup:browsers && npm run check:browsers
-        timeout-minutes: 10
-      - name: Qualify review fixes
-        run: |
-          mkdir -p verification-receipts/review-pilot
-          git rev-parse HEAD > verification-receipts/review-pilot/source.txt
-          npm run test:unit -- tests/unit/dungeon.test.ts tests/unit/RunItemSession.test.ts tests/unit/battlePersistence.test.ts > verification-receipts/review-pilot/session-units.log 2>&1
-          npm run build > verification-receipts/review-pilot/build.log 2>&1
-          PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/review-pilot/chromium.json npx --no-install playwright test tests/main-menu.spec.ts --reporter=list,json --output=verification-receipts/review-pilot/chromium
-          PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/review-pilot/webkit.json npx --no-install playwright test tests/main-menu.spec.ts -c playwright.device-acceptance.config.ts --reporter=list,json --output=verification-receipts/review-pilot/webkit
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: review-pilot-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/review-pilot/
           retention-days: 30
           if-no-files-found: warn
