@@ -1,4 +1,4 @@
-import { expect,test } from '@playwright/test';
+import { expect,test } from './helpers/startupDiagnostics';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon } from './helpers/dungeonTraversal';

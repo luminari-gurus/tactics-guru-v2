@@ -9,10 +9,14 @@ Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence re
   requested. Use OpenSpec change `issue-263-webkit-reload-boot` (spec-driven).
 - Initial refresh: worktree clean at planning commit `25fca08`; main still
   `a8b87c1`, PR #256 open at `c2e3c56`, #263 open and assigned to us.
-- Exact failed artifact download is live in tool session `54966`, destination
-  WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip`. Re-poll that
-  session before restarting; partial bytes are not yet a valid artifact.
-- Isolated exact-failure checkout/build is live in session `19248` at WSL
+- Exact failed artifact recovery (session `54966`), destination
+  WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip` **completed**:
+  590,452,011 bytes, SHA-256
+  `9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
+  Selected CRC-validated reports/error context and the pre-failure screenshot are
+  preserved in `docs/qa/issue-263/` with an evidence manifest; no original trace
+  or request/exception ledger exists. Task 1.1 is complete.
+- Isolated exact-failure checkout/build (session `19248`) completed at WSL
   `/tmp/tactics-issue263-failing`, source `9b543cb`. Install/build logs are in
   `/tmp/tactics-issue263-evidence/`. Native Git remains authoritative for commits
   in the Windows checkout; use authenticated WSL Git for network operations.
@@ -22,6 +26,28 @@ Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence re
   The OpenSpec proposal/spec/design/tasks capture the existing acceptance before
   diagnosis. Use `openspec instructions apply --change issue-263-webkit-reload-boot
   --json` for live task locations and progress.
+- OpenSpec artifacts validated and pushed in `f16cd5a`; apply is ready, **0/6**
+  tasks complete. [Current QA record](../qa/issue-263/README.md) retains progress.
+- Local exact-runtime build/browser qualification passed. Diagnostic-only tests:
+  desktop WASD **5/5** (27.2s), all 12 WebKit stair/input/profile combinations
+  repeated five times **60/60** (4.9m), no retries/skips. These passes do not
+  reproduce the reported failure. Some passing navigations cancelled an unfinished
+  `items` module request, so cancellation is observed but not established as cause.
+- Bounded 300-pair goto/reload probe **passed** (2.1m). Its initial zero-test config
+  mistake is retained separately. No blanket retry/application change was introduced.
+- Original failure is a later locked-stair fixture load (`tests/dungeon-exploration.spec.ts:124`),
+  after successful round-trip travel. The missing screen is confirmed, cause unknown.
+- First independent chunk adds bounded pre-navigation failure diagnostics to the
+  existing exploration tests; it does not fix boot or change test selection.
+  A synthetic two-engine privacy/bounds contract and local main-source real stairs
+  qualification are active in session `89668`. Main-source diagnostic checkout is
+  `/tmp/tactics-issue263-main`; its lockfile matches the exact-failure checkout.
+  OpenSpec now separates diagnostic publication (1.3) from the causal witness.
+- Initial diagnostic main-source qualification: build/content/both types pass;
+  exact selection unchanged (54 cases per engine); WebKit stairs 12/12 and
+  Chromium exploration 54/54 pass. Final privacy contract/typecheck pass after
+  filtering was tightened; complete final-helper positive checks remain active
+  in session `70802` (42 WebKit non-stair cases), then finish both matrices.
 
 - Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.

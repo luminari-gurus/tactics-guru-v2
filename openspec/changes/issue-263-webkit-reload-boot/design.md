@@ -25,6 +25,13 @@ menu redesign, automatic retries, weaker assertions or timeout-only mitigation.
    and no arbitrary storage dumps. Reuse Playwright reports/attachments and
    existing source/build receipts. Diagnostics placed only in the suspect import
    graph could never run, so they cannot alone locate a pre-mount stall.
+   The recovered original has no failure trace or request/exception ledger.
+   Therefore the first reviewable chunk is an automatic fixture on the existing
+   dungeon exploration tests: no request interception, timers driving the page,
+   browser storage access or runtime telemetry. Attach only on unexpected failure;
+   cap requests/events/samples and retain build-owned filenames plus safe error
+   categories. A synthetic two-engine contract checks redaction and bounds.
+   Preserve a distinct pending task for the causal witness and eventual repair.
 3. Select the repair only after evidence narrows the boundary. Preserve normal
    module error recovery and save bytes. Treat network/module evaluation, clock
    behavior, initialization lifecycle and engine readiness as hypotheses until
