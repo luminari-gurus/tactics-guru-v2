@@ -1,0 +1,23 @@
+{
+  "commit": "cdc39cf966d9f7b2bbf2ee74e57f4f5b05eda302",
+  "mainBase": "78a3f75b18601d12e243f810c0cbd1b95154efe9",
+  "buildDirty": false,
+  "dependencyInstall": "Reused npm-ci dependency tree from a byte-identical package-lock; local node_modules symlink excluded from status",
+  "inputs": {
+    "tests/helpers/startupDiagnostics.ts": "1f54fc9e0bcc19a10e16569ebb92772198e87133c0090a6dec5d2d2731c3c2e0",
+    "tests/dungeon-exploration.spec.ts": "ba4ac72b58d3d69cfcaa442afe6034b6f9659bcfd97651760a934fda2015dd6e",
+    "tests/tooling/browser-diagnostics.test.mjs": "3ce145fb04e296a6d37e25cedca299113f9df35f9a770d40215a1e036d4f7a29",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+    "playwright.config.ts": "464f45fcef3e4bb8f3e6c1c730d0ebe1b0cb38b812ebc0a1d17e65f68a3b0950",
+    "playwright.exploration.config.ts": "2a07d4a462e9e006cdb9caeeb225e76d3961aede3889f8ab09fa3d0299568e8f",
+    "dist/index.html": "98c218df649a85f2c608ba762e76e96ae805ae27424fcae99e9df68590d5d89d"
+  },
+  "node": "v24.15.0",
+  "playwright": "1.63.0",
+  "chromium": "153.0.8010.12",
+  "webkit": "26.6",
+  "workers": 1,
+  "retries": 0,
+  "mode": "root production preview; standard acceptance uses trace=off",
+  "tracedFailure": "Retained separately; same assertion reproduced on literal main 78a3f75"
+}

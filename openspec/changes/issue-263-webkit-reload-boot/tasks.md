@@ -4,7 +4,7 @@
 
 - [x] 1.1 Recover the exact failed-run artifact and relevant report/trace/screenshots; verify source identities and artifact hashes, and record findings plus reproduction commands in docs/qa/issue-263/README.md and plan.md.
 - [ ] 1.2 Capture bounded pre-navigation startup evidence and establish a causal failure witness on the exact affected source, using literal-base comparison where attribution is needed; retain failures and unresolved hypotheses in QA/design/plan.
-- [ ] 1.3 Publish the bounded startup-diagnostic fixture as an independently reviewable chunk; verify private-data exclusion, event caps, unchanged selection and affected real browser cases, and keep #263 open for the causal repair and complete acceptance.
+- [x] 1.3 Publish the bounded startup-diagnostic fixture as an independently reviewable chunk; verify private-data exclusion, event caps, unchanged selection and affected real browser cases, and keep #263 open for the causal repair and complete acceptance.
 
 ## 2. Repair and focused qualification
 

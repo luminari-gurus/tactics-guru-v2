@@ -4,61 +4,76 @@ Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence re
 
 ## Current implementation handoff
 
-- User authorized implementation, autonomous issue resolution, commits/pushes and
-  focused review-ready PRs on 2026-11-01. No merge, deployment or release tag is
-  requested. Use OpenSpec change `issue-263-webkit-reload-boot` (spec-driven).
-- Initial refresh: worktree clean at planning commit `25fca08`; main still
-  `a8b87c1`, PR #256 open at `c2e3c56`, #263 open and assigned to us.
-- Exact failed artifact recovery (session `54966`), destination
-  WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip` **completed**:
+Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
+
+- Diagnostic PR [#264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264)
+  is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
+  cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
+  it changes no application, asset, dependency, build or browser configuration.
+- OpenSpec change `issue-263-webkit-reload-boot` is **2/7 complete**: original
+  evidence recovery (1.1) and diagnostic publication (1.3). The causal witness
+  (1.2), repair (2.1), repair integration proof (2.2), full acceptance (3.1) and
+  final project handoff (3.2) remain open. Use live `openspec instructions apply`
+  for exact task locations before changing checkboxes.
+- Final diagnostic code `495d08d` is unchanged by main integration. On clean
+  **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
+  passed **54/54 WebKit and 54/54 Chromium**, one worker, no retries/skips.
+  Both matrices preserve the original selected IDs/titles. The byte-unchanged
+  two-engine privacy/bounds contract and final helper typecheck also pass.
+  [QA](../qa/issue-263/README.md), manifests and `integrated-source.json` retain
+  source/build/browser/mode identities and all earlier attempts.
+- A traced combined-tree attempt had 53 WebKit passes and one 250-floor budget
+  failure (3421ms vs unchanged 2500ms). Its attachment shows boot ready at 384ms,
+  styles loaded and no request/page error: a different symptom from #263.
+  **Literal main `78a3f75`** reproduced the same assertion on one of three traced
+  repetitions (3757ms); all three ordinary repetitions passed. Keep both failed
+  traced attempts separately; no limit/assertion was relaxed and neither failure
+  establishes #263's cause.
+- Original archive: WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip`,
   590,452,011 bytes, SHA-256
   `9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
-  Selected CRC-validated reports/error context and the pre-failure screenshot are
-  preserved in `docs/qa/issue-263/` with an evidence manifest; no original trace
-  or request/exception ledger exists. Task 1.1 is complete.
-- Isolated exact-failure checkout/build (session `19248`) completed at WSL
-  `/tmp/tactics-issue263-failing`, source `9b543cb`. Install/build logs are in
-  `/tmp/tactics-issue263-evidence/`. Native Git remains authoritative for commits
-  in the Windows checkout; use authenticated WSL Git for network operations.
-- The qualified `unraid-tactics-01` runner is online but was busy at refresh.
-  Do not interrupt another owner's job or run concurrent browser jobs there.
-- Cause remains unknown. No runtime behavior, test assertion or timeout changed.
-  The OpenSpec proposal/spec/design/tasks capture the existing acceptance before
-  diagnosis. Use `openspec instructions apply --change issue-263-webkit-reload-boot
-  --json` for live task locations and progress.
-- OpenSpec artifacts validated and pushed in `f16cd5a`; apply is ready, **0/6**
-  tasks complete. [Current QA record](../qa/issue-263/README.md) retains progress.
-- Local exact-runtime build/browser qualification passed. Diagnostic-only tests:
-  desktop WASD **5/5** (27.2s), all 12 WebKit stair/input/profile combinations
-  repeated five times **60/60** (4.9m), no retries/skips. These passes do not
-  reproduce the reported failure. Some passing navigations cancelled an unfinished
-  `items` module request, so cancellation is observed but not established as cause.
-- Bounded 300-pair goto/reload probe **passed** (2.1m). Its initial zero-test config
-  mistake is retained separately. No blanket retry/application change was introduced.
-- Original failure is a later locked-stair fixture load (`tests/dungeon-exploration.spec.ts:124`),
-  after successful round-trip travel. The missing screen is confirmed, cause unknown.
-- First independent chunk adds bounded pre-navigation failure diagnostics to the
-  existing exploration tests; it does not fix boot or change test selection.
-  A synthetic two-engine privacy/bounds contract and local main-source real stairs
-  qualification are active in session `89668`. Main-source diagnostic checkout is
-  `/tmp/tactics-issue263-main`; its lockfile matches the exact-failure checkout.
-  OpenSpec now separates diagnostic publication (1.3) from the causal witness.
-- Initial diagnostic main-source qualification: build/content/both types pass;
-  exact selection unchanged (54 cases per engine); WebKit stairs 12/12 and
-  Chromium exploration 54/54 pass. Final privacy contract/typecheck pass after
-  filtering was tightened; complete final-helper positive checks remain active
-  in session `70802` (42 WebKit non-stair cases), then finish both matrices.
-- Final-helper checks have now completed: Chromium exploration **54/54**, WebKit
-  **42 non-stair + 12 stair = 54/54**, zero retries/skips; final privacy contract
-  and typecheck pass. Inputs/reports are in the QA manifest and
-  `docs/qa/issue-263/diagnostic-source.json`. No runtime/build/dependency input
-  changes occurred. The diagnostic code is committed/pushed at **`495d08d`**.
-- Exact-runtime qualified-runner diagnosis is **pending**, run **41343197332**
-  ([Actions](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41343197332)),
-  temporary branch `branch/issue-263-runner-diagnosis` at `508f1b6`. It shares the
-  exclusive lock behind existing full run 41337233629. Re-poll those actual run
-  IDs; do not restart a live queued job or interrupt another owner's capture.
-  The temporary CI branch is separate from this implementation/review branch.
+  Selected CRC-validated reports, error context and pre-failure screenshot are
+  committed under `docs/qa/issue-263/`. Original failure: missing screen for 60s
+  during a later locked-stair fixture load, after successful round-trip travel.
+  The artifact has no failure trace or request/exception ledger.
+- Local exact-runtime checkout `/tmp/tactics-issue263-failing` is pinned to
+  `9b543cb`. Original build/browser checks passed; desktop WASD 5/5, all stair
+  inputs/profiles repeated five times 60/60, and 300 goto/reload pairs passed.
+  Some passing navigations cancelled an unfinished `items` module request;
+  cancellation is observed but not sufficient to establish the stall.
+- A corrected bounded cached-stylesheet probe found no synchronous/missing load
+  events in 2,000 insertions. Its first event-checkpoint mistake and correction
+  are retained in QA. Original/local exact-runtime build logs have matching sets
+  of 28 generated JS/CSS names, without an original served-byte comparison.
+- Other checkouts: `/tmp/tactics-issue263-main` (older diagnostic qualification),
+  `/tmp/tactics-issue263-integrated` (clean tested `cdc39cf`), and
+  `/tmp/tactics-issue263-current-base` (literal `78a3f75` comparison). Common logs,
+  reports and traces are under `/tmp/tactics-issue263-evidence/`. All local checks
+  above are terminal; do not poll old exec handles as live.
+- Runner attempt **41343197332 was cancelled while pending, zero jobs executed**.
+  It supplies no evidence. At last read, another owner's full capture
+  **41337233629** was in progress and browser setup **41344487694** was pending.
+  Recheck those specific runs and the queue; submit ours only when it will not
+  replace another pending request. A live queued/running job is a verified wait,
+  not a reason to restart it.
+- Temporary CI branch `branch/issue-263-runner-diagnosis` is pushed at **`4d4fd5b`**,
+  separate from #264. Its native worktree is `tmp/issue263-runner-worktree`.
+  Dispatch existing `browser-setup.yml` on that branch when the queue permits.
+  It checks out exact failed runtime `9b543cb`, overlays only the observer/one test
+  import, records hashes and builds, then runs original WebKit exploration order
+  **untraced** (preserving the embedded budget check) followed by five stair
+  repetitions with failure traces. One worker, zero retries, exclusive lock and
+  a two-failure diagnostic stop are explicit; partial runs cannot satisfy final
+  acceptance. Never introduce a hosted fallback or interrupt another owner's job.
+- Use native Git for checkout/commit/worktrees. Authenticated WSL network Git works
+  from the primary checkout; Windows worktree `.git` pointers cannot be read by
+  WSL Git. Push the CI branch from the primary repository using its explicit ref.
+- Next: refresh runner/PR/main state, resubmit the bounded diagnosis when safe,
+  recover any failure attachment/trace and identify the owning boot cause.
+  Stack a focused repair PR on #264 when ready. Preserve #257/#258 separately
+  unless evidence connects their causes. Then fulfill the original full-run gate.
+  User authorization includes implementation, fixes, commits/pushes and focused
+  review-ready PRs; it does not request merging, deployment or a release tag.
 
 - Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.

@@ -106,13 +106,62 @@ and the WebKit exploration config with complementary `-g` / `--grep-invert`
 ## Qualified-runner diagnosis
 
 [Run 41343197332](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41343197332)
-is queued behind an existing full capture on the exclusive self-hosted runner.
+was cancelled while pending; the API confirms **zero jobs executed**. Another
+owner's pending run 41344487694 must not be replaced by resubmission while the
+existing exclusive full capture 41337233629 is still active.
 Temporary branch `branch/issue-263-runner-diagnosis`, commit `508f1b6`, carries only
 the manual job addition beyond diagnostic code `495d08d`; it is separate from the
 review branch. It checks out exact failed runtime `9b543cb`, overlays the helper
 and its one import without changing original test bodies, records input hashes,
 builds and runs the diagnostic contract, then original WebKit exploration order
-and five stair repetitions with retained failure traces. One worker/zero retries
+and five stair repetitions with retained failure traces. Commit `4d4fd5b` now
+keeps the first, complete exploration order in ordinary untraced mode so its
+embedded startup-budget check has canonical measurement conditions; stair repeats
+still retain traces. One worker/zero retries
 and the shared exclusive lock remain. Two failures stop this **diagnostic** run
 early; such a partial attempt cannot satisfy acceptance. No original failed run
-is relabeled, and this queued run is not yet passing evidence.
+is relabeled, and the cancelled attempt supplies no passing evidence.
+
+## Main integration and traced-budget comparison
+
+#256 merged to main `78a3f75` during diagnosis. Our branch integrated it cleanly
+as `cdc39cf`; the helper and its contract/dependencies are unchanged. On this
+combined source a traced WebKit exploration attempt had **53 passes / one failed
+250-floor startup-budget case**, 3421ms against unchanged 2500ms. Its new startup
+attachment shows boot ready at 384ms, styles loaded and no request/page error;
+this is a different failure from #263's missing screen. The trace/report remain
+under `/tmp/tactics-issue263-evidence/integrated-webkit*`.
+
+A clean **literal-main `78a3f75`** checkout without the fixture reproduced the
+same assertion on one of three traced focused landscape-WebKit repetitions
+(3757ms), with two passes. Three matching ordinary/untraced repetitions passed.
+This does not attribute #263 to trace overhead or prove an exclusive cause of
+the budget variance; it establishes that this budget failure also occurs on the
+base under the diagnostic flags. Qualification now uses the unchanged canonical
+untraced mode and retains the failed traced attempts separately. No limit or
+assertion was relaxed. Combined-source ordinary qualification **passed 54/54
+WebKit (3.6m) and 54/54 Chromium (3.4m)**, zero retries/skips, at clean tested
+commit `cdc39cf`. [Integrated source/build identity](integrated-source.json),
+`integrated-*-standard.json.gz` and associated logs preserve the exact inputs.
+Current-tree discovery still matches the original 54 IDs/titles per engine.
+No application/build/config/dependency input differs from literal main in this
+diagnostic PR. The unchanged privacy contract remains valid independently of
+the main integration. OpenSpec task 1.3 is complete; cause/fix/full acceptance
+are still pending.
+
+## Additional bounded checks
+
+The original failed-run and local exact-runtime build logs have the same **28
+generated JS/CSS asset filenames**. This is consistent output naming, not a
+comparison of original served bytes (the original bundle itself is unavailable
+in that artifact).
+
+A local desktop-WebKit probe inserted the already-loaded production dungeon
+stylesheet 2,000 times. Its corrected post-dispatch check observed **zero
+synchronous load events, zero missing late listeners and zero timeouts**. This
+does not reproduce #263 or rule out cross-document/network-cache behavior.
+The first probe incorrectly checked after an awaited promise but before the
+remaining event listener ran; it reported a false late-listener miss. Corrected
+checks recorded 2,000 such early checkpoints followed by successful listeners.
+Both the invalid first probe and corrected result are retained as `css-event-probe*`
+reports/logs, with no application change inferred from either.
