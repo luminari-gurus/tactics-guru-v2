@@ -29,8 +29,8 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 
 ## 5. Integration qualification and delivery
 
-- [ ] 5.1 Freeze final relevant inputs and complete source-bound full-regression accounting using `npm run verify:full` and explicit menu Chromium/WebKit selections on qualified exclusive self-hosted capacity. Verify both type scopes/build, units/build integrations, ordinary/fixture/dev-placement suites, both WebKit configs, health bars, separate production/dev telemetry, asset root/prefix preview/dev, performance and root restoration. Retain source/build/asset identity, commands, actual reports/skips/failures and valid reused evidence; do not weaken assertions or restart unaffected passing suites for prose edits. Post-rebase capture [41303583877](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303583877) on `68004c4` completed every stage and **failed**: chromium 829/0, prefix preview/dev passed, `webkit-exploration` 98 passed / 1 portrait-webkit stairs/`compass` timeout waiting for the dungeon heading after reload while Phaser was still Loading. Landscape-webkit stairs/`cell` passed in that run. Pre-#255 capture 41239917772 on `c39e10b` passed 19/19 but does not qualify this head.
-- [ ] 5.2 Audit every #153 criterion against the design acceptance table, including exact title availability and all menu states; retain a QA report, screenshots, discovery comparison and honest limitations. Verify `openspec validate issue-153-portrait-main-menu --strict` and `git diff --check`. Focused report: `docs/qa/issue-153/README.md`. Full-run screenshots/logs live in workflow artifacts, not the tree. Remains open until the post-rebase capture is accounted. Device evidence is Playwright/WebKit emulation, not physical hardware. PR #256 stays a draft at caller request.
+- [ ] 5.1 Freeze final relevant inputs and complete source-bound full-regression accounting using `npm run verify:full` and explicit menu Chromium/WebKit selections on qualified exclusive self-hosted capacity. Verify both type scopes/build, units/build integrations, ordinary/fixture/dev-placement suites, both WebKit configs, health bars, separate production/dev telemetry, asset root/prefix preview/dev, performance and root restoration. Retain source/build/asset identity, commands, actual reports/skips/failures and valid reused evidence; do not weaken assertions or restart unaffected passing suites for prose edits. Capture [41320149918](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41320149918) on `9b543cb` completed every stage and **failed**: chromium 829/0, prefix preview/dev passed, `webkit-exploration` 98 passed / 1 desktop-webkit stairs/`wasd` timeout waiting 60s for `#dungeon-screen[data-boot=ready]` after a later reload while the HTML shell was still Loading. Portrait and landscape WebKit stairs all passed. Prior 41303583877 on `68004c4` failed portrait-webkit stairs/`compass` on a 15s heading wait. Pre-#255 capture 41239917772 on `c39e10b` passed 19/19 but does not qualify this head.
+- [ ] 5.2 Audit every #153 criterion against the design acceptance table, including exact title availability and all menu states; retain a QA report, screenshots, discovery comparison and honest limitations. Verify `openspec validate issue-153-portrait-main-menu --strict` and `git diff --check`. Focused report: `docs/qa/issue-153/README.md`. Full-run screenshots/logs live in workflow artifacts, not the tree. Remains open until a green capture on this head is accounted. Device evidence is Playwright/WebKit emulation, not physical hardware. PR #256 stays a draft at caller request.
 - [x] 5.3 Commit/push only approved issue work and open/attach one PR after checking for an existing branch PR; verify remote parity and PR base/body. Use `Closes #153` only with all acceptance verified, otherwise a draft with `Refs #153` and precise remaining gates.
 
 ## Workflow follow-up
@@ -40,10 +40,10 @@ Implementation authorized by the caller on 2026-10-30: “pick up the issue and 
 ## Implementation progress (2026-10-31)
 
 Runtime, closed-set intents, explicit unsaved-departure state, and menu art are
-in the branch, rebased onto main after #255. Post-rebase capture 41303583877
-failed `webkit-exploration` (portrait-webkit stairs/`compass` Continue heading
-timeout). Landscape-webkit stairs/`cell` did not reproduce. 5.1 and 5.2 remain
-open. PR #256 stays a draft (`Refs #153`). No merge.
+in the branch, rebased onto main after #255. Capture 41320149918 on `9b543cb`
+failed `webkit-exploration` (desktop-webkit stairs/`wasd` 60s `#dungeon-screen`
+boot wait; page still Loading). Portrait and landscape WebKit stairs passed.
+5.1 and 5.2 remain open. PR #256 stays a draft (`Refs #153`). No merge.
 
 ## PR #256 review repairs
 

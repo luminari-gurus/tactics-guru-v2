@@ -17,10 +17,13 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
 - Focused Chromium/WebKit menu coverage lives in `tests/main-menu.spec.ts`.
 - Run, dungeon, and standalone battle use explicit `hasUnsavedProgress` owner
   state so rejected commands cannot clear a leave warning.
-- Post-rebase capture [41303583877](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303583877)
-  (`68004c4`) completed every `verify:full` stage and **failed**. Artifact
-  `full-verify-41303583877-1`. Device evidence is Playwright/WebKit emulation.
-  Draft PR #256. No merge claim.
+- Phaser Core `READY` sets `#dungeon-screen[data-boot=ready]`. Helper
+  `continueSavedDungeon` waits for that marker (60s, helper-scoped), then the
+  heading and an enabled Continue. Every post-reload Continue click uses it.
+- Capture [41320149918](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41320149918)
+  (`9b543cb`) completed every `verify:full` stage and **failed**. Artifact
+  `full-verify-41320149918-1`. Device evidence is Playwright/WebKit emulation.
+  Draft PR #256. No merge claim. Delete `.github/full-verify-request` before merge.
 
   | Stage | Result | Notes |
   | --- | --- | --- |
@@ -33,7 +36,7 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
   | fixtures | passed | 87 expected |
   | placement-dev | passed | 3 expected |
   | webkit-acceptance | passed | 92 expected |
-  | webkit-exploration | **failed** | 98 passed, 1 timeout: `portrait-webkit` stairs / `compass` waiting 15s for heading `Dungeon floors` after reload while Phaser status was still Loading. Landscape-webkit stairs arrows/wasd/compass/`cell` all passed in this run. |
+  | webkit-exploration | **failed** | 98 passed, 1 timeout: `desktop-webkit` stairs / `wasd` waiting 60s for `#dungeon-screen[data-boot=ready]` after a later `load()`; page still showed the HTML shell with Phaser status Loading (`#dungeon-screen` never appeared). Portrait-webkit and landscape-webkit stairs arrows/wasd/compass/`cell` all passed. Desktop-webkit stairs arrows/compass/`cell` passed. |
   | health-bars | passed | 25 expected |
   | telemetry-production | passed | 36 expected |
   | telemetry-development | passed | 36 expected |
@@ -43,6 +46,11 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
   | assets-prefix-preview | passed | 78 expected, ~3.7 min |
   | assets-prefix-dev | passed | 75 expected / 3 skipped |
   | restore-root | passed | |
+
+- Post-rebase capture [41303583877](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41303583877)
+  (`68004c4`) completed every stage and **failed**: `webkit-exploration` 98
+  passed / 1 portrait-webkit stairs/`compass` timeout (15s heading wait while
+  Phaser was still Loading). Chromium 829/0. Does not qualify this head.
 
 - Passing full capture [41239917772](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41239917772)
   (`c39e10b`) completed every `verify:full` stage **before** the #255 rebase.
