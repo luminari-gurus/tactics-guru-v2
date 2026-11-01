@@ -75,10 +75,44 @@ fails four cases to check attached evidence, redaction and saturation caps.
 
 This is diagnosis support, not the causal repair. Final #263 acceptance is pending.
 
-Diagnostic qualification so far: main-runtime build/content/both types passed;
-the unchanged 54-test selection in each engine was verified; initial WebKit
-stairs **12/12** and the full affected Chromium file **54/54** passed. The final
-privacy contract passed on both engines, checking four deliberate failures,
-same-origin filename filtering, redaction and event saturation. Final metadata
-filtering changed after those first positive runs; fresh affected-matrix checks
-will qualify that exact helper before marking the diagnostic chunk complete.
+Final diagnostic-helper qualification (local WSL, one worker, zero retries/skips):
+
+- Main-runtime build/content/both types passed; final helper typecheck passed.
+- Exact before/after discovery retained all 54 test IDs/titles per engine.
+- Final privacy contract passed on Chromium and WebKit: four deliberate assertion
+  failures verify attachments, same-origin filenames, private-message/URL/save
+  exclusion and event saturation. This is one passing Node contract, not four
+  successful application journeys.
+- Final-helper Chromium exploration **54/54 passed** in 3.5 minutes.
+- Final-helper WebKit exploration **54/54 passed**, split into 42 non-stair cases
+  (3.3 minutes) and 12 stair cases (38.7 seconds). All three device profiles ran.
+  Earlier 54/54 Chromium and 12/12 WebKit positive runs preceded final filtering
+  and remain separate historical evidence.
+
+[Source identity](diagnostic-source.json) records base `f16cd5a`, dirty diagnostic
+test overlay matching code commit `495d08d`, relevant file/build hashes, runtime,
+browser versions and mode overrides. App, assets, dependencies and build/config
+inputs are unchanged by this test-only chunk. The served build identifies the
+actual tested base/dirty state; it is not claimed to be a clean build of the final
+documentation commit. Raw reports/logs/discovery are gzip-preserved and listed in
+the evidence manifest; hashes bind canonical committed payload bytes.
+
+Commands: `npm run build`; `npx tsc --noEmit` after final helper filtering;
+`node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs`;
+`npx --no-install playwright test tests/dungeon-exploration.spec.ts --retries=0`;
+and the WebKit exploration config with complementary `-g` / `--grep-invert`
+`stairs travel once per entry` filters. Discovery used `--list --reporter=json`.
+
+## Qualified-runner diagnosis
+
+[Run 41343197332](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41343197332)
+is queued behind an existing full capture on the exclusive self-hosted runner.
+Temporary branch `branch/issue-263-runner-diagnosis`, commit `508f1b6`, carries only
+the manual job addition beyond diagnostic code `495d08d`; it is separate from the
+review branch. It checks out exact failed runtime `9b543cb`, overlays the helper
+and its one import without changing original test bodies, records input hashes,
+builds and runs the diagnostic contract, then original WebKit exploration order
+and five stair repetitions with retained failure traces. One worker/zero retries
+and the shared exclusive lock remain. Two failures stop this **diagnostic** run
+early; such a partial attempt cannot satisfy acceptance. No original failed run
+is relabeled, and this queued run is not yet passing evidence.

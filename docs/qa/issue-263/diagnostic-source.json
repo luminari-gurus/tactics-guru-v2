@@ -1,0 +1,29 @@
+{
+  "base": "f16cd5aca4e5569606395ed7bbcf0b290e9e6dee",
+  "diagnosticCodeCommit": "495d08d5897030cfae3ac3d5528e9411361c4352",
+  "runtime": "unchanged main runtime; ordinary root preview, no telemetry configuration in this isolated checkout",
+  "dirty": true,
+  "node": "v24.15.0",
+  "platform": "WSL Linux x64",
+  "playwright": "1.63.0",
+  "chromium": "153.0.8010.12",
+  "webkit": "26.6",
+  "workers": 1,
+  "retries": 0,
+  "inputs": {
+    "tests/helpers/startupDiagnostics.ts": "1f54fc9e0bcc19a10e16569ebb92772198e87133c0090a6dec5d2d2731c3c2e0",
+    "tests/dungeon-exploration.spec.ts": "a54ef4362c45e66ebe28de2806599f4cdcae0db8b1ff7273e0792f8d2018d560",
+    "tests/tooling/browser-diagnostics.test.mjs": "f132fe6d2c92065ff365a0785a470bb99026f66b5292d03011cc6cc25f2e1d1f",
+    "package-lock.json": "577f6a4c329611f51a4631f72ef164c909e152275d9ec99de022b50b713e0a9d",
+    "playwright.config.ts": "464f45fcef3e4bb8f3e6c1c730d0ebe1b0cb38b812ebc0a1d17e65f68a3b0950",
+    "playwright.exploration.config.ts": "2a07d4a462e9e006cdb9caeeb225e76d3961aede3889f8ab09fa3d0299568e8f",
+    "dist/index.html": "4ac1858d46863b43a923b2408400d81e030d470dc5eb11cb710daf23684f9575"
+  },
+  "modeOverrides": {
+    "PLAYWRIGHT_SERVER_MODE": null,
+    "PLAYWRIGHT_BASE_PATH": null,
+    "PLAYWRIGHT_CHROMIUM_EXECUTABLE": null,
+    "PLAYWRIGHT_TELEMETRY_DEV": null,
+    "POSTHOG_SOURCEMAPS": null
+  }
+}

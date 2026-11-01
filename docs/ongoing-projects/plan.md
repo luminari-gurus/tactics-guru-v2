@@ -48,6 +48,17 @@ Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence re
   Chromium exploration 54/54 pass. Final privacy contract/typecheck pass after
   filtering was tightened; complete final-helper positive checks remain active
   in session `70802` (42 WebKit non-stair cases), then finish both matrices.
+- Final-helper checks have now completed: Chromium exploration **54/54**, WebKit
+  **42 non-stair + 12 stair = 54/54**, zero retries/skips; final privacy contract
+  and typecheck pass. Inputs/reports are in the QA manifest and
+  `docs/qa/issue-263/diagnostic-source.json`. No runtime/build/dependency input
+  changes occurred. The diagnostic code is committed/pushed at **`495d08d`**.
+- Exact-runtime qualified-runner diagnosis is **pending**, run **41343197332**
+  ([Actions](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41343197332)),
+  temporary branch `branch/issue-263-runner-diagnosis` at `508f1b6`. It shares the
+  exclusive lock behind existing full run 41337233629. Re-poll those actual run
+  IDs; do not restart a live queued job or interrupt another owner's capture.
+  The temporary CI branch is separate from this implementation/review branch.
 
 - Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.
