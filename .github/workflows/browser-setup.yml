@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
+    if: github.ref != 'refs/heads/branch/issue-263-runner-diagnosis'
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
@@ -36,3 +37,56 @@ jobs:
             test-results/
           retention-days: 7
           if-no-files-found: ignore
+  issue263-diagnosis:
+    if: github.ref == 'refs/heads/branch/issue-263-runner-diagnosis'
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 40
+    steps:
+      - name: Check qualified host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Preserve only the diagnostic test overlay
+        run: |
+          mkdir -p "$RUNNER_TEMP/issue263-${{ github.run_id }}"
+          cp tests/helpers/startupDiagnostics.ts tests/tooling/browser-diagnostics.test.mjs "$RUNNER_TEMP/issue263-${{ github.run_id }}/"
+      - uses: actions/checkout@v4
+        with:
+          ref: 9b543cbafecf1cce48f966ff1d8998a46a7ae32d
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Install the observer without changing original test bodies
+        run: |
+          cp "$RUNNER_TEMP/issue263-${{ github.run_id }}/startupDiagnostics.ts" tests/helpers/
+          cp "$RUNNER_TEMP/issue263-${{ github.run_id }}/browser-diagnostics.test.mjs" tests/tooling/
+          python3 - <<'PY'
+          from pathlib import Path
+          file=Path('tests/dungeon-exploration.spec.ts')
+          old="import { expect,test } from '@playwright/test';"
+          text=file.read_text()
+          assert text.count(old)==1
+          file.write_text(text.replace(old,"import { expect,test } from './helpers/startupDiagnostics';",1))
+          PY
+          mkdir -p verification-receipts/issue263
+          git rev-parse HEAD > verification-receipts/issue263/runtime-source.txt
+          git diff --stat > verification-receipts/issue263/overlay.txt
+          sha256sum tests/helpers/startupDiagnostics.ts tests/tooling/browser-diagnostics.test.mjs tests/dungeon-exploration.spec.ts package-lock.json > verification-receipts/issue263/input-hashes.txt
+      - run: npm run build
+      - run: node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs
+      - name: Original exploration order with failure traces
+        run: npm run test:browser -- --diagnostics -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --max-failures=2
+      - name: Bounded stair repetitions with failure traces
+        run: npm run test:browser -- --diagnostics -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'stairs travel once per entry' --repeat-each=5 --max-failures=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue263-diagnosis-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 30
+          if-no-files-found: warn
