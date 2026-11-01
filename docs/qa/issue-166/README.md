@@ -3,7 +3,7 @@
 Updated 2026-10-30 (Asia/Jerusalem). Implementation and qualification are complete
 on combined main/Shaman source **f4616ae301da4be133455334d4c2b38e3583c8f7**. All five issue criteria below are
 proven. Foundation #251 is merged; runtime #252 targets main for final merge closeout. OpenSpec is **9/9 complete**.
-The [live plan](../../ongoing-projects/plan.md) and
+The [completed plan](../../ongoing-projects/issue-166-goblin-shaman-plan.md) and
 [OpenSpec tasks](../../../openspec/changes/issue-166-goblin-shaman/tasks.md) contain
 the completed review handoff.
 
