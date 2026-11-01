@@ -8,7 +8,7 @@
 
 ## 2. Repair and focused qualification
 
-- [ ] 2.1 Fix the evidenced owning cause and add the causal regression to existing test owners; verify failure before and success after the repair without timeout increases, automatic retries, dropped profiles or save/state changes, updating design and owning documentation.
+- [x] 2.1 Fix the evidenced owning cause and add the causal regression to existing test owners; verify failure before and success after the repair without timeout increases, automatic retries, dropped profiles or save/state changes, updating design and owning documentation.
 - [ ] 2.2 Verify all stair inputs on desktop/portrait/landscape WebKit, saved continuation/recovery and affected shared route/lifecycle consumers; retain exact source/build/test identities, original failures and results in QA and the current handoff, then commit/push/open a focused reviewable PR when this chunk is ready.
 
 ## 3. Complete integration acceptance

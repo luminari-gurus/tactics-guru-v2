@@ -71,6 +71,14 @@ candidate, rather than retries, timeout changes, custom native-library overlays
 or changes to game rules. Specific native-defect attribution remains an inference
 until the same-host application comparison supports the repair.
 
+Qualified candidate run 41361259848 now passes the original 90-case prefix and
+60 traced stair repetitions, with both native bundles confirmed at 3.6.6.
+The owning observed failure is native networking before entry evaluation; exact
+upstream defect attribution remains an inference. Existing application stair
+cases are the regression witness, with earlier failed runs retained rather than
+replaced by a synthetic security or network reproducer. The complete issue gate
+remains distinct and is running at candidate e3e9ebf in 41362013777.
+
 Preserve the existing viewport/touch/DPR and screen behavior. Playwright 1.64
 starts forwarding device-descriptor screen options that 1.63's test runner
 ignored; explicitly retain the old effective behavior and record actual profile

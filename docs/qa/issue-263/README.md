@@ -243,7 +243,8 @@ Clean-candidate local proof:
 - Locked installation, browser preflight and the production build passed,
   including 223 content assertions and both TypeScript scopes.
 - Both browser diagnostic contracts passed. All 38 selection, batch and full
-  orchestration contracts passed with no skipped/cancelled tests.
+  orchestration contracts and 20 timing/reporter/process contracts passed with
+  no skipped/cancelled tests.
 - Before/after discovery preserves all **1,541 cases across 15 inventories**,
   including exact IDs, assertion metadata, filters, workers and retry policy.
   The deliberate differences are browser user-agent version and descriptor
@@ -257,10 +258,19 @@ canonical payload hashes are in the evidence manifest. These are local proof,
 separate from the qualified runner results.
 
 Qualified candidate run [41361259848](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41361259848)
-pins `e3e9ebf` using temporary CI source `3f93ce3`. Its ordinary 90-case prefix has
-passed; traced stair repetitions are still running. Required full acceptance
+pins `e3e9ebf` using temporary CI source `3f93ce3`. It passed **90/90 ordinary
+prefix cases in 413.1 seconds and 60/60 traced stair repetitions in 403.4 seconds**,
+one worker and zero retries/skips/flaky results. Both qualified GTK/WPE inventories
+confirm libsoup 3.6.6 before and after execution. Verified artifact `13105454118`
+contains 14,856,756 bytes, SHA-256
+`75fd3bb2c4794b095f4a28557a041c6ead514627827268c76083cd6fda16b051`.
+Portable reports, input identities, component inventories and job log are retained
+as `run-41361259848-*` and `candidate-41361259848.log.gz` in the manifest.
+This supports the supported-runtime repair at the observed native networking
+boundary; it does not establish the exact upstream native memory-defect stack.
+Required full acceptance
 [41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777)
-was dispatched at the same candidate source using the existing full-verification
-job, original limits and shared exclusive self-hosted lock. Neither in-progress
-attempt is claimed as complete acceptance. Observe those handles without
+is running at the same candidate source using the existing full-verification
+job, original limits and shared exclusive self-hosted lock. That in-progress
+attempt is not claimed as complete acceptance. Observe its handle without
 duplicating or cancelling work on an observation timeout.

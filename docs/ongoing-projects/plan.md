@@ -27,16 +27,20 @@ the supported runtime repair is published in stacked PR #265. Full acceptance re
 **Live continuation checkpoint:** candidate source **`e3e9ebf`** is clean and
 published in [PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265),
 base diagnostic PR #264. Candidate focused run **41361259848**, CI source
-`3f93ce3`, has passed its ordinary 90-case prefix; its traced 60-case repetitions
-are still running. Full acceptance **41362013777** was dispatched against
+`3f93ce3`, completed **90/90 ordinary prefix cases and 60/60 traced stair
+repetitions**, with zero failures/skips/retries. Its verified artifact is
+`13105454118`, SHA-256
+`75fd3bb2c4794b095f4a28557a041c6ead514627827268c76083cd6fda16b051`;
+both qualified GTK/WPE libraries contain libsoup 3.6.6. Full acceptance
+**41362013777**, job **125015648051**, is now running against
 `branch/issue-263-patched-webkit-runtime` at `e3e9ebf`, using the existing
 `issue-200-baseline.yml` full-verify job, original limits and shared exclusive
 self-hosted concurrency group. Observe these exact run IDs; do not duplicate or
 cancel them because an observation call times out.
 
 Clean-candidate locked installation, browser preflight, build/content/both type
-scopes pass. Both browser-diagnostic contracts and all 38 selection/batch/full
-orchestrator contracts pass. Fifteen before/after selection inventories retain
+scopes pass. Both browser-diagnostic contracts, all 38 selection/batch/full
+orchestrator contracts and 20 timing/reporter/process contracts pass. Fifteen before/after selection inventories retain
 all **1,541 test IDs and metadata**. Actual Chromium and WebKit probes on all six
 profiles preserve viewport, effective screen, DPR and touch; only the browser
 version/user-agent intentionally changes. Canonical local outputs are under
@@ -73,9 +77,10 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **3/7 complete**: original
+- OpenSpec change `issue-263-webkit-reload-boot` is **4/7 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
-  (1.2) and diagnostic publication (1.3). Repair (2.1), repair integration proof
+  (1.2), diagnostic publication (1.3), and the supported runtime repair with the
+  retained before/after stair regression witness (2.1). Repair integration proof
   (2.2), full acceptance (3.1) and
   final project handoff (3.2) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
