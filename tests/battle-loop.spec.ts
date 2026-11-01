@@ -8,7 +8,7 @@ import { enemyThreats } from '../src/domain/threat';
 import { displayName } from '../src/ui/hud';
 
 test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
-  await page.goto('/');
+  await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   let current=await session(page), assessment=enemyThreats(current.state,catalog);
   for(let i=0;i<12 && assessment.ok && assessment.threats.length===0;i++){
@@ -36,7 +36,7 @@ test('enemy danger inspection toggles without changing battle state or saves', a
 });
 
 test('undo and compound plan use the live HUD without bypassing review',async({page})=>{
-  test.setTimeout(90000);await page.goto('/');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  test.setTimeout(90000);await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const activate=async(selector:string)=>{const element=page.locator(selector);if(await page.evaluate(()=>navigator.maxTouchPoints>0))await element.tap();else {await element.focus();await element.press('Enter');}};
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
   const reach=previewMovement(initial.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);

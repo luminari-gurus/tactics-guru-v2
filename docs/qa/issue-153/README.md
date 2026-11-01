@@ -11,14 +11,17 @@ files. Start a full capture by dispatching `issue-200-baseline.yml` with
 
 ## Status
 
+- Rebased onto main after [PR #255](https://github.com/luminari-gurus/tactics-guru-v2/pull/255)
+  (`a8b87c1`). Planning/undo HUD stays; standalone battle stays at `/battle`.
+  #255 tests that still opened `/` now open `./battle`.
 - Focused Chromium/WebKit menu coverage lives in `tests/main-menu.spec.ts`.
 - Run, dungeon, and standalone battle use explicit `hasUnsavedProgress` owner
   state so rejected commands cannot clear a leave warning.
 - Passing full capture [41239917772](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41239917772)
-  (`c39e10b`) completed every `verify:full` stage. Artifact
-  `full-verify-41239917772-1`. Device evidence is Playwright/WebKit emulation.
-  `openspec validate issue-153-portrait-main-menu --strict` and `git diff --check`
-  pass on this accounting commit. Draft PR #256. No merge claim.
+  (`c39e10b`) completed every `verify:full` stage **before** the #255 rebase.
+  It does not qualify this head. Recapture is started from
+  `.github/full-verify-request` after the rebase. Device evidence is
+  Playwright/WebKit emulation. Draft PR #256. No merge claim.
 
   | Stage | Result | Notes |
   | --- | --- | --- |

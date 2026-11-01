@@ -47,7 +47,7 @@ async function continueSnapshot(page:Page,state:BattleState){
 }
 
 test('undo stays unavailable for the resumed turn after a prior undo',async({page})=>{
-  await page.goto('/');await ready(page);
+  await page.goto('./battle');await ready(page);
   await chooseMove(page);await page.locator('#battle-review').click();await ready(page);
   await expect(page.locator('#battle-undo')).toBeEnabled();await page.locator('#battle-undo').click();await ready(page);
   const before=await readSession(page);
