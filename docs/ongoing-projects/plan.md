@@ -2,6 +2,23 @@
 
 Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence recovery and causal diagnosis.
 
+**Active repair branch:** `branch/issue-263-patched-webkit-runtime`, stacked on
+diagnostic PR #264 at `6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
+packages only), retain the old effective screen behavior with `screen: undefined`
+in the existing device project definitions, and preserve other branches' browser
+caches during setup with `--no-remove`. Viewports, touch, DPR, project IDs, test
+selection, assertions and retry/timeout limits remain part of the proof.
+
+**Outcome / files / proof:** repair the failing Linux WebKit networking runtime
+through its official stable browser package. Owners are package.json/lock and the
+five existing device-bearing Playwright configs. The official candidate contains
+libsoup 3.6.6 versus observed 3.6.5. First prove install/build/types, actual device
+input compatibility and unchanged selection, then the same qualified prefix
+without debug and the full original acceptance inventory. Keep all failed old
+runtime runs. Native-memory-defect attribution remains an inference; no external
+security reproducer is part of this work. Game rules, saves, hosting and arbitrary
+native-library replacements are outside this candidate.
+
 ## Current implementation handoff
 
 Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
