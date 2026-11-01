@@ -69,26 +69,16 @@ jobs:
       - name: Record served build identity
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue254/build.sha256
-      - name: Chromium exploration and Shaman journeys
+      - name: Chromium dungeon lifecycle journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/chromium.json
-        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'dungeon enemies move only|walking onto a guardian|real traversal, art independence|read-only entry, keyboard new dungeon|chase follows|Shaman production journey|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/chromium-artifacts
-      - name: WebKit exploration and Shaman journeys
+        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts -g 'map input stays inert while hidden|dungeon previous-format recovery|corrupt bytes stay exportable' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/chromium-artifacts
+      - name: WebKit dungeon lifecycle journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'dungeon enemies move only|walking onto a guardian|real traversal, art independence|read-only entry, keyboard new dungeon|chase follows|Shaman production journey|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-artifacts
-      - name: Chromium Mage and Ranger journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/extended-chromium.json
-        run: npx --no-install playwright test -c playwright.extended.config.ts -g 'Mage legal progression|Ranger legal progression' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/extended-chromium-artifacts
-      - name: WebKit Mage and Ranger journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/extended-webkit.json
-        run: npx --no-install playwright test -c playwright.extended-webkit.config.ts -g 'Mage legal progression|Ranger legal progression' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/extended-webkit-artifacts
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts -g 'map input stays inert while hidden|dungeon previous-format recovery|corrupt bytes stay exportable' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
