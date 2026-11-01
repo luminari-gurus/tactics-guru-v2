@@ -52,14 +52,23 @@ version/user-agent intentionally changes. Canonical local outputs are under
 `PLAYWRIGHT_BROWSERS_PATH=/tmp/tactics-issue263-runtime-inspect/browsers`.
 Exec session **98824** runs Chromium's nine cases, then WebKit's nine cases;
 `/tmp/tactics-issue263-evidence/candidate-extended/{chromium,webkit}.log` and
-matching `.exit` files identify terminal outcomes. Chromium Mage and Ranger
-desktop cases have passed so far. Do not start another local browser/server
+matching `.exit` files identify terminal outcomes. The first four Chromium cases
+have passed: all desktop journeys and portrait Mage. Do not start another local browser/server
 while that process is active. After it finishes, retain both complete JSON
 reports from its printed `verification-receipts/browser-runs/run-*` directories,
 then run the existing `tests/tooling/verification-browser.test.mjs` cleanup
 contract against the candidate runtime (preview/dev), serially. All other
 local contracts are terminal and passed. Pending CI acceptance is run
 **41362013777**, job **125015648051**; never poll the completed focused run as live.
+
+**Development-link audit:** GitHub replaced the original native branch link with
+a closing reference to diagnostic PR #264 when that PR opened. On 2026-11-02 the
+issue sidebar association was moved to repair PR #265, preventing a diagnostic-only
+merge from closing #263. GraphQL readback confirms #264 has no closing issue,
+#265 closes #263, both PRs are open/non-draft/mergeable, and #263 remains open and
+assigned to `moshehbenavraham`. The branch-to-PR conversion is expected GitHub
+behavior ([GitHub documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-a-branch-for-an-issue));
+the current Development link now follows the actual repair branch.
 
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native

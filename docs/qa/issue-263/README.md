@@ -274,3 +274,10 @@ is running at the same candidate source using the existing full-verification
 job, original limits and shared exclusive self-hosted lock. That in-progress
 attempt is not claimed as complete acceptance. Observe its handle without
 duplicating or cancelling work on an observation timeout.
+
+The current Development association is repair PR #265. GitHub had converted the
+original linked branch into a closing reference on diagnostic PR #264 when it
+opened; that reference was moved in the issue sidebar. GraphQL readback confirms
+only #265 closes #263, #264 has no closing issue, both PRs remain open/non-draft
+and mergeable, and the issue remains open/assigned. This metadata correction
+prevents diagnostic-only merge from prematurely closing the work item.
