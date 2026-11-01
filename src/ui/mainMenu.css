@@ -6,7 +6,7 @@
 .menu-content { min-height:100svh; box-sizing:border-box; padding:max(2rem,env(safe-area-inset-top)) max(1.25rem,env(safe-area-inset-right)) max(1.5rem,env(safe-area-inset-bottom)) max(1.25rem,env(safe-area-inset-left)); display:flex; flex-direction:column; align-items:center; text-align:center; }
 .menu-title { width:100%; margin:1rem 0 0; min-height:5rem; font-size:2.7rem; text-shadow:0 2px 8px #000; }
 .menu-title img { display:block; width:100%; height:auto; }
-.menu-tagline { font-size:.9rem; letter-spacing:.09em; margin:1rem 0 clamp(2rem,15svh,8rem); text-shadow:0 2px 5px #000; }
+.menu-content > nav[aria-label='Main menu'] { margin-top:clamp(2rem,15svh,8rem); }
 .menu-content > nav[aria-label='Main menu'] { display:grid; gap:.8rem; width:min(100%,21rem); }
 .menu-content button,.menu-dialog button { min-height:48px; padding:.8rem 1rem; font:inherit; font-size:1.1rem; border:1px solid #b49a61; border-radius:4px; background:linear-gradient(#26352ef0,#14241df5); color:#fff2d0; cursor:pointer; box-shadow:0 3px 10px #0005; }
 .menu-content button:hover:not(:disabled),.menu-dialog button:hover { background:#36483a; }
@@ -23,4 +23,4 @@
 .menu-dialog a { display:flex; padding:.5rem 0; }
 .menu-dialog > button { margin-top:1rem; }
 .menu-dialog input { width:1.25rem; height:1.25rem; }
-@media (max-height:550px) { .menu-tagline { margin-bottom:1.5rem; } .menu-title { max-width:22rem; margin-top:0; } }
+@media (max-height:550px) { .menu-content > nav[aria-label='Main menu'] { margin-top:1.5rem; } .menu-title { max-width:22rem; margin-top:0; } }

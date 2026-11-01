@@ -10,6 +10,7 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await page.addInitScript(()=>{Storage.prototype.setItem=function(k,v){throw Error(`Unexpected menu write ${k}`);};});
  await page.goto('./');
  await expect(page.locator('[data-menu-action]')).toHaveText(['Continue','New Game','Hall of Records','Settings']);
+ await expect(page.getByText('A path through the forgotten realms')).toHaveCount(0);
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
  expect(await image.evaluate(n=>(n as HTMLImageElement).naturalWidth/(n as HTMLImageElement).naturalHeight)).toBe(3);
@@ -45,16 +46,22 @@ test('main menu: multiple modes, backup warning, recovery and fresh save inspect
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await expect(page.getByRole('dialog').locator('a')).toHaveCount(3);
  expect(await page.evaluate(()=>localStorage.getItem('godot:save'))).toBe('legacy');
 });
-test('main menu: New Game requires confirmation and preserves other save families',async({page})=>{
+test('main menu: New Game confirms over the menu and preserves other save families',async({page})=>{
  const text=menuFixture('dungeon');await page.addInitScript(({keys,text})=>{localStorage.setItem(keys.dungeon.primary,text);localStorage.setItem(keys.battle.primary,'battle sentinel');},{keys,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
- await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
- await page.getByRole('button',{name:'Cancel',exact:true}).click();
+ await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
+ await page.getByRole('button',{name:'Close',exact:true}).click();await expect(page.getByRole('button',{name:'New Game',exact:true})).toBeFocused();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
- await page.reload();await expect(page.locator('dialog')).toHaveCount(1);await expect(page.locator('dialog')).not.toBeVisible();
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
- await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');await expect(page.locator('dialog')).not.toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
+});
+test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await page.evaluate(key=>localStorage.setItem(key,'changed while confirming'),keys.dungeon.primary);
+ await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe('changed while confirming');
 });
 test('main menu: unavailable storage and failed artwork keep native actions usable',async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
@@ -108,7 +115,7 @@ test('main menu: failed new-game write retains exportable recovery copies',async
   localStorage.setItem(key,text);const original=Storage.prototype.setItem;
   Storage.prototype.setItem=function(key,value){if(key.includes(':dungeon:'))throw new DOMException('full','QuotaExceededError');original.call(this,key,value);};
  },{key:keys.dungeon.primary,text});
- await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
  const download=page.waitForEvent('download');await page.getByRole('button',{name:/Export primary/}).click();
  const file=await (await download).path();expect(readFileSync(file!,'utf8')).toBe(text);

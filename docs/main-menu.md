@@ -23,8 +23,7 @@ sessions, RNG or writes and never exposes save bytes in DOM.
 
 Menu actions use full-page navigation. The closed-set `entry` parameter is removed
 from history before use and consumed once. Battle/run/dungeon destinations inspect
-again and use existing Continue/recovery owners. New Game always uses the dungeon
-confirmation. If a confirmed replacement clears slots but cannot publish its new
+again and use existing Continue/recovery owners. New Game asks for confirmation over the menu. The dungeon rechecks the reviewed saves before replacement and requests confirmation again if they changed. If a confirmed replacement clears slots but cannot publish its new
 save, existing recovery exports retain reviewed old bytes and the destination opens
 recovery with unsaved status. Existing save keys/formats/rules are unchanged.
 

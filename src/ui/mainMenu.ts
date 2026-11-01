@@ -1,5 +1,6 @@
 import { inspectMenuSaves, type MenuSave } from '../app/menuSaves';
 import { routeHref } from '../app/routes';
+import { createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import './mainMenu.css';
 export const menuDefinition = [
@@ -19,7 +20,6 @@ export function startMainMenu() {
   const title = element('h1', 'Tactics Guru'); title.className = 'menu-title';
   const titleImage = element('img'); titleImage.src = `${import.meta.env.BASE_URL}menu/title.webp`; titleImage.alt = 'Tactics Guru'; titleImage.width = 2172; titleImage.height = 724;
   titleImage.onload = () => title.replaceChildren(titleImage);
-  const tagline = element('p', 'A path through the forgotten realms'); tagline.className = 'menu-tagline';
   const nav = element('nav'); nav.setAttribute('aria-label', 'Main menu');
   const status = element('p'); status.className = 'menu-save-summary'; status.setAttribute('role', 'status');
   const dialog = element('dialog'); dialog.className = 'menu-dialog'; dialog.setAttribute('aria-labelledby', 'menu-dialog-title');
@@ -64,7 +64,23 @@ export function startMainMenu() {
       if (saves.length === 1) location.assign(routeHref(saves[0].mode, import.meta.env.BASE_URL, 'continue'));
       else if (saves.length) choose(saves, false);
     },
-    new: () => location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new')),
+    new: () => {
+      const review = createDungeonStorage().inspect();
+      show('Start new dungeon?', () => {
+        body.append(element('p', 'Replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.'));
+        const confirm = element('button', 'Start new dungeon'); confirm.type = 'button';
+        confirm.onclick = () => {
+          try {
+            sessionStorage.setItem('tactics-guru:menu-new-dungeon-review', JSON.stringify({
+              primary: { status: review.primary.status, text: review.primary.text },
+              backup: { status: review.backup.status, text: review.backup.text },
+            }));
+          } catch { /* The destination will request confirmation again. */ }
+          location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new'));
+        };
+        body.append(confirm);
+      });
+    },
     records: () => show('Hall of Records', () => body.append(element('p', 'Records are not collected yet. Future records will be stored on this device.'))),
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
@@ -81,7 +97,7 @@ export function startMainMenu() {
   for (const [route, label] of [['battle', 'Standalone battle'], ['run', 'Three-encounter run'], ['map', 'Map inspection']] as const) {
     const link = element('a', label); link.href = routeHref(route, import.meta.env.BASE_URL); secondary.append(link);
   }
-  content.append(title, tagline, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
+  content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();
   for (const event of ['focus', 'pageshow', 'storage']) window.addEventListener(event, refresh);
   document.addEventListener('keydown', event => {

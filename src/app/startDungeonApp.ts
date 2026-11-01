@@ -83,7 +83,20 @@ const engine=createGame([],true);
 whenGameReady(engine,()=>{screen.dataset.boot='ready';});
 
 const entryIntent=consumeEntryIntent();
-if(entryIntent==='new')requestNew();
+if(entryIntent==='new'){
+ let approved: { primary?: { status?: string; text?: string | null }; backup?: { status?: string; text?: string | null } } | null=null;
+ try {
+  const text=sessionStorage.getItem('tactics-guru:menu-new-dungeon-review');
+  sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review');
+  if(text)approved=JSON.parse(text);
+ } catch { /* A missing or unreadable handoff requires a new confirmation. */ }
+ const review=session.inspect();
+ const matches=(['primary','backup'] as const).every(slot=>review[slot].status!=='unavailable' && approved?.[slot]?.status===review[slot].status && approved?.[slot]?.text===review[slot].text);
+ if(matches && session.replace(review,crypto.randomUUID(),(session.snapshot.seed+1)>>>0)){
+  startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();
+ }else if(matches)recovery();
+ else requestNew();
+}
 else if(entryIntent==='recovery')recovery();
 else if(entryIntent==='continue'){
  const review=session.inspect();
