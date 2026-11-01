@@ -1,6 +1,27 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: planning complete; implementation pending.
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence recovery and causal diagnosis.
+
+## Current implementation handoff
+
+- User authorized implementation, autonomous issue resolution, commits/pushes and
+  focused review-ready PRs on 2026-11-01. No merge, deployment or release tag is
+  requested. Use OpenSpec change `issue-263-webkit-reload-boot` (spec-driven).
+- Initial refresh: worktree clean at planning commit `25fca08`; main still
+  `a8b87c1`, PR #256 open at `c2e3c56`, #263 open and assigned to us.
+- Exact failed artifact download is live in tool session `54966`, destination
+  WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip`. Re-poll that
+  session before restarting; partial bytes are not yet a valid artifact.
+- Isolated exact-failure checkout/build is live in session `19248` at WSL
+  `/tmp/tactics-issue263-failing`, source `9b543cb`. Install/build logs are in
+  `/tmp/tactics-issue263-evidence/`. Native Git remains authoritative for commits
+  in the Windows checkout; use authenticated WSL Git for network operations.
+- The qualified `unraid-tactics-01` runner is online but was busy at refresh.
+  Do not interrupt another owner's job or run concurrent browser jobs there.
+- Cause remains unknown. No runtime behavior, test assertion or timeout changed.
+  The OpenSpec proposal/spec/design/tasks capture the existing acceptance before
+  diagnosis. Use `openspec instructions apply --change issue-263-webkit-reload-boot
+  --json` for live task locations and progress.
 
 - Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.
