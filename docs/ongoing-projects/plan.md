@@ -6,6 +6,25 @@ Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence re
 
 Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
 
+**2026-11-02 continuation:** qualified ordinary runs **41349975828** and
+**41356666822** reproduced the missing-screen stall. Their bounded attachments
+show prior-load cancellations followed by native **`WebKit encountered an internal
+error`** failures for the new document's entry/static dependencies. Application
+initialization never starts. Reuse/remote-browser/PWDEBUG flags are false. The
+runtime repair candidate is **Playwright 1.64.1**, whose inspected official WebKit
+2370 bundle contains fixed libsoup 3.6.6; old local and qualified bundles contain
+3.6.5. The specific upstream native defect is a supported inference, not a claim
+that a security reproducer was executed. See the new QA section for archive hashes,
+reports and exact failed/passed/incomplete counts.
+
+The old-runtime debug run **41358705036** completed successfully (90 prefix + 60
+traced cases), so no CI process is currently live. Earlier cancelled/pending/live
+notes below are historical. The temporary CI branch is now **`f30e65e`** and its
+latest run is terminal. Additional local transfer/cancellation controls and both
+54-case exact-runtime observer/control selections passed without reproducing the
+host fault. The next work is the minimal supported runtime update, preserving
+device geometry, then qualified before/after evidence and full acceptance.
+
 - Diagnostic PR [#264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264)
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;

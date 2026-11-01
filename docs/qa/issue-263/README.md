@@ -174,3 +174,52 @@ entry do contain top-level await; the latter is outside the dungeon closure.
 `exact-runtime-module-graph.json.gz` preserves this graph. This narrows the
 source-level wait-cycle hypothesis; it does not establish a browser/import or
 initialization cause.
+
+## Qualified failure witness and runtime repair candidate — 2026-11-02
+
+Ordinary, injection-free application tests reproduced the reported failure on
+the qualified runner:
+
+- [41349975828](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41349975828)
+  at CI branch `8298aea`: 36 passed, two failed, 16 not run after the declared
+  diagnostic stop. Portrait compass reproduced the 60-second missing-screen
+  failure at the same later fixture load; landscape marker reload also failed.
+- [41356666822](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41356666822)
+  at `a6a1323`: the focused original prefix selected 90 cases; 68 passed, two
+  failed, 20 did not run. Both failures were missing-screen stalls in landscape
+  stairs at `dungeon-exploration.spec.ts:124`, with the original 60-second wait.
+- Both show prior-page module cancellations followed by failure of the **new
+  document's entry script and static dependencies**, before application code.
+  The native reason is **`WebKit encountered an internal error`**. The document
+  completes and accepts diagnostic evaluation; its entry never runs. No requests
+  remain pending and its script/link resource timings are empty. This separates
+  the fault from Phaser READY and save admission. Context reuse, remote browser
+  attachment and PWDEBUG flags were all absent.
+
+The captured native reason is a component-level witness, not proof of a specific
+native memory defect. [An upstream report](https://github.com/microsoft/playwright/issues/42803)
+describes a Linux WebKit networking failure in bundled libsoup 3.6.5, fixed
+upstream in 3.6.6. Our local 1.63.0 and qualified-runner binary inventories both
+contain 3.6.5. An isolated **official stable Playwright 1.64.1** installation
+contains WebKit 2370 with libsoup **3.6.6** in both GTK/WPE bundles. This is a
+supported repair candidate; no external security reproducer was run.
+
+[41358705036](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41358705036)
+at `f30e65e` enabled browser-process logging and recorded component identities.
+It passed all 90 prefix cases and 60 traced stair repetitions on the old runtime.
+Its successful run does not erase the two captured failures or establish a fix.
+No allocator/network-process crash was observed in that successful log, and
+cgroup memory counters were unavailable. The component-specific attribution
+remains an inference to verify with the repaired runtime.
+
+Additional local controls passed: 54/54 exact-runtime exploration cases with the
+observer and 54/54 without early page script injection; 40/40 actual JS-transfer
+interruptions; 10/10 actual CSS-transfer interruptions plus ten CSS controls that
+waited for completion; and 20/20 reloads after engine-script transfer. These
+preserved the synthetic save. They narrow simple cancellation explanations but
+do not reproduce the qualified-host fault or constitute repair acceptance.
+
+Repair scope: pin the stable package that ships the fixed networking component,
+preserve existing device geometry/touch behavior across its screen-option change,
+then compare the original prefix on the same qualified runner without debug,
+retries, longer waits or application changes. Retain the full issue gate.

@@ -59,3 +59,21 @@ menu redesign, automatic retries, weaker assertions or timeout-only mitigation.
 No save migration or deployment is planned. Publish focused review-ready PRs,
 including source-bound evidence and the current handoff. Any rollback is an
 ordinary code revert; player saves and production infrastructure remain intact.
+
+## Qualified evidence and candidate decision (2026-11-02)
+
+Two ordinary qualified runs now reproduce entry/static-resource failure with
+`WebKit encountered an internal error` before the application module executes.
+The old bundled networking library is 3.6.5 on both inspected hosts; official
+stable Playwright 1.64.1 ships 3.6.6. Use that supported runtime as the repair
+candidate, rather than retries, timeout changes, custom native-library overlays
+or changes to game rules. Specific native-defect attribution remains an inference
+until the same-host application comparison supports the repair.
+
+Preserve the existing viewport/touch/DPR and screen behavior. Playwright 1.64
+starts forwarding device-descriptor screen options that 1.63's test runner
+ignored; explicitly retain the old effective behavior and record actual profile
+inputs. Browser-version/user-agent updates are intentional runtime changes.
+Qualify the original prefix without debug or early page script injection, then
+the complete issue-required inventory. Old successful captures are baselines,
+not proof that the fault was fixed.
