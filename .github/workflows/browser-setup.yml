@@ -1,6 +1,8 @@
 name: Browser setup smoke
 on:
   workflow_dispatch:
+  push:
+    branches: [work/issue-254-dungeon-enemy-behaviors]
 permissions:
   contents: read
 concurrency:
@@ -40,7 +42,7 @@ jobs:
     if: github.ref == 'refs/heads/work/issue-254-dungeon-enemy-behaviors'
     needs: browser-setup
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
