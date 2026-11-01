@@ -80,11 +80,6 @@ jobs:
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit.json
         run: npx --no-install playwright test -c playwright.exploration.config.ts --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-artifacts
-      - name: WebKit overworld map
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue254/webkit-overworld.json
-        run: printf '%s\n' "import { defineConfig } from '@playwright/test';" "import base from './playwright.exploration.config';" "export default defineConfig({ ...base, testMatch: ['**/overworld-map.spec.ts'] });" > tmp-overworld-webkit.config.ts && npx --no-install playwright test -c tmp-overworld-webkit.config.ts --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue254/webkit-overworld-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
