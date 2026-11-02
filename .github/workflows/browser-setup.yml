@@ -36,11 +36,11 @@ jobs:
       - name: Record build identity
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/compass/build.sha256
-      - name: Repeat full WebKit exploration with failure diagnostics
+      - name: Run repeated startup sequence with failure diagnostics
         if: ${{ steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/compass/results.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/artifacts
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=desktop-webkit -g 'startup reload stress investigation' --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

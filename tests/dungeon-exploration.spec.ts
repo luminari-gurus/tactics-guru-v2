@@ -27,9 +27,9 @@ test.beforeEach(async ({ page }) => {
  page.on('framenavigated',frame=>{if(frame===page.mainFrame())add('navigation',{path:pathname(frame.url())});});
  page.on('domcontentloaded',()=>add('domcontentloaded'));
  page.on('load',()=>add('load'));
- page.on('request',request=>{if(['document','script'].includes(request.resourceType()))add('request',{path:pathname(request.url()),resourceType:request.resourceType()});});
+ page.on('request',request=>{if(['document','script','stylesheet'].includes(request.resourceType()))add('request',{path:pathname(request.url()),resourceType:request.resourceType()});});
  page.on('requestfailed',request=>add('requestfailed',{path:pathname(request.url()),resourceType:request.resourceType(),error:(request.failure()?.errorText??'').slice(0,200)}));
- page.on('response',response=>{if(response.status()>=400||['document','script'].includes(response.request().resourceType()))add('response',{path:pathname(response.url()),status:response.status(),resourceType:response.request().resourceType()});});
+ page.on('response',response=>{if(response.status()>=400||['document','script','stylesheet'].includes(response.request().resourceType()))add('response',{path:pathname(response.url()),status:response.status(),resourceType:response.request().resourceType()});});
  page.on('pageerror',error=>add('pageerror',{name:error.name,message:clean(error.message)}));
  page.on('console',message=>{if(message.type()==='error')add('console-error',{message:clean(message.text())});});
  page.on('crash',()=>add('crash'));
@@ -436,5 +436,17 @@ test('chase follows the previous cell while block targets the resulting cell', a
   expect(poiCell(after.floors[0].exploration.pois[slot])).toBe(selected.expected);
   await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
   expect(await dungeonSnapshot(page)).toEqual(after);
+ }
+});
+
+// Investigation only: keep one WebKit page alive through repeated fixture navigation/reload pairs.
+test('startup reload stress investigation', async ({page}) => {
+ test.setTimeout(600000);
+ const encoded=encodeDungeon(freshDungeon('startup-repeat',1));if(!encoded.ok)throw Error(encoded.reason);
+ for(let iteration=0;iteration<150;iteration++) {
+  await page.goto('dungeon');
+  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();
+  await continueSavedDungeon(page);
  }
 });
