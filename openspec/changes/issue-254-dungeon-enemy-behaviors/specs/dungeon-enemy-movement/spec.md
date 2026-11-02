@@ -25,8 +25,10 @@ Enemy movement SHALL resolve in stable enemy order against actual current occupa
 - **THEN** no enemy enters an occupied player or enemy cell, overlaps another enemy, crosses invalid terrain or takes an unavailable destination
 
 #### Scenario: Adjacent or unreachable target
-- **WHEN** a blocking enemy is adjacent to the player's current cell, a chasing enemy cannot legally occupy the vacated cell, or either pursuer has no legal route
+- **WHEN** a blocking enemy is adjacent to the player's current cell, or either pursuer has no legal route to its goal
 - **THEN** it stays in place
+- **WHEN** a chasing enemy cannot legally occupy the vacated cell
+- **THEN** it seeks a legal adjacent cell and stays if already adjacent or no route exists
 
 #### Scenario: Invalid previous player cell
 - **WHEN** chase receives an out-of-range, non-cell, or current-player previous position

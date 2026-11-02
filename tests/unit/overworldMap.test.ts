@@ -328,6 +328,14 @@ describe('independent overworld enemy movement', () => {
     const enclosed = createMovement(fixture([[6,5],[2,2],[3,5],[17,17]],[83,102,104,123]),profiles);
     expect(position(stepMovement(enclosed,[],[],85))).toEqual(position(enclosed));
   });
+  it('approaches a contested or blocked previous cell without entering it', () => {
+    const profiles: readonly EnemyBehavior[] = [idle[0], {id:'enemy-2',kind:'chase',range:38}, idle[2]];
+    const oldCell = 4 * 20 + 5;
+    const occupied = createMovement(fixture([[5,5],[17,17],[2,4],[5,4]]), profiles);
+    const blocked = createMovement(fixture([[5,5],[17,17],[2,4],[17,16]]), profiles);
+    expect(position(stepMovement(occupied, [], [], oldCell))).toMatchObject({x:3,y:4});
+    expect(position(stepMovement(blocked, [], [oldCell], oldCell))).toMatchObject({x:3,y:4});
+  });
   it('chases into the vacated cell so a trailing enemy keeps pace without leaving range', () => {
     const profiles: readonly EnemyBehavior[] = [idle[0], {id:'enemy-2',kind:'chase',range:6}, idle[2]];
     let state = createMovement(fixture([[10,10],[2,2],[10,11],[17,17]]), profiles);

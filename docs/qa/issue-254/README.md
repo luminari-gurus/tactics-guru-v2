@@ -1,5 +1,13 @@
 # Issue 254 verification
 
+## Review follow-up: WebKit startup
+
+[Run 41344487694](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41344487694) on `f44a94d` failed the desktop WebKit compass stair case after reload: the dungeon screen did not appear within 60 seconds. The other 101 WebKit cases passed; Chromium recorded 171 passes and six skips. The original run did not retain a trace. The [separate investigation](https://github.com/luminari-gurus/tactics-guru-v2/blob/4afd5bc/docs/qa/issue-254/webkit-startup-investigation.md) records focused PR and literal-base comparisons, repeated probes and other failures; it did not reproduce the original stall or establish its cause. A later instrumented WebKit matrix passed all 102 cases, but does not erase the original failure or prove a fix. Browser profiles were emulated.
+
+The WebKit verification job now retains traces for failing cases so a recurrence can be diagnosed. This does not change runtime behavior, timeouts, assertions or retries, and does not claim the startup failure is fixed. Review also corrected the spec and movement documentation to match the approved design for an unavailable chase target; a focused unit case checks both occupied and blocked targets.
+
+On the review working tree based on `f44a94d`, `npm run test:unit -- tests/unit/overworldMap.test.ts` passed 62 tests and `npm run build` passed 223 content tests and both typechecks. Playwright discovery with the trace option selected the same 102 WebKit cases. The desktop WebKit compass case passed once locally with one worker and zero retries. The first attempt could not start the preview server because the sandbox denied the local port; the unsandboxed attempt passed. This macOS run does not reproduce the self-hosted workload or establish a runtime fix.
+
 Planning base: `a8b87c199fb2ae171a9bb72961ac7114622c4d60`; implementation was tested with a dirty working tree on macOS. The Playwright runs below are local browser emulation, not self-hosted CI or physical hardware. The final build after the last runtime edit passed content validation, both TypeScript scopes and Vite; it retains existing Vite loader and chunk-size warnings.
 
 - `npm run test:unit -- tests/unit/overworldMap.test.ts tests/unit/dungeon.test.ts`: 109 passed before the final test-only refinement.
