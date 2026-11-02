@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: runtime and focused follow-ups published; full acceptance running.
+Started: 2026-11-01 (Asia/Jerusalem). Status: runtime and focused follow-ups published; full execution passed, artifact audit pending.
 
 **Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
@@ -35,11 +35,26 @@ repetitions**, with zero failures/skips/retries. Its verified artifact is
 `13105454118`, SHA-256
 `75fd3bb2c4794b095f4a28557a041c6ead514627827268c76083cd6fda16b051`;
 both qualified GTK/WPE libraries contain libsoup 3.6.6. Full acceptance
-**41362013777**, job **125015648051**, is now running against
+**41362013777**, job **125015648051**, completed successfully against
 `branch/issue-263-patched-webkit-runtime` at `e3e9ebf`, using the existing
 `issue-200-baseline.yml` full-verify job, original limits and shared exclusive
-self-hosted concurrency group. Observe these exact run IDs; do not duplicate or
-cancel them because an observation call times out.
+self-hosted concurrency group. Its job log reports all 19 stages passed. Detailed
+source/coverage acceptance remains open until the artifact audit below completes;
+do not restart this completed test run.
+
+**Only live work: artifact download session 31921.** Artifact `13110492448` is
+585,086,035 bytes, with API-reported SHA-256
+`d9556fe6dd8a807940f324fbb27234579b44f9be491c3fbfebc0f6c693707865`.
+The initial transfer (session 63667, terminal exit 1) reset after 223,985,664 bytes.
+Authenticated curl is resuming the same `.zip.part` by HTTP range; it was confirmed
+live and progressing. Paths are `/tmp/tactics-issue263-evidence/full-41362013777.zip.part`
+and the final `.zip` path without `.part`. Poll session 31921 before doing anything
+to that file. An observation timeout is not terminal. If the process actually
+fails, inspect the preserved partial and resume only after confirming no writer
+is live; do not launch simultaneous writers or repeat the tests. The task-owned
+resume command is `tmp/issue263/resume-artifact.sh`, which keeps credentials out
+of its arguments/output. On success, require the complete archive hash to match
+the API receipt, then run the prepared audit and inspect its underlying reports.
 
 Clean-candidate locked installation, browser preflight, build/content/both type
 scopes pass. Both browser-diagnostic contracts, all 38 selection/batch/full
@@ -59,8 +74,9 @@ matching `.exit` files identify terminal outcomes. Both exit codes are zero,
 with no failures/skips/retries (Chromium 34.8m, WebKit 26.5m). Portable reports/logs
 are committed as `candidate-extended-{chromium,webkit}.*.gz` under QA. The six-case
 dev selector check also passed. The cleanup contract's stale root-route fixture
-is repaired and both qualification modes pass, as tracked below. Pending CI acceptance is run
-**41362013777**, job **125015648051**; never poll the completed focused run as live.
+is repaired and both qualification modes pass, as tracked below. Full CI execution
+is complete; only artifact transfer/audit remains. Never poll the completed
+focused or extended processes as live.
 
 **Development-link audit:** GitHub replaced the original native branch link with
 a closing reference to diagnostic PR #264 when that PR opened. On 2026-11-02 the
@@ -118,7 +134,7 @@ artifact link, was not consumed by the cleanup assertions, and the link is now
 locally excluded; tracked tested inputs remain unchanged. Review-ready
 [PR #267](https://github.com/luminari-gurus/tactics-guru-v2/pull/267) is stacked on
 #266. All local qualification processes are terminal. Finish the outstanding
-full-run audit using live run **41362013777**, job **125015648051**.
+artifact audit for completed run **41362013777**, job **125015648051**.
 
 The prepared (not yet executed) helper `tmp/issue263/audit-full-candidate.py`
 takes the downloaded full artifact ZIP and its API-reported SHA-256. It checks
@@ -207,9 +223,10 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   above are terminal; do not poll old exec handles as live.
 - Runner attempt **41343197332 was cancelled while pending, zero jobs executed**.
   It supplies no evidence. Later diagnosis and qualification are complete; the
-  earlier queue/dispatch instructions are obsolete. The sole current acceptance
-  handle is **41362013777 / job 125015648051**. Do not restart it on an observation
-  timeout or replace another owner's pending job.
+  earlier queue/dispatch instructions are obsolete. Acceptance run
+  **41362013777 / job 125015648051** completed successfully. Its artifact transfer
+  is the sole live handle recorded above; do not repeat tests or replace another
+  owner's pending job.
 - Historical temporary CI branch `branch/issue-263-runner-diagnosis` is at
   **`3f93ce3`**, outside the review PRs; its native worktree is
   `tmp/issue263-runner-worktree`. It pins `e3e9ebf` for the completed 150-case

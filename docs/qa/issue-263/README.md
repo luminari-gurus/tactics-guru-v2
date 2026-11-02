@@ -270,10 +270,11 @@ This supports the supported-runtime repair at the observed native networking
 boundary; it does not establish the exact upstream native memory-defect stack.
 Required full acceptance
 [41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777)
-is running at the same candidate source using the existing full-verification
-job, original limits and shared exclusive self-hosted lock. That in-progress
-attempt is not claimed as complete acceptance. Observe its handle without
-duplicating or cancelling work on an observation timeout.
+completed successfully at the same candidate source using the existing
+full-verification job, original limits and shared exclusive self-hosted lock.
+The job log reports all 19 stages passed. Detailed artifact verification is still
+pending, so complete acceptance is not yet claimed. The current download/audit
+handle is recorded in plan.md; no test rerun is needed for the transfer.
 
 The current Development association is repair PR #265. GitHub had converted the
 original linked branch into a closing reference on diagnostic PR #264 when it
