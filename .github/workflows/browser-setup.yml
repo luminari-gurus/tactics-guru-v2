@@ -36,16 +36,11 @@ jobs:
       - name: Record build identity
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/compass/build.sha256
-      - name: Chromium exploration before WebKit
-        if: ${{ steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/compass/chromium.json
-        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/overworld-map.spec.ts --grep-invert 'startup reload stress investigation' --max-failures=1 --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/chromium-artifacts
-      - name: WebKit exploration with startup markers
+      - name: Repeat exact WebKit compass case with startup markers
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/compass/results.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts --grep-invert 'startup reload stress investigation' --max-failures=1 --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/artifacts
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=desktop-webkit -g 'stairs travel once per entry with compass' --repeat-each=50 --max-failures=1 --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

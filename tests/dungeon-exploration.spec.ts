@@ -28,6 +28,7 @@ test.beforeEach(async ({ page }) => {
  page.on('domcontentloaded',()=>add('domcontentloaded'));
  page.on('load',()=>add('load'));
  page.on('request',request=>{if(['document','script','stylesheet'].includes(request.resourceType()))add('request',{path:pathname(request.url()),resourceType:request.resourceType()});});
+ page.on('requestfinished',request=>{if(['document','script','stylesheet'].includes(request.resourceType()))add('requestfinished',{path:pathname(request.url()),resourceType:request.resourceType()});});
  page.on('requestfailed',request=>add('requestfailed',{path:pathname(request.url()),resourceType:request.resourceType(),error:(request.failure()?.errorText??'').slice(0,200)}));
  page.on('response',response=>{if(response.status()>=400||['document','script','stylesheet'].includes(response.request().resourceType()))add('response',{path:pathname(response.url()),status:response.status(),resourceType:response.request().resourceType()});});
  page.on('pageerror',error=>add('pageerror',{name:error.name,message:clean(error.message)}));
