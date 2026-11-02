@@ -55,7 +55,8 @@ version/user-agent intentionally changes. Canonical local outputs are under
 Exec session **98824** runs Chromium's nine cases, then WebKit's nine cases;
 `/tmp/tactics-issue263-evidence/candidate-extended/{chromium,webkit}.log` and
 matching `.exit` files identify terminal outcomes. The first four Chromium cases
-have passed: all desktop journeys and portrait Mage. Do not start another local browser/server
+have progressed to **9/9 passed, exit 0**; the same live pipeline has started the
+nine WebKit journeys. Do not start another local browser/server
 while that process is active. After it finishes, retain both complete JSON
 reports from its printed `verification-receipts/browser-runs/run-*` directories,
 then run the existing `tests/tooling/verification-browser.test.mjs` cleanup
@@ -81,6 +82,19 @@ the six affected dev cases and existing verification contracts, then publish a
 focused PR. No application, assertion, timeout, budget or routine profile change
 is needed. Account for this extra dev coverage alongside the unchanged #263 full
 run; never claim that the earlier run executed the later selector.
+
+Follow-up source **`c508d6e`** is published on `branch/verify-map-disposer-coverage`.
+Clean WSL checkout `/tmp/tactics-issue263-map-verification` uses the candidate's
+unchanged 1.64.1 dependency tree through an ignored node_modules symlink.
+All 38 selection/batch/orchestration contracts passed. Discovery records
+`map-verification-selection.json` and `map-verification-comparison.json` prove
+exactly three added dev disposer cases, all three prior placement cases retained,
+and 14 other inventories unchanged. These reports/logs are under
+`/tmp/tactics-issue263-evidence/`. After live session 98824 finishes, run the six
+cases in this checkout with `PLAYWRIGHT_SERVER_MODE=dev` and the existing isolated
+browser-cache variable. Then retain the proof and open its focused PR with base
+`branch/issue-263-patched-webkit-runtime`. The browser cleanup contract recorded
+above still needs execution. No local browser job should overlap session 98824.
 
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
