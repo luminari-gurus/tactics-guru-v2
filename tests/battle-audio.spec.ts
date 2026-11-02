@@ -1,5 +1,5 @@
 import { confirmRestart } from './helpers/battlePolicy';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { readSession, session, playCommand, playerDecision } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';

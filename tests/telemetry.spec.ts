@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './helpers/forceRailControls';
 import { readSession, playCommand } from './helpers/battlePolicy';
 import { playerDecision } from './helpers/playerPolicy';
 import { runContext } from './helpers/runItemFixtures';

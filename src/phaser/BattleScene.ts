@@ -1,20 +1,22 @@
-import type { Command } from '../domain/types';
 import { enemyThreats, type Threat } from '../domain/threat';
 import { progressionLabel } from '../domain/progression';
 import { standaloneBattleCatalog } from '../content/standaloneCatalog';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
-import type { CellPosition, ContentCatalog } from '../content/types';
+import type { AbilityId, CellPosition, ContentCatalog } from '../content/types';
 import { BattleSession, type Presentation } from '../app/BattleSession';
 import { BattlePersistence } from '../app/BattlePersistence';
 import { previewMove, previewMovement } from '../domain/grid';
 import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser';
 import type { Point, BoardRegion } from '../geometry/iso';
-import { friendlyFire, actionCommand, type Action } from '../ui/battleActions';
-import { BattleHud, previewText, unitFeedback } from '../ui/hud';
+import { BattleHud, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
-import { targetOverlays, hoverPreview } from '../ui/targetPreview';
+import { hoverPreview } from '../ui/targetPreview';
+import { BattleSelection } from '../ui/battleSelection';
+import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
+import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
+import { lightHaptic, type RadialSliceId } from '../ui/radialGesture';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
@@ -60,64 +62,103 @@ export class BattleScene extends Phaser.Scene {
     if(!this.persistence.session)this.status('ready');
   }
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void,returnToMenu?:()=>void):void {
-    let selected:CellPosition|null=null,action:Action|null=null,message='Choose an action and target',live=true,ready=false,outcomeShown=false,initialFit=true;
-    let movingPresentation=false,showDanger=false,planning=false,planInFlight=false,planInterrupted=false;
-    let planMove: Extract<Command,{type:'move'}>|null=null;
+    const selection=new BattleSelection(session);
+    let live=true,ready=false,outcomeShown=false,initialFit=true,skin:CombatSkin=resolveCombatControlsSkin();
+    let movingPresentation=false,planInFlight=false,planInterrupted=false;
     let threatState: typeof session.state | null=null, threatIds: readonly number[]=[], threats: readonly Threat[] | null=null;
-    let initializedTurn:{round:number;unitId:number}|null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
-    const clear=(preserveQueued=false)=>{board.resetPicking();if(preserveQueued)session.clearPrepared();else session.cancel();planning=false;planMove=null;action=null;hovered=null;message='Choose an action and target';};
+    const radialMode=()=>skin==='radial' && session.phase==='player' && !dialogs.open;
+    const clientFrom= (point:Point)=>clientPointFromCanvas(canvas,point,{width:this.scale.width,height:this.scale.height});
+    const cellOrigin=(cell:CellPosition, fallback?:Point)=>{
+      const screen=board.screenPoint(cell);
+      return screen ? clientFrom(screen) : fallback ?? {x:innerWidth/2,y:innerHeight/2};
+    };
+    const clear=(preserveQueued=false)=>{board.resetPicking();selection.clear(preserveQueued);hovered=null;radial.hide();};
     const refresh=()=>{
       if(!live)return;
-      if(ready && session.phase==='player' && (initializedTurn?.round!==session.state.round || initializedTurn.unitId!==session.active.id)){
-        initializedTurn={round:session.state.round,unitId:session.active.id};
-        if(previewMovement(session.state,session.active.id,catalog).ok){action='move';message='Select a destination';}
-      }
+      if(ready && session.phase==='player')selection.applyTurnDefault();
+      const action=selection.selectedAction, selected=selection.selectedCell, message=selection.message;
       const reach=session.phase==='player' && (!action || action==='move')?previewMovement(session.state,session.active.id,catalog):null;
-      const reviewMove=planning && planMove ? planMove : session.pending?.type==='move' ? session.pending : null;
+      const reviewMove=selection.planning && selection.planMove ? selection.planMove : session.pending?.type==='move' ? session.pending : null;
       const preview=reviewMove?previewMove(session.state,reviewMove,catalog):null;
       board.setIdle(ready && session.phase==='player' && !dialogs.open && !document.hidden);
       const hover=!dialogs.open?hoverPreview(session,hovered ?? (session.pending?.type==='move'?session.pending.to:null)):null;
-      if(showDanger && session.phase==='player' && threatState!==session.state){
+      if(selection.showDanger && session.phase==='player' && threatState!==session.state){
         const result=enemyThreats(session.state,catalog);threatIds=result.ok?result.targets:[];threats=result.ok?result.threats:null;threatState=session.state;
       }
-      const danger=showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
-      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],targetOverlays(session,action,selected,planning?planMove:null),hover,danger);
-      hud.render(action,selected,message,showDanger && session.phase==='player',threats);
+      const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
+      board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
+      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats);
       const caption=document.querySelector('#battle-board-caption')!;
       caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
+      if(session.phase!=='player' || dialogs.open)radial.hide();
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
     };
-    const describe=(command: Command)=>{
-      if(planning && command.type==='move') {
-        const result=session.preview(command);planMove=result.ok?command:null;
-        return result.ok?'Move planned. Choose an ability and target.':previewText(result);
-      }
-      const plan=planning && planMove && command.type==='useAbility'?session.preparePlan(planMove,command):null;
-      const text=plan?(plan.ok?`Move to (${planMove!.to.x}, ${planMove!.to.y}) + ability · ${previewText(plan.preview)}`:previewText(plan)):previewText(session.prepare(command));
-      if(command.type!=='useAbility')return text;
-      const ability=catalog.abilities[command.abilityId];
-      const effect=ability.kind==='guardedAttack'?` · −${ability.attackPenalty} attack / +${ability.armorClassBonus} AC until your next turn`:'';
-      return `${friendlyFire(session,command)}${text} · range ${ability.rangeMin}–${ability.rangeMax}${effect}`;
+    const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
+      selection.selectedCell=cell;cursor=cell;
+      const followUp=selection.planning && selection.planMove;
+      const aimed=followUp ? 'attack' : selection.defaultSlice(cell);
+      if(!followUp && aimed!=='inspect' && aimed!=='plan')selection.aimSlice(cell,aimed);
+      radial.show(cell,{mode,origin});
+      const liveRegion=document.querySelector('#battle-preview');
+      if(liveRegion)liveRegion.textContent=`Cell (${cell.x}, ${cell.y}). ${radial.root.getAttribute('aria-label')}`;
     };
     const select=(cell:CellPosition|null)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
       const inputMs=performance.now();
-      const changed=selected?.x!==cell?.x || selected?.y!==cell?.y;
-      selected=cell;if(cell)cursor=cell;session.cancel();
-      if(action && cell){const command=actionCommand(session,action,cell);message=command?describe(command):'Unavailable: choose a living target';}
-      else if(!cell){hovered=null;message=action==='move'?'Select a destination':action?'Select a target':'Choose an action and target';}
+      const changed=selection.selectedCell?.x!==cell?.x || selection.selectedCell?.y!==cell?.y;
+      if(cell)cursor=cell;
+      if(skin==='radial' && cell){
+        if(selection.followUp){
+          selection.selectedAction=selection.followUp;
+          selection.applyCell(cell);
+          refresh();
+          if(selection.canConfirm())confirm();
+          if(changed)measurements.interaction('selection',inputMs);
+          return;
+        }
+        if(selection.planning && !selection.planMove){
+          if(selection.choosePlanDestination(cell)){openRadial(cell,'tap',cellOrigin(cell));refresh();if(changed)measurements.interaction('selection',inputMs);return;}
+          refresh();return;
+        }
+        openRadial(cell,'tap',cellOrigin(cell));
+        refresh();
+        if(changed)measurements.interaction('selection',inputMs);
+        return;
+      }
+      selection.selectCell(cell);
+      if(!cell)hovered=null;
       refresh();
       if(changed)measurements.interaction('selection',inputMs);
     };
     const board=new BoardRenderer(this,catalog,session.state.mapId,select);
+    const radial=new BattleRadial(selection,{
+      commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
+      inspect:()=>{
+        const unit=selection.selectedCell?session.state.units.find(u=>u.hp>0&&u.cell.x===selection.selectedCell!.x&&u.cell.y===selection.selectedCell!.y):null;
+        inspect(unit?.id ?? session.active.id);
+      },
+      plan:()=>{if(session.phase==='player' && !dialogs.open){selection.startPlan();refresh();}},
+      cancel:()=>{selection.clear();refresh();},
+    });
+    const commitSlice=(cell:CellPosition,slice:RadialSliceId,abilityId?:AbilityId)=>{
+      if(slice==='special' && abilityId){
+        const result=selection.commitSpecial(cell,abilityId);
+        refresh();
+        if(result.commit)confirm();
+        return;
+      }
+      const result=selection.aimSlice(cell,slice);
+      refresh();
+      if(result.commit)confirm();
+    };
     const hover=(point:Point|null)=>{
       const cell=point && session.phase==='player' && !dialogs.open?board.cellAt(point):null;
       if(hovered?.x===cell?.x && hovered?.y===cell?.y)return;
@@ -130,12 +171,24 @@ export class BattleScene extends Phaser.Scene {
       hover,
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
+      hold:(point:Point)=>{
+        if(!radialMode())return false;
+        const cell=board.cellAt(point);if(!cell)return false;
+        lightHaptic();
+        openRadial(cell,'hold',clientFrom(point));
+        refresh();
+        return true;
+      },
+      aim:(point:Point)=>{if(radial.open)radial.aimAt(clientFrom(point));},
+      release:(point:Point)=>{if(radial.open)radial.releaseAt(clientFrom(point));refresh();},
+      dismiss:()=>{if(radial.open){radial.hide();selection.clear();refresh();}},
     },()=>({width:this.scale.width,height:this.scale.height}),point=>ready && !initialFit && !dialogs.open
-      && point.x>=region.x && point.x<region.x+region.width && point.y>=region.y && point.y<region.y+region.height);
+      && point.x>=region.x && point.x<region.x+region.width && point.y>=region.y && point.y<region.y+region.height,
+    {reducedMotion:()=>matchMedia('(prefers-reduced-motion: reduce)').matches});
     const present=async(step:Presentation|null,followPlan=false)=>{
       if(!step){refresh();return;}
       if(followPlan){planInFlight=true;planInterrupted=false;}
-      clear(followPlan);selected=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
+      clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       const moving=step.events.some(event=>event.type==='moved');movingPresentation=moving;
       if(moving)measurements.workload('move',performance.now());
@@ -145,7 +198,7 @@ export class BattleScene extends Phaser.Scene {
       session.finishPresentation(step.token);cursor=session.active.cell;
       if(followPlan){
         planInFlight=false;
-        if(planInterrupted || document.hidden || dialogs.open){session.cancel();message='Planned ability cancelled after interruption';}
+        if(planInterrupted || document.hidden || dialogs.open){session.cancel();selection.message='Planned ability cancelled after interruption';}
         else {const next=session.confirmPlannedAbility();if(next){await present(next);return;}}
       }
       refresh();
@@ -153,7 +206,7 @@ export class BattleScene extends Phaser.Scene {
       pump();
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
-    setModalTransition(()=>{removeInput.reset();queueMicrotask(()=>{if(live){refresh();pump();}});});
+    setModalTransition(()=>{removeInput.reset();radial.hide();queueMicrotask(()=>{if(live){refresh();pump();}});});
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
@@ -162,6 +215,7 @@ export class BattleScene extends Phaser.Scene {
       if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
+    const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
     const inspect=(id:number=session.active.id)=>{
       const unit=session.state.units.find(u=>u.id===id);if(!unit)return;
       const {def,name,armorClass,accuracy,status,support}=unitFeedback(session,unit);
@@ -172,14 +226,10 @@ export class BattleScene extends Phaser.Scene {
         ],()=>{});
     };
     const hud=new BattleHud(session,{
-      action:a=>{board.resetPicking();session.cancel();hovered=null;
-        if(planning && a!=='move' && !planMove){message='Choose a reachable move destination first';refresh();return;}
-        if(planning && a==='move')planMove=null;
-        if(planning && a!=='move')selected=null;
-        action=a;message='Select a target';if(selected){const command=actionCommand(session,a,selected);message=command?describe(command):'Unavailable: choose a living target';}refresh();},
-      plan:()=>{if(session.phase==='player' && !dialogs.open){clear();planning=true;action='move';selected=null;message='Choose a reachable move destination';refresh();}},
+      action:a=>{board.resetPicking();hovered=null;selection.setAction(a);refresh();},
+      plan:()=>{if(session.phase==='player' && !dialogs.open){board.resetPicking();hovered=null;selection.startPlan();refresh();}},
       undo:()=>{if(session.phase==='player' && !dialogs.open)void present(session.undoMove());},
-      danger:()=>{if(session.phase==='player' && !dialogs.open){showDanger=!showDanger;refresh();}},
+      danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect,inspectTarget:inspect,
       log:lines=>{
         dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
@@ -193,13 +243,18 @@ export class BattleScene extends Phaser.Scene {
     });
     const audio=new BattleAudio(this,catalog,this.soundEnabled,snapshot=>hud.renderSound(snapshot));
     setBattleAudioDiagnostics(()=>audio.snapshot());
+    applySkin();
+    const stopSkinWatch=watchCombatControls(applySkin);
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
       if(event.key==='Escape'){cancel();event.preventDefault();return;}
+      if(radial.open)return;
       if(['Enter',' '].includes(event.key)){event.preventDefault();board.resetPicking();hovered=null;select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
       if(!delta[event.key])return;event.preventDefault();const [dx,dy]=delta[event.key],map=catalog.maps[session.state.mapId];
-      board.resetPicking();cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};hovered=cursor;select(cursor);
+      board.resetPicking();cursor={x:Math.max(0,Math.min(map.width-1,cursor.x+dx)),y:Math.max(0,Math.min(map.height-1,cursor.y+dy))};hovered=cursor;
+      if(skin==='radial'){refresh();return;}
+      select(cursor);
     };
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
@@ -232,11 +287,12 @@ export class BattleScene extends Phaser.Scene {
     };
     this.game.events.on(Phaser.Core.Events.POST_RENDER,onRender);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();hud.dispose();removeInput();observer.disconnect();
+      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('keydown',escape);canvas.style.clipPath='';
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;
+      delete document.body.dataset.combatSkin;document.body.classList.remove('battle-skin-radial','battle-skin-rail');
     });
   }
 }

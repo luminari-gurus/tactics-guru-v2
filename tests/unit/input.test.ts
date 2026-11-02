@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { bindBoardInput } from '../../src/phaser/BoardInput';
 import type { BoardInputTarget } from '../../src/phaser/BoardInput';
 
@@ -19,6 +19,7 @@ function fake(): Fake {
   const released: number[] = [];
   const document = {
     visibilityState: 'visible',
+    getElementById: () => null,
     addEventListener: (name: string, fn: EventListener) => documentListeners.set(name, fn),
     removeEventListener: (name: string, fn: EventListener) => { expect(documentListeners.get(name)).toBe(fn); documentListeners.delete(name); },
   };
@@ -28,6 +29,7 @@ function fake(): Fake {
     addEventListener: (name: string, fn: EventListener) => listeners.set(name, fn),
     removeEventListener: (name: string, fn: EventListener) => { expect(listeners.get(name)).toBe(fn); listeners.delete(name); },
     getBoundingClientRect: () => ({ left: 0, top: 0, width: 400, height: 600 }),
+    contains: () => false,
     setPointerCapture: (id: number) => captured.add(id),
     hasPointerCapture: (id: number) => captured.has(id),
     releasePointerCapture: (id: number) => { captured.delete(id); released.push(id); },
@@ -40,8 +42,8 @@ function board(fake: Fake): BoardInputTarget {
   return { pan: (dx: number) => { fake.board.pans.push(dx); }, select: () => { fake.board.selections++; }, zoom: () => {} };
 }
 
-function pointer(type: string, id: number, x: number, y: number): PointerEvent {
-  return { type, pointerId: id, button: 0, clientX: x, clientY: y } as unknown as PointerEvent;
+function pointer(type: string, id: number, x: number, y: number, pointerType = 'mouse'): PointerEvent {
+  return { type, pointerId: id, button: 0, clientX: x, clientY: y, pointerType } as unknown as PointerEvent;
 }
 
 it('drops captured gestures at the drawable boundary, including outside release and wheel', () => {
@@ -66,7 +68,7 @@ it('removes every listener and restores touch style on shutdown', () => {
   const f = fake();
   const cleanup = bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));
   expect(f.listeners.size).toBe(7);
-  expect([...f.documentListeners.keys()]).toEqual(['visibilitychange']);
+  expect([...f.documentListeners.keys()]).toEqual(['visibilitychange', 'pointermove', 'pointerup', 'pointercancel']);
   expect(f.canvas.style.touchAction).toBe('none');
   cleanup();
   expect(f.listeners.size).toBe(0);
@@ -188,4 +190,78 @@ it('modal guards and explicit reset discard held pointers before input is re-ena
   f.listeners.get('pointerdown')!(pointer('pointerdown',2,100,100));
   f.listeners.get('pointerup')!(pointer('pointerup',2,100,100));expect(f.board.selections).toBe(1);
   cleanup();
+});
+
+afterEach(() => { vi.useRealTimers(); });
+
+it('pans touch at 10 px and mouse at 6 px, and still-holds open the radial after 300 ms', () => {
+  vi.useFakeTimers();
+  const f=fake();
+  const holds:number[]=[], aims:number[]=[], releases:number[]=[], dismisses:number[]=[];
+  bindBoardInput(f.canvas,{
+    ...board(f),
+    hold:()=>{holds.push(1);return true;},
+    aim:()=>{aims.push(1);},
+    release:()=>{releases.push(1);},
+    dismiss:()=>{dismisses.push(1);},
+  },()=>({width:400,height:600}));
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  f.listeners.get('pointermove')!(pointer('pointermove',1,109,100,'touch'));
+  expect(f.board.pans).toEqual([]);
+  vi.advanceTimersByTime(299);expect(holds).toEqual([]);
+  vi.advanceTimersByTime(1);expect(holds).toEqual([1]);
+  f.listeners.get('pointermove')!(pointer('pointermove',1,140,100,'touch'));expect(aims.length).toBe(1);
+  f.listeners.get('pointerup')!(pointer('pointerup',1,140,100,'touch'));expect(releases).toEqual([1]);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,100,100,'touch'));
+  f.listeners.get('pointermove')!(pointer('pointermove',2,110,100,'touch'));
+  expect(f.board.pans).toEqual([10]);
+  vi.advanceTimersByTime(300);expect(holds).toEqual([1]);
+  f.listeners.get('pointerup')!(pointer('pointerup',2,110,100,'touch'));expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',3,100,100,'mouse'));
+  f.listeners.get('pointermove')!(pointer('pointermove',3,105,100,'mouse'));expect(f.board.pans).toEqual([10]);
+  f.listeners.get('pointermove')!(pointer('pointermove',3,106,100,'mouse'));expect(f.board.pans).toEqual([10,6]);
+});
+
+it('falls back to tap when the hold is rejected, reduced motion is on, or the press is short', () => {
+  vi.useFakeTimers();
+  const f=fake();
+  bindBoardInput(f.canvas,{...board(f),hold:()=>false},()=>({width:400,height:600}),()=>true,{reducedMotion:()=>false});
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  vi.advanceTimersByTime(300);
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100,'touch'));
+  expect(f.board.selections).toBe(1);
+  const reduced=fake();
+  bindBoardInput(reduced.canvas,{...board(reduced),hold:()=>true},()=>({width:400,height:600}),()=>true,{reducedMotion:()=>true});
+  reduced.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  vi.advanceTimersByTime(300);
+  reduced.listeners.get('pointerup')!(pointer('pointerup',1,100,100,'touch'));
+  expect(reduced.board.selections).toBe(1);
+  const short=fake();
+  bindBoardInput(short.canvas,{...board(short),hold:()=>true},()=>({width:400,height:600}));
+  short.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  vi.advanceTimersByTime(120);
+  short.listeners.get('pointerup')!(pointer('pointerup',1,101,100,'touch'));
+  expect(short.board.selections).toBe(1);
+});
+
+it('keeps aiming when pointer events land on an overlay above the captured canvas', () => {
+  vi.useFakeTimers();
+  const f = fake();
+  const aims: number[] = [];
+  const releases: number[] = [];
+  bindBoardInput(f.canvas, {
+    ...board(f),
+    hold: () => true,
+    aim: () => { aims.push(1); },
+    release: () => { releases.push(1); },
+    dismiss: () => { throw new Error('hold dismissed'); },
+  }, () => ({ width: 400, height: 600 }));
+  f.listeners.get('pointerdown')!(pointer('pointerdown', 1, 100, 100, 'touch'));
+  vi.advanceTimersByTime(300);
+  const overlay = { nodeType: 1 } as unknown as EventTarget;
+  f.documentListeners.get('pointermove')!({ ...pointer('pointermove', 1, 180, 100, 'touch'), target: overlay } as unknown as Event);
+  expect(aims).toEqual([1]);
+  f.listeners.get('pointerleave')!({ ...pointer('pointerleave', 1, 100, 100, 'touch'), relatedTarget: overlay } as unknown as Event);
+  f.documentListeners.get('pointerup')!({ ...pointer('pointerup', 1, 100, 100, 'touch'), target: overlay } as unknown as Event);
+  expect(releases).toEqual([1]);
 });

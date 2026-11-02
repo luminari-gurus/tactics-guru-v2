@@ -1,4 +1,4 @@
-import {expect,test} from '@playwright/test';
+import {expect,test} from './helpers/forceRailControls';
 import { readSession, playCommand } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
