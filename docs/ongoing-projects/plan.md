@@ -115,8 +115,17 @@ build symlink, and both failed/passing mode receipts are retained as `cleanup-*`
 in QA. Preview reused the clean `e3e9ebf` bundle, whose 115 file hashes still
 match its recorded receipt. Dev's dirty metadata flag came solely from that local
 artifact link, was not consumed by the cleanup assertions, and the link is now
-locally excluded; tracked tested inputs remain unchanged. Publish the focused
-cleanup-fixture PR stacked on #266, then finish the outstanding full-run audit.
+locally excluded; tracked tested inputs remain unchanged. Review-ready
+[PR #267](https://github.com/luminari-gurus/tactics-guru-v2/pull/267) is stacked on
+#266. All local qualification processes are terminal. Finish the outstanding
+full-run audit using live run **41362013777**, job **125015648051**.
+
+The prepared (not yet executed) helper `tmp/issue263/audit-full-candidate.py`
+takes the downloaded full artifact ZIP and its API-reported SHA-256. It checks
+the frozen `e3e9ebf` source, all 19 configured stages/commands, exact selected
+browser IDs, workers/retries/skips and complete performance capture identity.
+Inspect the underlying summary, reports and performance findings as well; the
+six-case dev supplement is separate from that run's original selector.
 
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
@@ -148,13 +157,13 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **5/9 complete**: original
+- OpenSpec change `issue-263-webkit-reload-boot` is **6/9 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
   (1.2), diagnostic publication (1.3), and the supported runtime repair with the
   retained before/after stair regression witness (2.1), plus the dev-selector
-  omission (3.3) in PR #266. Repair integration
-  proof (2.2), full acceptance (3.1), final handoff (3.2), and cleanup-fixture
-  route correction (3.4) remain open. Use live `openspec instructions apply`
+  omission (3.3) in PR #266 and cleanup-fixture correction (3.4) in PR #267.
+  Repair integration proof (2.2), full acceptance (3.1) and final handoff (3.2)
+  remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
 - Final diagnostic code `495d08d` is unchanged by main integration. On clean
   **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
