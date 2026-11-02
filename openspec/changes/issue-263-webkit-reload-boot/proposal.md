@@ -30,8 +30,11 @@ None. Combat, audio, controls and deterministic session requirements are unchang
 
 ## Impact
 
-Potential owners are `src/main.ts`, `src/app/startDungeonApp.ts`,
-`src/phaser/start.ts` and existing browser boot/dungeon helpers. The exact repair
-will follow the causal evidence. PR #256 is an active integration consumer;
-#257/#258 are related symptoms, not presumed duplicates. No new dependency,
-save-format change, deployment or menu redesign is proposed.
+Evidence located the owning failure in the bundled Linux WebKit networking
+runtime before application entry. Implemented owners are the existing
+Playwright package/lock, browser setup scripts, five device-bearing configs and
+bounded test diagnostics. Two independent verification omissions are repaired
+in focused follow-up PRs. Application entry, game/save rules and production
+dependencies are unchanged. PR #256 is integrated into main and included in
+qualification; #257/#258 remain separate unless their causes are established.
+No save-format change, deployment or menu redesign is part of this work.

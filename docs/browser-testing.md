@@ -14,7 +14,9 @@ npm run test:browser-smoke
 
 The setup commands invoke the locally installed, lockfile-compatible Playwright CLI.
 Do not install an unrelated latest global CLI. Repeat installation after lockfile
-updates. Linux setup uses Playwright's `--with-deps` installer; it needs package
+updates. Setup preserves other installed browser revisions with `--no-remove`,
+so other checkouts and literal-base comparisons retain their matching binaries.
+Linux setup uses Playwright's `--with-deps` installer; it needs package
 manager privileges and access to OS package repositories and Playwright download
 hosts. Invalid/truncated ZIP downloads are setup failures, not test failures.
 An unprivileged runner needs a pre-provisioned environment; the CI job installs

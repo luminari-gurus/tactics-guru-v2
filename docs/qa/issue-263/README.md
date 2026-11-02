@@ -1,9 +1,56 @@
 # WebKit dungeon reload boot investigation (#263)
 
-Updated 2026-11-02 (Asia/Jerusalem). **Native entry-resource failure is captured;
-runtime repair PR #265 is published. Complete acceptance remains open.**
+Updated 2026-11-02 (Asia/Jerusalem). **The observed native entry-resource failure
+is repaired by the supported runtime update. Full acceptance and final review/Git
+handoff are complete; supplemental review and the newly authorized ordered merge
+are in progress.**
 The current handoff is [plan.md](../../ongoing-projects/plan.md); tracked work is
 [OpenSpec tasks](../../../openspec/changes/issue-263-webkit-reload-boot/tasks.md).
+
+## Supplemental review and authorized merge — 2026-11-02
+
+Reviewed all four PR diffs and previous review submissions/threads, the fixture's
+lifecycle/privacy/bounds, device and inherited configurations, package/lock
+scope, aggregate selection/skip owners, cleanup process witnesses and retained
+source/build evidence. The only substantiated review defect is the existing
+P2 on #264: its generated startup contract ignored the supported Chromium
+executable override and used the default headless shell.
+
+Repair `d90a294` configures full Chromium and forwards the override only to the
+Chromium project. In an isolated cache containing only WebKit, the literal
+unrepaired contract fails at Chromium launch. After repair, both diagnostic
+contracts pass on Playwright 1.63.0 (12.9 seconds) and 1.64.1 (9.0 seconds), and
+the startup contract passes with default selection (3.5 seconds). No assertion,
+timeout, retry, application, helper or ordinary browser configuration changes.
+The original review thread has the repair/proof reply and is resolved. No
+additional actionable code defect was found by this supplemental review.
+
+Fresh independent readback verifies the 194 original canonical payload hashes,
+the complete 585,086,035-byte full-artifact hash, 19 passing stages, 1,440 browser
+passes, twelve intentional skips, unique case IDs, one worker and zero retries.
+The original native error is also verified by decoding the two failed cases'
+startup attachments in the retained 41356666822 archive, whose hash matches.
+Raw original error-context excerpt whitespace is preserved as evidence; three
+literal source-blank lines trigger range-wide `git diff --check` whitespace
+warnings and have not been rewritten to cosmetically clean that artifact.
+
+`review-*.gz` receipts in the manifest retain the failed/passing logs, exact
+source overlays, override-only cache contents, native/full readbacks and current
+source comparison. Commands: `node --test tests/tooling/browser-diagnostics.test.mjs`
+with the recorded override/cache; and
+`node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs`
+with default selection. Executions were serial in an isolated WSL checkout,
+Node 24.15.0, with installed lock-compatible dependency trees. The only tracked
+test overlay matches the canonical committed repair hash on both versions.
+
+Relative to full-run source `e3e9ebf`, only the already-qualified dev selector,
+cleanup fixture and this newly-qualified diagnostic contract differ in code.
+Application/public/build/package/config/ordinary-spec/helper inputs are unchanged;
+the existing full, device and extended acceptance evidence remains valid for
+those unchanged inputs. No new bundle or performance result is claimed for the
+merge commits. Caller authorization now includes ordered merge and safe Git
+cleanup; the current plan records that closeout separately from the historical
+unmerged handoff below.
 
 ## Original failure
 
@@ -270,10 +317,11 @@ This supports the supported-runtime repair at the observed native networking
 boundary; it does not establish the exact upstream native memory-defect stack.
 Required full acceptance
 [41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777)
-is running at the same candidate source using the existing full-verification
-job, original limits and shared exclusive self-hosted lock. That in-progress
-attempt is not claimed as complete acceptance. Observe its handle without
-duplicating or cancelling work on an observation timeout.
+completed successfully at the same candidate source using the existing
+full-verification job, original limits and shared exclusive self-hosted lock.
+All 19 stages and the detailed source/coverage audit passed. The completed
+qualification, mode-specific skip accounting and source-equivalence proof are
+recorded below. No execution or download process remains live.
 
 The current Development association is repair PR #265. GitHub had converted the
 original linked branch into a closing reference on diagnostic PR #264 when it
@@ -301,3 +349,103 @@ in 5.0 seconds, one worker and zero retries/skips. `map-verification-*` receipts
 bind its clean source, exact comparison and real execution. This is supplemental
 dev coverage; full run 41362013777 still uses its original three-case selector
 at `e3e9ebf`, and is not represented as execution of the later selector.
+
+## Real-browser cleanup fixture correction
+
+On baseline `e3e9ebf`, both existing preview/dev cleanup contracts failed at the
+positive canvas witness. Their retained page contexts show the intended main
+menu with New Game at `/`; the old fixture expected a renderer there. The
+interruption and process cleanup already completed correctly. This is a fixture
+route error, separate from the native WebKit loading failure.
+
+Follow-up `9a8e577` changes only the two synthetic fixture navigations to the
+existing `/?scene=proof` route. Both outer contracts pass in **43.9 seconds**,
+including positive real-engine canvas, deliberate 20-second interruption,
+complete cleanup and successful fresh same-port recovery. Assertions, timeouts,
+retries and application code are unchanged. `cleanup-before-*`, `cleanup-after-*`
+and `candidate-browser-cleanup-{before,after}.log.gz` retain both outcomes.
+
+`cleanup-source.json.gz` records tested source and the only untracked input: a
+local `dist` link to the immutable clean `e3e9ebf` build. All recorded build hashes
+still match. Preview served that build; dev metadata had dirty=true solely from
+the artifact link, which these lifecycle assertions do not consume. The link was
+locally excluded after execution; tracked code is unchanged. This known metadata
+difference is recorded explicitly, without claiming a new clean production build
+or a full-suite execution of the fixture change.
+
+## Complete full qualification and final-source reuse
+
+[Run 41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777)
+completed all **19 configured stages** at clean source
+`e3e9ebf11aff78d395f65df6c3f74cded6733e83`. Artifact `13110492448`,
+`full-verify-41362013777-1`, contains 585,086,035 bytes. The complete downloaded ZIP
+matches its API SHA-256
+`d9556fe6dd8a807940f324fbb27234579b44f9be491c3fbfebc0f6c693707865`.
+Selected entries were CRC-validated during reading. A transport reset was resumed
+by HTTP range; no test run was restarted or relabeled.
+
+- **1,440 browser cases passed**, zero unexpected/flaky results or retries.
+  Every selected ID is present exactly once, with one passing attempt for each
+  executed case, one worker and the unchanged retry policy.
+- WebKit exploration passed **99/99**, exactly **33 per desktop, portrait and
+  landscape profile**. All **12 arrows/WASD/compass/cell stair combinations**
+  passed, including post-reload restoration, inert arrival and lock assertions;
+  no post-reload boot timeout occurred. WebKit acceptance passed **94/94**.
+- All **1,103 unit tests**, both TypeScript scopes, both build-header integration
+  cases, root/prefix bundles, combined dev fixtures, health bars, configured
+  production/dev telemetry, root/prefix asset modes and root restoration passed.
+- The isolated **18-sample proof performance capture** is complete, bound to the
+  served clean `e3e9ebf` build, and its existing evaluator reports no capture
+  failures or metric violations. This is separate from the legacy dungeon
+  advisory measurements described below.
+- The final two-engine setup-smoke command also passed **2/2** on `e3e9ebf`,
+  exercising the edited setup configuration and real Phaser viewport resizing
+  in Chromium and WebKit. No skips/retries.
+
+The **12 intentional mode-specific skips** are retained, not hidden: six in
+Chromium preview for the two dev-only map cases, and three in each dev asset
+stage for production-only resource-hint nonce behavior. Their source guards and
+skip annotations match the original run. Every skip maps to a unique passing
+applicable-mode case: the full run's three dev placement cases, the separately
+qualified dev disposer cases, and the root/prefix preview nonce cases.
+`full-candidate-audit.json.gz` records all mappings; `skip-inventory-review.json.gz`
+explains the initial audit's narrower skip assumption and its source-checked
+resolution. No application test failure was waived.
+
+`full-41362013777-*`, `full-functional-witness.json.gz`,
+`full-performance-review.json.gz` and `final-setup-smoke.*.gz` preserve the actual
+reports, commands, preflight versions, source hashes and results. Earlier failed,
+cancelled and incomplete attempts remain separately identified in this document
+and the manifest.
+
+`final-source-equivalence.json.gz` proves the final code differs from the
+full-run source only in two verification owners: the dev selector (fresh six-case
+execution plus 38 contracts at `c508d6e`) and the synthetic cleanup fixture (fresh
+preview/dev contracts at `9a8e577`). Tracked application/public files, build
+configuration, package/lock files and ordinary browser assertions are unchanged.
+The selector adds exactly
+three cases with no omission elsewhere; the cleanup fixture is outside the
+routine matrices. Later edits are documentation/evidence only. Under
+[verification-policy.md](../../verification-policy.md), unchanged full-run
+coverage is reused with those later focused proofs. The full run is never claimed
+to have executed a later selector, fixture or documentation commit.
+
+The served build identity remains clean `e3e9ebf`. A later documentation commit
+would change Git build-info metadata if rebuilt; no new bundle, exact-byte cache
+equivalence or performance result is claimed for an unbuilt documentation commit.
+Functional evidence is reused only where that metadata is not its assertion input.
+
+## Retained dungeon performance advisories
+
+The existing non-gating `exploration-performance.json` receipts still report a
+411,855-byte gzip code total against their 400,000-byte advisory and WebKit frame
+budget misses. The original run already reported 411,731 bytes and the same
+WebKit frame-budget categories. The mobile portrait p50 flag also demonstrates
+floating precision (`16.700000000000045` versus `16.7`); raw values and flags are
+preserved without changing budgets. These legacy dungeon diagnostics are not the
+isolated proof capture above and do not establish a performance improvement.
+
+Original/current advisory receipts and `dungeon-advisory-comparison.json.gz` retain
+the findings. Existing [#127 performance work](../../../openspec/changes/issue-127-performance-budgets/tasks.md)
+was explicitly deferred by owner direction and is not resumed or represented as
+complete by this reload repair.

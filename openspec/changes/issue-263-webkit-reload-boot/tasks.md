@@ -9,11 +9,16 @@
 ## 2. Repair and focused qualification
 
 - [x] 2.1 Fix the evidenced owning cause and add the causal regression to existing test owners; verify failure before and success after the repair without timeout increases, automatic retries, dropped profiles or save/state changes, updating design and owning documentation.
-- [ ] 2.2 Verify all stair inputs on desktop/portrait/landscape WebKit, saved continuation/recovery and affected shared route/lifecycle consumers; retain exact source/build/test identities, original failures and results in QA and the current handoff, then commit/push/open a focused reviewable PR when this chunk is ready.
+- [x] 2.2 Verify all stair inputs on desktop/portrait/landscape WebKit, saved continuation/recovery and affected shared route/lifecycle consumers; retain exact source/build/test identities, original failures and results in QA and the current handoff, then commit/push/open a focused reviewable PR when this chunk is ready.
 
 ## 3. Complete integration acceptance
 
-- [ ] 3.1 Qualify the final integration candidate with the complete full-verification inventory, including passing WebKit exploration without post-reload boot timeouts on all three profiles and any affected extended journeys; audit both #263 criteria against source-bound evidence and keep incomplete/failed runs explicit.
-- [ ] 3.2 Finish the current-session handoff and focused PR descriptions, verify clean Git status, remote parity and issue links, and leave completed work ready for review without merging, deploying or creating an unrequested release tag.
+- [x] 3.1 Qualify the final integration candidate with the complete full-verification inventory, including passing WebKit exploration without post-reload boot timeouts on all three profiles and any affected extended journeys; audit both #263 criteria against source-bound evidence and keep incomplete/failed runs explicit.
+- [x] 3.2 Finish the current-session handoff and focused PR descriptions, verify clean Git status, remote parity and issue links, and leave completed work ready for review without merging, deploying or creating an unrequested release tag.
 - [x] 3.3 Repair the independently found full-verification dev-selector omission in a separate focused PR: preserve all existing coverage, add exactly the three existing direct map-disposer profile cases, execute the six affected dev cases and verification contracts, and retain source-bound comparison evidence without restarting unchanged #263 coverage.
-- [ ] 3.4 Repair the independently found browser-cleanup fixture route in a separate focused PR: retain the baseline preview/dev failures, use the explicit proof route for both fixture navigations, preserve canvas/interruption/cleanup/same-port recovery assertions and budgets, and verify both real-browser contracts without application changes.
+- [x] 3.4 Repair the independently found browser-cleanup fixture route in a separate focused PR: retain the baseline preview/dev failures, use the explicit proof route for both fixture navigations, preserve canvas/interruption/cleanup/same-port recovery assertions and budgets, and verify both real-browser contracts without application changes.
+
+## 4. Authorized supplemental review and merge
+
+- [x] 4.1 Review the complete stack and every existing review; repair and qualify all substantiated findings, publish the supplemental review and resolve addressed threads, retaining source-bound evidence and unchanged acceptance coverage.
+- [ ] 4.2 Merge #264, #265, #266 and #267 in order under the caller's new authorization; recheck rules, live reviews, exact refs and merge trees, verify published trees/parents and issue closure, clean up completed refs safely and finish with clean local/main remote parity.
