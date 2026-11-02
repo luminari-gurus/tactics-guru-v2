@@ -77,7 +77,10 @@ The owning observed failure is native networking before entry evaluation; exact
 upstream defect attribution remains an inference. Existing application stair
 cases are the regression witness, with earlier failed runs retained rather than
 replaced by a synthetic security or network reproducer. The complete issue gate
-remains distinct and is running at candidate e3e9ebf in 41362013777.
+passed at candidate e3e9ebf in 41362013777: all 19 stages, 99/99 WebKit exploration
+across all three profiles, 94/94 WebKit acceptance and zero unexpected failures
+or retries. Exact native memory-defect attribution remains an inference; the
+observed owning failure is native networking before application entry.
 
 The completion inventory also exposed a separate aggregate-selection omission:
 the existing dev-only direct map-disposer test is skipped in preview and absent
@@ -100,3 +103,22 @@ inputs. Browser-version/user-agent updates are intentional runtime changes.
 Qualify the original prefix without debug or early page script injection, then
 the complete issue-required inventory. Old successful captures are baselines,
 not proof that the fault was fixed.
+
+## Final qualification and evidence reuse
+
+The full artifact hash, exact IDs/attempts, twelve mapped mode-specific skips,
+source/build identities, recovery/stair witnesses and complete proof performance
+capture have been audited. Eighteen extended journeys and both real-engine setup
+smoke cases also pass. Existing non-gating dungeon code/frame advisories remain
+recorded with the owner-deferred #127 work; no budget is relaxed or falsely
+represented as passing.
+
+The final tracked application/public files, build configuration, package/lock
+files and ordinary browser assertions match the qualified full source. The only later verification
+changes are the dev selector and cleanup fixture, each separately qualified and
+published in PRs #266/#267. Source-equivalence and skip-counterpart receipts
+support proportional reuse under verification-policy.md. The full run remains
+identified as e3e9ebf and is not relabeled as execution of later Git commits.
+Later Git build-info metadata is not treated as a newly measured bundle or an
+exact-byte/performance result; functional reuse is limited to assertions whose
+inputs are unchanged by that metadata.

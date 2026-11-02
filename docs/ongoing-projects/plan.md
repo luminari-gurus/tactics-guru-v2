@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: runtime and focused follow-ups published; full execution passed, artifact audit pending.
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation and full artifact audit qualified; final review handoff in progress.
 
 **Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
@@ -24,242 +24,127 @@ native-library replacements are outside this candidate.
 
 ## Current implementation handoff
 
-Updated 2026-11-02 (Asia/Jerusalem). **Native entry-resource failures are captured;
-the supported runtime repair is published in stacked PR #265. Full acceptance remains open.**
+Updated 2026-11-02 (Asia/Jerusalem). **Implementation and functional acceptance
+are qualified. Final PR/Git handoff remains; no CI, browser or download process
+from this goal is live.**
 
-**Live continuation checkpoint:** candidate source **`e3e9ebf`** is clean and
-published in [PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265),
-base diagnostic PR #264. Candidate focused run **41361259848**, CI source
-`3f93ce3`, completed **90/90 ordinary prefix cases and 60/60 traced stair
-repetitions**, with zero failures/skips/retries. Its verified artifact is
-`13105454118`, SHA-256
-`75fd3bb2c4794b095f4a28557a041c6ead514627827268c76083cd6fda16b051`;
-both qualified GTK/WPE libraries contain libsoup 3.6.6. Full acceptance
-**41362013777**, job **125015648051**, completed successfully against
-`branch/issue-263-patched-webkit-runtime` at `e3e9ebf`, using the existing
-`issue-200-baseline.yml` full-verify job, original limits and shared exclusive
-self-hosted concurrency group. Its job log reports all 19 stages passed. Detailed
-source/coverage acceptance remains open until the artifact audit below completes;
-do not restart this completed test run.
+Review order, with independently published chunks:
 
-**Only live work: artifact download session 31921.** Artifact `13110492448` is
-585,086,035 bytes, with API-reported SHA-256
-`d9556fe6dd8a807940f324fbb27234579b44f9be491c3fbfebc0f6c693707865`.
-The initial transfer (session 63667, terminal exit 1) reset after 223,985,664 bytes.
-Authenticated curl is resuming the same `.zip.part` by HTTP range; it was confirmed
-live and progressing. Paths are `/tmp/tactics-issue263-evidence/full-41362013777.zip.part`
-and the final `.zip` path without `.part`. Poll session 31921 before doing anything
-to that file. An observation timeout is not terminal. If the process actually
-fails, inspect the preserved partial and resume only after confirming no writer
-is live; do not launch simultaneous writers or repeat the tests. The task-owned
-resume command is `tmp/issue263/resume-artifact.sh`, which keeps credentials out
-of its arguments/output. On success, require the complete archive hash to match
-the API receipt, then run the prepared audit and inspect its underlying reports.
+1. [PR #264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264): bounded
+   failure diagnostics; tested diagnostic code `495d08d`, integrated with main as
+   `cdc39cf`. This PR does not close #263.
+2. [PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265): supported
+   Playwright 1.64.1 runtime repair, tested clean code `e3e9ebf`. It owns #263's
+   Development/closing association.
+3. [PR #266](https://github.com/luminari-gurus/tactics-guru-v2/pull/266): the
+   independently found dev-selector omission, tested `c508d6e`.
+4. [PR #267](https://github.com/luminari-gurus/tactics-guru-v2/pull/267): the
+   independently found cleanup-fixture route error, tested `9a8e577`.
 
-Clean-candidate locked installation, browser preflight, build/content/both type
-scopes pass. Both browser-diagnostic contracts, all 38 selection/batch/full
-orchestrator contracts and 20 timing/reporter/process contracts pass. Fifteen before/after selection inventories retain
-all **1,541 test IDs and metadata**. Actual Chromium and WebKit probes on all six
-profiles preserve viewport, effective screen, DPR and touch; only the browser
-version/user-agent intentionally changes. Canonical local outputs are under
-`/tmp/tactics-issue263-evidence/` with `candidate-*`, `runtime-*-selection.json`,
-`runtime-selection-comparison.json` and `device-compatibility.json` names.
+The active checkout is `branch/verification-proof-cleanup-route`. All four PRs
+were verified open, non-draft and mergeable. Main is `78a3f75`; #256's menu work
+is integrated. #263 remains open and assigned to `moshehbenavraham`. The original
+native branch link became a closing reference on #264 when that PR opened; it
+was moved to #265 so diagnostic-only merge cannot close the issue.
 
-**Extended journeys complete:** local clean-candidate extended journeys ran serially in
-`/tmp/tactics-issue263-candidate` with isolated official browser cache
-`PLAYWRIGHT_BROWSERS_PATH=/tmp/tactics-issue263-runtime-inspect/browsers`.
-Exec session **98824 is terminal**: Chromium and WebKit each passed all nine cases;
-`/tmp/tactics-issue263-evidence/candidate-extended/{chromium,webkit}.log` and
-matching `.exit` files identify terminal outcomes. Both exit codes are zero,
-with no failures/skips/retries (Chromium 34.8m, WebKit 26.5m). Portable reports/logs
-are committed as `candidate-extended-{chromium,webkit}.*.gz` under QA. The six-case
-dev selector check also passed. The cleanup contract's stale root-route fixture
-is repaired and both qualification modes pass, as tracked below. Full CI execution
-is complete; only artifact transfer/audit remains. Never poll the completed
-focused or extended processes as live.
+**Cause and minimal repair.** Ordinary qualified runs 41349975828 and
+41356666822 captured native `WebKit encountered an internal error` failures for
+the new document's entry/static dependencies, before application initialization.
+Both old bundles contain libsoup 3.6.5; the official 1.64.1 WebKit 2370 GTK/WPE
+bundles contain 3.6.6. The owning observed fault is native networking before
+entry execution. Attribution to the exact upstream memory defect remains an
+inference, not a native-stack or external-security-reproducer claim. The repair
+changes the supported runtime and necessary device compatibility; application
+rules, saves, assertions, timeouts, budgets and retries are unchanged.
 
-**Development-link audit:** GitHub replaced the original native branch link with
-a closing reference to diagnostic PR #264 when that PR opened. On 2026-11-02 the
-issue sidebar association was moved to repair PR #265, preventing a diagnostic-only
-merge from closing #263. GraphQL readback confirms #264 has no closing issue,
-#265 closes #263, both PRs are open/non-draft/mergeable, and #263 remains open and
-assigned to `moshehbenavraham`. The branch-to-PR conversion is expected GitHub
-behavior ([GitHub documentation](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-a-branch-for-an-issue));
-the current Development link now follows the actual repair branch.
+**Completed proof:**
 
-**Separate verification omission:** the aggregate's `placement-dev` filter runs
-the controlled-placement case but omits the existing dev-only direct map-disposer
-case, which is skipped in production preview. Fix this selector separately,
-stacked on the runtime repair: retain the stage ID, add the existing title to its
-grep, prove exactly three added profile cases with no omissions elsewhere, run
-the six affected dev cases and existing verification contracts, then publish a
-focused PR. No application, assertion, timeout, budget or routine profile change
-is needed. Account for this extra dev coverage alongside the unchanged #263 full
-run; never claim that the earlier run executed the later selector.
+- Clean `e3e9ebf` locked install, browser preflight, content/build and both type
+  scopes pass. Qualified run 41361259848 passes 90 ordinary prefix cases and
+  60 traced stair repetitions, with zero skips/retries. Its inventories confirm
+  fixed libsoup 3.6.6 on the actual qualified runner.
+- Full run [41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777),
+  job 125015648051, passes all 19 configured stages at clean `e3e9ebf`.
+  Artifact 13110492448 contains 585,086,035 bytes; the complete local archive
+  matches API SHA-256
+  `d9556fe6dd8a807940f324fbb27234579b44f9be491c3fbfebc0f6c693707865`.
+  Selected ZIP entries passed CRC checks. A failed initial transfer was resumed;
+  no test run was restarted or relabeled.
+- Full reports prove 1,440 browser passes, zero unexpected/flaky outcomes or
+  retries, and twelve intentional mode-specific skips with passing counterparts.
+  WebKit exploration is 99/99, exactly 33 per profile. All twelve stair
+  input/profile cases pass reload restoration, arrival and lock assertions.
+  WebKit acceptance is 94/94. All 1,103 units, both type scopes, both build-header
+  integration cases, root/prefix builds, fixtures, health bars, telemetry modes,
+  asset modes and root restoration pass.
+- The isolated 18-sample proof performance capture passes its existing evaluator
+  with no capture failures or metric violations. Legacy non-gating dungeon
+  code-size/WebKit frame advisories remain in QA and owner-deferred #127 work;
+  this does not claim all dungeon FPS budgets or a performance improvement.
+- All 18 legal extended journeys pass: nine Chromium and nine WebKit, covering
+  Mage/Ranger/Fighter and all three profiles, with no failures/skips/retries.
+  Two-engine real-Phaser setup smoke also passes 2/2 on `e3e9ebf`.
+- Runtime before/after discovery preserves all 1,541 cases across 15 inventories.
+  Six actual-browser profile probes preserve viewport/effective screen/touch/DPR.
+  The new dev selector adds exactly three disposer cases with no omissions and
+  fourteen other inventories unchanged; all six affected dev cases and 38
+  verification contracts pass. Both diagnostic contracts and 20 timing/reporter/
+  process contracts also pass.
+- The corrected cleanup fixture passes both real-browser preview/dev contracts:
+  rendered canvas, deliberate 20-second interruption, complete owned-process
+  cleanup and fresh same-port recovery. Its original menu/canvas failures remain
+  retained. `cleanup-source.json.gz` records the known build-link input: preview
+  reuses clean `e3e9ebf`, all 115 build-file hashes match, and dev's dirty metadata
+  flag was not consumed by these lifecycle assertions. The artifact link is now
+  locally excluded; tracked tested code is unchanged.
 
-Follow-up source **`c508d6e`** is published in review-ready
-[PR #266](https://github.com/luminari-gurus/tactics-guru-v2/pull/266) on
-`branch/verify-map-disposer-coverage`.
-Clean WSL checkout `/tmp/tactics-issue263-map-verification` uses the candidate's
-unchanged 1.64.1 dependency tree through an ignored node_modules symlink.
-All 38 selection/batch/orchestration contracts passed. Discovery records
-`map-verification-selection.json` and `map-verification-comparison.json` prove
-exactly three added dev disposer cases, all three prior placement cases retained,
-and 14 other inventories unchanged. These reports/logs are under
-`/tmp/tactics-issue263-evidence/`. The six cases passed in **5.0 seconds** with
-`PLAYWRIGHT_SERVER_MODE=dev`, one worker, zero retries/skips, using the existing
-isolated browser-cache variable. QA retains the real report, command log,
-discovery comparison and contracts. Its focused PR has base
-`branch/issue-263-patched-webkit-runtime`. The browser cleanup contract recorded
-above is being qualified separately; do not rerun completed extended journeys.
+**Source-aware reuse.** The full run really executed `e3e9ebf` with its original
+three-case dev selector. The final tracked application/public files, build
+configuration, package/lock files and ordinary specs are unchanged. The only
+later verification owners are the selector and synthetic cleanup fixture, each
+freshly qualified above. `final-source-equivalence.json.gz` and the exact skip
+mapping account for that union under verification-policy.md. No later Git
+build-info identity is claimed as a newly built bundle, exact-byte cache result
+or new performance measurement.
 
-**Separate cleanup-fixture repair:** baseline `e3e9ebf` ran
-`node --test tests/tooling/verification-browser.test.mjs` (terminal session 5755).
-Both preview/dev outer contracts failed because the positive fixture visits `/`
-and expects a canvas, while the captured page is the intended main menu. The
-20-second interruption and process cleanup complete correctly; the positive
-engine witness cannot pass on that route. Preserve `candidate-browser-cleanup-before.log`
-and the baseline checkout's `verification-receipts/issue219/` records. Repair both
-fixture navigations to `/?scene=proof` in a separate focused PR, keeping the
-canvas assertion, interruption budget and fresh same-port recovery assertions.
-Follow-up source **`9a8e577`** corrects both fixture navigations. Both real-browser
-contracts pass (43.9 seconds total): positive rendered engine, expected timed
-interruption, complete cleanup and fresh same-port recovery. No application,
-assertion or timeout changed. WSL qualification used
-`/tmp/tactics-issue263-map-verification`; source/build details, the known local
-build symlink, and both failed/passing mode receipts are retained as `cleanup-*`
-in QA. Preview reused the clean `e3e9ebf` bundle, whose 115 file hashes still
-match its recorded receipt. Dev's dirty metadata flag came solely from that local
-artifact link, was not consumed by the cleanup assertions, and the link is now
-locally excluded; tracked tested inputs remain unchanged. Review-ready
-[PR #267](https://github.com/luminari-gurus/tactics-guru-v2/pull/267) is stacked on
-#266. All local qualification processes are terminal. Finish the outstanding
-artifact audit for completed run **41362013777**, job **125015648051**.
+All detailed source/build/browser/mode identities, hashes, raw reports, failed
+and incomplete attempts, baseline comparisons and remaining limitations are in
+[QA](../qa/issue-263/README.md) and its evidence manifest. This includes the
+original 60-second missing-screen failure, the earlier heading-only failure,
+old-runtime successful controls, traced budget failures and corrected probes.
+The original archive hash is
+`9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
 
-The prepared (not yet executed) helper `tmp/issue263/audit-full-candidate.py`
-takes the downloaded full artifact ZIP and its API-reported SHA-256. It checks
-the frozen `e3e9ebf` source, all 19 configured stages/commands, exact selected
-browser IDs, workers/retries/skips and complete performance capture identity.
-Inspect the underlying summary, reports and performance findings as well; the
-six-case dev supplement is separate from that run's original selector.
+**Remaining workflow:** OpenSpec `issue-263-webkit-reload-boot` is 8/9 complete.
+The audited integration/full-run obligations 2.2 and 3.1 are checked. Finish
+3.2: publish the final evidence/handoff, refresh PR descriptions and
+verify Git/remote parity, issue ownership/closure links and review readiness.
+Do not merge, deploy, create a release tag, close #263 before its repair merges,
+archive this unmerged OpenSpec change, or repeat qualified tests for prose-only
+follow-ups. Preserve #257/#258 separately unless evidence establishes their cause.
 
-The repair stays limited to the supported browser runtime and required device
-compatibility. No application fallback, retries, save changes or custom native
-library replacement is needed for the evidenced pre-application network fault.
-The diagnostic PR remains independently reviewable. Do not close #263 or claim a
-complete fix until the focused artifacts and complete full-run gate are audited.
+Useful local evidence is `/tmp/tactics-issue263-evidence/`; the audited full ZIP
+is `full-41362013777.zip`, with extracted selected reports in `full-41362013777/`.
+Current functional checkouts are `/tmp/tactics-issue263-candidate` (`e3e9ebf`)
+and `/tmp/tactics-issue263-map-verification` (`9a8e577`). Both browser and transfer
+exec handles are terminal. The executed audit helper is
+`tmp/issue263/audit-full-candidate.py`; its result was checked against raw
+summary, case attempts, skip guards, recovery/stair witnesses and performance
+evaluation. Historical CI branch `branch/issue-263-runner-diagnosis` is at
+`3f93ce3` in `tmp/issue263-runner-worktree`; do not redispatch it as completion
+verification. Use native Git for Windows checkout/commit/worktrees and WSL
+network Git from the primary repository; Windows worktree pointers are invalid
+to WSL Git.
 
-**2026-11-02 continuation:** qualified ordinary runs **41349975828** and
-**41356666822** reproduced the missing-screen stall. Their bounded attachments
-show prior-load cancellations followed by native **`WebKit encountered an internal
-error`** failures for the new document's entry/static dependencies. Application
-initialization never starts. Reuse/remote-browser/PWDEBUG flags are false. The
-runtime repair candidate is **Playwright 1.64.1**, whose inspected official WebKit
-2370 bundle contains fixed libsoup 3.6.6; old local and qualified bundles contain
-3.6.5. The specific upstream native defect is a supported inference, not a claim
-that a security reproducer was executed. See the new QA section for archive hashes,
-reports and exact failed/passed/incomplete counts.
-
-The old-runtime debug run **41358705036** completed successfully (90 prefix + 60
-traced cases). Earlier cancelled/pending/live notes below are historical; the
-current candidate/full run handles are recorded above. The temporary CI branch
-advanced from `f30e65e` to **`3f93ce3`** to pin candidate `e3e9ebf` and record its
-active WebKit executable. Additional local transfer/cancellation controls and both
-54-case exact-runtime observer/control selections passed without reproducing the
-host fault. The next work is to audit the qualified candidate artifacts and full
-acceptance, preserve final-source evidence, and finish the review handoff.
-
-- Diagnostic PR [#264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264)
-  is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
-  cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
-  it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **6/9 complete**: original
-  evidence recovery (1.1), causal pre-application native request-failure witness
-  (1.2), diagnostic publication (1.3), and the supported runtime repair with the
-  retained before/after stair regression witness (2.1), plus the dev-selector
-  omission (3.3) in PR #266 and cleanup-fixture correction (3.4) in PR #267.
-  Repair integration proof (2.2), full acceptance (3.1) and final handoff (3.2)
-  remain open. Use live `openspec instructions apply`
-  for exact task locations before changing checkboxes.
-- Final diagnostic code `495d08d` is unchanged by main integration. On clean
-  **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
-  passed **54/54 WebKit and 54/54 Chromium**, one worker, no retries/skips.
-  Both matrices preserve the original selected IDs/titles. The byte-unchanged
-  two-engine privacy/bounds contract and final helper typecheck also pass.
-  [QA](../qa/issue-263/README.md), manifests and `integrated-source.json` retain
-  source/build/browser/mode identities and all earlier attempts.
-- A traced combined-tree attempt had 53 WebKit passes and one 250-floor budget
-  failure (3421ms vs unchanged 2500ms). Its attachment shows boot ready at 384ms,
-  styles loaded and no request/page error: a different symptom from #263.
-  **Literal main `78a3f75`** reproduced the same assertion on one of three traced
-  repetitions (3757ms); all three ordinary repetitions passed. Keep both failed
-  traced attempts separately; no limit/assertion was relaxed and neither failure
-  establishes #263's cause.
-- Original archive: WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip`,
-  590,452,011 bytes, SHA-256
-  `9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
-  Selected CRC-validated reports, error context and pre-failure screenshot are
-  committed under `docs/qa/issue-263/`. Original failure: missing screen for 60s
-  during a later locked-stair fixture load, after successful round-trip travel.
-  The artifact has no failure trace or request/exception ledger.
-- Local exact-runtime checkout `/tmp/tactics-issue263-failing` is pinned to
-  `9b543cb`. Original build/browser checks passed; desktop WASD 5/5, all stair
-  inputs/profiles repeated five times 60/60, and 300 goto/reload pairs passed.
-  Some passing navigations cancelled an unfinished `items` module request;
-  cancellation is observed but not sufficient to establish the stall.
-- A corrected bounded cached-stylesheet probe found no synchronous/missing load
-  events in 2,000 insertions. Its first event-checkpoint mistake and correction
-  are retained in QA. Original/local exact-runtime build logs have matching sets
-  of 28 generated JS/CSS names, without an original served-byte comparison.
-- The native module parser inspected all 22 exact-runtime JS chunks without
-  evaluation: no static import cycle, no dependency importing the entry, and
-  no top-level await in the dungeon route's static closure. The graph is retained
-  in QA. That graph alone did not establish the cause; the later qualified runs
-  captured the native request-failure witness before entry evaluation.
-- Other checkouts: `/tmp/tactics-issue263-main` (older diagnostic qualification),
-  `/tmp/tactics-issue263-integrated` (clean tested `cdc39cf`), and
-  `/tmp/tactics-issue263-current-base` (literal `78a3f75` comparison). Common logs,
-  reports and traces are under `/tmp/tactics-issue263-evidence/`. All local checks
-  above are terminal; do not poll old exec handles as live.
-- Runner attempt **41343197332 was cancelled while pending, zero jobs executed**.
-  It supplies no evidence. Later diagnosis and qualification are complete; the
-  earlier queue/dispatch instructions are obsolete. Acceptance run
-  **41362013777 / job 125015648051** completed successfully. Its artifact transfer
-  is the sole live handle recorded above; do not repeat tests or replace another
-  owner's pending job.
-- Historical temporary CI branch `branch/issue-263-runner-diagnosis` is at
-  **`3f93ce3`**, outside the review PRs; its native worktree is
-  `tmp/issue263-runner-worktree`. It pins `e3e9ebf` for the completed 150-case
-  qualified comparison. Do not redispatch it as a completion check. A new observed
-  failure would need its own justified diagnostic selection and retained receipt.
-  Keep one worker, zero retries, the exclusive lock and no hosted fallback.
-- Use native Git for checkout/commit/worktrees. Authenticated WSL network Git works
-  from the primary checkout; Windows worktree `.git` pointers cannot be read by
-  WSL Git. Push the CI branch from the primary repository using its explicit ref.
-- Next: finish and audit the current full run, resolve any actual remaining
-  failures proportionally, retain the final source-bound proof, and complete the
-  PR/handoff audit. Preserve #257/#258 separately unless evidence connects their
-  causes. The original full-run gate remains required.
-  User authorization includes implementation, fixes, commits/pushes and focused
-  review-ready PRs; it does not request merging, deployment or a release tag.
-
-- Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
-- Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.
-- [Pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/263#issuecomment-6562475276).
-- Base: fetched `origin/main`, `a8b87c199fb2ae171a9bb72961ac7114622c4d60`.
-- Work branch: [branch/issue-263-webkit-reload-boot](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-263-webkit-reload-boot),
-  created from the base above using GitHub's native linked-branch operation for
-  #263. Development association: `LB_kwDPAAAAAW6Z0HjOAQNTDQ`.
-- Related work: [#153 / PR #256](https://github.com/luminari-gurus/tactics-guru-v2/pull/256),
-  [#257](https://github.com/luminari-gurus/tactics-guru-v2/issues/257), and
-  [#258](https://github.com/luminari-gurus/tactics-guru-v2/issues/258).
-  Their owners and remaining acceptance stay with those trackers.
-- Previous root plan: [Goblin Shaman #166](issue-166-goblin-shaman-plan.md),
-  preserved byte-for-byte; SHA-256
-  `aee5f94a745a9424eb26bcec41ca2900e823152d4f4eabc93ceba975fa5b02a1`,
-  Git blob `0bb94476c1db94b1fc3ffcd21696e8718125bb26`.
-  Its three specific backlinks are updated; general current-project links still
-  point here.
+Pickup metadata: original base `a8b87c199fb2ae171a9bb72961ac7114622c4d60`,
+[pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/263#issuecomment-6562475276),
+original native association `LB_kwDPAAAAAW6Z0HjOAQNTDQ`. The previous
+[Goblin Shaman plan](issue-166-goblin-shaman-plan.md) remains byte-for-byte
+preserved: raw SHA-256
+`aee5f94a745a9424eb26bcec41ca2900e823152d4f4eabc93ceba975fa5b02a1`,
+Git blob `0bb94476c1db94b1fc3ffcd21696e8718125bb26`; its three specific backlinks
+were updated. The original pickup/acceptance plan below is historical context,
+not a replacement for this current handoff.
 
 ## Selection and available work
 
