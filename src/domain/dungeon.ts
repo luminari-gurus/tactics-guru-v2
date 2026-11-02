@@ -315,7 +315,7 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination) };
   let candidate: DungeonState = { ...s, floors };
   if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p))) return startDungeonBattle(candidate);
-  candidate = moveDungeonEnemies(candidate);
+  candidate = moveDungeonEnemies(candidate, f.position);
   // Only accepted movement enters stairs; arrival, rendering and restore never travel.
   if (command.destination === f.descriptor.upstairs && s.depth > 1) return travelDungeon(candidate, 'ascend', s.revision);
   if (command.destination === f.descriptor.downstairs && f.completed === 3) return travelDungeon(candidate, 'descend', s.revision);
@@ -323,7 +323,7 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
 }
 
 /** Advance active enemies as part of an accepted player step. */
-function moveDungeonEnemies(s: DungeonState): DungeonState {
+function moveDungeonEnemies(s: DungeonState, previousPlayer: number): DungeonState {
   const f = currentFloor(s), cleared = clearedDungeonSlots(f);
   if (cleared.length === 3) return s;
   const exploration = movableExploration(f.exploration, f.descriptor.seed, f.completed, s.phase);
@@ -331,7 +331,7 @@ function moveDungeonEnemies(s: DungeonState): DungeonState {
   const player = {id:'player' as const,kind:'player' as const,x:f.position % 20,y:Math.floor(f.position / 20)};
   const moved = stepMovement({world:{map,placementVersion:'markers-v1',markers:[player,...exploration.pois]},behaviors:DEFAULT_BEHAVIORS,
     rng:exploration.movement!.rng,step:exploration.movement!.step}, cleared.map(i=>`enemy-${i+1}` as 'enemy-1'|'enemy-2'|'enemy-3'),
-    [...(s.depth > 1 ? [f.descriptor.upstairs] : []), ...(f.completed === 3 ? [f.descriptor.downstairs] : [])]);
+    [...(s.depth > 1 ? [f.descriptor.upstairs] : []), ...(f.completed === 3 ? [f.descriptor.downstairs] : [])], previousPlayer);
   const pois = exploration.pois.map((p,i)=>({...p,x:moved.world.markers[i+1].x,y:moved.world.markers[i+1].y}));
   const floors = [...s.floors];
   floors[s.depth-1] = {...f,exploration:{...exploration,pois,movement:{rng:moved.rng,step:moved.step}}};
