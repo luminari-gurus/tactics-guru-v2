@@ -17,8 +17,8 @@
     "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts tests/unit/dungeonEncounters.test.ts",
     "telemetry:release": "node scripts/posthog-release.mjs",
     "test:telemetry": "playwright test -c playwright.telemetry.config.ts",
-    "setup:browsers": "playwright install chromium webkit",
-    "setup:browsers:linux": "playwright install --with-deps chromium webkit",
+    "setup:browsers": "playwright install --no-remove chromium webkit",
+    "setup:browsers:linux": "playwright install --no-remove --with-deps chromium webkit",
     "check:browsers": "node scripts/browser-check.mjs",
     "test:extended": "playwright test -c playwright.extended.config.ts",
     "test:extended:webkit": "playwright test -c playwright.extended-webkit.config.ts",
@@ -40,7 +40,7 @@
     "phaser": "4.2.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.64.1",
     "@posthog/cli": "0.18.10",
     "@types/node": "26.6.4",
     "typescript": "7.0.2",

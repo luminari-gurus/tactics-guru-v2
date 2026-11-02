@@ -22,8 +22,9 @@ export default defineConfig({
     reuseExistingServer: false,
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
-    { name: 'mobile-portrait', grepInvert: /@canonical/, use: { ...devices['Pixel 7'], channel: 'chromium' } },
-    { name: 'mobile-landscape', grepInvert: /@canonical|@fixed-viewport/, use: { ...devices['Pixel 7'], channel: 'chromium', viewport: { width: 915, height: 412 } } },
+    // 1.64 forwards descriptor.screen; retain the former viewport-based screen.
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], screen: undefined, channel: 'chromium' } },
+    { name: 'mobile-portrait', grepInvert: /@canonical/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium' } },
+    { name: 'mobile-landscape', grepInvert: /@canonical|@fixed-viewport/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium', viewport: { width: 915, height: 412 } } },
   ],
 });

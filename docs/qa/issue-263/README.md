@@ -1,6 +1,7 @@
 # WebKit dungeon reload boot investigation (#263)
 
-Updated 2026-11-01 (Asia/Jerusalem). **Investigation active; cause and fix unproven.**
+Updated 2026-11-02 (Asia/Jerusalem). **Native entry-resource failure is captured;
+runtime repair PR #265 is published. Complete acceptance remains open.**
 The current handoff is [plan.md](../../ongoing-projects/plan.md); tracked work is
 [OpenSpec tasks](../../../openspec/changes/issue-263-webkit-reload-boot/tasks.md).
 
@@ -223,3 +224,60 @@ Repair scope: pin the stable package that ships the fixed networking component,
 preserve existing device geometry/touch behavior across its screen-option change,
 then compare the original prefix on the same qualified runner without debug,
 retries, longer waits or application changes. Retain the full issue gate.
+
+## Published runtime repair and compatibility evidence
+
+[PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265) is stacked on
+diagnostic PR #264. Clean tested source is **`e3e9ebf11aff78d395f65df6c3f74cded6733e83`**.
+Its changes are limited to the three Playwright packages, browser-cache-preserving
+setup and the five existing device-bearing configurations. Playwright 1.64 starts
+forwarding descriptor screen options; `screen: undefined` preserves the previous
+effective viewport-based screen. Viewports, touch, DPR, profiles, test selection,
+assertions, budgets, timeouts and retries are unchanged. No application or save
+source changes belong to this repair. Compared with original failed source
+`9b543cb`, main already includes later menu/dungeon UI fixes; these are integration
+inputs, not attributed to the runtime patch.
+
+Clean-candidate local proof:
+
+- Locked installation, browser preflight and the production build passed,
+  including 223 content assertions and both TypeScript scopes.
+- Both browser diagnostic contracts passed. All 38 selection, batch and full
+  orchestration contracts and 20 timing/reporter/process contracts passed with
+  no skipped/cancelled tests.
+- Before/after discovery preserves all **1,541 cases across 15 inventories**,
+  including exact IDs, assertion metadata, filters, workers and retry policy.
+  The deliberate differences are browser user-agent version and descriptor
+  screen metadata; six actual-browser probes establish unchanged effective
+  viewport/screen/touch/DPR for all Chromium and WebKit exploration profiles.
+
+`candidate-source.json.gz` binds clean source inputs and local served build
+hashes. `runtime-*-selection.json.gz`, `runtime-selection-comparison.json.gz`,
+`device-compatibility.json.gz` and `candidate-*.log.gz` retain portable receipts;
+canonical payload hashes are in the evidence manifest. These are local proof,
+separate from the qualified runner results.
+
+Qualified candidate run [41361259848](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41361259848)
+pins `e3e9ebf` using temporary CI source `3f93ce3`. It passed **90/90 ordinary
+prefix cases in 413.1 seconds and 60/60 traced stair repetitions in 403.4 seconds**,
+one worker and zero retries/skips/flaky results. Both qualified GTK/WPE inventories
+confirm libsoup 3.6.6 before and after execution. Verified artifact `13105454118`
+contains 14,856,756 bytes, SHA-256
+`75fd3bb2c4794b095f4a28557a041c6ead514627827268c76083cd6fda16b051`.
+Portable reports, input identities, component inventories and job log are retained
+as `run-41361259848-*` and `candidate-41361259848.log.gz` in the manifest.
+This supports the supported-runtime repair at the observed native networking
+boundary; it does not establish the exact upstream native memory-defect stack.
+Required full acceptance
+[41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777)
+is running at the same candidate source using the existing full-verification
+job, original limits and shared exclusive self-hosted lock. That in-progress
+attempt is not claimed as complete acceptance. Observe its handle without
+duplicating or cancelling work on an observation timeout.
+
+The current Development association is repair PR #265. GitHub had converted the
+original linked branch into a closing reference on diagnostic PR #264 when it
+opened; that reference was moved in the issue sidebar. GraphQL readback confirms
+only #265 closes #263, #264 has no closing issue, both PRs remain open/non-draft
+and mergeable, and the issue remains open/assigned. This metadata correction
+prevents diagnostic-only merge from prematurely closing the work item.

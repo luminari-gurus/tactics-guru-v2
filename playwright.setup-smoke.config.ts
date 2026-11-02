@@ -8,7 +8,7 @@ export default defineConfig({
   testIgnore: [],
   grep: /boots a Phaser scene and fits the viewport after resize/,
   projects: [
-    { name: 'setup-chromium', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
-    { name: 'setup-webkit', use: { ...devices['iPhone 13'], launchOptions: {} } },
+    { name: 'setup-chromium', use: { ...devices['Desktop Chrome'], screen: undefined, channel: 'chromium' } },
+    { name: 'setup-webkit', use: { ...devices['iPhone 13'], screen: undefined, launchOptions: {} } },
   ],
 });

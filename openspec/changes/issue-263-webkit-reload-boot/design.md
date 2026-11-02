@@ -4,9 +4,10 @@
 
 See proposal.md for motivation and `docs/ongoing-projects/plan.md` for source
 identities, the traced boot graph, issue acceptance and the implementation order.
-PR #256 remains open at `c2e3c56`; the reported failed runtime is `9b543cb`.
-Its engine-ready mitigation is absent from main and the failure reportedly occurs
-before dungeon screen construction. The owning failure is not yet identified.
+PR #256 is merged into main at `78a3f75`; the reported failed runtime is `9b543cb`.
+Qualified diagnostics captured native entry/static-resource failures before
+dungeon screen construction. The official runtime update is published as stacked
+PR #265; its complete acceptance gate remains open.
 
 ## Goals / Non-Goals
 
@@ -36,7 +37,7 @@ menu redesign, automatic retries, weaker assertions or timeout-only mitigation.
    module error recovery and save bytes. Treat network/module evaluation, clock
    behavior, initialization lifecycle and engine readiness as hypotheses until
    discriminating evidence exists. Update this decision with the actual cause.
-4. Keep the work branch on main and review PR #256 as an integration consumer.
+4. Keep the work branch integrated with main and review PR #256 as an integration consumer.
    Use a dependent branch/PR only if the cause genuinely requires its code;
    do not copy the menu feature into this repair or mutate another owner's branch.
 5. Use focused serial repetitions while iterating, then satisfy #263's explicit
@@ -69,6 +70,21 @@ stable Playwright 1.64.1 ships 3.6.6. Use that supported runtime as the repair
 candidate, rather than retries, timeout changes, custom native-library overlays
 or changes to game rules. Specific native-defect attribution remains an inference
 until the same-host application comparison supports the repair.
+
+Qualified candidate run 41361259848 now passes the original 90-case prefix and
+60 traced stair repetitions, with both native bundles confirmed at 3.6.6.
+The owning observed failure is native networking before entry evaluation; exact
+upstream defect attribution remains an inference. Existing application stair
+cases are the regression witness, with earlier failed runs retained rather than
+replaced by a synthetic security or network reproducer. The complete issue gate
+remains distinct and is running at candidate e3e9ebf in 41362013777.
+
+The completion inventory also exposed a separate aggregate-selection omission:
+the existing dev-only direct map-disposer test is skipped in preview and absent
+from the dev filter. Publish a separate selector-only repair, preserving its
+existing assertions and three profiles. Prove exact added coverage and execute
+the affected dev selection; reuse #263's unchanged full-run inputs explicitly,
+without representing that run as execution of the later selector.
 
 Preserve the existing viewport/touch/DPR and screen behavior. Playwright 1.64
 starts forwarding device-descriptor screen options that 1.63's test runner
