@@ -30,7 +30,7 @@ Continue disabled means no valid primary/backup across all modes; invalid-only o
 
 ### 3. Handoffs and destructive actions
 
-Menu links use bounded `entry=continue`, `entry=new`, or `entry=recovery` intents. Continue and recovery use current destination inspection/session APIs. New Game confirms over the menu and transfers a one-use review of the dungeon slots through session storage. The destination re-inspects and compares both slots before invoking its existing checked replacement; a missing, unreadable, or changed review falls back to the destination confirmation. The handoff never hydrates a save or bypasses compare-before-remove checks.
+Menu links use bounded `entry=continue`, `entry=new`, or `entry=recovery` intents. Continue and recovery use current destination inspection/session APIs. New Game starts without confirmation when both dungeon slots are missing; otherwise it confirms over the menu and transfers a one-use review through session storage. The destination re-inspects both slots before invoking its existing checked replacement. If either slot has data and the review is missing, unreadable, or changed, the destination requests confirmation. The handoff never hydrates a save or bypasses compare-before-remove checks.
 
 Add a quiet Main menu link to each mode at existing accessible navigation/tool surfaces. Preserve lifecycle teardown on pagehide. Where the owner reports unsaved progress, use a leave confirmation with recovery/save access; the link must not claim successful saving. Back/forward revisits refresh the menu summary rather than restoring stale action closures.
 

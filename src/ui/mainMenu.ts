@@ -66,6 +66,11 @@ export function startMainMenu() {
     },
     new: () => {
       const review = createDungeonStorage().inspect();
+      if (review.primary.status === 'missing' && review.backup.status === 'missing') {
+        try { sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review'); } catch { /* The destination rechecks storage. */ }
+        location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new'));
+        return;
+      }
       show('Start new dungeon?', () => {
         body.append(element('p', 'Replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.'));
         const confirm = element('button', 'Start new dungeon'); confirm.type = 'button';
