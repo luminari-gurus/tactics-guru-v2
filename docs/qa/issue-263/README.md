@@ -301,3 +301,26 @@ in 5.0 seconds, one worker and zero retries/skips. `map-verification-*` receipts
 bind its clean source, exact comparison and real execution. This is supplemental
 dev coverage; full run 41362013777 still uses its original three-case selector
 at `e3e9ebf`, and is not represented as execution of the later selector.
+
+## Real-browser cleanup fixture correction
+
+On baseline `e3e9ebf`, both existing preview/dev cleanup contracts failed at the
+positive canvas witness. Their retained page contexts show the intended main
+menu with New Game at `/`; the old fixture expected a renderer there. The
+interruption and process cleanup already completed correctly. This is a fixture
+route error, separate from the native WebKit loading failure.
+
+Follow-up `9a8e577` changes only the two synthetic fixture navigations to the
+existing `/?scene=proof` route. Both outer contracts pass in **43.9 seconds**,
+including positive real-engine canvas, deliberate 20-second interruption,
+complete cleanup and successful fresh same-port recovery. Assertions, timeouts,
+retries and application code are unchanged. `cleanup-before-*`, `cleanup-after-*`
+and `candidate-browser-cleanup-{before,after}.log.gz` retain both outcomes.
+
+`cleanup-source.json.gz` records tested source and the only untracked input: a
+local `dist` link to the immutable clean `e3e9ebf` build. All recorded build hashes
+still match. Preview served that build; dev metadata had dirty=true solely from
+the artifact link, which these lifecycle assertions do not consume. The link was
+locally excluded after execution; tracked code is unchanged. This known metadata
+difference is recorded explicitly, without claiming a new clean production build
+or a full-suite execution of the fixture change.

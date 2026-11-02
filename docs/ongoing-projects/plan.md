@@ -58,8 +58,8 @@ Exec session **98824 is terminal**: Chromium and WebKit each passed all nine cas
 matching `.exit` files identify terminal outcomes. Both exit codes are zero,
 with no failures/skips/retries (Chromium 34.8m, WebKit 26.5m). Portable reports/logs
 are committed as `candidate-extended-{chromium,webkit}.*.gz` under QA. The six-case
-dev selector check also passed. The existing browser cleanup contract failed on
-its stale root-route fixture; its separate repair is tracked below. Pending CI acceptance is run
+dev selector check also passed. The cleanup contract's stale root-route fixture
+is repaired and both qualification modes pass, as tracked below. Pending CI acceptance is run
 **41362013777**, job **125015648051**; never poll the completed focused run as live.
 
 **Development-link audit:** GitHub replaced the original native branch link with
@@ -97,7 +97,7 @@ discovery comparison and contracts. Its focused PR has base
 `branch/issue-263-patched-webkit-runtime`. The browser cleanup contract recorded
 above is being qualified separately; do not rerun completed extended journeys.
 
-**Separate cleanup-fixture failure:** baseline `e3e9ebf` ran
+**Separate cleanup-fixture repair:** baseline `e3e9ebf` ran
 `node --test tests/tooling/verification-browser.test.mjs` (terminal session 5755).
 Both preview/dev outer contracts failed because the positive fixture visits `/`
 and expects a canvas, while the captured page is the intended main menu. The
@@ -106,7 +106,17 @@ engine witness cannot pass on that route. Preserve `candidate-browser-cleanup-be
 and the baseline checkout's `verification-receipts/issue219/` records. Repair both
 fixture navigations to `/?scene=proof` in a separate focused PR, keeping the
 canvas assertion, interruption budget and fresh same-port recovery assertions.
-Qualify both real-browser modes, with no application or timeout change.
+Follow-up source **`9a8e577`** corrects both fixture navigations. Both real-browser
+contracts pass (43.9 seconds total): positive rendered engine, expected timed
+interruption, complete cleanup and fresh same-port recovery. No application,
+assertion or timeout changed. WSL qualification used
+`/tmp/tactics-issue263-map-verification`; source/build details, the known local
+build symlink, and both failed/passing mode receipts are retained as `cleanup-*`
+in QA. Preview reused the clean `e3e9ebf` bundle, whose 115 file hashes still
+match its recorded receipt. Dev's dirty metadata flag came solely from that local
+artifact link, was not consumed by the cleanup assertions, and the link is now
+locally excluded; tracked tested inputs remain unchanged. Publish the focused
+cleanup-fixture PR stacked on #266, then finish the outstanding full-run audit.
 
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
@@ -141,9 +151,8 @@ acceptance, preserve final-source evidence, and finish the review handoff.
 - OpenSpec change `issue-263-webkit-reload-boot` is **5/9 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
   (1.2), diagnostic publication (1.3), and the supported runtime repair with the
-  retained before/after stair regression witness (2.1). Repair integration proof
-  (2.2), full acceptance (3.1), final project handoff (3.2), and the separately
-  found dev-selector omission (3.3) is complete in PR #266. Repair integration
+  retained before/after stair regression witness (2.1), plus the dev-selector
+  omission (3.3) in PR #266. Repair integration
   proof (2.2), full acceptance (3.1), final handoff (3.2), and cleanup-fixture
   route correction (3.4) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
