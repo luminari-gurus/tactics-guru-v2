@@ -86,6 +86,13 @@ existing assertions and three profiles. Prove exact added coverage and execute
 the affected dev selection; reuse #263's unchanged full-run inputs explicitly,
 without representing that run as execution of the later selector.
 
+The required real-browser cleanup contract also fails on the integrated base:
+its positive fixture expects a canvas at the now-intentional main menu route.
+Correct only the fixture navigations to the existing explicit proof route in a
+separate PR, retaining the canvas witness, timed interruption, process ownership
+and same-port recovery checks. Retain both failed baseline mode receipts and
+qualify the repaired preview/dev contracts; application behavior stays unchanged.
+
 Preserve the existing viewport/touch/DPR and screen behavior. Playwright 1.64
 starts forwarding device-descriptor screen options that 1.63's test runner
 ignored; explicitly retain the old effective behavior and record actual profile

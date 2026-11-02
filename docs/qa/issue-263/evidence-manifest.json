@@ -495,6 +495,51 @@
       "file": "candidate-41361259848.log.gz",
       "sha256": "ec4d7f2db53759cf3648fe5c2ee3300dc013a4991d1f32a6530bdae3a75bdab4",
       "originalSha256": "7212684aca52d22d02e32c77427fb850c8883b805490c4c2f494b13bd718c485"
+    },
+    {
+      "file": "candidate-extended-chromium.json.gz",
+      "sha256": "ec9e70f710c85781efb5a71e9b1cb5a7f2aafcdf2c534ae1d6e406632e8b8222",
+      "originalSha256": "8de51beaef5e8321b9fa75fccf6b3ff05dae11a81d718c387ecfa9ca398b5d6f"
+    },
+    {
+      "file": "candidate-extended-chromium.log.gz",
+      "sha256": "5b453e10984ee4e5c82e27c9d224ccd298006d344e6aa9d65007a64167351ffb",
+      "originalSha256": "49a840709ca7582044956e45bc28fcdfa2d9efd384d832ecbcc8baf25c94c5fa"
+    },
+    {
+      "file": "candidate-extended-webkit.json.gz",
+      "sha256": "23c9c0147a365296cb95a6b0901d7f52c3a3bd3339ae10340a2342bb0eb25637",
+      "originalSha256": "844424ef08e6c42715954a86baed48b066282b52b0a7fd662747549ac9892124"
+    },
+    {
+      "file": "candidate-extended-webkit.log.gz",
+      "sha256": "e4cd2522dd582bdd293b8edc4f218b3f1ccadef565d8a239c69a3b78b7b3fb3b",
+      "originalSha256": "9a4af0b8c2c023528f36f15839181844ba284b0e8914acbf9a945877c0feb8dc"
+    },
+    {
+      "file": "map-verification-selection.json.gz",
+      "sha256": "13c62cca845cdf93de034f8a8e8ee344fc991660f0721354cf34fbaeacf99e22",
+      "originalSha256": "d44fd8d7cc10c4afe67cbdf2f992f41ba2137a07d1629b1f1b089d2f71a3ece0"
+    },
+    {
+      "file": "map-verification-comparison.json.gz",
+      "sha256": "199bdeb54c1f51698315234f6b7307321bdad16e994b2b8d2383647e1ee27b77",
+      "originalSha256": "6247c886a7fa34a823289ace1766b9d385b9f4b792a70f023ef239d748e89ac3"
+    },
+    {
+      "file": "map-verification-contracts.log.gz",
+      "sha256": "b5fbd15b0c14f31aae8b27c0ed2601b124e70cde63a914476f46cb4d30bef7c6",
+      "originalSha256": "c7f1a0adc364cc984e56944ac31e7226a06bb018c2dd78d7218a721b425e6fc5"
+    },
+    {
+      "file": "map-verification-browser.log.gz",
+      "sha256": "fb3530403d6858b15c380bff969d110187c13e4e6ef561f15e4562113a86a286",
+      "originalSha256": "300223df81e12cb1aa0360b88eea14caa4e87bcc7768295bbdc877a16410477c"
+    },
+    {
+      "file": "map-verification-browser.json.gz",
+      "sha256": "f5ff0261a225060b31115c85c16f71f4cab714592b4bf90f5a20f2b8f5c922d6",
+      "originalSha256": "b61fea0face0d78bbe8b8868d9660d194752c92d68de8bb9f5f59f904d79d7c8"
     }
   ],
   "additionalArchives": [

@@ -281,3 +281,23 @@ opened; that reference was moved in the issue sidebar. GraphQL readback confirms
 only #265 closes #263, #264 has no closing issue, both PRs remain open/non-draft
 and mergeable, and the issue remains open/assigned. This metadata correction
 prevents diagnostic-only merge from prematurely closing the work item.
+
+## Extended continuation and dev coverage supplement
+
+Clean runtime source `e3e9ebf` completed all **18 extended legal progression
+journeys**: nine Chromium in 34.8 minutes and nine WebKit in 26.5 minutes. Both
+engines exercised Mage, Ranger and Fighter on all three profiles, including their
+existing saved continuation assertions. One worker, no failures/skips/retries.
+`candidate-extended-{chromium,webkit}.{json,log}.gz` retain the reports and logs;
+the local source/build identity is the unchanged candidate receipt above.
+
+The completion audit found an independent full-run selector omission. The
+existing direct map-disposer test skips in preview and was absent from the dev
+stage's grep. Follow-up `c508d6e` adds its title to that existing selector, keeping
+the stage ID, assertions and profiles. Real discovery adds exactly three cases,
+retains all three placement cases and leaves the other 14 inventories unchanged.
+All 38 verification contracts pass. The resulting six-case dev selection passes
+in 5.0 seconds, one worker and zero retries/skips. `map-verification-*` receipts
+bind its clean source, exact comparison and real execution. This is supplemental
+dev coverage; full run 41362013777 still uses its original three-case selector
+at `e3e9ebf`, and is not represented as execution of the later selector.
