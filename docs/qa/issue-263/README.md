@@ -2,8 +2,8 @@
 
 Updated 2026-11-02 (Asia/Jerusalem). **The observed native entry-resource failure
 is repaired by the supported runtime update. Full acceptance and final review/Git
-handoff are complete; supplemental review and the newly authorized ordered merge
-are in progress.**
+handoff, supplemental review and the newly authorized ordered merge are complete.
+All four PRs are merged and #263 is closed.**
 The current handoff is [plan.md](../../ongoing-projects/plan.md); tracked work is
 [OpenSpec tasks](../../../openspec/changes/issue-263-webkit-reload-boot/tasks.md).
 
@@ -42,6 +42,10 @@ with the recorded override/cache; and
 with default selection. Executions were serial in an isolated WSL checkout,
 Node 24.15.0, with installed lock-compatible dependency trees. The only tracked
 test overlay matches the canonical committed repair hash on both versions.
+`review-dependency-context.json.gz` records the task-owned dependency symlink,
+its existing locked-install sources and all three installed Playwright versions
+matched against each canonical lockfile. The retained review checkout is now
+clean at `d90a294`; only its dependency symlink was locally excluded after testing.
 
 Relative to full-run source `e3e9ebf`, only the already-qualified dev selector,
 cleanup fixture and this newly-qualified diagnostic contract differ in code.
@@ -51,6 +55,18 @@ those unchanged inputs. No new bundle or performance result is claimed for the
 merge commits. Caller authorization now includes ordered merge and safe Git
 cleanup; the current plan records that closeout separately from the historical
 unmerged handoff below.
+
+Ordered integration is complete: #264 `7a56059`, #265 `54dc46c`, #266 `84664ec`
+and #267 `d94cd63`. Each actual tree and both parents matched its recorded
+`merge-tree` prediction; all live review threads are resolved. #263 remained
+open after #264 and closed with #265. The completed branch refs were removed
+locally and remotely after ancestry/open-PR checks, with atomic exact-tip leases
+for remote deletion. Local main was fast-forwarded and verified equal to origin.
+PR evidence links are pinned to merged history. The separate historical
+runner-diagnosis branch/worktree and raw failure evidence remain intact.
+`review-merge-audit.json.gz` binds the exact before/after trees/parents, review
+readback and cleanup. No manual deployment, release tag or OpenSpec archive was
+performed.
 
 ## Original failure
 

@@ -1,8 +1,8 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: implementation qualified; supplemental review and ordered merge in progress.
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation qualified; supplemental review, repair and ordered merge complete.
 
-**Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
+**Original follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
 runtime PR #265 at `1dfc3a6`. The runtime repair branch is
 `branch/issue-263-patched-webkit-runtime`, stacked on diagnostic PR #264 at
@@ -28,6 +28,25 @@ The caller now authorizes comprehensive supplemental review, repair of every
 substantiated review finding, and end-to-end Git management and merging of
 #264 → #265 → #266 → #267. This supersedes the original unmerged handoff below.
 Using OpenSpec change `issue-263-webkit-reload-boot` and the ablation skill.
+
+**Complete on 2026-11-02.** All four PRs were reviewed, merged in order onto
+main and checked after publication. Each tree and both ordered parents match
+its pre-merge prediction:
+
+- #264: `7a56059d6d71623d97f48a23bf9719f0cc4881fc`.
+- #265: `54dc46c34d685bb881c9c7ada80a9dec521054af`.
+- #266: `84664ec59701209f0126f6cdffadf80ca8575dc8`.
+- #267: `d94cd6345dd3a9d6d5663f88135bc5c460d9c942`.
+
+#263 remained open after diagnostics and closed when repair #265 merged.
+All review threads are resolved. The four completed local/remote branch refs
+were removed after proving their tips are ancestors of main and no remaining
+open PR uses them. Remote deletion was atomic and guarded by exact-tip leases.
+The checkout is now `main`; local/origin parity was verified. PR evidence links
+are pinned to merged history. The separate historical runner-diagnosis branch,
+worktree and raw recovery evidence remain preserved. OpenSpec is 11/11 complete;
+no implementation, review or merge work remains. No manual deployment, release
+tag or OpenSpec archive is part of this closeout.
 
 **Outcome / non-goals / files / proof:** review all four exact diffs, prior
 reviews and affected consumers; repair confirmed defects, publish the review,
@@ -55,13 +74,11 @@ The only later code owners versus `e3e9ebf` are the already qualified selector,
 cleanup fixture and now-qualified diagnostic contract. Application, helper,
 ordinary specs, assets, dependencies and browser configs still match.
 
-Merge commits preserve the dependent ancestry without rewriting published
-history. Carry the contract fix through the stack; recheck live reviews, branch
-rules and exact base/head before each merge, compare `merge-tree` with the
-published tree and verify parent order. Retarget each remaining PR to main after
-its parent merges. Remove completed branch refs only after proving ancestry;
-retain the separate historical runner-diagnosis branch/worktree and raw evidence.
-Update this section with the final merge commits and parity after completion.
+Merge commits preserved the dependent ancestry without rewriting published
+history. The contract fix was carried through every branch. Live reviews, branch
+rules and exact base/head were rechecked before each merge; each remaining PR
+was retargeted to main after its parent merged. The source-bound merge and
+cleanup receipt is retained in QA. Required recovery evidence is preserved.
 
 ## Original implementation handoff (before merge authorization)
 

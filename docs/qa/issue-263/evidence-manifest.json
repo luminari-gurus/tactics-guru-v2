@@ -1020,6 +1020,16 @@
       "file": "review-source-equivalence.json.gz",
       "sha256": "ec33cc04bee0283d82405e384d136d22b0b10ae309e2707308a11449408878b8",
       "originalSha256": "6d039f41071596fbae32c77e23f890469407b703f133ee6821e9cc4a58ef0629"
+    },
+    {
+      "file": "review-merge-audit.json.gz",
+      "sha256": "7dbdde3de03dd36740d3484fda67b77d8ec5a96e86c887e14b4fcf84e058a711",
+      "originalSha256": "54361476642d72005f3b9c09c0b514bbf028d054afe462d41bf7587ec79288ed"
+    },
+    {
+      "file": "review-dependency-context.json.gz",
+      "sha256": "351bebb243467492a2f1bd8bcf5d4c425231330781611cd23d52f777befaab7e",
+      "originalSha256": "d777b38e8bd4b3ec8e07237f46b33452d1906c5fc788f311169921ace664b770"
     }
   ],
   "additionalArchives": [
