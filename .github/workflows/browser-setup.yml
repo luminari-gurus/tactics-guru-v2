@@ -9,17 +9,12 @@ concurrency:
 jobs:
   compare:
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        source: [f44a94d1394db8d641d479813d1c476cca4d63d1, 78a3f75b18601d12e243f810c0cbd1b95154efe9]
+    timeout-minutes: 100
     steps:
       - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ matrix.source }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -41,15 +36,15 @@ jobs:
       - name: Record build identity
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/compass/build.sha256
-      - name: Repeat exact failing case with trace
+      - name: Repeat full WebKit exploration with failure diagnostics
         if: ${{ steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/compass/results.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=desktop-webkit -g 'stairs travel once per entry with compass' --repeat-each=5 --workers=1 --retries=0 --trace=on --reporter=line,json --output=verification-receipts/compass/artifacts
+        run: npx --no-install playwright test -c playwright.exploration.config.ts --workers=1 --retries=0 --trace=retain-on-failure --reporter=line,json --output=verification-receipts/compass/artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: compass-${{ matrix.source }}-${{ github.run_id }}
+          name: instrumented-exploration-${{ github.run_id }}
           path: verification-receipts/compass/
           retention-days: 30
           if-no-files-found: warn

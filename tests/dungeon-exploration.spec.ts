@@ -1,5 +1,7 @@
 import { expect,test } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
+import { loadavg, freemem } from 'node:os';
+import type { Page } from '@playwright/test';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { neighbors, poiCell } from '../src/domain/exploration';
@@ -15,6 +17,30 @@ import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope }
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+// Investigation-only instrumentation: bounded event metadata, attached only on failure.
+const startupEvents = new WeakMap<Page, Array<Record<string, unknown>>>();
+const pathname = (url: string) => { try { const u = new URL(url); return u.origin === 'http://127.0.0.1:4173' ? u.pathname : '[external]'; } catch { return '[invalid]'; } };
+const clean = (message:string) => message.replace(/https?:\/\/[^\s)]+/g, url=>pathname(url)).slice(0,200);
+test.beforeEach(async ({ page }) => {
+ const events: Array<Record<string, unknown>> = [];startupEvents.set(page, events);
+ const add = (type:string, details:Record<string,unknown>={}) => { events.push({time:new Date().toISOString(),type,...details}); if(events.length>300)events.shift(); };
+ page.on('framenavigated',frame=>{if(frame===page.mainFrame())add('navigation',{path:pathname(frame.url())});});
+ page.on('domcontentloaded',()=>add('domcontentloaded'));
+ page.on('load',()=>add('load'));
+ page.on('request',request=>{if(['document','script'].includes(request.resourceType()))add('request',{path:pathname(request.url()),resourceType:request.resourceType()});});
+ page.on('requestfailed',request=>add('requestfailed',{path:pathname(request.url()),resourceType:request.resourceType(),error:(request.failure()?.errorText??'').slice(0,200)}));
+ page.on('response',response=>{if(response.status()>=400||['document','script'].includes(response.request().resourceType()))add('response',{path:pathname(response.url()),status:response.status(),resourceType:response.request().resourceType()});});
+ page.on('pageerror',error=>add('pageerror',{name:error.name,message:clean(error.message)}));
+ page.on('console',message=>{if(message.type()==='error')add('console-error',{message:clean(message.text())});});
+ page.on('crash',()=>add('crash'));
+});
+test.afterEach(async ({ page }, info) => {
+ if(info.status===info.expectedStatus)return;
+ let documentState:unknown;
+ try { documentState=await Promise.race([page.evaluate(()=>({readyState:document.readyState,path:location.pathname,screen:!!document.querySelector('#dungeon-screen'),scripts:[...document.scripts].map(s=>new URL(s.src,location.href).pathname).slice(0,20),resources:performance.getEntriesByType('resource').slice(-80).map(r=>({name:new URL(r.name,location.href).pathname,duration:r.duration}))})),new Promise(resolve=>setTimeout(()=>resolve({error:'document sample timed out'}),3000))]); }
+ catch(error) {documentState={error:String(error).slice(0,200)};}
+ await info.attach('startup-diagnostics',{body:JSON.stringify({path:pathname(page.url()),events:startupEvents.get(page),documentState,host:{load:loadavg(),freeBytes:freemem(),processMemory:process.memoryUsage()}},null,2),contentType:'application/json'});
+});
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
  const load=async(state:DungeonState)=>{
