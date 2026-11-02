@@ -80,7 +80,9 @@ focused PR. No application, assertion, timeout, budget or routine profile change
 is needed. Account for this extra dev coverage alongside the unchanged #263 full
 run; never claim that the earlier run executed the later selector.
 
-Follow-up source **`c508d6e`** is published on `branch/verify-map-disposer-coverage`.
+Follow-up source **`c508d6e`** is published in review-ready
+[PR #266](https://github.com/luminari-gurus/tactics-guru-v2/pull/266) on
+`branch/verify-map-disposer-coverage`.
 Clean WSL checkout `/tmp/tactics-issue263-map-verification` uses the candidate's
 unchanged 1.64.1 dependency tree through an ignored node_modules symlink.
 All 38 selection/batch/orchestration contracts passed. Discovery records
@@ -90,7 +92,7 @@ and 14 other inventories unchanged. These reports/logs are under
 `/tmp/tactics-issue263-evidence/`. The six cases passed in **5.0 seconds** with
 `PLAYWRIGHT_SERVER_MODE=dev`, one worker, zero retries/skips, using the existing
 isolated browser-cache variable. QA retains the real report, command log,
-discovery comparison and contracts. Publish its focused PR with base
+discovery comparison and contracts. Its focused PR has base
 `branch/issue-263-patched-webkit-runtime`. The browser cleanup contract recorded
 above is being qualified separately; do not rerun completed extended journeys.
 
@@ -135,13 +137,14 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **4/9 complete**: original
+- OpenSpec change `issue-263-webkit-reload-boot` is **5/9 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
   (1.2), diagnostic publication (1.3), and the supported runtime repair with the
   retained before/after stair regression witness (2.1). Repair integration proof
   (2.2), full acceptance (3.1), final project handoff (3.2), and the separately
-  found dev-selector omission (3.3), and cleanup-fixture route correction (3.4)
-  remain open. Use live `openspec instructions apply`
+  found dev-selector omission (3.3) is complete in PR #266. Repair integration
+  proof (2.2), full acceptance (3.1), final handoff (3.2), and cleanup-fixture
+  route correction (3.4) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
 - Final diagnostic code `495d08d` is unchanged by main integration. On clean
   **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
