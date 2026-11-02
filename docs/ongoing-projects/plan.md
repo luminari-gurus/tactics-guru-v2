@@ -2,8 +2,10 @@
 
 Started: 2026-11-01 (Asia/Jerusalem). Status: repair published; focused and full acceptance running.
 
-**Active repair branch:** `branch/issue-263-patched-webkit-runtime`, stacked on
-diagnostic PR #264 at `6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
+**Active follow-up branch:** `branch/verify-map-disposer-coverage`, stacked on
+runtime PR #265 at `1dfc3a6`. The runtime repair branch is
+`branch/issue-263-patched-webkit-runtime`, stacked on diagnostic PR #264 at
+`6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
 packages only), retain the old effective screen behavior with `screen: undefined`
 in the existing device project definitions, and preserve other branches' browser
 caches during setup with `--no-remove`. Viewports, touch, DPR, project IDs, test
@@ -47,18 +49,16 @@ version/user-agent intentionally changes. Canonical local outputs are under
 `/tmp/tactics-issue263-evidence/` with `candidate-*`, `runtime-*-selection.json`,
 `runtime-selection-comparison.json` and `device-compatibility.json` names.
 
-**Other live work:** local clean-candidate extended journeys run serially in
+**Extended journeys complete:** local clean-candidate extended journeys ran serially in
 `/tmp/tactics-issue263-candidate` with isolated official browser cache
 `PLAYWRIGHT_BROWSERS_PATH=/tmp/tactics-issue263-runtime-inspect/browsers`.
-Exec session **98824** runs Chromium's nine cases, then WebKit's nine cases;
+Exec session **98824 is terminal**: Chromium and WebKit each passed all nine cases;
 `/tmp/tactics-issue263-evidence/candidate-extended/{chromium,webkit}.log` and
-matching `.exit` files identify terminal outcomes. The first four Chromium cases
-have passed: all desktop journeys and portrait Mage. Do not start another local browser/server
-while that process is active. After it finishes, retain both complete JSON
-reports from its printed `verification-receipts/browser-runs/run-*` directories,
-then run the existing `tests/tooling/verification-browser.test.mjs` cleanup
-contract against the candidate runtime (preview/dev), serially. All other
-local contracts are terminal and passed. Pending CI acceptance is run
+matching `.exit` files identify terminal outcomes. Both exit codes are zero,
+with no failures/skips/retries (Chromium 34.8m, WebKit 26.5m). Portable reports/logs
+are committed as `candidate-extended-{chromium,webkit}.*.gz` under QA. The six-case
+dev selector check also passed. The existing browser cleanup contract failed on
+its stale root-route fixture; its separate repair is tracked below. Pending CI acceptance is run
 **41362013777**, job **125015648051**; never poll the completed focused run as live.
 
 **Development-link audit:** GitHub replaced the original native branch link with
@@ -79,6 +79,33 @@ the six affected dev cases and existing verification contracts, then publish a
 focused PR. No application, assertion, timeout, budget or routine profile change
 is needed. Account for this extra dev coverage alongside the unchanged #263 full
 run; never claim that the earlier run executed the later selector.
+
+Follow-up source **`c508d6e`** is published in review-ready
+[PR #266](https://github.com/luminari-gurus/tactics-guru-v2/pull/266) on
+`branch/verify-map-disposer-coverage`.
+Clean WSL checkout `/tmp/tactics-issue263-map-verification` uses the candidate's
+unchanged 1.64.1 dependency tree through an ignored node_modules symlink.
+All 38 selection/batch/orchestration contracts passed. Discovery records
+`map-verification-selection.json` and `map-verification-comparison.json` prove
+exactly three added dev disposer cases, all three prior placement cases retained,
+and 14 other inventories unchanged. These reports/logs are under
+`/tmp/tactics-issue263-evidence/`. The six cases passed in **5.0 seconds** with
+`PLAYWRIGHT_SERVER_MODE=dev`, one worker, zero retries/skips, using the existing
+isolated browser-cache variable. QA retains the real report, command log,
+discovery comparison and contracts. Its focused PR has base
+`branch/issue-263-patched-webkit-runtime`. The browser cleanup contract recorded
+above is being qualified separately; do not rerun completed extended journeys.
+
+**Separate cleanup-fixture failure:** baseline `e3e9ebf` ran
+`node --test tests/tooling/verification-browser.test.mjs` (terminal session 5755).
+Both preview/dev outer contracts failed because the positive fixture visits `/`
+and expects a canvas, while the captured page is the intended main menu. The
+20-second interruption and process cleanup complete correctly; the positive
+engine witness cannot pass on that route. Preserve `candidate-browser-cleanup-before.log`
+and the baseline checkout's `verification-receipts/issue219/` records. Repair both
+fixture navigations to `/?scene=proof` in a separate focused PR, keeping the
+canvas assertion, interruption budget and fresh same-port recovery assertions.
+Qualify both real-browser modes, with no application or timeout change.
 
 The repair stays limited to the supported browser runtime and required device
 compatibility. No application fallback, retries, save changes or custom native
@@ -110,12 +137,14 @@ acceptance, preserve final-source evidence, and finish the review handoff.
   is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
   cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
   it changes no application, asset, dependency, build or browser configuration.
-- OpenSpec change `issue-263-webkit-reload-boot` is **4/7 complete**: original
+- OpenSpec change `issue-263-webkit-reload-boot` is **5/9 complete**: original
   evidence recovery (1.1), causal pre-application native request-failure witness
   (1.2), diagnostic publication (1.3), and the supported runtime repair with the
   retained before/after stair regression witness (2.1). Repair integration proof
-  (2.2), full acceptance (3.1) and
-  final project handoff (3.2) remain open. Use live `openspec instructions apply`
+  (2.2), full acceptance (3.1), final project handoff (3.2), and the separately
+  found dev-selector omission (3.3) is complete in PR #266. Repair integration
+  proof (2.2), full acceptance (3.1), final handoff (3.2), and cleanup-fixture
+  route correction (3.4) remain open. Use live `openspec instructions apply`
   for exact task locations before changing checkboxes.
 - Final diagnostic code `495d08d` is unchanged by main integration. On clean
   **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
