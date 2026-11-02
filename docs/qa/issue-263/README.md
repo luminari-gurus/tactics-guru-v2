@@ -1,8 +1,8 @@
 # WebKit dungeon reload boot investigation (#263)
 
 Updated 2026-11-02 (Asia/Jerusalem). **The observed native entry-resource failure
-is repaired by the supported runtime update. Full acceptance is audited; final
-review/Git handoff is being completed.**
+is repaired by the supported runtime update. Full acceptance and final review/Git
+handoff are complete; the unmerged review stack is ready.**
 The current handoff is [plan.md](../../ongoing-projects/plan.md); tracked work is
 [OpenSpec tasks](../../../openspec/changes/issue-263-webkit-reload-boot/tasks.md).
 

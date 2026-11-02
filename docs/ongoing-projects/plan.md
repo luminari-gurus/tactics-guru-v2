@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: implementation and full artifact audit qualified; final review handoff in progress.
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation, qualification and handoff complete; review stack ready.
 
 **Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
@@ -24,8 +24,8 @@ native-library replacements are outside this candidate.
 
 ## Current implementation handoff
 
-Updated 2026-11-02 (Asia/Jerusalem). **Implementation and functional acceptance
-are qualified. Final PR/Git handoff remains; no CI, browser or download process
+Updated 2026-11-02 (Asia/Jerusalem). **Implementation, functional acceptance and
+PR/Git handoff are complete; no CI, browser or download process
 from this goal is live.**
 
 Review order, with independently published chunks:
@@ -115,10 +115,10 @@ old-runtime successful controls, traced budget failures and corrected probes.
 The original archive hash is
 `9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
 
-**Remaining workflow:** OpenSpec `issue-263-webkit-reload-boot` is 8/9 complete.
-The audited integration/full-run obligations 2.2 and 3.1 are checked. Finish
-3.2: publish the final evidence/handoff, refresh PR descriptions and
-verify Git/remote parity, issue ownership/closure links and review readiness.
+**Completed workflow:** OpenSpec `issue-263-webkit-reload-boot` is 9/9 complete.
+Evidence/handoff and final PR descriptions are published. Git/remote parity,
+issue ownership/closure links, clean worktrees and review readiness are verified.
+Review the stack in the order above.
 Do not merge, deploy, create a release tag, close #263 before its repair merges,
 archive this unmerged OpenSpec change, or repeat qualified tests for prose-only
 follow-ups. Preserve #257/#258 separately unless evidence establishes their cause.
