@@ -5,7 +5,7 @@ import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
 import { freshDungeon, FloorCache } from '../domain/dungeon';
-import { createDungeonStorage } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
@@ -92,7 +92,7 @@ if(entryIntent==='new'){
  } catch { /* A missing or unreadable handoff requires a new confirmation. */ }
  const review=session.inspect();
  const matches=(['primary','backup'] as const).every(slot=>review[slot].status!=='unavailable' && approved?.[slot]?.status===review[slot].status && approved?.[slot]?.text===review[slot].text);
- const empty=review.primary.status==='missing' && review.backup.status==='missing';
+ const empty=bothDungeonSlotsMissing(review);
  if((matches || empty) && session.replace(review,crypto.randomUUID(),(session.snapshot.seed+1)>>>0)){
   startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();
  }else if(matches || empty)recovery();

@@ -1,6 +1,6 @@
 import { inspectMenuSaves, type MenuSave } from '../app/menuSaves';
 import { routeHref } from '../app/routes';
-import { createDungeonStorage } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import './mainMenu.css';
 export const menuDefinition = [
@@ -66,7 +66,7 @@ export function startMainMenu() {
     },
     new: () => {
       const review = createDungeonStorage().inspect();
-      if (review.primary.status === 'missing' && review.backup.status === 'missing') {
+      if (bothDungeonSlotsMissing(review)) {
         try { sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review'); } catch { /* The destination rechecks storage. */ }
         location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new'));
         return;

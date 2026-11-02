@@ -10,7 +10,7 @@ import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { clearedDungeonSlots, freshDungeon, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity } from '../../src/content/dungeon';
-import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
@@ -121,6 +121,18 @@ describe('dungeon floors', () => {
   });
 });
 describe('dungeon persistence',()=>{
+  it('treats only both missing dungeon slots as empty',()=>{
+    const missing={status:'missing' as const,text:null};
+    const unavailable={status:'unavailable' as const,text:null};
+    const invalid={status:'invalid' as const,text:'broken',reason:'corrupt'};
+    const valid={status:'valid' as const,text:'backup-only',state:fresh()};
+    expect(bothDungeonSlotsMissing({primary:missing,backup:missing})).toBe(true);
+    expect(bothDungeonSlotsMissing({primary:unavailable,backup:missing})).toBe(false);
+    expect(bothDungeonSlotsMissing({primary:missing,backup:unavailable})).toBe(false);
+    expect(bothDungeonSlotsMissing({primary:unavailable,backup:unavailable})).toBe(false);
+    expect(bothDungeonSlotsMissing({primary:missing,backup:valid})).toBe(false);
+    expect(bothDungeonSlotsMissing({primary:invalid,backup:missing})).toBe(false);
+  });
   it('preserves other namespaces, corrupt bytes, backup and compare-before-removal',()=>{
     const m=memory();m.setItem('tactics-guru:phaser:run:primary:v1','old-run');const store=createDungeonStorage(()=>m);
     expect(store.save(fresh()).ok).toBe(true);expect(store.inspect().primary.status).toBe('valid');

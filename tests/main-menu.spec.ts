@@ -57,10 +57,13 @@ test('main menu: New Game confirms over the menu and preserves other save famili
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
 });
 test('main menu: New Game starts immediately when no dungeon save exists',async({page})=>{
+ await page.addInitScript(({keys})=>{localStorage.setItem(keys.battle.primary,'battle sentinel');localStorage.setItem(keys.run.primary,'run sentinel');},{keys});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
  await expect(page.locator('dialog')).not.toBeVisible();
  await expect.poll(()=>page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).not.toBeNull();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
 });
 test('main menu: a dungeon save appearing during navigation requires confirmation',async({page})=>{
  await page.addInitScript(key=>{if(location.pathname.endsWith('/dungeon'))localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);

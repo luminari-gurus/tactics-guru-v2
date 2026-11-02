@@ -60,6 +60,10 @@ Continue SHALL target the sole resumable mode or show a labeled mode chooser whe
 ### Requirement: Reviewed dungeon new-game handoff
 New Game SHALL start without confirmation when both dungeon save slots are missing, and otherwise show its confirmation over the main menu. The dungeon SHALL re-inspect the slots before replacement and request fresh confirmation if data exists and the review changed or is unavailable. Replacing saved dungeon progress SHALL retain compare-before-remove checks. Cancelling or failing replacement SHALL preserve recoverable data and expose the existing recovery path. Battle and run saves SHALL remain separate.
 
+#### Scenario: No dungeon save exists
+- **WHEN** New Game is activated and both dungeon save slots are missing
+- **THEN** a new dungeon starts immediately with no confirmation, and battle and run saves remain unchanged
+
 #### Scenario: Existing dungeon and repeated activation
 - **WHEN** New Game is activated repeatedly with existing dungeon data
 - **THEN** one confirmation governs at most one replacement, and cancellation leaves all save families unchanged
