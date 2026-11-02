@@ -1,6 +1,7 @@
 import { continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, test } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';

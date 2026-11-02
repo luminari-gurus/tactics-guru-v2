@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/dungeonEntropy';
 import { battleCatalog } from '../src/content/catalog';
 import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';

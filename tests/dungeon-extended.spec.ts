@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, test } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
 import { dungeonContent } from '../src/content/dungeon';
 import { dungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';

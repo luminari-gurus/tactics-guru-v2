@@ -7,12 +7,12 @@ import { HERO_PROGRESSION } from '../../src/content/progression';
 import { describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
-import { clearedDungeonSlots, freshDungeon, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
-import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
+import { LEGACY_ENCOUNTER_POLICY, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { dispatch } from '../../src/domain/turns';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
@@ -48,6 +48,42 @@ function memory() {
   return { values, getItem: (k: string) => values.get(k) ?? null, setItem: (k: string,v: string) => { values.set(k,v); }, removeItem: (k: string) => { values.delete(k); } };
 }
 describe('dungeon floors', () => {
+  it('draws a colliding-safe uint32 seed from an injectable source', () => {
+    expect(newDungeonSeed(() => 7)).toBe(7);
+    expect(newDungeonSeed(() => 7, 7)).toBe(8);
+    expect(newDungeonSeed(() => 5, 7)).toBe(5);
+    expect(newDungeonSeed(() => 0xffffffff, 0xffffffff)).toBe(0);
+    expect(newDungeonSeed(() => -1)).toBe(0xffffffff);
+  });
+  it('builds a legal first floor for thousands of seeds', () => {
+    const failed: { seed: number; message: string }[] = [];
+    const seeds = new Set<number>([0, 13, 14, 0xffffffff]);
+    let walk = 0x9e3779b9;
+    while (seeds.size < 4096) { walk = (Math.imul(walk, 1664525) + 1013904223) >>> 0; seeds.add(walk); }
+    const resolvedPairings = new Set<string>();
+    let constructed = 0;
+    for (const seed of seeds) {
+      try {
+        for (const depth of [1, 2]) for (const slot of [0, 1, 2]) {
+          const selection = selectDungeonEncounter(seed, depth, slot);
+          const pairing = canonical(selection.encounter);
+          if (resolvedPairings.has(pairing)) continue;
+          const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), dungeonBattleCatalog);
+          if (!resolved.ok) throw Error('Invalid dungeon encounter pairing');
+          resolvedPairings.add(pairing);
+        }
+        if (constructed < 64) {
+          const dungeon = freshDungeon('seed-sweep', seed);
+          if (dungeon.seed !== seed || dungeon.floors[0].descriptor.encounters.length !== 3) throw Error('invalid generated dungeon');
+          constructed++;
+        }
+      } catch (error) {
+        failed.push({ seed, message: error instanceof Error ? error.message : String(error) });
+      }
+    }
+    expect(resolvedPairings.size).toBeGreaterThan(3);
+    expect(failed).toEqual([]);
+  });
   it('uses stable separate purposes and safe numerical bounds', () => {
     expect(floorDescriptor(13, 1)).toEqual(floorDescriptor(13, 1));
     expect(new Set(['floor','battle','reward'].map(p => dungeonSeed(13, 10, p as 'floor'))).size).toBe(3);

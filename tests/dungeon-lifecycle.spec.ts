@@ -1,6 +1,7 @@
 import { atEncounter } from './helpers/dungeonFixtures';
 import {continueSavedDungeon} from './helpers/dungeonTraversal';
-import {expect,test,type Page} from '@playwright/test';
+import {type Page} from '@playwright/test';
+import {expect,test} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,type DungeonState} from '../src/domain/dungeon';
 import {BattleSession} from '../src/app/BattleSession';

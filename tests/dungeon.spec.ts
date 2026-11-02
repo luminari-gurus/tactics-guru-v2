@@ -1,7 +1,8 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atStairApproach } from './helpers/dungeonFixtures';
-import { expect,test,type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect,test } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -16,16 +17,6 @@ import type { Command, BattleEvent } from '../src/domain/types';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
- await page.addInitScript(()=>{
-  const original=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-   if(array instanceof Uint32Array && array.length===1){
-    const next=Number(sessionStorage.getItem('test-dungeon-entropy')??'100');
-    sessionStorage.setItem('test-dungeon-entropy',String(next+1));array[0]=next;return array;
-   }
-   return original(array);
-  }) as typeof crypto.getRandomValues;
- });
  await page.goto('dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  const first=await snapshot(page);
@@ -35,6 +26,17 @@ test('new dungeons use fresh layouts across reloads and saved dungeons retain th
  const second=await snapshot(page);
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
+});
+test('play unsaved dungeon uses a fresh layout each visit and does not write a save',async({page})=>{
+ await page.goto('dungeon');
+ await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ const first=await snapshot(page);
+ await page.reload();
+ await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ const second=await snapshot(page);
+ expect(second.seed).not.toBe(first.seed);
+ expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
+ expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
 });
 
 test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle',async({page,isMobile},info)=>{
