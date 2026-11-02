@@ -56,12 +56,34 @@ test('main menu: New Game confirms over the menu and preserves other save famili
  await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');await expect(page.locator('dialog')).not.toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
 });
-test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
+test('main menu: New Game starts immediately when no dungeon save exists',async({page})=>{
+ await page.addInitScript(({keys})=>{localStorage.setItem(keys.battle.primary,'battle sentinel');localStorage.setItem(keys.run.primary,'run sentinel');},{keys});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ await expect(page.locator('dialog')).not.toBeVisible();
+ await expect.poll(()=>page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).not.toBeNull();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
+});
+test('main menu: a dungeon save appearing during navigation requires confirmation',async({page})=>{
+ await page.addInitScript(key=>{if(location.pathname.endsWith('/dungeon'))localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe('newly arrived save');
+});
+test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
+ const text=menuFixture('dungeon');await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.primary,text});
+ await page.getByRole('button',{name:'New Game',exact:true}).click();
  await page.evaluate(key=>localStorage.setItem(key,'changed while confirming'),keys.dungeon.primary);
  await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe('changed while confirming');
+});
+test('main menu: a backup-only dungeon still requires confirmation',async({page})=>{
+ const text=menuFixture('dungeon');await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.backup,text});
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.backup)).toBe(text);
 });
 test('main menu: unavailable storage and failed artwork keep native actions usable',async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));

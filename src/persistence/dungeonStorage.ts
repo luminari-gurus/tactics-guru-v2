@@ -7,6 +7,10 @@ type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string;
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
 export interface DungeonInspection { readonly primary: Slot; readonly backup: Slot }
 export type DungeonWrite = { ok: true } | { ok: false; reason: string };
+/** True only when both slots are missing. Unavailable, backup-only, and unreadable saves are not empty. */
+export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {
+  return review.primary.status === 'missing' && review.backup.status === 'missing';
+}
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
