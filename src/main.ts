@@ -2,6 +2,7 @@ import { mountTelemetryPreferences } from './telemetry/preferences';
 import { startTelemetry } from './telemetry/browser';
 import { reportFailure } from './telemetry/telemetry';
 import { classifyRoute } from './app/routes';
+performance.mark('investigation-entry-module');
 const route = classifyRoute(location.pathname, location.search, import.meta.env.BASE_URL);
 // Menu and dungeon have no approved collection taxonomy.
 if (route !== 'menu' && route !== 'dungeon') startTelemetry();

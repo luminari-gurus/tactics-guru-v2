@@ -37,7 +37,7 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }, info) => {
  if(info.status===info.expectedStatus)return;
  let documentState:unknown;
- try { documentState=await Promise.race([page.evaluate(()=>({readyState:document.readyState,path:location.pathname,screen:!!document.querySelector('#dungeon-screen'),scripts:[...document.scripts].map(s=>new URL(s.src,location.href).pathname).slice(0,20),resources:performance.getEntriesByType('resource').slice(-80).map(r=>({name:new URL(r.name,location.href).pathname,duration:r.duration}))})),new Promise(resolve=>setTimeout(()=>resolve({error:'document sample timed out'}),3000))]); }
+ try { documentState=await Promise.race([page.evaluate(()=>({readyState:document.readyState,path:location.pathname,screen:!!document.querySelector('#dungeon-screen'),marks:performance.getEntriesByType('mark').filter(m=>m.name.startsWith('investigation-')).map(m=>({name:m.name,start:m.startTime})),scripts:[...document.scripts].map(s=>new URL(s.src,location.href).pathname).slice(0,20),resources:performance.getEntriesByType('resource').slice(-80).map(r=>({name:new URL(r.name,location.href).pathname,duration:r.duration}))})),new Promise(resolve=>setTimeout(()=>resolve({error:'document sample timed out'}),3000))]); }
  catch(error) {documentState={error:String(error).slice(0,200)};}
  await info.attach('startup-diagnostics',{body:JSON.stringify({path:pathname(page.url()),events:startupEvents.get(page),documentState,host:{load:loadavg(),freeBytes:freemem(),processMemory:process.memoryUsage()}},null,2),contentType:'application/json'});
 });
