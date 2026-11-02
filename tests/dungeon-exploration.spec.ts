@@ -36,11 +36,13 @@ test.beforeEach(async ({ page }) => {
  page.on('crash',()=>add('crash'));
 });
 test.afterEach(async ({ page }, info) => {
- if(info.status===info.expectedStatus)return;
+ const pageErrors=(startupEvents.get(page)??[]).filter(event=>event.type==='pageerror');
+ if(info.status===info.expectedStatus && pageErrors.length===0)return;
  let documentState:unknown;
  try { documentState=await Promise.race([page.evaluate(()=>({readyState:document.readyState,path:location.pathname,screen:!!document.querySelector('#dungeon-screen'),marks:performance.getEntriesByType('mark').filter(m=>m.name.startsWith('investigation-')).map(m=>({name:m.name,start:m.startTime})),scripts:[...document.scripts].map(s=>new URL(s.src,location.href).pathname).slice(0,20),resources:performance.getEntriesByType('resource').slice(-80).map(r=>({name:new URL(r.name,location.href).pathname,duration:r.duration}))})),new Promise(resolve=>setTimeout(()=>resolve({error:'document sample timed out'}),3000))]); }
  catch(error) {documentState={error:String(error).slice(0,200)};}
  await info.attach('startup-diagnostics',{body:JSON.stringify({path:pathname(page.url()),events:startupEvents.get(page),documentState,host:{load:loadavg(),freeBytes:freemem(),processMemory:process.memoryUsage()}},null,2),contentType:'application/json'});
+ if(info.status===info.expectedStatus && pageErrors.length)throw new Error(`Unexpected page error during startup: ${String(pageErrors[0].message)}`);
 });
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
