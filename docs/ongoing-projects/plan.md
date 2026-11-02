@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: repair published; focused and full acceptance running.
+Started: 2026-11-01 (Asia/Jerusalem). Status: runtime and focused follow-ups published; full acceptance running.
 
 **Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
@@ -198,35 +198,31 @@ acceptance, preserve final-source evidence, and finish the review handoff.
 - The native module parser inspected all 22 exact-runtime JS chunks without
   evaluation: no static import cycle, no dependency importing the entry, and
   no top-level await in the dungeon route's static closure. The graph is retained
-  in QA. Loading/native import or synchronous initialization still need actual
-  failure evidence; no source-level wait-cycle repair is justified by this graph.
+  in QA. That graph alone did not establish the cause; the later qualified runs
+  captured the native request-failure witness before entry evaluation.
 - Other checkouts: `/tmp/tactics-issue263-main` (older diagnostic qualification),
   `/tmp/tactics-issue263-integrated` (clean tested `cdc39cf`), and
   `/tmp/tactics-issue263-current-base` (literal `78a3f75` comparison). Common logs,
   reports and traces are under `/tmp/tactics-issue263-evidence/`. All local checks
   above are terminal; do not poll old exec handles as live.
 - Runner attempt **41343197332 was cancelled while pending, zero jobs executed**.
-  It supplies no evidence. At last read, another owner's full capture
-  **41337233629** was in progress and browser setup **41344487694** was pending.
-  Recheck those specific runs and the queue; submit ours only when it will not
-  replace another pending request. A live queued/running job is a verified wait,
-  not a reason to restart it.
-- Temporary CI branch `branch/issue-263-runner-diagnosis` is pushed at **`4d4fd5b`**,
-  separate from #264. Its native worktree is `tmp/issue263-runner-worktree`.
-  Dispatch existing `browser-setup.yml` on that branch when the queue permits.
-  It checks out exact failed runtime `9b543cb`, overlays only the observer/one test
-  import, records hashes and builds, then runs original WebKit exploration order
-  **untraced** (preserving the embedded budget check) followed by five stair
-  repetitions with failure traces. One worker, zero retries, exclusive lock and
-  a two-failure diagnostic stop are explicit; partial runs cannot satisfy final
-  acceptance. Never introduce a hosted fallback or interrupt another owner's job.
+  It supplies no evidence. Later diagnosis and qualification are complete; the
+  earlier queue/dispatch instructions are obsolete. The sole current acceptance
+  handle is **41362013777 / job 125015648051**. Do not restart it on an observation
+  timeout or replace another owner's pending job.
+- Historical temporary CI branch `branch/issue-263-runner-diagnosis` is at
+  **`3f93ce3`**, outside the review PRs; its native worktree is
+  `tmp/issue263-runner-worktree`. It pins `e3e9ebf` for the completed 150-case
+  qualified comparison. Do not redispatch it as a completion check. A new observed
+  failure would need its own justified diagnostic selection and retained receipt.
+  Keep one worker, zero retries, the exclusive lock and no hosted fallback.
 - Use native Git for checkout/commit/worktrees. Authenticated WSL network Git works
   from the primary checkout; Windows worktree `.git` pointers cannot be read by
   WSL Git. Push the CI branch from the primary repository using its explicit ref.
-- Next: refresh runner/PR/main state, resubmit the bounded diagnosis when safe,
-  recover any failure attachment/trace and identify the owning boot cause.
-  Stack a focused repair PR on #264 when ready. Preserve #257/#258 separately
-  unless evidence connects their causes. Then fulfill the original full-run gate.
+- Next: finish and audit the current full run, resolve any actual remaining
+  failures proportionally, retain the final source-bound proof, and complete the
+  PR/handoff audit. Preserve #257/#258 separately unless evidence connects their
+  causes. The original full-run gate remains required.
   User authorization includes implementation, fixes, commits/pushes and focused
   review-ready PRs; it does not request merging, deployment or a release tag.
 
@@ -250,6 +246,9 @@ acceptance, preserve final-source evidence, and finish the review handoff.
 
 ## Selection and available work
 
+This section records the initial 2026-11-01 pickup snapshot; current ownership,
+branches and implementation status are in the handoff above.
+
 Reviewed all **33 open issues and four open PRs**, including issue bodies,
 ownership, dependencies, active branches, relevant comments and unfinished
 OpenSpec performance-qualification work. REST pagination and GraphQL agree on the
@@ -259,7 +258,7 @@ membership or an existing linked branch at this pickup snapshot. No additional
 project draft items were exposed by those inventories. The `ready for work` label
 was not an eligibility filter, and #263 has only `bug`.
 
-**Choose #263 for immediate reliability and delivery value.** It is unassigned,
+**Chose #263 for immediate reliability and delivery value.** It was unassigned,
 has a concrete recurring failure across WebKit desktop/portrait/landscape, and
 blocks acceptance of the main-menu work. A reported 60-second stall survived an
 existing readiness mitigation. Diagnosing it now also improves the quality of
@@ -297,6 +296,10 @@ The rest of the backlog was considered as follows:
   release/SSH draft with explicit operator boundaries. Neither is a new pickup.
 
 ## Evidence and implementation boundary
+
+The following is the original planning baseline, retained with its acceptance
+requirements. PR #256 has since merged into main and the artifacts have been
+recovered; use the current handoff and QA for implementation state.
 
 The issue reports [run 41320149918](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41320149918)
 at **`9b543cbafecf1cce48f966ff1d8998a46a7ae32d`**, with a desktop-WebKit `wasd`
