@@ -23,8 +23,8 @@ export default { ...base, testDir: ${JSON.stringify(dir)}, testMatch: 'contract.
   webServer: { ...base.webServer, cwd: ${JSON.stringify(root)}, command: 'npm run ${mode} -- --port 4173 --strictPort', reuseExistingServer: false },
   outputDir: ${JSON.stringify(join(receipt, 'artifacts'))} };`);
       writeFileSync(join(dir, 'contract.spec.cjs'), `const { test, expect } = require(${JSON.stringify(require.resolve('@playwright/test'))});
-test('completed real browser smoke', async ({page}) => { await page.goto('/'); await expect(page.locator('canvas')).toBeVisible(); });
-test('deliberately interrupted browser', async ({page}) => { await page.goto('/'); await new Promise(() => {}); });`);
+test('completed real browser smoke', async ({page}) => { await page.goto('/?scene=proof'); await expect(page.locator('canvas')).toBeVisible(); });
+test('deliberately interrupted browser', async ({page}) => { await page.goto('/?scene=proof'); await new Promise(() => {}); });`);
       const execute = (name, extra, timeoutMs) => runCommand(process.execPath, [resolve(root, 'node_modules/playwright/cli.js'),
         'test', '-c', join(dir, 'playwright.config.ts'), '--reporter=line,json,./scripts/verification-playwright-reporter.mjs', ...extra], {
         cwd: root, env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_FILE: join(receipt, name + '.json'),

@@ -2,7 +2,8 @@
 
 Started: 2026-11-01 (Asia/Jerusalem). Status: repair published; focused and full acceptance running.
 
-**Active follow-up branch:** `branch/verify-map-disposer-coverage`, stacked on
+**Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
+on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
 runtime PR #265 at `1dfc3a6`. The runtime repair branch is
 `branch/issue-263-patched-webkit-runtime`, stacked on diagnostic PR #264 at
 `6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
