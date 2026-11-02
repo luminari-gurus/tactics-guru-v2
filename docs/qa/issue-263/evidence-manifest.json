@@ -970,6 +970,56 @@
       "file": "skip-inventory-review.json.gz",
       "sha256": "ffea3cb3ca3402f96a0b475e696a97940135c77ac21c4f29484e41a05bb3a3d4",
       "originalSha256": "1f1a58688bcdc295035dd004990dbca4ab9314aa93d16ecce01f343de0719c3f"
+    },
+    {
+      "file": "review-override-before.log.gz",
+      "sha256": "57ce315a3740b893453a5234ebe75f2fc45b693d1f83440a4ef64e5ddee6b4e8",
+      "originalSha256": "ede62c7b5b4e92373d5011e67ce53f672dfb41087864abf71f5724410f8f5663"
+    },
+    {
+      "file": "review-override-before-source.json.gz",
+      "sha256": "292571c4cc376518a730f529af044bbc957b2dbb8c8fff419fd76da830f2a184",
+      "originalSha256": "b711b80ee38c680264ea5fd6719bbf48972f72042e302d98a179ffb01a65a538"
+    },
+    {
+      "file": "review-override-after.log.gz",
+      "sha256": "a82c5966ae2df4e1e28b79fc01d83335baa7a41996983b8d5c2b4ca02b807a64",
+      "originalSha256": "c57b1c33b9d11a25854b040fb55f2d37dad28275ae38e146822ef81585cf999f"
+    },
+    {
+      "file": "review-override-after-source.json.gz",
+      "sha256": "47330ad31930b48b7e7952963a59f3034e21c207423c2a9ba7a7b989d8934110",
+      "originalSha256": "7e4eda6fc0e33754b43f414e63d710eec704deacac9ebe7eb37154b4d5a9e389"
+    },
+    {
+      "file": "review-default-after.log.gz",
+      "sha256": "0590dd5c42fb74283bc33b77a624e1dd79ea4c44543473597e0c91f7c7530995",
+      "originalSha256": "efccb025ca09467e01c46ee4c969ea57b9ee0d8590e6e9486741070ab5c97148"
+    },
+    {
+      "file": "review-override-after-163.log.gz",
+      "sha256": "860239b3697b20b5461102c1de787e658d7142e63652237d1a3fdacbb055323e",
+      "originalSha256": "402a48e985470dd9d91c372f607c6430c944a97fa65a5be3093ec933e5bf636c"
+    },
+    {
+      "file": "review-override-after-163-source.json.gz",
+      "sha256": "fa534142bd4d480b8987cff1f80239294a469742fd3a2369d8964ae5c951ed2a",
+      "originalSha256": "9f53788b0d882685434df0d917196a81be19348aadfcc69a1e0cd6b6d689f07c"
+    },
+    {
+      "file": "review-native-witness-readback.json.gz",
+      "sha256": "8988ca500907dbba3417df4c4829904be9236e6847e8a952d7a1d472352ef1b4",
+      "originalSha256": "9d9c8717bec12a5465a857b0de69e6b35aa561163c862d992fb925f8e1386f09"
+    },
+    {
+      "file": "review-full-review-readback.json.gz",
+      "sha256": "74d84126ec6cebd4a285de0d9d4f75b10a111533220e092df14b01e9e146da08",
+      "originalSha256": "73de86eba182cdb9c7ddc4ea4ec9ac418797d7f17f388d5a722b590369551060"
+    },
+    {
+      "file": "review-source-equivalence.json.gz",
+      "sha256": "ec33cc04bee0283d82405e384d136d22b0b10ae309e2707308a11449408878b8",
+      "originalSha256": "6d039f41071596fbae32c77e23f890469407b703f133ee6821e9cc4a58ef0629"
     }
   ],
   "additionalArchives": [

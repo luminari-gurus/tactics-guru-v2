@@ -17,3 +17,8 @@
 - [x] 3.2 Finish the current-session handoff and focused PR descriptions, verify clean Git status, remote parity and issue links, and leave completed work ready for review without merging, deploying or creating an unrequested release tag.
 - [x] 3.3 Repair the independently found full-verification dev-selector omission in a separate focused PR: preserve all existing coverage, add exactly the three existing direct map-disposer profile cases, execute the six affected dev cases and verification contracts, and retain source-bound comparison evidence without restarting unchanged #263 coverage.
 - [x] 3.4 Repair the independently found browser-cleanup fixture route in a separate focused PR: retain the baseline preview/dev failures, use the explicit proof route for both fixture navigations, preserve canvas/interruption/cleanup/same-port recovery assertions and budgets, and verify both real-browser contracts without application changes.
+
+## 4. Authorized supplemental review and merge
+
+- [ ] 4.1 Review the complete stack and every existing review; repair and qualify all substantiated findings, publish the supplemental review and resolve addressed threads, retaining source-bound evidence and unchanged acceptance coverage.
+- [ ] 4.2 Merge #264, #265, #266 and #267 in order under the caller's new authorization; recheck rules, live reviews, exact refs and merge trees, verify published trees/parents and issue closure, clean up completed refs safely and finish with clean local/main remote parity.

@@ -2,9 +2,55 @@
 
 Updated 2026-11-02 (Asia/Jerusalem). **The observed native entry-resource failure
 is repaired by the supported runtime update. Full acceptance and final review/Git
-handoff are complete; the unmerged review stack is ready.**
+handoff are complete; supplemental review and the newly authorized ordered merge
+are in progress.**
 The current handoff is [plan.md](../../ongoing-projects/plan.md); tracked work is
 [OpenSpec tasks](../../../openspec/changes/issue-263-webkit-reload-boot/tasks.md).
+
+## Supplemental review and authorized merge — 2026-11-02
+
+Reviewed all four PR diffs and previous review submissions/threads, the fixture's
+lifecycle/privacy/bounds, device and inherited configurations, package/lock
+scope, aggregate selection/skip owners, cleanup process witnesses and retained
+source/build evidence. The only substantiated review defect is the existing
+P2 on #264: its generated startup contract ignored the supported Chromium
+executable override and used the default headless shell.
+
+Repair `d90a294` configures full Chromium and forwards the override only to the
+Chromium project. In an isolated cache containing only WebKit, the literal
+unrepaired contract fails at Chromium launch. After repair, both diagnostic
+contracts pass on Playwright 1.63.0 (12.9 seconds) and 1.64.1 (9.0 seconds), and
+the startup contract passes with default selection (3.5 seconds). No assertion,
+timeout, retry, application, helper or ordinary browser configuration changes.
+The original review thread has the repair/proof reply and is resolved. No
+additional actionable code defect was found by this supplemental review.
+
+Fresh independent readback verifies the 194 original canonical payload hashes,
+the complete 585,086,035-byte full-artifact hash, 19 passing stages, 1,440 browser
+passes, twelve intentional skips, unique case IDs, one worker and zero retries.
+The original native error is also verified by decoding the two failed cases'
+startup attachments in the retained 41356666822 archive, whose hash matches.
+Raw original error-context excerpt whitespace is preserved as evidence; three
+literal source-blank lines trigger range-wide `git diff --check` whitespace
+warnings and have not been rewritten to cosmetically clean that artifact.
+
+`review-*.gz` receipts in the manifest retain the failed/passing logs, exact
+source overlays, override-only cache contents, native/full readbacks and current
+source comparison. Commands: `node --test tests/tooling/browser-diagnostics.test.mjs`
+with the recorded override/cache; and
+`node --test --test-name-pattern='dungeon startup evidence' tests/tooling/browser-diagnostics.test.mjs`
+with default selection. Executions were serial in an isolated WSL checkout,
+Node 24.15.0, with installed lock-compatible dependency trees. The only tracked
+test overlay matches the canonical committed repair hash on both versions.
+
+Relative to full-run source `e3e9ebf`, only the already-qualified dev selector,
+cleanup fixture and this newly-qualified diagnostic contract differ in code.
+Application/public/build/package/config/ordinary-spec/helper inputs are unchanged;
+the existing full, device and extended acceptance evidence remains valid for
+those unchanged inputs. No new bundle or performance result is claimed for the
+merge commits. Caller authorization now includes ordered merge and safe Git
+cleanup; the current plan records that closeout separately from the historical
+unmerged handoff below.
 
 ## Original failure
 

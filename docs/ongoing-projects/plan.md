@@ -1,6 +1,6 @@
 # Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: implementation, qualification and handoff complete; review stack ready.
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation qualified; supplemental review and ordered merge in progress.
 
 **Active follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
 on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
@@ -22,7 +22,48 @@ runtime runs. Native-memory-defect attribution remains an inference; no external
 security reproducer is part of this work. Game rules, saves, hosting and arbitrary
 native-library replacements are outside this candidate.
 
-## Current implementation handoff
+## Supplemental review and merge closeout
+
+The caller now authorizes comprehensive supplemental review, repair of every
+substantiated review finding, and end-to-end Git management and merging of
+#264 → #265 → #266 → #267. This supersedes the original unmerged handoff below.
+Using OpenSpec change `issue-263-webkit-reload-boot` and the ablation skill.
+
+**Outcome / non-goals / files / proof:** review all four exact diffs, prior
+reviews and affected consumers; repair confirmed defects, publish the review,
+then merge in order and prove trees, parents, issue closure and remote parity.
+The only code repair is the Chromium project in the generated startup contract,
+`tests/tooling/browser-diagnostics.test.mjs`. Preserve application behavior,
+diagnostic helper, assertions and existing acceptance limits. No deployment,
+release tag, unrelated issue work or repeated full regression is needed.
+
+The existing P2 finding on #264 is reproduced: an override-only browser cache
+causes the contract to request a missing default headless shell despite a valid
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE`. Commit `d90a294` selects full Chromium and
+forwards that override only to its Chromium project. Both diagnostic contracts
+pass with an override-only cache on Playwright 1.63.0 and 1.64.1; the startup
+contract also passes with default selection. WebKit stays independent. The
+existing review thread is answered and resolved. No additional actionable code
+defect was found by the supplemental review.
+
+Fresh review independently verifies all 194 existing canonical evidence payload
+hashes and the complete full-artifact SHA-256. Its actual reports account for
+19 passing stages, 1,440 browser passes, twelve intentional skips, one worker,
+zero retries and no missing/duplicated case IDs. The original native failures
+are read back from their base64 startup attachments in the retained ZIP.
+The only later code owners versus `e3e9ebf` are the already qualified selector,
+cleanup fixture and now-qualified diagnostic contract. Application, helper,
+ordinary specs, assets, dependencies and browser configs still match.
+
+Merge commits preserve the dependent ancestry without rewriting published
+history. Carry the contract fix through the stack; recheck live reviews, branch
+rules and exact base/head before each merge, compare `merge-tree` with the
+published tree and verify parent order. Retarget each remaining PR to main after
+its parent merges. Remove completed branch refs only after proving ancestry;
+retain the separate historical runner-diagnosis branch/worktree and raw evidence.
+Update this section with the final merge commits and parity after completion.
+
+## Original implementation handoff (before merge authorization)
 
 Updated 2026-11-02 (Asia/Jerusalem). **Implementation, functional acceptance and
 PR/Git handoff are complete; no CI, browser or download process
@@ -119,9 +160,11 @@ The original archive hash is
 Evidence/handoff and final PR descriptions are published. Git/remote parity,
 issue ownership/closure links, clean worktrees and review readiness are verified.
 Review the stack in the order above.
-Do not merge, deploy, create a release tag, close #263 before its repair merges,
-archive this unmerged OpenSpec change, or repeat qualified tests for prose-only
-follow-ups. Preserve #257/#258 separately unless evidence establishes their cause.
+At this original handoff, merging was not yet authorized. The later authorization
+above controls the current review/merge work. Deployment, release tagging and
+OpenSpec archiving remain separate; do not close #263 before its repair merges
+or repeat qualified tests for prose-only follow-ups. Preserve #257/#258 separately
+unless evidence establishes their cause.
 
 Useful local evidence is `/tmp/tactics-issue263-evidence/`; the audited full ZIP
 is `full-41362013777.zip`, with extracted selected reports in `full-41362013777/`.

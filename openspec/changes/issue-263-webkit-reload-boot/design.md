@@ -7,7 +7,7 @@ identities, the traced boot graph, issue acceptance and the implementation order
 PR #256 is merged into main at `78a3f75`; the reported failed runtime is `9b543cb`.
 Qualified diagnostics captured native entry/static-resource failures before
 dungeon screen construction. The official runtime update is published as stacked
-PR #265; its complete acceptance gate remains open.
+PR #265; its complete acceptance gate passed at `e3e9ebf` in run 41362013777.
 
 ## Goals / Non-Goals
 
@@ -122,3 +122,19 @@ identified as e3e9ebf and is not relabeled as execution of later Git commits.
 Later Git build-info metadata is not treated as a newly measured bundle or an
 exact-byte/performance result; functional reuse is limited to assertions whose
 inputs are unchanged by that metadata.
+
+## Supplemental review and authorized integration
+
+The caller now authorizes comprehensive review, repairs and ordered merging of
+#264 through #267. The existing #264 review exposed an executable-selection
+defect in the generated diagnostic contract. Keep the fix in that owner:
+Chromium selects its full-browser channel and supported executable override;
+WebKit keeps independent options. An override-only cache reproduces the failure
+and both contracts pass after repair on the original 1.63 and repaired 1.64.1
+runtimes; default selection also passes. This adds a third later verification
+owner to the original two-owner reuse comparison above, with its own fresh proof.
+The diagnostic helper, importing exploration cases, application, assets, package
+and browser configurations remain unchanged. No additional application/full-run
+execution is invalidated by this isolated contract repair. Merge with preserved
+ancestry, recheck live reviews and exact trees, and record closure/parity in the
+current handoff. Deployment and OpenSpec archival remain separate.
