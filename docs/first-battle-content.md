@@ -21,7 +21,7 @@ For future unit artwork, use the [unit-art guide and annotated five-pair referen
 The catalog now also admits `goblin_shaman` with baseline HP/Move/Jump/Acc/AC/Power/
 Dex/Will **10/4/1/3/11/2/1/3** and Basic Attack ownership. The standalone map's
 six original spawns and the authored-run/desert rosters remain unchanged. Support
-rules and dungeon placement are tracked in [the current plan](ongoing-projects/plan.md)
+rules and dungeon placement are tracked in [the Shaman plan](ongoing-projects/issue-166-goblin-shaman-plan.md)
 and are not enabled by the content foundation alone.
 
 The [sprite](../public/battle/source/goblin_shaman_sprite.png) and

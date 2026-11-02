@@ -1,389 +1,337 @@
-# Issue #166: Goblin Shaman support combat
+# Issue #263: Reliable WebKit boot after dungeon reload
 
-Started: 2026-10-28; updated: 2026-10-30 (Asia/Jerusalem). Status: implementation complete; foundation merged, runtime in final merge closeout.
-OpenSpec change: `issue-166-goblin-shaman` (spec-driven).
+Started: 2026-11-01 (Asia/Jerusalem). Status: implementation active; evidence recovery and causal diagnosis.
 
-- Issue: [#166](https://github.com/luminari-gurus/tactics-guru-v2/issues/166).
+## Current implementation handoff
+
+Updated 2026-11-01 (Asia/Jerusalem). **Cause and repair remain unproven.**
+
+**2026-11-02 continuation:** qualified ordinary runs **41349975828** and
+**41356666822** reproduced the missing-screen stall. Their bounded attachments
+show prior-load cancellations followed by native **`WebKit encountered an internal
+error`** failures for the new document's entry/static dependencies. Application
+initialization never starts. Reuse/remote-browser/PWDEBUG flags are false. The
+runtime repair candidate is **Playwright 1.64.1**, whose inspected official WebKit
+2370 bundle contains fixed libsoup 3.6.6; old local and qualified bundles contain
+3.6.5. The specific upstream native defect is a supported inference, not a claim
+that a security reproducer was executed. See the new QA section for archive hashes,
+reports and exact failed/passed/incomplete counts.
+
+The old-runtime debug run **41358705036** completed successfully (90 prefix + 60
+traced cases), so no CI process is currently live. Earlier cancelled/pending/live
+notes below are historical. The temporary CI branch is now **`f30e65e`** and its
+latest run is terminal. Additional local transfer/cancellation controls and both
+54-case exact-runtime observer/control selections passed without reproducing the
+host fault. The next work is the minimal supported runtime update, preserving
+device geometry, then qualified before/after evidence and full acceptance.
+
+- Diagnostic PR [#264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264)
+  is open and non-draft. Main advanced when #256 merged to `78a3f75`; integrated
+  cleanly and pushed as **`cdc39cf`**. This PR adds bounded test failure evidence;
+  it changes no application, asset, dependency, build or browser configuration.
+- OpenSpec change `issue-263-webkit-reload-boot` is **2/7 complete**: original
+  evidence recovery (1.1) and diagnostic publication (1.3). The causal witness
+  (1.2), repair (2.1), repair integration proof (2.2), full acceptance (3.1) and
+  final project handoff (3.2) remain open. Use live `openspec instructions apply`
+  for exact task locations before changing checkboxes.
+- Final diagnostic code `495d08d` is unchanged by main integration. On clean
+  **`cdc39cf`**, build/content/both types passed; ordinary root-preview exploration
+  passed **54/54 WebKit and 54/54 Chromium**, one worker, no retries/skips.
+  Both matrices preserve the original selected IDs/titles. The byte-unchanged
+  two-engine privacy/bounds contract and final helper typecheck also pass.
+  [QA](../qa/issue-263/README.md), manifests and `integrated-source.json` retain
+  source/build/browser/mode identities and all earlier attempts.
+- A traced combined-tree attempt had 53 WebKit passes and one 250-floor budget
+  failure (3421ms vs unchanged 2500ms). Its attachment shows boot ready at 384ms,
+  styles loaded and no request/page error: a different symptom from #263.
+  **Literal main `78a3f75`** reproduced the same assertion on one of three traced
+  repetitions (3757ms); all three ordinary repetitions passed. Keep both failed
+  traced attempts separately; no limit/assertion was relaxed and neither failure
+  establishes #263's cause.
+- Original archive: WSL `/tmp/tactics-issue263-evidence/original-41320149918.zip`,
+  590,452,011 bytes, SHA-256
+  `9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
+  Selected CRC-validated reports, error context and pre-failure screenshot are
+  committed under `docs/qa/issue-263/`. Original failure: missing screen for 60s
+  during a later locked-stair fixture load, after successful round-trip travel.
+  The artifact has no failure trace or request/exception ledger.
+- Local exact-runtime checkout `/tmp/tactics-issue263-failing` is pinned to
+  `9b543cb`. Original build/browser checks passed; desktop WASD 5/5, all stair
+  inputs/profiles repeated five times 60/60, and 300 goto/reload pairs passed.
+  Some passing navigations cancelled an unfinished `items` module request;
+  cancellation is observed but not sufficient to establish the stall.
+- A corrected bounded cached-stylesheet probe found no synchronous/missing load
+  events in 2,000 insertions. Its first event-checkpoint mistake and correction
+  are retained in QA. Original/local exact-runtime build logs have matching sets
+  of 28 generated JS/CSS names, without an original served-byte comparison.
+- The native module parser inspected all 22 exact-runtime JS chunks without
+  evaluation: no static import cycle, no dependency importing the entry, and
+  no top-level await in the dungeon route's static closure. The graph is retained
+  in QA. Loading/native import or synchronous initialization still need actual
+  failure evidence; no source-level wait-cycle repair is justified by this graph.
+- Other checkouts: `/tmp/tactics-issue263-main` (older diagnostic qualification),
+  `/tmp/tactics-issue263-integrated` (clean tested `cdc39cf`), and
+  `/tmp/tactics-issue263-current-base` (literal `78a3f75` comparison). Common logs,
+  reports and traces are under `/tmp/tactics-issue263-evidence/`. All local checks
+  above are terminal; do not poll old exec handles as live.
+- Runner attempt **41343197332 was cancelled while pending, zero jobs executed**.
+  It supplies no evidence. At last read, another owner's full capture
+  **41337233629** was in progress and browser setup **41344487694** was pending.
+  Recheck those specific runs and the queue; submit ours only when it will not
+  replace another pending request. A live queued/running job is a verified wait,
+  not a reason to restart it.
+- Temporary CI branch `branch/issue-263-runner-diagnosis` is pushed at **`4d4fd5b`**,
+  separate from #264. Its native worktree is `tmp/issue263-runner-worktree`.
+  Dispatch existing `browser-setup.yml` on that branch when the queue permits.
+  It checks out exact failed runtime `9b543cb`, overlays only the observer/one test
+  import, records hashes and builds, then runs original WebKit exploration order
+  **untraced** (preserving the embedded budget check) followed by five stair
+  repetitions with failure traces. One worker, zero retries, exclusive lock and
+  a two-failure diagnostic stop are explicit; partial runs cannot satisfy final
+  acceptance. Never introduce a hosted fallback or interrupt another owner's job.
+- Use native Git for checkout/commit/worktrees. Authenticated WSL network Git works
+  from the primary checkout; Windows worktree `.git` pointers cannot be read by
+  WSL Git. Push the CI branch from the primary repository using its explicit ref.
+- Next: refresh runner/PR/main state, resubmit the bounded diagnosis when safe,
+  recover any failure attachment/trace and identify the owning boot cause.
+  Stack a focused repair PR on #264 when ready. Preserve #257/#258 separately
+  unless evidence connects their causes. Then fulfill the original full-run gate.
+  User authorization includes implementation, fixes, commits/pushes and focused
+  review-ready PRs; it does not request merging, deployment or a release tag.
+
+- Issue: [#263](https://github.com/luminari-gurus/tactics-guru-v2/issues/263).
 - Assignee: `moshehbenavraham`, verified through the connected GitHub account and CLI.
-- [Pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/166#issuecomment-6481328751).
-- Base: fetched `origin/main`, `7cea1e9071c922b8a27cefe105d2fe069bc82a56`.
-- Work branch: [branch/issue-166-goblin-shaman](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-166-goblin-shaman).
-  Created and published after writing this plan, from the base above, using
-  GitHub's native linked-branch operation for #166. Development association:
-  `LB_kwDPAAAAAWJCX-bOAQIPrQ`. This branch carries the committed planning changes;
-  final remote parity is checked at handoff.
-- Related foundation: [#161](https://github.com/luminari-gurus/tactics-guru-v2/issues/161).
-  Contribute only its Shaman save/heal/debuff slice; retain its existing owner and
-  remaining acceptance. [#170](https://github.com/luminari-gurus/tactics-guru-v2/issues/170)
-  retains the wider forest roster.
-- Previous root plan: [Mage #165](issue-165-mage-frost-snare-plan.md), preserved
-  byte-for-byte with SHA-256
-  `db6c03a113d4ecfa7e8b18fe7142324198acff9b5a7a7af0d1853ae4b4d128f9`.
-  Its QA backlink is updated. Its historical PR-ready wording is preserved;
-  PR #250 is now merged and #165 is closed.
+- [Pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/263#issuecomment-6562475276).
+- Base: fetched `origin/main`, `a8b87c199fb2ae171a9bb72961ac7114622c4d60`.
+- Work branch: [branch/issue-263-webkit-reload-boot](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-263-webkit-reload-boot),
+  created from the base above using GitHub's native linked-branch operation for
+  #263. Development association: `LB_kwDPAAAAAW6Z0HjOAQNTDQ`.
+- Related work: [#153 / PR #256](https://github.com/luminari-gurus/tactics-guru-v2/pull/256),
+  [#257](https://github.com/luminari-gurus/tactics-guru-v2/issues/257), and
+  [#258](https://github.com/luminari-gurus/tactics-guru-v2/issues/258).
+  Their owners and remaining acceptance stay with those trackers.
+- Previous root plan: [Goblin Shaman #166](issue-166-goblin-shaman-plan.md),
+  preserved byte-for-byte; SHA-256
+  `aee5f94a745a9424eb26bcec41ca2900e823152d4f4eabc93ceba975fa5b02a1`,
+  Git blob `0bb94476c1db94b1fc3ffcd21696e8718125bb26`.
+  Its three specific backlinks are updated; general current-project links still
+  point here.
 
-## Selection and available work (pickup snapshot)
+## Selection and available work
 
-Reviewed all 30 open issues, their bodies/ownership/dependencies, the three open
-PRs, local/remote branch inventory, current source and uncompleted OpenSpec tasks.
-REST pagination returned 33 issues/PRs on page 1 and zero on page 2; GraphQL
-independently reports 30 open issues with no next page. Repository, organization
-and authenticated-user Projects v2 inventories each report zero projects; all
-open issues have zero project memberships. No project draft work items are
-available in those inventories.
+Reviewed all **33 open issues and four open PRs**, including issue bodies,
+ownership, dependencies, active branches, relevant comments and unfinished
+OpenSpec performance-qualification work. REST pagination and GraphQL agree on the
+issue count; GraphQL has no next page. Repository, organization and authenticated
+user Projects v2 inventories each contain zero projects; no open issue has project
+membership or an existing linked branch at this pickup snapshot. No additional
+project draft items were exposed by those inventories. The `ready for work` label
+was not an eligibility filter, and #263 has only `bug`.
 
-#166 is the oldest unassigned **high-priority concrete combat slice**. It adds a
-distinct support enemy and supplies the first Will-save/accuracy-debuff consumer
-for #161, supporting later parity work. It does not have `ready for work`; that
-label was not an eligibility filter. #159's encounter foundation and #160/#163/
-#164/#165 are closed and merged. #161 is an incremental foundation, not a gate
-requiring all future mechanics first: its body and `docs/combat-effects.md`
-explicitly require implementing remaining primitives with their real consumer.
-No branch, linked branch or open PR currently owns #166.
+**Choose #263 for immediate reliability and delivery value.** It is unassigned,
+has a concrete recurring failure across WebKit desktop/portrait/landscape, and
+blocks acceptance of the main-menu work. A reported 60-second stall survived an
+existing readiness mitigation. Diagnosing it now also improves the quality of
+future save/lifecycle verification. This is a priority judgment, not a claim that
+the issue has a P1 label or that its cause is already known.
 
-Other work was considered as follows:
+The rest of the backlog was considered as follows:
 
-- #85, #128, #155, #161, #162, #200, #208 and #219 already belong to `dubstylee`.
-  #155 has PR #246; #208 is explicitly blocked on isolated runner capacity;
-  #200 is acceptance/timing follow-up, not fresh tooling implementation. #161/
-  #162 have delivered slices and open umbrella acceptance. Their historical
-  text does not justify taking over ownership or calling them complete.
-- #167/#168/#169 are subsequent high-priority consumers with push/charge/typed
-  damage or Graveyard coordination. #166 is earlier and its exact support rules
-  are recoverable from pinned source. #170 is a content epic requiring slices.
-- #172 is the strongest medium-priority gameplay alternative and helps #174.
-  #173/#174/#175 still require equipment/reward/currency/unlock policy decisions.
-  #176 and #153 are useful, but menu destinations/record boundaries need choices.
-  PR #237 remains separate combat-UI design work.
-- #177/#184 are independent medium-priority planning/generation expansions;
-  #183 is a useful independent documentation reconciliation. They provide less
-  immediate core-combat progress than the selected high-priority support enemy.
-  #171 is hazard work coupled to damage/movement semantics. #178/#179/#180/#181/
-  #182 are lower-priority view/export/audio/convenience/editor work. #185 explicitly
-  defers unresolved class-stat design. #199 is the DevOps parent, not one delivery.
-- Open PR #12 remains a separately controlled deployment proposal. Uncompleted
-  historical #127 OpenSpec follow-ups do not establish a new unclaimed issue.
+- #257 and #258 are the closest alternatives: older runner-readiness and route
+  module-load failures. Their original reports lack the decisive underlying
+  exception/request evidence. Compare symptoms during #263, but do not assume a
+  shared cause or silently expand this issue into all startup failures.
+- #167 is the strongest next high-priority combat feature; #168/#169 follow with
+  charge/stacking or typed-damage/Graveyard policy. #170 is an epic and #171 needs
+  hazard-ordering coordination. They remain useful after the current boot blocker.
+- #172/#173/#174/#175 have real gameplay value but still need bounded item,
+  acquisition, reward or currency decisions. #176 needs record-boundary policy;
+  #184 needs generation-equivalence/determinism decisions. #261/#262 need visibility
+  or visual-treatment decisions. #185 explicitly defers implementation until its
+  class-stat mapping is resolved. None outranks the observed reliability defect now.
+- #178/#179/#180/#181/#182 are independent lower-priority presentation, history,
+  audio or developer-tool work. Their readiness labels do not establish greater
+  urgency than a failing boot/continuation path.
+- #85/#128/#153/#161/#162/#200/#208/#219/#254 already belong to `dubstylee`.
+  #153 has PR #256 and #254 has PR #260. #208 is blocked on isolated runner
+  capacity; #200 is baseline acceptance, not unclaimed tooling implementation.
+  #161/#162 are incremental/umbrella work with delivered consumers. Preserve those
+  owners and their actual open criteria, including any stale bookkeeping.
+- #259 is explicitly blocked by #153/#256 and changes persistence policy; taking
+  it now would mix a separate behavior change into unresolved menu integration.
+  #199 is the DevOps epic, with child work already implemented or separately owned.
+  Outstanding #127 OpenSpec performance qualification is retained as existing work,
+  rather than used to launch another unrelated performance campaign.
+- PR #237 is a separate design-only combat UI draft. PR #12 is an unselected
+  release/SSH draft with explicit operator boundaries. Neither is a new pickup.
 
-No unrelated issue is closed, reassigned or relabeled by this pickup.
+## Evidence and implementation boundary
 
-## Outcome and non-goals
+The issue reports [run 41320149918](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41320149918)
+at **`9b543cbafecf1cce48f966ff1d8998a46a7ae32d`**, with a desktop-WebKit `wasd`
+stairs reload timeout after 60 seconds, 98 passing exploration cases and the
+other 18 stages passing. Earlier portrait/landscape failures are recorded on the
+issue. The Actions API confirms this exact run SHA, failed conclusion and an
+unexpired `full-verify-41320149918-1` artifact (ID `13093858052`, about 590 MB).
+Detailed failure claims above come from the issue; this planning pass has not
+downloaded/reanalyzed the full artifact or reproduced the failure.
 
-Deliver a validated Goblin Shaman with Basic Attack, Weakening Hex and Heal
-Goblin, reachable through deterministic dungeon Forest Ruins content. Pure shared
-previews, resolution, AI and presentation must agree; a complete legal seeded
-battle must preserve exact continuation through save/reload and replay.
+Read the exact failing revision and the current PR #256 branch before diagnosis;
+the inspected current PR head is `c2e3c56f9752789bc77bf05946d4852c83d6cbc0`.
+Main does not yet contain its `whenGameReady`, `data-boot` or shared Continue wait.
+Use isolated diagnostic checkouts of the failing revision, literal main and the
+integration candidate. Keep this branch based on main; do not import the whole
+menu PR or change another owner's branch. If the defect needs menu-only code,
+record that dependency and carry the smallest repair through reviewable integration.
+Recheck those refs at implementation time because both PRs are active.
 
-Preserve the standalone six-spawn canonical battle and authored-run/generated
-desert rosters. Preserve approved Fighter/Ranger/Mage mechanics, movement/action
-locks, deterministic streams and recovery/export behavior. New Shaman art is
-source-pinned and bounded by existing loading budgets.
+The traced boot path is `index.html`'s module entry → static entry imports and
+route selection in `src/main.ts` → dynamic `startDungeonApp` import and its static
+dependencies → session/screen construction → Phaser startup → saved continuation.
+`startDungeonApp.ts` imports `BattleScene` and `phaser/start.ts`, whose static graph
+imports Phaser and other scenes. A missing dungeon screen narrows the observation
+to before its append; it does **not** identify a specific import, engine bug,
+network failure, clock issue or save defect. The main catch handles rejected
+imports, while a promise that never settles may leave the original Loading shell.
+Dungeon telemetry is intentionally disabled, and `reportFailure` without a bound
+sink is insufficient evidence capture for this case.
 
-Non-goals: the full #161 effect engine, broader #170 roster, new hero buttons,
-typed damage/resistance, hazards, push/charge, generic resource/stack scripting,
-new services/dependencies, UI redesign, telemetry schema expansion, save migration,
-production deployment. The implementation authorization covered testing, commits,
-pushes and focused review-ready PRs, including dependent stacks. On 2026-10-30 the
-caller additionally authorized sequential merges, completed-issue closure and safe
-branch/worktree cleanup; release qualification and deployment remain separate.
+**Outcome:** identify and fix the cause of WebKit's post-reload boot stall; retain
+saved progress and normal recovery; pass WebKit exploration in a complete
+full-verification run across all three WebKit profiles, as #263 requires.
 
-## Implementation handoff (live)
+**Non-goals:** menu design, testing-route save isolation (#259), enemy behavior,
+combat/content changes, save-format migration, new telemetry collection, a new
+boot framework, dependency upgrades without a demonstrated cause, or deployment.
 
-Snapshot: 2026-10-30. **9/9 OpenSpec tasks complete**. Implementation,
-qualification and publication are complete. Foundation #251 is merged as
-`34235bf9dae66fdf63ac75cf6b0b90154a93cc0d`; #252 targets main for final merge.
-Main's intervening #253 changes only documentation. Its enemy-turn conflict is
-reconciled with Shaman scoring/support goals, and save-version descriptions agree
-with 5/6/7/9. All code/test inputs match the qualified functional source.
-No browser jobs are active. Both owned pipelines finished successfully.
+## Ablation: smallest complete approach
 
-- Foundation: `branch/issue-166-goblin-shaman`, functional head **03b1e899ad091ba79ba65b08487204427b23de1e**,
-  [PR #251](https://github.com/luminari-gurus/tactics-guru-v2/pull/251), merged.
-- Runtime: `branch/issue-166-shaman-support`, frozen functional source
-  **f4616ae301da4be133455334d4c2b38e3583c8f7**, dependent [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252).
-  Later commits update documentation/evidence only. The complete packet is
-  published. #252 and #166 contain the authoritative merge/closure state.
-- Main **b343ab0** (#246/#155) is integrated through the parent. All seven
-  conflicts are resolved. State/rules/run/dungeon versions are **5/6/7/9**;
-  moving encounters and current-format legacy exploration are retained. Exact
-  prior format-7/8 bytes remain recoverable/exportable without migration.
+- Keep browser-side failure evidence installed before navigation: failed requests,
+  HTTP failures, page/console errors, boot milestones and a bounded shell snapshot.
+  Install it outside the suspect route graph where necessary; late diagnostics
+  inside a module that never executes cannot distinguish this failure.
+- Reuse existing Playwright attachments, tracing, diagnostics/build identity and
+  verification receipts. Record only bounded allowlisted paths/status/timing and
+  sanitized errors; do not attach arbitrary storage, full URLs with query secrets,
+  save payloads or unrestricted console dumps. Synthetic-save hashes can prove
+  retention without exposing player data. Add runtime diagnostics only if the
+  reproduced failure demonstrates a persistent consumer for them.
+- Retain the current recovery message and save-preservation contract. Select the
+  code fix from evidence: network/module evaluation, initialization lifecycle,
+  engine readiness or a test-clock interaction remain hypotheses. If it is a
+  harness defect, repair that cause and prove production reload still works.
+- Drop timeout increases, automatic reload/import retries, skipped assertions,
+  profile removal, duplicate startup paths, global telemetry enablement and general
+  performance cleanup as proposed solutions. They do not establish root cause.
+- Keep full qualification because #263 explicitly requires it. Use focused cases
+  during diagnosis; one successful repetition or an old passing full run cannot
+  establish this issue's acceptance.
 
-Delivered: source-pinned Shaman stats/art, atomic exact Will-save Hex, one-source
-non-stacking Weakened, capped allied goblin healing, shared stable support AI,
-dungeon-only Forest Ruins composition and existing-surface save/heal/status feedback.
-The support-goal MapCell/x-y defect and fixed-frame backup test assumption are
-repaired. The existing strict reader and every acceptance assertion remain.
-
-### Qualified evidence
-
-[QA](../qa/issue-166/README.md) and its
-[19-family ledger](../qa/issue-166/full-run/qualification.json) contain the current
-acceptance mapping and immutable manifests. Fresh combined-source results:
-**1,069 units**, both type scopes, **two** root/prefix header integrations,
-production bundles, **18 performance samples**, and **360 passing browser
-executions**. Six expected preview map skips pass in their owning dev mode.
-One worker, zero retries/flaky cases, serial GPU use. Engines: Chromium
-**153.0.8010.12**, WebKit **26.6**, Playwright **1.63.0**; device emulation meets
-caller acceptance. Linux Node 24.15.0/npm 12.0.2. The parent separately passes
-**1,032 units** and its type/build gates; published foundation-main receipts are
-linked from #251.
-
-All four production witnesses pass all six profiles. Shaman **31** has 54 accepted
-commands, failed natural 5 and successful natural 13 saves, two heals, active
-Weakened reload/expiry and victory. Its six raw files are byte-identical:
-**e2c0cc8be5e8bfb307cc4e476d436ae4a01fdaca04dc448df7a3adf64fca5456**.
-Fighter **28** retains six battles/level three/heal/Taunt/depth-2-slot-2 defeat;
-Ranger **2** retains Mark/Pin/level three/defeat; Mage **12** retains Snare/multiple
-missiles and terminal replay. Actual states/events/RNG and continuation match.
-
-Input hash: **4946258a18330a0ef7cd1709bbc31971f19f8be5b1408858af70f78686d6f575**.
-Root/restored: **9f7ee2225f09d687a0b2c90daa12df4370417b79c5abba693ace3222b50b16d1**.
-Prefix: **86f20f9cf35f9e4b5f878b9964cb19a99c7fbd28822b28f55a1134bda5c57f40**.
-Root restoration is exact; source/test/config/dependency inputs after the frozen
-head are unchanged (native checkout newlines are recorded separately).
-
-Original full source **4e765f8** remains **failed**: all 19 stages executed,
-17 passed/two failed; 1,286 browser passes/nine failures/nine expected skips.
-Bounded repair **28cba2a** passed 1,049 units and 80 fresh browser executions.
-The merged source then refreshed all affected movement/dungeon/restart/build
-consumers. Unchanged families retain explicit valid reuse. This is not labeled a
-clean new full-suite run. Original Fighter/readiness failures, the 3,844-ms cold
-overrun and controlled passing base/repair repeats remain intact; its timing cause
-is unestablished. Current cold-history cases pass unchanged budgets.
-
-Portable evidence: `docs/qa/issue-166/full-run/{aggregate,repair,foundation-main,integration}/`.
-The current packet retains receipts, expanded unit metadata, reports/logs, all
-actual traces, representative reviewed screenshots, hashes and reproduction
-recipes. Raw data remains in **/tmp/tactics-issue-166-20261029**; current outputs
-are under `tmp/issue166/integration-{browsers,dev-map,assets}/`. The original raw
-full tree is `tmp/verification/full-2026-10-28T22-38-13.070Z-3061420/`.
-Do not rerun application suites for final docs-only metadata.
-
-### Review handoff
-
-Strict OpenSpec validation passed. The final audit verifies **52 local links**,
-**71 packaged artifact hashes**, all 19 policy families and the untouched Mage
-archive. A checkout-only JSON newline conversion was restored after confirming
-the Git blob already matched its original hash. Git input comparison and the
-combined merge tree are clean; source/build evidence is retained unchanged.
-
-Both branches were published. #251 merged first and #252 now targets main with
-Closes #166 / Refs #161; #161/#170 wider scope stays open. All 71 packaged artifact
-hashes were rechecked. The retained source-bound evidence applies because the
-combined runtime, tests/helpers, configuration, dependencies, assets and build
-inputs are unchanged; the merge reconciliation is documentation only. Original
-full-run failures remain explicit above. OpenSpec archive/sync follows when
-requested. See the PRs for final merge commits and #166 for closure; completed
-branches can be removed after their heads are verified as ancestors of main.
-
-Task-created scratch scripts/probes are removed after preserving reproduction
-recipes; raw failures, screenshots, traces and receipts remain available at the
-paths above. No browser or queue job remains active. No implementation work is
-left open in this change.
-
-Use native Git for checkouts/merges in the Windows checkout; WSL reports CRLF files
-as modified despite native clean status. Authenticated WSL fetch/push is available.
-The independent Linux testing checkout is clean at the qualified functional head.
-
-## Evidence and proposed implementation decisions
-
-Legacy evidence is pinned to `e9433f6b608ae6b2d95418615cce9cf17dadcf74`:
-[Shaman stats](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/content/classes/goblin_shaman.tres),
-[Hex](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/content/abilities/weakening_hex.tres),
-[heal](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/content/abilities/heal_goblin.tres),
-[Weakened](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/content/status_effects/weakened.tres),
-[resolver](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/CombatResolver.gd#L775-L824),
-[AI](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/AIController.gd),
-and [turn countdown](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/combat/TurnManager.gd#L184-L225).
-The following reviewed v2 adaptations define this change's implementation contract.
-Live progress and qualification are tracked above and in QA; deliberate departures
-from legacy behavior are stated explicitly below.
-
-1. **Content and placement.** Baseline HP 10, move 4, jump 1, accuracy 3, AC 11,
-   power 2, Dexterity 1, Will 3. Extend the closed enemy/ability catalog and exact
-   validators. Add one stable `forest_ruins_shaman_v1` dungeon composition that
-   replaces grunt spawn ID 6 with the Shaman, retaining the archer and other grunt,
-   coordinates and IDs. Select it for the existing dungeon Forest Ruins map;
-   standalone and authored-run map spawns remain unchanged. Preserve existing
-   map/biome selection RNG and scaling; catalog identity changes deliberately.
-   Prove legal spawn routes and living-party subsets on the dungeon map variant.
-2. **Hex.** Hostile living target, Manhattan range 2–4 and existing blocked-LOS
-   rule. Roll exactly one d20 after complete preflight: `d20 + target.will >=
-   10 + projected caster.power` saves (baseline DC 12); natural 1/20 have no
-   automatic save outcomes. Publish exact success/failure face counts and the
-   rolled result. A failed save applies accuracy −2 once through `combatStats`;
-   no damage, AC, Will, movement or automatic-Magic-Missile change. End the target's
-   next turn to expire. Store one bounded Shaman source reference: reapplication
-   refreshes/replaces, never stacks; a successful save leaves an existing debuff
-   intact. Follow v2 control-effect convention and clear on source/target defeat
-   and new battle entry; source-defeat cleanup is an explicit v2 adaptation.
-3. **Heal.** Same-side living injured eligible goblin, range 1–4 and LOS; apply
-   `min(4, projectedMaxHp - hp)`, without RNG. The closed eligible IDs are grunt,
-   archer and Shaman; range minimum excludes self. No name-prefix inference,
-   revival or free hero heal. Both support abilities use the ordinary one action,
-   with no additional cooldown/use pool. Full-health/dead/wrong-side/non-goblin/
-   out-of-range/blocked targets reject without state, events, budgets or RNG changes.
-4. **Immunity boundary.** #166 explicitly requires immunity proof. Admit only
-   bounded catalog immunity IDs/tags relevant here (`weakened` / `debuff`) and
-   evaluate one shared predicate in preview, resolution and AI. Do not assign
-   immunities to current production actors without source evidence. Controlled
-   validated catalog variants exercise immune targets in tests. Immune effect-only
-   casts reject before action/RNG per the v2 #161 handoff, an explicit adaptation
-   from legacy's accepted immune cast. No resistance/damage-type framework.
-5. **AI.** Extend the existing candidate pass to shared legal attack/heal/Hex
-   previews at the same reachable positions. Keep ordinary enemy choices identical.
-   Use deterministic integer scores in the existing summed-d20 damage-score units:
-   ordinary attacks retain their current score; healing scores `20 * appliedHeal`;
-   Hex scores `failedSaveFaces * max(1, targetEffectiveAccuracy + targetPower)`.
-   AI skips zero-value healing and already-Weakened/immune targets. This bounded
-   target-strength heuristic adapts legacy scoring without a new configurable AI
-   framework or preview RNG. Preserve ties by score descending, movement cost,
-   target ID, ability ID, then y/x; extend legal route goals to useful support
-   targets before Wait. Taunt restricts offensive targets, not allied healing;
-   Pin/Snare still allow a legal in-place support action or Wait. No hidden-roll
-   lookahead or extra move/action after a committed ability.
-6. **Admission, identity and continuation.** Use an exact optional Weakened source
-   field with eligible living source/target validation, following current bounded
-   fields rather than a generic effects array. Bump state format 4→5, rules 5→6,
-   run envelope 6→7 and dungeon envelope 8→9; keep RNG and standalone wrapper at 1.
-   The initial dungeon 7→8 allocation was superseded when main independently
-   introduced format 8 for moving encounters; retain exact 7/8 recovery bytes.
-   Existing content/dungeon identity hashing includes the new rule/catalog data.
-   Preserve/export previous-format bytes as incompatible through existing recovery;
-   no silent migration/reset. Retain battle-local status across active reload,
-   never carried party progression. Trace enemy healing through full snapshot
-   admission and run/dungeon aggregate limits; it must not relax hero-entry HP
-   checks or Second Wind bounds. Any changed AI replay behavior is versioned.
-7. **Assets and feedback.** Reuse pinned `art/units/goblin_shaman.png` and
-   `art/portraits/goblin_shaman_portrait.png`; record source hashes, actual
-   dimensions, foot anchor, rights uncertainty and bounded portrait export under
-   existing art guidance. No generation or bulk asset import. The current loader
-   loads all catalog images, so include the added pair's startup/transfer cost even
-   in modes without a Shaman; optimize only if measured budgets require it. Reuse
-   existing inspection/log/floating-heal presentation, add save/Weakened feedback
-   and honest ability/range/chance text. Trace audio events and telemetry allowlists;
-   retain current cue and sanitized-event contracts unless an actual consumer
-   requires a bounded update. Do not describe Heal Goblin as a spent Second Wind use.
-
-## Ablation and affected files
-
-Keep only the Shaman's real consumer and its required shared seams. Remove the
-proposed need for a general effect interpreter, configurable AI weights, full
-forest pack, new player support controls, save migration or new test harness.
-Existing discriminated abilities, exact readers, projection, AI candidate loop,
-event presentation, dungeon composition and recovery are sufficient. Retain the
-immunity seam and full qualification because explicit acceptance/shared contracts
-depend on them; dropping them would leave requirements unproven.
-
-Expected implementation owners, confirmed against current source:
-
-- `src/content/{constants,types,abilities,catalog,validate,assets}.ts`,
-  `src/content/dungeonEncounters.ts`, and the added source/runtime Shaman PNG pair
-  under `public/battle/source/` and `public/battle/portraits/`.
-- `src/domain/{types,effects,combat,battle,turns,ai,constants}.ts` and
-  `src/domain/{runSaveEnvelope,dungeonSaveEnvelope}.ts`. Inspect
-  `contentIdentity.ts`, `runBattle.ts`, `dungeon.ts` (including `dungeonBattle`),
-  `saveEnvelope.ts` and `src/app/BattleSession.ts` for identity, HP admission and
-  continuation consequences; edit only required consumers. Preserve grid/route/RNG
-  algorithms while testing their new actor and effect consumers.
-- `src/ui/hud.ts`, `src/phaser/abilityPresentation.ts`; trace `battleActions.ts`,
-  `targetPreview.ts`, `BattleScene.ts`, `src/audio/battleCues.ts` and telemetry.
-  Enemy-only support does not need new player picker actions.
-- Extend existing content/ability/state/AI/turn/session/save/dungeon unit owners,
-  `tests/dungeon.spec.ts`, affected persistence/loading/asset browser cases and
-  existing authored-encounter fixtures where isolated support coverage is needed.
-- Update `docs/combat-effects.md`, `docs/enemy-turns.md`,
-  `docs/first-battle-content.md`, `docs/dungeon.md`, related current ability/save
-  rules and `docs/qa/issue-166/README.md`. Update existing canonical enemy-turn
-  requirements where behavior changes; avoid rewriting old QA as fresh evidence.
+**Files:** likely owners are `src/main.ts`, `src/app/startDungeonApp.ts`,
+`src/phaser/start.ts`, `tests/dungeon-exploration.spec.ts` and
+`tests/helpers/dungeonTraversal.ts`. Inspect `src/app/startBattleApp.ts`,
+`src/app/startRunApp.ts`, `src/phaser/BattleScene.ts`, `src/diagnostics/browser.ts`,
+`index.html` and `vite.config.ts` as transitive consumers or diagnostic seams;
+edit only owners justified by the identified cause. Extend existing boot,
+loading/lifecycle and relevant unit tests rather than adding a parallel harness.
+Record resulting evidence under `docs/qa/issue-263/README.md` during implementation;
+update owning boot/lifecycle documentation and this plan with the actual result.
 
 ## Implementation sequence and proof
 
-1. **Freeze the rule/content contract.** Add closed catalog profiles/validators,
-   source-pinned assets and the dungeon-only composition. Add missing behavioral
-   assertions to existing test owners, including unchanged canonical spawns,
-   malformed catalog/immunity data and deterministic map/composition identities.
-2. **Resolve atomically.** Add pure Hex/heal previews, exact save arithmetic,
-   bounded Weakened projection/lifecycle/events and immutable resolution. Test
-   all 20 save faces, equality boundaries, natural 1/20, projected DC, modifiers
-   with Guarded/Mark, refresh and successful-save preservation, both defeat paths,
-   target-endTurn and RNG exhaustion. Snapshot every rejected command/preview to
-   prove no mutation/draw/spending. Healing covers partial four/full clamp and
-   every invalid ally/LOS/range case, including the last living ally.
-3. **Use the real AI/session path.** Add useful support candidates and legal
-   approach/Wait behavior. Assert exact scores/ties, unit permutations, repeated
-   planning, taunt restrictions, Pin/Snare, dead/missing targets, existing grunt/
-   archer command equivalence and no preview RNG. Drive accepted commands through
-   normal enemy turns and preserve event order and one-action locks.
-4. **Carry and explain the result.** Version all changed formats, update exact
-   compatible/incompatible fixtures, add feedback and prove standalone/run/dungeon
-   round trips, forged-source rejection, corrupted/old-format recovery with bytes
-   retained, status expiry after reload and fresh encounter reset. A legal dungeon
-   production-HUD journey must enter the actual Shaman composition, observe useful
-   Hex and ally healing, inspect Weakened/save feedback, reload active Weakened,
-   observe expiry and reach a legal terminal battle outcome. Retain commands,
-   state/events/RNG and exact continuation replay. Use separate deterministic
-   witnesses if one natural battle cannot demonstrate every save/heal branch;
-   injected fixture state alone does not prove production reachability.
-5. **Qualify and hand off.** Audit all five #166 criteria against evidence, finish
-   docs, commit/push implementation and publish focused review-ready PRs.
-   Use `Closes #166` only with complete proof; use `Refs #161` and
-   retain its wider remaining criteria. No unrelated issue closure or deployment.
+1. **Preserve and diagnose.** Recover the original artifact, failing trace/report,
+   test identity and screenshot before runs expire. Record source/build/browser,
+   runner, base path/server mode, cache, worker/retry settings and host conditions.
+   Attach bounded diagnostics before the first navigation and preserve every failed
+   attempt. Distinguish entry-script fetch, module evaluation/route import, dungeon
+   mount, Phaser READY and Continue/save admission. Check clock state across reload
+   without presuming it caused this failure. Compare exact failing source and
+   literal main under matching conditions where attribution is needed.
+2. **Reproduce and fix the owning cause.** Start with desktop-WebKit `wasd` and
+   portrait `compass`, then all four stair inputs on all three WebKit profiles.
+   Use one worker, no retries and a recorded finite repeat count (initially five
+   per affected case), with cold contexts and warm/repeated reloads. If repeats
+   pass without capturing the cause, retain the uncertainty and refine the
+   specific diagnostic boundary; do not mark the issue fixed. Add a causal
+   regression witness and apply the smallest evidenced fix. Preserve original
+   assertions and input, save, RNG and floor-travel semantics.
+3. **Prove continuation and shared consumers.** Verify saved dungeon Continue,
+   stair descent/ascent and inert arrival, exact reload state, corrupt/unavailable
+   save recovery and a legal battle continuation. Trace any changed shared entry,
+   engine or lifecycle code through standalone battle, run, proof, map and menu
+   consumers. Check root/prefix and preview/dev where the changed boundary is used.
+   Include hidden-page/BFCache/audio initialization when lifecycle ownership changes.
+   Injected request failures prove recovery, not reproduction of the original bug.
+4. **Qualify and hand off.** Run the full inventory on the final integration
+   candidate; require the complete WebKit exploration matrix without post-reload
+   boot timeouts. Retain all prior failures, skips and incomplete runs separately.
+   Publish a focused implementation PR with cause, regression proof, integration
+   dependency, source-bound results and limitations. Use `Closes #263` only when
+   both issue criteria hold. Cross-reference #257/#258 only to the extent evidence
+   establishes a relationship; their separate acceptance is not waived.
 
-The five issue criteria map respectively to content/placement proof (1),
-save/debuff/feedback proof (2 and 4), heal/atomicity proof (2), AI equivalence/
-support proof (3), and negative/complete-continuation proof (2–4).
+## Verification commands and acceptance
 
-Focused iteration commands from a supported Node/npm environment:
+Planning/publication is **documentation-only** under
+[verification-policy.md](../verification-policy.md): validate links, paths,
+commands/config selection, archive bytes, diff scope, assignment, native branch
+association and local/remote commit parity. No runtime fix or browser execution
+is claimed by this plan commit.
+
+Focused implementation commands, from a supported Node/npm environment:
 
 ```sh
-npm run test:unit -- tests/unit/content.test.ts tests/unit/abilityValidation.test.ts tests/unit/abilities.test.ts tests/unit/state.test.ts tests/unit/ai.test.ts tests/unit/turns.test.ts
-npm run test:unit -- tests/unit/battleSession.test.ts tests/unit/saveEnvelope.test.ts tests/unit/runSaveEnvelope.test.ts tests/unit/dungeonBattle.test.ts tests/unit/dungeonEncounters.test.ts tests/unit/dungeon.test.ts
+npm ci
 npm run build
-npx --no-install playwright test tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/battle-persistence.spec.ts
-npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=desktop-webkit -g 'stairs travel once per entry with wasd' --repeat-each=5 --retries=0
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'stairs travel once per entry' --retries=0
+npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/dungeon.spec.ts --retries=0
+npm run verify:full -- --list
 ```
 
-Final qualification is **full regression** under
-[verification-policy.md](../verification-policy.md): shared commands/AI/effects,
-versioned save admission and cross-route consumers change. Discover selection
-with `npm run verify:full -- --list`, then run `npm run verify:full` on qualified,
-otherwise idle capacity or use the existing complete serial-batch ledger. Account
-for all 19 stages: tooling, units/content, both type scopes, root/prefix build
-integrations/bundles, default Chromium, dev fixtures/placement, both WebKit
-matrices, health bars, both configured telemetry modes, root/prefix assets,
-exclusive performance capture and restored root build. Use test discovery to
-prove new journeys are selected on Chromium and WebKit desktop/portrait/landscape;
-add only explicitly missing selection, preserving prior IDs and metadata.
+Discover each selection with `--list` before execution and record exact test IDs.
+Add only the existing consumer-specific checks the diagnosed patch needs; select
+unit owners after identifying the cause. Both TypeScript scopes/content validation
+are included in `npm run build`. Preserve build-input identity and separate
+preview/dev, root/prefix and configured telemetry results.
 
-Keep one browser worker, serial GPU/performance use and the existing self-hosted
-CI lock; there is no automatic GitHub-hosted fallback. Device emulation satisfies
-acceptance under AGENTS.md. Local `CAN_TEST_MOBILE=android` describes availability
-only; physical-device work is neither required nor claimed. Preserve source/build
-hashes, commands, test IDs, mode/engine/host and all failures/skips/incomplete runs.
-Reuse prior results only with unchanged relevant inputs and retained provenance;
-#165 evidence does not qualify changed Shaman rules or the new build.
+**Final tier: full regression**, required explicitly by #263 and potentially by
+the shared startup/lifecycle seam. `npm run verify:full` accounts for all 19 stages;
+the current source also has separate extended dungeon journeys via
+`npm run test:extended` and `npm run test:extended:webkit`. Account for those
+consumers when a shared boot change reaches them. On self-hosted Actions use the
+existing `issue-200-baseline.yml` `capture` workflow and complete serial receipt
+ledger where appropriate, with exact source/build identity and all stages present.
+Do not substitute a partial green rerun for the issue's complete full-run gate.
+Re-inventory selection against the final integrated source.
 
-## Planning validation and estimate (historical)
+Keep `[self-hosted, tactics-browser]`, `tactics-browser-exclusive`, one browser
+worker and serial GPU/performance use. No automatic GitHub-hosted fallback.
+Playwright desktop and emulated portrait/landscape satisfy device acceptance under
+AGENTS.md; physical hardware is not required or claimed. Preserve useful prior
+evidence only when its relevant inputs are unchanged and provenance is available.
 
-Planning checks passed: source/acceptance tracing, 21 local links across the three
-changed documents, 15 named test
-paths, traced source paths and command/script consistency.
-`node scripts/verify-full.mjs --list` discovers all 19 stages without execution.
-Direct installed Playwright CLI discovery selects 105 default cases in the three
-listed files and 48 WebKit cases in the two listed files. These are selection
-checks of existing tests, not Shaman runtime evidence. The archive's raw hash and
-Git blob match the previous root plan. Before publication verify
-`git diff --check`, only the plan/archive/backlink file scope,
-native issue/branch association, assignment and local/remote commit parity.
-No application/browser test execution is required or claimed for this prose change.
-The native Windows shell has Node but no npm/gh on PATH; authenticated WSL gh is
-available. Runtime qualification later needs the supported npm/browser environment.
+## Planning validation
 
-**My implementation estimate: 7–11 hours of elapsed working time after an
-implementation request**, comprising 2–3 hours for rules/state/save admission and
-focused units, 1–2 hours for content/assets/AI, 1–2 hours for feedback and legal
-continuation journeys, and 3–4 hours for full qualification, focused repairs and
-evidence/PR handoff (some tasks overlap). Allow **12–15 hours** if legal support
-witnesses, WebKit behavior or existing regressions need substantive repair.
-This estimates my execution, not a human engineer's schedule or a guaranteed
-deadline; runner queues/offline waits, review, merge and deployment are excluded.
+Planning validation: full-stage discovery lists 19 stages; direct installed
+Playwright CLI discovery selects five repetitions of the desktop-WebKit `wasd`
+case, all 12 WebKit stairs cases, and 99 Chromium cases across the three named
+dungeon files. These checks discover selection without starting servers or
+browsers; they do not reproduce the defect or qualify runtime behavior. Archive
+SHA-256 and Git blob match the previous root plan. Local-link/path validation,
+`git diff --check` and final branch/assignment/remote readback complete publication.
+
+## Estimate for my implementation
+
+**6–10 hours of my elapsed working time after implementation starts**: roughly
+2–4 hours to recover evidence/reproduce/isolate the cause, 1–2 hours for the repair
+and causal regression, and 3–4 hours for focused integration checks, full serial
+qualification and evidence/PR handoff (some work overlaps). The latest reported
+full capture itself occupied about 2 hours 24 minutes, so qualification is a
+material part of this estimate.
+
+Allow **12–16 hours** if the intermittent stall needs a new causal witness,
+menu integration moves substantially, or an engine-level repair is required.
+Runner queue/offline waits, external review, merge and deployment are excluded.
+This is my execution estimate, not a human engineer estimate or a guaranteed
+deadline. Until a causal witness exists, the diagnostic portion is uncertain.

@@ -2,7 +2,7 @@
 
 ## Context
 
-See proposal.md for motivation and docs/ongoing-projects/plan.md for the reviewed
+See proposal.md for motivation and docs/ongoing-projects/issue-166-goblin-shaman-plan.md for the reviewed
 legacy evidence and full acceptance map. The current catalog has closed actor IDs,
 discriminated abilities, exact readers, pure previews, bounded source effects and
 an ordered enemy candidate pass. These existing seams own the new consumer.
