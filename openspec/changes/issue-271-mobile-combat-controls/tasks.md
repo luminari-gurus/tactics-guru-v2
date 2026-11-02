@@ -13,5 +13,5 @@
 
 ## 3. Tests, spec and verification
 
-- [x] 3.1 Playwright: mobile-portrait/landscape hold, tap, pan vs hold, sub-ring, hub cancel, End turn, undo, danger, reduced motion, orientation; WebKit grep hold/tap/cancel/End turn.
+- [x] 3.1 Playwright: mobile-portrait/landscape hold, tap, pan vs hold, sub-ring, hub cancel, End turn, undo, danger, reduced motion, orientation, one-line labels; WebKit grep hold/tap/cancel/End turn/labels.
 - [x] 3.2 Keep desktop battle files passing; typecheck, unit tests, build, and the listed Playwright suites.

@@ -44,6 +44,10 @@ The settings menu SHALL offer Auto (default), Radial and Rail. Auto SHALL use th
 ### Requirement: Mobile radial hold and tap
 On the radial skin, a 300 ms still press on a unit or tile SHALL open a labelled radial with slices from the held cell. A drag past the pan threshold before 300 ms SHALL pan and SHALL NOT open the radial. A lift before 300 ms with little movement SHALL open the same radial (tap fallback). `prefers-reduced-motion: reduce` SHALL skip the hold timer and radial animation. Holding SHALL never be the only path.
 
+#### Scenario: Labels fit the slices
+- **WHEN** the radial is open on a phone, including after movement is spent
+- **THEN** every visible slice, hub, Plan move, and sub-ring label sits on one line without breaking a word, shrinking its font down to a readable minimum rather than wrapping, and the Plan move chip does not overlap Inspect
+
 #### Scenario: Empty reachable tile
 - **WHEN** the radial opens on an empty reachable tile
 - **THEN** Move is the default slice, Inspect is available, and Attack and Special are disabled with a reason

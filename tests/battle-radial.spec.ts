@@ -43,6 +43,31 @@ async function livingEnemy(page: Page) {
   return { current, enemy };
 }
 
+async function radialLabelProblems(page: Page) {
+  return page.locator('#battle-radial').evaluate(root => {
+    const issues: string[] = [];
+    const hubText = root.querySelector('#battle-radial-hub')?.textContent ?? '';
+    if (/unavailable:.*unavailable:/i.test(hubText.replace(/\s+/g, ' '))) issues.push(`duplicate hub reason: ${hubText}`);
+    for (const el of root.querySelectorAll<HTMLElement>('strong, span')) {
+      if (el.closest('[hidden]') || !el.textContent?.trim()) continue;
+      const style = getComputedStyle(el);
+      const nowrap = style.whiteSpace.includes('nowrap');
+      const lines = el.getClientRects().length;
+      if (!nowrap || lines > 1) issues.push(`wrap (${lines}): ${el.textContent}`);
+      const overflow = el.scrollWidth > el.clientWidth + 1;
+      const abbreviated = style.textOverflow === 'ellipsis' && parseFloat(style.fontSize) <= 10.5;
+      if (overflow && !abbreviated) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
+    }
+    const plan = root.querySelector('#battle-radial-plan')?.getBoundingClientRect();
+    const inspect = root.querySelector('#battle-radial-inspect')?.getBoundingClientRect();
+    if (plan && inspect && plan.width && inspect.width
+      && !(plan.right <= inspect.left || plan.left >= inspect.right || plan.bottom <= inspect.top || plan.top >= inspect.bottom)) {
+      issues.push('plan overlaps inspect');
+    }
+    return issues;
+  });
+}
+
 test('radial hold opens labelled slices on a reachable tile', async ({ page }) => {
   await ready(page);
   const { cell, current } = await reachableEmpty(page);
@@ -214,6 +239,24 @@ test('orientation change keeps the radial End turn control usable', async ({ pag
   await tapBoard(page, cell);
   await expect(page.locator('#battle-radial')).toBeVisible();
   await page.keyboard.press('Escape');
+});
+
+test('radial labels stay on one line without overflowing', async ({ page }) => {
+  await ready(page);
+  const { cell } = await reachableEmpty(page);
+  await tapBoard(page, cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  expect(await radialLabelProblems(page)).toEqual([]);
+  await page.locator('#battle-radial-move').click();
+  await expect(page.locator('#battle-undo')).toBeEnabled();
+  const { enemy } = await livingEnemy(page);
+  await tapBoard(page, enemy.cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await expect(page.locator('#battle-radial-move')).toBeDisabled();
+  expect(await radialLabelProblems(page)).toEqual([]);
+  const hub = await page.locator('#battle-radial-hub').innerText();
+  expect(hub.toLowerCase().split('\n').filter((line, index, all) => line && all.indexOf(line) !== index)).toEqual([]);
+  await page.locator('#battle-radial-hub').click({ position: { x: 44, y: 44 } });
 });
 
 test('combat controls persist Radial across a reload', async ({ page }) => {

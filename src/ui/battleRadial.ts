@@ -3,6 +3,7 @@ import type { Point } from '../geometry/iso';
 import { displayName, previewText } from './hud';
 import { BattleSelection, legalSpecials, previewAction, type RadialSliceView } from './battleSelection';
 import { CARDINAL_SLICE, type RadialSliceId, cardinalFromVector, hubContains } from './radialGesture';
+import { fitRadialLabels, stripUnavailablePrefix, uniqueHubLines } from './radialLabels';
 
 export interface RadialOpenOptions {
   readonly mode: 'hold' | 'tap';
@@ -82,14 +83,13 @@ export class BattleRadial {
     // Hold origin stays under the finger so return-to-hub cancel cannot miss a clamped disk.
     const origin = options.mode === 'hold' ? options.origin : {
       x: Math.min(innerWidth - margin, Math.max(margin, options.origin.x)),
-      y: Math.min(innerHeight - margin - 40, Math.max(margin, options.origin.y)),
+      y: Math.min(innerHeight - margin - 56, Math.max(margin, options.origin.y)),
     };
     this.origin = origin;
     this.root.style.left = `${origin.x}px`;
     this.root.style.top = `${origin.y}px`;
     const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
     this.aim(def);
-    this.render();
     const live = document.querySelector('#battle-preview');
     if (live) live.textContent = this.announce();
     if (options.mode === 'tap') {
@@ -179,15 +179,6 @@ export class BattleRadial {
       if (specials.length > 1) this.subOpen = true;
     } else if (slice !== 'hub') this.subOpen = false;
     this.render();
-    const hub = this.root.querySelector('#battle-radial-hub')!;
-    if (slice === 'hub') {
-      hub.querySelector('strong')!.textContent = this.leftHub ? 'Release to cancel' : 'Release to confirm';
-      hub.querySelector('span')!.textContent = this.leftHub ? 'Nothing commits' : this.slices().find(entry => entry.isDefault)?.detail ?? '';
-      return;
-    }
-    const view = this.slices().find(entry => entry.id === slice);
-    hub.querySelector('strong')!.textContent = view?.disabled ? view.reason ?? 'Unavailable' : view?.label ?? '';
-    hub.querySelector('span')!.textContent = view?.detail ?? '';
   }
 
   private activate(slice: RadialSliceId): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
@@ -242,9 +233,8 @@ export class BattleRadial {
     });
     if (!this.cell) return;
     const preview = previewAction(this.selection.session, abilityId, this.cell, this.selection.planMove).preview;
-    const hub = this.root.querySelector('#battle-radial-hub')!;
-    hub.querySelector('strong')!.textContent = displayName(abilityId);
-    hub.querySelector('span')!.textContent = preview ? previewText(preview) : '';
+    const lines = uniqueHubLines(displayName(abilityId), preview ? previewText(preview) : '', preview && !preview.ok ? previewText(preview) : null, Boolean(preview && !preview.ok));
+    this.paintHub(lines.title, lines.subtitle);
   }
 
   private render(): void {
@@ -256,7 +246,8 @@ export class BattleRadial {
       button.disabled = view.disabled;
       button.setAttribute('aria-pressed', String(this.aimed === view.id || (this.aimed === 'hub' && view.isDefault)));
       button.querySelector('strong')!.textContent = view.label;
-      button.querySelector('span')!.textContent = view.disabled ? (view.reason ?? view.detail) : view.detail;
+      const visible = view.disabled ? stripUnavailablePrefix(view.reason ?? view.detail) : (view.id === 'plan' ? view.detail : '');
+      button.querySelector('span')!.textContent = visible && visible.toLowerCase() !== view.label.toLowerCase() ? visible : '';
       const preview = view.disabled ? view.reason ?? view.detail : view.detail;
       button.setAttribute('aria-label', view.disabled ? `${view.label}, unavailable: ${preview}` : `${view.label}, ${preview}`);
     }
@@ -273,12 +264,36 @@ export class BattleRadial {
         button.className = `battle-radial-sub n${index + 1}`;
         button.setAttribute('aria-pressed', String(ability.id === last || (!last && index === 0)));
         const detail = preview ? previewText(preview) : '';
-        button.innerHTML = `<strong>${displayName(ability.id)}</strong><span>${ability.id === last ? `Last used · ${detail}` : detail}</span>`;
+        button.innerHTML = `<strong>${displayName(ability.id)}</strong><span>${ability.id === last ? 'Last used' : stripUnavailablePrefix(detail)}</span>`;
         button.setAttribute('aria-label', `${displayName(ability.id)}, ${detail}`);
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });
         return button;
       }));
     }
+    this.writeHub(this.aimed);
+  }
+
+  private writeHub(slice: RadialSliceId | 'hub'): void {
+    if (slice === 'hub') {
+      const fallback = this.slices().find(entry => entry.isDefault);
+      this.paintHub(
+        this.leftHub ? 'Release to cancel' : 'Release to confirm',
+        this.leftHub ? 'Nothing commits' : stripUnavailablePrefix(fallback?.detail ?? ''),
+      );
+      return;
+    }
+    const view = this.slices().find(entry => entry.id === slice);
+    const lines = uniqueHubLines(view?.label ?? '', view?.detail ?? '', view?.reason ?? null, Boolean(view?.disabled));
+    this.paintHub(lines.title, lines.subtitle);
+  }
+
+  private paintHub(title: string, subtitle: string): void {
+    const hub = this.root.querySelector('#battle-radial-hub')!;
+    hub.querySelector('strong')!.textContent = title;
+    const secondary = hub.querySelector('span')!;
+    secondary.textContent = subtitle;
+    (secondary as HTMLElement).hidden = !subtitle;
+    fitRadialLabels(this.root);
   }
 }
 

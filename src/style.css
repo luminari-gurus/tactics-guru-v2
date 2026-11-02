@@ -130,23 +130,27 @@ dialog button { touch-action: manipulation; }
 .battle-mode [data-combat-controls] label, .menu-dialog [data-combat-controls] label { display:flex; align-items:center; gap:8px; min-height:44px; }
 .menu-dialog [data-combat-controls] { border:1px solid #b49a61; border-radius:6px; padding:8px 12px; margin:12px 0; text-align:left; }
 
-#battle-radial { position:fixed; z-index:6; width:260px; height:260px; transform:translate(-50%,-50%); pointer-events:none; }
+#battle-radial { position:fixed; z-index:6; width:260px; height:260px; transform:translate(-50%,-50%); pointer-events:none; overflow:visible; }
 #battle-radial .battle-radial-disk { position:absolute; inset:28px; border-radius:50%; background:#182335e6; border:2px solid #8d9bad; box-shadow:0 8px 24px #0008; pointer-events:auto; }
-.battle-radial-slice, .battle-radial-plan, #battle-radial-sub button { position:absolute; z-index:2; box-sizing:border-box; width:56px; min-width:44px; min-height:44px; height:56px; max-width:56px; max-height:56px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:4px 6px; font:inherit; color:var(--ink,#f5efdf); background:#26364b; border:1px solid #8d9bad; border-radius:8px; line-height:1.1; pointer-events:auto; }
-.battle-radial-slice span, .battle-radial-plan span, #battle-radial-sub button span { font-size:.62rem; color:#c3cbd6; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
+.battle-radial-slice, .battle-radial-plan, #battle-radial-sub button { position:absolute; z-index:2; box-sizing:border-box; width:64px; min-width:44px; min-height:44px; height:56px; max-width:64px; max-height:56px; overflow:hidden; display:flex; flex-direction:column; align-items:stretch; justify-content:center; padding:3px 2px; font:inherit; color:var(--ink,#f5efdf); background:#26364b; border:1px solid #8d9bad; border-radius:8px; line-height:1.1; pointer-events:auto; overflow-wrap:normal; word-break:normal; hyphens:none; }
+.battle-radial-slice strong, .battle-radial-slice span, .battle-radial-plan strong, .battle-radial-plan span, #battle-radial-sub button strong, #battle-radial-sub button span, #battle-radial-hub strong, #battle-radial-hub span { display:block; flex:0 1 auto; align-self:stretch; width:100%; max-width:100%; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; overflow-wrap:normal; word-break:keep-all; hyphens:none; text-align:center; }
+#battle-radial-sub button strong, #battle-radial-sub button span { text-align:left; }
+.battle-radial-slice span, .battle-radial-plan span, #battle-radial-sub button span { font-size:.62rem; color:#c3cbd6; }
 .battle-radial-slice.n { left:50%; top:4px; transform:translate(-50%,0); }
 .battle-radial-slice.e { right:4px; top:50%; transform:translate(0,-50%); }
 .battle-radial-slice.s { left:50%; bottom:4px; transform:translate(-50%,0); }
 .battle-radial-slice.w { left:4px; top:50%; transform:translate(0,-50%); }
-.battle-radial-plan { left:50%; bottom:-52px; transform:translate(-50%,0); width:auto; min-width:120px; max-width:none; height:auto; max-height:none; }
+.battle-radial-plan { left:50%; top:calc(100% + 12px); bottom:auto; transform:translate(-50%,0); width:auto; min-width:120px; max-width:min(220px,calc(100vw - 16px)); height:auto; max-height:none; }
 .battle-radial-slice[aria-pressed=true], .battle-radial-plan[aria-pressed=true], #battle-radial-sub button[aria-pressed=true] { border-color:#f0cf83; background:#334155; }
 .battle-radial-slice:disabled, .battle-radial-plan:disabled { opacity:.55; }
-#battle-radial-hub { position:absolute; z-index:3; left:50%; top:50%; transform:translate(-50%,-50%); width:88px; height:88px; overflow:hidden; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:8px; box-sizing:border-box; background:#101827; border:2px solid #f0cf83; font-size:.72rem; pointer-events:auto; }
-#battle-radial-hub strong, #battle-radial-hub span { pointer-events:none; }
-#battle-radial-hub strong { display:block; color:#f0cf83; font-size:.78rem; }
+#battle-radial-hub { position:absolute; z-index:3; left:50%; top:50%; transform:translate(-50%,-50%); width:88px; height:88px; overflow:hidden; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 12px; box-sizing:border-box; background:#101827; border:2px solid #f0cf83; font-size:.72rem; pointer-events:auto; overflow-wrap:normal; word-break:normal; }
+#battle-radial-hub strong, #battle-radial-hub span { pointer-events:none; width:100%; }
+#battle-radial-hub strong { color:#f0cf83; font-size:.78rem; }
 #battle-radial[data-aim=hub] #battle-radial-hub { box-shadow:0 0 0 6px #f0cf8333; }
 #battle-radial-sub { position:absolute; left:calc(100% + 6px); top:8px; display:flex; flex-direction:column; gap:6px; }
-#battle-radial-sub button { position:relative; width:140px; height:auto; max-width:none; max-height:none; text-align:left; align-items:flex-start; }
+#battle-radial-sub button { position:relative; width:140px; height:auto; max-width:none; max-height:none; text-align:left; align-items:flex-start; padding:6px 8px; }
+.battle-mode #battle-radial button { overflow-wrap:normal; word-break:normal; }
+.battle-skin-radial #battle-board-caption { overflow-wrap:break-word; word-break:normal; hyphens:none; }
 
 
 .run-entry-link { display:inline-flex; align-items:center; min-width:44px; min-height:44px; color:inherit; padding:4px 8px; box-sizing:border-box; }
