@@ -20,5 +20,5 @@
 
 ## 4. Authorized supplemental review and merge
 
-- [ ] 4.1 Review the complete stack and every existing review; repair and qualify all substantiated findings, publish the supplemental review and resolve addressed threads, retaining source-bound evidence and unchanged acceptance coverage.
+- [x] 4.1 Review the complete stack and every existing review; repair and qualify all substantiated findings, publish the supplemental review and resolve addressed threads, retaining source-bound evidence and unchanged acceptance coverage.
 - [ ] 4.2 Merge #264, #265, #266 and #267 in order under the caller's new authorization; recheck rules, live reviews, exact refs and merge trees, verify published trees/parents and issue closure, clean up completed refs safely and finish with clean local/main remote parity.
