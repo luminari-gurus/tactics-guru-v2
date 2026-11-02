@@ -17,7 +17,9 @@ test('dungeon startup evidence retains failed boundaries with bounded private da
     writeFileSync(join(fixture,'contract.config.ts'),`
       import {defineConfig} from '@playwright/test';
       export default defineConfig({testDir:'.',testMatch:'contract.spec.ts',workers:1,retries:0,use:{baseURL:'https://diagnostics.invalid'},
-        projects:[{name:'chromium',use:{browserName:'chromium'}},{name:'webkit',use:{browserName:'webkit'}}]});
+        projects:[{name:'chromium',use:{browserName:'chromium',channel:'chromium',launchOptions:{
+          executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}}},
+          {name:'webkit',use:{browserName:'webkit'}}]});
     `);
     writeFileSync(join(fixture,'contract.spec.ts'),`
       import {test,expect} from '${helper}';
