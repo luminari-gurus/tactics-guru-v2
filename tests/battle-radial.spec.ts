@@ -232,7 +232,9 @@ test('prefers-reduced-motion skips the hold timer and still opens via tap fallba
 test('orientation change keeps the radial End turn control usable', async ({ page }) => {
   await ready(page);
   const viewport = page.viewportSize()!;
-  await page.setViewportSize({ width: Math.max(viewport.height, 700), height: Math.min(viewport.width, 420) });
+  const resized={ width: Math.max(viewport.height, 700), height: Math.min(viewport.width, 420) };
+  await page.setViewportSize(resized);
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
   await expect(page.locator('#battle-next')).toBeVisible();
   const box = (await page.locator('#battle-next').boundingBox())!;
   expect(box.height).toBeGreaterThanOrEqual(48);
@@ -507,4 +509,120 @@ test('radial compact landscape fits controls and keeps tap and hold usable', asy
   await expect(page.locator('#battle-radial')).toBeVisible();
   await page.mouse.up();
   await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
+});
+
+
+test('radial resize dismisses an open tap menu without committing or stranding it', async ({page}) => {
+  await page.setViewportSize({width:915,height:412});
+  await ready(page);
+  const current=await session(page);
+  const board=(await page.locator('#battle-board-region').boundingBox())!;
+  const map=catalog.maps[current.state.mapId];
+  let cell:{x:number;y:number}|null=null;
+  for(const tile of map.cells) {
+    const p=await boardPoint(page,tile);
+    if(p.x>460 && p.x<board.x+board.width-10 && p.y>board.y+10 && p.y<board.y+board.height-10){cell=tile;break;}
+  }
+  expect(cell).not.toBeNull();
+  if(!cell) throw Error('No selectable cell near the right edge');
+  await tapBoard(page,cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const hub=(await page.locator('#battle-radial-hub').boundingBox())!;
+  expect(hub.x).toBeGreaterThan(412);
+  const resized={width:412,height:915};
+  await page.setViewportSize(resized);
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  const after=await session(page);
+  expect(after.state).toEqual(current.state);
+  expect(after.state.rng).toEqual(current.state.rng);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  expect(after.pending).toBeNull();
+  const next=await reachableEmpty(page);
+  await tapBoard(page,next.cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const reopened=(await page.locator('#battle-radial-hub').boundingBox())!;
+  expect(reopened.x).toBeGreaterThanOrEqual(0);
+  expect(reopened.x+reopened.width).toBeLessThanOrEqual(resized.width);
+});
+
+test('radial resize cancels a held gesture and ignores the trailing release', async ({page}) => {
+  await page.setViewportSize({width:915,height:412});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
+  const resized={width:412,height:915};
+  await page.setViewportSize(resized);
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await page.mouse.up();
+  const after=await session(page);
+  expect(after.state).toEqual(current.state);
+  expect(after.state.rng).toEqual(current.state.rng);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  expect(after.pending).toBeNull();
+});
+
+test('radial stays open on a layout reflow without a viewport resize', async ({page}) => {
+  await ready(page);
+  const {cell}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const pending=(await session(page)).pending;
+  expect(pending).toMatchObject({type:'move',to:cell});
+  const caption=page.locator('#battle-board-caption');
+  const before=(await caption.boundingBox())!.height;
+  await caption.evaluate(node=>{(node as HTMLElement).style.paddingTop='32px';});
+  await expect.poll(async()=> (await caption.boundingBox())!.height).toBeGreaterThan(before);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  expect((await session(page)).pending).toEqual(pending);
+});
+
+
+test('radial resize cancels an unconfirmed plan when its menu is open', async ({page}) => {
+  await page.setViewportSize({width:915,height:412});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  await page.locator('#battle-radial-plan').click();
+  await tapBoard(page,cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await expect(page.locator('#battle-radial-attack')).toHaveAttribute('aria-pressed','true');
+  const resized={width:412,height:915};
+  await page.setViewportSize(resized);
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await expect(page.getByRole('button',{name:'Cancel plan'})).toBeHidden();
+  const after=await session(page);
+  expect(after.state).toEqual(current.state);
+  expect(after.state.rng).toEqual(current.state.rng);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  expect(after.pending).toBeNull();
+  const next=await reachableEmpty(page);
+  await tapBoard(page,next.cell);
+  await expect(page.locator('#battle-radial-move')).toHaveAttribute('aria-pressed','true');
+});
+
+test('radial resize cancels a native touch hold without accepting a command', async ({page,browserName,isMobile}) => {
+  test.skip(browserName!=='chromium' || !isMobile, 'Chromium native touch uses CDP; other profiles cover the resize path separately.');
+  await page.setViewportSize({width:915,height:412});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  const origin=await boardPoint(page,cell);
+  const cdp=await page.context().newCDPSession(page);
+  try {
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:origin.x,y:origin.y,id:1}]});
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    const resized={width:412,height:915};
+    await page.setViewportSize(resized);
+    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual(resized);
+    await expect(page.locator('#battle-radial')).toBeHidden();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    const after=await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    expect(after.pending).toBeNull();
+  } finally { await cdp.detach(); }
 });

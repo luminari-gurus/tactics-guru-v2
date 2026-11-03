@@ -266,8 +266,16 @@ export class BattleScene extends Phaser.Scene {
     const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
+    let viewport={width:this.scale.width,height:this.scale.height};
     const fit=()=>{
       if(this.scale.width!==innerWidth || this.scale.height!==innerHeight)return;
+      const viewportChanged=viewport.width!==this.scale.width || viewport.height!==this.scale.height;
+      viewport={width:this.scale.width,height:this.scale.height};
+      if(viewportChanged && radial.open){
+        removeInput.reset(true);
+        // A held radial is dismissed by reset; a tap-open radial has no captured pointer.
+        if(radial.open){selection.clear();radial.hide();refresh();}
+      }
       const r=drawable.getBoundingClientRect(),c=canvas.getBoundingClientRect();
       const next={x:(r.left-c.left)*this.scale.width/c.width,y:(r.top-c.top)*this.scale.height/c.height,
         width:r.width*this.scale.width/c.width,height:r.height*this.scale.height/c.height};
