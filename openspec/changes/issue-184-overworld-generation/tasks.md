@@ -7,7 +7,7 @@
 
 ## 2. Generate and inspect
 
-- [ ] 2.1 Implement selected versioned profiles with bounded attempts and deterministic validated fallback; verify seed corpora, extremes, interleaving, independence, placements and existing profiles in unit tests.
+- [x] 2.1 Implement selected versioned profiles with bounded attempts and deterministic validated fallback; verify seed corpora, extremes, interleaving, independence, placements and existing profiles in unit tests.
 - [x] 2.2 Expose selected profiles in map inspection, retain orthogonal biome/art choices, and verify keyboard and desktop/portrait/landscape touch presentation in Playwright; update overworld documentation.
 
 ## 3. Durable floors

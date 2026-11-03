@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { generateMap, validMapCells, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
+import { generateMap, validMapCells, sizedLayoutOrFallback, MAP_TYPES, type MapType, type MapCell } from '../../src/map/generate';
 import { applyBiome, BIOMES, type Biome } from '../../src/map/biomes';
 import { createOverworld, type OverworldState, type OverworldMarker } from '../../src/map/state';
 import { createMovement, stepMovement, DEFAULT_BEHAVIORS, type EnemyBehavior, type OverworldMovement } from '../../src/map/movement';
@@ -503,4 +503,17 @@ describe('sized layout profiles', () => {
       expect(createOverworld(applyBiome(map)).ok).toBe(true);
     }
   });
+});
+
+
+it('uses a deterministic valid fallback when a sized candidate is invalid', () => {
+  for (const size of [20,24,28,32,36]) {
+    const bad = Array<MapCell>(size * size).fill(0);
+    for (const arena of [false,true]) {
+      const result=sizedLayoutOrFallback(bad,size,arena);
+      expect(result.fallback).toBe(true);
+      expect(validMapCells(result.cells,size,size,arena)).toBe(true);
+      expect(sizedLayoutOrFallback(bad,size,arena)).toEqual(result);
+    }
+  }
 });

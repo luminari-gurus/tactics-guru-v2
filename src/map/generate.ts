@@ -190,12 +190,16 @@ function generateSized(seed: number, type: 'sector-graph' | 'arena', size: numbe
     for (let i = 1; i < centers.length; i++) connect(centers[i], centers[i % 3 ? i - 1 : i - 3]);
     for (let i = 3; i < centers.length; i++) if (draw(3) === 0) connect(centers[i], centers[i - 3]);
   }
-  let fallback = false;
-  if (!validMapCells(cells, size, size, type === 'arena')) {
-    cells.fill(0);
-    for (let y = 1; y < 9; y++) for (let x = 1; x < 11; x++) cells[y * size + x] = 1;
-    if (!validMapCells(cells, size, size, type === 'arena')) throw new Error('Invalid map fallback');
-    fallback = true;
-  }
-  return {seed, type, version: type + '-v1', width:size, height:size, cells, fallback};
+  const checked = sizedLayoutOrFallback(cells, size, type === 'arena');
+  return {seed, type, version: type + '-v1', width:size, height:size, ...checked};
+}
+
+/** Validate a bounded candidate before admitting it to the map and save contracts. */
+export function sizedLayoutOrFallback(candidate: readonly MapCell[], size: number, allowOpen: boolean): { cells: readonly MapCell[]; fallback: boolean } {
+  if (!Number.isInteger(size) || size < 20 || size > 36) throw new RangeError('Invalid map size');
+  if (validMapCells(candidate, size, size, allowOpen)) return {cells: candidate, fallback: false};
+  const cells: MapCell[] = Array<MapCell>(size * size).fill(0);
+  for (let y = 1; y < 9; y++) for (let x = 1; x < 11; x++) cells[y * size + x] = 1;
+  if (!validMapCells(cells, size, size, allowOpen)) throw new Error('Invalid map fallback');
+  return {cells, fallback: true};
 }
