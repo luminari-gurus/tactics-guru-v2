@@ -17,6 +17,14 @@ async function ingest(page: Page, blocked = false) {
   });
   return events;
 }
+test('menu run entry attributes startup and context-only errors to run', async ({ page }) => {
+  const events = await ingest(page);
+  await page.goto('./?game=run');
+  await expect(page.locator('#run-start')).toBeVisible();
+  await expect.poll(() => events.find(e => e.event === 'app_entered')?.properties.route).toBe('run');
+  await expect.poll(() => events.find(e => e.properties.failure === 'verification')?.properties.route).toBe('run');
+});
+
 test('mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries', async ({ page }) => {
   test.setTimeout(300000);
   const events = await ingest(page);
