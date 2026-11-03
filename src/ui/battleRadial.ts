@@ -107,7 +107,7 @@ export class BattleRadial {
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
     const cardinal = cardinalFromVector(dx, dy);
-    const inPressHub = this.mode === 'hold' && hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y);
+    const inPressHub = this.inPressHub(point);
     if (inPressHub || (cardinal === 'hub' && slice !== 'plan')) {
       this.aim('hub');
       return;
@@ -124,7 +124,7 @@ export class BattleRadial {
     if (!this.open || !this.cell) return 'none';
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
-    const inHub = (this.mode === 'hold' && hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y))
+    const inHub = this.inPressHub(point)
       || (hubContains(dx, dy) && slice !== 'plan');
     if (inHub) {
       if (this.leftHub || this.mode === 'tap') { this.cancel(); return 'cancel'; }
@@ -163,6 +163,13 @@ export class BattleRadial {
     this.root.remove();
   }
 
+  private inPressHub(point: Point): boolean {
+    if (this.mode !== 'hold') return false;
+    // When the disk shifts, a full-size cancel area can cover an entire slice.
+    const shifted = this.origin.x !== this.holdOrigin.x || this.origin.y !== this.holdOrigin.y;
+    return hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y, shifted ? 12 : 44);
+  }
+
   private defaultId(): RadialSliceId {
     return this.cell ? (this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(this.cell)) : 'move';
   }
@@ -180,9 +187,11 @@ export class BattleRadial {
   private aim(slice: RadialSliceId | 'hub'): void {
     this.aimed = slice;
     this.root.dataset.aim = slice;
-    if (slice === 'special' && this.cell) {
-      const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
-      if (specials.length > 1) this.subOpen = true;
+    if (slice === 'special') {
+      if (this.cell && this.mode === 'hold') {
+        const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
+        if (specials.length > 1) this.subOpen = true;
+      }
     } else if (slice !== 'hub') this.subOpen = false;
     this.render();
   }
@@ -268,6 +277,7 @@ export class BattleRadial {
     const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
     const followUp = Boolean(this.selection.planning && this.selection.planMove);
     sub.hidden = !this.subOpen || specials.length < 2;
+    this.root.dataset.subOpen = String(!sub.hidden);
     if (!sub.hidden) {
       const last = this.selection.lastUsedSpecial();
       sub.replaceChildren(...specials.map((ability, index) => {
@@ -283,10 +293,11 @@ export class BattleRadial {
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });
         return button;
       }));
-      // Prefer the right of the disk, then clamp the choices into the viewport.
+      // Keep choices clear of Special: a hold release there must not select a chip.
       const root = this.root.getBoundingClientRect();
       const width = sub.offsetWidth, height = sub.offsetHeight;
-      sub.style.left = `${Math.max(0, Math.min(innerWidth - width, root.right + 6)) - root.left}px`;
+      const left = root.right + 6 + width <= innerWidth ? root.right + 6 : Math.max(0, root.left - width - 6);
+      sub.style.left = `${left - root.left}px`;
       sub.style.top = `${Math.max(0, Math.min(innerHeight - height, root.top + 8)) - root.top}px`;
     }
     this.writeHub(this.aimed);

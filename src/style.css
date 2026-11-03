@@ -147,6 +147,7 @@ dialog button { touch-action: manipulation; }
 #battle-radial-hub strong, #battle-radial-hub span { pointer-events:none; width:100%; }
 #battle-radial-hub strong { color:#f0cf83; font-size:.78rem; }
 #battle-radial[data-aim=hub] #battle-radial-hub { box-shadow:0 0 0 6px #f0cf8333; }
+#battle-radial[data-sub-open=true] .battle-radial-slice:not(.e), #battle-radial[data-sub-open=true] .battle-radial-plan { visibility:hidden; }
 #battle-radial-sub { position:absolute; left:calc(100% + 6px); top:8px; display:flex; flex-direction:column; gap:6px; }
 #battle-radial-sub button { position:relative; width:140px; height:auto; max-width:none; max-height:none; text-align:left; align-items:flex-start; padding:6px 8px; }
 .battle-mode #battle-radial button { overflow-wrap:normal; word-break:normal; }
