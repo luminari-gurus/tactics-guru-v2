@@ -436,3 +436,47 @@ test('radial switching to rail preserves a valid unchanged selection', async ({p
   await expect(page.locator('#battle-review')).toBeEnabled();
   expect((await session(page)).pending).toEqual(prepared);
 });
+
+test('radial plan cancellation stays available while choosing a destination or target', async ({page}) => {
+  const initial=page.viewportSize()!;
+  if(initial.width<initial.height) await page.setViewportSize({width:320,height:568});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  const cancel=page.getByRole('button',{name:'Cancel plan'});
+  await expect(cancel).toBeHidden();
+  for(const stage of ['destination','target'] as const) {
+    await tapBoard(page,cell);
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    await page.locator('#battle-radial-plan').click();
+    await expect(page.locator('#battle-radial')).toBeHidden();
+    await expect(cancel).toBeVisible();
+    if(stage==='target') {
+      await tapBoard(page,cell);
+      await expect(page.locator('#battle-radial')).toBeVisible();
+      await expect(cancel).toBeHidden();
+      await page.locator('#battle-radial-attack').click();
+      await expect(page.locator('#battle-radial')).toBeHidden();
+      await expect(page.locator('#battle-preview')).toContainText('Tap an enemy');
+      await expect(cancel).toBeVisible();
+    }
+    const box=(await cancel.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    const viewport=page.viewportSize()!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);
+    expect(box.y+box.height).toBeLessThanOrEqual(viewport.height);
+    if(test.info().project.use.hasTouch) await cancel.tap();
+    else { await cancel.focus(); await page.keyboard.press('Enter'); }
+    await expect(cancel).toBeHidden();
+    const after=await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.state.rng).toEqual(current.state.rng);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    expect(after.pending).toBeNull();
+    await tapBoard(page,cell);
+    await expect(page.locator('#battle-radial-move')).toBeEnabled();
+    await page.locator('#battle-radial-hub').click();
+  }
+});

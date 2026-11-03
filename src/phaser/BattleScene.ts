@@ -93,7 +93,7 @@ export class BattleScene extends Phaser.Scene {
       }
       const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
-      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats);
+      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open);
       const caption=document.querySelector('#battle-board-caption')!;
       caption.textContent=board.pickingHint+caption.textContent;
       game.dataset.phase=session.phase;

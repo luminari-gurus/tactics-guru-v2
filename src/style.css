@@ -122,6 +122,8 @@ dialog button { touch-action: manipulation; }
 }
 
 .battle-skin-radial .battle-actions { grid-template-columns:minmax(0,1fr); }
+.battle-skin-radial #battle-controls[data-plan-waiting=true] .battle-actions { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+.battle-skin-radial #battle-plan-cancel { min-height:48px; }
 .battle-skin-radial #battle-next { min-height:48px; width:100%; font-size:1rem; }
 .battle-skin-radial #battle-overflow summary { min-height:44px; }
 .battle-skin-radial #battle-overflow[open] { display:block; }

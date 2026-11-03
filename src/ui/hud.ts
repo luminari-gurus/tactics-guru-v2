@@ -103,7 +103,7 @@ export class BattleHud {
       <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
       <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
-      <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button></div>
+      <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button><button id="battle-plan-cancel" hidden>Cancel plan</button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
@@ -125,6 +125,7 @@ export class BattleHud {
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}else callbacks.target(null);},{signal});
     this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.confirm,{signal});
     this.root.querySelector('#battle-cancel')!.addEventListener('click',callbacks.cancel,{signal});
+    this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
   }
@@ -182,8 +183,11 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false) {
     const s=this.session, enabled=s.phase==='player', actor=s.active;
+    const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
+    this.root.dataset.planWaiting=String(showPlanCancel);
+    this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
     const movement=enabled?previewMovement(s.state,actor.id,s.catalog):null;
     const dangerButton=this.root.querySelector<HTMLButtonElement>('#battle-danger')!;
     dangerButton.disabled=!enabled; dangerButton.setAttribute('aria-pressed',String(danger));
