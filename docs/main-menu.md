@@ -46,7 +46,9 @@ and the existing two-profile iPhone WebKit acceptance stage. Serial batch select
 includes it exactly once per Chromium project. Saved-game browser regressions use
 the root selector, including the item fixture's moved durability cases. `/map`
 remains inspection. Supported
-explicit root `scene` diagnostics take precedence over `game`; unknown or duplicate
+explicit root `scene` diagnostics take precedence over `game`. The first `scene`
+value controls both route resolution and scene startup; later values are ignored.
+Unknown or duplicate
 `game` values render the menu. Direct paths cannot select a persistent entry through
 query parameters. `/battle`, `/run`, `/dungeon`, `/map` and supported explicit
 scene diagnostics start fresh without inspecting or changing any saved-game slot
