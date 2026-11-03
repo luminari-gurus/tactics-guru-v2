@@ -393,6 +393,7 @@
         "files": [
           "tests/battle-animations.spec.ts",
           "tests/battle-audio.spec.ts",
+          "tests/battle-radial.spec.ts",
           "tests/engine-fit.spec.ts",
           "tests/guarded-effects.spec.ts",
           "tests/layout.spec.ts",
@@ -405,8 +406,8 @@
         "estimatedTestWorkMs": 697201,
         "measuredCases": 68,
         "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
-        "command": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
-        "discoveryCommand": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "command": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-radial.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=desktop --workers=1 tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/battle-radial.spec.ts tests/engine-fit.spec.ts tests/guarded-effects.spec.ts tests/layout.spec.ts tests/move.spec.ts tests/procedural-grids.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
         "testIdSha256": "33af38cf8495a73ce08a4b394cfdc402897ad44efa71c81d87e30b1082941dde"
       },
       {
@@ -482,6 +483,7 @@
         "project": "mobile-portrait",
         "files": [
           "tests/battle-loop.spec.ts",
+          "tests/battle-radial.spec.ts",
           "tests/boot.spec.ts",
           "tests/dungeon-lifecycle.spec.ts",
           "tests/guarded-effects.spec.ts",
@@ -494,8 +496,8 @@
         "estimatedTestWorkMs": 483765,
         "measuredCases": 56,
         "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
-        "command": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
-        "discoveryCommand": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "command": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-portrait --workers=1 tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/guarded-effects.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
         "testIdSha256": "94db3ea82ca03ef79cca1b62bdf5be9d597b3854ae5d055fd37013cebaa36efc"
       },
       {
@@ -550,6 +552,7 @@
         "files": [
           "tests/audio.spec.ts",
           "tests/battle-loop.spec.ts",
+          "tests/battle-radial.spec.ts",
           "tests/boot.spec.ts",
           "tests/dungeon-lifecycle.spec.ts",
           "tests/procedural-grids.spec.ts",
@@ -561,8 +564,8 @@
         "estimatedTestWorkMs": 483645,
         "measuredCases": 7,
         "durationBasis": "observed completed attempts; missing landscape cases imputed from matching portrait cases",
-        "command": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
-        "discoveryCommand": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
+        "command": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts",
+        "discoveryCommand": "npx --no-install playwright test --project=mobile-landscape --workers=1 tests/audio.spec.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/boot.spec.ts tests/dungeon-lifecycle.spec.ts tests/procedural-grids.spec.ts tests/run-progression.spec.ts tests/terrain-materials.spec.ts tests/unit-health-bars.spec.ts --list --reporter=json",
         "testIdSha256": "5bd3ba97c48f8d55272b1b808fb4e6ece425e1cac3c9502e0e6feb601e7fa02a"
       }
     ]

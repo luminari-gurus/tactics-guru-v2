@@ -4,6 +4,29 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 
 ### Current qualification checkpoint
 
+Main advanced to `3333281` by merging #273 while final local checks were running.
+The entry foundation now incorporates it in `6a886b8` (21 route/menu units pass).
+The dependent branch integrates that foundation, retaining both mobile controls and
+the save capability; four overlapping import/config/documentation conflicts were
+resolved, and both TypeScript scopes pass. #276's literal merge tree with current
+main is clean; its focused one-line change needs no merge commit. #274 remains unmerged.
+
+**New integration work is required before completion.** The new radial browser suite
+contains a direct-route Continue assumption, and the new default mobile controls need
+save-isolation and persistent-menu proof. Audit/reconcile these consumers and selection
+against literal current main, retain both Rail/Radial behavior, and qualify the combined
+tree locally. Do not wait for CI. Preserve old-source evidence with its actual inputs;
+it is not final proof of the new shared controls.
+
+The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
+journeys. Its old-source WebKit extended stage was deliberately interrupted before
+integration; there is no final JSON for that stage. The exact owned process tree was
+stopped and `local-final-interrupted.json` records why. Process `49853` and all of its
+browser/server children have exited. Reopen affected task gates until the merged
+consumer audit and local qualification are complete.
+
+### Prior qualification evidence (before the mobile-controls merge)
+
 **Caller execution update:** do not wait for CI; run needed checks locally. Remaining
 acceptance now uses the matching locked local browsers and a fresh ordinary root build,
 with one worker and zero retries. This changes execution capacity, not test/profile

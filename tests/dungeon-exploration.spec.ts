@@ -9,12 +9,14 @@ import { legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession,playCommand } from './helpers/battlePolicy';
+import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
 import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+test.beforeEach(async ({ context }) => { await installRailControls(context); });
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
  const load=async(state:DungeonState)=>{

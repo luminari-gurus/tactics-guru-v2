@@ -1,7 +1,7 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach } from './helpers/dungeonFixtures';
-import { expect,test,type Page } from '@playwright/test';
+import { expect,test,type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';

@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/forceRailControls';
 import { preparedSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, runBattleCatalog } from '../src/domain/runSaveEnvelope';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';

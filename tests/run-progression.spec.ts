@@ -1,4 +1,4 @@
-import {expect,test,type Page} from '@playwright/test';
+import {expect,test,type Page,installRailControls} from './helpers/forceRailControls';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {readSession,playCommand,playUndo} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
@@ -129,7 +129,9 @@ test('accepted player presentation reload preserves exact boundary without old c
  await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
 });
 test('enemy presentation reload resumes the same commands and RNG as an uninterrupted run',async({page,browser,baseURL})=>{
- const other=await browser.newContext({viewport:page.viewportSize(),baseURL});const control=await other.newPage();
+ const other=await browser.newContext({viewport:page.viewportSize(),baseURL});
+ await installRailControls(other);
+ const control=await other.newPage();
  try {
   for(const p of [page,control]){
    await p.clock.install();await start(p);await p.clock.pauseAt(await p.evaluate(()=>Date.now()+1000));
