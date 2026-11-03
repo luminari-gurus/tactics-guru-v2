@@ -78,7 +78,8 @@ export class BattleScene extends Phaser.Scene {
       const screen=board.screenPoint(cell);
       return screen ? clientFrom(screen) : fallback ?? {x:innerWidth/2,y:innerHeight/2};
     };
-    const clear=(preserveQueued=false)=>{board.resetPicking();selection.clear(preserveQueued);hovered=null;radial.hide();};
+    const clearRadial=()=>{selection.clear();selection.selectedCell=null;};
+    const clear=(preserveQueued=false)=>{board.resetPicking();selection.clear(preserveQueued);if(skin==='radial')selection.selectedCell=null;hovered=null;radial.hide();};
     const refresh=()=>{
       if(!live)return;
       if(ready && session.phase==='player')selection.applyTurnDefault();
@@ -147,11 +148,11 @@ export class BattleScene extends Phaser.Scene {
       commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
       inspect:()=>{
         const unit=selection.selectedCell?session.state.units.find(u=>u.hp>0&&u.cell.x===selection.selectedCell!.x&&u.cell.y===selection.selectedCell!.y):null;
-        selection.clear();
+        clearRadial();
         inspect(unit?.id ?? session.active.id);
       },
       plan:()=>{if(session.phase==='player' && !dialogs.open){selection.startPlan();refresh();}},
-      cancel:()=>{selection.clear();refresh();},
+      cancel:()=>{clearRadial();refresh();},
     });
     const commitSlice=(cell:CellPosition,slice:RadialSliceId,abilityId?:AbilityId)=>{
       if(slice==='special' && abilityId){
@@ -187,7 +188,7 @@ export class BattleScene extends Phaser.Scene {
       },
       aim:(point:Point)=>{if(radial.open)radial.aimAt(clientFrom(point));},
       release:(point:Point)=>{if(radial.open)radial.releaseAt(clientFrom(point));refresh();},
-      dismiss:()=>{if(radial.open){radial.hide();selection.clear();refresh();}},
+      dismiss:()=>{if(radial.open){radial.hide();clearRadial();refresh();}},
     },()=>({width:this.scale.width,height:this.scale.height}),point=>ready && !initialFit && !dialogs.open
       && point.x>=region.x && point.x<region.x+region.width && point.y>=region.y && point.y<region.y+region.height,
     {reducedMotion:()=>matchMedia('(prefers-reduced-motion: reduce)').matches});
@@ -212,7 +213,7 @@ export class BattleScene extends Phaser.Scene {
       pump();
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
-    setModalTransition(()=>{removeInput.reset();if(radial.open){selection.clear();radial.hide();}queueMicrotask(()=>{if(live){refresh();pump();}});});
+    setModalTransition(()=>{removeInput.reset();if(radial.open){clearRadial();radial.hide();}queueMicrotask(()=>{if(live){refresh();pump();}});});
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
@@ -265,7 +266,7 @@ export class BattleScene extends Phaser.Scene {
     canvas.addEventListener('keydown',key);
     const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
     document.addEventListener('keydown',escape);
-    const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();if(radial.open){selection.clear();radial.hide();}refresh();}else {refresh();pump();}};
+    const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();if(radial.open){clearRadial();radial.hide();}refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
     let viewport={width:this.scale.width,height:this.scale.height};
@@ -276,7 +277,7 @@ export class BattleScene extends Phaser.Scene {
       if(viewportChanged && radial.open){
         removeInput.reset(true);
         // A held radial is dismissed by reset; a tap-open radial has no captured pointer.
-        if(radial.open){selection.clear();radial.hide();refresh();}
+        if(radial.open){clearRadial();radial.hide();refresh();}
       }
       const r=drawable.getBoundingClientRect(),c=canvas.getBoundingClientRect();
       const next={x:(r.left-c.left)*this.scale.width/c.width,y:(r.top-c.top)*this.scale.height/c.height,

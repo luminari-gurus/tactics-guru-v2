@@ -542,6 +542,12 @@ test('radial tap fallback dialog dismissal clears the prepared action', async ({
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
   await page.getByRole('radio',{name:'Rail',exact:true}).click();
   await expect(page.locator('#battle-review')).toBeDisabled();
+  await page.locator('#battle-move').click();
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await session(page)).pending).toBeNull();
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
   const after=await session(page);
   expect(after.state).toEqual(current.state);
   expect(after.replay.commands).toEqual(current.replay.commands);
