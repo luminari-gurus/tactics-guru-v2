@@ -8,11 +8,28 @@ Implementation is published in #275/#277; frozen implementation inputs are `4de7
 (later documentation-only commits may advance the branch head).
 Independent Windows contract repair #276 is mirrored as a separate dependency commit.
 
-OpenSpec task 3.3 is complete: the consumer/selection audit covers all ordinary,
+OpenSpec tasks 1–3 are complete (7/9 total): the consumer/selection audit covers all ordinary,
 dev, WebKit, telemetry, asset and extended owners. The current relevant-input hash
 matches the coverage ledger, all referenced files exist, and 1,469 retained,
-102 mapped and 65 added stage/profile identities are accounted for. Final runtime
-acceptance remains open under tasks 2.2, 3.1, 3.2 and 4.1/4.2.
+102 mapped and 65 added stage/profile identities are accounted for. Final aggregate
+runtime/source acceptance and publication cleanup remain open under tasks 4.1/4.2.
+
+Additional current-source proof: main-menu **84/84 Chromium** (`run-OCCQCn`) and
+**56/56 WebKit** (`run-5GHKRG`) pass, including native input, new-game revalidation,
+failed-write recovery and the moved item cases. Old-format recovery/export passes
+**9/9 Chromium** (`run-ge51Jl`) and **9/9 WebKit** (`run-JHoTSg`) for all three save
+families. Focused desktop legal run/reward/replay, saved floor travel/reload/backtracking,
+cached-run stale writer, presentation restart and visibility interruption pass **5/5**
+(`run-on4ll5`). These preview runs reuse the last ordinary root bundle: `src`, `public`,
+Vite/package inputs and menu/helper files are unchanged from its `aca9709` inputs;
+later implementation changes are asset-fixture setup and documentation.
+
+Documentation audit checked 109 local links across 13 changed Markdown files with
+no missing targets. The preserved #263 plan still hashes to
+`28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104`.
+Collector functional cold/warm proof includes the passing traced dev case; that trace
+is not used for performance/budget acceptance. Original asset-matrix failures remain
+retained, and qualified aggregate/extended/performance gates are still required.
 
 Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) is executing frozen `04cf227` on
 `unraid-tactics-01`. Current queued supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
