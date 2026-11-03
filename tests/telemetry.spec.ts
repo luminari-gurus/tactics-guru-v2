@@ -21,6 +21,7 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
   test.setTimeout(300000);
   const events = await ingest(page);
   await page.goto('/?game=run&token=private#private'); await page.locator('#run-start').click();
+  await expect.poll(()=>events.find(event=>event.event==='app_entered')?.properties.route).toBe('run');
   await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   for (let index = 0; index < 3; index++) {
