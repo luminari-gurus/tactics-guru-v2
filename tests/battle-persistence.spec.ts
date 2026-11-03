@@ -96,7 +96,14 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     await audit();
     await page.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));});
     await audit();await page.reload();await ready();await audit();
-    if(mode==='battle')expect((await readSession(page)).state.seed).toBe(1);
+    if(mode==='battle'){
+      const fresh=(await readSession(page)).state;expect(fresh.seed).toBe(1);
+      await page.locator('#battle-next').click();
+      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(fresh.commandCount);await audit();
+      await page.goto('./map');await expect(page.locator('#map-grid span')).toHaveCount(400);await audit();
+      await page.goBack({waitUntil:'commit'});await ready();await audit();
+      expect((await readSession(page)).state).toEqual(fresh);
+    }
     if(mode==='run')expect(JSON.parse(await page.locator('#game').getAttribute('data-run-snapshot')??'null').items.run.encounterIndex).toBe(0);
   });
   await page.goto('./');
