@@ -4,13 +4,15 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 
 ### Current qualification checkpoint
 
-Implementation is published in #275/#277; current feature branch head is `aca9709`.
+Implementation is published in #275/#277; frozen implementation inputs are `4de79c1`
+(later documentation-only commits may advance the branch head).
 Independent Windows contract repair #276 is mirrored as a separate dependency commit.
-Routine self-hosted run **41647380978** is executing frozen `04cf227` on
-`unraid-tactics-01`. Current queued supplemental run is **41651717195**, qualification
-branch `c28fa7a`, asserting source equivalence to `aca9709` except its temporary
-workflow. It covers changed telemetry, root/prefix isolation/history and both extended
-engines. Earlier queued runs 41647577545/41648868922 were cancelled before execution.
+Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) is executing frozen `04cf227` on
+`unraid-tactics-01`. Current queued supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
+branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
+workflow. It covers changed telemetry, repaired audio workloads/collector controls,
+root/prefix isolation/history and both extended engines. Earlier queued runs
+41647577545/41648868922/41651717195 were cancelled before execution.
 
 Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
 configured production/development telemetry are **72/72 passing**. The local four-mode
@@ -34,9 +36,11 @@ in 14.3s; the trace records a 6.5s dev-server wait for preferences CSS before Ph
 startup. It does not establish the timeout's cause or a product fix. Diagnostic trace
 is `verification-receipts/issue-259-dev-load-diagnostic`; it is not performance evidence.
 
-Next: finish the scoped audio checks, publish that fixture repair, align queued
-qualification, inspect final self-hosted artifacts, account for supplements and prior
-failures, then clean the trigger and finalize PR #277. The ignored local scripts and
+All scoped audio checks are complete and the repair is pushed as `4de79c1`; the
+queued qualification branch is aligned. No local browser/server run remains active.
+`origin/main` was rechecked and remains `d8692f9`; #273 advanced independently and
+is still unmerged. Next: inspect final self-hosted artifacts, account for supplements
+and prior failures, then clean the trigger and finalize PR #277. The ignored local scripts and
 receipts support continuation. `%TEMP%/tactics-259-baseline` now hosts the temporary
 qualification branch; its current head is not the earlier literal-parent comparison.
 
