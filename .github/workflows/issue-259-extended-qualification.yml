@@ -1,0 +1,62 @@
+name: Issue 259 extended qualification
+on:
+  push:
+    branches: [branch/issue-259-extended-qualification]
+    paths: [.github/workflows/issue-259-extended-qualification.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: tactics-browser-exclusive
+  cancel-in-progress: false
+jobs:
+  extended:
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 120
+    steps:
+      - name: Check qualified host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run setup:browsers && npm run check:browsers
+        timeout-minutes: 10
+      - name: Record exact source and candidate equivalence
+        run: |
+          mkdir -p verification-receipts/issue-259-extended
+          git rev-parse HEAD > verification-receipts/issue-259-extended/source.txt
+          git diff --name-only 04cf2279b5d1f262f687f5bbedc572a2bd3eddf4 HEAD > verification-receipts/issue-259-extended/candidate-diff.txt
+          test "$(cat verification-receipts/issue-259-extended/candidate-diff.txt)" = '.github/workflows/issue-259-extended-qualification.yml'
+          node --input-type=module -e "import {sourceIdentity} from './scripts/verification-report.mjs';import {writeFileSync} from 'node:fs';writeFileSync('verification-receipts/issue-259-extended/source.json',JSON.stringify(sourceIdentity(process.cwd()),null,2));"
+      - name: Build frozen gameplay inputs
+        id: build
+        run: npm run build
+        timeout-minutes: 10
+      - name: Chromium extended journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/chromium.json
+        run: npm run test:extended -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/chromium-artifacts
+        timeout-minutes: 50
+      - name: WebKit extended journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/webkit.json
+        run: npm run test:extended:webkit -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/webkit-artifacts
+        timeout-minutes: 50
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-259-extended-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 30
+          if-no-files-found: warn
