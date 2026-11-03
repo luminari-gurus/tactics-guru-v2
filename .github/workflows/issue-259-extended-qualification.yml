@@ -13,7 +13,9 @@ concurrency:
 jobs:
   extended:
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 120
+    timeout-minutes: 180
+    env:
+      VITE_POSTHOG_ENABLED: 'false'
     steps:
       - name: Check qualified host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
@@ -34,13 +36,30 @@ jobs:
         run: |
           mkdir -p verification-receipts/issue-259-extended
           git rev-parse HEAD > verification-receipts/issue-259-extended/source.txt
-          git diff --name-only 04cf2279b5d1f262f687f5bbedc572a2bd3eddf4 HEAD > verification-receipts/issue-259-extended/candidate-diff.txt
+          git diff --name-only 03777810dde407eb2f083eb0f094d191f1a67320 HEAD > verification-receipts/issue-259-extended/candidate-diff.txt
           test "$(cat verification-receipts/issue-259-extended/candidate-diff.txt)" = '.github/workflows/issue-259-extended-qualification.yml'
           node --input-type=module -e "import {sourceIdentity} from './scripts/verification-report.mjs';import {writeFileSync} from 'node:fs';writeFileSync('verification-receipts/issue-259-extended/source.json',JSON.stringify(sourceIdentity(process.cwd()),null,2));"
       - name: Build frozen gameplay inputs
         id: build
         run: npm run build
         timeout-minutes: 10
+      - name: Changed route and telemetry units and build integrations
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:unit -- tests/unit/routes.test.ts tests/unit/telemetry.test.ts && npm run test:build
+        timeout-minutes: 10
+      - name: Configured production telemetry
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/telemetry-production.json
+        run: npm run test:telemetry -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/telemetry-production-artifacts
+        timeout-minutes: 30
+      - name: Configured development telemetry
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_TELEMETRY_DEV: 'true'
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/telemetry-development.json
+        run: npm run test:telemetry -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/telemetry-development-artifacts
+        timeout-minutes: 30
       - name: Chromium extended journeys
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
