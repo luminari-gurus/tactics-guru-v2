@@ -247,7 +247,7 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
 });
 
 test('workflow stays manual, exclusive, serial, failure-preserving and pinned to the dispatched SHA', () => {
-  const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8');
+  const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:|ubuntu-latest|ubuntu-24/);
   assert.match(workflow, /group: tactics-browser-exclusive/); assert.match(workflow, /max-parallel: 1/);
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
