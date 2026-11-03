@@ -1,58 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
-import { readFile, writeFile } from 'node:fs/promises';
-import { RUN_STORAGE_KEYS as keys } from '../src/persistence/runStorage';
+import { writeFile } from 'node:fs/promises';
 import { rewardSnapshot } from './helpers/runItemFixtures';
 const entry = '/tests/fixtures/run-items/index.html';
 async function report(page: Page) { return JSON.parse(await page.locator('#evidence').textContent() ?? '{}'); }
 async function open(page: Page, query = '') { await page.goto(`${entry}${query}`); await expect(page.getByRole('heading', { level: 1 })).toBeVisible(); }
 async function confirm(page: Page) { await page.getByRole('button', { name: 'Confirm', exact: true }).click(); await expect(page.locator('dialog')).not.toBeVisible(); }
-async function activate(page: Page, name: string, touch: boolean) {
-  const button = page.getByRole('button', { name, exact: true });
-  if (touch) await button.tap(); else await button.click();
-}
-
-test('reward claim advances exactly once and survives pending/claimed reload', async ({ page }, info) => {
-  const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:healing_draught'))!;
-  await open(page, `?seed=${seed}`); const pending = (await report(page)).snapshot;
-  await page.reload(); expect((await report(page)).snapshot).toEqual(pending);
-  await activate(page, 'Claim Healing Draught', info.project.name !== 'desktop');
-  if (info.project.name === 'desktop') await page.getByRole('button', { name: 'Confirm', exact: true }).dblclick();
-  else {
-    const box = await page.getByRole('button', { name: 'Confirm', exact: true }).boundingBox();
-    for (let i = 0; i < 2; i++) await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2);
-    if (await page.locator('dialog').isVisible()) await page.keyboard.press('Escape');
-  }
-  await expect(page.getByRole('heading', { name: 'Party items', exact: true })).toBeVisible();
-  const claimed = (await report(page)).snapshot;
-  expect(claimed.items.run.encounterIndex).toBe(1); expect(claimed.items.itemRevision).toBe(1);
-  expect(claimed.items.ownership.consumables).toEqual([{ itemId: 'item:healing_draught', quantity: 1 }]);
-  await page.reload(); expect((await report(page)).snapshot).toEqual(claimed);
-  expect((await report(page)).selected).toBe(0);
-});
-
-test('real item use, equip and unequip preserve ownership/stats across reload', async ({ page }, info) => {
-  await open(page, '?state=prepared');
-  const select = page.getByRole('combobox', { name: 'Healing Draught target' });
-  await expect(select.locator('option', { hasText: 'Mage (defeated)' })).toBeDisabled();
-  await select.selectOption('ranger');
-  await activate(page, 'Use Healing Draught', info.project.name !== 'desktop'); await confirm(page);
-  const used = (await report(page)).snapshot;
-  expect(used.items.run.party[1].hp).toBe(10); expect(used.items.ownership.consumables[0].quantity).toBe(1);
-  await page.reload(); expect((await report(page)).snapshot).toEqual(used);
-  await page.getByRole('combobox', { name: 'Warding Charm target' }).selectOption('ranger');
-  await activate(page, 'Equip Warding Charm', info.project.name !== 'desktop'); await confirm(page);
-  const equipped = (await report(page)).snapshot;
-  expect(equipped.items.ownership.assignments).toHaveLength(1);
-  const fighter = await page.getByRole('region', { name: 'Party', exact: true }).textContent();
-  await page.reload(); expect((await report(page)).snapshot).toEqual(equipped);
-  expect(await page.getByRole('region', { name: 'Party', exact: true }).textContent()).toBe(fighter);
-  await page.getByRole('button', { name: 'Continue saved run', exact: true }).click();
-  await page.getByRole('button', { name: 'Continue', exact: true }).click();
-  expect((await report(page)).snapshot).toEqual(equipped);
-  await page.getByRole('button', { name: 'Unequip Warding Charm' }).click(); await confirm(page);
-  expect((await report(page)).snapshot.items.ownership.assignments).toEqual([]);
-});
-
 test('keyboard cancel, held activation, native modal capture and layout', async ({ page }, info) => {
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
   await open(page, '?state=prepared');
@@ -90,49 +42,10 @@ test('keyboard cancel, held activation, native modal capture and layout', async 
   expect(errors).toEqual([]);
 });
 
-test('corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
-  await open(page, '?state=prepared');
-  const backup = await page.evaluate(key => localStorage.getItem(key), keys.backup);
-  await page.evaluate(key => localStorage.setItem(key, '  {broken raw\n\ud800'), keys.primary);
-  await page.reload();
-  await expect(page.getByRole('status')).toContainText('Continued backup');
-  await page.getByRole('button', { name: 'Use Healing Draught' }).click(); await confirm(page);
-  await expect(page.getByRole('status')).toContainText('unsaved');
-  expect(await page.evaluate(key => localStorage.getItem(key), keys.primary)).toBe('  {broken raw\n\ud800');
-  expect(await page.evaluate(key => localStorage.getItem(key), keys.backup)).toBe(backup);
-  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
-  const download = page.waitForEvent('download'); await page.getByRole('button', { name: 'Export primary save' }).click();
-  const file = await download; expect(JSON.parse(await readFile((await file.path())!, 'utf8'))).toEqual({ slot: 'primary', text: '  {broken raw\n\ud800' });
-  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
-  await page.getByRole('button', { name: 'Remove primary save' }).click();
-  await page.getByRole('button', { name: 'Remove reviewed save' }).click();
-  expect(await page.evaluate(key => localStorage.getItem(key), keys.primary)).toBeNull();
-  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
-  await page.getByRole('button', { name: 'Retry saving' }).click();
-  await expect(page.getByRole('status')).toContainText('Run saved');
-  const saved = (await report(page)).snapshot; await page.reload(); expect((await report(page)).snapshot).toEqual(saved);
-});
 
-test('stale recovery review refuses changed bytes', async ({ page }) => {
-  await open(page, '?state=prepared');
-  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
-  await page.getByRole('button', { name: 'Remove primary save' }).click();
-  // Simulate a different tab writing after the review, without editing session state.
-  await page.evaluate(key => localStorage.setItem(key, 'newer foreign bytes'), keys.primary);
-  await page.getByRole('button', { name: 'Remove reviewed save' }).click();
-  await expect(page.getByRole('status')).toContainText('Removal refused');
-  expect(await page.evaluate(key => localStorage.getItem(key), keys.primary)).toBe('newer foreign bytes');
-});
 
-test('unavailable storage is nonfatal and active battle prevents item controls', async ({ page }) => {
-  await open(page, '?state=prepared&unavailable');
-  await page.getByRole('button', { name: 'Use Healing Draught' }).click(); await confirm(page);
-  await expect(page.getByRole('status')).toContainText('unsaved');
-  expect((await report(page)).snapshot.items.ownership.consumables[0].quantity).toBe(1);
-  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
-  await expect(page.locator('dialog')).toContainText('unavailable');
-  await page.keyboard.press('Escape');
-  await open(page, '?state=active&unavailable');
+test('active testing snapshot prevents item controls without saved games',async({page})=>{
+  await open(page, '?state=active');
   await expect(page.getByRole('button', { name: 'Use Healing Draught' })).toBeDisabled();
   await expect(page.getByText('Items are unavailable during a battle.')).toBeVisible();
   const active = (await report(page)).snapshot;
@@ -145,7 +58,6 @@ test('unavailable storage is nonfatal and active battle prevents item controls',
   await page.getByRole('button', { name: 'Claim Healing Draught', exact: true }).click(); await confirm(page);
   await expect(page.getByRole('status')).toContainText('There is no room for that reward. Nothing changed.');
   expect((await report(page)).snapshot).toEqual(before);
-  await page.evaluate(() => localStorage.clear());
   await open(page, '?state=active'); const active = (await report(page)).snapshot;
   await page.reload(); expect((await report(page)).snapshot).toEqual(active);
   expect((await report(page)).snapshot.activeBattle.rng).toEqual(active.activeBattle.rng);

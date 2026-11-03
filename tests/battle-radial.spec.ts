@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { session, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
+import { session, readSession, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
+import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { previewMovement } from '../src/domain/grid';
 import { previewTacticalPlan } from '../src/domain/tacticalPlan';
@@ -431,14 +432,31 @@ test('radial hold aiming continues when a slice leaves the board region', async 
 
 test('combat controls persist Radial across a reload', async ({ page }) => {
   await ready(page);
+  const fresh=(await session(page)).state;
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('radial');
   await page.locator('#battle-overflow summary').click();
   await page.getByRole('radio', { name: 'Auto', exact: true }).click();
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('auto');
   await page.reload();
-  await page.locator('#save-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#save-continue')).toHaveCount(0);
+  expect((await session(page)).state).toEqual(fresh);
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('auto');
+});
+
+test.describe('radial saved-game boundary',()=>{
+  test('radial menu battle preserves its accepted state through Continue',async({page})=>{
+    await page.goto('./');await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
+    const initial=(await readSession(page)).state;
+    await page.getByRole('button',{name:'End turn',exact:true}).click();
+    await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(initial.commandCount);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=(await readSession(page)).state;
+    const primary=await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary);expect(primary).not.toBeNull();
+    await page.reload();await page.locator('#save-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await readSession(page)).state).toEqual(saved);expect((await readSession(page)).events).toEqual([]);
+    expect(await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary)).toBe(primary);
+  });
 });
 
 test('radial hold dismisses when a second touch lands on the overlay', async ({ page }) => {

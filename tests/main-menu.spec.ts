@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
+import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
+import { readFile } from 'node:fs/promises';
 import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/menuFixtures';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
@@ -246,4 +249,102 @@ for(const condition of ['missing','invalid','unavailable'] as const)test(`main m
  await page.getByRole('dialog').getByRole('button',{name:'Main menu',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();
  if(condition!=='unavailable')expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe(condition==='invalid'?'invalid preserved battle':null);
+});
+
+// Item durability uses the menu's real run owner; the dev fixture stays transient.
+async function menuItemReport(page:Page) { return {snapshot:JSON.parse(await page.locator('#game').getAttribute('data-run-snapshot')??'null')}; }
+async function openMenuRunItems(page:Page,snapshot:RunSnapshot) {
+ const encoded=encodeRunSave(snapshot,runContext);if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=run');
+ await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys:RUN_STORAGE_KEYS,text:encoded.text});
+ await reloadMenuRunItems(page);
+}
+async function reloadMenuRunItems(page:Page) {
+ await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#run-item-status')).toBeVisible();
+}
+async function confirmMenuItem(page:Page) {await page.locator('#item-confirm').click();await expect(page.locator('dialog')).not.toBeVisible();}
+async function activateMenuItem(page:Page,name:string,touch:boolean) {
+ const button=page.getByRole('button',{name,exact:true});if(touch)await button.tap();else await button.click();
+}
+test('main menu: reward claim advances exactly once and survives pending/claimed reload', async ({ page }, info) => {
+  const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:healing_draught'))!;
+  await openMenuRunItems(page,rewardSnapshot(seed)); const pending = (await menuItemReport(page)).snapshot;
+  await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(pending);
+  await activateMenuItem(page, 'Claim Healing Draught', info.project.name !== 'desktop');
+  if (info.project.name === 'desktop') await page.getByRole('button', { name: 'Confirm', exact: true }).dblclick();
+  else {
+    const box = await page.getByRole('button', { name: 'Confirm', exact: true }).boundingBox();
+    for (let i = 0; i < 2; i++) await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    if (await page.locator('dialog').isVisible()) await page.keyboard.press('Escape');
+  }
+  await expect(page.getByRole('heading', { name: 'Party items', exact: true })).toBeVisible();
+  const claimed = (await menuItemReport(page)).snapshot;
+  expect(claimed.items.run.encounterIndex).toBe(1); expect(claimed.items.itemRevision).toBe(1);
+  expect(claimed.items.ownership.consumables).toEqual([{ itemId: 'item:healing_draught', quantity: 1 }]);
+  await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(claimed);
+});
+test('main menu: real item use, equip and unequip preserve ownership/stats across reload', async ({ page }, info) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const select = page.getByRole('combobox', { name: 'Healing Draught target' });
+  await expect(select.locator('option', { hasText: 'Mage (defeated)' })).toBeDisabled();
+  await select.selectOption('ranger');
+  await activateMenuItem(page, 'Use Healing Draught', info.project.name !== 'desktop'); await confirmMenuItem(page);
+  const used = (await menuItemReport(page)).snapshot;
+  expect(used.items.run.party[1].hp).toBe(10); expect(used.items.ownership.consumables[0].quantity).toBe(1);
+  await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(used);
+  await page.getByRole('combobox', { name: 'Warding Charm target' }).selectOption('ranger');
+  await activateMenuItem(page, 'Equip Warding Charm', info.project.name !== 'desktop'); await confirmMenuItem(page);
+  const equipped = (await menuItemReport(page)).snapshot;
+  expect(equipped.items.ownership.assignments).toHaveLength(1);
+  const fighter = await page.getByRole('region', { name: 'Party', exact: true }).textContent();
+  await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(equipped);
+  expect(await page.getByRole('region', { name: 'Party', exact: true }).textContent()).toBe(fighter);
+  await page.getByRole('button', { name: 'Continue saved run', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  expect((await menuItemReport(page)).snapshot).toEqual(equipped);
+  await page.getByRole('button', { name: 'Unequip Warding Charm' }).click(); await confirmMenuItem(page);
+  expect((await menuItemReport(page)).snapshot.items.ownership.assignments).toEqual([]);
+});
+test('main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const backup = await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.backup);
+  await page.evaluate(key => localStorage.setItem(key, '  {broken raw\n\ud800'), RUN_STORAGE_KEYS.primary);
+  await reloadMenuRunItems(page);
+  await expect(page.locator('#run-item-status')).toContainText('Continued backup');
+  await page.getByRole('button', { name: 'Use Healing Draught' }).click(); await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toContainText('unsaved');
+  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBe('  {broken raw\n\ud800');
+  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.backup)).toBe(backup);
+  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
+  const download = page.waitForEvent('download'); await page.getByRole('button', { name: 'Export primary save' }).click();
+  const file = await download; expect(JSON.parse(await readFile((await file.path())!, 'utf8'))).toEqual({ slot: 'primary', text: '  {broken raw\n\ud800' });
+  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove primary save' }).click();
+  await page.getByRole('button', { name: 'Remove reviewed save' }).click();
+  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBeNull();
+  await page.locator('#run-close-recovery').click();
+  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
+  await page.getByRole('button', { name: 'Retry saving' }).click();
+  await expect(page.locator('#run-item-status')).toContainText('Run saved');
+  const saved = (await menuItemReport(page)).snapshot; await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(saved);
+});
+test('main menu: stale recovery review refuses changed bytes', async ({ page }) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove primary save' }).click();
+  // Simulate a different tab writing after the review, without editing session state.
+  await page.evaluate(key => localStorage.setItem(key, 'newer foreign bytes'), RUN_STORAGE_KEYS.primary);
+  await page.getByRole('button', { name: 'Remove reviewed save' }).click();
+  await expect(page.getByRole('dialog')).toContainText('primary: invalid');
+  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBe('newer foreign bytes');
+});
+test('main menu: unavailable storage remains playable with owned items', async ({ page }) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  await page.evaluate(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
+  await page.getByRole('button', { name: 'Use Healing Draught' }).click(); await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toContainText('unsaved');
+  expect((await menuItemReport(page)).snapshot.items.ownership.consumables[0].quantity).toBe(1);
+  await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
+  await expect(page.locator('dialog')).toContainText('Storage security');
+  await page.keyboard.press('Escape');
 });

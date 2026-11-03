@@ -27,7 +27,7 @@ for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-f
  if(route==='battle'){body.payload.format=2;body.payload.versions.rules=3;}else body.format=route==='run'?4:5;
  const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
  const keys=route==='battle'?BATTLE_STORAGE_KEYS:route==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS;
- await page.goto(route==='battle'?'battle':route);
+ await page.goto(`./?game=${route}`);
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
  await page.reload();
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
@@ -48,7 +48,7 @@ for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-f
  await page.reload();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.reload();await continueSavedDungeon(page);}
+async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.reload();await continueSavedDungeon(page);}
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
@@ -74,7 +74,7 @@ test('legal enemy defeat boundary resumes once and a confirmed new dungeon reset
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{
- await page.goto('run');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
+ await page.goto('./?game=run');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
  await expect(page.getByRole('heading',{name:'Dungeon floors',exact:true})).toBeVisible();await page.getByRole('link',{name:'Three-battle scenario',exact:true}).click();
  await expect(page.locator('#run-start')).toBeVisible();
 });

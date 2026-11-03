@@ -1,10 +1,342 @@
 # Issue #259: Isolate testing routes from saved games
 
-Date: 2026-11-03 (Asia/Jerusalem). Status: implementation in progress; entry-routing chunk under verification.
+Date: 2026-11-04 (Asia/Jerusalem). Status: implementation, supplemental review and local acceptance complete.
+
+## Final handoff
+
+Supplemental review fixed root-query run telemetry and aligned repeated `scene`
+selectors with first-value startup (`c656df7`). Fresh testing battles now use a
+per-battle outcome key (`bfd9151`), so the same deterministic fight after reload
+reports its own completion. The runtime changes are limited to route selection
+and transient telemetry; the previous save, combat, lifecycle and extended
+journey evidence remains applicable to unchanged inputs.
+
+The [#275 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/275)
+and [#277 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/277)
+record fresh units, builds, root/prefix Chromium, WebKit and configured telemetry
+receipts. The cold development failures remain recorded; the affected desktop
+run-entry assertion passed on a prepared server with unchanged test limits. The
+production reproduction failed before `bfd9151` and passed after it. Cloudflare
+preview succeeded for `bfd9151`; the documentation-only `fe9056e` preview failed
+without a diagnostic in the GitHub check. Retain that failure separately from
+the local production build and browser results.
+
+Issue #259 is implemented and qualified for review. Entry foundation [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275) is based on main; isolation [#277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) is stacked on it. Independent test fixes [#276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276) and [#278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278) remain separately reviewable and are mirrored in the feature. No merge, release tag or deployment is part of this handoff.
+
+All four issue criteria are covered:
+
+- **Saved journeys survive testing:** exact primary/backup/handoff bytes are preserved through normal play, restart, reload and Back at root and prefix, with Rail and Radial. Current isolation covers 60 Chromium/WebKit executions. Menu persistence/recovery/new-game/item cases pass 140/140.
+- **Testing always starts fresh:** direct battle/run/dungeon/map and supported diagnostics ignore forged persistent selectors. Reload and restart use fresh memory state; legal transient dungeon floor clearing, descent and return work.
+- **No saved-progress access in testing:** entry capability is resolved once; testing battle uses BattleSession directly, and testing run/dungeon receive null storage. Browser spies and failing-provider unit tests prove no game-slot or menu-handoff acquisition/read/write/remove/clear. Combat-control and privacy preferences retain their separate behavior.
+- **Persistence proof belongs to menu play:** saved regressions use root game entries, with retained corruption/backup/raw export/stale-review/replay/lifecycle coverage. The new radial reload assumption and fixture preference baselines are corrected. The [coverage ledger](../qa/issue-259/coverage-map.json) accounts for 1,665 retained, 102 mapped and 75 added stage/profile identities; the earlier ledger remains archived.
+
+Validation uses Node 24.22.1, locked Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2 on local Windows, one worker and zero retries. Current checks include 1,148 units, both TypeScript scopes, both root/prefix build integrations, all 28 selection/batch contracts, 18 clean source/build-consistent performance captures, menus, both control skins, root/prefix isolation, legal run/dungeon/reload/lifecycle, dev fixtures, audio/collector and all 18 extended progression journeys. The nine-batch partition and 23 approved profile reductions are preserved. Playwright emulation satisfies device acceptance; no physical-device claim is made.
+
+The full original CI run remains failed and all interrupted runs remain incomplete. Qualification combines recorded unchanged-input evidence with bounded local repairs; it is not a clean current full-suite rerun. Application/runtime and shared-fixture sources are unchanged from frozen 7e6d709 after the test-only repairs. Final test input hash is 515b6881876d905c6aa8b4f74ce41aec8a3422f448333d5c1934d765f910cea2. Source/build manifests, exact selected IDs and reports remain under ignored tmp/issue-259 and verification-receipts. The original 583 MB CI artifact passed its published SHA-256 check.
+
+Final focused outcomes: the original fixture stage retained 80 passes/13 failures; 11 repaired ability cases passed in run-vwZLtO, and the two remaining desktop functional cases passed in run-zBOPpX against a prepared dev server with the same tests/timeouts (exact failed ID set reconciled). Cold dev-server navigation/reload timeouts remain recorded; their cause and cold-start performance are not claimed fixed. The single audio follow-up passes in run-dz9HX5. Original failed reports are preserved. Extended Chromium passes 9/9 in run-yW4OMm and WebKit 9/9 in run-Zdzd8P, with no skips/flakes/retries.
+
+The temporary full-run trigger is removed. Qualification-only workflows live outside the implementation PRs. The prior #263 plan remains byte-for-byte intact, SHA-256 28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104. All OpenSpec tasks are complete; archive/sync follows the normal post-merge workflow. The notes below are historical evidence and superseded checkpoints, retained for audit and continuation.
+
+## Historical implementation and qualification notes
+
+
+Main advanced to `3333281` by merging #273 while final local checks were running.
+The entry foundation now incorporates it in `6a886b8` (21 route/menu units pass).
+The dependent branch integrates that foundation, retaining both mobile controls and
+the save capability; four overlapping import/config/documentation conflicts were
+resolved, and both TypeScript scopes pass. #276's literal merge tree with current
+main is clean; its focused one-line change needs no merge commit. #274 remains unmerged.
+
+**New integration work is required before completion.** The new radial browser suite
+contained a direct-route Continue assumption; it now retains preference assertions while
+checking a fresh testing battle. New radial cases prove all three testing game owners
+preserve primary/backup/handoff bytes through actions, restart, reload and actual Back,
+and a menu-launched radial battle preserves its accepted state through Continue.
+These cases and the preference repair pass **9/9 Chromium** (`run-BD716F`, `run-N7pPI6`)
+and **4/4 WebKit** (`run-jV4sa0`), one worker/zero retries. Current full units pass
+**1,148/1,148**, both TypeScript scopes pass, both root/prefix build integrations pass,
+and all **28** batch/selection contracts pass. Logs are `tmp/issue-259/mobile-integration-*`.
+
+Literal-main capture `selection-main-3333281.json` and current capture
+`selection-mobile-integration.json` reconcile **1,665 retained**, **102 mapped** and
+**75 added** stage/profile IDs in the refreshed [ledger](../qa/issue-259/coverage-map.json).
+The [prior ledger](../qa/issue-259/coverage-map-pre-mobile.json) is preserved unchanged.
+Current routine discovery: Chromium **1,006**, fixtures **93**, placement **6**, WebKit
+acceptance **182**, exploration **120**, health **25**, telemetry **36 per mode**,
+assets **78 per mode**; dedicated encounters/items/abilities/smoke are **24/9/60/2**.
+The nine-batch partition, 23 approved reductions and both nine-case extended matrices
+remain intact. No original execution was silently removed.
+
+Remaining integration qualification runs locally on frozen inputs. It covers both control
+skins and all game owners: menu/safety, root/prefix isolation, radial interactions,
+legal run outcomes/reloads, dungeon/lifecycle and both extended matrices, dev fixtures,
+proof input, health, configured telemetry, asset audio/collector modes and a fresh
+performance capture. Reuse is limited by dependency comparison: save codecs, domain,
+content, storage owners, recovery UI, menu-return guards and their pure fixtures are
+unchanged from the earlier tested candidate. The merged `BattleScene.begin` input/render
+implementation is identical to main; the feature changes only admission/session setup.
+Unchanged map/placement and noninteractive visual/resource checks retain their prior
+evidence. Preserve all original failures and incomplete runs; do not wait for CI.
+The task-specific runner is `tmp/issue-259/current-qualification.mjs`. It retains
+source and build identities, exact per-stage discovery, logs and incremental outcomes
+under `tmp/issue-259/current-qualification/`. It guards builds with the completed full
+unit/content checks and fresh typecheck, records performance before other browser
+work, serializes every browser stage at one worker/zero retries, preserves failures,
+and runs both complete extended matrices after restoring the root bundle.
+
+Integration checkpoint at frozen `7e6d709`: clean/consistent source and build pass
+all **18** performance captures; menus pass **84/84 Chromium + 56/56 WebKit**;
+root Rail isolation passes **15/15 Chromium**. Full radial Chromium retains **100
+passed, 3 native-touch-only desktop skips, 2 failed**; WebKit retains **54 passed,
+6 Chromium-CDP-only skips**. Both failures are the same test's setup: synthetic mouse
+Plan activation after a touch gesture. Literal `3333281` reproduces both failures
+(`main-radial-resize-test.log`, baseline receipt `run-OU8YrY`). The local sequence was
+stopped during WebKit isolation for a single-browser-job baseline comparison; that
+unfinished stage remains incomplete in `current-qualification/interrupted.json`.
+
+Independent [PR #278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278),
+`16cd804`, uses a native tap on touch profiles and retains every assertion/limit.
+It passes **3/3 Chromium + 2/2 WebKit** on literal-main application inputs, and the
+mirrored feature commit `ab49cba` passes the same **5/5** against the unchanged served
+integration bundle. Production code is unchanged. These scoped passes repair the two
+failed case/profile obligations; the original radial run remains failed. Main-baseline
+worktree now hosts this test-fix branch; do not treat its head as literal `3333281`.
+
+Resume only uncompleted local stages with `current-qualification-resume.mjs`, keeping
+the original results immutable and recording reused successful stages separately.
+The root bundle is still the exact clean `7e6d709` build. The only relevant edit since
+that run is the isolated radial test body; other case inputs and runtime code are
+unchanged. Do not rerun passing matrices or label the original failed run clean.
+
+Latest bounded checkpoint: root WebKit isolation **10/10** and legal run/outcome,
+reward/reload/stale-cache checks **9/9 Chromium + 4/4 WebKit** pass at `ddfb19f`.
+Dungeon Chromium retains **9 passes / 3 failures**: its read-only startup check still
+expected empty local storage although the merged Rail fixture deliberately writes
+the combat-controls preference. Literal main reproduces `Expected 0 / Received 1`
+(`main-dungeon-readonly-before.log`). The repaired check compares the exact fixture
+baseline, rejecting every unexpected entry. After that fix, one baseline WebKit run
+exposed the already-recorded 400-step random-layout navigator cycle; this non-entropy
+workload now uses the existing legal seed, with separate random-layout coverage retained.
+All **3 Chromium + 3 WebKit** repaired cases pass on the feature inputs, and both type
+scopes pass. This directly blocking consumer repair is committed in #277 as `9a695dc`.
+The unfinished WebKit dungeon stage and both earlier failures remain recorded.
+
+Final local work is limited to the remaining save-isolation consumers: the other
+WebKit dungeon cases, affected lifecycle and dev fixtures, audio/collector behavior
+at both bases/modes, prefix isolation and the two explicitly required extended matrices.
+Completed menus, root isolation, legal run, radial and performance evidence is reused.
+Unchanged map/placement, noninteractive visual/resource, health and telemetry contracts
+retain their recorded evidence; this is not a new qualification of the parent mobile
+controls feature. The preliminary extra proof-input/health/telemetry reruns are unnecessary
+for the #259 delta and will not expand this task. No additional test-repair workstream
+is opened. The existing requirement/coverage ledger remains the completion boundary.
+The direct local command sequence records incremental outcomes in
+`tmp/issue-259/remaining-local-results.json`; no CI wait is required.
+
+The remaining WebKit dungeon subset passes **9/9**; with the separately repaired
+startup case, all 12 selected dungeon obligations are covered. Lifecycle passes
+**6/6 Chromium + 6/6 WebKit**. The dev-fixture stage retains **80 passes / 13 failures**:
+one initial `page.goto` load timeout, plus 12 executions of two ability-test assertions
+that still expected `{}` instead of the Rail fixture preference. The ability checks
+now use the same exact preference-only baseline as the dungeon check, retaining the
+no-unexpected-entry guarantee and all state/replay/action assertions. Typecheck passes.
+Only the affected 12 cases and the one desktop navigation case need a focused follow-up
+after the active sequence. No production startup cause is claimed fixed, and the
+original failed fixture report remains intact (`run-tnMhYj`). This test-only edit does
+not affect the active asset, prefix, lifecycle or extended consumers; no sequence is
+restarted and no timeout is raised.
+
+Current local run: prefix isolation passes **18/18 Chromium + 12/12 WebKit** and
+the root bundle is restored. Root dev, prefix preview and prefix dev audio/collector/menu
+subsets pass **27/27 each**. Root preview retains **26 passes / 1 failure**, a Web Audio
+battle completion check on mobile portrait (`run-fCug6z`); check that one case separately
+without erasing the original failure. The extended Chromium matrix is running, with
+desktop Mage/Ranger/Fighter and portrait Mage passed so far. WebKit follows in the
+same live local process `89450`. Afterward, run only the 12 repaired ability cases,
+the single desktop fixture navigation case and this single audio case, then finalize
+the source-aware acceptance record. No CI status or newer upstream work is a gate.
+
+The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
+journeys. Its old-source WebKit extended stage was deliberately interrupted before
+integration; there is no final JSON for that stage. The exact owned process tree was
+stopped and `local-final-interrupted.json` records why. Process `49853` and all of its
+browser/server children have exited. Reopen affected task gates until the merged
+consumer audit and local qualification are complete.
+
+### Prior qualification evidence (before the mobile-controls merge)
+
+**Caller execution update:** do not wait for CI; run needed checks locally. Remaining
+acceptance now uses the matching locked local browsers and a fresh ordinary root build,
+with one worker and zero retries. This changes execution capacity, not test/profile
+coverage or any substantive acceptance gate. Existing CI jobs continue in the background
+and are not dependencies for finishing this work; observation cell `g15:297` was stopped.
+
+Local final qualification is running through ignored
+`tmp/issue-259/local-final-qualification.ps1` (process session `49853`). It records
+source identity, browser preflight, a fresh build and bundle hashes, then runs the
+remaining WebKit acceptance repairs (2), WebKit exploration repairs (9), Chromium
+extended journeys (9) and WebKit extended journeys (9). Independent stages retain
+their own results/failures in `tmp/issue-259/local-final-*`; no passing Chromium repair
+case or unaffected full-regression stage is repeated. Original failed/incomplete runs
+remain retained. Inspect these local reports before closing either remaining task.
+The matching Chromium/WebKit preflight passes (`run-6pQVGG`); content validation,
+both TypeScript scopes and the fresh root build pass. The served build embeds
+`75fe65a`, `dirty: true`: build-time content validation normalized two generated
+snapshot files' line endings, with zero logical diff. Those task-generated changes
+were restored; no production/test logic changed. Actual bundle hashes are retained
+in `local-final-build.json`, and functional qualification uses those served bytes.
+Local WebKit repairs are **11/11 passing**: acceptance **2/2** (`run-bUDRuz`) and
+exploration **9/9** (`run-iW6Y4o`). Combined with Chromium `run-OWih7J` **12/12**,
+all 23 scoped repair executions pass. The independent report audit verifies exact
+selected IDs, one worker, zero retries/skips/flakes/global errors, unchanged current
+input hash and unchanged served bundle bytes (`local-final-audit.json`). Extended
+Chromium now passes **9/9** (`run-7PH40S`, 22.9 minutes), with exact selected IDs,
+zero skips/flakes/retries/global errors and unchanged served bytes verified by the
+same audit. **Only the 9 WebKit extended journeys remain pending**; the local process
+is executing them without a CI wait.
+
+Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
+Final test/collector-description inputs are `30dc8ac`; cleanup `e168f43` changes only
+documentation and removes the temporary trigger. Subsequent documentation commits
+may advance the branch head. The scoped repairs below are being validated separately.
+Independent Windows contract repair #276 is mirrored as a separate dependency commit.
+
+OpenSpec tasks 1–3 are complete (7/9 total): the consumer/selection audit covers all ordinary,
+dev, WebKit, telemetry, asset and extended owners. The current relevant-input hash
+matches the coverage ledger, all referenced files exist, and 1,469 retained,
+102 mapped and 65 added stage/profile identities are accounted for. Final aggregate
+runtime/source acceptance and publication cleanup remain open under tasks 4.1/4.2.
+
+Additional current-source proof: main-menu **84/84 Chromium** (`run-OCCQCn`) and
+**56/56 WebKit** (`run-5GHKRG`) pass, including native input, new-game revalidation,
+failed-write recovery and the moved item cases. Old-format recovery/export passes
+**9/9 Chromium** (`run-ge51Jl`) and **9/9 WebKit** (`run-JHoTSg`) for all three save
+families. Focused desktop legal run/reward/replay, saved floor travel/reload/backtracking,
+cached-run stale writer, presentation restart and visibility interruption pass **5/5**
+(`run-on4ll5`). These preview runs reuse the last ordinary root bundle: `src`, `public`,
+Vite/package inputs and menu/helper files are unchanged from its `aca9709` inputs;
+later implementation changes are asset-fixture setup and documentation.
+
+Documentation audit checked 109 local links across 13 changed Markdown files with
+no missing targets. The preserved #263 plan still hashes to
+`28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104`.
+Collector functional cold/warm proof includes the passing traced dev case; that trace
+is not used for performance/budget acceptance. Original asset-matrix failures remain
+retained, and qualified aggregate/extended/performance gates are still required.
+
+Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) completed **failed** at frozen `04cf227` on
+`unraid-tactics-01`. Background supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
+branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
+workflow. It covers changed telemetry, repaired audio workloads/collector controls,
+root/prefix isolation/history and both extended engines. Earlier queued runs
+41647577545/41648868922/41651717195 were cancelled before execution.
+
+Full-run triage retains all 12 unexpected executions: Chromium 885 passed, 6 owning-mode
+skips, 7 failed; WebKit acceptance 118 passed, 2 failed; root dev assets 73 passed,
+3 production-only skips, 2 failed; prefix dev assets 74 passed, 3 skips, 1 failed.
+WebKit exploration passes 120/120. All other routine stages, including 18 untraced
+performance samples, completed successfully. Reports were recovered with ZIP entry CRC
+verification under `verification-receipts/ci/41647380978/reports`; the complete archive
+also passes SHA-256 verification. Artifact `13251420700` is 583,252,554 bytes, digest
+`df5b926cfbfcdaf7b41e81dd41fe11e891ced5c98d94d53ac1508b4a439c43b4`.
+
+Scoped repairs published as `30dc8ac`: the run defeat regression still expected saved Continue
+after following an intentional testing link. It now checks unchanged primary/backup
+bytes through direct battle/run entries and returns through Main menu → Continue for
+exact saved state. The new transient dungeon case must tolerate a not-yet-mounted
+battle session while polling readiness on touch devices. Two save/input dungeon cases
+also reached the existing random-layout navigator cycle; pin only those workloads to
+the established legal seed fixture, retaining independent fresh-layout proof. No
+production route/domain behavior, assertions, retry count or timeout is relaxed.
+The collector's stale descriptive `warmStorage` metadata is corrected to match its
+already-tested preservation behavior; historical captures remain unmodified.
+All four repaired cases now pass across the three Chromium profiles: **12/12**,
+zero skips/flakes/retries (`run-OWih7J`, `tmp/issue-259/ci-repairs-chromium.log`).
+Both TypeScript scopes and strict OpenSpec validation pass. The unchanged runtime
+bundle is reused; only these test bodies and collector description changed.
+The runtime report/selection audit matches all **1,550** full-run browser stage IDs
+exactly (`tmp/issue-259/full-ci-audit.json`). Its 12 skips are the six preview placement
+executions (covered in dev) and six dev-only production-hint executions (covered in
+preview); none is a missing owning-mode obligation. Qualified scoped repair
+[run 41680229366](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41680229366)
+is queued behind the current supplemental/extended job on the same exclusive lock.
+Its verification-only branch `branch/issue-259-repair-qualification` at `b9366a1`
+differs from candidate `30dc8ac` only by its workflow, asserted before execution.
+It builds the exact candidate and runs Chromium 12, WebKit acceptance 2 and WebKit
+exploration 9 repaired cases (23 total), one worker/zero retries, retaining independent
+stage failures and source/browser/results artifacts. This workflow is outside #277.
+The temporary `.github/full-verify-request` is removed. Its deletion otherwise triggers
+another full capture; this docs/trigger-only cleanup uses `[skip ci]` to avoid that
+duplicate run. Source-bound qualification still runs at the immutable candidates above,
+and the original full failure remains retained. No application/test/config input changes
+with this cleanup, and neither remaining task is marked complete yet.
+
+Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
+configured production/development telemetry are **72/72 passing**. The local four-mode
+asset matrix is complete but not clean: root preview 78 passed; root dev 74 passed,
+3 production-only skips, 1 initial navigation timeout; prefix preview 77 passed,
+1 random-layout navigator cycle; prefix dev 74 passed, 3 production-only skips,
+1 random-layout navigator cycle. Logs/results are in `tmp/issue-259/assets-*` and
+`assets-matrix-results.json`; receipts are `run-MuzPXV`, `run-fDSIuw`, `run-Ws4PGN`,
+`run-rEFYv8` respectively. No failure was erased or retried automatically.
+
+The two random-layout failures reached the existing test navigator's 400-step limit.
+Only the asset audio workload is pinned to legal seed 28 in
+`tests/public-asset-base.spec.ts`; its purpose is audio/base delivery, while random
+new-layout proof remains separate. Both backends/all profiles/four modes pass
+`-g 'dungeon audio loads'` (24 cases): `run-txgI9W`, `run-pZttSi`, `run-etW6zc`,
+`run-2dUq2y`, 6/6 each, zero skips/flakes/retries. All four asset discoveries still
+select the same 78 IDs/profiles. This is scoped repair evidence; the original failed
+full-file mode runs remain failed. No draft #274 code was cherry-picked.
+The first dev navigation was traced separately: the unchanged collector case passed
+in 14.3s; the trace records a 6.5s dev-server wait for preferences CSS before Phaser
+startup. It does not establish the timeout's cause or a product fix. Diagnostic trace
+is `verification-receipts/issue-259-dev-load-diagnostic`; it is not performance evidence.
+
+Supplemental job steps through both root/prefix isolation matrices, both configured
+telemetry modes, all audio/collector modes and restored-root build have passed.
+The same live job `126058161857` is executing Chromium extended journeys; WebKit
+extended journeys follow. Scoped repair run `41680229366` remains queued behind it.
+No local browser/server process remains active, and no qualification run was restarted.
+The bounded observation cell `g15:293` ended normally after 15 minutes; that is an
+observation deadline, not a stopped CI run. Poll these same run IDs before acting.
+
+Current source audit traces every #259 criterion to the implementation and its proof:
+
+- **Saved games unchanged after testing:** the five storage-condition journeys in
+  [battle-persistence.spec.ts](../../tests/battle-persistence.spec.ts) compare exact
+  primary/backup/handoff bytes through all seven entry families and real actions,
+  restart, reload, cleanup and history, then return to menu Continue. The repaired
+  run defeat journey also checks exact saved state after testing-link navigation.
+- **Testing always fresh:** [routes.ts](../../src/app/routes.ts) makes direct paths
+  and supported diagnostics transient regardless of forged intents; standalone
+  testing uses a fresh `BattleSession`, and run/dungeon hosts construct fresh memory
+  state. Existing isolation, reload/restart and random-new-layout cases prove these
+  boundaries across root/prefix, engines and profiles.
+- **No saved-game access:** hosts pass absent storage before provider construction;
+  owner save/inspect/export/recovery paths guard that absence. Browser spies cover
+  all progress keys and the menu handoff; owner units fail on provider acquisition.
+  Non-game preferences keep their existing separate behavior.
+- **Persistence regression coverage retained under menu ownership:** saved cases now
+  use root game entries, the moved item/ability obligations are reconciled in the
+  [coverage ledger](../qa/issue-259/coverage-map.json), and all 1,550 full-run browser
+  execution IDs match discovery. Menu negative recovery/new-game, replay, lifecycle,
+  BFCache and old-format raw export evidence is retained above.
+
+This source audit found no further production change. Final acceptance still requires
+the remaining repaired and extended local executions above, with source/build/browser
+identities and failures reconciled before closing tasks 4.1/4.2. Pending CI is no longer
+a gate under the caller's execution update.
+`origin/main` remains `d8692f9`; #273/#274 remain unmerged independent drafts. The
+ignored local scripts and receipts support continuation. `%TEMP%/tactics-259-baseline`
+hosts the temporary extended-qualification branch; `%TEMP%/tactics-259-repairs` hosts
+the repair-qualification branch. Neither workflow belongs in an implementation PR.
 
 - Issue: [#259](https://github.com/luminari-gurus/tactics-guru-v2/issues/259).
 - Owner: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/259#issuecomment-6603160055).
-- Branch: [`work/issue-259-testing-route-save-isolation`](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-259-testing-route-save-isolation).
+- Entry branch / PR: [`work/issue-259-testing-route-save-isolation`](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-259-testing-route-save-isolation), [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275), pushed `ffbdde0`.
+- Active dependent branch: `branch/issue-259-transient-gameplay`, implementation `6c8280f`, [PR #277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) against #275. Verification request `04cf227` adds only a temporary trigger.
 - Base: current `origin/main`, `d8692f94cb652eb6fbb6f4fa2a9330ad57c3d4dd`.
 - Planning method: [ablation](../../.agents/skills/ablation/SKILL.md), with [OpenSpec proposal](../../openspec/changes/issue-259-testing-route-save-isolation/proposal.md), [design](../../openspec/changes/issue-259-testing-route-save-isolation/design.md), [contract](../../openspec/changes/issue-259-testing-route-save-isolation/specs/game-save-scope/spec.md), and [implementation tasks](../../openspec/changes/issue-259-testing-route-save-isolation/tasks.md).
 - Previous plan: [#263 archive](issue-263-webkit-reload-boot-plan.md), preserved byte-for-byte; SHA-256 `28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104`.
@@ -116,7 +448,21 @@ The previous plan is preserved at the archive path above. Related #176/#270 are 
 - Browser evidence uses the repository Playwright wrapper, one worker, zero retries, untraced preview builds; no physical device claim. Initial `node scripts/browser-test.mjs tests/main-menu.spec.ts` retained 66 passes/3 failures in `verification-receipts/browser-runs/run-AoDT2L/results.json`: the newly added battle reload check incorrectly compared a pre-enemy fixture against a post-enemy save. Corrected only the three-mode fixture/reload block to seed on menu entry and compare the settled save; `... -g 'Continue resumes'` passed 9/9 in `run-baYPQZ`. The other 60 original Chromium cases are reused unchanged, covering all 69 obligations without claiming a clean rerun of the first suite. `... -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts` passed 46/46 (`run-k4x0PY`). Root menu asset/navigation passed 3/3 (`run-moFba9`). No app bug or acceptance assertion was removed to obtain these passes.
 - Prefix validation: `vite build --base=/prototype/` followed by `PLAYWRIGHT_BASE_PATH=/prototype/ node scripts/browser-test.mjs tests/main-menu.spec.ts tests/public-asset-base.spec.ts -g 'Continue resumes|New Game starts immediately|changed dungeon save|stale Continue|menu public artwork'` passed 21/21 (`run-cIbKCZ`). The root bundle was restored afterward. PowerShell supplied the environment assignment; unchanged successful content/type prerequisites were reused for these bundle steps.
 - Test/source hashes are recorded in ignored `tmp/issue-259/entry-source.json`; all receipts above are local retained evidence. OpenSpec tasks 1.1/1.2 are complete. Full-regression and extended journeys have not run and remain required for the finished isolation stack.
-- Next: publish the verified entry-routing PR; then consume `persistent` in the existing hosts, make storage explicitly absent for testing, migrate remaining save fixtures, add storage-spy isolation cases, and run the full/extended acceptance inventory. Task checkboxes close only when their complete proof is retained.
+- Entry PR #275 is open for review, without a closing reference. Runtime/test inputs are the tested inputs above; its final changes after verification are documentation/task tracking only.
+- Dependent chunk now resolves `appEntry` once, passes the capability to standalone battle, and supplies `null` storage to transient run/dungeon owners. Testing restart discards only memory; persistent reset/recovery and failed-travel guards remain. Save controls/review handoffs are guarded by storage eligibility. Battle telemetry lifecycle events are retained independently of saves. The collector's warm reload no longer removes game slots.
+- Iteration: the existing 132 owner tests passed after introducing optional storage. Two additional transient tests pass (complete legal run/replay/restart and dungeon descent/ascent without storage-factory acquisition). The updated build passes content/type/bundle checks. Initial desktop isolation journey passes 5/5 (`verification-receipts/browser-runs/run-3nWegI/results.json`), each exercising seven direct/diagnostic entry families with forged parameters, actions, restart, synthetic visibility/pagehide cleanup and reload against exact primary/backup/handoff sentinels. These are iteration results, not final acceptance; actual history/BFCache and full engine/device coverage remain required.
+- Save cases now use root `game` entries across battle/run/dungeon, effects, audio, health bars, procedural grids, lifecycle/BFCache, telemetry and extended journeys. Item fixture durability/recovery moved into five real menu-run cases; direct item/ability fixtures now keep only memory and reset on reload. Learned-ability save proof remains in the menu-owned extended Mage/Ranger/Fighter journeys, with a new menu dungeon XP 0/60/180/600 exact caster/active-boundary corpus. Fictional `zz_*` abilities retain immediate command/replay proof and have no production save contract.
+- The transient legal dungeon browser case passed a complete first floor, descent and return (`run-KBzO8y`, desktop). Its first attempt (`run-DCzA7w`) failed after 400 steps chasing one specific moving enemy; using the existing nearest-encounter traversal and Fighter seed-28 policy resolved the test-helper misuse. No domain movement rule or timeout was relaxed. The four menu caster cases pass (`run-H52nis`). Four moved item cases pass in `run-60uXcb`; the fifth initially expected the fixture's null-provider word `unavailable` for an actual denied browser getter. It correctly reports `Storage security`; its corrected exact classification passes in `run-oTBoS7`.
+- Dev fixture iteration `run-yTSHGQ` retained 16 passes/1 first-navigation timeout. Matched focused diagnostic runs of the same original picker case passed at parent `ffbdde0` (21.2s, `%TEMP%/tactics-259-baseline/verification-receipts/browser-runs/run-ldxrNV`) and current source (19.1s, `run-6BW9jS`). Neither reproduces that timeout; its cause is not claimed fixed or attributed to this change. Earlier mixed dev/root-item iteration `run-XLhGAx` was interrupted after startup timeouts and a host-specific recovery-summary assertion; error contexts remain, but no final JSON exists and it is incomplete. The final inventory must retain these outcomes and run the actual owning modes.
+- Final fast checks: all **1,122 unit tests pass** (`tmp/issue-259/all-units.json`), both build integrations pass (`tmp/issue-259/build-integration.log`), both TypeScript scopes/content/root build pass. The selection tooling run retained **27 passes/1 pre-existing CRLF parser failure** (`tmp/issue-259/selection-contracts.log`); literal `ffbdde0` reproduces that exact failure. Fixed independently in [PR #276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276), commit `aa3cfc7`, mirrored here as `ae7dfc1`. All 23 batch contracts pass on that repair; the formerly failing contract also passes on this branch. Put bundled Git's `usr/bin` on PATH for the existing real POSIX-shell guard assertions on Windows; no assertion/runner/timeout/skip was removed.
+- [Coverage ledger](../qa/issue-259/coverage-map.json) accounts for 1,469 unchanged stage/project IDs, 102 moved/renamed prior IDs and 65 added executions across the 15 captures. Current routine counts: Chromium **898**, dev fixtures **75**, placement **6**, WebKit acceptance **120** and exploration **120**, health **25**, telemetry **36 per mode**, assets **78 per mode**. Dedicated encounter/item/ability/smoke configs are **24/9/42/2**. These are discovery counts, not completed runtime results. Existing nine-batch exact partition, all extended profiles and the 23 approved matrix reductions passed discovery contracts; no test file or fixture consumer is left unassigned.
+- Final routine regression is running on frozen `04cf227` in [self-hosted run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978). Host disposition, locked setup, both browser preflights and exact full/batch discovery succeeded before the 19-stage execution started. The three historical PR-only workflow gates skip this unrelated branch; those skips are not runtime coverage.
+- Required extended journeys are queued behind the same exclusive lock in [run 41647577545](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647577545), verification-only branch `branch/issue-259-extended-qualification` at `4b372a3`. It differs from candidate `04cf227` only by its temporary workflow; that exact diff is asserted before execution. It builds the same gameplay inputs, runs both existing extended commands with one worker/zero retries, continues independent engines after a failure, and retains source/browser/results artifacts. This workflow is not part of either implementation PR and must not be merged into the product branches.
+- Review follow-up found telemetry's separate pathname-only classifier labels `/?game=run` as battle. A real configured production assertion reproduced `Expected run / Received battle` (`run-rmt8Ji`). `startTelemetry` now uses the existing shared route policy and preserves the disabled menu/dungeon taxonomy. The same existing ingestion case asserts the actual `app_entered` route. This is a required consumer repair, with no new event/schema or selection change.
+- Telemetry follow-up: 23 route/telemetry units and both root/prefix build integrations pass. Configured production **36/36** (`run-0YbuHD`) and development **36/36** (`run-02Orv4`) pass with no skips/flakes/retries, retaining the synthetic-error sanitization assertions. Both telemetry discoveries still select exactly the prior 36 IDs/effective profiles. Routine run `04cf227` remains valid gameplay evidence but cannot qualify this changed telemetry path; source-bound supplemental qualification is required. No original full-run failure or incomplete result may be erased by supplements.
+- Strengthened the five existing isolation journeys with accepted battle actions followed by actual Back navigation in the existing BFCache-enabled harness. They require exact fresh state and unchanged primary/backup/handoff bytes after return. All **15 Chromium** profiles/cases (`run-yloL62`) and **10 WebKit** (`run-7Xd3FS`) pass. Earlier full-file desktop persistence coverage also passed **26/26** (`run-wA5Jh9`), including the retained actual cached-document/stale-writer cases. Prefix isolation and asset-mode checks follow; the case IDs/matrix remain unchanged.
+- Superseded queued extended run `41647577545` was cancelled before execution. Replacement [run 41648868922](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41648868922), qualification branch `bfa6c3f`, asserts equivalence to telemetry candidate `0377781` and adds both configured telemetry suites plus changed units/build integrations ahead of the extended journeys. Align this queued branch once more with the stronger history proof before it executes. All supplemental work stays on the same `tactics-browser-exclusive` lock; its temporary workflow is never part of the implementation PR.
+- Next: inspect both final runs/artifacts, diagnose any failures without retries/limit changes, reconcile all acceptance gates, update PR #277 with source-bound results, and remove `.github/full-verify-request` from the implementation branch before review handoff. Do not merge or tag/release/deploy. Task checkboxes close only when their complete proof is retained.
 
 ## Estimate for my implementation
 

@@ -47,6 +47,14 @@ This primitive removes only that slot. Load/save never invoke it. The pre-remova
 
 ## Live battle controls (#73)
 
+These durable controls belong to menu-launched `/?game=battle` play (with the
+configured base prefix). Direct `/battle` and explicit battle/proof/content-smoke
+scene diagnostics are transient testing entries: they never construct
+`BattlePersistence`, inspect slots, serialize saves or mount recovery controls.
+Testing restart advances the in-memory seed and reload starts at seed 1. Use
+base-menu Continue to open an existing save, including one created through an
+older direct-route bookmark. No keys or formats are migrated or cleared.
+
 `BattlePersistence` owns one app lifecycle and composes this adapter with `BattleSession`. Startup only inspects: a compatible primary offers Continue; a backup is labelled recovery with possible lost progress. Invalid/unreadable data stays in place. If both slots are confirmed absent, seed 1 starts normally and its initial state is saved. If storage cannot be read and no valid candidate exists, Retry storage is required before starting; the app never silently replaces unknown saved data.
 
 Each accepted player/enemy command invokes one synchronous save callback before presentation. Previews, rejection, cancellation, acknowledgements and hydration never write. A failure leaves the accepted in-memory battle playable and the Save recovery status says progress is unsaved. Retry storage saves the current state when safe. A damaged other slot continues to block autosave until explicitly removed. No automatic destructive retry occurs.
