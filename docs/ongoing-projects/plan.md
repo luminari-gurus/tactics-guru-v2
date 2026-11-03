@@ -48,6 +48,30 @@ unit/content checks and fresh typecheck, records performance before other browse
 work, serializes every browser stage at one worker/zero retries, preserves failures,
 and runs both complete extended matrices after restoring the root bundle.
 
+Integration checkpoint at frozen `7e6d709`: clean/consistent source and build pass
+all **18** performance captures; menus pass **84/84 Chromium + 56/56 WebKit**;
+root Rail isolation passes **15/15 Chromium**. Full radial Chromium retains **100
+passed, 3 native-touch-only desktop skips, 2 failed**; WebKit retains **54 passed,
+6 Chromium-CDP-only skips**. Both failures are the same test's setup: synthetic mouse
+Plan activation after a touch gesture. Literal `3333281` reproduces both failures
+(`main-radial-resize-test.log`, baseline receipt `run-OU8YrY`). The local sequence was
+stopped during WebKit isolation for a single-browser-job baseline comparison; that
+unfinished stage remains incomplete in `current-qualification/interrupted.json`.
+
+Independent [PR #278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278),
+`16cd804`, uses a native tap on touch profiles and retains every assertion/limit.
+It passes **3/3 Chromium + 2/2 WebKit** on literal-main application inputs, and the
+mirrored feature commit `ab49cba` passes the same **5/5** against the unchanged served
+integration bundle. Production code is unchanged. These scoped passes repair the two
+failed case/profile obligations; the original radial run remains failed. Main-baseline
+worktree now hosts this test-fix branch; do not treat its head as literal `3333281`.
+
+Resume only uncompleted local stages with `current-qualification-resume.mjs`, keeping
+the original results immutable and recording reused successful stages separately.
+The root bundle is still the exact clean `7e6d709` build. The only relevant edit since
+that run is the isolated radial test body; other case inputs and runtime code are
+unchanged. Do not rerun passing matrices or label the original failed run clean.
+
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
 integration; there is no final JSON for that stage. The exact owned process tree was
