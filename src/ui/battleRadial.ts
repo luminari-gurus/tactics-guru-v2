@@ -18,6 +18,7 @@ export class BattleRadial {
   readonly root: HTMLElement;
   private readonly abort = new AbortController();
   private origin: Point = { x: 0, y: 0 };
+  private holdOrigin: Point = { x: 0, y: 0 };
   private cell: CellPosition | null = null;
   mode: 'hold' | 'tap' | null = null;
   private aimed: RadialSliceId | 'hub' = 'hub';
@@ -80,10 +81,13 @@ export class BattleRadial {
     this.leftHub = false;
     this.root.hidden = false;
     const margin = 132;
-    // Hold origin stays under the finger so return-to-hub cancel cannot miss a clamped disk.
-    const origin = options.mode === 'hold' ? options.origin : {
+    const plan = this.root.querySelector<HTMLElement>('#battle-radial-plan')!;
+    const bottomMargin = 142 + Math.ceil(plan.getBoundingClientRect().height);
+    // Keep the initial press as the hold cancel point even when the visible disk is clamped.
+    this.holdOrigin = options.origin;
+    const origin = {
       x: Math.min(innerWidth - margin, Math.max(margin, options.origin.x)),
-      y: Math.min(innerHeight - margin - 56, Math.max(margin, options.origin.y)),
+      y: Math.min(innerHeight - bottomMargin, Math.max(margin, options.origin.y)),
     };
     this.origin = origin;
     this.root.style.left = `${origin.x}px`;
@@ -103,7 +107,8 @@ export class BattleRadial {
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
     const cardinal = cardinalFromVector(dx, dy);
-    if (cardinal === 'hub' && slice !== 'plan') {
+    const inPressHub = this.mode === 'hold' && hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y);
+    if (inPressHub || (cardinal === 'hub' && slice !== 'plan')) {
       this.aim('hub');
       return;
     }
@@ -119,7 +124,8 @@ export class BattleRadial {
     if (!this.open || !this.cell) return 'none';
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
-    const inHub = hubContains(dx, dy) && slice !== 'plan';
+    const inHub = (this.mode === 'hold' && hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y))
+      || (hubContains(dx, dy) && slice !== 'plan');
     if (inHub) {
       if (this.leftHub || this.mode === 'tap') { this.cancel(); return 'cancel'; }
       return this.activate(this.defaultId());
@@ -277,6 +283,11 @@ export class BattleRadial {
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });
         return button;
       }));
+      // Prefer the right of the disk, then clamp the choices into the viewport.
+      const root = this.root.getBoundingClientRect();
+      const width = sub.offsetWidth, height = sub.offsetHeight;
+      sub.style.left = `${Math.max(0, Math.min(innerWidth - width, root.right + 6)) - root.left}px`;
+      sub.style.top = `${Math.max(0, Math.min(innerHeight - height, root.top + 8)) - root.top}px`;
     }
     this.writeHub(this.aimed);
   }

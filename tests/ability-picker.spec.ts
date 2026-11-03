@@ -1,5 +1,5 @@
 import {expect,test} from './helpers/forceRailControls';
-import { readSession, playCommand } from './helpers/battlePolicy';
+import { readSession, playCommand, tapBoard } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
@@ -218,4 +218,78 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19],[600
  const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state).toEqual(before.state);
  await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.screenshot({path:test.info().outputPath(`progression-level-${level}.png`)});
+});
+
+
+test('radial multiple specials remain reachable on a narrow viewport', async ({page,isMobile}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(() => {
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls = 'radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.locator('#battle-radial-special').click();
+  const choices=page.locator('#battle-radial-sub button');
+  await expect(choices).toHaveCount(2);
+  for (const choice of await choices.all()) {
+    const box=(await choice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(320);
+    expect(box.y+box.height).toBeLessThanOrEqual(568);
+  }
+  const before=await readSession(page);
+  if(isMobile) await choices.last().tap(); else await choices.last().click();
+  await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+});
+
+test('radial hold keeps edge actions visible and cancels at the original press', async ({page}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const results = await page.evaluate(async () => {
+    const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
+    const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
+    const {BattleSelection}=await import(/* @vite-ignore */ selectionPath);
+    const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
+    document.querySelector('#battle-radial')?.remove();
+    const model=new BattleSelection(abilitySession('mage'));
+    let cancelled=0;
+    const committed:string[]=[];
+    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string)=>{committed.push(slice);},inspect:()=>{},plan:()=>{},cancel:()=>{cancelled++;}});
+    const result=[];
+    const root=radial.root as HTMLElement;
+    for(const origin of [{x:8,y:8},{x:312,y:8},{x:8,y:560},{x:312,y:560}]) {
+      radial.show({x:1,y:0},{mode:'hold',origin});
+      const boxes=[...root.querySelectorAll<HTMLElement>('[data-slice]')].map(button=>{
+        const r=button.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};
+      });
+      const move=root.querySelector<HTMLElement>('#battle-radial-move')!.getBoundingClientRect();
+      radial.aimAt({x:move.left+move.width/2,y:move.top+move.height/2});
+      const verdict=radial.releaseAt(origin);
+      radial.show({x:1,y:0},{mode:'hold',origin});
+      const attack=root.querySelector<HTMLElement>('#battle-radial-attack')!.getBoundingClientRect();
+      const target={x:attack.left+attack.width/2,y:attack.top+attack.height/2};
+      radial.aimAt(target);
+      const attackVerdict=radial.releaseAt(target);
+      result.push({boxes,verdict,attackVerdict});
+    }
+    radial.dispose();
+    return {result,cancelled,committed};
+  });
+  for(const {boxes,verdict,attackVerdict} of results.result) {
+    for(const box of boxes) {
+      expect(box.left).toBeGreaterThanOrEqual(0);
+      expect(box.top).toBeGreaterThanOrEqual(0);
+      expect(box.right).toBeLessThanOrEqual(320);
+      expect(box.bottom).toBeLessThanOrEqual(568);
+    }
+    expect(verdict).toBe('cancel');
+    expect(attackVerdict).toBe('commit');
+  }
+  expect(results.cancelled).toBe(4);
+  expect(results.committed).toEqual(['attack','attack','attack','attack']);
 });
