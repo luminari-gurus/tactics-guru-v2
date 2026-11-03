@@ -5,6 +5,20 @@ import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
+
+test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
+ await page.goto('./?scene=unknown&scene=proof');
+ await expect(page.locator('[data-menu-action]')).toHaveCount(4);
+ await expect(page.locator('canvas')).toHaveCount(0);
+ await page.goto('./?game=run&scene=unknown&scene=proof');
+ await expect(page.locator('#run-start')).toBeVisible();
+ for(const scene of ['proof','content-smoke']){
+  await page.goto(`./?game=run&scene=${scene}&scene=unknown`);
+  await expect(page.locator('#fit-status')).toHaveText(scene==='proof'?'Ready':'Content ready');
+  await expect(page.locator('#game')).not.toHaveAttribute('data-session',/.+/);
+ }
+ await page.screenshot({path:test.info().outputPath('repeated-scene.png')});
+});
 test('main menu: read-only root, separate artwork and isolated loading',async({page})=>{
  const requests:string[]=[];page.on('request',r=>requests.push(r.url()));
  await page.addInitScript(()=>{Storage.prototype.setItem=function(k,v){throw Error(`Unexpected menu write ${k}`);};});
