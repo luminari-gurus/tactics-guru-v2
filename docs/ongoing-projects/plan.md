@@ -1,8 +1,25 @@
 # Issue #259: Isolate testing routes from saved games
 
-Date: 2026-11-03 (Asia/Jerusalem). Status: implementation and local acceptance complete; PR stack ready for review.
+Date: 2026-11-04 (Asia/Jerusalem). Status: implementation, supplemental review and local acceptance complete.
 
 ## Final handoff
+
+Supplemental review fixed root-query run telemetry and aligned repeated `scene`
+selectors with first-value startup (`c656df7`). Fresh testing battles now use a
+per-battle outcome key (`bfd9151`), so the same deterministic fight after reload
+reports its own completion. The runtime changes are limited to route selection
+and transient telemetry; the previous save, combat, lifecycle and extended
+journey evidence remains applicable to unchanged inputs.
+
+The [#275 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/275)
+and [#277 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/277)
+record fresh units, builds, root/prefix Chromium, WebKit and configured telemetry
+receipts. The cold development failures remain recorded; the affected desktop
+run-entry assertion passed on a prepared server with unchanged test limits. The
+production reproduction failed before `bfd9151` and passed after it. Cloudflare
+preview succeeded for `bfd9151`; the documentation-only `fe9056e` preview failed
+without a diagnostic in the GitHub check. Retain that failure separately from
+the local production build and browser results.
 
 Issue #259 is implemented and qualified for review. Entry foundation [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275) is based on main; isolation [#277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) is stacked on it. Independent test fixes [#276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276) and [#278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278) remain separately reviewable and are mirrored in the feature. No merge, release tag or deployment is part of this handoff.
 
