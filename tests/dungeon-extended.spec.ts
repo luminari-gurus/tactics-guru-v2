@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { dungeonContent } from '../src/content/dungeon';
 import { dungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';

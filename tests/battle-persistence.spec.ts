@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, installRailControls } from './helpers/forceRailControls';
 import { readFileSync } from 'node:fs';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
@@ -181,7 +181,9 @@ test('held confirmation Enter cannot flow through Restart and replace either sav
 
 for(const side of ['player','enemy'] as const)test(`reload during legal ${side} presentation matches an uninterrupted browser`,async({page,browser,baseURL})=>{
   test.setTimeout(60000);
-  const controlContext=await browser.newContext({viewport:page.viewportSize(),baseURL}),control=await controlContext.newPage();
+  const controlContext=await browser.newContext({viewport:page.viewportSize(),baseURL});
+  await installRailControls(controlContext);
+  const control=await controlContext.newPage();
   const errors:string[]=[];for(const p of [page,control])p.on('pageerror',e=>errors.push(e.message));
   try {
     for(const p of [page,control]){await p.clock.install();await seedTwo(p);}

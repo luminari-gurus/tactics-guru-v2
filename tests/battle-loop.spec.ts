@@ -1,5 +1,5 @@
 import { confirmRestart } from './helpers/battlePolicy';
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
