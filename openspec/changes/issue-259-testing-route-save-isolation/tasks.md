@@ -18,7 +18,7 @@
 
 ## 4. Integration qualification
 
-- [ ] 4.1 Run the final full-regression inventory and affected extended journeys on qualified exclusive self-hosted capacity; verify both TypeScript scopes/builds, complete coverage ledger and exact source/build/browser identities, retaining all failures, skips, incomplete runs and justified reused results.
+- [ ] 4.1 Account for the final full-regression inventory and affected extended journeys, running remaining checks locally under the caller's execution update instead of waiting for CI; verify both TypeScript scopes/builds, complete coverage ledger and exact source/build/browser identities, retaining all failures, skips, incomplete runs and justified reused results.
 - [ ] 4.2 Audit every #259 acceptance criterion against code and retained evidence, validate this OpenSpec change and diff scope, then publish the focused implementation PR with issue links, source-bound validation and remaining limitations; use a closing reference only after all acceptance gates pass.
 
 ## Workflow follow-up

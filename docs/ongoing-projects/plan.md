@@ -4,6 +4,27 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 
 ### Current qualification checkpoint
 
+**Caller execution update:** do not wait for CI; run needed checks locally. Remaining
+acceptance now uses the matching locked local browsers and a fresh ordinary root build,
+with one worker and zero retries. This changes execution capacity, not test/profile
+coverage or any substantive acceptance gate. Existing CI jobs continue in the background
+and are not dependencies for finishing this work; observation cell `g15:297` was stopped.
+
+Local final qualification is running through ignored
+`tmp/issue-259/local-final-qualification.ps1` (process session `49853`). It records
+source identity, browser preflight, a fresh build and bundle hashes, then runs the
+remaining WebKit acceptance repairs (2), WebKit exploration repairs (9), Chromium
+extended journeys (9) and WebKit extended journeys (9). Independent stages retain
+their own results/failures in `tmp/issue-259/local-final-*`; no passing Chromium repair
+case or unaffected full-regression stage is repeated. Original failed/incomplete runs
+remain retained. Inspect these local reports before closing either remaining task.
+The matching Chromium/WebKit preflight passes (`run-6pQVGG`); content validation,
+both TypeScript scopes and the fresh root build pass. The served build embeds
+`75fe65a`, `dirty: true`: build-time content validation normalized two generated
+snapshot files' line endings, with zero logical diff. Those task-generated changes
+were restored; no production/test logic changed. Actual bundle hashes are retained
+in `local-final-build.json`, and functional qualification uses those served bytes.
+
 Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
 Final test/collector-description inputs are `30dc8ac`; cleanup `e168f43` changes only
 documentation and removes the temporary trigger. Subsequent documentation commits
@@ -34,7 +55,7 @@ is not used for performance/budget acceptance. Original asset-matrix failures re
 retained, and qualified aggregate/extended/performance gates are still required.
 
 Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) completed **failed** at frozen `04cf227` on
-`unraid-tactics-01`. Current executing supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
+`unraid-tactics-01`. Background supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
 branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
 workflow. It covers changed telemetry, repaired audio workloads/collector controls,
 root/prefix isolation/history and both extended engines. Earlier queued runs
@@ -133,8 +154,9 @@ Current source audit traces every #259 criterion to the implementation and its p
   BFCache and old-format raw export evidence is retained above.
 
 This source audit found no further production change. Final acceptance still requires
-inspecting both pending jobs' artifacts, proving all repaired and extended executions,
-and reconciling source/build/browser identities and failures before closing tasks 4.1/4.2.
+the remaining repaired and extended local executions above, with source/build/browser
+identities and failures reconciled before closing tasks 4.1/4.2. Pending CI is no longer
+a gate under the caller's execution update.
 `origin/main` remains `d8692f9`; #273/#274 remain unmerged independent drafts. The
 ignored local scripts and receipts support continuation. `%TEMP%/tactics-259-baseline`
 hosts the temporary extended-qualification branch; `%TEMP%/tactics-259-repairs` hosts
