@@ -2,8 +2,8 @@
 
 ## 1. Entry and menu boundary
 
-- [ ] 1.1 Recheck main and draft PRs #273/#274, capture current selected test IDs, and implement the closed root `game` entry policy plus menu URL builder; verify root/prefix, diagnostic precedence, unknown/conflicting parameters and one-shot intent reload behavior in route units.
-- [ ] 1.2 Update menu New/Continue/recovery navigation and production preload routing; move #269 destination checks into persistent root play, update main-menu documentation, and verify empty, changed, backup-only and failed-write menu cases plus root/prefix build-header checks.
+- [x] 1.1 Recheck main and draft PRs #273/#274, capture current selected test IDs, and implement the closed root `game` entry policy plus menu URL builder; verify root/prefix, diagnostic precedence, unknown/conflicting parameters and one-shot intent reload behavior in route units.
+- [x] 1.2 Update menu New/Continue/recovery navigation and production preload routing; move #269 destination checks into persistent root play, update main-menu documentation, and verify empty, changed, backup-only and failed-write menu cases plus root/prefix build-header checks.
 
 ## 2. Transient gameplay owners
 

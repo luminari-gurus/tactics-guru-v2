@@ -21,9 +21,12 @@ engine chunks. Menu inspection imports validators/content through `menuSaves.ts`
 and a side-effect-free run context, without importing app hosts. It creates no
 sessions, RNG or writes and never exposes save bytes in DOM.
 
-Menu actions use full-page navigation. The closed-set `entry` parameter is removed
-from history before use and consumed once. Battle/run/dungeon destinations inspect
-again and use existing Continue/recovery owners. New Game starts immediately when
+Menu actions use full-page navigation to the configured base root with a closed
+`game=battle|run|dungeon` selector, for example `/?game=dungeon&entry=new` or
+`/prototype/?game=run&entry=continue`. The closed-set `entry` parameter is removed
+from history before use and consumed once; `game` remains so reload retains the
+saved-game owner. Battle/run/dungeon destinations inspect again and use existing
+Continue/recovery owners. New Game starts immediately when
 both dungeon save slots are empty. Otherwise it asks for confirmation over the
 menu. The dungeon rechecks the reviewed saves before replacement and requests
 confirmation again if they changed. If a confirmed replacement clears slots but
@@ -41,4 +44,8 @@ battle dialogs offer a Main menu button inside the modal.
 The `main-menu.spec.ts` suite belongs to the default three-profile Chromium matrix
 and the existing two-profile iPhone WebKit acceptance stage. Serial batch selection
 includes it exactly once per Chromium project. Existing test identities are retained
-while battle navigation changes to `/battle`; explicit root scene diagnostics remain.
+while saved journeys use the root selector. `/map` remains inspection. Supported
+explicit root `scene` diagnostics take precedence over `game`; unknown or duplicate
+`game` values render the menu. Direct paths cannot select a persistent entry through
+query parameters. The follow-up #259 owner change removes their legacy save access;
+this entry-routing chunk alone does not claim testing-route isolation.

@@ -27,4 +27,4 @@ Issue: #259. Owner: `moshehbenavraham`. Planned branch: `work/issue-259-testing-
 
 Owners include `src/main.ts`, `src/app/routes.ts`, the three application/session hosts, `BattleScene`, persistence controls, main-menu and dungeon UI, `vite.config.ts`, existing tests/helpers and verification selection, and `scripts/measure-fit-controls.ts`. The human implementation plan is `docs/ongoing-projects/plan.md`.
 
-No dependency, save migration, record subsystem, combat rule, deployment or runner-capacity change is proposed. #270 explicitly references this route boundary; #176/#270 implementation remains separate. Current draft PRs #273/#274 remain independent and must be rechecked before implementation. This delivery contains planning only.
+No dependency, save migration, record subsystem, combat rule, deployment or runner-capacity change is proposed. #270 explicitly references this route boundary; #176/#270 implementation remains separate. Current draft PRs #273/#274 remain independent and were rechecked before implementation. Implementation progress and evidence are tracked in tasks.md and the human plan.

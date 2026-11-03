@@ -1,5 +1,5 @@
 import { inspectMenuSaves, type MenuSave } from '../app/menuSaves';
-import { routeHref } from '../app/routes';
+import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import './mainMenu.css';
@@ -54,21 +54,21 @@ export function startMainMenu() {
       body.append(element('p', recoveryMode ? 'Open a mode to inspect, export or recover its saves. Nothing is removed here.' : 'Choose which saved journey to continue.'));
       for (const save of saves) {
         const link = element('a', `${save.label}${save.fromBackup ? ' · backup (some progress may be lost)' : ''}${save.needsRecovery ? ' · recovery needed' : ''}`);
-        link.href = routeHref(save.mode, import.meta.env.BASE_URL, recoveryMode ? 'recovery' : 'continue'); body.append(link);
+        link.href = menuGameHref(save.mode, import.meta.env.BASE_URL, recoveryMode ? 'recovery' : 'continue'); body.append(link);
       }
     });
   }
   const actions: Record<string, () => void> = {
     continue: () => {
       const saves = refresh().filter(save => save.resumable);
-      if (saves.length === 1) location.assign(routeHref(saves[0].mode, import.meta.env.BASE_URL, 'continue'));
+      if (saves.length === 1) location.assign(menuGameHref(saves[0].mode, import.meta.env.BASE_URL, 'continue'));
       else if (saves.length) choose(saves, false);
     },
     new: () => {
       const review = createDungeonStorage().inspect();
       if (bothDungeonSlotsMissing(review)) {
         try { sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review'); } catch { /* The destination rechecks storage. */ }
-        location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new'));
+        location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'new'));
         return;
       }
       show('Start new dungeon?', () => {
@@ -81,7 +81,7 @@ export function startMainMenu() {
               backup: { status: review.backup.status, text: review.backup.text },
             }));
           } catch { /* The destination will request confirmation again. */ }
-          location.assign(routeHref('dungeon', import.meta.env.BASE_URL, 'new'));
+          location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'new'));
         };
         body.append(confirm);
       });
@@ -100,7 +100,7 @@ export function startMainMenu() {
   recovery.onclick = () => { recovery.focus(); choose(refresh(), true); };
   const secondary = element('nav'); secondary.className = 'menu-secondary'; secondary.setAttribute('aria-label', 'Other modes');
   for (const [route, label] of [['battle', 'Standalone battle'], ['run', 'Three-encounter run'], ['map', 'Map inspection']] as const) {
-    const link = element('a', label); link.href = routeHref(route, import.meta.env.BASE_URL); secondary.append(link);
+    const link = element('a', label); link.href = route === 'map' ? routeHref(route, import.meta.env.BASE_URL) : menuGameHref(route, import.meta.env.BASE_URL); secondary.append(link);
   }
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();

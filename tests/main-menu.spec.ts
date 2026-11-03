@@ -15,6 +15,9 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
  expect(await image.evaluate(n=>(n as HTMLImageElement).naturalWidth/(n as HTMLImageElement).naturalHeight)).toBe(3);
  await expect(page.locator('canvas')).toHaveCount(0);
+ await expect(page.getByRole('link',{name:'Standalone battle',exact:true})).toHaveAttribute('href',/\?game=battle$/);
+ await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run$/);
+ await expect(page.getByRole('link',{name:'Map inspection',exact:true})).toHaveAttribute('href',/\/map$/);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
  await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('Records are not collected yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
@@ -26,13 +29,24 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await page.screenshot({path:test.info().outputPath('menu.png'),fullPage:true});
 });
 for(const mode of ['battle','run','dungeon'] as const)test(`main menu: Continue resumes ${mode} through its owner`,async({page})=>{
- const text=menuFixture(mode);await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:keys[mode].primary,text});
+ const text=menuFixture(mode);await page.addInitScript(({key,text})=>{
+  if(!new URLSearchParams(location.search).has('game'))localStorage.setItem(key,text);
+ },{key:keys[mode].primary,text});
  await page.goto('./');await page.getByRole('button',{name:'Continue',exact:true}).click();
- await expect(page).toHaveURL(new RegExp(`/${mode}$`));
+ await expect(page).toHaveURL(new RegExp(`\\/\\?game=${mode}$`));
  if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  else if(mode==='run')await expect(page.locator('#run-start-encounter')).toBeVisible();
  else await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
  await expect(page.getByRole('link',{name:'Main menu',exact:true}).first()).toBeVisible();
+ const saved=await page.evaluate(key=>localStorage.getItem(key),keys[mode].primary);
+ await page.reload();
+ await expect(page).toHaveURL(new RegExp(`\\/\\?game=${mode}$`));
+ if(mode==='battle')await page.locator('#save-continue').click();
+ else await page.getByRole('button',{name:`Continue saved ${mode}`,exact:true}).click();
+ if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ else if(mode==='run')await expect(page.locator('#run-start-encounter')).toBeVisible();
+ else await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys[mode].primary)).toBe(saved);
 });
 test('main menu: multiple modes, backup warning, recovery and fresh save inspection',async({page})=>{
  const battle=menuFixture('battle'),run=menuFixture('run');
@@ -66,7 +80,7 @@ test('main menu: New Game starts immediately when no dungeon save exists',async(
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
 });
 test('main menu: a dungeon save appearing during navigation requires confirmation',async({page})=>{
- await page.addInitScript(key=>{if(location.pathname.endsWith('/dungeon'))localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);
+ await page.addInitScript(key=>{if(new URLSearchParams(location.search).get('game')==='dungeon')localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe('newly arrived save');
@@ -115,21 +129,21 @@ test('main menu: supplied background compositions remain independent of controls
  }
 });
 test('main menu: stale Continue and closed-set intents preserve missing or damaged saves',async({page})=>{
- await page.goto('./battle?entry=continue');await expect(page.getByRole('dialog')).toContainText('Saved battle');
+ await page.goto('./?game=battle&entry=continue');await expect(page.getByRole('dialog')).toContainText('Saved battle');
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':battle:')))).toEqual([]);
- await page.goto('./run?entry=continue');await expect(page.getByRole('dialog')).toContainText('Run save recovery');
- await page.goto('./dungeon?entry=continue');await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
+ await page.goto('./?game=run&entry=continue');await expect(page.getByRole('dialog')).toContainText('Run save recovery');
+ await page.goto('./?game=dungeon&entry=continue');await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')||key.includes(':run:')))).toEqual([]);
- await page.goto('./dungeon?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
- await expect(page).toHaveURL(/\/dungeon$/);
- await page.goto('./battle?entry=new');await expect(page.getByRole('dialog')).toContainText('Start a new battle?');
+ await page.goto('./?game=dungeon&entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
+ await expect(page).toHaveURL(/\/\?game=dungeon$/);
+ await page.goto('./?game=battle&entry=new');await expect(page.getByRole('dialog')).toContainText('Start a new battle?');
  await page.getByRole('button',{name:'Cancel',exact:true}).click();
- await page.goto('./run?entry=new');await expect(page.getByRole('dialog')).toContainText('Start new run?');
+ await page.goto('./?game=run&entry=new');await expect(page.getByRole('dialog')).toContainText('Start new run?');
  await page.getByRole('button',{name:'Cancel',exact:true}).click();
- await page.goto('./battle?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
- await expect(page).toHaveURL(/\/battle$/);
- await page.goto('./run?entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
- await expect(page).toHaveURL(/\/run$/);
+ await page.goto('./?game=battle&entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
+ await expect(page).toHaveURL(/\/\?game=battle$/);
+ await page.goto('./?game=run&entry=unrecognized');await expect(page.locator('dialog')).not.toBeVisible();
+ await expect(page).toHaveURL(/\/\?game=run$/);
 });
 test('main menu: failed new-game write retains exportable recovery copies',async({page})=>{
  const text=menuFixture('dungeon');
@@ -160,7 +174,7 @@ test('main menu: unsaved run still warns after a rejected reward command',async(
   localStorage.setItem(key,text);const original=Storage.prototype.setItem;
   Storage.prototype.setItem=function(key,value){if(String(key).includes(':run:'))throw new DOMException('full','QuotaExceededError');original.call(this,key,value);};
  },{key:keys.run.primary,text});
- await page.goto('./run');await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
+ await page.goto('./?game=run');await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
  const claim=page.getByRole('button',{name:/^Claim /}).first();
  await expect(claim).toBeVisible();await claim.click();await page.locator('#item-confirm').click();
  await expect(page.locator('#run-item-status')).toContainText(/unsaved/i);
@@ -175,7 +189,7 @@ test('main menu: unsaved run still warns after a rejected reward command',async(
 });
 test('main menu: unsaved return cancellation opens recovery and accepted leave reaches menu',async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
- await page.goto('./run');await page.getByRole('button',{name:'Play unsaved run',exact:true}).click();
+ await page.goto('./?game=run');await page.getByRole('button',{name:'Play unsaved run',exact:true}).click();
  page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
  await expect(page.getByRole('dialog')).toContainText('Run save recovery');
  await page.locator('#run-close-recovery').click();
@@ -185,7 +199,7 @@ test('main menu: unsaved return cancellation opens recovery and accepted leave r
 
 for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`,async({page})=>{
  if(path==='failed replacement')await page.addInitScript(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.includes(':dungeon:'))throw new DOMException('full','QuotaExceededError');set.call(this,key,value);};});
- await page.goto('./dungeon');
+ await page.goto('./?game=dungeon');
  if(path==='unsaved play'){
   await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
   await page.locator('.dungeon-directions button:not(:disabled)').first().click();
@@ -212,7 +226,7 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
 for(const condition of ['missing','invalid','unavailable'] as const)test(`main menu: startup battle recovery can return with ${condition} storage`,async({page})=>{
  if(condition==='invalid')await page.addInitScript(key=>localStorage.setItem(key,'invalid preserved battle'),keys.battle.primary);
  if(condition==='unavailable')await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
- await page.goto('./battle?entry=recovery');await expect(page.getByRole('dialog')).toContainText('Saved battle');
+ await page.goto('./?game=battle&entry=recovery');await expect(page.getByRole('dialog')).toContainText('Saved battle');
  await page.getByRole('dialog').getByRole('button',{name:'Main menu',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();
  if(condition!=='unavailable')expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe(condition==='invalid'?'invalid preserved battle':null);
