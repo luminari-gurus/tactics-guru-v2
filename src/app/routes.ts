@@ -11,7 +11,7 @@ export function resolveAppEntry(pathname: string, search = '', base = '/'): AppE
   }
   if (path === root) {
     const params = new URLSearchParams(search);
-    if (params.getAll('scene').some(scene => ['battle', 'proof', 'content-smoke'].includes(scene))) {
+    if (['battle', 'proof', 'content-smoke'].includes(params.get('scene') ?? '')) {
       return { route: 'battle', persistent: false };
     }
     const games = params.getAll('game');

@@ -30,7 +30,9 @@ describe('base-aware menu routing', () => {
         expect(resolveAppEntry(base, search, base)).toEqual({ route: 'menu', persistent: false });
       }
       expect(resolveAppEntry(base, '?game=run&scene=unknown', base)).toEqual({ route: 'run', persistent: true });
-      expect(resolveAppEntry(base, '?game=run&scene=unknown&scene=proof', base)).toEqual({ route: 'battle', persistent: false });
+      expect(resolveAppEntry(base, '?game=run&scene=unknown&scene=proof', base)).toEqual({ route: 'run', persistent: true });
+      expect(resolveAppEntry(base, '?scene=unknown&scene=proof', base)).toEqual({ route: 'menu', persistent: false });
+      expect(resolveAppEntry(base, '?game=run&scene=proof&scene=unknown', base)).toEqual({ route: 'battle', persistent: false });
     });
     it.each(['new', 'continue', 'recovery', 'unrecognized'])(`consumes %s once while retaining persistent identity at ${base}`, intent => {
       const location = { href: `https://test.invalid${base}?game=dungeon&entry=${intent}#floor` };

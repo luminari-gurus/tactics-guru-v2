@@ -54,6 +54,7 @@ for (const base of ['/', '/tactics/']) {
       expect(direct.length).toBeGreaterThan(0);
       expect(direct.every(link => link.href.startsWith(base))).toBe(true);
       expect(preloads(base, `?game=${mode}&entry=continue`)).toEqual(direct);
+      expect(preloads(base, `?game=${mode}&scene=unknown&scene=proof`)).toEqual(direct);
       expect(preloads(base.replace(/\/$/, ''), `?game=${mode}`)).toEqual(direct);
     }
     for (const scene of ['battle', 'proof', 'content-smoke']) {
@@ -61,6 +62,7 @@ for (const base of ['/', '/tactics/']) {
       expect(diagnostic.length).toBeGreaterThan(0);
       expect(preloads(base, `?game=run&scene=${scene}`)).toEqual(diagnostic);
       expect(diagnostic.some(link => link.as === 'image')).toBe(scene === 'battle');
+      expect(preloads(base, `?game=run&scene=${scene}&scene=unknown`)).toEqual(diagnostic);
     }
   }, 60_000);
 }
