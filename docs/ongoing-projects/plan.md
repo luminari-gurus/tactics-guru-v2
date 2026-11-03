@@ -72,6 +72,31 @@ The root bundle is still the exact clean `7e6d709` build. The only relevant edit
 that run is the isolated radial test body; other case inputs and runtime code are
 unchanged. Do not rerun passing matrices or label the original failed run clean.
 
+Latest bounded checkpoint: root WebKit isolation **10/10** and legal run/outcome,
+reward/reload/stale-cache checks **9/9 Chromium + 4/4 WebKit** pass at `ddfb19f`.
+Dungeon Chromium retains **9 passes / 3 failures**: its read-only startup check still
+expected empty local storage although the merged Rail fixture deliberately writes
+the combat-controls preference. Literal main reproduces `Expected 0 / Received 1`
+(`main-dungeon-readonly-before.log`). The repaired check compares the exact fixture
+baseline, rejecting every unexpected entry. After that fix, one baseline WebKit run
+exposed the already-recorded 400-step random-layout navigator cycle; this non-entropy
+workload now uses the existing legal seed, with separate random-layout coverage retained.
+All **3 Chromium + 3 WebKit** repaired cases pass on the feature inputs, and both type
+scopes pass. This directly blocking consumer repair is committed in #277 as `9a695dc`.
+The unfinished WebKit dungeon stage and both earlier failures remain recorded.
+
+Final local work is limited to the remaining save-isolation consumers: the other
+WebKit dungeon cases, affected lifecycle and dev fixtures, audio/collector behavior
+at both bases/modes, prefix isolation and the two explicitly required extended matrices.
+Completed menus, root isolation, legal run, radial and performance evidence is reused.
+Unchanged map/placement, noninteractive visual/resource, health and telemetry contracts
+retain their recorded evidence; this is not a new qualification of the parent mobile
+controls feature. The preliminary extra proof-input/health/telemetry reruns are unnecessary
+for the #259 delta and will not expand this task. No additional test-repair workstream
+is opened. The existing requirement/coverage ledger remains the completion boundary.
+The direct local command sequence records incremental outcomes in
+`tmp/issue-259/remaining-local-results.json`; no CI wait is required.
+
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
 integration; there is no final JSON for that stage. The exact owned process tree was
