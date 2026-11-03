@@ -29,8 +29,10 @@ exploration **9/9** (`run-iW6Y4o`). Combined with Chromium `run-OWih7J` **12/12*
 all 23 scoped repair executions pass. The independent report audit verifies exact
 selected IDs, one worker, zero retries/skips/flakes/global errors, unchanged current
 input hash and unchanged served bundle bytes (`local-final-audit.json`). Extended
-Chromium and WebKit remain the only pending runtime checks; the local process is
-executing the Chromium matrix before WebKit, without a CI wait.
+Chromium now passes **9/9** (`run-7PH40S`, 22.9 minutes), with exact selected IDs,
+zero skips/flakes/retries/global errors and unchanged served bytes verified by the
+same audit. **Only the 9 WebKit extended journeys remain pending**; the local process
+is executing them without a CI wait.
 
 Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
 Final test/collector-description inputs are `30dc8ac`; cleanup `e168f43` changes only
