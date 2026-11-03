@@ -147,6 +147,7 @@ export class BattleScene extends Phaser.Scene {
       commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
       inspect:()=>{
         const unit=selection.selectedCell?session.state.units.find(u=>u.hp>0&&u.cell.x===selection.selectedCell!.x&&u.cell.y===selection.selectedCell!.y):null;
+        selection.clear();
         inspect(unit?.id ?? session.active.id);
       },
       plan:()=>{if(session.phase==='player' && !dialogs.open){selection.startPlan();refresh();}},
@@ -211,7 +212,7 @@ export class BattleScene extends Phaser.Scene {
       pump();
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
-    setModalTransition(()=>{removeInput.reset();radial.hide();queueMicrotask(()=>{if(live){refresh();pump();}});});
+    setModalTransition(()=>{removeInput.reset();if(radial.open){selection.clear();radial.hide();}queueMicrotask(()=>{if(live){refresh();pump();}});});
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');

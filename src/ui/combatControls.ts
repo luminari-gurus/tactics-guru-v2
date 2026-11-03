@@ -3,12 +3,14 @@ export type CombatControlsPreference = 'auto' | 'radial' | 'rail';
 export type CombatSkin = 'radial' | 'rail';
 export const COMBAT_CONTROLS_CHANGE = 'combat-controls-change';
 const TEST_OVERRIDE = '__tacticsGuruCombatControls';
+let unsavedPreference: CombatControlsPreference | null = null;
 
 export function readCombatControlsPreference(storage?: Storage | null): CombatControlsPreference {
   try {
     const injected = (globalThis as Record<string, unknown>)[TEST_OVERRIDE];
     if (injected === 'radial' || injected === 'rail' || injected === 'auto') return injected;
   } catch { /* Ignore missing globals in non-DOM unit tests. */ }
+  if (storage == null && unsavedPreference !== null) return unsavedPreference;
   try {
     const raw = (storage ?? globalThis.localStorage)?.getItem(COMBAT_CONTROLS_KEY);
     if (raw === 'radial' || raw === 'rail' || raw === 'auto') return raw;
@@ -17,11 +19,14 @@ export function readCombatControlsPreference(storage?: Storage | null): CombatCo
 }
 
 export function writeCombatControlsPreference(value: CombatControlsPreference, storage?: Storage | null): boolean {
+  let saved = false;
   try {
     (storage ?? globalThis.localStorage)?.setItem(COMBAT_CONTROLS_KEY, value);
-    globalThis.dispatchEvent?.(new Event(COMBAT_CONTROLS_CHANGE));
-    return true;
-  } catch { return false; }
+    saved = true;
+  } catch { /* Retain the choice in memory when storage is unavailable. */ }
+  if (storage == null) unsavedPreference = saved ? null : value;
+  globalThis.dispatchEvent?.(new Event(COMBAT_CONTROLS_CHANGE));
+  return saved;
 }
 
 export function isCoarsePointer(query: (query: string) => { matches: boolean } = (q) => matchMedia(q)): boolean {

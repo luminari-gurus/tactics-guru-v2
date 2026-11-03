@@ -529,6 +529,52 @@ test('radial switching to rail preserves a valid unchanged selection', async ({p
   expect((await session(page)).pending).toEqual(prepared);
 });
 
+test('radial tap fallback dialog dismissal clears the prepared action', async ({page}) => {
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
+  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-log-open').click();
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await page.locator('#log-close').click();
+  expect((await session(page)).pending).toBeNull();
+  await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+  await page.getByRole('radio',{name:'Rail',exact:true}).click();
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  const after=await session(page);
+  expect(after.state).toEqual(current.state);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+});
+
+test('radial tap fallback inspect clears the prepared action', async ({page}) => {
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
+  await page.locator('#battle-radial-inspect').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.locator('#inspection-close').click();
+  const after=await session(page);
+  expect(after.pending).toBeNull();
+  expect(after.state).toEqual(current.state);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+});
+
+test('radial switching to rail applies for the page when saving fails', async ({page}) => {
+  await ready(page);
+  await page.evaluate(key=>{
+    delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;
+    const original=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(name,value){if(name===key)throw new Error('storage unavailable');original.call(this,name,value);};
+  },COMBAT_CONTROLS_KEY);
+  await page.locator('#battle-overflow summary').click();
+  await page.getByRole('radio',{name:'Rail',exact:true}).click();
+  await expect.poll(()=>combatSkin(page)).toBe('rail');
+  await expect(page.getByRole('radio',{name:'Rail',exact:true})).toBeChecked();
+  await expect(page.locator('[data-combat-controls] [role="status"]')).toContainText('choice applies until you leave the page');
+});
+
 test('radial plan cancellation stays available while choosing a destination or target', async ({page}) => {
   const initial=page.viewportSize()!;
   if(initial.width<initial.height) await page.setViewportSize({width:320,height:568});
