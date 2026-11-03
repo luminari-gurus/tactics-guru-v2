@@ -68,7 +68,7 @@ it('removes every listener and restores touch style on shutdown', () => {
   const f = fake();
   const cleanup = bindBoardInput(f.canvas, board(f), () => ({ width: 400, height: 600 }));
   expect(f.listeners.size).toBe(7);
-  expect([...f.documentListeners.keys()]).toEqual(['visibilitychange', 'pointermove', 'pointerup', 'pointercancel']);
+  expect([...f.documentListeners.keys()]).toEqual(['visibilitychange', 'pointerdown', 'pointermove', 'pointerup', 'pointercancel']);
   expect(f.canvas.style.touchAction).toBe('none');
   cleanup();
   expect(f.listeners.size).toBe(0);
@@ -288,4 +288,62 @@ it('keeps aiming when pointer events land on an overlay above the captured canva
   f.listeners.get('pointerleave')!({ ...pointer('pointerleave', 1, 100, 100, 'touch'), relatedTarget: overlay } as unknown as Event);
   f.documentListeners.get('pointerup')!({ ...pointer('pointerup', 1, 100, 100, 'touch'), target: overlay } as unknown as Event);
   expect(releases).toEqual([1]);
+});
+
+
+it.each(['overlay', 'canvas-outside', 'canvas-inside'])('second touch on %s dismisses an open hold and suppresses both releases', target => {
+  vi.useFakeTimers();
+  const f=fake();
+  const releases:number[]=[], dismisses:number[]=[];
+  const cleanup=bindBoardInput(f.canvas,{
+    ...board(f),hold:()=>true,release:()=>releases.push(1),dismiss:()=>dismisses.push(1),
+  },()=>({width:400,height:600}),p=>p.x<220);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  vi.advanceTimersByTime(300);
+  let stopped=false;
+  const overlay={} as EventTarget;
+  f.documentListeners.get('pointerdown')!({
+    ...pointer('pointerdown',2,target==='canvas-outside'?300:120,100,'touch'),
+    target:target==='overlay'?overlay:f.canvas,stopPropagation:()=>{stopped=true;},
+  } as unknown as Event);
+  expect(stopped).toBe(true);
+  expect(dismisses).toEqual([1]);
+  expect(f.captured.size).toBe(0);
+  f.documentListeners.get('pointerup')!({...pointer('pointerup',2,120,100,'touch'),target:overlay} as unknown as Event);
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100,'touch'));
+  expect(releases).toEqual([]);
+  expect(f.board.selections).toBe(0);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',3,100,100,'touch'));
+  f.listeners.get('pointerup')!(pointer('pointerup',3,100,100,'touch'));
+  expect(f.board.selections).toBe(1);
+  cleanup();
+});
+
+it('a second canvas touch before a hold still starts a pinch gesture', () => {
+  vi.useFakeTimers();
+  const f=fake();
+  let stopped=false, zooms=0;
+  const cleanup=bindBoardInput(f.canvas,{...board(f),hold:()=>true,zoom:()=>zooms++},()=>({width:400,height:600}));
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  f.documentListeners.get('pointerdown')!({...pointer('pointerdown',2,150,100,'touch'),target:f.canvas,stopPropagation:()=>{stopped=true;}} as unknown as Event);
+  expect(stopped).toBe(false);
+  f.listeners.get('pointerdown')!(pointer('pointerdown',2,150,100,'touch'));
+  f.listeners.get('pointermove')!(pointer('pointermove',2,170,100,'touch'));
+  expect(zooms).toBe(1);
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100,'touch'));
+  f.listeners.get('pointerup')!(pointer('pointerup',2,170,100,'touch'));
+  expect(f.board.selections).toBe(0);
+  cleanup();
+});
+
+it('leaves additional off-canvas touches alone for boards without hold controls', () => {
+  const f=fake();
+  let stopped=false;
+  const cleanup=bindBoardInput(f.canvas,board(f),()=>({width:400,height:600}));
+  f.listeners.get('pointerdown')!(pointer('pointerdown',1,100,100,'touch'));
+  f.documentListeners.get('pointerdown')!({...pointer('pointerdown',2,300,100,'touch'),target:{},stopPropagation:()=>{stopped=true;}} as unknown as Event);
+  expect(stopped).toBe(false);
+  f.listeners.get('pointerup')!(pointer('pointerup',1,100,100,'touch'));
+  expect(f.board.selections).toBe(1);
+  cleanup();
 });

@@ -144,6 +144,15 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     const target = event.target;
     return !(target === canvas || (typeof Node !== 'undefined' && target instanceof Node && canvas.contains(target)));
   };
+  const documentDown = (event: PointerEvent): void => {
+    if (!board.hold || event.pointerType !== 'touch' || !pointers.size || pointers.has(event.pointerId)) return;
+    // An overlay or off-board touch never reaches the canvas handler. A second touch
+    // during a hold must also suppress the canvas handler and the trailing release.
+    if (holding || fromOverlay(event) || !enabled(point(event))) {
+      reset();
+      event.stopPropagation();
+    }
+  };
   const documentMove = (event: PointerEvent): void => { if (fromOverlay(event)) move(event, false); };
   const documentEnd = (event: PointerEvent): void => { if (fromOverlay(event)) end(event); };
   // A finger down at an app switch may never deliver pointerup; drop it so resume cannot pan without a press.
@@ -156,11 +165,13 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   canvas.addEventListener('lostpointercapture', end);
   canvas.addEventListener('wheel', wheel, { passive: false });
   owner.addEventListener('visibilitychange', visibility);
+  owner.addEventListener('pointerdown', documentDown, true);
   owner.addEventListener('pointermove', documentMove, true);
   owner.addEventListener('pointerup', documentEnd, true);
   owner.addEventListener('pointercancel', documentEnd, true);
   return Object.assign(() => {
     owner.removeEventListener('visibilitychange', visibility);
+    owner.removeEventListener('pointerdown', documentDown, true);
     owner.removeEventListener('pointermove', documentMove, true);
     owner.removeEventListener('pointerup', documentEnd, true);
     owner.removeEventListener('pointercancel', documentEnd, true);

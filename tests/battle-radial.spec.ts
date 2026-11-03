@@ -348,3 +348,48 @@ test('combat controls persist Radial across a reload', async ({ page }) => {
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('auto');
 });
+
+test('radial hold dismisses when a second touch lands on the overlay', async ({ page }) => {
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.locator('#battle-radial-hub').dispatchEvent('pointerdown', {
+    pointerId:42,pointerType:'touch',button:0,isPrimary:false,bubbles:true,
+  });
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await page.mouse.up();
+  const after=await session(page);
+  expect(after.state).toEqual(current.state);
+  expect(after.state.rng).toEqual(current.state.rng);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  expect(after.pending).toBeNull();
+  await tapBoard(page,cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+});
+
+test('radial hold dismisses on a native second touch over the overlay', async ({page,browserName,isMobile}) => {
+  test.skip(browserName !== 'chromium' || !isMobile, 'Chromium touch emulation uses CDP; other profiles cover overlay interruption separately.');
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  const origin=await boardPoint(page,cell);
+  const cdp=await page.context().newCDPSession(page);
+  const first={x:origin.x,y:origin.y,id:1};
+  try {
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[first]});
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    const hub=(await page.locator('#battle-radial-hub').boundingBox())!;
+    const second={x:hub.x+hub.width/2,y:hub.y+hub.height/2,id:2};
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[first,second]});
+    await expect(page.locator('#battle-radial')).toBeHidden();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[second]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    const after=await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.state.rng).toEqual(current.state.rng);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    expect(after.pending).toBeNull();
+    await tapBoard(page,cell);
+    await expect(page.locator('#battle-radial')).toBeVisible();
+  } finally { await cdp.detach(); }
+});
