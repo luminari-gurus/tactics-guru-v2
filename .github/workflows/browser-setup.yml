@@ -87,3 +87,51 @@ jobs:
           path: verification-receipts/issue254/
           retention-days: 30
           if-no-files-found: warn
+  issue184-verify:
+    if: github.ref == 'refs/heads/work/issue-184-overworld-generation'
+    needs: browser-setup
+    runs-on: [self-hosted, tactics-browser]
+    timeout-minutes: 45
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and runtime
+        run: |
+          mkdir -p verification-receipts/issue184
+          git rev-parse HEAD > verification-receipts/issue184/source.txt
+          git status --short > verification-receipts/issue184/status.txt
+          node --version > verification-receipts/issue184/node.txt
+          npx --no-install playwright --version > verification-receipts/issue184/playwright.txt
+          uname -a > verification-receipts/issue184/host.txt
+          sha256sum package-lock.json src/map/generate.ts src/domain/dungeon.ts src/domain/exploration.ts src/ui/dungeonMap.ts tests/dungeon-exploration.spec.ts > verification-receipts/issue184/inputs.sha256
+      - id: build
+        run: npm run build
+      - name: Record build identity
+        if: ${{ steps.build.outcome == 'success' }}
+        run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/build.sha256
+      - name: Maximum-floor Chromium behavior and timing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium.json
+        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts -g 'maximum-size' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184/chromium-artifacts
+      - name: Maximum-floor WebKit behavior and timing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts -g 'maximum-size' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184/webkit-artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue184-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue184/
+          retention-days: 30
+          if-no-files-found: warn

@@ -440,7 +440,9 @@ test('maximum-size floor step responsiveness meets the established budget', asyn
  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
  const times:number[]=[];
  for(let i=0;i<20;i++)times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},i%2===0?second:first));
- const sorted=[...times].sort((a,b)=>a-b),p95=sorted[Math.ceil(sorted.length*.95)-1];
- writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,budgetMs:33.4,dimension:map.width},null,2));
- expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);
+ const frames=await page.evaluate(async({a,b})=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push(now-previous);previous=now;}return samples;},{a:first,b:second});
+ const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
+ const p95=percentile(times,.95),frameP95=percentile(frames,.95);
+ writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,frames,frameP95,budgetMs:33.4,dimension:map.width},null,2));
+ expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
