@@ -96,6 +96,28 @@ test('radial tap fallback opens the same radial without requiring a hold', async
   expect((await session(page)).pending).toBeNull();
 });
 
+test('radial tap fallback is dismissed without a command when the page is hidden', async ({ page }) => {
+  await ready(page);
+  const { cell, current } = await reachableEmpty(page);
+  await tapBoard(page, cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  expect((await session(page)).pending).toMatchObject({ type: 'move', to: cell });
+  for (const hidden of [true, false]) {
+    await page.evaluate(value => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => value });
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => value ? 'hidden' : 'visible' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    }, hidden);
+    await expect(page.locator('#battle-radial')).toBeHidden();
+  }
+  const after = await session(page);
+  expect(after.pending).toBeNull();
+  expect(after.state).toEqual(current.state);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  await tapBoard(page, cell);
+  await expect(page.locator('#battle-radial-move')).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('radial hub cancel records no command after leaving a slice', async ({ page }) => {
   await ready(page);
   const { cell, current } = await reachableEmpty(page);
