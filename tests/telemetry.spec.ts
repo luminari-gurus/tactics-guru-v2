@@ -91,6 +91,29 @@ test('blocked ingestion leaves battle continue and save working', async ({ page 
   await page.reload(); await page.locator('#save-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player'); expect((await readSession(page)).state).toEqual(after);
 });
+
+test('fresh testing battles each report their outcome across reload', async ({ page }) => {
+  test.setTimeout(60000);
+  const events = await ingest(page);
+  const completed = [];
+  await page.goto('./battle');
+  for (let battle = 0; battle < 2; battle++) {
+    await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+    for (let turn = 0; turn < 100; turn++) {
+      await expect(page.locator('#game')).toHaveAttribute('data-phase', /^(player|ended)$/);
+      if ((await readSession(page)).phase === 'ended') break;
+      await page.locator('#battle-next').click();
+    }
+    await expect(page.locator('#game')).toHaveAttribute('data-phase', 'ended');
+    const { seed, commandCount, outcome } = (await readSession(page)).state;
+    completed.push({ seed, commandCount, outcome });
+    await expect.poll(() => events.filter(e => e.event === 'battle_outcome').length).toBe(battle + 1);
+    expect(events.filter(e => e.event === 'battle_started')).toHaveLength(battle + 1);
+    if (battle === 0) await page.reload();
+  }
+  expect(completed[1]).toEqual(completed[0]);
+  await page.screenshot({path:test.info().outputPath('testing-battle-outcome.png')});
+});
 for (const signal of ['opt-out','DNT','GPC'] as const) test(`${signal} prevents parser loading and all collection`, async ({ page }) => {
   const events = await ingest(page); const sdk: string[] = []; page.on('request', r => { if (r.url().includes('/transport-')) sdk.push(r.url()); });
   await page.addInitScript(signal => {

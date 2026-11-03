@@ -56,8 +56,9 @@ export class BattleScene extends Phaser.Scene {
     if (!this.persistent) {
       let modalTransition=()=>{};
       const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
+      const outcomeKey=crypto.randomUUID();
       const session=new BattleSession(catalog,FIRST_BATTLE_MAP_ID,this.testingSeed,()=>{
-        if(session.state.outcome!=='ongoing')track('battle_outcome',{route:'battle',phase:'ended',outcome:session.state.outcome==='playerWin'?'victory':'defeat'},`${session.state.mapId}:${session.state.seed}:${session.state.commandCount}`);
+        if(session.state.outcome!=='ongoing')track('battle_outcome',{route:'battle',phase:'ended',outcome:session.state.outcome==='playerWin'?'victory':'defeat'},outcomeKey);
       });
       track('battle_started',{route:'battle',phase:session.phase});
       const tools=document.querySelector<HTMLElement>('#battle-persistence')!;
