@@ -4,6 +4,7 @@ import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
 import { previewMovement } from '../src/domain/grid';
+import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 
 test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three',async({page})=>{
   for(const [xp,count] of [[0,0],[60,0],[180,1]]) {
@@ -168,7 +169,7 @@ for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later abili
   await page.setViewportSize(viewport);await page.locator('#battle-cancel').click();
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   expect(after.state).toEqual(before.state);expect(after.replay).toEqual(before.replay);expect(after.pending).toBeNull();
-  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe('{}');
+  expect(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)))).toEqual({[COMBAT_CONTROLS_KEY]:'rail'});
   if(isMobile)await button.tap();else await button.click();
   await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -192,7 +193,7 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
     if(dismissal==='cancel')await page.locator('#battle-cancel').click();else await page.keyboard.press('Escape');
     const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
     expect(after.state).toEqual(before.state);expect(after.replay).toEqual(before.replay);expect(after.pending).toBeNull();
-    expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe('{}');
+    expect(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)))).toEqual({[COMBAT_CONTROLS_KEY]:'rail'});
   }
   await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('4,0');
   await page.locator('#battle-review').click();

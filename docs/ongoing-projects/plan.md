@@ -97,6 +97,19 @@ is opened. The existing requirement/coverage ledger remains the completion bound
 The direct local command sequence records incremental outcomes in
 `tmp/issue-259/remaining-local-results.json`; no CI wait is required.
 
+The remaining WebKit dungeon subset passes **9/9**; with the separately repaired
+startup case, all 12 selected dungeon obligations are covered. Lifecycle passes
+**6/6 Chromium + 6/6 WebKit**. The dev-fixture stage retains **80 passes / 13 failures**:
+one initial `page.goto` load timeout, plus 12 executions of two ability-test assertions
+that still expected `{}` instead of the Rail fixture preference. The ability checks
+now use the same exact preference-only baseline as the dungeon check, retaining the
+no-unexpected-entry guarantee and all state/replay/action assertions. Typecheck passes.
+Only the affected 12 cases and the one desktop navigation case need a focused follow-up
+after the active sequence. No production startup cause is claimed fixed, and the
+original failed fixture report remains intact (`run-tnMhYj`). This test-only edit does
+not affect the active asset, prefix, lifecycle or extended consumers; no sequence is
+restarted and no timeout is raised.
+
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
 integration; there is no final JSON for that stage. The exact owned process tree was
