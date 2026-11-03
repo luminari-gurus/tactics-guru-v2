@@ -8,6 +8,7 @@ import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, t
 import { progressHero } from '../src/domain/progression';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
@@ -206,9 +207,15 @@ test('dungeon battle undo survives reload and a legal defeat journey',async({pag
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
 });
 test('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
- const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('./?game=dungeon');
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ // This witnesses startup/input/resume; fresh random layouts have separate coverage.
+ await page.addInitScript(()=>{
+  const draw=crypto.getRandomValues.bind(crypto);
+  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);}) as typeof crypto.getRandomValues;
+ });
+ await page.goto('./?game=dungeon');
  await expect(page.getByRole('button',{name:'Continue saved dungeon',exact:true})).toBeDisabled();
- expect(await page.evaluate(()=>localStorage.length)).toBe(0);
+ expect(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)))).toEqual({[COMBAT_CONTROLS_KEY]:'rail'});
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).focus();await page.keyboard.press('Enter');await page.locator('#dungeon-confirm-new').click();
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.locator('#dungeon-ascend')).toHaveCount(0);
  const frame=await page.locator('#dungeon-screen').boundingBox();expect(frame!.y).toBe(0);expect(frame!.height).toBe(page.viewportSize()!.height);
