@@ -1,8 +1,8 @@
 import type { AbilityId, CellPosition } from '../content/types';
 import type { Point } from '../geometry/iso';
 import { displayName, previewText } from './hud';
-import { BattleSelection, legalSpecials, previewAction, type RadialSliceView } from './battleSelection';
-import { CARDINAL_SLICE, type RadialSliceId, cardinalFromVector, hubContains } from './radialGesture';
+import { BattleSelection, previewAction, selectableSpecials, type RadialSliceView } from './battleSelection';
+import { CARDINAL_SLICE, type RadialSliceId, cardinalFromVector, hubContains, specialSliceActivation } from './radialGesture';
 import { fitRadialLabels, stripUnavailablePrefix, uniqueHubLines } from './radialLabels';
 
 export interface RadialOpenOptions {
@@ -175,7 +175,7 @@ export class BattleRadial {
     this.aimed = slice;
     this.root.dataset.aim = slice;
     if (slice === 'special' && this.cell) {
-      const specials = legalSpecials(this.selection.session, this.cell, this.selection.planMove);
+      const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
       if (specials.length > 1) this.subOpen = true;
     } else if (slice !== 'hub') this.subOpen = false;
     this.render();
@@ -188,9 +188,12 @@ export class BattleRadial {
     if (slice === 'inspect') { this.hide(); this.onInspect(); return 'inspect'; }
     if (slice === 'plan') { this.hide(); this.onPlan(); return 'plan'; }
     if (slice === 'special') {
-      const specials = legalSpecials(this.selection.session, this.cell, this.selection.planMove);
-      if (specials.length > 1 && this.mode === 'tap' && !this.subOpen) {
+      const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
+      const kind = specialSliceActivation(specials.length);
+      if (kind === 'none') return 'none';
+      if (kind === 'open-sub') {
         this.subOpen = true;
+        this.mode = 'tap';
         this.aim('special');
         this.root.querySelector<HTMLButtonElement>('#battle-radial-sub button:not(:disabled)')?.focus();
         return 'open-sub';
@@ -232,6 +235,10 @@ export class BattleRadial {
       button.setAttribute('aria-pressed', String(button.dataset.radialAbility === abilityId));
     });
     if (!this.cell) return;
+    if (this.selection.planning && this.selection.planMove) {
+      this.paintHub(displayName(abilityId), 'Choose a target');
+      return;
+    }
     const preview = previewAction(this.selection.session, abilityId, this.cell, this.selection.planMove).preview;
     const lines = uniqueHubLines(displayName(abilityId), preview ? previewText(preview) : '', preview && !preview.ok ? previewText(preview) : null, Boolean(preview && !preview.ok));
     this.paintHub(lines.title, lines.subtitle);
@@ -252,18 +259,19 @@ export class BattleRadial {
       button.setAttribute('aria-label', view.disabled ? `${view.label}, unavailable: ${preview}` : `${view.label}, ${preview}`);
     }
     const sub = this.root.querySelector<HTMLElement>('#battle-radial-sub')!;
-    const specials = legalSpecials(this.selection.session, this.cell, this.selection.planMove);
+    const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
+    const followUp = Boolean(this.selection.planning && this.selection.planMove);
     sub.hidden = !this.subOpen || specials.length < 2;
     if (!sub.hidden) {
       const last = this.selection.lastUsedSpecial();
       sub.replaceChildren(...specials.map((ability, index) => {
-        const preview = previewAction(this.selection.session, ability.id, this.cell!, this.selection.planMove).preview;
+        const preview = followUp ? null : previewAction(this.selection.session, ability.id, this.cell!, this.selection.planMove).preview;
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.radialAbility = ability.id;
         button.className = `battle-radial-sub n${index + 1}`;
         button.setAttribute('aria-pressed', String(ability.id === last || (!last && index === 0)));
-        const detail = preview ? previewText(preview) : '';
+        const detail = followUp ? 'Choose a target' : (preview ? previewText(preview) : '');
         button.innerHTML = `<strong>${displayName(ability.id)}</strong><span>${ability.id === last ? 'Last used' : stripUnavailablePrefix(detail)}</span>`;
         button.setAttribute('aria-label', `${displayName(ability.id)}, ${detail}`);
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });

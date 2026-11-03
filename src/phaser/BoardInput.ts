@@ -60,7 +60,8 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
     canvas.setPointerCapture(event.pointerId);
   };
   const move = (event: PointerEvent, allowHover = true): void => {
-    if (!enabled(point(event))) { reset(); return; }
+    // An open hold stays live when a slice extends into the HUD or off the board.
+    if (!holding && !enabled(point(event))) { reset(); return; }
     const pointer = pointers.get(event.pointerId);
     if (!pointer) {
       if (allowHover && !pointers.size && event.buttons === 0 && (event.pointerType === 'mouse' || event.pointerType === 'pen')) board.hover?.(point(event));
@@ -92,7 +93,7 @@ export function bindBoardInput(canvas: HTMLCanvasElement, board: BoardInputTarge
   const end = (event: PointerEvent): void => {
     const pointer = pointers.get(event.pointerId);
     if (!pointer) return;
-    if (!enabled(point(event))) { reset(); return; }
+    if (!holding && !enabled(point(event))) { reset(); return; }
     board.hover?.(null);
     if(event.type!=='pointerup')board.resetPicking?.();
     const next = point(event);

@@ -50,3 +50,13 @@ export function classifyHoldUp(input: {
   if (input.distance >= input.threshold) return 'pan';
   return 'tap';
 }
+
+/**
+ * First activation of the Special slice never commits when more than one ability is listed.
+ * Visual sub-ring reveal (pointerenter / hold-aim) must not skip this.
+ */
+export function specialSliceActivation(listedCount: number): 'none' | 'commit' | 'open-sub' {
+  if (listedCount <= 0) return 'none';
+  if (listedCount === 1) return 'commit';
+  return 'open-sub';
+}

@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { session, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { previewMovement } from '../src/domain/grid';
+import { previewTacticalPlan } from '../src/domain/tacticalPlan';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 
 test.beforeEach(async ({ context }) => {
@@ -257,6 +258,83 @@ test('radial labels stay on one line without overflowing', async ({ page }) => {
   const hub = await page.locator('#battle-radial-hub').innerText();
   expect(hub.toLowerCase().split('\n').filter((line, index, all) => line && all.indexOf(line) !== index)).toEqual([]);
   await page.locator('#battle-radial-hub').click({ position: { x: 44, y: 44 } });
+});
+
+test('radial plan specials can be chosen after a destination', async ({ page }) => {
+  await ready(page);
+  const current = await session(page);
+  const actor = current.state.units.find(unit => unit.id === current.state.initiative[current.state.activeIndex])!;
+  const reach = previewMovement(current.state, actor.id, catalog);
+  if (!reach.ok) throw Error(reach.reason);
+  const enemies = current.state.units.filter(unit => unit.side === 'enemy' && unit.hp > 0);
+  const abilities = Object.values(catalog.abilities).filter(ability => ability.id !== 'ability:basic_attack' && ability.owners.includes(actor.defId));
+  let setup: { dest: { x: number; y: number }; enemy: typeof enemies[number] } | null = null;
+  for (const destination of reach.cells.filter(entry => entry.cost > 0)) {
+    const occupied = current.state.units.some(unit => unit.hp > 0 && unit.cell.x === destination.cell.x && unit.cell.y === destination.cell.y);
+    if (occupied) continue;
+    const move = { type: 'move' as const, unitId: actor.id, to: destination.cell };
+    for (const ability of abilities) {
+      if (ability.kind === 'secondWind') continue;
+      for (const enemy of enemies) {
+        const command = { type: 'useAbility' as const, unitId: actor.id, abilityId: ability.id, target: { unitId: enemy.id } };
+        if (previewTacticalPlan(current.state, move, command, catalog).ok) {
+          setup = { dest: destination.cell, enemy };
+          break;
+        }
+      }
+      if (setup) break;
+    }
+    if (setup) break;
+  }
+  expect(setup).not.toBeNull();
+  if (!setup) return;
+  await tapBoard(page, setup.dest);
+  await page.locator('#battle-radial-plan').click();
+  await tapBoard(page, setup.dest);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await expect(page.locator('#battle-radial-special')).toBeEnabled();
+  await page.locator('#battle-radial-special').click();
+  const sub = page.locator('#battle-radial-sub');
+  if (await sub.isVisible()) await sub.locator('button').first().click();
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await tapBoard(page, setup.enemy.cell);
+  await expect.poll(async () => (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
+});
+
+test('radial special tap waits for a sub-ring choice after pointerenter', async ({ page }) => {
+  await ready(page);
+  const { enemy, current } = await livingEnemy(page);
+  await tapBoard(page, enemy.cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const special = page.locator('#battle-radial-special');
+  if (await special.isDisabled()) {
+    await page.locator('#battle-radial-hub').click();
+    return;
+  }
+  await special.dispatchEvent('pointerenter');
+  await special.click();
+  const sub = page.locator('#battle-radial-sub');
+  if (await sub.isVisible()) {
+    expect((await session(page)).state.commandCount).toBe(current.state.commandCount);
+    expect((await session(page)).pending).toBeNull();
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    await sub.locator('button').first().click();
+  }
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const after = await session(page);
+  expect(after.state.commandCount).toBeGreaterThan(current.state.commandCount);
+});
+
+test('radial hold aiming continues when a slice leaves the board region', async ({ page }) => {
+  await ready(page);
+  const { cell } = await reachableEmpty(page);
+  const origin = await boardPoint(page, cell);
+  await holdAt(page, origin);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const dock = (await page.locator('#battle-next').boundingBox())!;
+  await page.mouse.move(dock.x + dock.width / 2, dock.y + dock.height / 2);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.mouse.up();
 });
 
 test('combat controls persist Radial across a reload', async ({ page }) => {

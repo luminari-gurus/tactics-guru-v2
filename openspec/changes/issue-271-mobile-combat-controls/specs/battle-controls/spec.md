@@ -68,12 +68,24 @@ On the radial skin, a 300 ms still press on a unit or tile SHALL open a labelled
 - **WHEN** a second finger, pinch, pointer cancel, lost capture, hidden page, dialog, enemy/presentation/ended phase, or restart occurs
 - **THEN** the radial closes with no command and restart leaves no stale radial or duplicate listeners
 
+#### Scenario: Hold aiming past the board edge
+- **WHEN** the radial is already open from a hold and the pointer moves onto a slice that extends outside the enabled board region
+- **THEN** the hold stays open and the pointer can aim or release on that slice
+
 ### Requirement: Special sub-ring
 The Special slice SHALL show the last-used special’s name and a count of specials whose preview is legal for that target. Opening it SHALL list only those legal specials, with the last-used one preselected. Illegal specials SHALL NOT appear. A unit with one legal special SHALL commit that special without an extra choice step.
 
 #### Scenario: Far Shot omitted
 - **WHEN** a special would be rejected by target preview for the current cell
 - **THEN** it has no chip and cannot be aimed or committed from the radial
+
+#### Scenario: First Special activation opens the sub-ring
+- **WHEN** more than one special is listed and the player activates the Special slice, including after pointerenter
+- **THEN** the sub-ring opens and no ability is committed until an explicit chip choice or a hold-release on a chip
+
+#### Scenario: Planned specials after a destination
+- **WHEN** a plan destination is stored and the radial reopens on that empty tile
+- **THEN** Special is enabled only when an owned special would be legal against some eventual target from that destination, and choosing it arms the follow-up instead of filtering against the empty tile
 
 ### Requirement: Docked End turn
 Wait / End turn SHALL be a docked control at least 48 CSS pixels tall, always reachable, never a radial slice, and SHALL commit immediately as it does on the rail.

@@ -3,7 +3,7 @@ import type { BattleSession } from '../app/BattleSession';
 import type { Command } from '../domain/types';
 import { previewMovement } from '../domain/grid';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
-import { actionCommand, friendlyFire, ownedAbilities, type Action } from './battleActions';
+import { actionCommand, actionTargets, friendlyFire, ownedAbilities, type Action } from './battleActions';
 import { previewText, displayName } from './hud';
 import { targetOverlays } from './targetPreview';
 import type { RadialSliceId } from './radialGesture';
@@ -52,6 +52,21 @@ export function previewAction(session: BattleSession, action: Action, cell: Cell
 
 export function legalSpecials(session: BattleSession, cell: CellPosition, planMove: Extract<Command, { type: 'move' }> | null = null) {
   return ownedAbilities(session).filter(ability => previewAction(session, ability.id, cell, planMove).preview?.ok === true);
+}
+
+function specialHasFollowUp(session: BattleSession, abilityId: AbilityId, planMove: Extract<Command, { type: 'move' }>): boolean {
+  const ability = session.catalog.abilities[abilityId];
+  if (!ability) return false;
+  const cells = ability.kind === 'secondWind'
+    ? [session.active.cell]
+    : actionTargets(session, abilityId).map(unit => unit.cell);
+  return cells.some(cell => previewAction(session, abilityId, cell, planMove).preview?.ok === true);
+}
+
+/** Specials the player can pick now. After a planned move the destination is empty, so legality is against eventual targets. */
+export function selectableSpecials(session: BattleSession, cell: CellPosition, planMove: Extract<Command, { type: 'move' }> | null = null) {
+  if (planMove) return ownedAbilities(session).filter(ability => specialHasFollowUp(session, ability.id, planMove));
+  return legalSpecials(session, cell);
 }
 
 /** Shared action/target model. HUD skins are views; session calls stay authoritative. */
@@ -194,7 +209,7 @@ export class BattleSelection {
     const reachable = cellReachable(s, cell);
     const standing = sameCell(cell, actor.cell);
     const followUp = this.planning && this.planMove !== null;
-    const specials = followUp ? ownedAbilities(s) : legalSpecials(s, cell, this.planMove);
+    const specials = selectableSpecials(s, cell, this.planMove);
     const last = specials.find(ability => ability.id === this.lastUsedSpecial()) ?? specials[0];
     const movement = s.phase === 'player' ? previewMovement(s.state, actor.id, s.catalog) : null;
     const movePreview = previewAction(s, 'move', cell);
@@ -207,7 +222,7 @@ export class BattleSelection {
     const defaultId = this.planning && this.planMove ? 'attack' : this.defaultSlice(cell);
     const moveReason = actor.hasMoved ? 'Movement spent' : !movement?.ok ? 'No legal move' : !reachable && !standing ? 'Not reachable' : null;
     const attackReason = actor.hasActed ? 'Action spent' : followUp ? null : subject !== 'enemy' ? 'Need an enemy' : attackPreview.preview && !attackPreview.preview.ok ? previewText(attackPreview.preview) : null;
-    const specialReason = actor.hasActed ? 'Action spent' : specials.length === 0 ? (followUp ? 'No owned special' : subject === 'enemy' ? 'No legal special' : 'Need a legal target') : null;
+    const specialReason = actor.hasActed ? 'Action spent' : specials.length === 0 ? (followUp || subject === 'enemy' ? 'No legal special' : 'Need a legal target') : null;
     const planDisabled = actor.hasMoved || actor.hasActed || !movement?.ok;
     return [
       {
@@ -256,30 +271,24 @@ export class BattleSelection {
       this.applyCell(cell);
       return { ok: this.canConfirm(), message: this.message, commit: this.canConfirm() };
     }
-    const specials = legalSpecials(this.session, cell, this.planMove);
+    const specials = selectableSpecials(this.session, cell, this.planMove);
     const chosen = specials.find(ability => ability.id === this.lastUsedSpecial()) ?? specials[0];
     if (!chosen) return { ok: false, message: 'No legal special', commit: false };
-    if (this.planning && this.planMove && chosen.kind !== 'secondWind') {
-      this.armFollowUp(chosen.id);
-      return { ok: true, message: this.message, commit: false };
-    }
-    this.selectedAction = chosen.id;
-    this.applyCell(cell);
-    if (this.canConfirm()) this.rememberSpecial(chosen.id);
-    return { ok: this.canConfirm(), message: this.message, commit: this.canConfirm() };
+    return this.commitSpecial(cell, chosen.id);
   }
 
   commitSpecial(cell: CellPosition, abilityId: AbilityId): { ok: boolean; message: string; commit: boolean } {
-    const legal = legalSpecials(this.session, cell, this.planMove).some(ability => ability.id === abilityId);
+    const legal = selectableSpecials(this.session, cell, this.planMove).some(ability => ability.id === abilityId);
     if (!legal) return { ok: false, message: 'Unavailable', commit: false };
     this.selectedCell = cell;
-    if (this.planning && this.planMove && this.session.catalog.abilities[abilityId]?.kind !== 'secondWind') {
+    const ability = this.session.catalog.abilities[abilityId];
+    if (this.planning && this.planMove && ability?.kind !== 'secondWind') {
       this.armFollowUp(abilityId);
       this.rememberSpecial(abilityId);
       return { ok: true, message: this.message, commit: false };
     }
     this.selectedAction = abilityId;
-    this.applyCell(cell);
+    this.applyCell(ability?.kind === 'secondWind' ? this.session.active.cell : cell);
     if (this.canConfirm()) this.rememberSpecial(abilityId);
     return { ok: this.canConfirm(), message: this.message, commit: this.canConfirm() };
   }

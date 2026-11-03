@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import { BattleSession } from '../../src/app/BattleSession';
 import { battleCatalog } from '../../src/content/catalog';
 import { abilityCatalog, abilitySession } from '../helpers/abilityCatalog';
-import { BattleSelection, classifyCell, legalSpecials } from '../../src/ui/battleSelection';
+import { BattleSelection, classifyCell, legalSpecials, selectableSpecials } from '../../src/ui/battleSelection';
 import { previewMovement } from '../../src/domain/grid';
 import { previewTacticalPlan } from '../../src/domain/tacticalPlan';
 
@@ -128,4 +128,69 @@ it('omits an illegal special such as High Shot at range 1', () => {
   const ids = legalSpecials(session, enemy.cell).map(ability => ability.id);
   expect(ids).not.toContain('ability:high_shot');
   expect(ids.length).toBeGreaterThan(0);
+});
+
+it('selects a planned special before filtering against the eventual target', () => {
+  const catalog = abilityCatalog();
+  const session = abilitySession('fighter', catalog);
+  const model = new BattleSelection(session);
+  const actor = session.active;
+  const enemies = session.state.units.filter(unit => unit.side === 'enemy' && unit.hp > 0);
+  const reach = previewMovement(session.state, actor.id, session.catalog);
+  expect(reach.ok).toBe(true);
+  if (!reach.ok) return;
+  const owned = Object.values(session.catalog.abilities).filter(ability => ability.id !== 'ability:basic_attack' && ability.owners.includes(actor.defId));
+  let chosen: { cell: { x: number; y: number }; enemy: typeof enemies[number]; abilityId: (typeof owned)[number]['id'] } | null = null;
+  for (const destination of reach.cells.filter(entry => entry.cost > 0)) {
+    const occupant = session.state.units.some(unit => unit.hp > 0 && unit.cell.x === destination.cell.x && unit.cell.y === destination.cell.y);
+    if (occupant) continue;
+    const move = { type: 'move' as const, unitId: actor.id, to: destination.cell };
+    for (const ability of owned) {
+      for (const enemy of enemies) {
+        const command = { type: 'useAbility' as const, unitId: actor.id, abilityId: ability.id, target: { unitId: enemy.id } };
+        if (previewTacticalPlan(session.state, move, command, session.catalog).ok) {
+          chosen = { cell: destination.cell, enemy, abilityId: ability.id };
+          break;
+        }
+      }
+      if (chosen) break;
+    }
+    if (chosen) break;
+  }
+  expect(chosen).not.toBeNull();
+  if (!chosen) return;
+  model.startPlan();
+  expect(model.choosePlanDestination(chosen.cell)).toBe(true);
+  expect(legalSpecials(session, chosen.cell, model.planMove)).toEqual([]);
+  const listed = selectableSpecials(session, chosen.cell, model.planMove);
+  expect(listed.map(ability => ability.id)).toContain(chosen.abilityId);
+  expect(model.slices(chosen.cell).find(slice => slice.id === 'special')?.disabled).toBe(false);
+  const aimed = model.aimSlice(chosen.cell, 'special');
+  expect(aimed.ok).toBe(true);
+  expect(aimed.commit).toBe(false);
+  expect(model.followUp).toBeTruthy();
+  model.clear();
+  model.startPlan();
+  expect(model.choosePlanDestination(chosen.cell)).toBe(true);
+  const picked = model.commitSpecial(chosen.cell, chosen.abilityId);
+  expect(picked).toEqual({ ok: true, message: expect.any(String), commit: false });
+  expect(model.followUp).toBe(chosen.abilityId);
+  model.selectCell(chosen.enemy.cell);
+  expect(session.pendingPlan).not.toBeNull();
+});
+
+it('disables the planned Special slice when no ability would be legal from the destination', () => {
+  const session = abilitySession('fighter', battleCatalog);
+  const model = new BattleSelection(session);
+  const actor = session.active;
+  const dest = { x: 0, y: 2 };
+  const reach = previewMovement(session.state, actor.id, session.catalog);
+  expect(reach.ok).toBe(true);
+  if (!reach.ok) return;
+  expect(reach.cells.some(entry => entry.cell.x === dest.x && entry.cell.y === dest.y && entry.cost > 0)).toBe(true);
+  model.startPlan();
+  expect(model.choosePlanDestination(dest)).toBe(true);
+  expect(selectableSpecials(session, dest, model.planMove)).toEqual([]);
+  expect(model.slices(dest).find(slice => slice.id === 'special')?.disabled).toBe(true);
+  expect(model.aimSlice(dest, 'special').ok).toBe(false);
 });

@@ -244,6 +244,30 @@ it('falls back to tap when the hold is rejected, reduced motion is on, or the pr
   expect(short.board.selections).toBe(1);
 });
 
+it('keeps an open hold aiming when the pointer leaves the enabled board region', () => {
+  vi.useFakeTimers();
+  const f = fake();
+  const aims: { x: number; y: number }[] = [];
+  const releases: { x: number; y: number }[] = [];
+  const dismisses: number[] = [];
+  bindBoardInput(f.canvas, {
+    ...board(f),
+    hold: () => true,
+    aim: point => { aims.push(point); },
+    release: point => { releases.push(point); },
+    dismiss: () => { dismisses.push(1); },
+  }, () => ({ width: 400, height: 600 }), p => p.x >= 20 && p.x < 220 && p.y >= 40 && p.y < 300);
+  f.listeners.get('pointerdown')!(pointer('pointerdown', 1, 100, 100, 'touch'));
+  vi.advanceTimersByTime(300);
+  f.listeners.get('pointermove')!(pointer('pointermove', 1, 240, 80, 'touch'));
+  expect(dismisses).toEqual([]);
+  expect(aims).toEqual([{ x: 240, y: 80 }]);
+  f.listeners.get('pointerup')!(pointer('pointerup', 1, 250, 70, 'touch'));
+  expect(releases).toEqual([{ x: 250, y: 70 }]);
+  expect(dismisses).toEqual([]);
+  expect(f.board.selections).toBe(0);
+});
+
 it('keeps aiming when pointer events land on an overlay above the captured canvas', () => {
   vi.useFakeTimers();
   const f = fake();

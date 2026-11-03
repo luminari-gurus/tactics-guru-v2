@@ -2,6 +2,7 @@ import { expect, it } from 'vitest';
 import { DRAG_THRESHOLD, TOUCH_DRAG_THRESHOLD, dragThresholdFor } from '../../src/geometry/picking';
 import {
   HOLD_MS, cardinalFromVector, classifyHoldMove, classifyHoldUp, hubContains, lightHaptic,
+  specialSliceActivation,
 } from '../../src/ui/radialGesture';
 
 it('uses 10 px for touch and 6 px for mouse/pen, with tests on both sides', () => {
@@ -40,4 +41,11 @@ it('maps the hub and cardinal slices and fails closed when vibrate is missing', 
   const calls: number[] = [];
   lightHaptic({ vibrate: (pattern) => { calls.push(pattern as number); return true; } });
   expect(calls).toEqual([10]);
+});
+
+it('opens the special sub-ring on the first slice activation even if aim already revealed it', () => {
+  expect(specialSliceActivation(0)).toBe('none');
+  expect(specialSliceActivation(1)).toBe('commit');
+  expect(specialSliceActivation(2)).toBe('open-sub');
+  expect(specialSliceActivation(5)).toBe('open-sub');
 });
