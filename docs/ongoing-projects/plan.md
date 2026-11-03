@@ -1,8 +1,28 @@
 # Issue #259: Isolate testing routes from saved games
 
-Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-owner/UI/coverage chunk in progress.
+Date: 2026-11-03 (Asia/Jerusalem). Status: implementation and local acceptance complete; PR stack ready for review.
 
-### Current qualification checkpoint
+## Final handoff
+
+Issue #259 is implemented and qualified for review. Entry foundation [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275) is based on main; isolation [#277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) is stacked on it. Independent test fixes [#276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276) and [#278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278) remain separately reviewable and are mirrored in the feature. No merge, release tag or deployment is part of this handoff.
+
+All four issue criteria are covered:
+
+- **Saved journeys survive testing:** exact primary/backup/handoff bytes are preserved through normal play, restart, reload and Back at root and prefix, with Rail and Radial. Current isolation covers 60 Chromium/WebKit executions. Menu persistence/recovery/new-game/item cases pass 140/140.
+- **Testing always starts fresh:** direct battle/run/dungeon/map and supported diagnostics ignore forged persistent selectors. Reload and restart use fresh memory state; legal transient dungeon floor clearing, descent and return work.
+- **No saved-progress access in testing:** entry capability is resolved once; testing battle uses BattleSession directly, and testing run/dungeon receive null storage. Browser spies and failing-provider unit tests prove no game-slot or menu-handoff acquisition/read/write/remove/clear. Combat-control and privacy preferences retain their separate behavior.
+- **Persistence proof belongs to menu play:** saved regressions use root game entries, with retained corruption/backup/raw export/stale-review/replay/lifecycle coverage. The new radial reload assumption and fixture preference baselines are corrected. The [coverage ledger](../qa/issue-259/coverage-map.json) accounts for 1,665 retained, 102 mapped and 75 added stage/profile identities; the earlier ledger remains archived.
+
+Validation uses Node 24.22.1, locked Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2 on local Windows, one worker and zero retries. Current checks include 1,148 units, both TypeScript scopes, both root/prefix build integrations, all 28 selection/batch contracts, 18 clean source/build-consistent performance captures, menus, both control skins, root/prefix isolation, legal run/dungeon/reload/lifecycle, dev fixtures, audio/collector and all 18 extended progression journeys. The nine-batch partition and 23 approved profile reductions are preserved. Playwright emulation satisfies device acceptance; no physical-device claim is made.
+
+The full original CI run remains failed and all interrupted runs remain incomplete. Qualification combines recorded unchanged-input evidence with bounded local repairs; it is not a clean current full-suite rerun. Application/runtime and shared-fixture sources are unchanged from frozen 7e6d709 after the test-only repairs. Final test input hash is 515b6881876d905c6aa8b4f74ce41aec8a3422f448333d5c1934d765f910cea2. Source/build manifests, exact selected IDs and reports remain under ignored tmp/issue-259 and verification-receipts. The original 583 MB CI artifact passed its published SHA-256 check.
+
+Final focused outcomes: the original fixture stage retained 80 passes/13 failures; 11 repaired ability cases passed in run-vwZLtO, and the two remaining desktop functional cases passed in run-zBOPpX against a prepared dev server with the same tests/timeouts (exact failed ID set reconciled). Cold dev-server navigation/reload timeouts remain recorded; their cause and cold-start performance are not claimed fixed. The single audio follow-up passes in run-dz9HX5. Original failed reports are preserved. Extended Chromium passes 9/9 in run-yW4OMm and WebKit 9/9 in run-Zdzd8P, with no skips/flakes/retries.
+
+The temporary full-run trigger is removed. Qualification-only workflows live outside the implementation PRs. The prior #263 plan remains byte-for-byte intact, SHA-256 28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104. All OpenSpec tasks are complete; archive/sync follows the normal post-merge workflow. The notes below are historical evidence and superseded checkpoints, retained for audit and continuation.
+
+## Historical implementation and qualification notes
+
 
 Main advanced to `3333281` by merging #273 while final local checks were running.
 The entry foundation now incorporates it in `6a886b8` (21 route/menu units pass).
