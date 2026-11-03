@@ -746,7 +746,8 @@ test('radial resize cancels an unconfirmed plan when its menu is open', async ({
   await ready(page);
   const {cell,current}=await reachableEmpty(page);
   await tapBoard(page,cell);
-  await page.locator('#battle-radial-plan').click();
+  const plan=page.locator('#battle-radial-plan');
+  if(test.info().project.use.hasTouch) await plan.tap(); else await plan.click();
   await tapBoard(page,cell);
   await expect(page.locator('#battle-radial')).toBeVisible();
   await expect(page.locator('#battle-radial-attack')).toHaveAttribute('aria-pressed','true');
