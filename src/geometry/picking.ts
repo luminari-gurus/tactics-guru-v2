@@ -3,6 +3,10 @@ export interface View { x: number; y: number; scale: number; }
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 4;
 export const DRAG_THRESHOLD = 6;
+export const TOUCH_DRAG_THRESHOLD = 10;
+export function dragThresholdFor(pointerType: string | undefined): number {
+  return pointerType === 'touch' ? TOUCH_DRAG_THRESHOLD : DRAG_THRESHOLD;
+}
 export function screenToBoard(point: Point, view: View): Point {
   return { x: (point.x - view.x) / view.scale, y: (point.y - view.y) / view.scale };
 }

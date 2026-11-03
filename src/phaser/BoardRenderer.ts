@@ -604,6 +604,13 @@ export class BoardRenderer {
     return tile ? { x: tile.x, y: tile.y } : null;
   }
 
+  screenPoint(cell: CellPosition): Point | null {
+    const tile = this.byCell.get(cellKey(cell));
+    if (!tile) return null;
+    const local = projectTile(tile);
+    return { x: this.view.x + local.x * this.view.scale, y: this.view.y + local.y * this.view.scale };
+  }
+
   resetPicking(): void { this.picking=null; }
 
   get pickingHint(): string {

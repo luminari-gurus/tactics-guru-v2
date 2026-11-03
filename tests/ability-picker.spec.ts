@@ -1,5 +1,5 @@
-import {expect,test} from '@playwright/test';
-import { readSession, playCommand } from './helpers/battlePolicy';
+import {expect,test} from './helpers/forceRailControls';
+import { readSession, playCommand, tapBoard } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
@@ -218,4 +218,233 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19],[600
  const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state).toEqual(before.state);
  await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.screenshot({path:test.info().outputPath(`progression-level-${level}.png`)});
+});
+
+
+test('radial multiple specials remain reachable on a narrow viewport', async ({page,isMobile}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(() => {
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls = 'radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.locator('#battle-radial-special').click();
+  const choices=page.locator('#battle-radial-sub button');
+  await expect(choices).toHaveCount(2);
+  for (const choice of await choices.all()) {
+    const box=(await choice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(320);
+    expect(box.y+box.height).toBeLessThanOrEqual(568);
+  }
+  const before=await readSession(page);
+  if(isMobile) await choices.last().tap(); else await choices.last().click();
+  await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+});
+
+test('radial hold keeps edge actions visible and cancels at the original press', async ({page}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const results = await page.evaluate(async () => {
+    const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
+    const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
+    const {BattleSelection}=await import(/* @vite-ignore */ selectionPath);
+    const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
+    document.querySelector('#battle-radial')?.remove();
+    const model=new BattleSelection(abilitySession('mage'));
+    let cancelled=0;
+    const committed:string[]=[];
+    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string)=>{committed.push(slice);},inspect:()=>{},plan:()=>{},cancel:()=>{cancelled++;}});
+    const result=[];
+    const root=radial.root as HTMLElement;
+    for(const origin of [{x:8,y:8},{x:312,y:8},{x:8,y:560},{x:312,y:560}]) {
+      radial.show({x:1,y:0},{mode:'hold',origin});
+      const boxes=[...root.querySelectorAll<HTMLElement>('[data-slice]')].map(button=>{
+        const r=button.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};
+      });
+      const move=root.querySelector<HTMLElement>('#battle-radial-move')!.getBoundingClientRect();
+      radial.aimAt({x:move.left+move.width/2,y:move.top+move.height/2});
+      const verdict=radial.releaseAt(origin);
+      radial.show({x:1,y:0},{mode:'hold',origin});
+      const attack=root.querySelector<HTMLElement>('#battle-radial-attack')!.getBoundingClientRect();
+      const target={x:attack.left+attack.width/2,y:attack.top+attack.height/2};
+      radial.aimAt(target);
+      const attackVerdict=radial.releaseAt(target);
+      result.push({boxes,verdict,attackVerdict});
+    }
+    radial.dispose();
+    return {result,cancelled,committed};
+  });
+  for(const {boxes,verdict,attackVerdict} of results.result) {
+    for(const box of boxes) {
+      expect(box.left).toBeGreaterThanOrEqual(0);
+      expect(box.top).toBeGreaterThanOrEqual(0);
+      expect(box.right).toBeLessThanOrEqual(320);
+      expect(box.bottom).toBeLessThanOrEqual(568);
+    }
+    expect(verdict).toBe('cancel');
+    expect(attackVerdict).toBe('commit');
+  }
+  expect(results.cancelled).toBe(4);
+  expect(results.committed).toEqual(['attack','attack','attack','attack']);
+});
+
+test('radial Special does not commit when choices appear on a narrow screen', async ({page,isMobile}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=ranger&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(() => {
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  const special=page.locator('#battle-radial-special');
+  await expect(special).toBeEnabled();
+  await special.dispatchEvent('pointerenter');
+  await expect(page.locator('#battle-radial-sub')).toBeHidden();
+  const before=await readSession(page);
+  if(isMobile) await special.tap(); else await special.click();
+  const choices=page.locator('#battle-radial-sub button');
+  await expect(choices).toHaveCount(3);
+  await expect(choices.first()).toBeVisible();
+  await expect(page.locator('#battle-radial-attack')).toBeHidden();
+  await expect(page.locator('#battle-radial-special')).toBeVisible();
+  expect((await readSession(page)).state.commandCount).toBe(before.state.commandCount);
+  const slice=(await special.boundingBox())!;
+  for(const choice of await choices.all()) {
+    const box=(await choice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(320);
+    expect(box.x+box.width <= slice.x || box.x >= slice.x+slice.width || box.y+box.height <= slice.y || box.y >= slice.y+slice.height).toBe(true);
+  }
+  if(isMobile) await choices.last().tap(); else await choices.last().click();
+  await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+});
+
+test('radial shifted hold can aim Special and still cancel at the press', async ({page}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const result=await page.evaluate(async()=>{
+    const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
+    const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
+    const {BattleSelection}=await import(/* @vite-ignore */ selectionPath);
+    const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
+    document.querySelector('#battle-radial')?.remove();
+    const model=new BattleSelection(abilitySession('mage'));
+    const commits:string[]=[];
+    let cancels=0;
+    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string,ability?:string)=>commits.push(`${slice}:${ability}`),inspect:()=>{},plan:()=>{},cancel:()=>cancels++});
+    const root=radial.root as HTMLElement;
+    const origin={x:282,y:280};
+    const target={x:262,y:280};
+    radial.show({x:1,y:0},{mode:'hold',origin});
+    radial.aimAt(target);
+    const aimed=root.dataset.aim;
+    const chip=root.querySelector<HTMLElement>('#battle-radial-sub button')!;
+    const rect=chip.getBoundingClientRect();
+    const special=root.querySelector<HTMLElement>('#battle-radial-special')!.getBoundingClientRect();
+    const targetElement=document.elementFromPoint(target.x,target.y)?.closest('[data-slice]')?.getAttribute('data-slice');
+    const verdict=radial.releaseAt(target);
+    const beforeChoice=[...commits];
+    radial.cancel();
+    radial.show({x:1,y:0},{mode:'hold',origin});
+    radial.aimAt(target);
+    const cancel=radial.releaseAt(origin);
+    radial.show({x:1,y:0},{mode:'hold',origin});
+    radial.aimAt(target);
+    const chipBox=root.querySelector<HTMLElement>('#battle-radial-sub button')!.getBoundingClientRect();
+    const chipTarget={x:chipBox.left+20,y:chipBox.top+chipBox.height/2};
+    radial.aimAt(chipTarget);
+    const chipVerdict=radial.releaseAt(chipTarget);
+    radial.dispose();
+    return {aimed,targetElement,verdict,beforeChoice,cancel,chipVerdict,commits,cancels,chipRight:rect.right,specialLeft:special.left};
+  });
+  expect(result.aimed).toBe('special');
+  expect(result.targetElement).toBe('special');
+  expect(result.chipRight).toBeLessThanOrEqual(result.specialLeft);
+  expect(result.verdict).toBe('open-sub');
+  expect(result.beforeChoice).toEqual([]);
+  expect(result.cancel).toBe('cancel');
+  expect(result.chipVerdict).toBe('commit');
+  expect(result.commits).toHaveLength(1);
+  expect(result.commits[0]).toMatch(/^special:/);
+  expect(result.cancels).toBe(2);
+});
+
+test('radial compact landscape keeps every slice reachable on tap and hold', async ({page}) => {
+  await page.setViewportSize({width:568,height:300});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const results=await page.evaluate(async()=>{
+    const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
+    const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
+    const {BattleSelection}=await import(/* @vite-ignore */ selectionPath);
+    const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
+    document.querySelector('#battle-radial')?.remove();
+    const commits:string[]=[];
+    const radial=new BattleRadial(new BattleSelection(abilitySession('mage')),{commit:(_cell:unknown,slice:string)=>commits.push(slice),inspect:()=>{},plan:()=>{},cancel:()=>{}});
+    const root=radial.root as HTMLElement;
+    const layouts=[];
+    for(const mode of ['tap','hold'] as const) for(const origin of [{x:8,y:8},{x:560,y:8},{x:8,y:292},{x:560,y:292}]) {
+      radial.show({x:1,y:0},{mode,origin});
+      const boxes=[...root.querySelectorAll<HTMLElement>('[data-slice]')].map(button=>{
+        const rect=button.getBoundingClientRect();return {id:button.id,left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,width:rect.width,height:rect.height};
+      });
+      const attack=root.querySelector<HTMLElement>('#battle-radial-attack')!.getBoundingClientRect();
+      const point={x:attack.left+attack.width/2,y:attack.top+attack.height/2};
+      const hit=document.elementFromPoint(point.x,point.y)?.closest('[data-slice]')?.getAttribute('data-slice');
+      if(mode==='hold') {radial.aimAt(point);radial.releaseAt(point);} else root.querySelector<HTMLButtonElement>('#battle-radial-attack')!.click();
+      layouts.push({boxes,hit});
+    }
+    radial.dispose();return {layouts,commits};
+  });
+  for(const {boxes,hit} of results.layouts) {
+    expect(hit).toBe('attack');
+    for(const box of boxes) {
+      expect(box.left,box.id).toBeGreaterThanOrEqual(0);
+      expect(box.top,box.id).toBeGreaterThanOrEqual(0);
+      expect(box.right,box.id).toBeLessThanOrEqual(568);
+      expect(box.bottom,box.id).toBeLessThanOrEqual(300);
+      expect(box.width,box.id).toBeGreaterThanOrEqual(44);
+      expect(box.height,box.id).toBeGreaterThanOrEqual(44);
+    }
+    const attack=boxes.find(box=>box.id==='battle-radial-attack')!;
+    const plan=boxes.find(box=>box.id==='battle-radial-plan')!;
+    expect(attack.bottom).toBeLessThanOrEqual(plan.top);
+  }
+  expect(results.commits).toEqual(Array(8).fill('attack'));
+});
+
+test('radial compact landscape keeps Special choices reachable', async ({page,isMobile}) => {
+  await page.setViewportSize({width:568,height:300});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(()=>{
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  const special=page.locator('#battle-radial-special');
+  await expect(special).toBeEnabled();
+  if(isMobile) await special.tap(); else await special.click();
+  const choices=page.locator('#battle-radial-sub button');
+  await expect(choices).toHaveCount(2);
+  const before=await readSession(page);
+  for(const choice of await choices.all()) {
+    const box=(await choice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(568);
+    expect(box.y+box.height).toBeLessThanOrEqual(300);
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  if(isMobile) await choices.last().tap(); else await choices.last().click();
+  await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
 });

@@ -2,6 +2,7 @@ import { inspectMenuSaves, type MenuSave } from '../app/menuSaves';
 import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
+import { mountCombatControlsPreference } from './combatControls';
 import './mainMenu.css';
 export const menuDefinition = [
   { id: 'continue', label: 'Continue' }, { id: 'new', label: 'New Game' },
@@ -89,6 +90,7 @@ export function startMainMenu() {
     records: () => show('Hall of Records', () => body.append(element('p', 'Records are not collected yet. Future records will be stored on this device.'))),
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
+      mountCombatControlsPreference(body);
       mountTelemetryPreferences(body);
     }),
   };

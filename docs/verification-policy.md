@@ -146,7 +146,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
 | Run-item fixtures | `npm run test:fixtures -- run-items.spec.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
 | Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
-| WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression and audio cases, iPhone portrait/landscape. |
+| WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression, audio and radial hold/tap/cancel/End turn cases, iPhone portrait/landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
 | Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, three Chromium and two WebKit profiles. Account for existing Chromium overlap; no silent removal. |
 | Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`, all three Chromium profiles. |
@@ -164,7 +164,7 @@ so every browser file has an owner in the inventory:
   `opacity.spec.ts`, `audio.spec.ts`, `lifecycle.spec.ts`, `layout.spec.ts`.
 - Battle presentation/commands/persistence: `battle-board.spec.ts`,
   `battle-animations.spec.ts`, `battle-loop.spec.ts`, `battle-persistence.spec.ts`,
-  `battle-audio.spec.ts`, `guarded-effects.spec.ts`, `unit-health-bars.spec.ts`.
+  `battle-audio.spec.ts`, `battle-radial.spec.ts`, `guarded-effects.spec.ts`, `unit-health-bars.spec.ts`.
 - Run/dungeon/map: `run-progression.spec.ts`, `dungeon.spec.ts`,
   `dungeon-exploration.spec.ts`, `dungeon-lifecycle.spec.ts`, `overworld-map.spec.ts`.
 

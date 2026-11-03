@@ -22,6 +22,8 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('Records are not collected yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
  await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Sound controls');
+ await expect(page.getByRole('dialog')).toContainText('Combat controls');
+ await expect(page.getByRole('radio',{name:'Auto'})).toBeChecked();
  await page.getByRole('dialog').locator('summary').focus();await page.keyboard.press('Tab');
  await expect(page.getByRole('button',{name:'Close',exact:true})).toBeFocused();await page.keyboard.press('Shift+Tab');
  await expect(page.getByRole('dialog').locator('summary')).toBeFocused();

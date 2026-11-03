@@ -1,5 +1,5 @@
 import type { Command } from '../src/domain/types';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';

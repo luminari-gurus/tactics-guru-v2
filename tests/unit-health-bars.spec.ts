@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
