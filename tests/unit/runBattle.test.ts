@@ -3,6 +3,7 @@ import { createRunBattle, freshRunSnapshot, replayRunBattle } from '../../src/do
 import { BattleSession } from '../../src/app/BattleSession';
 import { RunItemSession } from '../../src/app/RunItemSession';
 import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
+import * as runStorage from '../../src/persistence/runStorage';
 import { preparedSnapshot, runContext } from '../helpers/runItemFixtures';
 import { playerDecision } from '../helpers/playerPolicy';
 import { planEnemyTurn } from '../../src/domain/ai';
@@ -98,6 +99,31 @@ it('projects equipped stats once and rejects replays with a different equipped e
  expect(first.catalog.heroes.fighter.stats.armorClass).toBe(runContext.catalog.heroes.fighter.stats.armorClass+1);expect(again).toEqual(first);
  const session=BattleSession.fromRun(entry,runContext);assert(session.ok);expect(replayRunBattle(session.session.replay,prepared.items,runContext).ok).toBe(false);
 });
+it('plays a complete transient run and restarts without acquiring save storage',()=>{
+ const acquire=vi.spyOn(runStorage,'createRunStorage').mockImplementation(()=>{throw Error('Unexpected save provider');});
+ try {
+  const controller=new RunItemSession(freshRunSnapshot('testing-run',13,runContext),runContext,null);
+  for(let index=0;index<3;index++) {
+   const entry=controller.snapshot.items,battle=controller.startEncounter();assert(battle);fight(battle);
+   const replay=replayRunBattle(battle.replay,entry,runContext);assert(replay.ok);expect(replay.state).toEqual(battle.state);
+   if(controller.snapshot.items.run.phase==='defeat')break;
+   const offer=controller.snapshot.items.offer;
+   if(offer){
+    const choice=offer.options.find(o=>o.itemId==='item:healing_draught')??offer.options[0];
+    assert(controller.dispatch({...controller.boundary(),type:'claimReward',offerId:offer.id,itemId:choice.itemId}).ok);
+    for(const hero of controller.snapshot.items.run.party)if(hero.hp>0 && controller.snapshot.items.ownership.consumables.length)controller.dispatch({...controller.boundary(),type:'useItem',itemId:'item:healing_draught',heroId:hero.heroId});
+   }
+  }
+  expect(['victory','defeat']).toContain(controller.snapshot.items.run.phase);
+  expect(controller.hasUnsavedProgress).toBe(false);expect(controller.status).toContain('resets on reload');
+  const old=controller.activeSession;
+  expect(controller.restart('testing-restart',14)).toBe(true);
+  expect(old?.phase).toBe('disposed');expect(controller.snapshot).toEqual(freshRunSnapshot('testing-restart',14,runContext));
+  expect(controller.save()).toEqual({ok:false,reason:'transient'});
+  expect(()=>controller.inspect()).toThrow('no save storage');expect(acquire).not.toHaveBeenCalled();
+  controller.dispose();expect(controller.restart('disposed',15)).toBe(false);
+ } finally {acquire.mockRestore();}
+},120000);
 it('reconciles a validated ended active snapshot on Continue once without old commands',()=>{
  const made=BattleSession.fromRun(freshRunSnapshot('ended',1,runContext).items,runContext);assert(made.ok);fight(made.session,true);
  const snapshot={...freshRunSnapshot('ended',1,runContext),activeBattle:made.session.state,battlefield:made.session.battlefield};

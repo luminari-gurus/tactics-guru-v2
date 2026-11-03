@@ -7,7 +7,7 @@
 
 ## 2. Transient gameplay owners
 
-- [ ] 2.1 Supply standalone testing battle through the existing storage-independent session and make persistence explicitly absent in testing run/dungeon owners; verify no storage-provider acquisition, complete legal actions, fresh restarts, transient floor travel and unchanged persistent failed-save guards in focused session tests.
+- [x] 2.1 Supply standalone testing battle through the existing storage-independent session and make persistence explicitly absent in testing run/dungeon owners; verify no storage-provider acquisition, complete legal actions, fresh restarts, transient floor travel and unchanged persistent failed-save guards in focused session tests.
 - [ ] 2.2 Scope recovery controls, menu-review handoffs and departure feedback to persistent owners, retaining all non-save tools; update dungeon/persistence documentation and verify native keyboard/touch controls, restart, modal cancellation, pagehide and BFCache behavior in affected browser cases.
 
 ## 3. Coverage and collector consumers

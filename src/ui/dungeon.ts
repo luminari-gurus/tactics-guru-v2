@@ -11,7 +11,7 @@ import { BattleDialogs } from './dialogs';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
 export function renderDungeon(root: HTMLElement, session: DungeonSession, dialogs: BattleDialogs,
-  actions: { start: () => void; recover: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
+  actions: { start: () => void; recover?: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
   const focusId=(document.activeElement as HTMLElement|null)?.id;
   const el = dungeonElement, s = session.snapshot, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
@@ -55,7 +55,9 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
       ],focus),!['ready','reward'].includes(s.phase)));
     }
     inventory.append(row);
-  }root.append(inventory,button('Save recovery',actions.recover),button('Start new dungeon',actions.restart));
+  }root.append(inventory);
+  if(actions.recover)root.append(button('Save recovery',actions.recover));
+  root.append(button('Start new dungeon',actions.restart));
   const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}root.append(nav);
   if(focusId){
     const target=root.querySelector<HTMLElement>(`#${focusId}`);

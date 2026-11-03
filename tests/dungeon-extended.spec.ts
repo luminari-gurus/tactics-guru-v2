@@ -11,7 +11,7 @@ import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerP
 import { journeyPreparation, rangerJourney, mageJourney, fighterJourney } from './helpers/dungeonFixtures';
 
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
+async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
 
 test('Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));

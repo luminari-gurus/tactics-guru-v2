@@ -165,12 +165,22 @@ so every browser file has an owner in the inventory:
 - Battle presentation/commands/persistence: `battle-board.spec.ts`,
   `battle-animations.spec.ts`, `battle-loop.spec.ts`, `battle-persistence.spec.ts`,
   `battle-audio.spec.ts`, `guarded-effects.spec.ts`, `unit-health-bars.spec.ts`.
-- Run/dungeon/map: `run-progression.spec.ts`, `dungeon.spec.ts`,
+- Menu/run/dungeon/map: `main-menu.spec.ts`, `run-progression.spec.ts`, `dungeon.spec.ts`,
   `dungeon-exploration.spec.ts`, `dungeon-lifecycle.spec.ts`, `overworld-map.spec.ts`.
 
 The other four files are explicitly assigned above: authored encounters, run
 items, ability picker and telemetry. New suites must be assigned before their
 change is accepted.
+
+Saved-game regressions use persistent root `game` entries. The main-menu suite
+also owns the item fixture's moved save/recovery cases. Direct-route isolation
+cases live in `battle-persistence.spec.ts` and the ordinary dungeon suite; the
+WebKit acceptance/exploration configs retain their matching profiles. Dev item
+and ability fixtures reset on reload, with learned-ability persistence retained
+in the menu dungeon corpus and extended journeys. Collector cold/warm coverage
+preserves game slots instead of clearing them. Issue #259's source-bound coverage
+[mapping](qa/issue-259/coverage-map.json) records moved/renamed/added IDs; the existing 23 approved device-matrix
+reductions remain unchanged.
 Honor meaningful engine/mode skips (for example Chromium CDP-only input checks
 and production-only resource hints); record reasons, and run the owning mode.
 

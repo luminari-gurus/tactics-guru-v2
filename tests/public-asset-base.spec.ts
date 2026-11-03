@@ -9,7 +9,7 @@ import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
-for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
+for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and preserves saved games`, async ({page,baseURL}) => {
   const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await navigateCapture(page,target,'cold');
@@ -24,12 +24,13 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
   await page.evaluate(()=>{
     localStorage.setItem('legacy-save','keep');
     localStorage.setItem('tactics-guru:phaser:unrelated','keep');
-    for(const kind of ['battle','run']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
+    for(const kind of ['battle','run','dungeon']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
   });
   await navigateCapture(page,target,'warm');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect(await page.evaluate(()=>[localStorage.getItem('legacy-save'),localStorage.getItem('tactics-guru:phaser:unrelated')])).toEqual(['keep','keep']);
+  expect(await page.evaluate(()=>['battle','run','dungeon'].flatMap(kind=>['primary','backup'].map(slot=>localStorage.getItem(`tactics-guru:phaser:${kind}:${slot}:v1`))))).toEqual(Array(6).fill('invalid test save'));
   expect(errors).toEqual([]);
   await page.screenshot({path:test.info().outputPath(`collector-${route || 'battle'}-warm.png`)});
 });
@@ -57,7 +58,6 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
       if (visit) {
         paths.clear();
         await page.reload();
-        if (scene === 'battle') await page.locator('#save-continue').click();
       }
       await expect(page.locator('#fit-status')).toHaveText(scene === 'proof' ? 'Ready' : scene === 'battle' ? 'Battle ready' : 'Content ready');
       await expect(page.locator('canvas')).toHaveCount(1);
@@ -78,7 +78,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
           await page.locator('#audio-play').click();
           await expect(page.locator('#audio-status')).toHaveText('Played');
         } else {
-          // A base change must not alter the seeded state or save identity.
+          // A base change must not alter the fresh seeded testing state.
           await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
           const expectedSession = new BattleSession(standaloneCatalog, 'map:forest_ruins', 1);
           while (expectedSession.phase === 'enemy') {
@@ -109,7 +109,6 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   if (route === 'dungeon') {
     await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
-    await page.locator('#dungeon-confirm-new').click();
     await walkDungeon(page, undefined, test.info().project.use.hasTouch ? 'touch' : 'keyboard');
   }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');

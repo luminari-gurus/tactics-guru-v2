@@ -14,7 +14,7 @@ import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 async function loadLegalDefeat(page:Page){
  await test.step('reach legal outcome',async()=>{
   const {primary,backup}=legalDefeatSaves();
-  await page.goto('/run');
+  await page.goto('/?game=run');
   await page.evaluate(({keys,primary,backup})=>{
    localStorage.setItem(keys.primary,primary);localStorage.setItem(keys.backup,backup);
   },{keys:RUN_STORAGE_KEYS,primary,backup});
@@ -25,7 +25,7 @@ async function loadLegalDefeat(page:Page){
 }
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
 async function start(page:Page){
- await page.goto('/run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(page.locator('#battle-actor')).toBeVisible();
  const drawable=await page.locator('#battle-board-region').boundingBox();
  expect(drawable!.width).toBeGreaterThan(0);
@@ -147,7 +147,7 @@ test('enemy presentation reload resumes the same commands and RNG as an uninterr
  }finally{await other.close();}
 });
 test('run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play',async({page})=>{
- await page.goto('/run');
+ await page.goto('/?game=run');
  await expect(page.locator('#run-start')).toBeVisible();
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);
  expect((await snapshot(page)).activeBattle).toBeNull();
@@ -165,7 +165,7 @@ test('run startup preserves corrupt bytes, recovery captures input, and unavaila
  await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
 });
 test('run preparation and dialogs retain 44px controls, native touch and narrow layout',async({page},info)=>{
- await page.goto('/run');const activate=async(selector:string)=>{if(info.project.use.hasTouch)await page.locator(selector).tap();else await page.locator(selector).click();};
+ await page.goto('/?game=run');const activate=async(selector:string)=>{if(info.project.use.hasTouch)await page.locator(selector).tap();else await page.locator(selector).click();};
  await activate('#run-start');await expect(page.locator('#run-start-encounter')).toBeVisible();
  for(const viewport of [{width:320,height:568},{width:915,height:412},{width:412,height:915}]){
   await page.setViewportSize(viewport);
@@ -182,7 +182,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
 test('cached run return cannot overwrite either slot of a newer replacement',async({page,context,baseURL})=>{
  await start(page);const first=(await snapshot(page)).items.run.id;
  await page.goto(new URL('map',baseURL).href);await expect(page.locator('#map-grid span')).toHaveCount(400);
- const replacement=await context.newPage();await replacement.goto('/run');
+ const replacement=await context.newPage();await replacement.goto('/?game=run');
  await replacement.locator('#run-start').click();await replacement.locator('#run-confirm-new').click();
  const fresh=await snapshot(replacement);expect(fresh.items.run.id).not.toBe(first);expect(fresh.items.run.seed).toBe(14);
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);
@@ -214,7 +214,7 @@ test('review: in-flow Continue resumes an ongoing backup battle after legal defe
  await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
 });
 test('review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes',async({page})=>{
- await page.goto('/run');await page.evaluate(keys=>{localStorage.setItem(keys.primary,'preserve primary');localStorage.setItem(keys.backup,'preserve backup');},RUN_STORAGE_KEYS);
+ await page.goto('/?game=run');await page.evaluate(keys=>{localStorage.setItem(keys.primary,'preserve primary');localStorage.setItem(keys.backup,'preserve backup');},RUN_STORAGE_KEYS);
  await page.addInitScript(keys=>{
   const read=Storage.prototype.getItem,write=Storage.prototype.setItem,remove=Storage.prototype.removeItem,calls:string[]=[];
   const owns=(key:string)=>Object.values(keys).some(value=>value===key);
@@ -255,7 +255,7 @@ for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissa
   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();await expect(recovery).toBeInViewport();
   expect(await recovery.evaluate(node=>node.isConnected && document.activeElement===node)).toBe(true);expect(await snapshot(page)).toEqual(before);
  }
- await page.goto('/run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+ await page.goto('/?game=run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
  await checkFocus(); // The mounted preparation controls are replaced on dismissal.
  await page.reload();await expect(page.locator('#run-continue')).toBeVisible();await checkFocus();
  await page.locator('#run-continue').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -263,7 +263,7 @@ for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissa
 });
 
 for(const exit of ['Cancel','Escape','Export'] as const)test(`review repair: startup Continue survives ${exit}`,async({page})=>{
- await page.goto('/run');await page.locator('#run-start').click();
+ await page.goto('/?game=run');await page.locator('#run-start').click();
  const saved=await snapshot(page);expect(saved.items.run.seed).toBe(13);
  const bytes=await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS);
  await page.reload();
@@ -296,7 +296,7 @@ test('review repair: deleting both loaded slots starts a fresh playable run',asy
 
 for(const choice of ['continue','replace'] as const)test(`review repair: recovered storage preserves unsaved bytes until explicit ${choice}`,async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('/run');await page.locator('#run-start').click();await page.reload();
+ await page.goto('/?game=run');await page.locator('#run-start').click();await page.reload();
  await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();
  const saved=await snapshot(page);expect(saved.items.run.seed).toBe(14);
  const bytes=await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS);

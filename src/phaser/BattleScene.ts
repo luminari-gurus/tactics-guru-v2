@@ -14,6 +14,8 @@ import { friendlyFire, actionCommand, type Action } from '../ui/battleActions';
 import { BattleHud, previewText, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
 import { BattleSaveControls } from '../ui/persistence';
+import { menuReturnLink } from '../ui/menuReturn';
+import { track } from '../telemetry/telemetry';
 import { targetOverlays, hoverPreview } from '../ui/targetPreview';
 import { BoardRenderer } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
@@ -30,7 +32,8 @@ export class BattleScene extends Phaser.Scene {
   private persistence: BattlePersistence | null = null;
   private restartAction: (()=>void) | null = null;
   private soundEnabled = false;
-  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void, private readonly host?: RunBattleHost) {super('battle'); this.soundEnabled=host?.sound.enabled??false;}
+  private testingSeed = 1;
+  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void, private readonly host?: RunBattleHost, private readonly persistent = false) {super('battle'); this.soundEnabled=host?.sound.enabled??false;}
   requestRestart(){this.restartAction?.();}
   create():void {
     this.status('loading');measurements.begin(performance.now());
@@ -46,6 +49,24 @@ export class BattleScene extends Phaser.Scene {
       this.restartAction=()=>{if(!host.dialogs.open)host.restart();};
       this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.restartAction=null;host.modalTransition=()=>{};});
       this.begin(catalog,host.session,host.dialogs,fn=>{host.modalTransition=fn;});
+      return;
+    }
+    if (!this.persistent) {
+      let modalTransition=()=>{};
+      const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
+      const session=new BattleSession(catalog,FIRST_BATTLE_MAP_ID,this.testingSeed,()=>{
+        if(session.state.outcome!=='ongoing')track('battle_outcome',{route:'battle',phase:'ended',outcome:session.state.outcome==='playerWin'?'victory':'defeat'},`${session.state.mapId}:${session.state.seed}:${session.state.commandCount}`);
+      });
+      track('battle_started',{route:'battle',phase:session.phase});
+      const tools=document.querySelector<HTMLElement>('#battle-persistence')!;
+      const notice=document.createElement('span');notice.textContent='Testing battle. Progress resets on reload.';
+      const menu=menuReturnLink(()=>false,()=>{});tools.hidden=false;tools.replaceChildren(notice,menu);
+      this.restartAction=()=>{
+        if(dialogs.open)return;
+        this.testingSeed=(this.testingSeed+1)>>>0;this.status('loading');this.scene.restart();
+      };
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.restartAction=null;dialogs.dispose();tools.replaceChildren();});
+      this.begin(catalog,session,dialogs,fn=>{modalTransition=fn;},()=>location.assign(menu.href));
       return;
     }
     this.persistence??=new BattlePersistence(catalog,FIRST_BATTLE_MAP_ID);

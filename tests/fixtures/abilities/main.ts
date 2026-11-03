@@ -17,13 +17,9 @@ const party=HERO_IDS.map(id=>progressHero(id,Number(xp??0),1,base));
 const projected=projectProgression(party,base);
 // The default picker fixture deliberately authors two missiles; XP fixtures use canonical caster progression.
 const catalog=xp===null&&!real?{...projected,abilities:{...projected.abilities,'ability:zz_mage':base.abilities['ability:zz_mage']}}:projected;
-const saveKey=`ability-fixture-${hero}${real?'-real':''}${xp===null?'':`-xp-${xp}`}`;
-const saved=localStorage.getItem(saveKey);
-const accepted=(state:import('../../../src/domain/types').BattleState)=>localStorage.setItem(saveKey,JSON.stringify(state));
-const resumed=saved?BattleSession.fromSnapshot(catalog,JSON.parse(saved),accepted):null;
 const initial=abilitySession(hero,catalog).state;
 const injured=new URLSearchParams(location.search).has('injured');
-const session=resumed?.ok?resumed.session:new BattleSession(catalog,injured?{...initial,units:initial.units.map(u=>u.defId==='fighter'?{...u,hp:u.hp-10}:u)}:initial,2,accepted,true);
+const session=new BattleSession(catalog,injured?{...initial,units:initial.units.map(u=>u.defId==='fighter'?{...u,hp:u.hp-10}:u)}:initial,2,undefined,true);
 session.progression=party;
 const host:RunBattleHost={catalog,session,sound:{enabled:false},modalTransition:()=>{},ended:()=>{},restart:()=>location.reload(),dialogs:null!};
 host.dialogs=new BattleDialogs(()=>host.modalTransition(),host.restart);

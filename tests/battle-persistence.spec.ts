@@ -8,6 +8,9 @@ import { BattleSession } from '../src/app/BattleSession';
 import { previewMovement } from '../src/domain/grid';
 import { RULE_BOUNDS } from '../src/domain/constants';
 import type { BattleState } from '../src/domain/types';
+import { menuFixture } from './helpers/menuFixtures';
+import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
+import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
 test.use({launchOptions:async({browserName},use)=>{
@@ -16,8 +19,97 @@ test.use({launchOptions:async({browserName},use)=>{
 
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);
+
+declare global {
+  interface Window {
+    testingSaveAudit: { calls: string[]; snapshot: () => Record<string, string | null> };
+  }
+}
+for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(`testing routes: fresh play never accesses ${condition} saved games`,async({page})=>{
+  const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
+  const values:Record<string,string>={'isolation-unrelated':'preserve'};
+  for(const mode of ['battle','run','dungeon'] as const)for(const slot of ['primary','backup'] as const){
+    if(condition==='missing'||condition==='backup-only'&&slot==='primary')continue;
+    values[families[mode][slot]]=condition==='corrupt'?'broken saved bytes':menuFixture(mode);
+  }
+  // Harness setup precedes the application spy; subsequent assertion reads bypass it explicitly.
+  await page.goto('./');
+  await page.evaluate(values=>{
+    for(const [key,text]of Object.entries(values))localStorage.setItem(key,text);
+    sessionStorage.setItem('tactics-guru:menu-new-dungeon-review','review sentinel');
+  },values);
+  const progressKeys=Object.values(families).flatMap(slots=>Object.values(slots));
+  const expected=Object.fromEntries([...progressKeys,'isolation-unrelated'].map(key=>[key,values[key]??null]));
+  expected['tactics-guru:menu-new-dungeon-review']='review sentinel';
+  await page.addInitScript(({progressKeys,unavailable})=>{
+    const local=window.localStorage,session=window.sessionStorage;
+    const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem,clear=Storage.prototype.clear;
+    const watched=new Set([...progressKeys,'tactics-guru:menu-new-dungeon-review']);
+    const calls:string[]=[];
+    window.testingSaveAudit={calls,snapshot:()=>Object.fromEntries([
+      ...[...progressKeys,'isolation-unrelated'].map(key=>[key,get.call(local,key)]),
+      ['tactics-guru:menu-new-dungeon-review',get.call(session,'tactics-guru:menu-new-dungeon-review')],
+    ])};
+    Storage.prototype.getItem=function(key){if(watched.has(String(key)))calls.push(`read:${key}`);return get.call(this,key);};
+    Storage.prototype.setItem=function(key,value){if(watched.has(String(key)))calls.push(`write:${key}`);set.call(this,key,value);};
+    Storage.prototype.removeItem=function(key){if(watched.has(String(key)))calls.push(`remove:${key}`);remove.call(this,key);};
+    Storage.prototype.clear=function(){calls.push('clear');clear.call(this);};
+    if(unavailable)Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});
+  },{progressKeys,unavailable:condition==='unavailable'});
+  const audit=async()=>{
+    expect(await page.evaluate(()=>window.testingSaveAudit.calls)).toEqual([]);
+    expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+    await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
+  };
+  const entries=[
+    ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
+    ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
+    ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
+    ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
+  ];
+  for(const [mode,url]of entries)await test.step(mode+' '+url,async()=>{
+    await page.goto(url);
+    const ready=async()=>{
+      if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      else if(mode==='run')await expect(page.locator('#run-start')).toBeVisible();
+      else if(mode==='dungeon')await expect(page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
+      else if(mode==='map')await expect(page.locator('#map-grid span')).toHaveCount(400);
+      else await expect(page.locator('#fit-status')).toHaveText(mode==='proof'?'Ready':'Content ready');
+    };
+    await ready();await audit();
+    if(mode==='battle'){
+      const before=await readSession(page);await page.locator('#battle-next').click();
+      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
+      await page.locator('#fit-restart').click();
+      await expect.poll(async()=>JSON.parse(await page.locator('#game').getAttribute('data-session')??'null')?.state.seed).toBe(2);
+    }else if(mode==='run'){
+      await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await page.locator('#battle-next').click();
+      await page.locator('#fit-restart').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+    }else if(mode==='dungeon'){
+      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await expect(page.locator('#dungeon-map')).toBeVisible();
+      await page.locator('.dungeon-directions button:not(:disabled)').first().click();
+      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await expect(page.locator('#dungeon-map')).toBeVisible();
+    }else if(mode==='proof')await page.locator('#fit-restart').click();
+    await audit();
+    await page.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));});
+    await audit();await page.reload();await ready();await audit();
+    if(mode==='battle')expect((await readSession(page)).state.seed).toBe(1);
+    if(mode==='run')expect(JSON.parse(await page.locator('#game').getAttribute('data-run-snapshot')??'null').items.run.encounterIndex).toBe(0);
+  });
+  await page.goto('./');
+  expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+  if(condition==='valid'||condition==='backup-only'){
+    await page.getByRole('button',{name:'Continue',exact:true}).click();
+    await page.getByRole('dialog').getByRole('link',{name:/^Dungeon/}).click();
+    await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+    expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+  }else await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+});
 async function seedTwo(page:Page) {
-  await page.goto('./battle');await ready(page);await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
+  await page.goto('./?game=battle');await ready(page);await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
 }
 test('undo stays unavailable after a move exhausts the command limit',async({page})=>{
   const initial=new BattleSession(catalog,'map:forest_ruins',2).state,hero=initial.units.find(u=>u.side==='player')!;
@@ -41,13 +133,13 @@ async function touch(page:Page,selector:string) {
 async function continueSnapshot(page:Page,state:BattleState){
   const save=encodeBattleSave(state,catalog);if(!save.ok)throw Error(save.reason);
   await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:keys.primary,text:save.text});
-  await page.goto('./battle');await page.locator('#save-continue').click();await ready(page);
+  await page.goto('./?game=battle');await page.locator('#save-continue').click();await ready(page);
   expect((await readSession(page)).state).toEqual(state);
   return save.text;
 }
 
 test('undo stays unavailable for the resumed turn after a prior undo',async({page})=>{
-  await page.goto('./battle');await ready(page);
+  await page.goto('./?game=battle');await ready(page);
   await chooseMove(page);await page.locator('#battle-review').click();await ready(page);
   await expect(page.locator('#battle-undo')).toBeEnabled();await page.locator('#battle-undo').click();await ready(page);
   const before=await readSession(page);
@@ -60,7 +152,7 @@ test('undo stays unavailable for the resumed turn after a prior undo',async({pag
   await expect(page.locator('#battle-undo')).toBeEnabled();
 });
 test('default Move Continue is read-only and confirmed movement keeps the remaining-action flow',async({page})=>{
-  await page.goto('./battle');await ready(page);const before=await readSession(page),saved=await stored(page);
+  await page.goto('./?game=battle');await ready(page);const before=await readSession(page),saved=await stored(page);
   await page.reload();await page.locator('#save-continue').click();await ready(page);
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#fit-restart')).toBeFocused();
@@ -155,7 +247,7 @@ test('startup is read-only, keyboard Continue rebuilds no historical presentatio
 });
 
 test('held confirmation Enter cannot flow through Restart and replace either saved slot',async({page})=>{
-  await page.goto('./battle');await ready(page);
+  await page.goto('./?game=battle');await ready(page);
   const before=await readSession(page),old=await stored(page);
   await chooseMove(page);await page.locator('#battle-review').focus();
   await page.keyboard.down('Enter');
@@ -248,7 +340,7 @@ test('unknown storage blocks startup until retry; writes remain nonfatal during 
     Storage.prototype.getItem=function(key){if((window as any).denyRead && key.startsWith('tactics-guru:phaser:'))throw new DOMException('Denied','SecurityError');return get.call(this,key);};
     Storage.prototype.setItem=function(key,value){if((window as any).denyWrite && key.startsWith('tactics-guru:phaser:'))throw new DOMException('Full','QuotaExceededError');return set.call(this,key,value);};
   });
-  await page.goto('./battle');await expect(page.getByRole('dialog')).toContainText('unreadable');expect(await page.locator('#game').getAttribute('data-session')).toBeNull();
+  await page.goto('./?game=battle');await expect(page.getByRole('dialog')).toContainText('unreadable');expect(await page.locator('#game').getAttribute('data-session')).toBeNull();
   await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();
   await expect(page.getByRole('dialog')).toContainText('Reset incomplete');expect(await page.locator('#game').getAttribute('data-session')).toBeNull();
   await page.evaluate(()=>Object.assign(window,{denyRead:false,denyWrite:true}));await page.locator('#save-retry').click();await ready(page);
@@ -298,7 +390,7 @@ test('successful reset with failed fresh save cannot recover an old battle on re
 
 for(const invalid of ['{broken',JSON.stringify({kind:'tactics-guru:battle-snapshot',format:99,payload:{},digest:'sha256:'+'0'.repeat(64)})])test(`invalid startup requires explicit reset: ${invalid.slice(0,12)}`,async({page})=>{
   await page.goto('/?scene=proof');await page.evaluate(({keys,invalid})=>localStorage.setItem(keys.primary,invalid),{keys,invalid});
-  await page.goto('./battle');await expect(page.getByRole('dialog')).toContainText('needs recovery');await expect(page.locator('#save-continue')).toHaveCount(0);
+  await page.goto('./?game=battle');await expect(page.getByRole('dialog')).toContainText('needs recovery');await expect(page.locator('#save-continue')).toHaveCount(0);
   if(invalid.includes('"format":99'))await expect(page.getByRole('dialog')).toContainText('incompatible');
   expect((await stored(page)).primary).toBe(invalid);await page.locator('#save-new').click();
   await expect(page.locator('#save-confirm-reset')).toBeFocused();
@@ -317,11 +409,11 @@ test.describe('browser history with BFCache enabled',()=>{
 
   for(const cached of ['battle','recovery dialog'])test(`cached ${cached} cannot overwrite either slot of its replacement`,async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-    const first=new URL('./battle?history=first',baseURL).href,map=new URL('map',baseURL).href;
+    const first=new URL('./?game=battle&history=first',baseURL).href,map=new URL('map',baseURL).href;
     await page.goto(first);await ready(page);
     expect((await readSession(page)).state.seed).toBe(1);
     if(cached==='recovery dialog'){await page.reload();await expect(page.locator('#save-continue')).toBeVisible();}
-    await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);await page.goto(new URL('battle',baseURL).href);
+    await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);await page.goto(new URL('./?game=battle',baseURL).href);
     await page.locator('#save-new').click();await page.locator('#save-confirm-reset').click();await ready(page);
     const replacement=await readSession(page),saved=await stored(page);
     expect(replacement.state.seed).toBe(2);
@@ -346,7 +438,7 @@ test.describe('browser history with BFCache enabled',()=>{
 
   for(const departure of ['player','presentation'])test(`cached return after restart at ${departure} preserves the accepted boundary`,async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-    const first=new URL('./battle?history=first',baseURL).href,map=new URL('map',baseURL).href;
+    const first=new URL('./?game=battle&history=first',baseURL).href,map=new URL('map',baseURL).href;
     await page.goto(first);await ready(page);
     await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
     // Observe the last accepted boundary before the application's pagehide shutdown.
