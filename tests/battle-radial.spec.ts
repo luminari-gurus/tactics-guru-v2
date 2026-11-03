@@ -200,6 +200,74 @@ test('radial hold release on the hub commits the default move in one step', asyn
   expect(after.replay.commands.some(command => command.type === 'move')).toBe(true);
 });
 
+test('radial hold on an unavailable slice dismisses without committing', async ({ page }) => {
+  await ready(page);
+  const { cell, current } = await reachableEmpty(page);
+  await holdAt(page, await boardPoint(page, cell));
+  const attack = page.locator('#battle-radial-attack');
+  await expect(attack).toBeDisabled();
+  const box = (await attack.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.up();
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  const after = await session(page);
+  expect(after.pending).toBeNull();
+  expect(after.state).toEqual(current.state);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  await tapBoard(page, cell);
+  await expect(page.locator('#battle-radial-move')).toBeEnabled();
+});
+
+test('radial hold accepts a planned destination and opens the follow-up choices', async ({ page }) => {
+  await ready(page);
+  const { cell, current } = await reachableEmpty(page);
+  await tapBoard(page, cell);
+  await page.locator('#battle-radial-plan').click();
+  await holdAt(page, await boardPoint(page, cell));
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await page.mouse.up();
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await expect(page.locator('#battle-radial-attack')).toHaveAttribute('aria-pressed', 'true');
+  const after = await session(page);
+  expect(after.pending).toBeNull();
+  expect(after.state).toEqual(current.state);
+  expect(after.replay.commands).toEqual(current.replay.commands);
+  await page.locator('#battle-radial-attack').click();
+  await expect(page.locator('#battle-preview')).toContainText('Tap an enemy');
+});
+
+test('radial hold handles unavailable slices and planned destinations with native touch', async ({ page, browserName, isMobile }) => {
+  test.skip(browserName !== 'chromium' || !isMobile, 'Native touch holds use Chromium CDP.');
+  await ready(page);
+  const { cell, current } = await reachableEmpty(page);
+  const origin = await boardPoint(page, cell);
+  const cdp = await page.context().newCDPSession(page);
+  const touch = async (type: 'touchStart' | 'touchMove', point: {x:number; y:number}) => {
+    await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: [{ ...point, id: 1 }] });
+  };
+  const lift = async () => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); };
+  try {
+    await touch('touchStart', origin);
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    const box = (await page.locator('#battle-radial-attack').boundingBox())!;
+    await touch('touchMove', { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+    await lift();
+    await expect(page.locator('#battle-radial')).toBeHidden();
+    expect((await session(page)).pending).toBeNull();
+    await tapBoard(page, cell);
+    await page.locator('#battle-radial-plan').tap();
+    await touch('touchStart', await boardPoint(page, cell));
+    await page.waitForTimeout(350);
+    await lift();
+    await expect(page.locator('#battle-radial-attack')).toHaveAttribute('aria-pressed', 'true');
+    const after = await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    await page.locator('#battle-radial-attack').tap();
+    await expect(page.locator('#battle-preview')).toContainText('Tap an enemy');
+  } finally { await cdp.detach(); }
+});
+
 test('plan move slice reopens the radial at the chosen tile', async ({ page }) => {
   await ready(page);
   const { cell, current } = await reachableEmpty(page);

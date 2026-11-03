@@ -176,7 +176,8 @@ export class BattleScene extends Phaser.Scene {
       pan:(dx:number,dy:number)=>{const now=performance.now();if(board.pan(dx,dy))measurements.interaction('pan',now);},
       zoom:(factor:number,anchor:Point)=>{const now=performance.now();if(board.zoom(factor,anchor))measurements.interaction('zoom',now);},
       hold:(point:Point)=>{
-        if(!radialMode())return false;
+        // Plan destination and follow-up picking use the same selection path on release.
+        if(!radialMode() || selection.planning)return false;
         const cell=board.cellAt(point);if(!cell)return false;
         lightHaptic();
         openRadial(cell,'hold',clientFrom(point));

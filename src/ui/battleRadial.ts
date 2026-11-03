@@ -201,7 +201,10 @@ export class BattleRadial {
   private activate(slice: RadialSliceId): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
     if (!this.cell) return 'none';
     const view = this.slices().find(entry => entry.id === slice);
-    if (!view || view.disabled) return 'none';
+    if (!view || view.disabled) {
+      if (this.mode === 'hold') { this.cancel(); return 'cancel'; }
+      return 'none';
+    }
     if (slice === 'inspect') { this.hide(); this.onInspect(); return 'inspect'; }
     if (slice === 'plan') { this.hide(); this.onPlan(); return 'plan'; }
     if (slice === 'special') {
