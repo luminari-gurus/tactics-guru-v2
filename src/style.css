@@ -152,6 +152,11 @@ dialog button { touch-action: manipulation; }
 #battle-radial[data-sub-open=true] .battle-radial-slice:not(.e), #battle-radial[data-sub-open=true] .battle-radial-plan { visibility:hidden; }
 #battle-radial-sub { position:absolute; left:calc(100% + 6px); top:8px; display:flex; flex-direction:column; gap:6px; }
 #battle-radial-sub button { position:relative; width:140px; height:auto; max-width:none; max-height:none; text-align:left; align-items:flex-start; padding:6px 8px; }
+@media (max-height:340px) {
+  #battle-radial { width:220px; height:220px; }
+  .battle-radial-plan { height:44px; }
+  .battle-radial-plan span { display:none; }
+}
 .battle-mode #battle-radial button { overflow-wrap:normal; word-break:normal; }
 .battle-skin-radial #battle-board-caption { overflow-wrap:break-word; word-break:normal; hyphens:none; }
 

@@ -80,20 +80,22 @@ export class BattleRadial {
     this.subOpen = false;
     this.leftHub = false;
     this.root.hidden = false;
-    const margin = 132;
+    const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
+    // Render first: fitted labels can change the Plan control's height.
+    this.aim(def);
+    const marginX = this.root.offsetWidth / 2 + 2;
+    const marginY = this.root.offsetHeight / 2 + 2;
     const plan = this.root.querySelector<HTMLElement>('#battle-radial-plan')!;
-    const bottomMargin = 142 + Math.ceil(plan.getBoundingClientRect().height);
+    const bottomMargin = this.root.offsetHeight / 2 + 14 + Math.ceil(plan.getBoundingClientRect().height);
     // Keep the initial press as the hold cancel point even when the visible disk is clamped.
     this.holdOrigin = options.origin;
     const origin = {
-      x: Math.min(innerWidth - margin, Math.max(margin, options.origin.x)),
-      y: Math.min(innerHeight - bottomMargin, Math.max(margin, options.origin.y)),
+      x: Math.min(innerWidth - marginX, Math.max(marginX, options.origin.x)),
+      y: Math.min(innerHeight - bottomMargin, Math.max(marginY, options.origin.y)),
     };
     this.origin = origin;
     this.root.style.left = `${origin.x}px`;
     this.root.style.top = `${origin.y}px`;
-    const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
-    this.aim(def);
     const live = document.querySelector('#battle-preview');
     if (live) live.textContent = this.announce();
     if (options.mode === 'tap') {

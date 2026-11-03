@@ -376,3 +376,75 @@ test('radial shifted hold can aim Special and still cancel at the press', async 
   expect(result.commits[0]).toMatch(/^special:/);
   expect(result.cancels).toBe(2);
 });
+
+test('radial compact landscape keeps every slice reachable on tap and hold', async ({page}) => {
+  await page.setViewportSize({width:568,height:300});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const results=await page.evaluate(async()=>{
+    const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
+    const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
+    const {BattleSelection}=await import(/* @vite-ignore */ selectionPath);
+    const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
+    document.querySelector('#battle-radial')?.remove();
+    const commits:string[]=[];
+    const radial=new BattleRadial(new BattleSelection(abilitySession('mage')),{commit:(_cell:unknown,slice:string)=>commits.push(slice),inspect:()=>{},plan:()=>{},cancel:()=>{}});
+    const root=radial.root as HTMLElement;
+    const layouts=[];
+    for(const mode of ['tap','hold'] as const) for(const origin of [{x:8,y:8},{x:560,y:8},{x:8,y:292},{x:560,y:292}]) {
+      radial.show({x:1,y:0},{mode,origin});
+      const boxes=[...root.querySelectorAll<HTMLElement>('[data-slice]')].map(button=>{
+        const rect=button.getBoundingClientRect();return {id:button.id,left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,width:rect.width,height:rect.height};
+      });
+      const attack=root.querySelector<HTMLElement>('#battle-radial-attack')!.getBoundingClientRect();
+      const point={x:attack.left+attack.width/2,y:attack.top+attack.height/2};
+      const hit=document.elementFromPoint(point.x,point.y)?.closest('[data-slice]')?.getAttribute('data-slice');
+      if(mode==='hold') {radial.aimAt(point);radial.releaseAt(point);} else root.querySelector<HTMLButtonElement>('#battle-radial-attack')!.click();
+      layouts.push({boxes,hit});
+    }
+    radial.dispose();return {layouts,commits};
+  });
+  for(const {boxes,hit} of results.layouts) {
+    expect(hit).toBe('attack');
+    for(const box of boxes) {
+      expect(box.left,box.id).toBeGreaterThanOrEqual(0);
+      expect(box.top,box.id).toBeGreaterThanOrEqual(0);
+      expect(box.right,box.id).toBeLessThanOrEqual(568);
+      expect(box.bottom,box.id).toBeLessThanOrEqual(300);
+      expect(box.width,box.id).toBeGreaterThanOrEqual(44);
+      expect(box.height,box.id).toBeGreaterThanOrEqual(44);
+    }
+    const attack=boxes.find(box=>box.id==='battle-radial-attack')!;
+    const plan=boxes.find(box=>box.id==='battle-radial-plan')!;
+    expect(attack.bottom).toBeLessThanOrEqual(plan.top);
+  }
+  expect(results.commits).toEqual(Array(8).fill('attack'));
+});
+
+test('radial compact landscape keeps Special choices reachable', async ({page,isMobile}) => {
+  await page.setViewportSize({width:568,height:300});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(()=>{
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  const special=page.locator('#battle-radial-special');
+  await expect(special).toBeEnabled();
+  if(isMobile) await special.tap(); else await special.click();
+  const choices=page.locator('#battle-radial-sub button');
+  await expect(choices).toHaveCount(2);
+  const before=await readSession(page);
+  for(const choice of await choices.all()) {
+    const box=(await choice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(568);
+    expect(box.y+box.height).toBeLessThanOrEqual(300);
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  if(isMobile) await choices.last().tap(); else await choices.last().click();
+  await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+});

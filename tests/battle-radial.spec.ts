@@ -480,3 +480,31 @@ test('radial plan cancellation stays available while choosing a destination or t
     await page.locator('#battle-radial-hub').click();
   }
 });
+
+test('radial compact landscape fits controls and keeps tap and hold usable', async ({page}) => {
+  await page.setViewportSize({width:568,height:300});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  for(const slice of await page.locator('#battle-radial [data-slice]').all()) {
+    const box=(await slice.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(568);
+    expect(box.y+box.height).toBeLessThanOrEqual(300);
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  expect(await radialLabelProblems(page)).toEqual([]);
+  const plan=page.locator('#battle-radial-plan');
+  if(test.info().project.use.hasTouch) await plan.tap(); else await plan.click();
+  const cancel=page.getByRole('button',{name:'Cancel plan'});
+  await expect(cancel).toBeVisible();
+  if(test.info().project.use.hasTouch) await cancel.tap(); else await cancel.click();
+  expect((await session(page)).state).toEqual(current.state);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.mouse.up();
+  await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
+});
