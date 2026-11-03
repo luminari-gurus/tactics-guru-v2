@@ -102,8 +102,10 @@ export class BattleScene extends Phaser.Scene {
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
     };
     const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
+      session.clearPrepared();
       selection.selectedCell=cell;cursor=cell;
       const followUp=selection.planning && selection.planMove;
+      if(!followUp){selection.selectedAction=null;selection.message='Choose an action and target';}
       const aimed=followUp ? 'attack' : selection.defaultSlice(cell);
       if(!followUp && aimed!=='inspect' && aimed!=='plan')selection.aimSlice(cell,aimed);
       radial.show(cell,{mode,origin});
@@ -117,6 +119,8 @@ export class BattleScene extends Phaser.Scene {
       if(cell)cursor=cell;
       if(skin==='radial' && cell){
         if(selection.followUp){
+          session.clearPrepared();
+          selection.selectedCell=cell;
           selection.selectedAction=selection.followUp;
           selection.applyCell(cell);
           refresh();

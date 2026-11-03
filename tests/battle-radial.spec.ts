@@ -393,3 +393,46 @@ test('radial hold dismisses on a native second touch over the overlay', async ({
     await expect(page.locator('#battle-radial')).toBeVisible();
   } finally { await cdp.detach(); }
 });
+
+test('radial invalid reselection clears the previous command before switching to rail', async ({page}) => {
+  await page.setViewportSize({width:412,height:915});
+  await ready(page);
+  const current=await session(page);
+  const actor=current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!;
+  const reach=previewMovement(current.state,actor.id,catalog);
+  if(!reach.ok) throw Error(reach.reason);
+  const enemy=current.state.units.find(unit=>unit.side==='enemy' && unit.hp>0)!;
+  const enemyPoint=await boardPoint(page,enemy.cell);
+  let destination: {x:number;y:number}|null=null;
+  for(const entry of reach.cells.filter(entry=>entry.cost>0)) {
+    const point=await boardPoint(page,entry.cell);
+    if(Math.hypot(point.x-enemyPoint.x,point.y-enemyPoint.y)>200) {destination=entry.cell;break;}
+  }
+  expect(destination).not.toBeNull();
+  if(!destination) throw Error('No reachable tile far enough from the enemy');
+  await tapBoard(page,destination);
+  await expect.poll(async()=> (await session(page)).pending).toMatchObject({type:'move',to:destination});
+  await tapBoard(page,enemy.cell);
+  await expect(page.locator('#battle-target-info')).toContainText('Goblin');
+  await expect(page.locator('#battle-radial-attack')).toBeDisabled();
+  expect((await session(page)).pending).toBeNull();
+  await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+  await page.locator('#battle-overflow summary').click();
+  await page.getByRole('radio',{name:'Rail',exact:true}).click();
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await session(page)).state).toEqual(current.state);
+  expect((await session(page)).replay.commands).toEqual(current.replay.commands);
+});
+
+test('radial switching to rail preserves a valid unchanged selection', async ({page}) => {
+  await ready(page);
+  const {cell}=await reachableEmpty(page);
+  await tapBoard(page,cell);
+  const prepared=(await session(page)).pending;
+  expect(prepared).toMatchObject({type:'move',to:cell});
+  await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+  await page.locator('#battle-overflow summary').click();
+  await page.getByRole('radio',{name:'Rail',exact:true}).click();
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  expect((await session(page)).pending).toEqual(prepared);
+});
